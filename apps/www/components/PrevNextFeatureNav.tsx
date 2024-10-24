@@ -72,7 +72,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
             <List className={iconClassName} />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" alignOffset={-38} className="pb-0">
-            <DropdownMenuLabel className="text-foreground-lighter p-0">
+            <DropdownMenuItem asChild className="text-foreground-lighter p-0">
               <Link
                 href="/features"
                 as="/features"
@@ -80,7 +80,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
               >
                 <span className="truncate flex-grow">All Features</span>
               </Link>
-            </DropdownMenuLabel>
+            </DropdownMenuItem>
             <DropdownMenuSeparator className="mb-0" />
             <DropdownMenuGroup className="max-h-[400px] overflow-y-scroll py-1">
               {features
@@ -90,7 +90,7 @@ const PrevNextFeatureNav: React.FC<Props> = ({
                   return 0
                 })
                 .map((feature) => (
-                  <DropdownMenuItem key={feature.slug} className="p-0">
+                  <DropdownMenuItem asChild key={feature.slug} className="p-0">
                     <Link
                       href={`/features/${feature.slug}`}
                       as={`/features/${feature.slug}`}

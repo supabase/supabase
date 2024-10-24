@@ -21,6 +21,8 @@ function FeaturesPage() {
     (query.products as string)?.split(',') || []
   )
 
+  const HAS_ACTIVE_FILTERS = selectedProducts.length || searchTerm.length
+
   const products = Array.from(new Set(features.flatMap((feature) => feature.products)))
 
   // Debounced function to update URL params
@@ -131,7 +133,7 @@ function FeaturesPage() {
                   {products
                     .sort((a, b) => (a > b ? 1 : -1))
                     .map((product) => (
-                      <button
+                      <div
                         key={product}
                         className="flex items-center gap-2 text-foreground-light hover:text-foreground !cursor-pointer hover:!cursor-pointer transition-colors"
                       >
@@ -147,7 +149,7 @@ function FeaturesPage() {
                         >
                           {product}
                         </label>
-                      </button>
+                      </div>
                     ))}
                 </div>
                 <div className="text-foreground-muted text-xs">
@@ -155,6 +157,7 @@ function FeaturesPage() {
                 </div>
               </div>
               <Button
+                tabIndex={HAS_ACTIVE_FILTERS ? 0 : -1}
                 block
                 type="dashed"
                 onClick={() => {
@@ -163,7 +166,7 @@ function FeaturesPage() {
                 }}
                 className={cn(
                   'opacity-0 transition-opacity hidden md:block',
-                  (selectedProducts.length || searchTerm.length) && '!block opacity-100'
+                  HAS_ACTIVE_FILTERS && '!block opacity-100'
                 )}
               >
                 Clear all filters
@@ -180,14 +183,15 @@ function FeaturesPage() {
                 {filteredFeatures
                   .sort((a, b) => (a.title > b.title ? 1 : -1))
                   .map((feature) => (
-                    <Panel
-                      key={feature.title}
-                      hasActiveOnHover
-                      innerClassName="flex flex-col justify-start items-stretch"
+                    <Link
+                      key={`feat-${feature.title}`}
+                      href={`/features/${feature.slug}`}
+                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-none outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-brand-600"
                     >
-                      <Link
-                        href={`/features/${feature.slug}`}
-                        className="p-2 group cursor-pointer transition flex md:flex-col gap-3 sm:gap-2 h-full items-start"
+                      <Panel
+                        hasActiveOnHover
+                        outerClassName="h-full"
+                        innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
                       >
                         <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:!aspect-video bg-alternative flex items-center justify-center shadow-inner border border-muted">
                           <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
@@ -200,8 +204,8 @@ function FeaturesPage() {
                             {feature.subtitle}
                           </p>
                         </div>
-                      </Link>
-                    </Panel>
+                      </Panel>
+                    </Link>
                   ))}
               </div>
             )}
