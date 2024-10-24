@@ -103,6 +103,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Inner Side Menu',
+          href: '/docs/fragments/inner-side-menu',
+          items: [],
+        },
+        {
           title: 'Form Item Layout',
           href: '/docs/fragments/form-item-layout',
           items: [],
