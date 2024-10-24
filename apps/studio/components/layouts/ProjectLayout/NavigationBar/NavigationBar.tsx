@@ -16,6 +16,7 @@ import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +27,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
   Separator,
   Theme,
   cn,
@@ -44,6 +48,7 @@ import NavigationIconLink from './NavigationIconLink'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { CommandOption } from './CommandOption'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -108,36 +113,36 @@ const NavigationBar = () => {
     )
   }
 
-  const SearchButton = (
-    <NavigationIconButton
-      size="tiny"
-      onClick={() => {
-        setCommandMenuOpen(true)
-        snap.setNavigationPanelOpen(false)
-      }}
-      type="text"
-      icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-      rightText={
-        <div
-          className={cn(
-            'flex items-center gap-1',
-            'h-6 py-1.5 px-2 leading-none',
-            'bg-surface-100 text-foreground-lighter',
-            'border border-default rounded-md',
-            'shadow-xs shadow-background-surface-100'
-          )}
+  const CommandButton = (
+    <HoverCard_Shadcn_ openDelay={10}>
+      <HoverCardTrigger_Shadcn_ asChild>
+        <NavigationIconButton
+          size="tiny"
+          type="text"
+          icon={<Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
         >
-          {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
-            <Command size={11.5} strokeWidth={1.5} />
-          ) : (
-            <p className="text-xs">CTRL</p>
-          )}
-          <p className="text-xs">K</p>
-        </div>
-      }
-    >
-      Search
-    </NavigationIconButton>
+          Commands
+        </NavigationIconButton>
+      </HoverCardTrigger_Shadcn_>
+      <HoverCardContent_Shadcn_ side="right" className="w-48 p-1 flex flex-col gap-y-1">
+        <CommandOption
+          icon={
+            <div className="px-1">
+              <Search size={16} />
+            </div>
+          }
+          label="Search"
+          shortcut="K"
+        />
+        <CommandOption
+          icon={
+            <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+          }
+          label="Assistant"
+          shortcut="I"
+        />
+      </HoverCardContent_Shadcn_>
+    </HoverCard_Shadcn_>
   )
 
   const UserAccountButton = (
@@ -312,13 +317,13 @@ const NavigationBar = () => {
             <>
               {!allowNavPanelToExpand && (
                 <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>{SearchButton}</TooltipTrigger_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
                   <TooltipContent_Shadcn_ side="right">
-                    <span>Search</span>
+                    <span>Commands</span>
                   </TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               )}
-              {allowNavPanelToExpand && SearchButton}
+              {allowNavPanelToExpand && CommandButton}
             </>
           )}
 
