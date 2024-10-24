@@ -115,7 +115,7 @@ interface DiskSizeMeterProps {
   form: UseFormReturn<DiskStorageSchemaType>
   numReplicas: number
   isDialogOpen: boolean
-  isWithinCooldown: boolean
+  disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
 }
@@ -123,7 +123,7 @@ interface DiskSizeMeterProps {
 export const DiskManagementReviewAndSubmitDialog = ({
   isDialogOpen,
   setIsDialogOpen,
-  isWithinCooldown,
+  disabled,
   form,
   numReplicas,
   loading,
@@ -205,14 +205,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             const isValid = await form.trigger()
             if (isValid) setIsDialogOpen(true)
           }}
-          disabled={isWithinCooldown || !isDirty}
+          disabled={disabled || !isDirty}
           tooltip={{
             content: {
               side: 'bottom',
               text: !canUpdateDiskConfiguration
                 ? 'You need additional permissions to update disk configuration'
-                : isWithinCooldown
-                  ? 'Currently within cooldown period from previous disk change'
+                : disabled
+                  ? 'Current form values are invalid'
                   : undefined,
             },
           }}
