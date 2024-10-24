@@ -14,7 +14,8 @@ export async function chatSql(
   messages: Message[],
   existingSql?: string,
   entityDefinitions?: string[],
-  context?: 'rls-policies' | 'functions'
+  context?: 'rls-policies' | 'functions',
+  webContent?: string
 ): Promise<ReadableStream<Uint8Array>> {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -79,6 +80,13 @@ export async function chatSql(
         ${sqlBlock}
         Any SQL output should follow the casing of the existing SQL that I've written.
       `.trim(),
+    })
+  }
+
+  if (webContent) {
+    initMessages.push({
+      role: 'user',
+      content: `Here is some additional web content for context: ${webContent}`,
     })
   }
 
