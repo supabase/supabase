@@ -55,7 +55,9 @@ const DisallowAllAccessButton = ({ disabled, onClick }: AccessButtonProps) => (
     tooltip={{
       content: {
         side: 'bottom',
-        text: 'You need additional permissions to update network restrictions',
+        text: disabled
+          ? 'You need additional permissions to update network restrictions'
+          : undefined,
       },
     }}
   >

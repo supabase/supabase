@@ -142,7 +142,9 @@ const FunctionsList = ({
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to create functions',
+                      text: !canCreateFunctions
+                        ? 'You need additional permissions to create functions'
+                        : undefined,
                     },
                   }}
                 >

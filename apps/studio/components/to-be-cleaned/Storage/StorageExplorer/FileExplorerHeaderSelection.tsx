@@ -48,6 +48,7 @@ const FileExplorerHeaderSelection = () => {
         <ButtonTooltip
           icon={<Trash2 size={16} strokeWidth={2} />}
           type="primary"
+          disabled={!canUpdateFiles}
           onClick={() => setSelectedItemsToDelete(selectedItems)}
           tooltip={{
             content: {
@@ -62,6 +63,7 @@ const FileExplorerHeaderSelection = () => {
         <ButtonTooltip
           icon={<Move size={16} strokeWidth={2} />}
           type="primary"
+          disabled={!canUpdateFiles}
           onClick={() => setSelectedItemsToMove(selectedItems)}
           tooltip={{
             content: {

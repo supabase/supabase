@@ -136,7 +136,9 @@ const TableEditorMenu = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to create tables',
+                    text: !canCreateTables
+                      ? 'You need additional permissions to create tables'
+                      : undefined,
                   },
                 }}
               >
