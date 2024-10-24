@@ -275,7 +275,9 @@ const TableList = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create tables',
+                text: !canUpdateTables
+                  ? 'You need additional permissions to create tables'
+                  : undefined,
               },
             }}
           >

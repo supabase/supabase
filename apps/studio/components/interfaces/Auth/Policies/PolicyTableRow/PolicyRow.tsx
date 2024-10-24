@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -20,7 +20,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 
 interface PolicyRowProps {
   policy: PostgresPolicy

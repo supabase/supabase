@@ -184,7 +184,13 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
               disabled={hasAPISchema && isAPISchemaExposed}
               loading={isCreatingAPISchema}
               tooltip={{
-                content: { side: 'right', text: 'Schema has already been created and exposed' },
+                content: {
+                  side: 'right',
+                  text:
+                    hasAPISchema && isAPISchemaExposed
+                      ? 'Schema has already been created and exposed'
+                      : undefined,
+                },
               }}
             >
               Create and expose schema to Data API
@@ -249,7 +255,12 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 className="w-min"
                 disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}
-                tooltip={{ content: { side: 'right', text: 'Public schema no longer exposed' } }}
+                tooltip={{
+                  content: {
+                    side: 'right',
+                    text: !isPublicSchemaExposed ? 'Public schema no longer exposed' : undefined,
+                  },
+                }}
                 onClick={onSelectRemovePublicSchema}
               >
                 Remove public schema from exposed schemas

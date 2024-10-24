@@ -804,7 +804,9 @@ export const AIPolicyEditorPanel = memo(function ({
                         tooltip={{
                           content: {
                             side: 'top',
-                            text: 'You need additional permissions to update policies',
+                            text: !canUpdatePolicies
+                              ? 'You need additional permissions to update policies'
+                              : undefined,
                           },
                         }}
                       >
