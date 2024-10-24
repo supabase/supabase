@@ -411,6 +411,26 @@ Create a Route Handler for `auth/confirm`. When a user clicks their confirmation
 
 Since this is a Router Handler, use the Supabase client from `@/utils/supabase/server.ts`.
 
+<Admonition type="caution">
+  Attention: in certain specific cases, such as with Microsoft's email provider, it is possible that links in emails are pre-opened (e.g., [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/defender-office-365/safe-links-about?view=o365-worldwide)). This can result in the confirmation link being opened before the user clicks on it, consuming the confirmation token and rendering it expired. To perform this action, email services send an HTTP HEAD request to check the validity of the link.
+
+  To avoid this issue, a double confirmation system can be implemented. For example, by directing the user to a confirmation page where they need to click a button to confirm their email, as explained [here](/docs/guides/auth/auth-email-templates#limitations).
+
+  Another solution is to "block" HTTP HEAD requests (thus preventing the token from being consumed) by adding this code at the beginning of your route:
+
+  ```ts app/auth/confirm/route.ts
+  export async function GET(request: NextRequest) {
+    if (request.method !== 'GET') {
+        return new NextResponse(
+          'Method Not Allowed', 
+          { status: 405 }
+        );
+    }
+    // Rest of the code
+  }
+  ```
+</Admonition>
+
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
