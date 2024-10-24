@@ -2,12 +2,20 @@ import { Wrench } from 'lucide-react'
 import Link from 'next/link'
 import { type PropsWithChildren, useCallback } from 'react'
 
-import { type ITroubleshootingEntry, getArticleSlug } from './Troubleshooting.utils'
+import {
+  type ITroubleshootingEntry,
+  getArticleSlug,
+  getTroubleshootingUpdatedDates,
+} from './Troubleshooting.utils'
 import { TroubleshootingFilter } from './Troubleshooting.ui.client'
 import { formatError, TROUBLESHOOTING_DATA_ATTRIBUTES } from './Troubleshooting.utils.shared'
 import { cn } from 'ui'
 
-export function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry }) {
+export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry }) {
+  const dateUpdated = entry.data.database_id.startsWith('pseudo-')
+    ? new Date()
+    : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+
   const keywords = [...entry.data.topics, ...(entry.data.keywords ?? [])]
   const attributes = {
     [TROUBLESHOOTING_DATA_ATTRIBUTES.QUERY_ATTRIBUTE]:
@@ -58,14 +66,13 @@ export function TroubleshootingPreview({ entry }: { entry: ITroubleshootingEntry
             ))}
           </div>
           <div className="basis-l8 flex-shrink-0 flex-grow-0 truncate text-sm text-foreground-lighter">
-            {entry.data.updated_at &&
+            {dateUpdated &&
               (() => {
-                const date = new Date(entry.data.updated_at)
                 const options = { month: 'short', day: 'numeric' } as Intl.DateTimeFormatOptions
-                if (date.getFullYear() !== new Date().getFullYear()) {
+                if (dateUpdated.getFullYear() !== new Date().getFullYear()) {
                   options.year = 'numeric'
                 }
-                return date.toLocaleDateString(undefined, options)
+                return dateUpdated.toLocaleDateString(undefined, options)
               })()}
           </div>
         </div>
