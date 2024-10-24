@@ -26,7 +26,7 @@ const formSchema = z.object({
   reason: z.string().optional(),
 })
 
-export default function SpamPage() {
+export default function OptOutPage() {
   const router = useRouter()
   const ref = router.query.ref as string
   const email = router.query.email as string | undefined
@@ -55,7 +55,7 @@ export default function SpamPage() {
       setSubmissionType(null)
       setFormMessage('Submitting...')
 
-      const response = await fetch(`/api-v2/spam/${data.ref}`, {
+      const response = await fetch(`/api-v2/opt-out/${data.ref}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,10 +82,10 @@ export default function SpamPage() {
     }
   }
 
-  function SpamLayout({ children }: { children: React.ReactNode }) {
+  function OptOutLayout({ children }: { children: React.ReactNode }) {
     return (
       <>
-        <NextSeo title="Supabase | Report Spam" description="Report spam emails." />
+        <NextSeo title="Supabase | Opt Out" description="Opt out of receiving emails." />
         <Layout className="overflow-visible mx-auto max-w-xl mt-24 flex flex-col gap-8">
           {children}
         </Layout>
@@ -99,9 +99,9 @@ export default function SpamPage() {
 
   return (
     <>
-      <SpamLayout>
+      <OptOutLayout>
         <div>
-          <span className="label">Report spam</span>
+          <span className="label">Opt out</span>
           <h2 className="h4 !m-0">Receive an unexpected email from Supabase?</h2>
           <p className="text-foreground-light">Please report it here so we can investigate.</p>
         </div>
@@ -122,7 +122,7 @@ export default function SpamPage() {
               render={({ field }) => (
                 <FormItemLayout label="Choose reason for reporting" labelOptional="Optional">
                   <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger_Shadcn_ size={'medium'} className="capitalize">
+                    <SelectTrigger_Shadcn_ size="medium">
                       <SelectValue_Shadcn_ placeholder="Select a reason (optional)">
                         {field.value}
                       </SelectValue_Shadcn_>
@@ -190,8 +190,7 @@ export default function SpamPage() {
             </FormMessage_Shadcn_>
           </form>
         </Form_Shadcn_>
-        {/* )} */}
-      </SpamLayout>
+      </OptOutLayout>
     </>
   )
 }
