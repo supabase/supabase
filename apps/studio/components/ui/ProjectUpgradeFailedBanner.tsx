@@ -1,6 +1,8 @@
 import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/timezone'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button } from 'ui'
@@ -11,10 +13,13 @@ import { X } from 'lucide-react'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
 const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
-  const { status, initiated_at, error } = data?.databaseUpgradeStatus ?? {}
+  const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
 
   const key = `supabase-upgrade-${ref}-${initiated_at}`
   const isAcknowledged =
@@ -22,13 +27,24 @@ const ProjectUpgradeFailedBanner = () => {
   const [showMessage, setShowMessage] = useState(!isAcknowledged)
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
-  const initiatedAtUTC = dayjs
+  const initiatedAt = dayjs
     .utc(initiated_at ?? 0)
-    .utc()
+    .tz(dayjs.tz.guess())
     .format('DD MMM YYYY HH:mm:ss')
 
   const subject = 'Upgrade%20failed%20for%20project'
   const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
+
+  const initiatedAtEncoded = encodeURIComponent(
+    dayjs.utc(initiated_at ?? 0).format('YYYY-MM-DDTHH:mm:ss')
+  )
+  const latestStatusAtEncoded = encodeURIComponent(
+    dayjs
+      .utc(latest_status_at ?? 0)
+      .utcOffset(0)
+      .format('YYYY-MM-DDTHH:mm:ss')
+  )
+  const timestampFilter = `its=${initiatedAtEncoded}&ite=${latestStatusAtEncoded}`
 
   const acknowledgeMessage = () => {
     setShowMessage(false)
@@ -42,7 +58,7 @@ const ProjectUpgradeFailedBanner = () => {
       <Alert
         withIcon
         variant={'warning'}
-        title={`Postgres version upgrade was not successful (Initiated at ${initiatedAtUTC} UTC)`}
+        title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
           <div className="flex items-center h-full space-x-4">
             <Button asChild type="default">
@@ -63,8 +79,22 @@ const ProjectUpgradeFailedBanner = () => {
           </div>
         }
       >
-        Your project and its data are not affected. Please reach out to us via our support form for
-        assistance with the upgrade.
+        <div>
+          Your project and its data are not affected. Please reach out to us via our support form
+          for assistance with the upgrade.
+        </div>
+        <div>
+          To view logs related to the failed upgrade, visit the{' '}
+          <Link
+            className="underline"
+            href={`/project/${ref}/logs/pg-upgrade-logs?${timestampFilter}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Postgres Version Upgrade logs section
+          </Link>
+          .
+        </div>
       </Alert>
     </div>
   )
