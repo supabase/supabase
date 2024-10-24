@@ -2817,7 +2817,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/features/analytics</loc>
+    <loc>https://supabase.com/features/auth-captcha-protection</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2835,19 +2835,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/features/automated-performance-monitoring</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
     <loc>https://supabase.com/features/branching</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/features/captcha-protection</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2866,12 +2854,6 @@
 
   <url>
     <loc>https://supabase.com/features/custom-domains</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/features/customizable-dashboard-widgets</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2925,12 +2907,6 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/features/integrated-ci-cd-pipelines</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
     <loc>https://supabase.com/features/log-drains</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -2967,7 +2943,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/features/passwordless-login</loc>
+    <loc>https://supabase.com/features/passwordless-login-via-magicklink</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2992,6 +2968,12 @@
 
   <url>
     <loc>https://supabase.com/features/postgres-extensions</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/postgres-roles</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -3027,6 +3009,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/features/reports-and-metrics</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/features/resumable-uploads</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -3051,7 +3039,7 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/features/security-performance-advisor</loc>
+    <loc>https://supabase.com/features/security-and-performance-advisor</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -3093,7 +3081,19 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/features/supavisor</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/features/terraform-provider</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/vault</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
