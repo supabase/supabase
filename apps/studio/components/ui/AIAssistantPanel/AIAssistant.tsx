@@ -20,12 +20,11 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
   Button,
   cn,
   DropdownMenu,
@@ -79,6 +78,7 @@ export const AIAssistant = ({
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
+  const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel } = useAppStateSnapshot()
   const { editor } = aiAssistantPanel
 
@@ -420,6 +420,13 @@ export const AIAssistant = ({
               )}
             </AnimatePresence>
             <div className="flex flex-col gap-y-2">
+              {disablePrompts && (
+                <Admonition
+                  type="default"
+                  title="Assistant has been temporarily disabled"
+                  description="Give us a moment while we work on bringing the Assistant back online"
+                />
+              )}
               <div className="w-full border rounded">
                 <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
                   <DropdownMenu>
@@ -429,7 +436,7 @@ export const AIAssistant = ({
                           <Button
                             type="default"
                             icon={<Plus />}
-                            className={noContextAdded ? '' : 'px-1.5 !space-x-0'}
+                            className={cn(noContextAdded ? '' : 'px-1.5 !space-x-0')}
                           >
                             <span className={noContextAdded ? '' : 'sr-only'}>Add context</span>
                           </Button>
@@ -582,7 +589,7 @@ export const AIAssistant = ({
                     '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
                   )}
                   loading={isLoading}
-                  disabled={isLoading}
+                  disabled={disablePrompts || isLoading}
                   placeholder={
                     hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
                   }
@@ -594,6 +601,7 @@ export const AIAssistant = ({
                   }}
                 />
               </div>
+
               <AnimatePresence>
                 {!hasMessages && (
                   <motion.div
