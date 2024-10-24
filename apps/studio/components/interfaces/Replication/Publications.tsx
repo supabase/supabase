@@ -14,34 +14,23 @@ import { DeletePublicationModal } from './DeletePublicationModal'
 
 export const ReplicationPublications = () => {
   const { ref } = useParams()
-  const { data } = useReplicationSourcesQuery({
+  const { data: sources_data } = useReplicationSourcesQuery({
     projectRef: ref,
   })
   const [showCreatePublicationModal, setShowCreatePublicationModal] = useState(false)
   const [showDeletePublicationModal, setShowDeletePublicationModal] = useState(false)
   const [publicationToDelete, setPublicationToDelete] = useState('')
 
-  const sources = data ?? []
-  let source_id = null
+  const sources = sources_data ?? []
+  const thisProjectSource = sources.find((s) => s.name === ref)
 
-  for (let i = 0; i < sources.length; i++) {
-    const source = sources[i]
-    if (source.config.Postgres!.host.startsWith(`db.${ref}`)) {
-      if (source_id === null) {
-        source_id = source.id
-      } else {
-        toast.error('failed to load sources for ref')
-      }
-    }
-  }
-
-  if (source_id === null) {
-    toast.error('failed to load sources for ref')
+  if (!thisProjectSource) {
+    toast.error("Failed to find this project's source")
   }
 
   const { data: pub_data } = useReplicationPublicationsQuery({
     projectRef: ref,
-    sourceId: source_id!,
+    sourceId: thisProjectSource!.id,
   })
 
   const publications = pub_data ?? []
@@ -121,14 +110,14 @@ export const ReplicationPublications = () => {
       </ScaffoldContainer>
       <CreatePublicationModal
         visible={showCreatePublicationModal}
-        sourceId={source_id!}
+        sourceId={thisProjectSource!.id}
         onClose={() => setShowCreatePublicationModal(false)}
       />
       <DeletePublicationModal
         visible={showDeletePublicationModal}
         title={`Delete publication "${publicationToDelete}"`}
         publicationName={publicationToDelete}
-        sourceId={source_id!}
+        sourceId={thisProjectSource!.id}
         onClose={() => setShowDeletePublicationModal(false)}
       />
     </>
