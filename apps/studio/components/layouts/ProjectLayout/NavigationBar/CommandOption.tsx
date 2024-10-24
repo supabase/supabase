@@ -8,13 +8,17 @@ interface CommandOptionProps {
   icon: ReactNode
   label: string
   shortcut: string
+  onClick: () => void
 }
 
-export const CommandOption = ({ icon, label, shortcut }: CommandOptionProps) => {
+export const CommandOption = ({ icon, label, shortcut, onClick }: CommandOptionProps) => {
   const os = detectOS()
 
   return (
-    <div className="px-2 py-1 bg-surface-100 flex items-center justify-between rounded">
+    <div
+      className="px-2 py-1 transition hover:bg-surface-100 flex items-center justify-between rounded cursor-pointer"
+      onClick={onClick}
+    >
       <div className="flex items-center gap-x-2">
         {icon}
         <p className="text-sm">{label}</p>

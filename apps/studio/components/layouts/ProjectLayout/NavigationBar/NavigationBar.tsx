@@ -54,7 +54,6 @@ export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const NavigationBar = () => {
-  const os = detectOS()
   const router = useRouter()
   const { profile } = useProfile()
   const { project } = useProjectContext()
@@ -133,6 +132,10 @@ const NavigationBar = () => {
           }
           label="Search"
           shortcut="K"
+          onClick={() => {
+            setCommandMenuOpen(true)
+            snap.setNavigationPanelOpen(false)
+          }}
         />
         <CommandOption
           icon={
@@ -140,6 +143,7 @@ const NavigationBar = () => {
           }
           label="Assistant"
           shortcut="I"
+          onClick={() => snap.setAiAssistantPanel({ open: true, editor: null })}
         />
       </HoverCardContent_Shadcn_>
     </HoverCard_Shadcn_>
