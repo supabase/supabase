@@ -1,16 +1,16 @@
+import { AlertCircle, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { AlertCircle, ExternalLink } from 'lucide-react'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -20,7 +20,7 @@ export type CustomDomainActivateProps = {
 const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { mutate: checkCNAMERecord, isLoading: isCheckingRecord } = useCheckCNAMERecordMutation()
   const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
     {
@@ -32,7 +32,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   )
   const { mutate: deleteCustomDomain, isLoading: isDeleting } = useCustomDomainDeleteMutation()
 
-  const endpoint = settings?.autoApiService.endpoint
+  const endpoint = settings?.app_config?.endpoint
 
   const onActivateCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')

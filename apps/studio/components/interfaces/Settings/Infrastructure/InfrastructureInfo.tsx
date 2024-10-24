@@ -145,8 +145,8 @@ const InfrastructureInfo = () => {
                           A new version of Postgres is available for your project
                         </AlertTitle_Shadcn_>
                         <AlertDescription_Shadcn_>
-                          You will need to remove all read replicas first prior to upgrading your
-                          Postgrest version to the latest available ({latestPgVersion}).
+                          You will need to remove all read replicas prior to upgrading your Postgres
+                          version to the latest available ({latestPgVersion}).
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
                     )}

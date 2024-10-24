@@ -2,7 +2,12 @@ import pgMeta from '@supabase/pg-meta'
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import {
+  executeSql,
+  ExecuteSqlData,
+  ExecuteSqlError,
+  useExecuteSqlQuery,
+} from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 
 export type SchemasVariables = {
@@ -38,4 +43,21 @@ export const useSchemasQuery = <TData = SchemasData>(
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
   return client.invalidateQueries(sqlKeys.query(projectRef, ['schemas', 'list']))
+}
+
+export function prefetchSchemas(
+  client: QueryClient,
+  { projectRef, connectionString }: SchemasVariables
+) {
+  return client.fetchQuery(sqlKeys.query(projectRef, ['schemas', 'list']), ({ signal }) =>
+    executeSql(
+      {
+        projectRef,
+        connectionString,
+        sql: pgMetaSchemasList.sql,
+        queryKey: ['schemas', 'list'],
+      },
+      signal
+    )
+  )
 }

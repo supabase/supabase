@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.200.3
+  version: 1.207.8
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1128,6 +1128,10 @@ commands:
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
         default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after updating config.
+        default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
@@ -2878,7 +2882,7 @@ commands:
 
       Requires the local development stack to be started by running `supabase start`.
 
-      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql` by default, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
+      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
 
       Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
     examples:
@@ -2976,7 +2980,7 @@ commands:
         default_value: 'false'
       - id: include-seed
         name: --include-seed
-        description: Include seed data from supabase/seed.sql.
+        description: Include seed data from your config.
         default_value: 'false'
       - id: linked
         name: --linked

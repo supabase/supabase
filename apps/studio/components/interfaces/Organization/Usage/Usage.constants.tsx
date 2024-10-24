@@ -100,7 +100,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     name: 'Database & Storage Size',
     description: 'Amount of resources your project is consuming',
     attributes: [
-      subscription?.plan.id === 'free' || subscription?.usage_based_billing_project_addons !== true
+      subscription?.plan.id === 'free'
         ? {
             anchor: 'dbSize',
             key: PricingMetric.DATABASE_SIZE,
@@ -115,14 +115,6 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
                 name: 'Documentation',
                 url: 'https://supabase.com/docs/guides/platform/database-size',
               },
-              ...(subscription?.usage_based_billing_project_addons === true
-                ? [
-                    {
-                      name: 'Disk Management',
-                      url: 'https://supabase.com/docs/guides/platform/database-size#disk-management',
-                    },
-                  ]
-                : []),
             ],
             chartDescription: 'The data refreshes every 24 hours.',
             additionalInfo: (usage?: OrgUsageResponse) => {

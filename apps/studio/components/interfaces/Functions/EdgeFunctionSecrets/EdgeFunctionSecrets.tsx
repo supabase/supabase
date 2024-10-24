@@ -24,8 +24,8 @@ const EdgeFunctionSecrets = () => {
   const [showCreateSecret, setShowCreateSecret] = useState(false)
   const [selectedSecret, setSelectedSecret] = useState<ProjectSecret>()
 
-  const canReadSecrets = useCheckPermissions(PermissionAction.FUNCTIONS_READ, '*')
-  const canUpdateSecrets = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const canReadSecrets = useCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
 
   const { data, error, isLoading, isSuccess, isError } = useSecretsQuery({
     projectRef: projectRef,
@@ -81,7 +81,9 @@ const EdgeFunctionSecrets = () => {
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to update edge function secrets',
+                        text: !canUpdateSecrets
+                          ? 'You need additional permissions to update edge function secrets'
+                          : undefined,
                       },
                     }}
                   >

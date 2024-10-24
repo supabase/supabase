@@ -118,11 +118,6 @@ const ProductDropdown = () => {
               ))}
             </ul>
           </div>
-          <div>
-            <Panel outerClassName="rounded-md" innerClassName="bg-surface-100 rounded-md">
-              <EventCallout size="tiny" className="p-3 !gap-0.5 [&_svg]:hidden" />
-            </Panel>
-          </div>
         </div>
       </div>
     </div>

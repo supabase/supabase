@@ -79,7 +79,9 @@ const TransferProjectButton = () => {
             side: 'bottom',
             text: !canTransferProject
               ? 'You need additional permissions to transfer this project'
-              : 'Project transfers are temporarily disabled, please try again later.',
+              : disableProjectTransfer
+                ? 'Project transfers are temporarily disabled, please try again later.'
+                : undefined,
           },
         }}
       >

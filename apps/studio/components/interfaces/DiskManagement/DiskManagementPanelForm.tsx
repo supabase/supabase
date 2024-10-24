@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
@@ -8,6 +9,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -18,6 +20,7 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
 import {
@@ -57,22 +60,29 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
+import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 
 export function DiskManagementPanelForm() {
+  const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
@@ -113,7 +123,7 @@ export function DiskManagementPanelForm() {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
+    (x: { type: string }) => x.type === 'compute_instance'
   )?.variant
   const maxIopsBasedOnCompute =
     COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
@@ -125,7 +135,7 @@ export function DiskManagementPanelForm() {
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
-  const planId = subscription?.plan.id ?? ''
+  const planId = subscription?.plan.id ?? 'free'
   const isPlanUpgradeRequired =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
 
@@ -146,7 +156,7 @@ export function DiskManagementPanelForm() {
     })
 
   const defaultValues = {
-    storageType: type,
+    storageType: type || DiskType.GP3,
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
@@ -164,10 +174,13 @@ export function DiskManagementPanelForm() {
   const watchedIOPS = watch('provisionedIOPS')
   const { dirtyFields } = formState // Destructure dirtyFields from formState
   const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
-  const disableInput = isRequestingChanges || isPlanUpgradeRequired || isWithinCooldownWindow
+  const disableInput =
+    isRequestingChanges ||
+    isPlanUpgradeRequired ||
+    isWithinCooldownWindow ||
+    !canUpdateDiskConfiguration
 
-  const { includedDiskGB: includedDiskGBMeta } =
-    PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
+  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
   const minIOPS = IOPS_RANGE[watchedStorageType]?.min ?? 0
@@ -187,12 +200,21 @@ export function DiskManagementPanelForm() {
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
 
+  // i hate typescript enums
+  // gotta clean this up but it allows me to remove type casts for now
+  function getEnumFromFormValue(value: string) {
+    if (value === 'io2') return DiskType.IO2
+    if (value === 'gp3') return DiskType.GP3
+    return DiskType.IO2
+  }
+
+  const newStorageType = form.getValues('storageType')
   const diskSizePrice = calculateDiskSizePrice({
     planId,
     oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    oldStorageType: getEnumFromFormValue(form.formState.defaultValues?.storageType || 'io2'),
     newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    newStorageType: getEnumFromFormValue(newStorageType),
   })
 
   const iopsPrice = calculateIOPSPrice({
