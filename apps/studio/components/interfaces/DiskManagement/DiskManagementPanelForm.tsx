@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import { ExternalLink, HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -60,7 +60,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { getDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
@@ -68,6 +68,8 @@ import {
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { Admonition } from 'ui-patterns'
+import { Markdown } from '../Markdown'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
@@ -161,6 +163,7 @@ export function DiskManagementPanelForm() {
     throughput: throughput_mbps,
     totalSize: size_gb,
   }
+  const DiskStorageSchema = getDiskStorageSchema(size_gb)
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(DiskStorageSchema),
     defaultValues,
@@ -177,7 +180,7 @@ export function DiskManagementPanelForm() {
   const disableInput =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
-    isWithinCooldownWindow ||
+    // isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
 
   const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
@@ -250,7 +253,9 @@ export function DiskManagementPanelForm() {
   }, [watchedStorageType, watchedTotalSize, setValue, form])
 
   useEffect(() => {
-    if (initialRemainingTime > 0) setRemainingTime(initialRemainingTime)
+    if (initialRemainingTime > 0) {
+      // setRemainingTime(initialRemainingTime)
+    }
   }, [initialRemainingTime])
 
   useEffect(() => {
@@ -616,8 +621,38 @@ export function DiskManagementPanelForm() {
                       label="Disk Size"
                       layout="horizontal"
                       description={
-                        includedDiskGB > 0 &&
-                        `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
+                        <>
+                          {includedDiskGB > 0 &&
+                            `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+                          {field.value < size_gb && (
+                            <Admonition
+                              className="mt-2"
+                              type="default"
+                              title="Need to reduce disk size?"
+                              description={
+                                <Markdown
+                                  className="[&>p]:!leading-normal"
+                                  content={`Your disk size will automatically "right-size" when you [upgrade your project](/project/${projectRef}/settings/infrastructure). However, if your project cannot be upgraded, do contact us via support for help.`}
+                                />
+                              }
+                            >
+                              <div className="flex items-center gap-x-2">
+                                <Button asChild type="default" icon={<ExternalLink />}>
+                                  <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
+                                    Documentation
+                                  </Link>
+                                </Button>
+                                <Button asChild type="default">
+                                  <Link
+                                    href={`/support/new?ref=${projectRef}&subject=Enquiry%20on%20reducing%20disk%20size%20for%20project`}
+                                  >
+                                    Contact support
+                                  </Link>
+                                </Button>
+                              </div>
+                            </Admonition>
+                          )}
+                        </>
                       }
                     >
                       <div className="mt-1 relative flex gap-2 items-center">
