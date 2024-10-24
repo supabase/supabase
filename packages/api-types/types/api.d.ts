@@ -8542,6 +8542,8 @@ export interface components {
       project_id: string
       /** @description BigQuery service account key */
       service_account_key: string
+      /** @description Sink name */
+      sink_name: string
     }
     CreateRoleBody: {
       admins?: string[]
@@ -9042,6 +9044,7 @@ export interface components {
         BigQuery?: components['schemas']['ReplicationBigQueryConfig']
       }
       id: number
+      name: string
       tenant_id: string
     }
     ReplicationSourcesResponse: {
@@ -9049,6 +9052,7 @@ export interface components {
         Postgres?: components['schemas']['ReplicationPostgresConfig']
       }
       id: number
+      name: string
       tenant_id: string
     }
     ReplicationTable: {
