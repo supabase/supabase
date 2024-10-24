@@ -30,7 +30,6 @@ const EmptyState = ({}: EmptyStateProps) => {
     connectionString: project?.connectionString,
     schemas: [selectedSchema],
     sort,
-    filterTypes: Object.values(ENTITY_TYPE),
   })
 
   const totalCount = data?.pages?.[0].data.count ?? 0
