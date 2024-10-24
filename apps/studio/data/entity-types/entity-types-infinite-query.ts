@@ -1,7 +1,8 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
 import type { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
+import { ENTITY_TYPE } from './entity-type-constants'
 
 export type EntityTypesVariables = {
   projectRef?: string
@@ -29,7 +30,7 @@ export async function getEntityTypes(
     limit = 100,
     page = 0,
     sort = 'alphabetical',
-    filterTypes,
+    filterTypes = Object.values(ENTITY_TYPE),
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -57,7 +58,7 @@ export async function getEntityTypes(
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in (${filterTypes === undefined ? `'r', 'v', 'm', 'f', 'p'` : filterTypes.map((x) => `'${x}'`).join(', ')})
+        c.relkind in (${filterTypes.map((x) => `'${x}'`).join(', ')})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -155,3 +156,34 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       ...options,
     }
   )
+
+export function prefetchEntityTypes(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    schemas = ['public'],
+    search,
+    limit = 100,
+    sort,
+    filterTypes,
+  }: Omit<EntityTypesVariables, 'page'>
+) {
+  return client.prefetchInfiniteQuery(
+    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    ({ signal, pageParam }) =>
+      getEntityTypes(
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
+        signal
+      )
+  )
+}
