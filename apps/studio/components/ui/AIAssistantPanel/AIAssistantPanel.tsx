@@ -334,6 +334,10 @@ export const AiAssistantPanel = () => {
                 actions={{
                   runQuery: { enabled: true, callback: () => onExecuteSql() },
                   explainCode: { enabled: true, callback: onExplainSql },
+                  closeAssistant: {
+                    enabled: true,
+                    callback: () => setAiAssistantPanel({ open: false }),
+                  },
                 }}
               />
             </div>
