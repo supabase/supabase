@@ -316,7 +316,9 @@ export const CreateCronJobSheet = ({
                           tooltip={{
                             content: {
                               side: 'bottom',
-                              text: 'You need additional permissions to enable database extensions',
+                              text: !canToggleExtensions
+                                ? 'You need additional permissions to enable database extensions'
+                                : undefined,
                             },
                           }}
                         >

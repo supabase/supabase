@@ -79,7 +79,9 @@ const PolicyTableRowHeader = ({
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to toggle RLS',
+                    text: !canToggleRLS
+                      ? 'You need additional permissions to toggle RLS'
+                      : undefined,
                   },
                 }}
               >
@@ -94,7 +96,9 @@ const PolicyTableRowHeader = ({
                 content: {
                   side: 'bottom',
                   text: !canToggleRLS
-                    ? 'You need additional permissions to create RLS policies'
+                    ? !canToggleRLS
+                      ? 'You need additional permissions to create RLS policies'
+                      : undefined
                     : undefined,
                 },
               }}

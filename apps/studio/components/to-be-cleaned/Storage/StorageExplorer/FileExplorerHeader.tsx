@@ -434,7 +434,9 @@ const FileExplorerHeader = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to upload files',
+                text: !canUpdateStorage
+                  ? 'You need additional permissions to upload files'
+                  : undefined,
               },
             }}
           >
@@ -448,7 +450,9 @@ const FileExplorerHeader = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create folders',
+                text: !canUpdateStorage
+                  ? 'You need additional permissions to create folders'
+                  : undefined,
               },
             }}
           >

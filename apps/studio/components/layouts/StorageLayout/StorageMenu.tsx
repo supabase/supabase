@@ -79,7 +79,9 @@ const StorageMenu = () => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create buckets',
+                text: !canCreateBuckets
+                  ? 'You need additional permissions to create buckets'
+                  : undefined,
               },
             }}
           >

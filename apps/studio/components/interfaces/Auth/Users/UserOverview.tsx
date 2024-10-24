@@ -521,6 +521,8 @@ const RowAction = ({
   }
   className?: string
 }) => {
+  const disabled = button?.disabled ?? false
+
   return (
     <div className={cn(CONTAINER_CLASS, className)}>
       <div>
@@ -535,11 +537,13 @@ const RowAction = ({
         icon={success ? <Check className="text-brand" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}
-        disabled={button?.disabled ?? false}
+        disabled={disabled}
         tooltip={{
           content: {
             side: 'bottom',
-            text: `You need additional permissions to ${button.text.toLowerCase()}`,
+            text: disabled
+              ? `You need additional permissions to ${button.text.toLowerCase()}`
+              : undefined,
           },
         }}
       >

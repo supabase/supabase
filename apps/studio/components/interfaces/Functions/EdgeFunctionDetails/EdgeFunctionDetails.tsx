@@ -257,7 +257,9 @@ const EdgeFunctionDetails = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to delete edge functions',
+                    text: !canUpdateEdgeFunction
+                      ? 'You need additional permissions to delete edge functions'
+                      : undefined,
                   },
                 }}
               >
