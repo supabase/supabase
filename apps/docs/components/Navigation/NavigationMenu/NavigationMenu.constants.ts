@@ -606,6 +606,7 @@ export const auth = {
           items: [
             { name: 'App Authenticator (TOTP)', url: '/guides/auth/auth-mfa/totp' },
             { name: 'Phone', url: '/guides/auth/auth-mfa/phone' },
+            { name: 'WebAuthn (Security Keys)', url: '/guides/auth/auth-mfa/webauthn' },
           ],
         },
         {
