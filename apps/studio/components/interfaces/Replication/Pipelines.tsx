@@ -77,9 +77,8 @@ export const ReplicationPipelines = () => {
               <div className="my-4 w-full">
                 <Table
                   head={[
-                    <Table.th key="id">Id</Table.th>,
-                    <Table.th key="source_id">Source Id</Table.th>,
-                    <Table.th key="sink_id">Sink Id</Table.th>,
+                    <Table.th key="source_name">Source</Table.th>,
+                    <Table.th key="sink_name">Sink</Table.th>,
                     <Table.th key="action">Action</Table.th>,
                     <Table.th key="edit">Edit</Table.th>,
                     <Table.th key="delete">Delete</Table.th>,
@@ -87,7 +86,7 @@ export const ReplicationPipelines = () => {
                   body={
                     pipelines.length === 0 ? (
                       <Table.tr>
-                        <Table.td align="center" colSpan={6}>
+                        <Table.td align="center" colSpan={5}>
                           No pipelines
                         </Table.td>
                       </Table.tr>
@@ -112,9 +111,8 @@ export const ReplicationPipelines = () => {
                                   : 'Stop'
                         return (
                           <Table.tr key={pipeline.id}>
-                            <Table.td>{pipeline.id}</Table.td>
-                            <Table.td>{pipeline.source_id}</Table.td>
-                            <Table.td>{pipeline.sink_id}</Table.td>
+                            <Table.td>This project</Table.td>
+                            <Table.td>{pipeline.sink_name}</Table.td>
                             <Table.td>
                               <Button
                                 onClick={() => {
