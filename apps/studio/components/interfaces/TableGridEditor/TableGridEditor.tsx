@@ -61,6 +61,7 @@ const TableGridEditor = ({
   const { data: encryptedColumns } = useEncryptedColumnsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedTable?.schema,
     tableName: selectedTable?.name,
   })
 

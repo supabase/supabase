@@ -50,6 +50,7 @@ const ForeignRowSelector = ({
   const { data: encryptedColumns } = useEncryptedColumnsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: schemaName,
     tableName,
   })
 

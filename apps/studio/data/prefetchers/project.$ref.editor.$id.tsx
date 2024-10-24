@@ -72,6 +72,7 @@ export function usePrefetchEditorTablePage() {
             prefetchEncryptedColumns(queryClient, {
               projectRef: project.ref,
               connectionString: project.connectionString,
+              schema: entity?.schema,
               tableName: entity?.name,
             }),
             undefined,
