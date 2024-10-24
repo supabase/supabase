@@ -1,13 +1,17 @@
-import { DiamondIcon, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Link2, Table2 } from 'lucide-react'
 import { Handle, NodeProps } from 'reactflow'
-import { cn } from 'ui'
+import Link from 'next/link'
+
+import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320
 const TABLE_NODE_ROW_HEIGHT = 40
 
 export type TableNodeData = {
+  id?: number
   name: string
+  ref: string
   isForeign: boolean
   columns: {
     id: string
@@ -48,12 +52,21 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
         >
           <header
             className={cn(
-              'text-[0.55rem] px-2 bg-alternative text-default flex gap-1 items-center',
+              'text-[0.55rem] pl-2 pr-1 bg-alternative text-default flex items-center justify-between',
               itemHeight
             )}
           >
-            <Table2 strokeWidth={1} size={12} className="text-light" />
-            {data.name}
+            <div className="flex gap-x-1 items-center">
+              <Table2 strokeWidth={1} size={12} className="text-light" />
+              {data.name}
+            </div>
+            {data.id && (
+              <Button asChild type="text" className="px-0 w-[16px] h-[16px] rounded">
+                <Link href={`/project/${data.ref}/editor/${data.id}`}>
+                  <ExternalLink size={10} className="text-foreground-light" />
+                </Link>
+              </Button>
+            )}
           </header>
 
           {data.columns.map((column) => (
@@ -63,8 +76,6 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 'bg-surface-100',
                 'border-t',
                 'border-t-[0.5px]',
-                // 'odd:bg-scale-300',
-                // 'even:bg-scale-400',
                 'hover:bg-scale-500 transition cursor-default',
                 itemHeight
               )}
