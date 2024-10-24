@@ -49,7 +49,7 @@ export function prefetchSchemas(
   client: QueryClient,
   { projectRef, connectionString }: SchemasVariables
 ) {
-  return client.prefetchQuery(sqlKeys.query(projectRef, ['schemas', 'list']), ({ signal }) =>
+  return client.fetchQuery(sqlKeys.query(projectRef, ['schemas', 'list']), ({ signal }) =>
     executeSql(
       {
         projectRef,

@@ -53,18 +53,14 @@ export function prefetchEncryptedColumns(
   client: QueryClient,
   { projectRef, connectionString, tableName }: EncryptedColumnsVariables
 ) {
-  const key = encryptedColumnKeys.list(projectRef, tableName)
-
-  return client
-    .prefetchQuery(key, ({ signal }) =>
-      getEncryptedColumns(
-        {
-          projectRef,
-          connectionString,
-          tableName,
-        },
-        signal
-      )
+  return client.fetchQuery(encryptedColumnKeys.list(projectRef, tableName), ({ signal }) =>
+    getEncryptedColumns(
+      {
+        projectRef,
+        connectionString,
+        tableName,
+      },
+      signal
     )
-    .then(() => client.getQueryData<EncryptedColumnsData>(key, { exact: true }))
+  )
 }

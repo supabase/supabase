@@ -1,11 +1,12 @@
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+
+import { sqlKeys } from 'data/sql/keys'
 import {
   executeSql,
   ExecuteSqlData,
   ExecuteSqlError,
   useExecuteSqlQuery,
 } from '../sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -142,10 +143,8 @@ export function prefetchForeignKeyConstraints(
   client: QueryClient,
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
 ) {
-  const key = sqlKeys.query(projectRef, ['foreign-key-constraints', schema])
-
   return client
-    .prefetchQuery(key, ({ signal }) =>
+    .fetchQuery(sqlKeys.query(projectRef, ['foreign-key-constraints', schema]), ({ signal }) =>
       executeSql(
         {
           projectRef,
@@ -156,5 +155,5 @@ export function prefetchForeignKeyConstraints(
         signal
       )
     )
-    .then(() => select(client.getQueryData(key, { exact: true })) as ForeignKeyConstraintsData)
+    .then((data) => select(data) as ForeignKeyConstraintsData)
 }

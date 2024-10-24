@@ -60,9 +60,7 @@ export function prefetchView(
   client: QueryClient,
   { projectRef, connectionString, id }: ViewVariables
 ) {
-  const key = viewKeys.view(projectRef, id)
-
-  return client
-    .prefetchQuery(key, ({ signal }) => getView({ id, projectRef, connectionString }, signal))
-    .then(() => client.getQueryData<ViewData>(key, { exact: true }))
+  return client.fetchQuery(viewKeys.view(projectRef, id), ({ signal }) =>
+    getView({ id, projectRef, connectionString }, signal)
+  )
 }

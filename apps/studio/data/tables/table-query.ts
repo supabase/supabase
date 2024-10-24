@@ -1,6 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { tableKeys } from './keys'
@@ -61,9 +60,7 @@ export function prefetchTable(
   client: QueryClient,
   { projectRef, connectionString, id }: TableVariables
 ) {
-  const key = tableKeys.table(projectRef, id)
-
-  return client
-    .prefetchQuery(key, ({ signal }) => getTable({ id, projectRef, connectionString }, signal))
-    .then(() => client.getQueryData<TableData>(key, { exact: true }))
+  return client.fetchQuery(tableKeys.table(projectRef, id), ({ signal }) =>
+    getTable({ id, projectRef, connectionString }, signal)
+  )
 }

@@ -260,24 +260,21 @@ export function prefetchTableRows(
   client: QueryClient,
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables
 ) {
-  const key = sqlKeys.query(
-    projectRef,
-    getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args })
-  )
-
-  return client.prefetchQuery(key, ({ signal }) =>
-    executeSql(
-      {
-        projectRef,
-        connectionString,
-        sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
-          projectRef: projectRef ?? 'ref',
-          role: impersonatedRole,
-        }),
-        queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
-        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
-      },
-      signal
-    )
+  return client.fetchQuery(
+    sqlKeys.query(projectRef, getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args })),
+    ({ signal }) =>
+      executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
+            projectRef: projectRef ?? 'ref',
+            role: impersonatedRole,
+          }),
+          queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+        },
+        signal
+      )
   )
 }

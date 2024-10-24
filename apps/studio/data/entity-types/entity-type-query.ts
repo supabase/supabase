@@ -1,4 +1,5 @@
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+
 import { sqlKeys } from 'data/sql/keys'
 import {
   executeSql,
@@ -86,10 +87,8 @@ export function prefetchEntityType(
   client: QueryClient,
   { projectRef, connectionString, id }: EntityTypeVariables
 ) {
-  const key = sqlKeys.query(projectRef, ['entity-type', id])
-
   return client
-    .prefetchQuery(key, ({ signal }) =>
+    .fetchQuery(sqlKeys.query(projectRef, ['entity-type', id]), ({ signal }) =>
       executeSql(
         {
           projectRef,
@@ -100,8 +99,5 @@ export function prefetchEntityType(
         signal
       )
     )
-    .then(
-      () =>
-        client.getQueryData<{ result: EntityTypeData[] }>(key, { exact: true })?.result?.[0] ?? null
-    )
+    .then((data: { result: EntityTypeData[] }) => data?.result?.[0] ?? null)
 }

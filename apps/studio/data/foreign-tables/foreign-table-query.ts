@@ -61,11 +61,7 @@ export function prefetchForeignTable(
   client: QueryClient,
   { projectRef, connectionString, id }: ForeignTableVariables
 ) {
-  const key = foreignTableKeys.foreignTable(projectRef, id)
-
-  return client
-    .prefetchQuery(key, ({ signal }) =>
-      getForeignTable({ id, projectRef, connectionString }, signal)
-    )
-    .then(() => client.getQueryData<ForeignTableData>(key, { exact: true }))
+  return client.fetchQuery(foreignTableKeys.foreignTable(projectRef, id), ({ signal }) =>
+    getForeignTable({ id, projectRef, connectionString }, signal)
+  )
 }
