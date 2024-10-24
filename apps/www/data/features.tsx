@@ -404,7 +404,7 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE],
-    heroImage: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
   },
@@ -548,10 +548,10 @@ This feature is particularly valuable for teams looking to optimize their databa
   },
   // Realtime
   {
-    title: 'Postgres changes',
+    title: 'Realtime Postgres changes',
     subtitle: 'Receive your database changes through websockets.',
     description: `
-Supabase's Postgres Changes feature allows you to listen to database changes in real-time using the Realtime system. This capability enables you to build responsive, live-updating applications that reflect database changes instantly.
+Supabase's Realtime Postgres Changes feature allows you to listen to database changes in real-time using the Realtime system. This capability enables you to build responsive, live-updating applications that reflect database changes instantly.
 
 ## Key features
 1. Event-based listening: Subscribe to INSERT, UPDATE, DELETE, or all (*) events.
@@ -573,7 +573,7 @@ Supabase's Postgres Changes feature allows you to listen to database changes in 
 - Live chat and messaging systems
 - Applications requiring instant updates based on database changes
 
-Supabase's Postgres Changes feature provides a powerful tool for creating responsive, real-time applications while leveraging the full capabilities of your Postgres database.
+Supabase's Realtime Postgres Changes feature provides a powerful tool for creating responsive, real-time applications while leveraging the full capabilities of your Postgres database.
 `,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.REALTIME],
@@ -582,10 +582,10 @@ Supabase's Postgres Changes feature provides a powerful tool for creating respon
     slug: 'realtime-postgres-changes',
   },
   {
-    title: 'Broadcast',
+    title: 'Realtime Broadcast',
     subtitle: 'Send messages between connected users through websockets.',
     description: `
-Supabase's Broadcast feature enables real-time communication between connected clients using the Realtime system. This functionality allows you to build interactive, collaborative applications where users can instantly share messages or data in real-time.
+Supabase's Realtime Broadcast feature enables real-time communication between connected clients using the Realtime system. This functionality allows you to build interactive, collaborative applications where users can instantly share messages or data in real-time.
 
 ## Key features
 1. Channel-based messaging: Send and receive messages within specific channels or rooms.
@@ -602,7 +602,7 @@ Supabase's Broadcast feature enables real-time communication between connected c
 - Simplified architecture: Build real-time features without managing complex messaging infrastructure.
 - Enhanced user engagement: Create interactive, collaborative experiences that keep users connected.
 
-## Broadcast is particularly valuable for:
+## Realtime Broadcast is particularly valuable for:
 - Chat applications and messaging platforms
 - Collaborative tools like shared documents or whiteboards
 - Multiplayer games requiring real-time state synchronization
@@ -610,7 +610,7 @@ Supabase's Broadcast feature enables real-time communication between connected c
 - Real-time commenting systems for blogs or social media platforms
 - Interactive presentations or educational platforms
 
-Supabase's Broadcast feature provides a powerful tool for creating responsive, real-time applications with minimal setup and infrastructure management.
+Supabase's Realtime Broadcast feature provides a powerful tool for creating responsive, real-time applications with minimal setup and infrastructure management.
 `,
     icon: MessageCircle,
     products: [PRODUCT_SHORTNAMES.REALTIME],
@@ -619,10 +619,10 @@ Supabase's Broadcast feature provides a powerful tool for creating responsive, r
     slug: 'realtime-broadcast',
   },
   {
-    title: 'Presence',
+    title: 'Realtime Presence',
     subtitle: 'Synchronize shared state between users through websockets.',
     description: `
-Supabase's Presence feature allows you to track and synchronize shared state between connected users in real-time. This capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
+Supabase's Realtime Presence feature allows you to track and synchronize shared state between connected users in real-time. This capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
 
 ## Key features
 1. Real-time state synchronization: Track and update shared state across multiple clients.
@@ -638,7 +638,7 @@ Supabase's Presence feature allows you to track and synchronize shared state bet
 - Reduced complexity: Implement shared state features without building custom synchronization logic.
 - Flexible use cases: Adapt the feature for various applications, from simple online indicators to complex collaborative tools.
 
-## Presence is particularly valuable for:
+## Realtime Presence is particularly valuable for:
 - Collaborative document editing platforms
 - Multiplayer games showing player positions or status
 - Team collaboration tools with user availability indicators
@@ -646,7 +646,7 @@ Supabase's Presence feature allows you to track and synchronize shared state bet
 - Project management applications with real-time task assignments
 - Social media platforms showing active users in a group or chat
 
-Supabase's Presence feature provides a powerful tool for creating interactive, real-time applications that require shared state management, allowing developers to focus on creating unique and valuable user experiences.
+Supabase's Realtime Presence feature provides a powerful tool for creating interactive, real-time applications that require shared state management, allowing developers to focus on creating unique and valuable user experiences.
 `,
     icon: Users,
     products: [PRODUCT_SHORTNAMES.REALTIME],
