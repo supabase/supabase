@@ -51,7 +51,6 @@ export const useTableQuery = <TData = TableData>(
     ({ signal }) => getTable({ projectRef, connectionString, id }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      staleTime: 0,
       ...options,
     }
   )
