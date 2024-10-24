@@ -8943,7 +8943,9 @@ export interface components {
       publication_name: string
       replicator_id: number
       sink_id: number
+      sink_name: string
       source_id: number
+      source_name: string
       tenant_id: string
     }
     ReplicationPipelinesStatusResponse: {
