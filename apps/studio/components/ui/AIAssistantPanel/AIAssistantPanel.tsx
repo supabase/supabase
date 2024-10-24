@@ -40,6 +40,7 @@ import CodeEditor from '../CodeEditor/CodeEditor'
 import { AIAssistant } from './AIAssistant'
 import { generateCTA, generatePlaceholder, generateTitle, validateQuery } from './AIAssistant.utils'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export const AiAssistantPanel = () => {
   const os = detectOS()
@@ -48,6 +49,7 @@ export const AiAssistantPanel = () => {
   const project = useSelectedProject()
   const queryClient = useQueryClient()
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const isEnabled = useIsDatabaseFunctionsAssistantEnabled()
 
   const { open, editor, content } = aiAssistantPanel
   const previousEditor = usePrevious(editor)
@@ -249,10 +251,10 @@ export const AiAssistantPanel = () => {
         setAiAssistantPanel({ open: true, editor: null })
       }
     }
-    if (project !== undefined) window.addEventListener('keydown', handler)
+    if (project !== undefined && isEnabled) window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project])
+  }, [project, isEnabled])
 
   // [Joshen] Whenever the deps change recalculate the height of the editor
   useEffect(() => {
@@ -293,7 +295,7 @@ export const AiAssistantPanel = () => {
                 <Button
                   type="outline"
                   icon={<SqlEditor />}
-                  className="px-1"
+                  className="h-[24px] w-[24px] px-1"
                   onClick={() => {
                     const content = editorRef.current?.getValue() ?? ''
                     router.push(`/project/${ref}/sql/new?content=${encodeURIComponent(content)}`)
