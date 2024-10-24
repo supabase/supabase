@@ -61,20 +61,22 @@ export type FeatureType = {
    */
   icon: string | LucideIcon
   /**
-   * Each feature belongs to at most one product.
-   * Use more than one if only strictly necessary.
+   * Each feature belongs to one or more products
    */
   products: FeatureProductType[]
   /**
-   * heroImage can either be an absolute path to an image or to a video
+   * heroImage can be an absolute path to either:
+   * - an image
+   * - a youtube video
+   * - a video sourced from supabase storage
    */
   heroImage: string
   /**
-   * heroImage can either be an absolute path to an image or to a video
+   * light-mode version image, if heroImage is not a video
    */
   heroImageLight?: string
   /**
-   * url to docs page for this feature
+   * url to docs or blog page for this feature
    */
   docsUrl?: string
 }
