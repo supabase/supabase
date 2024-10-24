@@ -200,9 +200,11 @@ To use Google's pre-built signin buttons:
 
     You will need to configure a client ID for your Chrome extension:
 
-    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Chrome extension_ for the application type. For _Item ID_ provide the unique ID of your Chrome extension. You can get this by calling `chrome.runtime.id` within the extension, or from the Web Store URL of the extension. For example, the [Google Translate extension](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb) has the Web Store URL `https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb` and the last part `aapbdbdomjkkjkaonfhkkikfgjllcleb` is its unique ID.
-    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app.
-    3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+    1. Get the unique ID of your Chrome extension. You can get this by calling `chrome.runtime.id` within the extension, or from the Web Store URL of the extension. For example, the [Google Translate extension](https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb) has the Web Store URL `https://chrome.google.com/webstore/detail/google-translate/aapbdbdomjkkjkaonfhkkikfgjllcleb` and the last part `aapbdbdomjkkjkaonfhkkikfgjllcleb` is its unique ID.
+    2. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Web application_ for the application type. Add the Redirect URL for your Chrome extension (example: `https://UNIQUE_ID_FROM_STEP_1.chromiumapp.org`) to the list of _Authorized redirect URIs_.
+    3. Click the _Create_ button and then download the _Client ID_ and _Client secret_ from the next screen.
+    4. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent), including test users if you are developing an extension prior to publishing it on the Chrome Web Store. This information is shown to the user when giving consent to your app. 
+    5. Finally, add the _Client ID_ and _Client secret_ from Step 3 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers).
 
     Note that you do not have to configure the OAuth flow in the Supabase Dashboard to sign in with Google inside Chrome extensions.
 
