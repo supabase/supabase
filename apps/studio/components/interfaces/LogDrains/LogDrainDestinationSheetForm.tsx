@@ -68,6 +68,8 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('loki'),
     url: z.string().min(1, { message: 'Loki URL is required' }),
     headers: z.record(z.string(), z.string()),
+    username: z.string().optional(),
+    password: z.string().optional(),
   }),
 ])
 
@@ -162,6 +164,8 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
+      username: defaultValues?.config?.username || '',
+      password: defaultValues?.config?.password || '',
     },
   })
 
@@ -244,6 +248,18 @@ export function LogDrainDestinationSheetForm({
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
+                }
+
+                // If we have username and password and type is Loki
+                // We encode it to base64 and set it as a header
+                if (type === 'loki' && form.getValues('username') && form.getValues('password')) {
+                  const encodedAuth = btoa(
+                    `${form.getValues('username')}:${form.getValues('password')}`
+                  )
+                  form.setValue('headers', {
+                    ...form.getValues('headers'),
+                    Authorization: `Basic ${encodedAuth}`,
+                  })
                 }
 
                 form.handleSubmit(onSubmit)(e)
@@ -422,9 +438,22 @@ export function LogDrainDestinationSheetForm({
                     <LogDrainFormItem
                       type="url"
                       value="url"
+                      placeholder="https://my-logs-endpoint.grafana.net/loki/api/v1/push"
                       label="Loki URL"
                       formControl={form.control}
                       description="The Loki HTTP(S) endpoint to send events."
+                    />
+                    <LogDrainFormItem
+                      value="username"
+                      label="Username"
+                      placeholder="123456789"
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      value="password"
+                      label="Password"
+                      placeholder="glc_ABCD1234567890"
+                      formControl={form.control}
                     />
                   </div>
                 )}
