@@ -74,15 +74,10 @@ function Database() {
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}
-          h1={[
-            <span key={'database-h1'}>
-              Open Source SQL Database
-              <br /> (without the hassle)
-            </span>,
-          ]}
+          h1={[<span key={'database-h1'}>Fully Managed PostgreSQL</span>]}
           subheader={[
-            'Every Supabase project is a dedicated PostgreSQL database, trusted by millions of developers.',
-            "PostgreSQL is one of the world's most scalable databases.",
+            'Every Supabase project is a dedicated Postgres cluster, trusted by millions of developers.',
+            "This makes Supabase one of the world's most scalable databases.",
           ]}
           image={[
             <Image
