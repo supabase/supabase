@@ -132,3 +132,5 @@ set default_transaction_read_only = 'off';
 ### Reducing disk size
 
 Disks don't automatically downsize during normal operation. Once you have [reduced your database size](/docs/guides/platform/database-size#database-size), they _will_ automatically "right-size" during a [project upgrade](/docs/guides/platform/upgrading). The final disk size after the upgrade is 1.2x the size of the database with a minimum of 8 GB. For example, if your database size is 100GB, and you have a 200GB disk, the size after a project upgrade will be 120 GB.
+
+In the event that your project is already on the latest version of Postgres and cannot be upgraded, a new version of Postgres will be released approximately every week which you can then upgrade to once it becomes available.
