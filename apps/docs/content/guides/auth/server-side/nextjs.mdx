@@ -726,9 +726,9 @@ import { useState } from 'react'
 
 import { createClient } from '@/utils/supabase/component'
 
-export default function LoginPage() {
+export default async function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -940,7 +940,7 @@ export default function PublicPage({ data }: { data?: any[] }) {
 }
 
 export async function getStaticProps() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase.from('countries').select()
 
