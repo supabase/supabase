@@ -15,17 +15,24 @@ import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import {
+  BASE_PATH,
+  IS_PLATFORM,
+  OPT_IN_TAGS,
+  TELEMETRY_ACTIONS,
+  TELEMETRY_CATEGORIES,
+  TELEMETRY_LABELS,
+} from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
   Button,
   cn,
   DropdownMenu,
@@ -79,6 +86,7 @@ export const AIAssistant = ({
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
+  const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel } = useAppStateSnapshot()
   const { editor } = aiAssistantPanel
 
@@ -127,6 +135,15 @@ export const AIAssistant = ({
           .map((def) => def.sql.trim())
     : undefined
 
+  const { mutate: sendEvent } = useSendEventMutation()
+  const sendTelemetryEvent = (action: string) => {
+    sendEvent({
+      action,
+      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
+      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+    })
+  }
+
   const {
     messages: chatMessages,
     isLoading: isChatLoading,
@@ -172,6 +189,7 @@ export const AIAssistant = ({
     append(payload)
     setAssistantError(undefined)
     setLastSentMessage(payload)
+    sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
   }
 
   const toggleSchema = (schema: string) => {
@@ -180,6 +198,7 @@ export const AIAssistant = ({
     } else {
       const newSelectedSchemas = [...selectedSchemas, schema].sort((a, b) => a.localeCompare(b))
       setSelectedSchemas(newSelectedSchemas)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.SCHEMA_CONTEXT_ADDED)
     }
   }
 
@@ -192,6 +211,7 @@ export const AIAssistant = ({
         (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
       )
       setSelectedTables(newselectedTables)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.TABLE_CONTEXT_ADDED)
     }
   }
 
@@ -205,6 +225,7 @@ export const AIAssistant = ({
     if (prompt) {
       setValue(prompt)
       sendMessageToAssistant(prompt)
+      sendTelemetryEvent(TELEMETRY_ACTIONS.QUICK_PROMPT_SELECTED(type))
     }
   }
 
@@ -420,6 +441,13 @@ export const AIAssistant = ({
               )}
             </AnimatePresence>
             <div className="flex flex-col gap-y-2">
+              {disablePrompts && (
+                <Admonition
+                  type="default"
+                  title="Assistant has been temporarily disabled"
+                  description="Give us a moment while we work on bringing the Assistant back online"
+                />
+              )}
               <div className="w-full border rounded">
                 <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
                   <DropdownMenu>
@@ -429,7 +457,7 @@ export const AIAssistant = ({
                           <Button
                             type="default"
                             icon={<Plus />}
-                            className={noContextAdded ? '' : 'px-1.5 !space-x-0'}
+                            className={cn(noContextAdded ? '' : 'px-1.5 !space-x-0')}
                           >
                             <span className={noContextAdded ? '' : 'sr-only'}>Add context</span>
                           </Button>
@@ -582,7 +610,7 @@ export const AIAssistant = ({
                     '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
                   )}
                   loading={isLoading}
-                  disabled={isLoading}
+                  disabled={disablePrompts || isLoading}
                   placeholder={
                     hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
                   }
@@ -594,6 +622,7 @@ export const AIAssistant = ({
                   }}
                 />
               </div>
+
               <AnimatePresence>
                 {!hasMessages && (
                   <motion.div

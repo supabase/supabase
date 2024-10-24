@@ -10,6 +10,7 @@ import { Loading } from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { formatQuery } from 'data/sql/format-sql-query'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
 const DEFAULT_ACTIONS = {
@@ -17,6 +18,7 @@ const DEFAULT_ACTIONS = {
   explainCode: { enabled: false, callback: noop },
   formatDocument: { enabled: true, callback: noop },
   placeholderFill: { enabled: true },
+  closeAssistant: { enabled: false, callback: noop },
 }
 
 interface CodeEditorProps {
@@ -37,6 +39,7 @@ interface CodeEditorProps {
     formatDocument: CodeEditorActions
     placeholderFill: Omit<CodeEditorActions, 'callback'>
     explainCode: CodeEditorActions
+    closeAssistant: CodeEditorActions
   }>
   editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | undefined>
   onInputChange?: (value?: string) => void
@@ -66,7 +69,7 @@ const CodeEditor = ({
   const editorRef = editorRefProps || ref
   const monacoRef = useRef<Monaco>()
 
-  const { runQuery, placeholderFill, formatDocument, explainCode } = {
+  const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
     ...DEFAULT_ACTIONS,
     ...actions,
   }
@@ -165,6 +168,15 @@ const CodeEditor = ({
             .getValueInRange((editorRef?.current as any)?.getSelection())
           explainCode.callback(selectedValue)
         },
+      })
+    }
+
+    if (closeAssistant.enabled) {
+      editor.addAction({
+        id: 'close-assistant',
+        label: 'Close Assistant',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
+        run: () => closeAssistant.callback(),
       })
     }
 
