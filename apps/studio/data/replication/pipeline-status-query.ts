@@ -4,8 +4,12 @@ import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
+type PipelineStatusParams = { pipelineId: number; refetchInterval: number | false }
 type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId: number }
-type ReplicationPipelinesStatusesParams = { projectRef?: string; pipelineIds: number[] }
+type ReplicationPipelinesStatusesParams = {
+  projectRef?: string
+  statusParams: PipelineStatusParams[]
+}
 
 async function fetchReplicationPipelineStatus(
   { projectRef, pipelineId }: ReplicationPipelinesStatusParams,
@@ -45,13 +49,14 @@ type TQueries = UseQueryOptions<ReplicationPipelineStatusData>[]
 
 export const useReplicationPipelinesStatuesQuery = ({
   projectRef,
-  pipelineIds,
+  statusParams,
 }: ReplicationPipelinesStatusesParams) => {
   return useQueries<TQueries>({
-    queries: pipelineIds.map((pipelineId) => {
+    queries: statusParams.map(({ pipelineId, refetchInterval }) => {
       return {
         queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-        queryFn: async () => await fetchReplicationPipelineStatus({ projectRef, pipelineId }),
+        queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
+        refetchInterval,
       }
     }),
   })
