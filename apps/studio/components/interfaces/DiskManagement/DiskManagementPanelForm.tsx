@@ -626,11 +626,11 @@ export function DiskManagementPanelForm() {
                             <Admonition
                               className="mt-2"
                               type="default"
-                              title="Need to reduce disk size?"
+                              title="Reducing your project's disk size?"
                               description={
                                 <Markdown
                                   className="[&>p]:!leading-normal"
-                                  content={`Your disk size will automatically "right-size" when you [upgrade your project](/project/${projectRef}/settings/infrastructure). However, if your project cannot be upgraded, do contact us via support for help.`}
+                                  content={`Your disk size will automatically "right-size" when you [upgrade your project](/project/${projectRef}/settings/infrastructure).`}
                                 />
                               }
                             >
@@ -638,13 +638,6 @@ export function DiskManagementPanelForm() {
                                 <Button asChild type="default" icon={<ExternalLink />}>
                                   <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
                                     Documentation
-                                  </Link>
-                                </Button>
-                                <Button asChild type="default">
-                                  <Link
-                                    href={`/support/new?ref=${projectRef}&subject=Enquiry%20on%20reducing%20disk%20size%20for%20project`}
-                                  >
-                                    Contact support
                                   </Link>
                                 </Button>
                               </div>
