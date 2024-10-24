@@ -41,6 +41,7 @@ import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
+import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
@@ -147,6 +148,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <StudioCommandMenu />
                                 <GenerateSql />
                                 <FeaturePreviewModal />
+                                <AiAssistantPanel />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                             <SonnerToaster position="top-right" />

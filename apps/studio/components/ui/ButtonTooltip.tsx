@@ -18,7 +18,7 @@ export const ButtonTooltip = forwardRef<
           {props.children}
         </Button>
       </TooltipTrigger_Shadcn_>
-      {props.disabled && props.tooltip.content.text !== undefined && (
+      {props.tooltip.content.text !== undefined && (
         <TooltipContent_Shadcn_ {...props.tooltip.content}>
           {props.tooltip.content.text}
         </TooltipContent_Shadcn_>

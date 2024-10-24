@@ -24,7 +24,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { auth_id } = useParams()
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isSuccess: isSuccessOrganizations,
+    isLoading: isLoadingOrganizations,
+  } = useOrganizationsQuery()
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
@@ -43,10 +47,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
-    if (!isLoadingOrganizations) {
-      setSelectedOrgSlug(organizations?.[0].slug ?? undefined)
+    if (isSuccessOrganizations && organizations.length > 0) {
+      setSelectedOrgSlug(organizations[0].slug)
     }
-  }, [isLoadingOrganizations])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessOrganizations])
 
   const onApproveRequest = async () => {
     if (!auth_id) {
@@ -113,7 +118,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   if (isApproved) {
     const approvedOrganization = organizations?.find(
-      (org) => org.slug === requester.approved_organization_slug
+      (org) => org?.slug === requester.approved_organization_slug
     )
 
     return (
@@ -184,9 +189,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.slug}
-                label={organization.name}
-                value={organization.slug}
+                key={organization?.slug}
+                label={organization?.name}
+                value={organization?.slug}
               >
                 {organization.name}
               </Listbox.Option>

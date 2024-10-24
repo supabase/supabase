@@ -81,7 +81,9 @@ const EdgeFunctionSecrets = () => {
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to update edge function secrets',
+                        text: !canUpdateSecrets
+                          ? 'You need additional permissions to update edge function secrets'
+                          : undefined,
                       },
                     }}
                   >

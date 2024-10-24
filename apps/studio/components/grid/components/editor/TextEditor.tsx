@@ -15,6 +15,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
@@ -188,9 +189,10 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
         }
       >
         <div
-          className={`${
-            !!value && value.trim().length == 0 ? 'sb-grid-fill-container' : ''
-          } sb-grid-text-editor__trigger`}
+          className={cn(
+            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+            'sb-grid-text-editor__trigger'
+          )}
           onClick={() => setIsPopoverOpen(!isPopoverOpen)}
         >
           {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}

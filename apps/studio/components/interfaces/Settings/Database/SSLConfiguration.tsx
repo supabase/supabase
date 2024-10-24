@@ -10,7 +10,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -27,7 +27,7 @@ const SSLConfiguration = () => {
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
 
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const {
     data: sslEnforcementConfiguration,
     isLoading,
@@ -65,8 +65,7 @@ const SSLConfiguration = () => {
   )
   const env = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod' ? 'prod' : 'staging'
   const hasSSLCertificate =
-    projectSettings?.project !== undefined &&
-    new Date(projectSettings.project.inserted_at) >= new Date('2021-04-30')
+    settings?.inserted_at !== undefined && new Date(settings.inserted_at) >= new Date('2021-04-30')
 
   useEffect(() => {
     if (!isLoading && sslEnforcementConfiguration) {

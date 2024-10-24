@@ -231,7 +231,9 @@ const InstanceConfigurationUI = () => {
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to deploy replicas',
+                      text: !canManageReplicas
+                        ? 'You need additional permissions to deploy replicas'
+                        : undefined,
                     },
                   }}
                 >

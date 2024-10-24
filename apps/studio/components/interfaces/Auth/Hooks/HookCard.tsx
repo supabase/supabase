@@ -100,7 +100,9 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to configure auth hooks',
+                text: !canUpdateAuthHook
+                  ? 'You need additional permissions to configure auth hooks'
+                  : undefined,
               },
             }}
           >
