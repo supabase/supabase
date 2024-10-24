@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useCreateSinkMutation } from 'data/replication/create-sink-mutation'
 import { toast } from 'sonner'
-import { Button, Form, Input, Modal } from 'ui'
+import { Button, Form, Input, Modal, Select } from 'ui'
 
 export interface CreateSinkModalProps {
   visible: boolean
@@ -18,6 +18,9 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
   })
   const validate = (values: any) => {
     const errors = {} as any
+    if (!values.sink_name) {
+      errors.sink_name = 'Please enter a name for your sink'
+    }
     if (!values.project_id) {
       errors.project_id = 'Please enter a Project Id for your sink'
     }
@@ -32,12 +35,15 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
   const onSubmit = (values: any) => {
     createSink({
       projectRef: ref!,
+      sink_name: values.sink_name,
       project_id: values.project_id,
       dataset_id: values.dataset_id,
       service_account_key: values.service_account_key,
     })
   }
   const initialValues = {
+    sink_type: 'BigQuery',
+    sink_name: '',
     project_id: '',
     dataset_id: '',
     service_account_key: '',
@@ -55,13 +61,28 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
           return (
             <>
               <Modal.Content>
+                <Select autoFocus id="sink_type" name="sink_type" size="small" label="Sink Type">
+                  <Select.Option value="BigQuery">BigQuery</Select.Option>
+                </Select>
+              </Modal.Content>
+              <Modal.Content>
+                <Input
+                  id="sink_name"
+                  name="sink_name"
+                  type="text"
+                  className="w-full"
+                  layout="vertical"
+                  label="Sink Name"
+                />
+              </Modal.Content>
+              <Modal.Content>
                 <Input
                   id="project_id"
                   name="project_id"
                   type="text"
                   className="w-full"
                   layout="vertical"
-                  label="Project Id"
+                  label="BigQuery Project Id"
                 />
               </Modal.Content>
               <Modal.Content>
@@ -71,7 +92,7 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
                   type="text"
                   className="w-full"
                   layout="vertical"
-                  label="Dataset Id"
+                  label="BigQuery Dataset Id"
                 />
               </Modal.Content>
               <Modal.Content>
@@ -81,7 +102,7 @@ const CreateSinkModal = ({ visible, onClose }: CreateSinkModalProps) => {
                   type="text"
                   className="w-full"
                   layout="vertical"
-                  label="Service Account Key"
+                  label="BigQuery Service Account Key"
                 ></Input.TextArea>
               </Modal.Content>
               <Modal.Separator />
