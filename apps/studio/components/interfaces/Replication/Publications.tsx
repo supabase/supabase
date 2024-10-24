@@ -44,7 +44,8 @@ export const ReplicationPublications = () => {
     sourceId: source_id!,
   })
 
-  const publications = pub_data ?? []
+  const pubs = pub_data ?? []
+  const publications = pubs.filter((pub) => pub.name !== 'supabase_realtime')
 
   return (
     <>
