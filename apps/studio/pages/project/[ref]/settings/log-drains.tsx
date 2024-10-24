@@ -24,7 +24,7 @@ import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_WRITE, 'logflare')
+  const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_ADMIN_WRITE, 'logflare')
 
   const [open, setOpen] = useState(false)
   const { ref } = useParams() as { ref: string }
