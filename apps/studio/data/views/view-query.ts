@@ -1,5 +1,5 @@
 import type { PostgresView } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
@@ -55,3 +55,12 @@ export const useViewQuery = <TData = ViewData>(
       ...options,
     }
   )
+
+export function prefetchView(
+  client: QueryClient,
+  { projectRef, connectionString, id }: ViewVariables
+) {
+  return client.fetchQuery(viewKeys.view(projectRef, id), ({ signal }) =>
+    getView({ id, projectRef, connectionString }, signal)
+  )
+}
