@@ -35,7 +35,7 @@ import {
   getAvailableComputeOptions,
 } from './DiskManagement.utils'
 import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
-import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { DiskStorageSchemaType } from './DiskManagementPanel.schema'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useMemo } from 'react'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -250,8 +250,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 defaultValue={form.formState.defaultValues?.computeSize ?? ''}
                 newValue={form.getValues('computeSize')}
                 unit="-"
-                beforePrice={computeSizePrice.oldPrice}
-                afterPrice={computeSizePrice.newPrice}
+                beforePrice={Number(computeSizePrice.oldPrice)}
+                afterPrice={Number(computeSizePrice.newPrice)}
               />
             )}
             {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (

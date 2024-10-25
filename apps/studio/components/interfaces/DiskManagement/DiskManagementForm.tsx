@@ -50,7 +50,7 @@ import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import BillingChangeBadge from './BillingChangeBadge'
-import { DiskManagementFormLoading } from './BillingMangementForm.loading'
+// import { DiskManagementFormLoading } from './BillingMangementForm.loading'
 import { ComputeSizeReccomendationSection } from './ComputeSizeReccomendationSection'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
@@ -74,7 +74,7 @@ import {
   calculateThroughputPrice,
   getAvailableComputeOptions,
 } from './DiskManagement.utils'
-import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanel.schema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
@@ -292,6 +292,7 @@ export function DiskManagementForm() {
   useEffect(() => {
     // Initialize field values properly when data has been loaded
     if (isSuccess) form.reset(defaultValues)
+    // @ts-nocheck
   }, [isSuccess])
 
   // Watch storageType and allocatedStorage to adjust constraints dynamically
@@ -349,7 +350,8 @@ export function DiskManagementForm() {
   }
 
   if (isLoading) {
-    return <DiskManagementFormLoading />
+    // return <DiskManagementFormLoading />
+    return <div>loading...</div>
   }
 
   if (error) {
@@ -455,7 +457,7 @@ export function DiskManagementForm() {
                       defaultValue={field.value}
                       value={field.value}
                     >
-                      {availableOptions.map((compute) => {
+                      {availableOptions.map((compute: (typeof availableOptions)[number]) => {
                         const cpuArchitecture = getCloudProviderArchitecture(
                           project?.cloud_provider
                         )

@@ -53,12 +53,15 @@ export const calculateComputeSizePrice = ({
   oldComputeSize: string
   newComputeSize: string
 }) => {
-  const oldPrice = availableOptions?.find((x) => x.identifier === oldComputeSize)?.price * 720
-  const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price * 720
+  const oldPrice = availableOptions?.find((x) => x.identifier === oldComputeSize)?.price ?? 0
+  const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price ?? 0
+
+  const oldPriceMonthly = oldPrice * 720
+  const newPriceMonthly = newPrice * 720
 
   return {
-    oldPrice,
-    newPrice,
+    oldPrice: oldPriceMonthly.toFixed(2),
+    newPrice: newPriceMonthly.toFixed(2),
   }
 }
 
@@ -145,7 +148,7 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
   const computeOptions =
     availableAddons
       .find((addon) => addon.type === 'compute_instance')
-      ?.variants.filter((option) => {
+      ?.variants.filter((option: { [key: string]: any }) => {
         if (!projectCloudProvider) {
           return true
         }

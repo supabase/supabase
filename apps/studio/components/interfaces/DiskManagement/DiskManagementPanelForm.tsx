@@ -60,7 +60,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanel.schema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
@@ -195,6 +195,12 @@ export function DiskManagementPanelForm() {
     watchedStorageType === 'gp3'
       ? Math.min(0.25 * watchedIOPS, THROUGHPUT_RANGE[DiskType.GP3].max)
       : undefined
+
+  const onSubmit = async (data: DiskStorageSchemaType) => {
+    console.log('submitting')
+    if (projectRef === undefined) return console.error('Project ref is required')
+    updateDiskConfigurationRQ({ ref: projectRef, ...data })
+  }
 
   // i hate typescript enums
   // gotta clean this up but it allows me to remove type casts for now
