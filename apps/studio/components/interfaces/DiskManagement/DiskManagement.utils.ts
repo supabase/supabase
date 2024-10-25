@@ -191,17 +191,17 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
 
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
   if (!totalSize) throw Error('Total size is required')
-  return Math.min(1000 * totalSize, 256000)
+  return Math.min(3000 * totalSize, 16000)
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
   if (!iops) throw Error('IOPS is required')
-  return Math.max(1, Math.ceil(iops / 1000))
+  return Math.max(1, Math.ceil(iops / 3000))
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithio2 = (totalSize: number) => {
   if (!totalSize) throw Error('Total size is required')
-  return Math.min(500 * totalSize, 16000)
+  return Math.min(500 * totalSize, 256000)
 }
 
 export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {

@@ -257,32 +257,9 @@ export function DiskManagementForm() {
   const disableIopsInput =
     RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(watchedComputeSize) && watchedStorageType === 'gp3'
 
-  const disableThroughputInput =
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(watchedComputeSize) &&
-    watchedStorageType === 'gp3'
-
-  const currentCompute = (addons?.selected_addons ?? []).find((x) => x.type === 'compute_instance')
-    ?.variant
-  const maxIopsBasedOnCompute =
-    COMPUTE_MAX_IOPS[watchedComputeSize as keyof typeof COMPUTE_MAX_IOPS]
-  const maxThroughputBasedOnCompute =
-    COMPUTE_MAX_THROUGHPUT[watchedComputeSize as keyof typeof COMPUTE_MAX_THROUGHPUT]
-
   const { includedDiskGB: includedDiskGBMeta } =
     PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
-
-  const minIOPS = IOPS_RANGE[watchedStorageType]?.min ?? 0
-  const maxIOPS =
-    watchedStorageType === 'gp3'
-      ? Math.min(500 * watchedTotalSize, IOPS_RANGE[DiskType.GP3].max)
-      : Math.min(1000 * watchedTotalSize, IOPS_RANGE[DiskType.IO2].max)
-  const minThroughput =
-    watchedStorageType === 'gp3' ? THROUGHPUT_RANGE[watchedStorageType]?.min ?? 0 : 0
-  const maxThroughput =
-    watchedStorageType === 'gp3'
-      ? Math.min(0.25 * watchedIOPS, THROUGHPUT_RANGE[DiskType.GP3].max)
-      : undefined
 
   /**
    * Price calculations
@@ -666,6 +643,8 @@ export function DiskManagementForm() {
                           // only trigger provisionedIOPS due to other input being hidden
                           await form.trigger('provisionedIOPS')
                           await form.trigger('totalSize')
+
+                          trigger('provisionedIOPS')
                         }}
                         defaultValue={field.value}
                         disabled={disableInput}
