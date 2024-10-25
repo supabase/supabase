@@ -107,7 +107,6 @@ function MultiSelector({
               onValuesChange(values.filter((item) => item !== values[values.length - 1]))
             }
           }
-          console.log('Esc  ')
           break
         case 'Escape':
           activeIndex !== -1 ? setActiveIndex(-1) : setOpen(false)

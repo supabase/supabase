@@ -200,20 +200,11 @@ function TroubleshootingFilterInternal({
     allEntries.current = entries
   }, [])
 
-  const convertToItem = useCallback(
-    (arr: string[], { capitalize = false }: { capitalize?: boolean } = {}) =>
-      arr.map((item) => item),
-    []
-  )
-
   return (
     <>
       <h2 className="sr-only">Search and filter</h2>
       <div className={cn('flex flex-wrap gap-2 items-center', className)}>
-        <MultiSelector
-          values={convertToItem(selectedProducts, { capitalize: true })}
-          onValuesChange={setSelectedProducts}
-        >
+        <MultiSelector values={selectedProducts} onValuesChange={setSelectedProducts}>
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Products" />
           <MultiSelector.Content>
             <MultiSelector.List>
@@ -225,10 +216,7 @@ function TroubleshootingFilterInternal({
             </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
-        <MultiSelector
-          values={convertToItem(selectedErrorCodes, { capitalize: true })}
-          onValuesChange={setSelectedErrorCodes}
-        >
+        <MultiSelector values={selectedErrorCodes} onValuesChange={setSelectedErrorCodes}>
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Error codes" />
           <MultiSelector.Content>
             <MultiSelector.List>
@@ -240,10 +228,7 @@ function TroubleshootingFilterInternal({
             </MultiSelector.List>
           </MultiSelector.Content>
         </MultiSelector>
-        <MultiSelector
-          values={convertToItem(selectedTags, { capitalize: true })}
-          onValuesChange={setSelectedTags}
-        >
+        <MultiSelector values={selectedTags} onValuesChange={setSelectedTags}>
           <MultiSelector.Trigger badgeLimit={1} className="w-48" label="Tags" />
           <MultiSelector.Content>
             <MultiSelector.List>

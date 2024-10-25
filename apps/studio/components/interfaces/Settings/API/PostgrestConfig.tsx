@@ -188,9 +188,6 @@ export const PostgrestConfig = () => {
 
   const isDataApiEnabledInForm = form.getValues('enableDataApi')
 
-  console.log('form', form)
-  console.log('schema', schema)
-
   return (
     <>
       <Form_Shadcn_ {...form}>
