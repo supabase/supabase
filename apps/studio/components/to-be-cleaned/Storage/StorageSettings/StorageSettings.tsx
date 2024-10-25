@@ -37,11 +37,7 @@ import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 interface StorageSettingsState {
   fileSizeLimit: number
   unit: StorageSizeUnits
-  features?: {
-    imageTransformation: {
-      enabled: boolean
-    }
-  }
+  imageTransformationEnabled: boolean
 }
 
 const StorageSettings = () => {
@@ -61,27 +57,26 @@ const StorageSettings = () => {
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.BYTES,
-    features: {
-      imageTransformation: {
-        enabled: !isFreeTier as boolean,
-      },
-    },
+    imageTransformationEnabled: !isFreeTier,
   })
 
   useEffect(() => {
     if (isSuccess && config) {
-      const { fileSizeLimit, features } = config
+      const { fileSizeLimit, features, isFreeTier } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
+      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+
       setInitialValues({
         fileSizeLimit: value,
         unit: unit,
-        // features:
+        imageTransformationEnabled,
       })
+
       // Reset the form values when the config values load
       form.reset({
         fileSizeLimit: value,
         unit: unit,
-        features,
+        imageTransformationEnabled,
       })
     }
   }, [isSuccess, config])
@@ -94,13 +89,7 @@ const StorageSettings = () => {
     .object({
       fileSizeLimit: z.coerce.number(),
       unit: z.nativeEnum(StorageSizeUnits),
-      features: z
-        .object({
-          imageTransformation: z.object({
-            enabled: z.boolean(),
-          }),
-        })
-        .optional(),
+      imageTransformationEnabled: z.boolean(),
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
@@ -135,7 +124,7 @@ const StorageSettings = () => {
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
       features: {
         imageTransformation: {
-          enabled: data.features?.imageTransformation.enabled,
+          enabled: data.imageTransformationEnabled,
         },
       },
     })
@@ -245,7 +234,7 @@ const StorageSettings = () => {
                     <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
                       <FormField_Shadcn_
                         control={form.control}
-                        name="features.imageTransformation.enabled"
+                        name="imageTransformationEnabled"
                         render={({ field }) => (
                           <Switch
                             size="large"
