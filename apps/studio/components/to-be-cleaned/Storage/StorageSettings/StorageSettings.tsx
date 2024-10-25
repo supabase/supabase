@@ -29,6 +29,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Switch,
 } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
@@ -50,15 +51,32 @@ const StorageSettings = () => {
   const [initialValues, setInitialValues] = useState({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.BYTES,
+    features: {
+      imageTransformation: {
+        enabled: !isFreeTier,
+      },
+    },
   })
 
   useEffect(() => {
     if (isSuccess && config) {
-      const { fileSizeLimit } = config
+      const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      setInitialValues({ fileSizeLimit: value, unit: unit })
+      setInitialValues({
+        fileSizeLimit: value,
+        unit: unit,
+        features: {
+          imageTransformation: {
+            enabled: false,
+          },
+        },
+      })
       // Reset the form values when the config values load
-      form.reset({ fileSizeLimit: value, unit: unit })
+      form.reset({
+        fileSizeLimit: value,
+        unit: unit,
+        features,
+      })
     }
   }, [isSuccess, config])
 
@@ -70,6 +88,13 @@ const StorageSettings = () => {
     .object({
       fileSizeLimit: z.coerce.number(),
       unit: z.nativeEnum(StorageSizeUnits),
+      features: z
+        .object({
+          imageTransformation: z.object({
+            enabled: z.boolean(),
+          }),
+        })
+        .optional(),
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
@@ -102,6 +127,11 @@ const StorageSettings = () => {
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
+      features: {
+        imageTransformation: {
+          enabled: data.features.imageTransformation.enabled,
+        },
+      },
     })
   }
 
@@ -196,6 +226,35 @@ const StorageSettings = () => {
                     Maximum size in bytes of a file that can be uploaded is 50 GB (
                     {formattedMaxSizeBytes}).
                   </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-surface-100  overflow-hidden border-muted rounded-md border shadow">
+              <div className="flex flex-col gap-0 divide-y divide-border-muted">
+                <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
+                  <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
+                    <p className="text-sm">Image Transformation</p>
+                  </div>
+                  <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
+                    <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="features.imageTransformation.enabled"
+                        render={({ field }) => (
+                          <Switch
+                            size="large"
+                            disabled={isFreeTier}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        )}
+                      />
+                    </div>
+                    <p className={'text-sm text-foreground-light col-start-5 col-span-8'}>
+                      Toggle image transformation feature.
+                      <br /> When disabled transformation endpoints will not be reachable
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
