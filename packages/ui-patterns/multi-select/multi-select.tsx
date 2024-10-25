@@ -344,7 +344,7 @@ const MultiSelectorInput = React.forwardRef<
 
   const handleFocus = () => setOpen(true)
   const handleClick = () => setActiveIndex(-1)
-  const handleClose = () => setInputValue('')
+  const handleReset = () => setInputValue('')
 
   useEffect(() => {
     setTimeout(() => {
@@ -368,9 +368,9 @@ const MultiSelectorInput = React.forwardRef<
       onClick={handleClick}
       tabIndex={open ? 0 : -1}
       disabled={disabled}
-      showResetIcon={showResetIcon}
       showSearchIcon={showSearchIcon}
-      handleClose={handleClose}
+      showResetIcon={showResetIcon}
+      handleReset={handleReset}
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),

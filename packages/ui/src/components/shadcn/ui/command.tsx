@@ -43,7 +43,7 @@ const CommandInput = React.forwardRef<
     wrapperClassName?: string
     showResetIcon?: boolean
     showSearchIcon?: boolean
-    handleClose?: () => void
+    handleReset?: () => void
   }
 >(
   (
@@ -52,7 +52,7 @@ const CommandInput = React.forwardRef<
       wrapperClassName,
       showResetIcon = false,
       showSearchIcon = true,
-      handleClose,
+      handleReset,
       ...props
     },
     ref
@@ -69,7 +69,7 @@ const CommandInput = React.forwardRef<
       />
       {showResetIcon && (
         <button
-          onClick={handleClose}
+          onClick={handleReset}
           className={cn(
             'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
             !!props.value?.length && 'opacity-100'
