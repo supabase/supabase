@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendEventPH = components['schemas']['TelemetryEventBodyV2']
+type SendEvent = components['schemas']['TelemetryEventBodyV2']
 
 export type SendEventVariables = {
   action: string
@@ -51,7 +51,7 @@ export const useSendEventMutation = ({
     (vars) => {
       const { action, ...otherVars } = vars
 
-      const body: SendEventPH = {
+      const body: SendEvent = {
         action,
         page_url: window.location.href,
         page_title: title,
