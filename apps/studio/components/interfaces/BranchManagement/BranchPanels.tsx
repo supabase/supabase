@@ -18,6 +18,7 @@ import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -38,7 +39,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
-import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -234,7 +234,13 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
-                {branchingWorkflowLogsEnabled && <WorkflowLogs projectRef={branch.project_ref} />}
+                {branchingWorkflowLogsEnabled && (
+                  <Button type="default" asChild>
+                    <Link href={`/project/${branch.project_ref}/logs/workflow-run-logs`}>
+                      View Logs
+                    </Link>
+                  </Button>
+                )}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
@@ -289,7 +295,30 @@ export const BranchRow = ({
                 </Link>
               </Button>
             ) : (
-              <WorkflowLogs projectRef={branch.project_ref} />
+              <ButtonTooltip
+                type="default"
+                asChild
+                disabled={branch.status === 'CREATING_PROJECT'}
+                tooltip={{
+                  content: {
+                    side: 'bottom',
+                    text:
+                      branch.status === 'CREATING_PROJECT'
+                        ? 'Branch is still creating. Logs will be available once the branch is active'
+                        : undefined,
+                  },
+                }}
+              >
+                <Link
+                  href={
+                    branch.status === 'CREATING_PROJECT'
+                      ? '#'
+                      : `/project/${branch.project_ref}/logs/workflow-run-logs`
+                  }
+                >
+                  View Logs
+                </Link>
+              </ButtonTooltip>
             )}
 
             <DropdownMenu modal={false}>
