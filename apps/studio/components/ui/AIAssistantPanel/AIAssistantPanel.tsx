@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { generateThreadMessage } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel/AIPolicyEditorPanel.utils'
 import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
 import { sqlAiDisclaimerComment } from 'components/interfaces/SQLEditor/SQLEditor.constants'
@@ -17,11 +18,18 @@ import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { sqlKeys } from 'data/sql/keys'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { SqlEditor } from 'icons'
-import { BASE_PATH, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import {
+  BASE_PATH,
+  LOCAL_STORAGE_KEYS,
+  TELEMETRY_ACTIONS,
+  TELEMETRY_CATEGORIES,
+  TELEMETRY_LABELS,
+} from 'lib/constants'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -40,7 +48,6 @@ import CodeEditor from '../CodeEditor/CodeEditor'
 import { AIAssistant } from './AIAssistant'
 import { generateCTA, generatePlaceholder, generateTitle, validateQuery } from './AIAssistant.utils'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export const AiAssistantPanel = () => {
   const os = detectOS()
@@ -79,6 +86,15 @@ export const AiAssistantPanel = () => {
   const [errorHeader, ...errorContent] =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === editor)
+
+  const { mutate: sendEvent } = useSendEventMutation()
+  const sendTelemetryEvent = (action: string) => {
+    sendEvent({
+      action,
+      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
+      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+    })
+  }
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
@@ -156,6 +172,7 @@ export const AiAssistantPanel = () => {
     })
 
     setDebugThread([...debugThread, assistantMessageBefore])
+    sendTelemetryEvent(TELEMETRY_ACTIONS.FIX_WITH_ASSISTANT)
 
     try {
       const { solution, sql } = await debugSql({
@@ -190,6 +207,7 @@ export const AiAssistantPanel = () => {
         ${value}
     `.trim(),
     })
+    sendTelemetryEvent(TELEMETRY_ACTIONS.EXPLAIN_CODE)
   }
 
   const updateEditorWithCheckForDiff = useCallback(
@@ -334,6 +352,10 @@ export const AiAssistantPanel = () => {
                 actions={{
                   runQuery: { enabled: true, callback: () => onExecuteSql() },
                   explainCode: { enabled: true, callback: onExplainSql },
+                  closeAssistant: {
+                    enabled: true,
+                    callback: () => setAiAssistantPanel({ open: false }),
+                  },
                 }}
               />
             </div>
