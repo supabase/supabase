@@ -11,7 +11,6 @@ import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutatio
 import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
@@ -34,13 +33,11 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   const consentToastId = useRef<string | number>()
   const previousPathname = usePrevious(router.pathname)
-  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
 
-  const consentFlag = enablePostHogTelemetry
-    ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
-    : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+  const consentFlag = LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
+
   const consent = typeof window !== 'undefined' ? localStorage.getItem(consentFlag) : null
-  const trackTelemetryPH = enablePostHogTelemetry && consent === 'true'
+  const trackTelemetryPH = consent === 'true'
 
   const { mutate: sendPage } = useSendPageMutation()
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
@@ -48,27 +45,22 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && enablePostHogTelemetry !== undefined) {
+    if (typeof window !== 'undefined') {
       const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true, consentFlag)
+        snap.setIsOptedInTelemetry(true)
         if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
       const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false, consentFlag)
+        snap.setIsOptedInTelemetry(false)
         if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
-      const hasAcknowledgedConsent = localStorage.getItem(
-        enablePostHogTelemetry
-          ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
-          : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
-      )
+      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       snap.setIsOptedInTelemetry(
         typeof hasAcknowledgedConsent === 'string'
           ? hasAcknowledgedConsent === 'true'
-          : hasAcknowledgedConsent,
-        consentFlag
+          : hasAcknowledgedConsent
       )
 
       if (IS_PLATFORM && hasAcknowledgedConsent === null) {
@@ -86,7 +78,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enablePostHogTelemetry])
+  }, [])
 
   useEffect(() => {
     function handleRouteChange() {
@@ -163,7 +155,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const handleBeforeUnload = async () => {
-      if (enablePostHogTelemetry && snap.isOptedInTelemetry) await sendPageLeave()
+      if (snap.isOptedInTelemetry) await sendPageLeave()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
 
