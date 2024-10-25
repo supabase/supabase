@@ -6981,13 +6981,46 @@ functions:
       - id: move-file
         name: Move file
         code: |
-          ```
-          res = supabase.storage.from_('bucket_name').move('public/avatar1.png', 'private/avatar2.png')
+          ```py
+          response = supabase.storage.from_("avatars").move(
+            "public/avatar1.png", "private/avatar2.png"
+          )
           ```
         response: |
           ```json
           {
             "message": "Successfully moved"
+          }
+  - id: from-copy
+    title: 'from_.copy()'
+    description: Copies an existing file to a new path in the same bucket.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from_path
+        isOptional: false
+        type: str
+        description: The original file path, including the current file name. For example `folder/image.png`.
+      - name: to_path
+        isOptional: false
+        type: str
+        description: The new file path, including the new file name. For example `folder/image-new.png`.
+    examples:
+      - id: copy-file
+        name: Copy file
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").copy(
+            "public/avatar1.png", "private/avatar2.png"
+          )
+          ```
+        response: |
+          ```json
+          {
+            "path": "avatars/private/avatar2.png"
           }
 
   - id: from-create-signed-urls
@@ -7131,19 +7164,57 @@ functions:
 
   - id: from-download
     title: 'from_.download()'
+    description: Downloads a file from a private bucket. For public buckets, make a request to the URL returned from `get_public_url` instead.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The full path and file name of the file to be downloaded. For example `folder/image.png`.
+      - name: options
+        isOptional: false
+        type: DownloadOptions
+        subContent:
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: int
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: int
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: int
+                description: The width of the image in pixels.
     examples:
       - id: download-file
         name: Download file
         code: |
-          ```
-          with open(destination, 'wb+') as f:
-            res = supabase.storage.from_('bucket_name').download(source)
-            f.write(res)
+          ```py
+          with open("./myfolder/avatar1.png", "wb+") as f:
+            response = supabase.storage.from_("avatars").download(
+              "folder/avatar1.png"
+            )
+            f.write(response)
           ```
 
   - id: from-remove
