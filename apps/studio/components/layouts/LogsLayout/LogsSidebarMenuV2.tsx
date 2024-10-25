@@ -282,9 +282,9 @@ export function LogsSidebarMenuV2() {
             title="No queries created yet"
             description="Create and save your queries to use them in the explorer"
             actions={
-              <Link href={`/project/${ref}/logs/explorer`}>
-                <Button type="default">Create query</Button>
-              </Link>
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
+              </Button>
             }
           />
         )}
