@@ -51,7 +51,13 @@ export const generateToolRoutes = (
 export const generateProductRoutes = (
   ref?: string,
   project?: Project,
-  features?: { auth?: boolean; edgeFunctions?: boolean; storage?: boolean; realtime?: boolean; replication?: boolean }
+  features?: {
+    auth?: boolean
+    edgeFunctions?: boolean
+    storage?: boolean
+    realtime?: boolean
+    replication?: boolean
+  }
 ): Route[] => {
   const isProjectActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
