@@ -48,8 +48,8 @@ import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
-  COMPUTE_SIZE_MAX_IOPS,
-  COMPUTE_SIZE_MAX_THROUGHPUT,
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
   DiskType,
   IOPS_RANGE,
   PLAN_DETAILS,
@@ -60,7 +60,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
@@ -126,10 +126,10 @@ export function DiskManagementPanelForm() {
     (x: { type: string }) => x.type === 'compute_instance'
   )?.variant
   const maxIopsBasedOnCompute =
-    COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
+    COMPUTE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
-    COMPUTE_SIZE_MAX_THROUGHPUT[
-      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_THROUGHPUT
+    COMPUTE_MAX_THROUGHPUT[
+      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_THROUGHPUT
     ]
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -160,9 +160,10 @@ export function DiskManagementPanelForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
+    computeSize: '',
   }
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(DiskStorageSchema),
+    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -196,6 +197,7 @@ export function DiskManagementPanelForm() {
       : undefined
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
+    console.log('submitting')
     if (projectRef === undefined) return console.error('Project ref is required')
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
@@ -739,7 +741,7 @@ export function DiskManagementPanelForm() {
                     form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}
-                    isWithinCooldown={disableInput}
+                    disabled={disableInput}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
                   />

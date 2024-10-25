@@ -193,7 +193,7 @@ export function DiskManagementForm() {
   // @ts-ignore [Joshen TODO] check whats happening here
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
   const defaultValues = {
-    storageType: type ?? 'gp3',
+    storageType: type ?? DiskType.GP3,
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,

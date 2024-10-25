@@ -1,11 +1,9 @@
 import { z } from 'zod'
 import { DISK_LIMITS, DiskType, THROUGHPUT_RANGE, IOPS_RANGE } from './DiskManagement.constants'
 import {
-  calculateComputeSizeRequiredForIops,
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
   calculateIopsRequiredForThroughput,
-  calculateMaxIopsAllowedForComputeSize,
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsAllowedForDiskSizeWithio2,
 } from './DiskManagement.utils'
@@ -30,7 +28,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: `Allocated disk size must be at least ${defaultTotalSize} GB.`,
+        message: `Disk size cannot be reduced in size. Must be at least ${defaultTotalSize} GB.`,
         path: ['totalSize'],
       })
     }
