@@ -49,7 +49,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
     <>
       <div className="bg-surface-100 border-default overflow-hidden border shadow px-5 py-4 flex flex-row rounded-md space-x-4">
         <div>
-          <Clock size={24} className="text-foreground-muted mt-0.5" />
+          <Clock size={20} className="text-foreground-muted mt-0.5 translate-y-0.5" />
         </div>
         <div className="flex flex-col flex-0 overflow-y-auto w-full">
           <div className="flex flex-row justify-between items-center">
