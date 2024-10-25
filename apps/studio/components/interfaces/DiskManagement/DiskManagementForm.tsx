@@ -483,7 +483,7 @@ export function DiskManagementForm() {
                           beforePrice={Number(computeSizePrice.oldPrice)}
                           afterPrice={Number(computeSizePrice.newPrice)}
                         />
-                        <p>hardware resources allocated to your postgres database</p>
+                        <p>Hardware resources allocated to your postgres database</p>
                       </>
                     }
                   >
@@ -568,61 +568,68 @@ export function DiskManagementForm() {
 
             {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
 
-            <div className="flex flex-row gap-6">
-              <FormField_Shadcn_
-                name="totalSize"
-                control={control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Disk Size"
-                    layout="vertical"
-                    description={
-                      includedDiskGB > 0 &&
-                      `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
-                    }
-                    labelOptional={
-                      <BillingChangeBadge
-                        beforePrice={Number(diskSizePrice.oldPrice)}
-                        afterPrice={Number(diskSizePrice.newPrice)}
-                        show={
-                          formState.isDirty &&
-                          !formState.errors.totalSize &&
-                          diskSizePrice.oldPrice !== diskSizePrice.newPrice
-                        }
-                      />
-                    }
-                  >
-                    <div className="mt-1 relative flex gap-2 items-center">
-                      <InputPostTab label="GB">
-                        <FormControl_Shadcn_>
-                          <Input
-                            type="number"
-                            step="1"
-                            {...field}
-                            disabled={disableInput}
-                            className="flex-grow font-mono rounded-r-none"
-                            onWheel={(e) => e.currentTarget.blur()}
-                            onChange={(e) => {
-                              setValue('totalSize', e.target.valueAsNumber, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              })
-                              trigger('provisionedIOPS')
-                              trigger('throughput')
-                            }}
-                            min={includedDiskGB}
+            <div className="grid grid-cols-12 gap-5">
+              <div className="col-span-4">
+                <FormField_Shadcn_
+                  name="totalSize"
+                  control={control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Disk Size"
+                      layout="vertical"
+                      description={
+                        <div className="flex flex-col gap-1">
+                          <BillingChangeBadge
+                            className="mt-1"
+                            beforePrice={Number(diskSizePrice.oldPrice)}
+                            afterPrice={Number(diskSizePrice.newPrice)}
+                            show={
+                              formState.isDirty &&
+                              !formState.errors.totalSize &&
+                              diskSizePrice.oldPrice !== diskSizePrice.newPrice
+                            }
                           />
-                        </FormControl_Shadcn_>
-                      </InputPostTab>
-                      <InputResetButton
-                        isDirty={isAllocatedStorageDirty}
-                        onClick={() => form.resetField('totalSize')}
-                      />
-                    </div>
-                  </FormItemLayout>
-                )}
-              />
-              <div className="w-full">
+                          <span className="text-foreground-muted">
+                            {includedDiskGB > 0 &&
+                              `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+                          </span>
+                        </div>
+                      }
+                      // labelOptional={}
+                      // className=""/
+                    >
+                      <div className="relative flex gap-2 items-center">
+                        <InputPostTab label="GB">
+                          <FormControl_Shadcn_>
+                            <Input
+                              type="number"
+                              step="1"
+                              {...field}
+                              disabled={disableInput}
+                              className="w-32 font-mono rounded-r-none"
+                              onWheel={(e) => e.currentTarget.blur()}
+                              onChange={(e) => {
+                                setValue('totalSize', e.target.valueAsNumber, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                })
+                                trigger('provisionedIOPS')
+                                trigger('throughput')
+                              }}
+                              min={includedDiskGB}
+                            />
+                          </FormControl_Shadcn_>
+                        </InputPostTab>
+                        <InputResetButton
+                          isDirty={isAllocatedStorageDirty}
+                          onClick={() => form.resetField('totalSize')}
+                        />
+                      </div>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+              <div className="col-span-8">
                 {/* You can add additional content in the remaining 4 columns if needed */}
                 <DiskSpaceBar
                   showNewBar={form.formState.dirtyFields.totalSize !== undefined}
@@ -648,8 +655,7 @@ export function DiskManagementForm() {
               open={advancedSettingsOpen}
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
             >
-              <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b">
-                <ChevronRight size={13} className="text-foreground-light" strokeWidth={1} />
+              <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                 <div className="flex flex-col items-start">
                   <span className="text-sm text-foreground">Advanced disk settings</span>
                   <span className="text-sm text-foreground-light">
@@ -657,6 +663,11 @@ export function DiskManagementForm() {
                     type.
                   </span>
                 </div>
+                <ChevronRight
+                  size={16}
+                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
+                  strokeWidth={1}
+                />
               </CollapsibleTrigger_Shadcn_>
 
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
@@ -949,7 +960,12 @@ export function DiskManagementForm() {
                   )}
                 >
                   <FormFooterChangeBadge formState={formState} />
-                  <Button type="default" onClick={() => form.reset()} disabled={!isDirty}>
+                  <Button
+                    type="default"
+                    onClick={() => form.reset()}
+                    disabled={!isDirty}
+                    size="medium"
+                  >
                     Cancel
                   </Button>
                   <DiskManagementReviewAndSubmitDialog

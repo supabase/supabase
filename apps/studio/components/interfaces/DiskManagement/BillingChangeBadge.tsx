@@ -44,7 +44,7 @@ const BillingChangeBadge = ({
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.12 }}
                   >
-                    {formatCurrency(afterPrice)}
+                    {formatCurrency(afterPrice)}/month
                   </motion.span>
                 </div>
               </TooltipTrigger_Shadcn_>

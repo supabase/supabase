@@ -39,6 +39,7 @@ import { DiskStorageSchemaType } from './DiskManagementPanelSchema'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useMemo } from 'react'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -80,9 +81,13 @@ const TableDataRow = ({
       {defaultValue !== newValue ? (
         <Badge variant="default" className="bg-alternative bg-opacity-100">
           <div className="flex items-center gap-1">
-            <span className="text-xs font-mono text-foreground-muted">{defaultValue}</span>
+            <span className="text-xs font-mono text-foreground-muted">
+              {defaultValue.toString().replace('ci_', '')}
+            </span>
             <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-            <span className="text-xs font-mono text-foreground">{newValue}</span>
+            <span className="text-xs font-mono text-foreground">
+              {newValue.toString().replace('ci_', '')}
+            </span>
           </div>
         </Badge>
       ) : (
@@ -194,10 +199,17 @@ export const DiskManagementReviewAndSubmitDialog = ({
     numReplicas,
   })
 
+  const hasDiskConfigChanges =
+    form.formState.defaultValues?.provisionedIOPS !== form.getValues('provisionedIOPS') ||
+    (form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
+      form.getValues('storageType') === 'gp3') ||
+    form.formState.defaultValues?.totalSize !== form.getValues('totalSize')
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
+          size="medium"
           htmlType="submit"
           type="primary"
           onClick={async (e) => {
@@ -223,9 +235,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
       <DialogContent className="min-w-[620px]">
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
-          <DialogDescription>
-            Disk configuration changes will be applied shortly once confirmed.
-          </DialogDescription>
+          <DialogDescription>Changes will be applied shortly once confirmed.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
 
@@ -234,71 +244,73 @@ export const DiskManagementReviewAndSubmitDialog = ({
             <TableHeaderRow />
           </TableHeader>
           <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-            <TableDataRow
-              attribute="Compute size"
-              defaultValue={form.formState.defaultValues?.computeSize ?? ''}
-              newValue={form.getValues('computeSize')}
-              unit="-"
-              beforePrice={computeSizePrice.oldPrice}
-              afterPrice={computeSizePrice.newPrice}
-            />
-            <TableDataRow
-              hidePrice
-              attribute="Storage Type"
-              defaultValue={form.formState.defaultValues?.storageType ?? ''}
-              newValue={form.getValues('storageType')}
-              unit="-"
-              beforePrice={0}
-              afterPrice={0}
-            />
-            <TableDataRow
-              attribute="IOPS"
-              defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
-              newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
-              unit="IOPS"
-              beforePrice={Number(iopsPrice.oldPrice)}
-              afterPrice={Number(iopsPrice.newPrice)}
-              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-            />
-            {form.getValues('storageType') === 'gp3' ? (
+            {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
               <TableDataRow
-                attribute="Throughput"
-                defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
-                newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
-                unit="MB/s"
-                beforePrice={Number(throughputPrice.oldPrice)}
-                afterPrice={Number(throughputPrice.newPrice)}
+                attribute="Compute size"
+                defaultValue={form.formState.defaultValues?.computeSize ?? ''}
+                newValue={form.getValues('computeSize')}
+                unit="-"
+                beforePrice={computeSizePrice.oldPrice}
+                afterPrice={computeSizePrice.newPrice}
+              />
+            )}
+            {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (
+              <TableDataRow
+                hidePrice
+                attribute="Storage Type"
+                defaultValue={form.formState.defaultValues?.storageType ?? ''}
+                newValue={form.getValues('storageType')}
+                unit="-"
+                beforePrice={0}
+                afterPrice={0}
+              />
+            )}
+            {form.formState.defaultValues?.provisionedIOPS !==
+              form.getValues('provisionedIOPS') && (
+              <TableDataRow
+                attribute="IOPS"
+                defaultValue={form.formState.defaultValues?.provisionedIOPS?.toLocaleString() ?? 0}
+                newValue={form.getValues('provisionedIOPS')?.toLocaleString()}
+                unit="IOPS"
+                beforePrice={Number(iopsPrice.oldPrice)}
+                afterPrice={Number(iopsPrice.newPrice)}
                 priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
               />
-            ) : (
-              <TableRow>
-                <TableCell className="pl-5">
-                  <div className="flex flex-row gap-2 items-center">
-                    <span>Throughput</span>
-                  </div>
-                </TableCell>
-                <TableCell colSpan={3}>
-                  <p className="text-foreground-lighter text-xs text-center">
-                    Throughput is not configurable for io2 storage type
-                  </p>
-                </TableCell>
-              </TableRow>
             )}
-            <TableDataRow
-              attribute="Disk size"
-              defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
-              newValue={form.getValues('totalSize')?.toLocaleString()}
-              unit="GB"
-              beforePrice={Number(diskSizePrice.oldPrice)}
-              afterPrice={Number(diskSizePrice.newPrice)}
-              priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
-            />
+            {form.formState.defaultValues?.throughput !== form.getValues('throughput') &&
+              form.getValues('storageType') === 'gp3' && (
+                <TableDataRow
+                  attribute="Throughput"
+                  defaultValue={form.formState.defaultValues?.throughput?.toLocaleString() ?? 0}
+                  newValue={form.getValues('throughput')?.toLocaleString() ?? 0}
+                  unit="MB/s"
+                  beforePrice={Number(throughputPrice.oldPrice)}
+                  afterPrice={Number(throughputPrice.newPrice)}
+                  priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+                />
+              )}
+            {form.formState.defaultValues?.totalSize !== form.getValues('totalSize') && (
+              <TableDataRow
+                attribute="Disk size"
+                defaultValue={form.formState.defaultValues?.totalSize?.toLocaleString() ?? 0}
+                newValue={form.getValues('totalSize')?.toLocaleString()}
+                unit="GB"
+                beforePrice={Number(diskSizePrice.oldPrice)}
+                afterPrice={Number(diskSizePrice.newPrice)}
+                priceTooltip={numReplicas > 0 ? replicaTooltipText : undefined}
+              />
+            )}
           </TableBody>
         </Table>
 
-        <DialogSectionSeparator />
+        <div className="flex flex-col gap-2 p-5">
+          {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
+            <DiskMangementRestartRequiredSection />
+          )}
+          {hasDiskConfigChanges && <DiskMangementCoolDownSection />}
+        </div>
 
-        <DiskMangementCoolDownSection />
+        {/* <DialogSectionSeparator /> */}
 
         <DialogFooter>
           <Button block size="small" type="default" onClick={() => setIsDialogOpen(false)}>

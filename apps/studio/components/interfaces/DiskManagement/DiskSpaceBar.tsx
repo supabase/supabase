@@ -41,7 +41,7 @@ export default function DiskSpaceBar({
 
   const databaseSizeBytes = data?.result[0].db_size ?? 0
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
           {usedSize.toFixed(2)} GB used of{' '}
