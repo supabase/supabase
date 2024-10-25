@@ -330,11 +330,11 @@ const MultiSelectorInputVariants = cva('bg-control border', {
 const MultiSelectorInput = React.forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput> & {
-    showCloseIcon?: boolean
+    showResetIcon?: boolean
     showSearchIcon?: boolean
     wrapperClassName?: string
   }
->(({ className, wrapperClassName, showCloseIcon, showSearchIcon, ...props }, ref) => {
+>(({ className, wrapperClassName, showResetIcon, showSearchIcon, ...props }, ref) => {
   const { open, setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
     useMultiSelect()
   const inputRef = React.useRef<HTMLInputElement>(null)
@@ -368,7 +368,7 @@ const MultiSelectorInput = React.forwardRef<
       onClick={handleClick}
       tabIndex={open ? 0 : -1}
       disabled={disabled}
-      showCloseIcon={showCloseIcon}
+      showResetIcon={showResetIcon}
       showSearchIcon={showSearchIcon}
       handleClose={handleClose}
       wrapperClassName={wrapperClassName}

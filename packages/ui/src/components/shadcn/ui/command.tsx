@@ -41,7 +41,7 @@ const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
     wrapperClassName?: string
-    showCloseIcon?: boolean
+    showResetIcon?: boolean
     showSearchIcon?: boolean
     handleClose?: () => void
   }
@@ -50,7 +50,7 @@ const CommandInput = React.forwardRef<
     {
       className,
       wrapperClassName,
-      showCloseIcon = false,
+      showResetIcon = false,
       showSearchIcon = true,
       handleClose,
       ...props
@@ -67,11 +67,11 @@ const CommandInput = React.forwardRef<
         )}
         {...props}
       />
-      {showCloseIcon && (
+      {showResetIcon && (
         <button
           onClick={handleClose}
           className={cn(
-            'text-foreground-lighter hover:text-foreground-light transition-all opacity-0 duration-100',
+            'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',
             !!props.value?.length && 'opacity-100'
           )}
         >
