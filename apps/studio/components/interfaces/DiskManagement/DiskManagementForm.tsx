@@ -65,6 +65,7 @@ import {
 } from './DiskManagement.constants'
 import {
   calculateComputeSizePrice,
+  calculateComputeSizeRequiredForIops,
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
@@ -86,6 +87,7 @@ import { InputPostTab } from './InputPostTab'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { InputResetButton } from './InputResetButton'
 import { DiskManagementFormLoading } from './BillingMangementForm.loading'
+import { ComputeSizeReccomendationSection } from './ComputeSizeReccomendationSection'
 
 export function DiskManagementForm() {
   const { project } = useProjectContext()
@@ -492,6 +494,8 @@ export function DiskManagementForm() {
                           shouldDirty: true,
                           shouldValidate: true,
                         })
+                        trigger('provisionedIOPS')
+                        trigger('throughput')
                       }}
                       defaultValue={field.value}
                       value={field.value}
@@ -620,7 +624,10 @@ export function DiskManagementForm() {
                         </InputPostTab>
                         <InputResetButton
                           isDirty={isAllocatedStorageDirty}
-                          onClick={() => form.resetField('totalSize')}
+                          onClick={() => {
+                            form.resetField('totalSize')
+                            trigger('provisionedIOPS')
+                          }}
                         />
                       </div>
                     </FormItemLayout>
@@ -724,14 +731,16 @@ export function DiskManagementForm() {
                 <FormField_Shadcn_
                   control={form.control}
                   name="provisionedIOPS"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="IOPS"
-                      description={
-                        <div className="flex flex-col gap-y-2">
-                          <div className="flex items-center gap-x-2">
-                            {watchedStorageType === 'io2' ? (
+                  render={({ field }) => {
+                    const reccomendedComputeSize = calculateComputeSizeRequiredForIops(watchedIOPS)
+                    return (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="IOPS"
+                        description={
+                          <div className="flex flex-col gap-y-2">
+                            <div className="flex items-center gap-x-2">
+                              {/* {watchedStorageType === 'io2' ? (
                               <>
                                 <span>
                                   IOPS must be{' '}
@@ -761,9 +770,27 @@ export function DiskManagementForm() {
                                   lower
                                 </InfoTooltip>
                               </>
-                            )}
-                          </div>
-                          {!form.formState.errors.provisionedIOPS &&
+                            )} */}
+                            </div>
+                            <ComputeSizeReccomendationSection
+                              computeSize={watchedComputeSize}
+                              iops={watchedIOPS}
+                              actions={
+                                <Button
+                                  type="default"
+                                  onClick={() => {
+                                    setValue(
+                                      'computeSize',
+                                      `ci_${reccomendedComputeSize.toLocaleLowerCase()}`
+                                    )
+                                    trigger('provisionedIOPS')
+                                  }}
+                                >
+                                  Update to {reccomendedComputeSize}
+                                </Button>
+                              }
+                            />
+                            {/* {!form.formState.errors.provisionedIOPS &&
                             field.value > maxIopsBasedOnCompute && (
                               <p>
                                 Note: Final usable IOPS will be at{' '}
@@ -772,62 +799,65 @@ export function DiskManagementForm() {
                                 </span>{' '}
                                 based on your current compute size of {currentCompute?.name}
                               </p>
-                            )}
+                            )} */}
 
-                          {!form.formState.errors.provisionedIOPS && (
-                            <DiskManagementIOPSReadReplicas
-                              isDirty={form.formState.dirtyFields.provisionedIOPS !== undefined}
-                              oldIOPS={iops ?? 0}
-                              newIOPS={field.value}
-                              oldStorageType={form.formState.defaultValues?.storageType as DiskType}
-                              newStorageType={form.getValues('storageType') as DiskType}
+                            {!form.formState.errors.provisionedIOPS && (
+                              <DiskManagementIOPSReadReplicas
+                                isDirty={form.formState.dirtyFields.provisionedIOPS !== undefined}
+                                oldIOPS={iops ?? 0}
+                                newIOPS={field.value}
+                                oldStorageType={
+                                  form.formState.defaultValues?.storageType as DiskType
+                                }
+                                newStorageType={form.getValues('storageType') as DiskType}
+                              />
+                            )}
+                          </div>
+                        }
+                        labelOptional={
+                          <>
+                            <BillingChangeBadge
+                              show={
+                                (watchedStorageType !== type ||
+                                  (watchedStorageType === 'gp3' && field.value !== iops)) &&
+                                !formState.errors.provisionedIOPS
+                              }
+                              beforePrice={Number(iopsPrice.oldPrice)}
+                              afterPrice={Number(iopsPrice.newPrice)}
+                              className="mb-2"
                             />
-                          )}
-                        </div>
-                      }
-                      labelOptional={
-                        <>
-                          <BillingChangeBadge
-                            show={
-                              (watchedStorageType !== type ||
-                                (watchedStorageType === 'gp3' && field.value !== iops)) &&
-                              !formState.errors.provisionedIOPS
-                            }
-                            beforePrice={Number(iopsPrice.oldPrice)}
-                            afterPrice={Number(iopsPrice.newPrice)}
-                            className="mb-2"
-                          />
-                          <p>Input/output operations per second.</p>
-                          <p>Higher IOPS for high-throughput apps.</p>
-                        </>
-                      }
-                    >
-                      <InputPostTab label="IOPS">
-                        <FormControl_Shadcn_>
-                          <Input
-                            id="provisionedIOPS"
-                            type="number"
-                            className="flex-grow font-mono rounded-r-none max-w-32"
-                            {...field}
-                            value={
-                              disableIopsInput
-                                ? COMPUTE_BASELINE_IOPS[
-                                    watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
-                                  ]
-                                : field.value
-                            }
-                            disabled={disableInput || disableIopsInput}
-                            onChange={(e) => {
-                              setValue('provisionedIOPS', e.target.valueAsNumber, {
-                                shouldDirty: true,
-                                shouldValidate: true,
-                              })
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                      </InputPostTab>
-                    </FormItemLayout>
-                  )}
+                            <p>Input/output operations per second.</p>
+                            <p>Higher IOPS for high-throughput apps.</p>
+                          </>
+                        }
+                      >
+                        <InputPostTab label="IOPS">
+                          <FormControl_Shadcn_>
+                            <Input
+                              id="provisionedIOPS"
+                              type="number"
+                              className="flex-grow font-mono rounded-r-none max-w-32"
+                              {...field}
+                              value={
+                                disableIopsInput
+                                  ? COMPUTE_BASELINE_IOPS[
+                                      watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
+                                    ]
+                                  : field.value
+                              }
+                              disabled={disableInput || disableIopsInput}
+                              onChange={(e) => {
+                                setValue('provisionedIOPS', e.target.valueAsNumber, {
+                                  shouldDirty: true,
+                                  shouldValidate: true,
+                                })
+                              }}
+                            />
+                          </FormControl_Shadcn_>
+                        </InputPostTab>
+                      </FormItemLayout>
+                    )
+                  }}
                 />
 
                 <AnimatePresence initial={false}>
@@ -851,14 +881,14 @@ export function DiskManagementForm() {
                               <div className="flex flex-col gap-y-2">
                                 <div>
                                   <div className="flex items-center gap-x-2">
-                                    <span>
+                                    {/* <span>
                                       Throughput must be between {minThroughput.toLocaleString()}{' '}
                                       and {maxThroughput?.toLocaleString()} MB/s based on your IOPS.
                                     </span>
                                     <InfoTooltip>
                                       Min throughput is at 125MB/s, while max throughput is at
                                       0.25MB/s * IOPS or 1,000, whichever is lower
-                                    </InfoTooltip>
+                                    </InfoTooltip> */}
                                   </div>
                                   {!form.formState.errors.throughput &&
                                     field.value !== undefined &&

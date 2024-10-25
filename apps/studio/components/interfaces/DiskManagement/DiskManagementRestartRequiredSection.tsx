@@ -1,8 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw, X } from 'lucide-react'
 import React, { useState } from 'react'
-
-import { DialogSection, TableCell, TableRow } from 'ui'
+import { DialogSection } from 'ui'
 
 export const DiskMangementRestartRequiredSection: React.FC = () => {
   const [progress, setProgress] = useState(100)

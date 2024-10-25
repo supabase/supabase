@@ -1,5 +1,11 @@
 import { components } from 'api-types'
-import { DISK_LIMITS, DISK_PRICING, DiskType, PLAN_DETAILS } from './DiskManagement.constants'
+import {
+  DISK_LIMITS,
+  DISK_PRICING,
+  DiskType,
+  PLAN_DETAILS,
+  COMPUTE_BASELINE_IOPS,
+} from './DiskManagement.constants'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useMemo } from 'react'
@@ -183,9 +189,56 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
   return computeOptions
 }
 
-export const calculateMaxIopsAllowed = (totalSize: number) => {
+export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
   if (!totalSize) throw Error('Total size is required')
   return Math.min(1000 * totalSize, 256000)
+}
+
+export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
+  if (!iops) throw Error('IOPS is required')
+  return Math.max(1, Math.ceil(iops / 1000))
+}
+
+export const calculateMaxIopsAllowedForDiskSizeWithio2 = (totalSize: number) => {
+  if (!totalSize) throw Error('Total size is required')
+  return Math.min(500 * totalSize, 16000)
+}
+
+export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {
+  if (!iops) throw Error('IOPS is required')
+  return Math.max(4, Math.ceil(iops / 500))
+}
+
+export const calculateMaxThroughput = (iops: number) => {
+  if (!iops) throw Error('IOPS is required')
+  return Math.min(0.256 * iops, 1000)
+}
+
+export const calculateIopsRequiredForThroughput = (throughput: number) => {
+  if (!throughput) throw Error('Throughput is required')
+  return Math.max(125, Math.ceil(throughput / 0.256))
+}
+
+export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
+  if (!computeSize) throw Error('Compute size is required')
+  return COMPUTE_BASELINE_IOPS[computeSize as keyof typeof COMPUTE_BASELINE_IOPS] || 0
+}
+
+export const calculateComputeSizeRequiredForIops = (iops: number) => {
+  if (iops === undefined || iops === null) {
+    throw new Error('IOPS is required')
+  }
+
+  const computeSizes = Object.entries(COMPUTE_BASELINE_IOPS).sort((a, b) => a[1] - b[1])
+  for (const [size, baselineIops] of computeSizes) {
+    if (iops <= baselineIops) {
+      return size.toUpperCase().replace('CI_', '')
+    }
+  }
+
+  // fallback to largest compute size
+  // this should never happen though :-/
+  return computeSizes[computeSizes.length - 1][0].toUpperCase().replace('CI_', '')
 }
 
 export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number => {
