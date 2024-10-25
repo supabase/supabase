@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-react'
-import { Key, ReactNode, useCallback, useMemo, useRef, useState } from 'react'
+import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
 
@@ -93,6 +93,14 @@ const LogTable = ({
   const { show: showContextMenu } = useContextMenu()
 
   const [cellPosition, setCellPosition] = useState<any>()
+
+  const [selectionOpen, setSelectionOpen] = useState(false)
+
+  useEffect(() => {
+    if (selectedLog || isSelectedLogLoading) {
+      setSelectionOpen(true)
+    }
+  }, [selectedLog, isSelectedLogLoading])
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
@@ -408,19 +416,22 @@ const LogTable = ({
         </ResizablePanel>
         <ResizableHandle withHandle />
 
-        <ResizablePanel defaultSize={40}>
-          <LogSelection
-            isLoading={isSelectedLogLoading || false}
-            projectRef={projectRef}
-            onClose={() => {
-              onSelectedLogChange?.(null)
-            }}
-            log={selectedLog}
-            error={selectedLogError}
-            queryType={queryType}
-            collectionName={collectionName}
-          />
-        </ResizablePanel>
+        {selectionOpen && (
+          <ResizablePanel minSize={40} defaultSize={50}>
+            <LogSelection
+              isLoading={isSelectedLogLoading || false}
+              projectRef={projectRef}
+              onClose={() => {
+                onSelectedLogChange?.(null)
+                setSelectionOpen(false)
+              }}
+              log={selectedLog}
+              error={selectedLogError}
+              queryType={queryType}
+              collectionName={collectionName}
+            />
+          </ResizablePanel>
+        )}
       </ResizablePanelGroup>
     </section>
   )
