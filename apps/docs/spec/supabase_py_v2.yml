@@ -6629,6 +6629,8 @@ functions:
 
   - id: list-buckets
     title: 'list_buckets()'
+    description: |
+      Retrieves the details of all Storage buckets within an existing project.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
@@ -6638,107 +6640,343 @@ functions:
       - id: list-buckets
         name: List buckets
         code: |
+          ```python
+          response = supabase.storage.list_buckets()
           ```
-          res = supabase.storage.list_buckets()
+        response: |
+          ```json
+          [
+            {
+              "id": "avatars",
+              "name": "avatars",
+              "owner": "",
+              "public": false,
+              "file_size_limit": 1024,
+              "allowed_mime_types": [
+                "image/png"
+              ],
+              "created_at": "2024-05-22T22:26:05.100Z",
+              "updated_at": "2024-05-22T22:26:05.100Z"
+            }
+          ]
           ```
 
   - id: get-bucket
     title: 'get_bucket()'
+    description: |
+      Retrieves the details of an existing Storage bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to retrieve.
     examples:
       - id: get-bucket
         name: Get bucket
         code: |
+          ```python
+          response = supabase.storage.get_bucket('avatars')
           ```
-          res = supabase.storage.get_bucket(name)
+        response: |
+          ```json
+          {
+            "id": "avatars",
+            "name": "avatars",
+            "owner": "",
+            "public": false,
+            "file_size_limit": 1024,
+            "allowed_mime_types": [
+              "image/png"
+            ],
+            "created_at": "2024-05-22T22:26:05.100Z",
+            "updated_at": "2024-05-22T22:26:05.100Z"
+          }
           ```
 
   - id: create-bucket
     title: 'create_bucket()'
+    description: |
+      Creates a new Storage bucket
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: A unique identifier for the bucket you are creating.
+      - name: options
+        isOptional: false
+        type: CreateOrUpdateBucketOptions
+        subContent:
+          - name: public
+            isOptional: true
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
+          - name: allowed_mime_types
+            isOptional: true
+            type: list[str]
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+          - name: file_size_limit
+            isOptional: true
+            type: int
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
     examples:
       - id: create-bucket
         name: Create bucket
         code: |
+          ```python
+          response = supabase.storage.create_bucket('avatars',   
+            options={
+              "public": False,
+              "allowed_mime_types": ["image/png"],
+              "file_size_limit": 1024,
+            }
+          )
           ```
-          res = supabase.storage.create_bucket(name)
+        response: |
+          ```json
+          {
+            "name": "avatars"
+          }
           ```
 
   - id: empty-bucket
     title: 'empty_bucket()'
+    description: |
+      Removes all objects inside a single bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
         code: |
+          ```python
+          response = supabase.storage.empty_bucket('avatars')
           ```
-          res = supabase.storage.empty_bucket(name)
+        response: |
+          ```json
+          {
+            "message": "Successfully emptied"
+          }
           ```
+  - id: update-bucket
+    title: 'update_bucket()'
+    description: |
+      Updates a Storage bucket
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: A unique identifier for the bucket you are creating.
+      - name: options
+        isOptional: false
+        type: CreateOrUpdateBucketOptions
+        subContent:
+          - name: public
+            isOptional: true
+            type: bool
+            description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
+          - name: allowed_mime_types
+            isOptional: true
+            type: list[str]
+            description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
+          - name: file_size_limit
+            isOptional: true
+            type: int
+            description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        code: |
+          ```python
+          response = supabase.storage.update_bucket('avatars',   
+            options={
+              "public": False,
+              "allowed_mime_types": ["image/png"],
+              "file_size_limit": 1024,
+            }
+          )
+          ```
+        response: |
+          ```json
+          {
+            "message": "Successfully updated"
+          }
+          ```
+
   - id: delete-bucket
     title: 'delete_bucket()'
+    description: |
+      Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: string
+        description: The unique identifier of the bucket you would like to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket
         code: |
+          ```python
+          response = supabase.storage.delete_bucket('avatars')
           ```
-          res = supabase.storage.delete_bucket(name)
+        response: |
+          ```json
+          {
+            "message": "Successfully deleted"
+          }
           ```
 
   - id: from-upload
     title: 'from_.upload()'
+    description: Uploads a file to an existing bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
-        - `objects` table permissions: `insert`
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - Please specify the appropriate content [MIME type](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types) if you are uploading images or audio. If no `file_options` are specified, the MIME type defaults to `text/html`.
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | str | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: str
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: upload-file
         name: Upload file using filepath
         code: |
           ```py
-          with open(filepath, 'rb') as f:
-              supabase.storage.from_("testbucket").upload(file=f,path=path_on_supastorage, file_options={"content-type": "audio/mpeg"})
+          with open('./public/avatar1.png', 'rb') as f:
+            response = supabase.storage.from_("avatars").upload(
+                file=f,
+                path="public/avatar1.png",
+                file_options={"cache-control": "3600", "upsert": "false"},
+            )
           ```
+        response: |
+          ```json
+          {
+            "path": "public/avatar1.png",
+            "full_path": "avatars/public/avatar1.png"
+          }
   - id: from-update
     title: from_.update()
+    description: Replaces an existing file at the specified path with a new one.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | str | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: str
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
     examples:
       - id: update-file
         name: Update file
         code: |
           ```python
-          with open(filepath, 'rb') as f:
-            supabase.storage.from_("bucket_name").update(file=f, path=path_on_supastorage, file_options={"cache-control": "3600", "upsert": "true"})
+          with open('./public/avatar1.png', 'rb') as f:
+            response = supabase.storage.from_("avatars").update(
+                file=f,
+                path="public/avatar1.png",
+                file_options={"cache-control": "3600", "upsert": "true"},
+            )
           ```
+        response: |
+          ```json
+          {
+            "path": "public/avatar1.png",
+            "full_path": "avatars/public/avatar1.png"
+          }
   - id: from-move
     title: 'from_.move()'
+    description: Moves an existing file to a new path in the same bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from_path
+        isOptional: false
+        type: str
+        description: The original file path, including the current file name. For example `folder/image.png`.
+      - name: to_path
+        isOptional: false
+        type: str
+        description: The new file path, including the new file name. For example `folder/image-new.png`.
     examples:
       - id: move-file
         name: Move file
@@ -6746,20 +6984,133 @@ functions:
           ```
           res = supabase.storage.from_('bucket_name').move('public/avatar1.png', 'private/avatar2.png')
           ```
+        response: |
+          ```json
+          {
+            "message": "Successfully moved"
+          }
 
-  - id: from-create-signed-url
-    title: 'from_.create_signed_url()'
+  - id: from-create-signed-urls
+    title: 'from_.create_signed_urls()'
+    description: Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: list[string]
+        description: |
+          The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
+      - name: expires_in
+        isOptional: false
+        type: int
+        description: The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
+      - name: options
+        isOptional: true
+        type: CreateSignedURLsOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```python
+          response = supabase.storage.from_("avatars").create_signed_urls(
+            ["folder/avatar1.png", "folder/avatar2.png"], 60
+          )
+          ```
+        response: |
+          ```json
+          [
+            {
+              "error": null,
+              "path": "folder/avatar1.png",
+              "signedURL": "/object/sign/avatars/folder/avatar1.png?token=<TOKEN>",
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+            },
+            {
+              "error": null,
+              "path": "folder/avatar2.png",
+              "signedURL": "/object/sign/avatars/folder/avatar2.png?token=<TOKEN>",
+              "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar2.png?token=<TOKEN>"
+            }
+          ]
+          ```
+  - id: from-create-signed-url
+    title: 'from_.create_signed_url()'
+    description: Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the current file name. For example `'folder/image.png'`.
+      - name: expires_in
+        isOptional: false
+        type: int
+        description: The number of seconds until the signed URL expires. For example, `60` for URLs which are valid for one minute.
+      - name: options
+        isOptional: true
+        type: URLOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: int
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: int
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: int
+                description: The width of the image in pixels.
     examples:
       - id: create-signed-url
         name: Create Signed URL
         code: |
+          ```python
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60
+          )
           ```
-          res = supabase.storage.from_('bucket_name').create_signed_url(filepath, expiry_duration)
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
+          }
           ```
 
   - id: from-get-public-url
