@@ -196,12 +196,6 @@ export function DiskManagementPanelForm() {
       ? Math.min(0.25 * watchedIOPS, THROUGHPUT_RANGE[DiskType.GP3].max)
       : undefined
 
-  const onSubmit = async (data: DiskStorageSchemaType) => {
-    console.log('submitting')
-    if (projectRef === undefined) return console.error('Project ref is required')
-    updateDiskConfigurationRQ({ ref: projectRef, ...data })
-  }
-
   // i hate typescript enums
   // gotta clean this up but it allows me to remove type casts for now
   function getEnumFromFormValue(value: string) {

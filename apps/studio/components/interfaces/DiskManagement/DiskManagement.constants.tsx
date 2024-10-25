@@ -144,3 +144,16 @@ export const COMPUTE_MAX_THROUGHPUT = {
 export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_micro', 'ci_small', 'ci_medium']
 
 export const RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 = ['ci_micro', 'ci_small', 'ci_medium']
+
+export const DISK_TYPE_OPTIONS = [
+  {
+    type: 'gp3',
+    name: 'General Purpose SSD',
+    description: 'Balance between price and performance',
+  },
+  {
+    type: 'io2',
+    name: 'Provisioned IOPS SSD',
+    description: 'High IOPS for mission-critical applications.',
+  },
+]

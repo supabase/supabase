@@ -1,15 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronRight, CpuIcon, InfoIcon, Microchip, RotateCcw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
+import { components } from 'api-types'
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -19,13 +14,17 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { GB, INSTANCE_MICRO_SPECS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { GB } from 'lib/constants'
+import { ChevronRight, CpuIcon, Microchip } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Badge,
   Button,
   Card,
@@ -47,15 +46,19 @@ import {
   SelectValue_Shadcn_,
   Separator,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import BillingChangeBadge from './BillingChangeBadge'
+import { DiskManagementFormLoading } from './BillingMangementForm.loading'
+import { ComputeSizeReccomendationSection } from './ComputeSizeReccomendationSection'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
   COMPUTE_BASELINE_IOPS,
   COMPUTE_BASELINE_THROUGHPUT,
   COMPUTE_MAX_IOPS,
   COMPUTE_MAX_THROUGHPUT,
+  DISK_TYPE_OPTIONS,
   DiskType,
   IOPS_RANGE,
   PLAN_DETAILS,
@@ -79,16 +82,8 @@ import {
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { ComputeBadge } from 'ui-patterns'
-import { components } from 'api-types'
-import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { InputPostTab } from './InputPostTab'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { InputResetButton } from './InputResetButton'
-import { DiskManagementFormLoading } from './BillingMangementForm.loading'
-import { ComputeSizeReccomendationSection } from './ComputeSizeReccomendationSection'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export function DiskManagementForm() {
   const showDiskAndComputeForm = useFlag('diskAndComputeForm')
@@ -368,19 +363,6 @@ export function DiskManagementForm() {
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
 
-  const diskTypeOptions = [
-    {
-      type: 'gp3',
-      name: 'General Purpose SSD',
-      description: 'Balance between price and performance',
-    },
-    {
-      type: 'io2',
-      name: 'Provisioned IOPS SSD',
-      description: 'High IOPS for mission-critical applications.',
-    },
-  ]
-
   if (!showDiskAndComputeForm) {
     return (
       <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
@@ -435,27 +417,12 @@ export function DiskManagementForm() {
 
   return (
     <>
-      {isRequestingChanges ? (
-        <Card className="px-2 rounded-none">
-          <CardContent className="py-3 flex gap-3 px-3 items-center">
-            <div className="flex flex-col">
-              <p className="text-foreground-lighter text-sm p-0">
-                Disk configuration changes have been requested
-              </p>
-              <p className="text-sm">The requested changes will be applied to your disk shortly</p>
-            </div>
-          </CardContent>
-        </Card>
-      ) : (
-        <></>
-      )}
-      {/* <DiskManagementFormLoading /> */}
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
             {/* {showNewDiskManagementUI ? <DiskManagementForm /> : null} */}
 
-            {true ? (
+            {isRequestingChanges ? (
               <Card className="px-2 bg-surface-100">
                 <CardContent className="py-3 flex gap-3 px-3 items-center">
                   <div className="flex flex-col">
@@ -710,7 +677,7 @@ export function DiskManagementForm() {
                         </FormControl_Shadcn_>
                         <SelectContent_Shadcn_>
                           <>
-                            {diskTypeOptions.map((item) => (
+                            {DISK_TYPE_OPTIONS.map((item) => (
                               <SelectItem_Shadcn_
                                 key={item.type}
                                 disabled={disableInput}
