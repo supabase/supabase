@@ -26,6 +26,7 @@ import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
 import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+import { parseAsString, useQueryStates } from 'nuqs'
 
 interface LogsPreviewHook {
   logData: LogData[]
@@ -60,12 +61,15 @@ function useLogsPreview({
   const [filters, setFilters] = useState<Filters>({ ...filterOverride })
   const isFirstRender = useRef<boolean>(true)
 
-  const [params, setParams] = useState<LogsEndpointParams>({
-    project: projectRef,
-    sql: genDefaultQuery(table, filters, limit),
-    iso_timestamp_start: defaultHelper.calcFrom(),
-    iso_timestamp_end: defaultHelper.calcTo(),
+  const [queryParams, setQueryParams] = useQueryStates({
+    project: parseAsString.withDefault(projectRef),
+    iso_timestamp_start: parseAsString.withDefault(defaultHelper.calcFrom()),
+    iso_timestamp_end: parseAsString.withDefault(defaultHelper.calcTo()),
   })
+
+  const [sql, setSQL] = useState(genDefaultQuery(table, filters, limit))
+
+  const params: LogsEndpointParams = { ...queryParams, sql }
 
   useEffect(() => {
     if (isFirstRender.current) {
@@ -178,7 +182,7 @@ function useLogsPreview({
 
   const refresh = async () => {
     const generatedSql = genDefaultQuery(table, filters, limit)
-    setParams((prev) => ({ ...prev, sql: generatedSql }))
+    setQueryParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
     refreshEventChart()
     refetch()
@@ -224,7 +228,7 @@ function useLogsPreview({
     setFilters: handleSetFilters,
     refresh,
     loadOlder: () => fetchNextPage(),
-    setParams,
+    setParams: setQueryParams,
   }
 }
 export default useLogsPreview

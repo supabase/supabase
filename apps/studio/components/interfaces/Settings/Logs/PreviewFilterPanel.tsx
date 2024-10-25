@@ -121,9 +121,7 @@ const PreviewFilterPanel = ({
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
-    <div
-      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-4 pt-4' : '')}
-    >
+    <div className={'flex w-full items-center justify-between' + (condensedLayout ? ' p-3' : '')}>
       <div className="flex flex-row items-center gap-x-2">
         <form
           id="log-panel-search"
