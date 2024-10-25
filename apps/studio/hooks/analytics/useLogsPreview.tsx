@@ -71,14 +71,6 @@ function useLogsPreview({
 
   const params: LogsEndpointParams = { ...queryParams, sql }
 
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false
-      return
-    }
-    refresh()
-  }, [JSON.stringify(filters)])
-
   const {
     data,
     isSuccess,
@@ -111,6 +103,16 @@ function useLogsPreview({
       },
     }
   )
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    const newSql = genDefaultQuery(table, filters, limit)
+    setSQL(newSql)
+    refresh(newSql)
+  }, [JSON.stringify(filters)])
 
   // memoize all this calculations stuff
   const { logData, error, oldestTimestamp } = useMemo(() => {
@@ -180,8 +182,9 @@ function useLogsPreview({
     { refetchOnWindowFocus: false }
   )
 
-  const refresh = async () => {
-    const generatedSql = genDefaultQuery(table, filters, limit)
+  const refresh = async (newSql?: string) => {
+    const generatedSql = newSql || genDefaultQuery(table, filters, limit)
+    setSQL(generatedSql)
     setQueryParams((prev) => ({ ...prev, sql: generatedSql }))
     setLatestRefresh(new Date().toISOString())
     refreshEventChart()
