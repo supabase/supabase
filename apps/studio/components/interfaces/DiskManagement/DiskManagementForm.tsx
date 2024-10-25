@@ -397,37 +397,37 @@ export function DiskManagementForm() {
     return <div>Error: {error.message}</div>
   }
 
-  if (planId === 'free') {
-    return (
-      <div id="disk-management">
-        <FormHeader
-          title="Disk Management"
-          docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
-        />
-        <Alert_Shadcn_>
-          <InfoIcon />
-          <AlertTitle_Shadcn_>
-            Disk size configuration is not available for projects on the Free Plan
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>
-              If you are intending to use more than 500MB of disk space, then you will need to
-              upgrade to at least the Pro Plan.
-            </p>
-            <Button asChild type="default" className="mt-3">
-              <Link
-                target="_blank"
-                rel="noreferrer"
-                href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
-              >
-                Upgrade plan
-              </Link>
-            </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-      </div>
-    )
-  }
+  // if (planId === 'team') {
+  //   return (
+  //     <div id="disk-management">
+  //       <FormHeader
+  //         title="Disk Management"
+  //         docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+  //       />
+  //       <Alert_Shadcn_>
+  //         <InfoIcon />
+  //         <AlertTitle_Shadcn_>
+  //           Disk size configuration is not available for projects on the Free Plan
+  //         </AlertTitle_Shadcn_>
+  //         <AlertDescription_Shadcn_>
+  //           <p>
+  //             If you are intending to use more than 500MB of disk space, then you will need to
+  //             upgrade to at least the Pro Plan.
+  //           </p>
+  //           <Button asChild type="default" className="mt-3">
+  //             <Link
+  //               target="_blank"
+  //               rel="noreferrer"
+  //               href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+  //             >
+  //               Upgrade plan
+  //             </Link>
+  //           </Button>
+  //         </AlertDescription_Shadcn_>
+  //       </Alert_Shadcn_>
+  //     </div>
+  //   )
+  // }
 
   // return <></>
 
@@ -750,39 +750,6 @@ export function DiskManagementForm() {
                         label="IOPS"
                         description={
                           <div className="flex flex-col gap-y-2">
-                            <div className="flex items-center gap-x-2">
-                              {/* {watchedStorageType === 'io2' ? (
-                              <>
-                                <span>
-                                  IOPS must be{' '}
-                                  {watchedTotalSize >= 8
-                                    ? `between ${minIOPS} and ${maxIOPS.toLocaleString()} based on your disk size.`
-                                    : `at least ${minIOPS}`}
-                                </span>
-                                <InfoTooltip>
-                                  For io2 storage type, min IOPS is at {minIOPS}, while max IOPS is
-                                  at 1000 * disk size in GB or{' '}
-                                  {IOPS_RANGE[DiskType.IO2].max.toLocaleString()}, whichever is
-                                  lower
-                                </InfoTooltip>
-                              </>
-                            ) : (
-                              <>
-                                <span>
-                                  IOPS must be{' '}
-                                  {watchedTotalSize >= 8
-                                    ? `between ${minIOPS.toLocaleString()} and ${maxIOPS.toLocaleString()} based on your disk size.`
-                                    : `at least ${minIOPS.toLocaleString()}`}
-                                </span>
-                                <InfoTooltip>
-                                  For gp3 storage type, min IOPS is at {minIOPS} while max IOPS is
-                                  at 500 * disk size in GB or{' '}
-                                  {IOPS_RANGE[DiskType.GP3].max.toLocaleString()}, whichever is
-                                  lower
-                                </InfoTooltip>
-                              </>
-                            )} */}
-                            </div>
                             <ComputeSizeReccomendationSection
                               computeSize={watchedComputeSize}
                               iops={watchedIOPS}
@@ -801,17 +768,6 @@ export function DiskManagementForm() {
                                 </Button>
                               }
                             />
-                            {/* {!form.formState.errors.provisionedIOPS &&
-                            field.value > maxIopsBasedOnCompute && (
-                              <p>
-                                Note: Final usable IOPS will be at{' '}
-                                <span className="text-foreground">
-                                  {maxIopsBasedOnCompute.toLocaleString()}
-                                </span>{' '}
-                                based on your current compute size of {currentCompute?.name}
-                              </p>
-                            )} */}
-
                             {!form.formState.errors.provisionedIOPS && (
                               <DiskManagementIOPSReadReplicas
                                 isDirty={form.formState.dirtyFields.provisionedIOPS !== undefined}
@@ -831,7 +787,8 @@ export function DiskManagementForm() {
                               show={
                                 (watchedStorageType !== type ||
                                   (watchedStorageType === 'gp3' && field.value !== iops)) &&
-                                !formState.errors.provisionedIOPS
+                                !formState.errors.provisionedIOPS &&
+                                !disableIopsInput
                               }
                               beforePrice={Number(iopsPrice.oldPrice)}
                               afterPrice={Number(iopsPrice.newPrice)}
@@ -889,43 +846,17 @@ export function DiskManagementForm() {
                             label="Throughput (MB/s)"
                             layout="horizontal"
                             description={
-                              <div className="flex flex-col gap-y-2">
-                                <div>
-                                  <div className="flex items-center gap-x-2">
-                                    {/* <span>
-                                      Throughput must be between {minThroughput.toLocaleString()}{' '}
-                                      and {maxThroughput?.toLocaleString()} MB/s based on your IOPS.
-                                    </span>
-                                    <InfoTooltip>
-                                      Min throughput is at 125MB/s, while max throughput is at
-                                      0.25MB/s * IOPS or 1,000, whichever is lower
-                                    </InfoTooltip> */}
-                                  </div>
-                                  {!form.formState.errors.throughput &&
-                                    field.value !== undefined &&
-                                    field.value > maxThroughputBasedOnCompute && (
-                                      <p>
-                                        Note: Final usable throughput will be at{' '}
-                                        <span className="text-foreground">
-                                          {maxThroughputBasedOnCompute.toFixed(0)}
-                                        </span>{' '}
-                                        MB/s based on your current compute size of{' '}
-                                        {currentCompute?.name}
-                                      </p>
-                                    )}
-                                </div>
-                                {!form.formState.errors.throughput && (
-                                  <DiskManagementThroughputReadReplicas
-                                    isDirty={form.formState.dirtyFields.throughput !== undefined}
-                                    oldThroughput={throughput_mbps ?? 0}
-                                    newThroughput={field.value ?? 0}
-                                    oldStorageType={
-                                      form.formState.defaultValues?.storageType as DiskType
-                                    }
-                                    newStorageType={form.getValues('storageType') as DiskType}
-                                  />
-                                )}
-                              </div>
+                              !form.formState.errors.throughput && (
+                                <DiskManagementThroughputReadReplicas
+                                  isDirty={form.formState.dirtyFields.throughput !== undefined}
+                                  oldThroughput={throughput_mbps ?? 0}
+                                  newThroughput={field.value ?? 0}
+                                  oldStorageType={
+                                    form.formState.defaultValues?.storageType as DiskType
+                                  }
+                                  newStorageType={form.getValues('storageType') as DiskType}
+                                />
+                              )
                             }
                             labelOptional={
                               <>
