@@ -7,7 +7,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendPagePH = components['schemas']['TelemetryPageBodyV2']
+type SendPage = components['schemas']['TelemetryPageBodyV2']
 
 export type SendPageVariables = {
   url: string
@@ -15,7 +15,12 @@ export type SendPageVariables = {
 
 type SendPagePayload = any
 
-export async function sendPage({ consent, body }: { consent: boolean; body: SendPagePayload }) {
+export async function sendPage({ body }: { body: SendPagePayload }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
   if (!consent) return undefined
 
   const headers = { Version: '2' }
@@ -33,11 +38,6 @@ export const useSendPageMutation = ({
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
   const router = useRouter()
 
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
-
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
@@ -45,7 +45,7 @@ export const useSendPageMutation = ({
     (vars) => {
       const { url } = vars
       const type = 'PH'
-      const body: SendPagePH = {
+      const body: SendPage = {
         page_url: url,
         page_title: title,
         pathname: router.pathname,
@@ -58,7 +58,7 @@ export const useSendPageMutation = ({
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
       }
-      return sendPage({ consent, body })
+      return sendPage({ body })
     },
     {
       async onSuccess(data, variables, context) {

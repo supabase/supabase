@@ -18,7 +18,12 @@ export type SendEventVariables = {
 
 type SendEventPayload = any
 
-export async function sendEvent({ consent, body }: { consent: boolean; body: SendEventPayload }) {
+export async function sendEvent({ body }: { body: SendEventPayload }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
   if (!consent) return undefined
 
   const headers = { Version: '2' }
@@ -38,11 +43,6 @@ export const useSendEventMutation = ({
   'mutationFn'
 > = {}) => {
   const router = useRouter()
-
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -68,7 +68,7 @@ export const useSendEventMutation = ({
         custom_properties: otherVars,
       }
 
-      return sendEvent({ consent, body })
+      return sendEvent({ body })
     },
     {
       async onSuccess(data, variables, context) {

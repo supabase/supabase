@@ -6,7 +6,7 @@ import { Profile } from 'data/profile/types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { ResponseError } from 'types'
 
-type SendIdentifyPH = components['schemas']['TelemetryIdentifyBodyV2']
+type SendIdentify = components['schemas']['TelemetryIdentifyBodyV2']
 
 export type SendIdentifyVariables = {
   slug?: string
@@ -16,13 +16,12 @@ export type SendIdentifyVariables = {
 
 type SendIdentifyPayload = any
 
-export async function sendIdentify({
-  consent,
-  body,
-}: {
-  consent: boolean
-  body: SendIdentifyPayload
-}) {
+export async function sendIdentify({ body }: { body: SendIdentifyPayload }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
   if (!consent) return undefined
 
   const headers = { Version: '2' }
@@ -41,22 +40,17 @@ export const useSendIdentifyMutation = ({
   UseMutationOptions<SendIdentifyData, ResponseError, SendIdentifyVariables>,
   'mutationFn'
 > = {}) => {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
-
   return useMutation<SendIdentifyData, ResponseError, SendIdentifyVariables>(
     (vars) => {
       const { user, slug, ref } = vars
 
-      const body: SendIdentifyPH = {
+      const body: SendIdentify = {
         user_id: user.gotrue_id,
         organization_slug: slug,
         project_ref: ref,
       }
 
-      return sendIdentify({ consent, body })
+      return sendIdentify({ body })
     },
     {
       async onSuccess(data, variables, context) {
