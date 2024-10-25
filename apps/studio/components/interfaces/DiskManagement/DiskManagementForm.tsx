@@ -84,6 +84,10 @@ import {
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { InputPostTab } from './InputPostTab'
 import { InputResetButton } from './InputResetButton'
+import {
+  updateSubscriptionAddon,
+  useProjectAddonUpdateMutation,
+} from 'data/subscriptions/project-addon-update-mutation'
 
 export function DiskManagementForm() {
   const showDiskAndComputeForm = useFlag('diskAndComputeForm')
@@ -95,6 +99,11 @@ export function DiskManagementForm() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const [messageState, setMessageState] = useState<{
+    message: string
+    type: 'error' | 'success'
+  } | null>(null)
+  const [showRestartPending, setShowRestartPendingState] = useState(false)
 
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
@@ -323,22 +332,59 @@ export function DiskManagementForm() {
     return () => clearInterval(timer)
   }, [remainingTime])
 
-  const { mutate: updateDiskConfigurationRQ, isLoading: isUpdatingDiskConfiguration } =
-    useUpdateDiskAttributesMutation({
-      onSuccess: (_, vars) => {
-        toast.success(
-          'Successfully requested disk configuration changes! Your changes will be applied shortly'
-        )
-        const { ref, ...formData } = vars
-        setIsDialogOpen(false)
-        setRefetchInterval(3000)
-        form.reset(formData as DiskStorageSchemaType)
+  const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
+    useUpdateDiskAttributesMutation({})
+  const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
+    useProjectAddonUpdateMutation({
+      onSuccess: () => {
+        setShowRestartPendingState(true)
       },
     })
 
+  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute
+
   const onSubmit = async (data: DiskStorageSchemaType) => {
-    if (projectRef === undefined) return console.error('Project ref is required')
-    updateDiskConfigurationRQ({ ref: projectRef, ...data })
+    let payload = data
+    try {
+      if (
+        payload.storageType !== form.formState.defaultValues?.storageType ||
+        payload.provisionedIOPS !== form.formState.defaultValues?.provisionedIOPS ||
+        payload.throughput !== form.formState.defaultValues?.throughput ||
+        payload.totalSize !== form.formState.defaultValues?.totalSize
+      ) {
+        if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
+          payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
+        }
+
+        await updateDiskConfiguration({
+          ref: projectRef,
+          provisionedIOPS: payload.provisionedIOPS,
+          storageType: payload.storageType,
+          totalSize: payload.totalSize,
+          throughput: payload.throughput,
+        })
+      }
+
+      if (payload.computeSize !== form.formState.defaultValues?.computeSize) {
+        await updateSubscriptionAddon({
+          projectRef: projectRef,
+          variant: payload.computeSize,
+          type: 'compute_instance',
+          suppressToast: true,
+        })
+      }
+
+      // toast.success(
+      //   'Successfully requested disk configuration changes! Your changes will be applied shortly'
+      // )
+      setIsDialogOpen(false)
+      form.reset(data as DiskStorageSchemaType)
+    } catch (error: unknown) {
+      setMessageState({
+        message: error instanceof Error ? error.message : 'An unknown error occurred',
+        type: 'error',
+      })
+    }
   }
 
   if (!showDiskAndComputeForm) {
@@ -401,7 +447,19 @@ export function DiskManagementForm() {
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
             {/* {showNewDiskManagementUI ? <DiskManagementForm /> : null} */}
 
-            {isRequestingChanges ? (
+            {showRestartPending && (
+              <Card className="px-2 bg-surface-100">
+                <CardContent className="py-3 flex gap-3 px-3 items-center">
+                  <div className="flex flex-col">
+                    <p className="text-foreground text-sm p-0">Project about to restart</p>
+                    <p className="text-foreground-lighter text-sm">
+                      This project is about to restart to change compute to {watchedComputeSize}.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+            {isRequestingChanges && (
               <Card className="px-2 bg-surface-100">
                 <CardContent className="py-3 flex gap-3 px-3 items-center">
                   <div className="flex flex-col">
@@ -414,8 +472,6 @@ export function DiskManagementForm() {
                   </div>
                 </CardContent>
               </Card>
-            ) : (
-              <></>
             )}
 
             <Separator />
@@ -446,7 +502,7 @@ export function DiskManagementForm() {
                   >
                     <RadioGroupCard
                       className="grid grid-cols-3 flex-wrap gap-3"
-                      onValueChange={(value) => {
+                      onValueChange={(value: components['schemas']['AddonVariantId']) => {
                         setValue('computeSize', value, {
                           shouldDirty: true,
                           shouldValidate: true,
@@ -707,7 +763,7 @@ export function DiskManagementForm() {
                                   onClick={() => {
                                     setValue(
                                       'computeSize',
-                                      `ci_${reccomendedComputeSize.toLocaleLowerCase()}`
+                                      `ci_${reccomendedComputeSize.toLocaleLowerCase()}` as components['schemas']['AddonVariantId']
                                     )
                                     trigger('provisionedIOPS')
                                   }}
@@ -887,7 +943,7 @@ export function DiskManagementForm() {
                     Cancel
                   </Button>
                   <DiskManagementReviewAndSubmitDialog
-                    loading={isUpdatingDiskConfiguration}
+                    loading={isUpdatingConfig}
                     form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}

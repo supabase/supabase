@@ -8,6 +8,8 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import {
+  Alert_Shadcn_,
+  AlertTitle_Shadcn_,
   Badge,
   Button,
   Dialog,
@@ -24,6 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  WarningIcon,
 } from 'ui'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskType } from './DiskManagement.constants'
@@ -123,6 +126,10 @@ interface DiskSizeMeterProps {
   disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
+  message?: {
+    type: 'error' | 'warning'
+    message: string
+  }
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({
@@ -133,6 +140,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
   numReplicas,
   loading,
   onSubmit,
+  message,
 }: DiskSizeMeterProps) => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
@@ -232,6 +240,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
           Review changes
         </ButtonTooltip>
       </DialogTrigger>
+      {loading && <h1>is loading</h1>}
       <DialogContent className="min-w-[620px]">
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
@@ -328,6 +337,13 @@ export const DiskManagementReviewAndSubmitDialog = ({
           >
             Confirm changes
           </Button>
+
+          {message && (
+            <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
+              <WarningIcon />
+              <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
+            </Alert_Shadcn_>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

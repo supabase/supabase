@@ -160,7 +160,7 @@ export function DiskManagementPanelForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: '',
+    computeSize: undefined,
   }
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),

@@ -7,6 +7,9 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsAllowedForDiskSizeWithio2,
 } from './DiskManagement.utils'
+import { components } from 'api-types'
+
+type AddonVariantId = components['schemas']['AddonVariantId']
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -16,14 +19,16 @@ const baseSchema = z.object({
     .describe('Allocated disk size in GB'),
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
-  computeSize: z.string().describe('Compute size'),
+  computeSize: z
+    .custom<AddonVariantId>((val): val is AddonVariantId => true)
+    .describe('Compute size'),
 })
 
 export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
 
-    const computeLabel = computeSize.toUpperCase().replace('CI_', '')
+    const computeLabel = computeSize?.toUpperCase().replace('CI_', '')
 
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
