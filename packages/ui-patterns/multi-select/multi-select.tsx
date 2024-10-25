@@ -344,15 +344,22 @@ const MultiSelectorInput = React.forwardRef<
 
   const handleFocus = () => setOpen(true)
   const handleClick = () => setActiveIndex(-1)
-  const handleReset = () => setInputValue('')
+  const handleReset = () => {
+    setInputValue('')
+    setInputFocus()
+  }
 
-  useEffect(() => {
+  const setInputFocus = () => {
     setTimeout(() => {
       if (!inputRef?.current) return
       if (open) {
         inputRef.current.focus()
       }
     }, 100)
+  }
+
+  useEffect(() => {
+    setInputFocus()
 
     if (!open) {
       inputRef.current?.blur()
