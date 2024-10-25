@@ -257,6 +257,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       connectionString: project?.connectionString,
       table,
       filters,
+      enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
     },
     { keepPreviousData: true }
@@ -270,6 +271,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   }
 
   const onRowsDelete = () => {
+    console.log({ totalRows, countData })
     const numRows = allRowsSelected ? totalRows : selectedRows.size
     const rowIdxs = Array.from(selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
