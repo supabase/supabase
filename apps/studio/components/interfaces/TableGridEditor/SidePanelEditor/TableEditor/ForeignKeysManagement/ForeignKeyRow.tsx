@@ -78,9 +78,10 @@ export const ForeignKeyRow = ({
               }
             >
               <EditorTablePageLink
+                target="_blank"
+                rel="norefererer"
                 projectRef={ref}
                 id={String(foreignKey.tableId)}
-                onClick={() => closePanel()}
               >
                 {foreignKey.schema}.{foreignKey.table}
               </EditorTablePageLink>
