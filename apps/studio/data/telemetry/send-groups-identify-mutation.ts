@@ -36,7 +36,7 @@ export const useSendGroupsIdentifyMutation = ({
 > = {}) => {
   const consent =
     (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
   return useMutation<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>(

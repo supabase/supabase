@@ -36,7 +36,7 @@ export const useSendPageLeaveMutation = ({
   const router = useRouter()
   const consent =
     (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
   const url = typeof window !== 'undefined' ? window.location.href : ''
