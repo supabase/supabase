@@ -8,23 +8,7 @@ import {
 } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
 
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
-import { Separator } from 'ui'
-
 const AuthSettings: NextPageWithLayout = () => {
-  const diskManagementV2 = useFlag('diskManagementV2')
-  const project = useSelectedProject()
-  const selectedOrg = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-
-  const showNewDiskManagementUI =
-    diskManagementV2 &&
-    project?.cloud_provider === 'AWS' &&
-    subscription?.usage_based_billing_project_addons
-
   return (
     <>
       <ScaffoldContainer>
@@ -35,7 +19,6 @@ const AuthSettings: NextPageWithLayout = () => {
           </ScaffoldDescription>
         </ScaffoldHeader>
       </ScaffoldContainer>
-
       <DiskManagementForm />
     </>
   )

@@ -88,8 +88,11 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { InputResetButton } from './InputResetButton'
 import { DiskManagementFormLoading } from './BillingMangementForm.loading'
 import { ComputeSizeReccomendationSection } from './ComputeSizeReccomendationSection'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export function DiskManagementForm() {
+  const showDiskAndComputeForm = useFlag('diskAndComputeForm')
+
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
@@ -377,6 +380,14 @@ export function DiskManagementForm() {
       description: 'High IOPS for mission-critical applications.',
     },
   ]
+
+  if (!showDiskAndComputeForm) {
+    return (
+      <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+        This page is not available yet
+      </ScaffoldContainer>
+    )
+  }
 
   if (isLoading) {
     return <DiskManagementFormLoading />
