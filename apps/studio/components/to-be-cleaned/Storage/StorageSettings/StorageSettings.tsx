@@ -135,7 +135,7 @@ const StorageSettings = () => {
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
       features: {
         imageTransformation: {
-          enabled: data.features.imageTransformation.enabled,
+          enabled: data.features?.imageTransformation.enabled,
         },
       },
     })
