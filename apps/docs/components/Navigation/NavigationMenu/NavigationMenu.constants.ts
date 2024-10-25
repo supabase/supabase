@@ -988,10 +988,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/postgis',
         },
         {
-          name: 'pgmq: Queues',
-          url: '/guides/database/extensions/pgmq',
-        },
-        {
           name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
