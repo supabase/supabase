@@ -12,14 +12,20 @@ import {
   Trash,
   Unlock,
 } from 'lucide-react'
-// TODO: remove this!
 import Link from 'next/link'
 import Papa from 'papaparse'
-import toast from 'react-hot-toast'
+import toast from 'sonner'
 
 import { IS_PLATFORM } from 'common'
+import {
+  MAX_EXPORT_ROW_COUNT,
+  MAX_EXPORT_ROW_COUNT_MESSAGE,
+} from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  formatTableRowsToSQL,
+  getEntityLintDetails,
+} from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import type { Entity } from 'data/entity-types/entity-type-query'
@@ -33,9 +39,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { Markdown } from 'components/interfaces/Markdown'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import useTableDefinition from 'hooks/misc/useTableDefinition'
 import useEntityType from 'hooks/misc/useEntityType'
 
@@ -322,17 +333,34 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 <span>View Policies</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              key="download-table-csv"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                exportTableAsCSV()
-              }}
-            >
-              <Download size={12} />
-              <span>Export as CSV</span>
-            </DropdownMenuItem>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-x-2">
+                <Download size={12} />
+                Export Data
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  key="download-table-csv"
+                  className="space-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsCSV()
+                  }}
+                >
+                  <span>Export table as CSV</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="download-table-sql"
+                  className="gap-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsSQL()
+                  }}
+                >
+                  <span>Export table as SQL</span>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
             <DropdownMenuItem
               key="copy-definition"
               className="space-x-2"
