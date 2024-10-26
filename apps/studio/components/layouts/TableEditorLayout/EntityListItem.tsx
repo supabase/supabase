@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import toast from 'sonner'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
 import {
