@@ -399,9 +399,8 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Service ID (for OAuth)',
-      description: `Client identifier used in the OAuth flow on the web.
-[Learn more](https://developer.apple.com/documentation/sign_in_with_apple/configuring_your_environment_for_sign_in_with_apple)`,
+      title: 'Client IDs (OAuth, iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
+      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
       type: 'string',
     },
     EXTERNAL_APPLE_SECRET: {
@@ -410,11 +409,6 @@ const EXTERNAL_PROVIDER_APPLE = {
 [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#generate-a-client_secret)`,
       type: 'string',
       isSecret: true,
-    },
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: {
-      title: 'Authorized Client IDs (iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
-      description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
-      type: 'string',
     },
   },
   validationSchema: object().shape({
@@ -473,47 +467,27 @@ const EXTERNAL_PROVIDER_APPLE = {
               },
             }),
       })
-      .when(
-        [
-          'EXTERNAL_APPLE_ENABLED',
-          'EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS',
-          'EXTERNAL_APPLE_CLIENT_ID',
-        ],
-        {
-          is: (
-            EXTERNAL_APPLE_ENABLED: boolean,
-            EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string,
-            EXTERNAL_APPLE_CLIENT_ID: string
-          ) => {
-            return (
-              EXTERNAL_APPLE_ENABLED &&
-              !!EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS &&
-              !EXTERNAL_APPLE_CLIENT_ID
-            )
-          },
-          then: (schema) =>
-            schema.matches(
-              /^$/,
-              'Secret Key should only be set if Service ID for OAuth is provided.'
-            ),
-        }
-      ),
-    EXTERNAL_APPLE_CLIENT_ID: string().matches(
-      /^[a-z0-9.-]+$/i,
-      'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app).'
-    ),
-    EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string()
-      .matches(
-        /^([.a-z0-9-]+(,\s*[.a-z0-9-]+)*,*\s*)?$/i,
-        'Invalid characters. Apple recommends a reverse-domain name style string (e.g. com.example.app). You must only use explicit bundle IDs, asterisks (*) are not allowed.'
-      )
       .when(['EXTERNAL_APPLE_ENABLED', 'EXTERNAL_APPLE_CLIENT_ID'], {
         is: (EXTERNAL_APPLE_ENABLED: boolean, EXTERNAL_APPLE_CLIENT_ID: string) => {
           return EXTERNAL_APPLE_ENABLED && !EXTERNAL_APPLE_CLIENT_ID
         },
         then: (schema) =>
+          schema.matches(
+            /^$/,
+            'Secret Key should only be set if Service ID for OAuth is provided.'
+          ),
+      }),
+    EXTERNAL_APPLE_CLIENT_ID: string()
+      .matches(/^\S+$/, 'Client IDs should not contain spaces.')
+      .matches(
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
+        'Invalid characters. Each ID should follow a reverse-domain style string (e.g. com.example.app). Use commas to separate multiple IDs.'
+      )
+      .when('EXTERNAL_APPLE_ENABLED', {
+        is: true,
+        then: (schema) =>
           schema.required(
-            'At least one Authorized Client ID is required when not using the OAuth flow.'
+            'At least one Service ID or bundle ID is required when Apple sign-in is enabled.'
           ),
       }),
   }),
@@ -835,7 +809,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_CLIENT_ID: {
       title: 'Client IDs',
       description:
-        'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
+        'Comma-separated list of client IDs for OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -856,10 +830,14 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_CLIENT_ID: string()
       .matches(/^\S+$/, 'Client IDs should not contain spaces.')
       .matches(
-        /^([a-z0-9-]+([.][a-z0-9-]+)*(,\s*[a-z0-9-]+([.][a-z0-9-]+)*)*,*\s*)?$/i,
+        /^([a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*(,[a-z0-9-]+\.[a-z0-9-]+(\.[a-z0-9-]+)*)*)$/i,
         'Invalid characters. Google Client IDs should be a comma-separated list of domain-like strings.'
       )
-      .required('At least one Client ID is required when Google sign-in is enabled.'),
+      .when('EXTERNAL_GOOGLE_ENABLED', {
+        is: true,
+        then: (schema) =>
+          schema.required('At least one Client ID is required when Google sign-in is enabled.'),
+      }),
     EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
       is: true,
       then: (schema) =>
