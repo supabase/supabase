@@ -17,18 +17,10 @@ export async function updateSubscriptionAddon({
   projectRef,
   variant,
   type,
-  suppressToast,
 }: ProjectAddonUpdateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!variant) throw new Error('variant is required')
   if (!type) throw new Error('type is required')
-
-  // wait 10 seconds
-  // Synchronous delay using a loop
-  // const start = Date.now()
-  // while (Date.now() - start < 10000) {
-  //   // Empty loop to create delay
-  // }
 
   const { data, error } = await post(`/platform/projects/{ref}/billing/addons`, {
     params: {
