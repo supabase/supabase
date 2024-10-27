@@ -7,14 +7,14 @@ import { handleError, post } from 'data/fetchers'
 
 export type StopPipelineParams = {
   projectRef: string
-  pipeline_id: number
+  pipelineId: number
 }
 
-async function stopPipeline({ projectRef, pipeline_id }: StopPipelineParams, signal?: AbortSignal) {
+async function stopPipeline({ projectRef, pipelineId }: StopPipelineParams, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/pipelines/{pipeline_id}/stop', {
-    params: { path: { ref: projectRef, pipeline_id } },
+    params: { path: { ref: projectRef, pipeline_id: pipelineId } },
     signal,
   })
   if (error) {
@@ -40,10 +40,8 @@ export const useStopPipelineMutation = ({
     (vars) => stopPipeline(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, pipeline_id } = variables
-        await queryClient.invalidateQueries(
-          replicationKeys.pipelinesStatus(projectRef, pipeline_id)
-        )
+        const { projectRef, pipelineId } = variables
+        await queryClient.invalidateQueries(replicationKeys.pipelinesStatus(projectRef, pipelineId))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

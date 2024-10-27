@@ -1,15 +1,10 @@
-import { UseQueryOptions, useQueries, useQuery } from '@tanstack/react-query'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { replicationKeys } from './keys'
 
-type PipelineStatusParams = { pipelineId: number; refetchInterval: number | false }
 type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId: number }
-type ReplicationPipelinesStatusesParams = {
-  projectRef?: string
-  statusParams: PipelineStatusParams[]
-}
 
 async function fetchReplicationPipelineStatus(
   { projectRef, pipelineId }: ReplicationPipelinesStatusParams,
@@ -44,20 +39,3 @@ export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineSta
     ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-type TQueries = UseQueryOptions<ReplicationPipelineStatusData>[]
-
-export const useReplicationPipelinesStatuesQuery = ({
-  projectRef,
-  statusParams,
-}: ReplicationPipelinesStatusesParams) => {
-  return useQueries<TQueries>({
-    queries: statusParams.map(({ pipelineId, refetchInterval }) => {
-      return {
-        queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-        queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
-        refetchInterval,
-      }
-    }),
-  })
-}
