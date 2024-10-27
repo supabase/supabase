@@ -63,11 +63,11 @@ functions:
             description: Options passed to the realtime-py instance.
           - name: postgrest_client_timeout
             isOptional: true
-            type: int, float, Timeout
+            type: number, float, Timeout
             description: Timeout passed to the SyncPostgrestClient instance.
           - name: storage_client_timeout
             isOptional: true
-            type: int, float, Timeout
+            type: number, float, Timeout
             description: Timeout passed to the SyncStorageClient instance.
           - name: flow_type
             isOptional: true
@@ -1389,7 +1389,7 @@ functions:
             type: string
           - name: identity_data
             isOptional: true
-            type: Dict[str, Any]
+            type: Dict[string, Any]
           - name: last_sign_in_at
             isOptional: true
             type: string
@@ -6722,11 +6722,11 @@ functions:
             description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
           - name: allowed_mime_types
             isOptional: true
-            type: list[str]
+            type: list[string]
             description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
           - name: file_size_limit
             isOptional: true
-            type: int
+            type: number
             description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
     examples:
       - id: create-bucket
@@ -6799,11 +6799,11 @@ functions:
             description: The visibility of the bucket. Public buckets don't require an authorization token to download objects, but still require a valid token for all other operations. By default, buckets are private
           - name: allowed_mime_types
             isOptional: true
-            type: list[str]
+            type: list[string]
             description: Specifies the allowed mime types that this bucket can accept during upload. The default value is null, which allows files with all mime types to be uploaded. Each mime type specified can be a wildcard, e.g. image/*, or a specific mime type, e.g. image/png.
           - name: file_size_limit
             isOptional: true
-            type: int
+            type: number
             description: Specifies the max file size in bytes that can be uploaded to this bucket. The global file size limit takes precedence over this value. The default value is null, which doesn't set a per bucket file size limit.
     examples:
       - id: update-bucket
@@ -6869,7 +6869,7 @@ functions:
         description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
       - name: file
         isOptional: false
-        type: BufferedReader | bytes | FileIO | str | Path
+        type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
       - name: options
         isOptional: false
@@ -6882,7 +6882,7 @@ functions:
               The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
           - name: content-type
             isOptional: true
-            type: str
+            type: string
             description: |
               The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
           - name: upsert
@@ -6922,7 +6922,7 @@ functions:
         description: The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
       - name: file
         isOptional: false
-        type: BufferedReader | bytes | FileIO | str | Path
+        type: BufferedReader | bytes | FileIO | string | Path
         description: The body of the file to be stored in the bucket.
       - name: options
         isOptional: false
@@ -6935,7 +6935,7 @@ functions:
               The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
           - name: content-type
             isOptional: true
-            type: str
+            type: string
             description: |
               The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
           - name: upsert
@@ -6971,11 +6971,11 @@ functions:
     params:
       - name: from_path
         isOptional: false
-        type: str
+        type: string
         description: The original file path, including the current file name. For example `folder/image.png`.
       - name: to_path
         isOptional: false
-        type: str
+        type: string
         description: The new file path, including the new file name. For example `folder/image-new.png`.
     examples:
       - id: move-file
@@ -7002,11 +7002,11 @@ functions:
     params:
       - name: from_path
         isOptional: false
-        type: str
+        type: string
         description: The original file path, including the current file name. For example `folder/image.png`.
       - name: to_path
         isOptional: false
-        type: str
+        type: string
         description: The new file path, including the new file name. For example `folder/image-new.png`.
     examples:
       - id: copy-file
@@ -7039,7 +7039,7 @@ functions:
           The file paths to be downloaded, including the current file names. For example `['folder/image.png', 'folder2/image2.png']`.
       - name: expires_in
         isOptional: false
-        type: int
+        type: number
         description: The number of seconds until the signed URLs expire. For example, `60` for URLs which are valid for one minute.
       - name: options
         isOptional: true
@@ -7086,14 +7086,14 @@ functions:
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     params:
-      - name: paths
+      - name: path
         isOptional: false
         type: string
         description: |
           The file path, including the current file name. For example `'folder/image.png'`.
       - name: expires_in
         isOptional: false
-        type: int
+        type: number
         description: The number of seconds until the signed URL expires. For example, `60` for URLs which are valid for one minute.
       - name: options
         isOptional: true
@@ -7115,11 +7115,11 @@ functions:
                 description: Specify the format of the image requested.
               - name: height
                 isOptional: true
-                type: int
+                type: number
                 description: The height of the image in pixels.
               - name: quality
                 isOptional: true
-                type: int
+                type: number
                 description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
               - name: resize
                 isOptional: true
@@ -7128,7 +7128,7 @@ functions:
                   The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
               - name: width
                 isOptional: true
-                type: int
+                type: number
                 description: The width of the image in pixels.
     examples:
       - id: create-signed-url
@@ -7145,22 +7145,199 @@ functions:
             "signedUrl": "https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>"
           }
           ```
+      - id: create-signed-url-with-transformations
+        name: Create a signed URL for an asset with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60, {"transform": {"width": 100, "height": 100}}
+          )
+          ```
+      - id: create-signed-url-with-download
+        name: Create a signed URL which triggers the download of the asset
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_url(
+            "folder/avatar1.png", 60, {"download": True}
+          )
+          ```
 
-  - id: from-get-public-url
-    title: 'from_.get_public_url()'
+  - id: from-create-signed-upload-url
+    title: 'from_.create_signed_upload_url()'
+    description: Creates a signed upload URL. Signed upload URLs can be used to upload files to the bucket without further authentication. They are valid for 2 hours.
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/python/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the current file name. For example `'folder/image.png'`.
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").create_signed_upload_url(
+            "folder/avatar1.png"
+          )
+          ```
+        response: |
+          ```json
+          {
+            "signedUrl": "https://example.supabase.co/storage/v1/object/upload/sign/avatars/folder/cat.jpg?token=<TOKEN>",
+              "path": "folder/cat.jpg",
+              "token": "<TOKEN>"
+          }
+          ```
+  - id: from-upload-to-signed-url
+    title: 'from_.upload_to_signed_url()'
+    description: Upload a file with a token generated from `create_signed_upload_url`.
+    notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The file path, including the file name. Should be of the format `folder/subfolder/filename.png`. The bucket must already exist before attempting to upload.
+      - name: token
+        isOptional: false
+        type: string
+        description: The token generated from `create_signed_upload_url`
+      - name: file
+        isOptional: false
+        type: BufferedReader | bytes | FileIO | string | Path
+        description: The body of the file to be stored in the bucket.
+      - name: options
+        isOptional: false
+        type: FileOptions
+        subContent:
+          - name: cache-control
+            isOptional: true
+            type: string
+            description: |
+              The number of seconds the asset is cached in the browser and in the Supabase CDN. This is set in the `Cache-Control: max-age=<seconds>` header. Defaults to 3600 seconds.
+          - name: content-type
+            isOptional: true
+            type: string
+            description: |
+              The `Content-Type` header value. Should be specified if using a `file` that is neither `Blob` nor `File` nor `FormData`, otherwise will default to `text/plain;charset=UTF-8`.
+          - name: upsert
+            isOptional: true
+            type: string
+            description: When upsert is set to true, the file is overwritten if it exists. When set to false, an error is thrown if the object already exists. Defaults to false.
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        code: |
+          ```py
+          with open("./public/avatar1.png", "rb") as f:
+            response = supabase.storage.from_("avatars").upload_to_signed_url(
+                path="folder/cat.jpg",
+                token="token-from-create_signed_upload_url",
+                file=f,
+            )
+          ```
+        response: |
+          ```json
+          {
+            "path": "folder/cat.jpg",
+            "full_path": "avatars/folder/cat.jpg"
+          }
+          ```
+  
+  - id: from-get-public-url
+    title: 'from_.get_public_url()'
+    description: |
+      A simple convenience function to get the URL for an asset in a public bucket. If you do not want to use this function, you can construct the public URL by concatenating the bucket URL with the path to the asset. This function does not verify if the bucket is public. If a public URL is created for a bucket which is not public, you will not be able to download the asset.
+    notes: |
+      - The bucket needs to be set to public, either via [update_bucket()](/docs/reference/python/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: string
+        description: |
+          The path and name of the file to generate the public URL for. For example `folder/image.png`.
+      - name: options
+        isOptional: true
+        type: URLOptions
+        subContent:
+          - name: download
+            isOptional: true
+            type: string | bool
+            description: |
+              Triggers the file as a download if set to true. Set this parameter as the name of the file if you want to trigger the download with a different filename.
+          - name: transform
+            isOptional: true
+            type: TransformOptions
+            description: Transform the asset before serving it to the client.
+            subContent:
+              - name: format
+                isOptional: true
+                type: origin | avif
+                description: Specify the format of the image requested.
+              - name: height
+                isOptional: true
+                type: number
+                description: The height of the image in pixels.
+              - name: quality
+                isOptional: true
+                type: number
+                description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
+              - name: resize
+                isOptional: true
+                type: cover | contain | fill
+                description: |
+                  The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
+              - name: width
+                isOptional: true
+                type: number
+                description: The width of the image in pixels.
     examples:
       - id: get-public-url
         name: Returns the URL for an asset in a public bucket
         code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg"
+          )
           ```
-          res = supabase.storage.from_('bucket_name').get_public_url('test/avatar1.jpg')
+        response: |
+          ```json
+          {
+            "publicURL": "https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png"
+          }
           ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg", {"transform": {"width": 100, "height": 100}}
+          )
+          ```
+      - id: download-asset-in-public-bucket
+        name: Returns the URL which triggers the download of an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").get_public_url(
+            "folder/avatar1.jpg", {"download": True}
+          )
 
   - id: from-download
     title: 'from_.download()'
@@ -7190,11 +7367,11 @@ functions:
                 description: Specify the format of the image requested.
               - name: height
                 isOptional: true
-                type: int
+                type: number
                 description: The height of the image in pixels.
               - name: quality
                 isOptional: true
-                type: int
+                type: number
                 description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80.
               - name: resize
                 isOptional: true
@@ -7203,7 +7380,7 @@ functions:
                   The resize mode can be cover, contain or fill. Defaults to cover. Cover resizes the image to maintain it's aspect ratio while filling the entire width and height. Contain resizes the image to maintain it's aspect ratio while fitting the entire image within the width and height. Fill resizes the image to fill the entire width and height. If the object's aspect ratio does not match the width and height, the image will be stretched to fit.
               - name: width
                 isOptional: true
-                type: int
+                type: number
                 description: The width of the image in pixels.
     examples:
       - id: download-file
@@ -7216,32 +7393,150 @@ functions:
             )
             f.write(response)
           ```
+      - id: download-file-with-transformations
+        name: Download file with transformations
+        isSpotlight: true
+        code: |
+          ```py
+          with open("./myfolder/avatar1.png", "wb+") as f:
+            response = supabase.storage.from_("avatars").download(
+                "folder/avatar1.png",
+                {"transform": {"width": 100, "height": 100, "quality": 80}},
+            )
+            f.write(response)
+          ```
 
   - id: from-remove
     title: 'from_.remove()'
+    description: Deletes files within the same bucket
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: list[string]
+        description: |
+          An array of files to delete, including the path and file name. For example `['folder/image.png']`.
     examples:
       - id: delete-file
         name: Delete file
         code: |
+          ```py
+          response = supabase.storage.from_('avatars').remove(['folder/avatar1.png'])
           ```
-          res = supabase.storage.from_('bucket_name').remove('test.jpg')
+        response: |
+          ```json
+          [
+            {
+              "name": "folder/avatar1.png",
+              "bucket_id": "avatars",
+              "owner": "",
+              "owner_id": "",
+              "version": "151d16d2-0319-4e5b-add4-53820e8a0863",
+              "id": "e281a32a-6998-4ed1-b8e0-7d3d7ae9ae3c",
+              "updated_at": "2024-10-25T15:52:13.993Z",
+              "created_at": "2024-10-23T21:33:10.046Z",
+              "last_accessed_at": "2024-10-23T21:33:10.046Z",
+              "metadata": {
+                "eTag": "\"ca390059ef9fdb91e2ad5447201d2e91\"",
+                "size": 343017,
+                "mimetype": "image/png",
+                "cacheControl": "max-age=360",
+                "lastModified": "2024-10-25T15:52:13.974Z",
+                "contentLength": 343017,
+                "httpStatusCode": 200
+              },
+              "user_metadata": {}
+            }
+          ]
           ```
+  
   - id: from-list
     title: 'from_.list()'
+    description: Lists all the files within a bucket.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: true
+        type: string
+        description: |
+          The folder path.
+      - name: options
+        isOptional: true
+        type: SearchOptions
+        subContent:
+          - name: limit
+            isOptional: true
+            type: number
+            description: The number of files you want to be returned.
+          - name: offset
+            isOptional: true
+            type: number
+            description: The starting position.
+          - name: search
+            isOptional: true
+            type: number
+            description: The search string to filter files by.
+          - name: sortBy
+            isOptional: true
+            type: number
+            description: The column to sort by. Can be any column inside a FileObject.
+            subContent:
+              - name: column
+                isOptional: true
+                type: string
+              - name: order
+                isOptional: true
+                type: asc | desc
     examples:
       - id: list-files
         name: List files in a bucket
         code: |
+          ```py
+          response = supabase.storage.from_("avatars").list(
+            "folder",
+            {"limit": 100, "offset": 0, "sortBy": {"column": "name", "order": "desc"}},
+          )
           ```
-          res = supabase.storage.from_('bucket_name').list()
+        response: |
+          ```json
+          [
+            {
+              "name": "avatar1.png",
+              "id": "e668cf7f-821b-4a2f-9dce-7dfa5dd1cfd2",
+              "updated_at": "2024-05-22T23:06:05.580Z",
+              "created_at": "2024-05-22T23:04:34.443Z",
+              "last_accessed_at": "2024-05-22T23:04:34.443Z",
+              "metadata": {
+                "eTag": "\"c5e8c553235d9af30ef4f6e280790b92\"",
+                "size": 32175,
+                "mimetype": "image/png",
+                "cacheControl": "max-age=3600",
+                "lastModified": "2024-05-22T23:06:05.574Z",
+                "contentLength": 32175,
+                "httpStatusCode": 200
+              }
+            }
+          ]
+          ```
+      - id: search-files-in-a-bucket
+        name: Search files in a bucket
+        code: |
+          ```py
+          response = supabase.storage.from_("avatars").list(
+            "folder",
+            {
+                "limit": 100,
+                "offset": 0,
+                "sortBy": {"column": "name", "order": "desc"},
+                "search": "jon",
+            },
+          )
           ```
