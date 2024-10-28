@@ -28,7 +28,7 @@ import {
   TableRow,
   WarningIcon,
 } from 'ui'
-import BillingChangeBadge from './BillingChangeBadge'
+import { BillingChangeBadge } from './BillingChangeBadge'
 import { DiskType } from './DiskManagement.constants'
 import {
   calculateComputeSizePrice,

@@ -59,4 +59,4 @@ const BillingChangeBadge = ({
   )
 }
 
-export default BillingChangeBadge
+export { BillingChangeBadge }
