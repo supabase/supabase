@@ -420,7 +420,6 @@ const EXTERNAL_PROVIDER_APPLE = {
         },
         then: (schema) =>
           schema
-            .required('Secret key is required when using the OAuth flow.')
             .matches(/^[a-z0-9_-]+([.][a-z0-9_-]+){2}$/i, 'Secret key should be a JWT.')
             .test({
               message: 'Secret key is not a correctly generated JWT.',
@@ -486,9 +485,7 @@ const EXTERNAL_PROVIDER_APPLE = {
       .when('EXTERNAL_APPLE_ENABLED', {
         is: true,
         then: (schema) =>
-          schema.required(
-            'At least one Client ID is required when Apple sign-in is enabled.'
-          ),
+          schema.required('At least one Client ID is required when Apple sign-in is enabled.'),
       }),
   }),
   misc: {
@@ -809,7 +806,7 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_CLIENT_ID: {
       title: 'Client IDs',
       description:
-        'Comma-separated list of client IDs for OAuth, Android apps, One Tap, and Chrome extensions.',
+        'Comma-separated list of client IDs for Web, OAuth, Android apps, One Tap, and Chrome extensions.',
       type: 'string',
     },
     EXTERNAL_GOOGLE_SECRET: {
@@ -841,12 +838,10 @@ const EXTERNAL_PROVIDER_GOOGLE = {
     EXTERNAL_GOOGLE_SECRET: string().when('EXTERNAL_GOOGLE_ENABLED', {
       is: true,
       then: (schema) =>
-        schema
-          .required('Client Secret is required when using the OAuth flow.')
-          .matches(
-            /^[a-z0-9.\/_-]*$/i,
-            'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes, and underscores.'
-          ),
+        schema.matches(
+          /^[a-z0-9.\/_-]*$/i,
+          'Invalid characters. Google OAuth Client Secrets usually contain letters, numbers, dots, dashes, and underscores.'
+        ),
     }),
     EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean().required(),
   }),
