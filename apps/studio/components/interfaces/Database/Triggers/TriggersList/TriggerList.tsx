@@ -125,9 +125,7 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <MoreVertical />
-                      </Button>
+                      <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent side="bottom" align="end" className="w-36">
                       <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
