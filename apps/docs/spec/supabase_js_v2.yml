@@ -2420,6 +2420,59 @@ functions:
             error: null
           }
           ```
+  - id: mfa-list-factors
+    title: 'mfa.listFactors()'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.listFactors'
+    examples:
+      - id: list-all-enrolled-factors
+        name: List all enrolled factors
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.mfa.listFactors()
+          ```
+        response: |
+          ```json
+          {
+            data: {
+              all: [{
+                id: '<ID>',
+                friendly_name: 'Auth App Factor',
+                factor_type: 'totp',
+                status: 'verified',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z'
+              }, {
+                id: '<ID>',
+                friendly_name: 'Auth Phone Factor',
+                factor_type: 'phone',
+                phone: '<PHONE_NUMBER>',
+                status: 'verified',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z'
+              }],
+              totp: [{
+                id: '<ID>',
+                friendly_name: 'Auth App Factor',
+                factor_type: 'totp',
+                status: 'verified',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z'
+              }],
+              phone: [{
+                id: '<ID>',
+                friendly_name: 'Auth Phone Factor',
+                factor_type: 'phone',
+                phone: '<PHONE_NUMBER>',
+                status: 'verified',
+                created_at: '2024-01-01T00:00:00Z',
+                updated_at: '2024-01-01T00:00:00Z'
+              }]
+            },
+            error: null
+          }
+          ```
+
   - id: admin-api
     title: 'Overview'
     notes: |

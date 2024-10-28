@@ -678,6 +678,13 @@
             "type": "function"
           },
           {
+            "id": "mfa-list-factors",
+            "title": "List factors",
+            "slug": "auth-mfa-listfactors",
+            "product": "auth",
+            "type": "function"
+          },
+          {
             "id": "mfa-get-authenticator-assurance-level",
             "title": "Get Authenticator Assurance Level",
             "slug": "auth-mfa-getauthenticatorassurancelevel",
@@ -749,7 +756,7 @@
             "type": "function"
           },
           {
-            "id": "mfa-list-factors",
+            "id": "mfa-list-factors-admin",
             "title": "List all factors for a user",
             "slug": "auth-admin-mfa-listfactors",
             "product": "auth-admin",
