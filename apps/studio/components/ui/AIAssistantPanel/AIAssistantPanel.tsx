@@ -266,13 +266,13 @@ export const AiAssistantPanel = () => {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.metaKey && e.code === 'KeyI') {
-        setAiAssistantPanel({ open: true, editor: null })
+        setAiAssistantPanel({ open: !open, editor: null })
       }
     }
     if (project !== undefined && isEnabled) window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, isEnabled])
+  }, [project, isEnabled, open])
 
   // [Joshen] Whenever the deps change recalculate the height of the editor
   useEffect(() => {
