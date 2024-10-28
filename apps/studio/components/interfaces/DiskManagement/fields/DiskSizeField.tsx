@@ -15,6 +15,7 @@ import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadRepl
 import DiskSpaceBar from '../ui/DiskSpaceBar'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
+import FormMessage from '../ui/FormMessage'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -42,7 +43,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
   })
 
   const isLoading = isSubscriptionLoading || isDiskUtilizationLoading
-  const isError = subscriptionError || diskUtilError
+  const error = subscriptionError || diskUtilError
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
@@ -71,43 +72,21 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
           name="totalSize"
           control={control}
           render={({ field }) => (
-            <FormItemLayout
-              label="Disk Size"
-              // isReactForm={!isLoading}
-              layout="vertical"
-              description={
-                <div className="flex flex-col gap-1">
-                  <BillingChangeBadge
-                    className="mt-1"
-                    beforePrice={Number(diskSizePrice.oldPrice)}
-                    afterPrice={Number(diskSizePrice.newPrice)}
-                    show={
-                      formState.isDirty &&
-                      !formState.errors.totalSize &&
-                      diskSizePrice.oldPrice !== diskSizePrice.newPrice
-                    }
-                  />
-                  <span className="text-foreground-muted">
-                    {includedDiskGB > 0 &&
-                      subscription?.plan.id &&
-                      `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
-                  </span>
-                </div>
-              }
-            >
+            <FormItemLayout label="Disk Size" layout="vertical">
+              {error && <FormMessage message={error?.message} type="error" />}
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
-                  <FormControl_Shadcn_>
-                    {isLoading ? (
-                      <div
-                        className={cn(
-                          InputVariants({ size: 'small' }),
-                          'w-32 font-mono rounded-r-none'
-                        )}
-                      >
-                        <Skeleton className="w-10 h-4" />
-                      </div>
-                    ) : (
+                  {isLoading ? (
+                    <div
+                      className={cn(
+                        InputVariants({ size: 'small' }),
+                        'w-32 font-mono rounded-r-none'
+                      )}
+                    >
+                      <Skeleton className="w-10 h-4" />
+                    </div>
+                  ) : (
+                    <FormControl_Shadcn_>
                       <Input_Shadcn_
                         type="number"
                         {...field}
@@ -124,8 +103,8 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                         }}
                         min={includedDiskGB}
                       />
-                    )}
-                  </FormControl_Shadcn_>
+                    </FormControl_Shadcn_>
+                  )}
                 </InputPostTab>
                 <InputResetButton
                   isDirty={isAllocatedStorageDirty}
@@ -138,6 +117,23 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
             </FormItemLayout>
           )}
         />
+        <div className="flex flex-col gap-1">
+          <BillingChangeBadge
+            className="mt-1"
+            beforePrice={Number(diskSizePrice.oldPrice)}
+            afterPrice={Number(diskSizePrice.newPrice)}
+            show={
+              formState.isDirty &&
+              !formState.errors.totalSize &&
+              diskSizePrice.oldPrice !== diskSizePrice.newPrice
+            }
+          />
+          <span className="text-foreground-muted text-sm">
+            {includedDiskGB > 0 &&
+              subscription?.plan.id &&
+              `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+          </span>
+        </div>
       </div>
       <div className="col-span-8">
         <DiskSpaceBar

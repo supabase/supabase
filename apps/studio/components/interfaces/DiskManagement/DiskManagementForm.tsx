@@ -18,7 +18,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { ChevronRight } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -200,29 +200,29 @@ export function DiskManagementForm() {
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
 
-  // useEffect(() => {
-  //   // Initialize field values properly when data has been loaded, preserving any user changes
-  //   if (isSuccess) {
-  //     console.log('FORM resetting', form.formState)
-  //     // const currentValues = form.getValues()
-  //     // const dirtyFields = form.formState.dirtyFields
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded, preserving any user changes
+    if (isSuccess) {
+      console.log('FORM resetting', form.formState)
+      // const currentValues = form.getValues()
+      // const dirtyFields = form.formState.dirtyFields
 
-  //     // const newValues = {
-  //     //   ...defaultValues,
-  //     //   ...Object.fromEntries(
-  //     //     Object.entries(currentValues).filter(
-  //     //       ([key]) => dirtyFields[key as keyof typeof dirtyFields]
-  //     //     )
-  //     //   ),
-  //     // }
-  //     // form.reset(defaultValues, {
-  //     //   keepDirtyValues: true, // This preserves which fields have been changed
-  //     //   keepTouched: true,
-  //     //   keepDirty: true,
-  //     //   keepValues: true,
-  //     // })
-  //   }
-  // }, [isSuccess])
+      // const newValues = {
+      //   ...defaultValues,
+      //   ...Object.fromEntries(
+      //     Object.entries(currentValues).filter(
+      //       ([key]) => dirtyFields[key as keyof typeof dirtyFields]
+      //     )
+      //   ),
+      // }
+      form.reset(defaultValues, {
+        // keepDirtyValues: true, // This preserves which fields have been changed
+        // keepTouched: true,
+        // keepDirty: true,
+        // keepValues: true,
+      })
+    }
+  }, [isSuccess])
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({})
@@ -274,14 +274,6 @@ export function DiskManagementForm() {
         type: 'error',
       })
     }
-  }
-
-  if (!showDiskAndComputeForm) {
-    return (
-      <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-        This page is not available yet
-      </ScaffoldContainer>
-    )
   }
 
   // if (planId === 'team') {
