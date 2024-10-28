@@ -399,7 +399,7 @@ const EXTERNAL_PROVIDER_APPLE = {
       type: 'boolean',
     },
     EXTERNAL_APPLE_CLIENT_ID: {
-      title: 'Client IDs (OAuth, iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
+      title: 'Client IDs (Web, OAuth, iOS, macOS, watchOS, tvOS bundle IDs or service IDs)',
       description: `Comma separated list of allowed Apple app bundle IDs for native sign in, or service IDs for Sign in with Apple JS. [Learn more](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_js)`,
       type: 'string',
     },
