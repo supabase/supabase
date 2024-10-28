@@ -29,7 +29,7 @@ const RpcContent = ({
 }: RpcContentProps) => {
   const { ref: projectRef } = useParams()
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const endpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `https://${settings?.app_config?.endpoint ?? ''}`
 
   const meta = rpcs[rpcId]
   const pathKey = `/rpc/${rpcId}`

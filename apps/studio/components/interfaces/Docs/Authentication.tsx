@@ -15,7 +15,7 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const { anonKey, serviceKey } = getAPIKeys(settings)
-  const endpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `https://${settings?.app_config?.endpoint ?? ''}`
 
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
