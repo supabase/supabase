@@ -6,6 +6,7 @@ type GetViewDefinition = {
   name?: string
 }
 
+// [Joshen] Eventually move this into entity-definition-query
 export const getViewDefinitionQuery = ({ schema, name }: GetViewDefinition) => {
   const sql = /* SQL */ `
     select pg_get_viewdef(to_regclass('"${schema}"."${name}"'), true) as definition

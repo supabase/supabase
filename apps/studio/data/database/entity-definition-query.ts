@@ -3,22 +3,24 @@ import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/exec
 import { databaseKeys } from './keys'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 
+// [Joshen] Eventually should support table definition and view definition as well if possible
 export const getEntityDefinitionQuery = ({
   id,
   type,
 }: {
   id?: number
-  type?: SupportedAssistantEntities | null
+  type?: SupportedAssistantEntities | 'table' | 'view' | null
 }) => {
   if (!id || !type) return ''
 
-  if (type === 'functions') {
-    return /* SQL */ `
+  switch (type) {
+    case 'functions':
+      return /* SQL */ `
       select pg_get_functiondef(${id})
     `.trim()
-  } else if (type === 'rls-policies') {
-    // [Joshen] Eventually to-do, unless we have to piece it manually?
-    return /* SQL */ `
+    case 'rls-policies':
+      // [Joshen] Eventually to-do, unless we have to piece it manually?
+      return /* SQL */ `
       select 1;
     `.trim()
   }
