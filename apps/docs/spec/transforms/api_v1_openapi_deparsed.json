@@ -4604,12 +4604,7 @@
             "description": "Failed to retrieve project's Postgres config"
           }
         },
-        "tags": ["Database"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "tags": ["Database"]
       },
       "put": {
         "operationId": "v1-update-postgres-config",
@@ -4814,12 +4809,7 @@
             "description": "Failed to update project's Postgres config"
           }
         },
-        "tags": ["Database"],
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        "tags": ["Database"]
       }
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
@@ -7832,7 +7822,7 @@
     },
     "/v1/projects/{ref}/functions": {
       "post": {
-        "operationId": "createFunction",
+        "operationId": "v1-create-a-function",
         "summary": "Create a function",
         "description": "Creates a function and adds it to the specified project.",
         "parameters": [
