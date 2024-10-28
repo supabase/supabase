@@ -1,22 +1,20 @@
-import { FormField_Shadcn_, FormControl_Shadcn_, Input_Shadcn_ } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BillingChangeBadge } from '../BillingChangeBadge'
-import { InputPostTab } from '../InputPostTab'
-import { InputResetButton } from '../InputResetButton'
-import DiskSpaceBar from '../DiskSpaceBar'
-
-import { DiskType, PLAN_DETAILS } from '../DiskManagement.constants'
-import { UseFormReturn } from 'react-hook-form'
-import { DiskStorageSchemaType } from '../DiskManagementPanel.schema'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { calculateDiskSizePrice } from '../DiskManagement.utils'
-import { DiskManagementDiskSizeReadReplicas } from '../DiskManagementReadReplicas'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useParams } from 'common'
 import { GB } from 'lib/constants'
+import { UseFormReturn } from 'react-hook-form'
+import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { calculateDiskSizePrice } from '../DiskManagement.utils'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
+import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
+import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
+import DiskSpaceBar from '../ui/DiskSpaceBar'
+import { InputPostTab } from '../ui/InputPostTab'
+import { InputResetButton } from '../ui/InputResetButton'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -26,7 +24,6 @@ type DiskSizeFieldProps = {
 export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
-  const { project } = useProjectContext()
   const org = useSelectedOrganization()
 
   const {
@@ -40,10 +37,12 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
     data: diskUtil,
     isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
-    isSuccess: isDiskUtilizationSuccess,
   } = useDiskUtilizationQuery({
     projectRef: projectRef,
   })
+
+  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading
+  const isError = subscriptionError || diskUtilError
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
@@ -74,6 +73,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
           render={({ field }) => (
             <FormItemLayout
               label="Disk Size"
+              // isReactForm={!isLoading}
               layout="vertical"
               description={
                 <div className="flex flex-col gap-1">
@@ -89,6 +89,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                   />
                   <span className="text-foreground-muted">
                     {includedDiskGB > 0 &&
+                      subscription?.plan.id &&
                       `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
                   </span>
                 </div>
@@ -97,23 +98,33 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
                   <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      type="number"
-                      step="1"
-                      {...field}
-                      disabled={disableInput}
-                      className="w-32 font-mono rounded-r-none"
-                      onWheel={(e) => e.currentTarget.blur()}
-                      onChange={(e) => {
-                        setValue('totalSize', e.target.valueAsNumber, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                        trigger('provisionedIOPS')
-                        trigger('throughput')
-                      }}
-                      min={includedDiskGB}
-                    />
+                    {isLoading ? (
+                      <div
+                        className={cn(
+                          InputVariants({ size: 'small' }),
+                          'w-32 font-mono rounded-r-none'
+                        )}
+                      >
+                        <Skeleton className="w-10 h-4" />
+                      </div>
+                    ) : (
+                      <Input_Shadcn_
+                        type="number"
+                        {...field}
+                        disabled={disableInput}
+                        className="w-32 font-mono rounded-r-none"
+                        onWheel={(e) => e.currentTarget.blur()}
+                        onChange={(e) => {
+                          setValue('totalSize', e.target.valueAsNumber, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          })
+                          trigger('provisionedIOPS')
+                          trigger('throughput')
+                        }}
+                        min={includedDiskGB}
+                      />
+                    )}
                   </FormControl_Shadcn_>
                 </InputPostTab>
                 <InputResetButton
@@ -130,10 +141,11 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
       </div>
       <div className="col-span-8">
         <DiskSpaceBar
-          showNewBar={formState.dirtyFields.totalSize !== undefined}
-          totalSize={formState.defaultValues?.totalSize || 0}
-          usedSize={mainDiskUsed}
-          newTotalSize={watchedTotalSize}
+          form={form}
+          // showNewBar={formState.dirtyFields.totalSize !== undefined}
+          // totalSize={formState.defaultValues?.totalSize || 0}
+          // usedSize={mainDiskUsed}
+          // newTotalSize={watchedTotalSize}
         />
         <DiskManagementDiskSizeReadReplicas
           isDirty={formState.dirtyFields.totalSize !== undefined}

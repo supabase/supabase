@@ -7,7 +7,7 @@ import { useParams } from 'common'
 import {
   DISK_PRICING,
   DiskType,
-} from 'components/interfaces/DiskManagement/DiskManagement.constants'
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import {
   calculateIOPSPrice,
   calculateThroughputPrice,

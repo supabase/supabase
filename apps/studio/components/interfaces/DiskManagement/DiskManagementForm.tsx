@@ -18,13 +18,11 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Card,
-  CardContent,
   cn,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -33,20 +31,22 @@ import {
   Separator,
 } from 'ui'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
-import { DiskCountdownRadial } from './DiskCountdownRadial'
-import {
-  DiskType,
-  IOPS_RANGE,
-  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
-} from './DiskManagement.constants'
-import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanel.schema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
+import { formatComputeName } from './DiskManagement.utils'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'
 import { IOPSField } from './fields/IOPSField'
 import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import {
+  DiskType,
+  IOPS_RANGE,
+  RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
+} from './ui/DiskManagement.constants'
+import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
+import { NoticeBar } from './ui/NoticeBar'
 
 export function DiskManagementForm() {
   const showDiskAndComputeForm = useFlag('diskAndComputeForm')
@@ -152,7 +152,7 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: subscriptionCompute?.variant.identifier ?? 'ci_micro',
+    computeSize: subscriptionCompute?.variant.identifier,
   }
 
   const form = useForm<DiskStorageSchemaType>({
@@ -200,24 +200,29 @@ export function DiskManagementForm() {
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
 
-  useEffect(() => {
-    // Initialize field values properly when data has been loaded
-    if (isSuccess) form.reset(defaultValues)
-  }, [isSuccess])
+  // useEffect(() => {
+  //   // Initialize field values properly when data has been loaded, preserving any user changes
+  //   if (isSuccess) {
+  //     console.log('FORM resetting', form.formState)
+  //     // const currentValues = form.getValues()
+  //     // const dirtyFields = form.formState.dirtyFields
 
-  useEffect(() => {
-    if (initialRemainingTime > 0) setRemainingTime(initialRemainingTime)
-  }, [initialRemainingTime])
-
-  useEffect(() => {
-    if (remainingTime <= 0) return
-
-    const timer = setInterval(() => {
-      setRemainingTime(Math.max(0, remainingTime - 1))
-    }, 1000)
-
-    return () => clearInterval(timer)
-  }, [remainingTime])
+  //     // const newValues = {
+  //     //   ...defaultValues,
+  //     //   ...Object.fromEntries(
+  //     //     Object.entries(currentValues).filter(
+  //     //       ([key]) => dirtyFields[key as keyof typeof dirtyFields]
+  //     //     )
+  //     //   ),
+  //     // }
+  //     // form.reset(defaultValues, {
+  //     //   keepDirtyValues: true, // This preserves which fields have been changed
+  //     //   keepTouched: true,
+  //     //   keepDirty: true,
+  //     //   keepValues: true,
+  //     // })
+  //   }
+  // }, [isSuccess])
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({})
@@ -279,15 +284,6 @@ export function DiskManagementForm() {
     )
   }
 
-  // if (isLoading) {
-  //   // return <DiskManagementFormLoading />
-  //   return <div>loading...</div>
-  // }
-
-  // if (error) {
-  //   return <div>Error: {error.message}</div>
-  // }
-
   // if (planId === 'team') {
   //   return (
   //     <div id="disk-management">
@@ -329,40 +325,26 @@ export function DiskManagementForm() {
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-            {showRestartPending && (
-              <Card className="px-2 bg-surface-100">
-                <CardContent className="py-3 flex gap-3 px-3 items-center">
-                  <div className="flex flex-col">
-                    <p className="text-foreground text-sm p-0">Project about to restart</p>
-                    <p className="text-foreground-lighter text-sm">
-                      This project is about to restart to change compute to {watchedComputeSize}.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-            {isRequestingChanges && (
-              <Card className="px-2 bg-surface-100">
-                <CardContent className="py-3 flex gap-3 px-3 items-center">
-                  <div className="flex flex-col">
-                    <p className="text-foreground text-sm p-0">
-                      Disk configuration changes have been requested
-                    </p>
-                    <p className="text-foreground-lighter text-sm">
-                      The requested changes will be applied to your disk shortly
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            {showRestartPending ? (
+              <NoticeBar
+                title="Project about to restart"
+                description={`This project is about to restart to change compute to ${formatComputeName(watchedComputeSize)}.`}
+              />
+            ) : isRequestingChanges ? (
+              <NoticeBar
+                title="Disk configuration changes have been requested"
+                description="The requested changes will be applied to your disk shortly"
+              />
+            ) : null}
             <Separator />
             <ComputeSizeField form={form} />
             <Separator />
             <DiskSizeField form={form} disableInput={disableInput} />
-            <DiskCountdownRadial remainingTime={remainingTime} />
+            <DiskCountdownRadial />
             {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
             <Separator />
             <Collapsible_Shadcn_
+              // TO DO: wrap component into pattern
               className="-space-y-px"
               open={advancedSettingsOpen}
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
@@ -381,7 +363,6 @@ export function DiskManagementForm() {
                   strokeWidth={1}
                 />
               </CollapsibleTrigger_Shadcn_>
-
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                 <StorageTypeField form={form} disableInput={disableInput} />
                 <IOPSField form={form} disableInput={disableInput} />
@@ -395,7 +376,7 @@ export function DiskManagementForm() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.1, delay: 0.4 }}
+                transition={{ duration: 0.1, delay: 0.2 }}
                 className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
               >
                 <div

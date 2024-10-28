@@ -1,6 +1,13 @@
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { AnimatePresence, motion } from 'framer-motion'
+import { GB } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
+import { Info } from 'lucide-react'
 import MotionNumber from 'motion-number'
-
+import { UseFormReturn } from 'react-hook-form'
 import {
   badgeVariants,
   cn,
@@ -9,24 +16,30 @@ import {
   TooltipTrigger_Shadcn_,
 } from 'ui'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
-import { Info } from 'lucide-react'
-import { formatBytes } from 'lib/helpers'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
 
 interface DiskSpaceBarProps {
-  showNewBar: boolean
-  totalSize: number
-  usedSize: number
-  newTotalSize: number
+  form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({
-  showNewBar,
-  totalSize,
-  usedSize,
-  newTotalSize,
-}: DiskSpaceBarProps) {
+export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+  const { ref } = useParams()
+  const { formState, watch } = form
+
+  const {
+    data: diskUtil,
+    // to do, error handling
+    isLoading: isDiskUtilizationLoading,
+    error: diskUtilError,
+  } = useDiskUtilizationQuery({
+    projectRef: ref,
+  })
+
+  const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
+  const totalSize = formState.defaultValues?.totalSize || 0
+  const show = formState.dirtyFields.totalSize !== undefined && usedSize
+  const newTotalSize = watch('totalSize')
+
   const usedPercentage = (usedSize / totalSize) * 100
   const resizePercentage = AUTOSCALING_THRESHOLD * 100
 
@@ -44,7 +57,8 @@ export default function DiskSpaceBar({
     <div className="flex flex-col gap-3">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)} GB used of{' '}
+          {usedSize.toFixed(2)}
+          <span>GB used of </span>
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber
               value={newTotalSize}
@@ -62,11 +76,11 @@ export default function DiskSpaceBar({
         <div
           className={cn(
             'h-[34px] relative border rounded-sm w-full transition',
-            showNewBar ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            show ? 'bg-selection border border-brand-button' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
-            {!showNewBar ? (
+            {!show ? (
               <motion.div
                 key="currentBar"
                 initial={{ rotateY: 90, zIndex: 2 }}
@@ -133,7 +147,7 @@ export default function DiskSpaceBar({
             )}
           </AnimatePresence>
           <AnimatePresence>
-            {showNewBar && (
+            {show && (
               <motion.span
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -149,8 +163,8 @@ export default function DiskSpaceBar({
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence mode="wait">
-          {!showNewBar && (
+        <AnimatePresence initial={true}>
+          {!show && (
             <motion.div
               key="currentSize"
               initial={{ opacity: 0, y: -10 }}
@@ -161,7 +175,7 @@ export default function DiskSpaceBar({
             >
               <div
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
-                style={{ left: `${showNewBar ? newResizePercentage : resizePercentage}%` }}
+                style={{ left: `${show ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>

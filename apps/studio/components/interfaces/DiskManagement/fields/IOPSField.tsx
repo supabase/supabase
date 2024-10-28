@@ -2,17 +2,18 @@ import { components } from 'api-types'
 import { UseFormReturn } from 'react-hook-form'
 import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BillingChangeBadge } from '../BillingChangeBadge'
-import { ComputeSizeReccomendationSection } from '../ComputeSizeReccomendationSection'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
+import { ComputeSizeReccomendationSection } from '../ui/ComputeSizeReccomendationSection'
 import {
   COMPUTE_BASELINE_IOPS,
   DiskType,
+  IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from '../DiskManagement.constants'
+} from '../ui/DiskManagement.constants'
 import { calculateComputeSizeRequiredForIops, calculateIOPSPrice } from '../DiskManagement.utils'
-import { DiskStorageSchemaType } from '../DiskManagementPanel.schema'
-import { DiskManagementIOPSReadReplicas } from '../DiskManagementReadReplicas'
-import { InputPostTab } from '../InputPostTab'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
+import { InputPostTab } from '../ui/InputPostTab'
 
 type IOPSFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -24,7 +25,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
 
   const watchedStorageType = watch('storageType')
   const watchedComputeSize = watch('computeSize')
-  const watchedIOPS = watch('provisionedIOPS')
+  const watchedIOPS = watch('provisionedIOPS') ?? 0
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,

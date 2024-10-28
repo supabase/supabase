@@ -5,7 +5,7 @@ import {
   DiskType,
   PLAN_DETAILS,
   COMPUTE_BASELINE_IOPS,
-} from './DiskManagement.constants'
+} from './ui/DiskManagement.constants'
 import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useMemo } from 'react'
@@ -28,7 +28,7 @@ export const calculateDiskSizePrice = ({
 }) => {
   const oldPricePerGB = DISK_PRICING[oldStorageType]?.storage ?? 0
   const newPricePerGB = DISK_PRICING[newStorageType]?.storage ?? 0
-  const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
+  const { includedDiskGB } = PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS]
 
   const oldPrice = Math.max(oldSize - includedDiskGB[oldStorageType], 0) * oldPricePerGB
   const oldPriceReplica = oldSize * 1.25 * oldPricePerGB
@@ -258,4 +258,8 @@ export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): numbe
   }
 
   return Math.max(1, Math.ceil(provisionedIOPS / 1000))
+}
+
+export const formatComputeName = (compute: string) => {
+  return compute.toUpperCase().replace('CI_', '')
 }

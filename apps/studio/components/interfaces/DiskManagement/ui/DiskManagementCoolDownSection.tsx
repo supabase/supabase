@@ -3,7 +3,7 @@ import { X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 
 import { DialogSection, TableCell, TableRow } from 'ui'
-import CountdownTimerRadial from '../../ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerRadial from '../../../ui/CountdownTimer/CountdownTimerRadial'
 
 export const DiskMangementCoolDownSection: React.FC = () => {
   const [progress, setProgress] = useState(100)

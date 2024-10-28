@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DISK_LIMITS, DiskType, THROUGHPUT_RANGE, IOPS_RANGE } from './DiskManagement.constants'
+import { DISK_LIMITS, DiskType, THROUGHPUT_RANGE, IOPS_RANGE } from './ui/DiskManagement.constants'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,

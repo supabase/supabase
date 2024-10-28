@@ -9,8 +9,8 @@ import {
 } from 'ui'
 import { Badge } from 'ui'
 import { UseFormReturn } from 'react-hook-form'
-import { DiskStorageSchemaType } from '../DiskManagementPanel.schema'
-import { DISK_TYPE_OPTIONS } from '../DiskManagement.constants'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DISK_TYPE_OPTIONS } from '../ui/DiskManagement.constants'
 
 type StorageTypeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

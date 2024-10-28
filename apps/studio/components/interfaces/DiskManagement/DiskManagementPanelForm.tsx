@@ -6,9 +6,8 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-
 import { useParams } from 'common'
-import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
@@ -45,8 +44,8 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
-import BillingChangeBadge from './BillingChangeBadge'
-import { DiskCountdownRadial } from './DiskCountdownRadial'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
   COMPUTE_MAX_IOPS,
   COMPUTE_MAX_THROUGHPUT,
@@ -54,19 +53,19 @@ import {
   IOPS_RANGE,
   PLAN_DETAILS,
   THROUGHPUT_RANGE,
-} from './DiskManagement.constants'
+} from './ui/DiskManagement.constants'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanel.schema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
+import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
-} from './DiskManagementReadReplicas'
+} from './ui/DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 
 export function DiskManagementPanelForm() {
@@ -688,10 +687,11 @@ export function DiskManagementPanelForm() {
                   </div>
                   <div className="col-span-8 space-y-6 mt-6">
                     <DiskSpaceBar
-                      showNewBar={form.formState.dirtyFields.totalSize !== undefined}
-                      totalSize={size_gb}
-                      usedSize={mainDiskUsed}
-                      newTotalSize={watchedTotalSize}
+                      form={form}
+                      // showNewBar={form.formState.dirtyFields.totalSize !== undefined}
+                      // totalSize={size_gb}
+                      // usedSize={mainDiskUsed}
+                      // newTotalSize={watchedTotalSize}
                     />
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
@@ -720,7 +720,7 @@ export function DiskManagementPanelForm() {
                 </CardContent>
               </Card>
             ) : (
-              <DiskCountdownRadial remainingTime={remainingTime} />
+              <DiskCountdownRadial />
             )}
 
             {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}

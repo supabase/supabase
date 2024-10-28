@@ -28,8 +28,8 @@ import {
   TableRow,
   WarningIcon,
 } from 'ui'
-import { BillingChangeBadge } from './BillingChangeBadge'
-import { DiskType } from './DiskManagement.constants'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskType } from './ui/DiskManagement.constants'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -37,8 +37,8 @@ import {
   calculateThroughputPrice,
   getAvailableComputeOptions,
 } from './DiskManagement.utils'
-import { DiskMangementCoolDownSection } from './DiskManagementCoolDownSection'
-import { DiskStorageSchemaType } from './DiskManagementPanel.schema'
+import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
+import { DiskStorageSchemaType } from './DiskManagement.schema'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useMemo } from 'react'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
@@ -145,6 +145,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
 
+  const { formState, getValues } = form
+
   /**
    * Queries
    * */
@@ -162,7 +164,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     },
   })
 
-  const planId = subscription?.plan.id ?? ''
+  const planId = subscription?.plan.id ?? 'free'
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
 
@@ -184,11 +186,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
   })
 
   const diskSizePrice = calculateDiskSizePrice({
-    planId,
-    oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
-    newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    planId: planId,
+    oldSize: formState.defaultValues?.totalSize || 0,
+    oldStorageType: formState.defaultValues?.storageType as DiskType,
+    newSize: getValues('totalSize'),
+    newStorageType: getValues('storageType') as DiskType,
     numReplicas,
   })
 

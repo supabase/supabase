@@ -2,17 +2,17 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { UseFormReturn } from 'react-hook-form'
 import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BillingChangeBadge } from '../BillingChangeBadge'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
   COMPUTE_BASELINE_THROUGHPUT,
   DiskType,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
   THROUGHPUT_RANGE,
-} from '../DiskManagement.constants'
+} from '../ui/DiskManagement.constants'
 import { calculateThroughputPrice } from '../DiskManagement.utils'
-import { DiskStorageSchemaType } from '../DiskManagementPanel.schema'
-import { DiskManagementThroughputReadReplicas } from '../DiskManagementReadReplicas'
-import { InputPostTab } from '../InputPostTab'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
+import { InputPostTab } from '../ui/InputPostTab'
 import { useEffect } from 'react'
 
 type ThroughputFieldProps = {

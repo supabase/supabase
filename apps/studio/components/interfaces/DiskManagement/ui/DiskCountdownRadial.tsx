@@ -1,22 +1,42 @@
 import { AnimatePresence, motion } from 'framer-motion'
-
 import { COOLDOWN_DURATION } from 'data/config/disk-attributes-update-mutation'
 import { Card, CardContent } from 'ui'
-import CountdownTimerRadial from '../../ui/CountdownTimer/CountdownTimerRadial'
-import CountdownTimerSpan from '../../ui/CountdownTimer/CountdownTimerSpan'
+import CountdownTimerRadial from '../../../ui/CountdownTimer/CountdownTimerRadial'
+import CountdownTimerSpan from '../../../ui/CountdownTimer/CountdownTimerSpan'
+import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
+import { useParams } from 'common'
+import FormMessage from './FormMessage'
 
-export function DiskCountdownRadial({
-  remainingTime,
-  show = true,
-}: {
-  remainingTime: number
-  show?: boolean
-}) {
+export function DiskCountdownRadial() {
+  const { projectRef } = useParams()
+
+  const {
+    remainingDuration: remainingTime,
+    error,
+    isSuccess,
+  } = useRemainingDurationForDiskAttributeUpdate({
+    projectRef,
+  })
+
   const progressPercentage = (remainingTime / COOLDOWN_DURATION) * 100
+
+  // useEffect(() => {
+  //   if (initialRemainingTime > 0) setRemainingTime(initialRemainingTime)
+  // }, [initialRemainingTime])
+
+  // useEffect(() => {
+  //   if (remainingTime <= 0) return
+
+  //   const timer = setInterval(() => {
+  //     setRemainingTime(Math.max(0, remainingTime - 1))
+  //   }, 1000)
+
+  //   return () => clearInterval(timer)
+  // }, [remainingTime])
 
   return (
     <AnimatePresence>
-      {remainingTime !== 0 && show && (
+      {remainingTime !== 0 && isSuccess && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -40,6 +60,7 @@ export function DiskCountdownRadial({
           </Card>
         </motion.div>
       )}
+      {error && <FormMessage message={error.message} type="error" />}
     </AnimatePresence>
   )
 }
