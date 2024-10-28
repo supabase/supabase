@@ -487,7 +487,7 @@ const EXTERNAL_PROVIDER_APPLE = {
         is: true,
         then: (schema) =>
           schema.required(
-            'At least one Service ID or bundle ID is required when Apple sign-in is enabled.'
+            'At least one Client ID is required when Apple sign-in is enabled.'
           ),
       }),
   }),
