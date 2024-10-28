@@ -197,7 +197,9 @@ export function getDisplayName(user: User, fallback = '-'): string {
         full_name ||
         ccFullName ||
         cc_full_name ||
-        (first && last && `${first} ${last}`)
+        (first && last && `${first} ${last}`) ||
+        last ||
+        first
     ) || fallback
   )
 }
