@@ -16,7 +16,7 @@ export default function Introduction({ selectedLang }: Props) {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
 
-  const endpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `https://${settings?.app_config?.endpoint ?? ''}`
 
   const isPublicSchemaEnabled = config?.db_schema
     .split(',')
