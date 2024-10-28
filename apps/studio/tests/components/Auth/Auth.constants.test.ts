@@ -38,4 +38,14 @@ describe('Auth.constants: urlRegex', () => {
       expect(urlRegex().test(url)).toBe(false)
     })
   })
+
+  it('should not match simple domain URLs when excludeSimpleDomains is true', () => {
+    const simpleDomainUrl = 'smtp-pulse.com'
+    expect(urlRegex({ excludeSimpleDomains: true }).test(simpleDomainUrl)).toBe(false)
+  })
+
+  it('should match simple domain URLs when excludeSimpleDomains is false', () => {
+    const simpleDomainUrl = 'smtp-pulse.com'
+    expect(urlRegex({ excludeSimpleDomains: false }).test(simpleDomainUrl)).toBe(true)
+  })
 })
