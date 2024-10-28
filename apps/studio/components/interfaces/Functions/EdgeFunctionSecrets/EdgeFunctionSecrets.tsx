@@ -12,7 +12,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button } from 'ui'
+import { Badge, Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
@@ -94,7 +94,12 @@ const EdgeFunctionSecrets = () => {
               <Table
                 head={[
                   <Table.th key="secret-name">Name</Table.th>,
-                  <Table.th key="secret-value">Digest</Table.th>,
+                  <Table.th key="secret-value" className="flex items-center gap-x-2">
+                    Digest{' '}
+                    <Badge color="scale" className="font-mono">
+                      SHA256
+                    </Badge>
+                  </Table.th>,
                   <Table.th key="actions" />,
                 ]}
                 body={

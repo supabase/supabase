@@ -1159,7 +1159,7 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
 Supabase's Deno Edge Functions allow you to deploy and run custom TypeScript functions globally at the edge, bringing your code closer to users for enhanced performance and reduced latency.
 
 ## Key features
-1. Global distribution: Functions run close to users, reducing latency.
+1. Global distribution: Edge Functions run close to users, reducing latency.
 2. TypeScript support: Leverage TypeScript's type safety and modern language features.
 3. Deno runtime: Benefit from Deno's security-first approach and modern JavaScript APIs.
 4. Seamless integration: Easy integration with other Supabase services like Auth and Database.
@@ -1197,10 +1197,10 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
 Supabase's Regional Invocations feature allows you to execute Edge Functions in a region close to your database, optimizing performance for database-intensive operations. This capability ensures low-latency communication between your functions and database, enhancing overall application responsiveness.
 
 ## Key benefits
-1. Reduced latency: Minimize round-trip time between functions and database for faster operations.
-2. Improved performance: Enhance the speed of database queries and updates from your functions.
+1. Reduced latency: Minimize round-trip time between edge functions and database for faster operations.
+2. Improved performance: Enhance the speed of database queries and updates from your edge functions.
 3. Data locality: Keep data processing close to where the data is stored for efficiency.
-4. Consistency: Ensure that functions operate on the most up-to-date data with minimal delay.
+4. Consistency: Ensure that edge functions operate on the most up-to-date data with minimal delay.
 5. Cost optimization: Reduce data transfer costs between regions.
 6. Simplified architecture: Streamline your application's geographic setup for database operations.
 7. Compliance support: Help meet data residency requirements by processing data in specific regions.
@@ -1223,7 +1223,7 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
   },
   {
     title: 'NPM compatibility',
-    subtitle: 'Edge functions natively support NPM modules and Node built-in APIs.',
+    subtitle: 'Edge Functions natively support NPM modules and Node built-in APIs.',
     description: `
 Supabase's NPM Compatibility feature for Edge Functions allows you to use NPM modules and Node.js built-in APIs directly in your Deno-based Edge Functions. This powerful capability bridges the gap between Deno and the vast Node.js ecosystem, giving you access to a wide range of libraries and familiar APIs.
 
