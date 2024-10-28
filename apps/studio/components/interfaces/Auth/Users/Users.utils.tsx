@@ -171,17 +171,17 @@ export function getDisplayName(user: User, fallback = '-'): string {
     ccFirstName ||
     cc_first_name
 
-  return (
+  return String(
     displayName ||
-    display_name ||
-    ccDisplayName ||
-    cc_display_name ||
-    fullName ||
-    full_name ||
-    ccFullName ||
-    cc_full_name ||
-    (first && last && `${first} ${last}`) ||
-    fallback
+      display_name ||
+      ccDisplayName ||
+      cc_display_name ||
+      fullName ||
+      full_name ||
+      ccFullName ||
+      cc_full_name ||
+      (first && last && `${first} ${last}`) ||
+      fallback
   )
 }
 
