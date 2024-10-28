@@ -74,15 +74,12 @@ export const AiAssistantPanel = () => {
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
 
-  const { data: existingDefinition } = useEntityDefinitionQuery(
-    {
-      id: entity?.id,
-      type: editor,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: !!entity?.id && !!editor }
-  )
+  const { data: existingDefinition } = useEntityDefinitionQuery({
+    id: entity?.id,
+    type: editor,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   // [Joshen] JFYI I'm opting to just have the assistant always show and not toggle-able
   // I don't really see any negatives of keeping it open (or benefits from hiding) tbh
@@ -139,7 +136,7 @@ export const AiAssistantPanel = () => {
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     // [Joshen] Don't need entity definitions if calling here cause support action
-    // via AI here is just to explain code segment, no need for context
+    // via AI here is just to explain code segment, no need for entity definitions context
     body: {},
   })
 
@@ -254,7 +251,7 @@ export const AiAssistantPanel = () => {
       const existingValue = editorRef.current?.getValue() ?? ''
       setAiAssistantPanel({ open: false, content: existingValue })
     } else {
-      setAiAssistantPanel({ open: true, editor: null })
+      setAiAssistantPanel({ open: true, editor: null, entity: undefined })
     }
   }
 

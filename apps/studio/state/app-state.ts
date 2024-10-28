@@ -112,8 +112,7 @@ export const appState = proxy({
     entity: undefined,
   } as AiAssistantPanelType,
   setAiAssistantPanel: (value: AiAssistantPanelType) => {
-    const hasEntityChanged =
-      !!value.entity && value.entity.id !== appState.aiAssistantPanel.entity?.id
+    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,

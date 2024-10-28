@@ -60,6 +60,7 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
+import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 
 const ANIMATION_DURATION = 0.3
 
@@ -88,7 +89,7 @@ export const AIAssistant = ({
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel } = useAppStateSnapshot()
-  const { editor } = aiAssistantPanel
+  const { editor, entity } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -114,6 +115,13 @@ export const AIAssistant = ({
     selectedSchemas.length === 0 &&
     selectedTables.length === 0
 
+  const { data: existingDefinition } = useEntityDefinitionQuery({
+    id: entity?.id,
+    type: editor,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const { data } = useEntityDefinitionsQuery(
     {
       schemas: selectedSchemas,
@@ -123,17 +131,17 @@ export const AIAssistant = ({
     { enabled: includeSchemaMetadata }
   )
 
-  const entityDefinitions = includeSchemaMetadata
-    ? selectedTables.length === 0
-      ? data?.map((def) => def.sql.trim())
+  const tableDefinitions =
+    selectedTables.length === 0
+      ? data?.map((def) => def.sql.trim()) ?? []
       : data
           ?.filter((def) => {
             return selectedTables.some((table) => {
               return def.sql.startsWith(`CREATE  TABLE ${table.schema}.${table.name}`)
             })
           })
-          .map((def) => def.sql.trim())
-    : undefined
+          .map((def) => def.sql.trim()) ?? []
+  const entityDefinitions = includeSchemaMetadata ? tableDefinitions : undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
   const sendTelemetryEvent = (action: string) => {
@@ -151,7 +159,7 @@ export const AIAssistant = ({
   } = useChat({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions, context: selectedDatabaseEntity },
+    body: { entityDefinitions, context: selectedDatabaseEntity, existingSql: existingDefinition },
     onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
 

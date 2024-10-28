@@ -52,6 +52,7 @@ export const useEntityDefinitionQuery = <TData extends EntityDefinitionData = En
       select(data) {
         return data.result[0].pg_get_functiondef
       },
+      enabled: enabled && typeof id !== 'undefined' && typeof type !== 'undefined',
       ...options,
     }
   )

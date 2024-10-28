@@ -160,7 +160,13 @@ const FunctionsList = ({
                           icon={
                             <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
                           }
-                          onClick={() => setAiAssistantPanel({ open: true, editor: 'functions' })}
+                          onClick={() =>
+                            setAiAssistantPanel({
+                              open: true,
+                              editor: 'functions',
+                              entity: undefined,
+                            })
+                          }
                         />
                       </TooltipTrigger_Shadcn_>
                       <TooltipContent_Shadcn_ side="bottom">
