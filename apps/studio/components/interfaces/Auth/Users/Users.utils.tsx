@@ -116,6 +116,7 @@ const phoneProviders = providers.phone.map((x) => {
 })
 
 function toPrettyJsonString(value: unknown): string | undefined {
+  if (!value) return undefined
   if (typeof value === 'string') return value
   if (Array.isArray(value)) return value.map((item) => toPrettyJsonString(item)).join(', ')
 
