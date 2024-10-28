@@ -621,6 +621,11 @@ export const AIAssistant = ({
                     sendMessageToAssistant(value)
                   }}
                 />
+                {!hasMessages && (
+                  <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
+                    The Assistant is in Alpha and your prompts might be rate limited
+                  </div>
+                )}
               </div>
 
               <AnimatePresence>
