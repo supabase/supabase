@@ -1,20 +1,22 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
+import { IS_PLATFORM } from 'common'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
+import { useFlag } from 'hooks/ui/useFlag'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateProjectIntegrationsMenu } from './ProjectIntegrationsMenu.utils'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export interface ProjectIntegrationsLayoutProps {
   title?: string
 }
 
 const ProjectIntegrationsMenu = () => {
-  const cronUiEnabled = useFlag('cronUi')
+  // if running on self-hosted, cron UI should be always enabled
+  const cronUiEnabled = useFlag('cronUi') || !IS_PLATFORM
   const project = useSelectedProject()
 
   const router = useRouter()
