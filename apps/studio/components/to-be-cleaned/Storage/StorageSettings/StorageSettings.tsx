@@ -69,7 +69,7 @@ const StorageSettings = () => {
 
   useEffect(() => {
     if (isSuccess && config) {
-      const { fileSizeLimit, features, isFreeTier } = config
+      const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
       const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
 
