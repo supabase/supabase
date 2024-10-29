@@ -383,6 +383,7 @@ services:
       - log_min_messages=fatal # prevents Realtime polling queries from appearing in logs
     restart: unless-stopped
     environment:
+      POSTGRES_USER: supabase_admin
       POSTGRES_HOST: /var/run/postgresql
       PGPORT: ${POSTGRES_PORT}
       POSTGRES_PORT: ${POSTGRES_PORT}
