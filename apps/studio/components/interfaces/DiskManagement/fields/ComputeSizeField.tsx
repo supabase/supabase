@@ -81,7 +81,7 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
           }
         >
           <RadioGroupCard
-            className="grid grid-cols-3 flex-wrap gap-3"
+            className="grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3"
             onValueChange={(value: components['schemas']['AddonVariantId']) => {
               setValue('computeSize', value, {
                 shouldDirty: true,

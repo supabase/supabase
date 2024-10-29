@@ -1,9 +1,7 @@
+import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-
-import { DialogSection, TableCell, TableRow } from 'ui'
-import CountdownTimerRadial from '../../../ui/CountdownTimer/CountdownTimerRadial'
+import { DialogSection } from 'ui'
 
 export const DiskMangementCoolDownSection: React.FC = () => {
   const [progress, setProgress] = useState(100)
@@ -39,8 +37,6 @@ export const DiskMangementCoolDownSection: React.FC = () => {
     return () => clearTimeout(initialDelay)
   }, [])
 
-  const MotionTableRow = motion(TableRow)
-
   return (
     <AnimatePresence>
       {isVisible && (
@@ -51,7 +47,7 @@ export const DiskMangementCoolDownSection: React.FC = () => {
           className="w-full"
         >
           <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative w-full border rounded-md">
-            <div className="w-12 h-12 opacity-75">
+            <div className="w-12 h-12">
               <AnimatePresence>
                 {showCountdown && (
                   <motion.div
@@ -82,13 +78,13 @@ export const DiskMangementCoolDownSection: React.FC = () => {
                 This is due to a cooldown period between disk changes.
               </p>
             </div>
-            <button
+            {/* <button
               type="button"
               className="text-foreground-lighter hover:text-foreground-light transition-colors self-start p-1"
               onClick={() => setIsVisible(false)}
             >
               <X size={14} />
-            </button>
+            </button> */}
           </DialogSection>
         </motion.div>
       )}

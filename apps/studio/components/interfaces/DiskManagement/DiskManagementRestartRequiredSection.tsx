@@ -1,42 +1,39 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { RotateCcw, X } from 'lucide-react'
-import React, { useState } from 'react'
-import { DialogSection } from 'ui'
+import { RotateCcw } from 'lucide-react'
+import React from 'react'
+import { DialogSection, WarningIcon } from 'ui'
 
-export const DiskMangementRestartRequiredSection: React.FC = () => {
-  const [progress, setProgress] = useState(100)
-  const [showCountdown, setShowCountdown] = useState(false)
-  const [isJumping, setIsJumping] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
+interface Props {
+  visible: boolean
+  title: string
+  description: string
+}
 
+export const DiskMangementRestartRequiredSection: React.FC<Props> = ({
+  visible,
+  title,
+  description,
+}) => {
   return (
     <AnimatePresence>
-      {isVisible && (
+      {visible && (
         <motion.div
           initial={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.15 }}
           className="w-full"
         >
-          <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative w-full border rounded-md">
-            <div className="w-12 h-12 opacity-75">
-              <div className="w-10 h-10 m-1 bg-studio border rounded-md flex items-center justify-center">
+          <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative w-full rounded-md border-spacing-0 border">
+            <div className="w-12 h-12">
+              <div className="relative w-10 h-10 m-1 bg-alternative text-foreground border rounded-full flex items-center justify-center">
                 <RotateCcw strokeWidth={1} />
+                <WarningIcon className="absolute -right-2 -top-2" />
               </div>
             </div>
             <div className="flex flex-col gap-0 flex-grow">
-              <p className="text-sm text-foreground">A Project restart will be required.</p>
-              <p className="text-sm text-foreground-light">
-                You can restart after confirming changes or when convenient.
-              </p>
+              <p className="text-sm text-foreground">{title}</p>
+              <p className="text-sm text-foreground-light">{description}</p>
             </div>
-            <button
-              type="button"
-              className="text-foreground-lighter hover:text-foreground-light transition-colors self-start p-1"
-              onClick={() => setIsVisible(false)}
-            >
-              <X size={14} />
-            </button>
           </DialogSection>
         </motion.div>
       )}

@@ -1,12 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ChevronRight } from 'lucide-react'
-import { UseFormReturn } from 'react-hook-form'
-
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
+import { ChevronRight } from 'lucide-react'
+import { useMemo } from 'react'
+import { UseFormReturn } from 'react-hook-form'
 import {
   Alert_Shadcn_,
   AlertTitle_Shadcn_,
@@ -28,8 +30,7 @@ import {
   TableRow,
   WarningIcon,
 } from 'ui'
-import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskType } from './ui/DiskManagement.constants'
+import { DiskStorageSchemaType } from './DiskManagement.schema'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -37,12 +38,10 @@ import {
   calculateThroughputPrice,
   getAvailableComputeOptions,
 } from './DiskManagement.utils'
-import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
-import { DiskStorageSchemaType } from './DiskManagement.schema'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useMemo } from 'react'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskType } from './ui/DiskManagement.constants'
+import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -249,7 +248,15 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <DialogDescription>Changes will be applied shortly once confirmed.</DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-
+        <div className="flex flex-col gap-2 p-5">
+          <DiskMangementRestartRequiredSection
+            visible={form.formState.defaultValues?.computeSize !== form.getValues('computeSize')}
+            title="Your project will be unavailable for up to 2 mins."
+            description="Project will restart automatically on confirmation."
+          />
+          {hasDiskConfigChanges && <DiskMangementCoolDownSection />}
+        </div>
+        <DialogSectionSeparator />
         <Table>
           <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
             <TableHeaderRow />
@@ -314,23 +321,17 @@ export const DiskManagementReviewAndSubmitDialog = ({
           </TableBody>
         </Table>
 
-        <div className="flex flex-col gap-2 p-5">
-          {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
-            <DiskMangementRestartRequiredSection />
-          )}
-          {hasDiskConfigChanges && <DiskMangementCoolDownSection />}
-        </div>
-
         {/* <DialogSectionSeparator /> */}
 
         <DialogFooter>
-          <Button block size="small" type="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
 
           <Button
             block
-            size="small"
+            type={'warning'}
+            size="large"
             htmlType="submit"
             loading={loading}
             onClick={async () => {

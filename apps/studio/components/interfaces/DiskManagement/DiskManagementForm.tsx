@@ -47,13 +47,17 @@ import {
 } from './ui/DiskManagement.constants'
 import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
 import { NoticeBar } from './ui/NoticeBar'
+import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
+import { useQueryClient } from '@tanstack/react-query'
+import { PROJECT_STATUS } from 'lib/constants'
+import { setProjectStatus } from 'data/projects/projects-query'
 
 export function DiskManagementForm() {
   const showDiskAndComputeForm = useFlag('diskAndComputeForm')
-
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
+  const queryClient = useQueryClient()
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
@@ -229,7 +233,11 @@ export function DiskManagementForm() {
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
       onSuccess: () => {
-        setShowRestartPendingState(true)
+        /**
+         * Manually set project status to RESIZING
+         * Project status should be RESIZING on next project status request.
+         */
+        setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       },
     })
 
@@ -311,28 +319,33 @@ export function DiskManagementForm() {
   // return <></>
 
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
+  const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
+  const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
 
   return (
     <>
+      {isProjectResizing || isProjectRequestingDiskChanges ? (
+        <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+          <DiskMangementRestartRequiredSection
+            visible={isProjectResizing}
+            title="Your project will now automatically restart."
+            description="Your project will be unavailable for up to 2 mins."
+          />
+          <NoticeBar
+            visible={isProjectRequestingDiskChanges}
+            title="Disk configuration changes have been requested"
+            description="The requested changes will be applied to your disk shortly"
+          />
+        </ScaffoldContainer>
+      ) : null}
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-            {showRestartPending ? (
-              <NoticeBar
-                title="Project about to restart"
-                description={`This project is about to restart to change compute to ${formatComputeName(watchedComputeSize)}.`}
-              />
-            ) : isRequestingChanges ? (
-              <NoticeBar
-                title="Disk configuration changes have been requested"
-                description="The requested changes will be applied to your disk shortly"
-              />
-            ) : null}
             <Separator />
             <ComputeSizeField form={form} />
             <Separator />
-            <DiskSizeField form={form} disableInput={disableInput} />
             <DiskCountdownRadial />
+            <DiskSizeField form={form} disableInput={disableInput} />
             {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
             <Separator />
             <Collapsible_Shadcn_

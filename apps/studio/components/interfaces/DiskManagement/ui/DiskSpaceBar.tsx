@@ -54,7 +54,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
 
   const databaseSizeBytes = data?.result[0].db_size ?? 0
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
           {usedSize.toFixed(2)}
@@ -75,7 +75,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
       <div className="relative">
         <div
           className={cn(
-            'h-[34px] relative border rounded-sm w-full transition',
+            'h-[35px] relative border rounded-sm w-full transition',
             show ? 'bg-selection border border-brand-button' : 'bg-surface-300'
           )}
         >
