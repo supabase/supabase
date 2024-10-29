@@ -13,7 +13,9 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -52,7 +54,12 @@ const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
-  const { isFreeTier } = config || {}
+
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization?.slug,
+  })
+  const isFreeTier = isSuccessSubscription && subscription.plan.id === 'free'
 
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
@@ -167,7 +174,7 @@ const StorageSettings = () => {
                                 type="number"
                                 {...field}
                                 className="w-full"
-                                disabled={!canUpdateStorageSettings}
+                                disabled={isFreeTier || !canUpdateStorageSettings}
                               />
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -277,7 +284,7 @@ const StorageSettings = () => {
                     type="default"
                     htmlType="reset"
                     onClick={() => form.reset()}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Cancel
                   </Button>
@@ -285,7 +292,7 @@ const StorageSettings = () => {
                     type="primary"
                     htmlType="submit"
                     loading={isUpdating}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Save
                   </Button>
