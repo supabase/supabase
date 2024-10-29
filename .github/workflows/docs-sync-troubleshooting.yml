@@ -7,8 +7,6 @@ on:
     paths:
       - 'apps/docs/content/troubleshooting/**'
   workflow_dispatch:
-  # testing only, delete later
-  pull_request:
 
 permissions:
   contents: write
@@ -46,8 +44,6 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
         with:
-          # for testing on pull_request only
-          base: ${{ github.head_ref }}
           commit-message: '[bot] sync troubleshooting guides to db'
           title: '[bot] sync troubleshooting guides to db'
           author: 'github-docs-sync-bot <github-docs-sync-bot@supabase.com>'
