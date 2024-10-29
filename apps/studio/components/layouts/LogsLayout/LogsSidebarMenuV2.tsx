@@ -164,7 +164,7 @@ export function LogsSidebarMenuV2() {
     },
     workflowsEnabled
       ? {
-          name: 'Workflows',
+          name: 'Branching logs',
           key: 'workflow-run-logs',
           url: `/project/${ref}/logs/workflow-run-logs`,
           items: [],
