@@ -145,6 +145,10 @@ export interface paths {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
   }
+  '/platform/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
+  }
   '/platform/cli/login': {
     /** Create CLI login session */
     post: operations['CliLoginController_createCliLoginSession']
@@ -1346,6 +1350,10 @@ export interface paths {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
   }
+  '/v0/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
+  }
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
@@ -2087,6 +2095,12 @@ export interface paths {
     /** Updates project's Postgres config */
     put: operations['v1-update-postgres-config']
   }
+  '/v1/projects/{ref}/config/storage': {
+    /** Gets project's storage config */
+    get: operations['v1-get-storage-config']
+    /** Updates project's storage config */
+    patch: operations['v1-update-storage-config']
+  }
   '/v1/projects/{ref}/custom-hostname': {
     /** [Beta] Gets project's custom hostname config */
     get: operations['v1-get-hostname-config']
@@ -2673,6 +2687,7 @@ export interface components {
     }
     BranchResetResponse: {
       message: string
+      workflow_run_id: string
     }
     BranchResponse: {
       created_at: string
@@ -5479,9 +5494,8 @@ export interface components {
       updated_at: string
     }
     StorageConfigResponse: {
-      features?: components['schemas']['StorageFeatures']
+      features: components['schemas']['StorageFeatures']
       fileSizeLimit: number
-      isFreeTier: boolean
     }
     StorageFeatureImageTransformation: {
       enabled: boolean
@@ -6356,11 +6370,7 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: components['schemas']['StorageFeatures']
-      fileSizeLimit: number
-    }
-    UpdateStorageConfigResponse: {
-      features?: components['schemas']['StorageFeatures']
-      fileSizeLimit: number
+      fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
       payment_method?: string
@@ -6785,6 +6795,18 @@ export interface components {
     }
     ValidateQueryResponse: {
       valid: boolean
+    }
+    ValidateSpamBody: {
+      content: string
+      subject: string
+    }
+    ValidateSpamResponse: {
+      rules: components['schemas']['ValidateSpamRule'][]
+    }
+    ValidateSpamRule: {
+      desc: string
+      name: string
+      score: number
     }
     ValidationError: {
       message: string
@@ -7490,6 +7512,28 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete factors */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Validate spam based on the given email content */
+  ValidateController_validateSpam: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateSpamBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ValidateSpamResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to validate spam based on the given email content */
       500: {
         content: never
       }
@@ -12317,7 +12361,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['UpdateStorageConfigResponse']
+          'application/json': components['schemas']['StorageConfigResponse']
         }
       }
       403: {
@@ -12659,7 +12703,46 @@ export interface operations {
   DailyStatsController_getDailyStats: {
     parameters: {
       query: {
-        attribute: string
+        attribute:
+          | 'total_realtime_requests'
+          | 'total_realtime_egress'
+          | 'avg_cpu_usage'
+          | 'total_ingress'
+          | 'total_egress'
+          | 'total_requests'
+          | 'total_get_requests'
+          | 'total_patch_requests'
+          | 'total_post_requests'
+          | 'total_delete_requests'
+          | 'total_options_requests'
+          | 'total_supavisor_egress_bytes'
+          | 'total_rest_ingress'
+          | 'total_rest_egress'
+          | 'total_rest_requests'
+          | 'total_rest_get_requests'
+          | 'total_rest_post_requests'
+          | 'total_rest_patch_requests'
+          | 'total_rest_delete_requests'
+          | 'total_rest_options_requests'
+          | 'total_auth_billing_period_mau'
+          | 'total_auth_billing_period_sso_mau'
+          | 'total_auth_ingress'
+          | 'total_auth_egress'
+          | 'total_auth_requests'
+          | 'total_auth_get_requests'
+          | 'total_auth_post_requests'
+          | 'total_auth_patch_requests'
+          | 'total_auth_options_requests'
+          | 'total_auth_delete_requests'
+          | 'total_storage_ingress'
+          | 'total_storage_egress'
+          | 'total_storage_image_render_count'
+          | 'total_storage_requests'
+          | 'total_storage_get_requests'
+          | 'total_storage_post_requests'
+          | 'total_storage_delete_requests'
+          | 'total_storage_options_requests'
+          | 'total_storage_patch_requests'
         interval: string
         endDate: string
         startDate: string
@@ -15623,6 +15706,55 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's pgbouncer config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's storage config */
+  'v1-get-storage-config': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['StorageConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve project's storage config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's storage config */
+  'v1-update-storage-config': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateStorageConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project's storage config */
       500: {
         content: never
       }
