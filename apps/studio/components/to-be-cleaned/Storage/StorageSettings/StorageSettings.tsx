@@ -13,7 +13,9 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -45,7 +47,12 @@ const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
-  const { isFreeTier } = config || {}
+
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization?.slug,
+  })
+  const isFreeTier = isSuccessSubscription && subscription.plan.id === 'free'
 
   const [initialValues, setInitialValues] = useState({
     fileSizeLimit: 0,
