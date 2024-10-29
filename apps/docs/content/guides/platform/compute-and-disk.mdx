@@ -4,9 +4,11 @@ title: 'Compute and Disk'
 description: "Learn about your project's compute and disk sizing options."
 ---
 
-Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM).
+## Compute
 
-The following table describes the base instances, Nano (free projects) and Micro (paying projects), with additional compute instance sizes available if you need extra performance when scaling up Supabase.
+Every project on the Supabase Platform comes with its own dedicated Postgres instance.
+
+The following table describes the base instances, Nano (free plan) and Micro (paid plans), with additional compute instance sizes available if you need extra performance when scaling up.
 
 <Admonition type="note" label="Upgrade to Micro Instances at No Additional Charge for Paid Projects">
 
@@ -18,122 +20,41 @@ Since every project on a paid plan is already paying for a Micro instance you ca
 
 | Compute Size | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Database Max Connections[^1] | Connection Pooler Max Clients | Max DB Size (Recommended)[^2] |
 | ------------ | ---------------- | ----------------- | ----------------------- | ------------ | ---------------------------- | ----------------------------- | ----------------------------- |
-| Nano[^3]     | $0               | $0                | Shared                  | Up to 0.5 GB | 60                           | 200                           | 500MB                         |
-| Micro        | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 60                           | 200                           | 10GB                          |
-| Small        | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 90                           | 400                           | 50GB                          |
-| Medium       | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 120                          | 600                           | 100GB                         |
-| Large        | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 160                          | 800                           | 200GB                         |
-| XL           | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 240                          | 1,000                         | 500GB                         |
-| 2XL          | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 380                          | 1,500                         | 1TB                           |
-| 4XL          | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 480                          | 3,000                         | 2TB                           |
-| 8XL          | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 490                          | 6,000                         | 4TB                           |
-| 12XL         | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 500                          | 9,000                         | 6TB                           |
-| 16XL         | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 500                          | 12,000                        | 10TB                          |
+| Nano[^3]     | $0               | $0                | Shared                  | Up to 0.5 GB | 60                           | 200                           | 500 MB                        |
+| Micro        | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 60                           | 200                           | 10 GB                         |
+| Small        | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 90                           | 400                           | 50 GB                         |
+| Medium       | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 120                          | 600                           | 100 GB                        |
+| Large        | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 160                          | 800                           | 200 GB                        |
+| XL           | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 240                          | 1,000                         | 500 GB                        |
+| 2XL          | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 380                          | 1,500                         | 1 TB                          |
+| 4XL          | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 480                          | 3,000                         | 2 TB                          |
+| 8XL          | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 490                          | 6,000                         | 4 TB                          |
+| 12XL         | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 500                          | 9,000                         | 6 TB                          |
+| 16XL         | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 500                          | 12,000                        | 10 TB                         |
 
 [^1]: Database max connections are recommended values and can be customized depending on your use case.
 [^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model) for more information.
-[^3]: Nano compute resources on the Free plan are subject to change.
+[^3]: Compute resources on the Free plan are subject to change.
 
 Compute sizes can be changed by first selecting your project in the dashboard [here](https://supabase.com/dashboard/project/_/settings/compute-and-disk) and the upgrade process will [incur downtime](/docs/guides/platform/compute-and-disk#upgrade-downtime).
 
 We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
 
-## Dedicated vs. shared CPU
+### Dedicated vs shared CPU
 
-All Postgres instances on Supabase are dedicated applications running inside dedicated virtual machines. However, the underlying hardware resources, for example the physical CPU, may be shared between multiple VMs, but appear to the OS as if it is a dedicated hardware CPU. This is commonly referred to as a vCPU (virtual CPU). Cloud providers use these shared hardware resources to save on costs. You can upgrade to a larger compute instance (sizes Large and above) to guarantee a dedicated physical CPU for your instance.
+All Postgres databases on Supabase run in isolated environments. Compute instances smaller than `Large` compute size have CPUs which can burst to higher performance levels for short periods of time. Instances bigger than `Large` have predictable performance levels and do not exhibit the same burst behavior.
 
-## Compute upgrades [#upgrades]
-
-When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade later as needed
-
-## Disk IO
-
-SSD disks are attached to your servers, and their performance depends on the compute size of your instance as well as the attributes set for the disk.
-
-Disk IO performance attributes:
-
-- Throughput: Measured in Megabits per Second (Mbps), which indicates the rate of data transfer.
-- IOPS: Input/Output Operations per Second, which measures the number of read and write operations.
-
-Performance limits:
-
-Compute instance sizes have specific upper limits for disk throughput and IOPS. The table below shows the limits for each instance size. However, these limits are also subject to the [storage volume type you choose](https://supabase.com/docs/guides/platform/compute-and-disk#storage-volume-types), as well as the [size of your disk](https://supabase.com/docs/guides/platform/compute-and-disk#disk-size). For instance, the default storage volume type of gp3 has a maximum throughput of 1,000 Mbps and a maximum IOPS of 16,000.
-
-
-| Compute Instance | Baseline Disk Throughput | Burst Disk Throughput | Baseline IOPS | Burst IOPS |
-| -------------- | ----------------------- | ------------------- | ------------- | ----------- |
-| Nano (free)    | 43 Mbps                | 2,085 Mbps         | 250 IOPS      | 11,800 IOPS |
-| Micro          | 87 Mbps                | 2,085 Mbps         | 500 IOPS      | 11,800 IOPS |
-| Small          | 174 Mbps               | 2,085 Mbps         | 1,000 IOPS    | 11,800 IOPS |
-| Medium         | 347 Mbps               | 2,085 Mbps         | 2,000 IOPS    | 11,800 IOPS |
-| Large          | 630 Mbps               | 4,750 Mbps         | 3,600 IOPS    | 20,000 IOPS |
-| XL             | 1,188 Mbps             | 4,750 Mbps         | 6,000 IOPS    | 20,000 IOPS |
-| 2XL            | 2,375 Mbps             | 4,750 Mbps         | 12,000 IOPS   | 20,000 IOPS |
-| 4XL            | 4,750 Mbps             | N/A         | 20,000 IOPS   | N/A         |
-| 8XL            | 9,500 Mbps             | N/A        | 40,000 IOPS   | N/A         |
-| 12XL           | 14,250 Mbps            | N/A       | 50,000 IOPS   | N/A         |
-| 16XL           | 19,000 Mbps            | N/A       | 80,000 IOPS   | N/A         |
-
-### Self-Serve Configurability
-
-You can adjust storage type, IOPS, throughput and disk size parameters yourself in the Dashboard [Database Settings](/dashboard/project/_/settings/database).
+### Compute upgrades [#upgrades]
 
 <Admonition type="caution">
 
-Be aware that increasing IOPS or throughput incurs additional charges.
+Compute add-on changes are usually applied with less than 2 minutes of downtime, but can take longer depending on the underlying Cloud Provider.
 
 </Admonition>
 
-### Understanding I/O Balance and Bursting (Smaller compute instances)
+When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
 
- Smaller compute instances like Nano, Micro, and Small, have a baseline I/O balance and burst capacity. These smaller compute instances come with burst credits that let you handle temporary spikes for 30 minutes in a day in demand by briefly exceeding their baseline performance. This means you can achieve higher performance for short bursts before reverting to your baseline limits.
-
-For example, the micro add-on can burst up to 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk I/O budget gets replenished throughout the day.
-
-### Dedicated I/O Resources (Larger compute instances)
-
-Larger compute-instances, such as 4XL and above, come with dedicated I/O resources and don't rely on I/O balance or burst capacity. These instances are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur, but you won't have burst credits to exceed these limits.
-
-### Storage volume types: gp3 vs. io2
-
-When selecting your storage volume, it’s essential to focus on the performance needs of your workload. Below is a comparison between the two volume types we offer:
-
-**gp3 (General Purpose SSD) - Default Option**
-This is our standard, versatile option and offers great value for most use cases. It’s ideal for general workloads that require moderate IOPS and throughput, such as small to medium-sized databases, development environments, and everyday tasks.
-
-- Volume Size: Up to 16TB
-- IOPS: Can scale up to 16,000 IOPS based on your disk attributes, with max IOPS achievable at 32GB disk size. 
-- Throughput: 125 MB/s (default) to 1,000 MB/s (maximum)
-
-**io2 (Provisioned IOPS SSD)**
-This option is designed for high-performance needs where low latency and very high IOPS are crucial. If you’re running large-scale databases or mission-critical applications, io2 provides the performance you need.
-
-- Volume Size: Up to 60TB
-- IOPS: Can scale up to 80,000 IOPS based on your disk attributes, with max IOPS achievable at 80GB disk size. 
-- Throughput: Scales with IOPS
-
-**Choosing the Right Type**
-Think about the performance your workload demands. For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
-
-### Choosing the Right Compute Instance for Consistent Disk Performance
-
-If you need consistent disk performance, choose the 4XL or larger compute instance which has the same baseline and maximum disk throughput and IOPS.
-
-If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
-
-<Admonition type="information">
-
-Compute instance size changes will not change your selected disk volume type or disk size, but your IO limits may change according to what your selected compute instance size supports.
-
-</Admonition>
-
-### Constraints
-
-- After **any** disk attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
-- You can increase volume size but cannot decrease it.
-- The performance of EBS volumes is affected by the add-on size to which you are attached.
-
-## Postgres replication slots and WAL senders
+### Postgres replication slots and WAL senders
 
 [Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
 
@@ -155,10 +76,96 @@ The maximum number of replication slots and WAL senders depends on your compute 
 
 <Admonition type="caution">
 
-As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
 
 </Admonition>
 
-## Upgrade downtime
+## Disks
 
-Compute add-on changes are usually applied with less than 2 minutes of downtime, but can take longer depending on the Cloud Provider.
+Supabase databases are backed by high performance SSD disks. The _effective performance_ depends on a combination of all the following factors:
+
+- Compute size
+- Provisioned Disk Throughput
+- Provisioned Disk IOPS: Input/Output Operations per Second, which measures the number of read and write operations.
+- Disk type: io2 or gp3
+- Disk size
+
+<Admonition type="note">
+
+The disk size and the disk type dictate the maximum IOPS and throughput that can be provisioned. The effective IOPS is the lower of the IOPS supported by the compute size or the provisioned IOPS of the disk. Similarly, the effective throughout is the lower of the throughput supported by the compute size and the provisioned throughput of the disk.
+
+</Admonition>
+
+The following sections explain how these attributes affect disk performance.
+
+### Compute size
+
+The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, the default disk type of gp3 has a maximum throughput of 1,000 Mbps and a maximum IOPS of 16,000.
+
+| Compute Instance | Baseline Disk Throughput | Burst Disk Throughput | Baseline IOPS | Burst IOPS  |
+| ---------------- | ------------------------ | --------------------- | ------------- | ----------- |
+| Nano (free)      | 43 Mbps                  | 2,085 Mbps            | 250 IOPS      | 11,800 IOPS |
+| Micro            | 87 Mbps                  | 2,085 Mbps            | 500 IOPS      | 11,800 IOPS |
+| Small            | 174 Mbps                 | 2,085 Mbps            | 1,000 IOPS    | 11,800 IOPS |
+| Medium           | 347 Mbps                 | 2,085 Mbps            | 2,000 IOPS    | 11,800 IOPS |
+| Large            | 630 Mbps                 | 4,750 Mbps            | 3,600 IOPS    | 20,000 IOPS |
+| XL               | 1,188 Mbps               | 4,750 Mbps            | 6,000 IOPS    | 20,000 IOPS |
+| 2XL              | 2,375 Mbps               | 4,750 Mbps            | 12,000 IOPS   | 20,000 IOPS |
+| 4XL              | 4,750 Mbps               | N/A                   | 20,000 IOPS   | N/A         |
+| 8XL              | 9,500 Mbps               | N/A                   | 40,000 IOPS   | N/A         |
+| 12XL             | 14,250 Mbps              | N/A                   | 50,000 IOPS   | N/A         |
+| 16XL             | 19,000 Mbps              | N/A                   | 80,000 IOPS   | N/A         |
+
+Smaller compute instances like Nano, Micro, and Small, have a baseline and burst IOPS and throughput. These smaller instances can burst up to the burst IOPS and throughput for 30 minutes in a day. This means you can achieve higher performance for short bursts before reverting to your baseline limits. For example, the Micro compute can burst up to a throughput of 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps.
+
+Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur, but you won't have burst credits to exceed these limits.
+
+### Choosing the right compute instance for consistent disk performance
+
+If you need consistent disk performance, choose the 4XL or larger compute instance which has the same baseline and maximum disk throughput and IOPS. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
+
+### Provisioned Disk throughput and IOPS
+
+The default disk type is gp3, which comes with a baseline throughput of 125 MiB/s and a baseline IOPS of 3,000. You can provision additional IOPS and throughput from the [Database Settings](/dashboard/project/_/settings/database) page.
+
+<Admonition type="caution">
+
+Be aware that increasing IOPS or throughput incurs additional charges.
+
+</Admonition>
+
+### Disk types
+
+When selecting your disk, it’s essential to focus on the performance needs of your workload. Below is a comparison between the two disk types we offer:
+
+**gp3 (General Purpose SSD)**
+This is our standard, versatile option and offers great value for most use cases. It’s ideal for general workloads that require moderate IOPS and throughput, such as small to medium-sized databases, development environments, and everyday tasks.
+
+- Disk Size: Up to 16 TB
+- IOPS: Can scale up to 16,000 IOPS based on your disk attributes, with max IOPS achievable at 32 GB disk size.
+- Throughput: 125 MiB/s (default) to 1,000 MiB/s (maximum)
+
+**io2 (Provisioned IOPS SSD)**
+This option is designed for high-performance needs where low latency and very high IOPS are crucial. If you’re running large-scale databases or mission-critical applications, io2 provides the performance you need.
+
+- Disk Size: Up to 60 TB
+- IOPS: Can scale up to 80,000 IOPS based on your disk attributes, with max IOPS achievable at 80 GB disk size.
+- Throughput: Automatically scales with IOPS
+
+or general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
+
+<Admonition type="information">
+
+Compute instance size changes will not change your selected disk type or disk size, but your IO limits may change according to what your selected compute instance size supports.
+
+</Admonition>
+
+### Disk size
+
+gp3 disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provisional additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughout per provisioned IOPS.
+io2 disks can be provisioned with 1,000 IOPS per GB of disk size.
+
+### Constraints
+
+- After **any** disk attribute change, there is a cooldown period of approximately six hours before you can make further adjustments. During this time, no changes are allowed. If you encounter throttling, you’ll need to wait until the cooldown period concludes before making additional modifications.
+- You can increase disk size but cannot decrease it.
