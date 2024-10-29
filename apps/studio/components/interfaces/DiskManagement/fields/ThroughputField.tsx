@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
@@ -14,6 +14,10 @@ import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { InputPostTab } from '../ui/InputPostTab'
 import { useEffect } from 'react'
+import FormMessage from '../ui/FormMessage'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useParams } from 'common'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
 
 type ThroughputFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -21,12 +25,16 @@ type ThroughputFieldProps = {
 }
 
 export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
+  const { ref: projectRef } = useParams()
+
   const { control, formState, setValue, getValues, watch } = form
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
   const watchedComputeSize = watch('computeSize')
   const throughput_mbps = formState.defaultValues?.throughput
+
+  const { isLoading, error } = useDiskAttributesQuery({ projectRef })
 
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
@@ -98,28 +106,40 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                 }
               >
                 <InputPostTab label="MB/s">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
-                      type="number"
-                      {...field}
-                      value={
-                        disableIopsInput
-                          ? COMPUTE_BASELINE_THROUGHPUT[
-                              watchedComputeSize as keyof typeof COMPUTE_BASELINE_THROUGHPUT
-                            ]
-                          : field.value
-                      }
-                      onChange={(e) => {
-                        setValue('throughput', e.target.valueAsNumber, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
-                      }}
-                      className="flex-grow font-mono rounded-r-none max-w-32"
-                      disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
-                    />
-                  </FormControl_Shadcn_>
+                  {isLoading ? (
+                    <div
+                      className={cn(
+                        InputVariants({ size: 'small' }),
+                        'w-32 font-mono rounded-r-none'
+                      )}
+                    >
+                      <Skeleton className="w-10 h-4" />
+                    </div>
+                  ) : (
+                    <FormControl_Shadcn_>
+                      <Input_Shadcn_
+                        type="number"
+                        {...field}
+                        value={
+                          disableIopsInput
+                            ? COMPUTE_BASELINE_THROUGHPUT[
+                                watchedComputeSize as keyof typeof COMPUTE_BASELINE_THROUGHPUT
+                              ]
+                            : field.value
+                        }
+                        onChange={(e) => {
+                          setValue('throughput', e.target.valueAsNumber, {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          })
+                        }}
+                        className="flex-grow font-mono rounded-r-none max-w-32"
+                        disabled={disableInput || disableIopsInput || watchedStorageType === 'io2'}
+                      />
+                    </FormControl_Shadcn_>
+                  )}
                 </InputPostTab>
+                {error && <FormMessage type="error" message={error.message} />}
               </FormItemLayout>
             )}
           />

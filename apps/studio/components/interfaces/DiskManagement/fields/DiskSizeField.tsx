@@ -16,6 +16,7 @@ import DiskSpaceBar from '../ui/DiskSpaceBar'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
 import FormMessage from '../ui/FormMessage'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -28,9 +29,15 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
   const org = useSelectedOrganization()
 
   const {
+    isLoading: isLoadingDiskAttributes,
+    error: diskAttributesError,
+    isError: isDiskAttributesError,
+  } = useDiskAttributesQuery({ projectRef })
+  const {
     data: subscription,
     isLoading: isSubscriptionLoading,
     error: subscriptionError,
+    isError: isSubscriptionError,
   } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
@@ -38,12 +45,14 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
     data: diskUtil,
     isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
+    isError: isDiskUtilizationError,
   } = useDiskUtilizationQuery({
     projectRef: projectRef,
   })
 
-  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading
-  const error = subscriptionError || diskUtilError
+  const isLoading = isSubscriptionLoading || isDiskUtilizationLoading || isLoadingDiskAttributes
+  const error = subscriptionError || diskUtilError || diskAttributesError
+  const isError = isSubscriptionError || isDiskUtilizationError || isDiskAttributesError
 
   const watchedStorageType = watch('storageType')
   const watchedTotalSize = watch('totalSize')
@@ -73,7 +82,6 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
           control={control}
           render={({ field }) => (
             <FormItemLayout label="Disk Size" layout="vertical">
-              {error && <FormMessage message={error?.message} type="error" />}
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
                   {isLoading ? (
@@ -90,7 +98,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                       <Input_Shadcn_
                         type="number"
                         {...field}
-                        disabled={disableInput}
+                        disabled={disableInput || isError}
                         className="w-32 font-mono rounded-r-none"
                         onWheel={(e) => e.currentTarget.blur()}
                         onChange={(e) => {
@@ -136,13 +144,8 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
         </div>
       </div>
       <div className="col-span-8">
-        <DiskSpaceBar
-          form={form}
-          // showNewBar={formState.dirtyFields.totalSize !== undefined}
-          // totalSize={formState.defaultValues?.totalSize || 0}
-          // usedSize={mainDiskUsed}
-          // newTotalSize={watchedTotalSize}
-        />
+        <DiskSpaceBar form={form} />
+        {error && <FormMessage message={error?.message} type="error" />}
         <DiskManagementDiskSizeReadReplicas
           isDirty={formState.dirtyFields.totalSize !== undefined}
           totalSize={(formState.defaultValues?.totalSize || 0) * 1.25}

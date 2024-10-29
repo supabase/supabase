@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -9,14 +10,15 @@ import {
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
+import { PROJECT_STATUS } from 'lib/constants'
 import { ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -32,7 +34,7 @@ import {
 } from 'ui'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
-import { formatComputeName } from './DiskManagement.utils'
+import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'
@@ -47,10 +49,6 @@ import {
 } from './ui/DiskManagement.constants'
 import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
 import { NoticeBar } from './ui/NoticeBar'
-import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
-import { useQueryClient } from '@tanstack/react-query'
-import { PROJECT_STATUS } from 'lib/constants'
-import { setProjectStatus } from 'data/projects/projects-query'
 
 export function DiskManagementForm() {
   const { project } = useProjectContext()
@@ -63,8 +61,12 @@ export function DiskManagementForm() {
     message: string
     type: 'error' | 'success'
   } | null>(null)
-  const [showRestartPending, setShowRestartPendingState] = useState(false)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
+
+  /**
+   * Permissions
+   */
+  const isPermissionsLoaded = usePermissionsLoaded()
   const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
@@ -208,6 +210,11 @@ export function DiskManagementForm() {
     }
   }, [isSuccess])
 
+  const isDirty = !!Object.keys(form.formState.dirtyFields).length
+  const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
+  const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
+
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({})
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
@@ -298,13 +305,9 @@ export function DiskManagementForm() {
 
   // return <></>
 
-  const isDirty = !!Object.keys(form.formState.dirtyFields).length
-  const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
-  const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-
   return (
     <>
-      {isProjectResizing || isProjectRequestingDiskChanges ? (
+      {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
         <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
           <DiskMangementRestartRequiredSection
             visible={isProjectResizing}
@@ -315,6 +318,11 @@ export function DiskManagementForm() {
             visible={isProjectRequestingDiskChanges}
             title="Disk configuration changes have been requested"
             description="The requested changes will be applied to your disk shortly"
+          />
+          <NoticeBar
+            visible={noPermissions}
+            title="You do not have permission to update disk configuration"
+            description="Please contact your organization administrator to update your disk configuration"
           />
         </ScaffoldContainer>
       ) : null}
@@ -331,7 +339,8 @@ export function DiskManagementForm() {
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern
               className="-space-y-px"
-              open={advancedSettingsOpen}
+              // open={advancedSettingsOpen}
+              defaultOpen
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
             >
               <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
@@ -382,6 +391,7 @@ export function DiskManagementForm() {
                   </Button>
                   <DiskManagementReviewAndSubmitDialog
                     loading={isUpdatingConfig}
+                    disabled={noPermissions}
                     form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}

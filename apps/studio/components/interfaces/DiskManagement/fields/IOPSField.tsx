@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 import { UseFormReturn } from 'react-hook-form'
-import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_ } from 'ui'
+import { Button, cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { ComputeSizeReccomendationSection } from '../ui/ComputeSizeReccomendationSection'
@@ -14,6 +14,10 @@ import { calculateComputeSizeRequiredForIops, calculateIOPSPrice } from '../Disk
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { InputPostTab } from '../ui/InputPostTab'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { useParams } from 'common'
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import FormMessage from '../ui/FormMessage'
 
 type IOPSFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -21,11 +25,14 @@ type IOPSFieldProps = {
 }
 
 export function IOPSField({ form, disableInput }: IOPSFieldProps) {
+  const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, watch } = form
 
   const watchedStorageType = watch('storageType')
   const watchedComputeSize = watch('computeSize')
   const watchedIOPS = watch('provisionedIOPS') ?? 0
+
+  const { isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: formState.defaultValues?.storageType as DiskType,
@@ -47,8 +54,9 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
           <FormItemLayout
             layout="horizontal"
             label="IOPS"
+            id={field.name}
             description={
-              <div className="flex flex-col gap-y-2">
+              <span className="flex flex-col gap-y-2">
                 <ComputeSizeReccomendationSection
                   computeSize={watchedComputeSize}
                   iops={watchedIOPS}
@@ -76,7 +84,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                     newStorageType={getValues('storageType') as DiskType}
                   />
                 )}
-              </div>
+              </span>
             }
             labelOptional={
               <>
@@ -98,29 +106,37 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
             }
           >
             <InputPostTab label="IOPS">
-              <FormControl_Shadcn_>
-                <Input_Shadcn_
-                  id="provisionedIOPS"
-                  type="number"
-                  className="flex-grow font-mono rounded-r-none max-w-32"
-                  {...field}
-                  value={
-                    disableIopsInput
-                      ? COMPUTE_BASELINE_IOPS[
-                          watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
-                        ]
-                      : field.value
-                  }
-                  disabled={disableInput || disableIopsInput}
-                  onChange={(e) => {
-                    setValue('provisionedIOPS', e.target.valueAsNumber, {
-                      shouldDirty: true,
-                      shouldValidate: true,
-                    })
-                  }}
-                />
-              </FormControl_Shadcn_>
+              {isLoading ? (
+                <div
+                  className={cn(InputVariants({ size: 'small' }), 'w-32 font-mono rounded-r-none')}
+                >
+                  <Skeleton className="w-10 h-4" />
+                </div>
+              ) : (
+                <FormControl_Shadcn_>
+                  <Input_Shadcn_
+                    type="number"
+                    className="flex-grow font-mono rounded-r-none max-w-32"
+                    {...field}
+                    value={
+                      disableIopsInput
+                        ? COMPUTE_BASELINE_IOPS[
+                            watchedComputeSize as keyof typeof COMPUTE_BASELINE_IOPS
+                          ]
+                        : field.value
+                    }
+                    disabled={disableInput || disableIopsInput || isError}
+                    onChange={(e) => {
+                      setValue('provisionedIOPS', e.target.valueAsNumber, {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      })
+                    }}
+                  />
+                </FormControl_Shadcn_>
+              )}
             </InputPostTab>
+            {error && <FormMessage type="error" message={error.message} />}
           </FormItemLayout>
         )
       }}

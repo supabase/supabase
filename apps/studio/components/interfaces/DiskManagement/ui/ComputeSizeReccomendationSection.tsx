@@ -24,7 +24,7 @@ export function ComputeSizeReccomendationSection({
     iops > maxIOPSforComputeSize && !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize)
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isVisible && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}

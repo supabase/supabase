@@ -12,6 +12,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskManagement.utils'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import FormMessage from '../ui/FormMessage'
 
 type ComputeOption = {
   identifier: components['schemas']['AddonVariantId']
@@ -37,7 +38,6 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
     data: addons,
     isLoading: isAddonsLoading,
     error: addonsError,
-    isSuccess: isAddonsSuccess,
   } = useProjectAddonsQuery({ projectRef: ref })
 
   const availableAddons = useMemo(() => {
@@ -81,7 +81,7 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
           }
         >
           <RadioGroupCard
-            className="grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3"
+            className={!addonsError ? 'grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3' : ''}
             onValueChange={(value: components['schemas']['AddonVariantId']) => {
               setValue('computeSize', value, {
                 shouldDirty: true,
@@ -99,7 +99,7 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
                 .fill(0)
                 .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
             ) : addonsError ? (
-              <p>Error loading compute options</p>
+              <FormMessage message={addonsError?.message} type="error" />
             ) : (
               availableOptions.map((compute: ComputeOption) => {
                 // @ts-expect-error

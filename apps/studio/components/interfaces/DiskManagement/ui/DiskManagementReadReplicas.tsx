@@ -154,7 +154,7 @@ export const DiskManagementIOPSReadReplicas = ({
   if (readReplicas.length === 0) return null
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isDirty && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -217,7 +217,7 @@ export const DiskManagementThroughputReadReplicas = ({
   if (readReplicas.length === 0) return null
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isDirty && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}

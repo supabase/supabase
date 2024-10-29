@@ -686,13 +686,7 @@ export function DiskManagementPanelForm() {
                     {/* Additional content or information can go here */}
                   </div>
                   <div className="col-span-8 space-y-6 mt-6">
-                    <DiskSpaceBar
-                      form={form}
-                      // showNewBar={form.formState.dirtyFields.totalSize !== undefined}
-                      // totalSize={size_gb}
-                      // usedSize={mainDiskUsed}
-                      // newTotalSize={watchedTotalSize}
-                    />
+                    <DiskSpaceBar form={form} />
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
                       totalSize={size_gb * 1.25}
