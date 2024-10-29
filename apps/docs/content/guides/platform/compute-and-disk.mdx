@@ -48,7 +48,7 @@ All Postgres databases on Supabase run in isolated environments. Compute instanc
 
 <Admonition type="caution">
 
-Compute add-on changes are usually applied with less than 2 minutes of downtime, but can take longer depending on the underlying Cloud Provider.
+Compute instance changes are usually applied with less than 2 minutes of downtime, but can take longer depending on the underlying Cloud Provider.
 
 </Admonition>
 
@@ -58,9 +58,9 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 [Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
 
-The maximum number of replication slots and WAL senders depends on your compute add-on size, as follows:
+The maximum number of replication slots and WAL senders depends on your compute instance size, as follows:
 
-| Compute add-on | Max Replication Slots | Max WAL Senders |
+| Compute instance | Max Replication Slots | Max WAL Senders |
 | -------------- | --------------------- | --------------- |
 | Nano (free)    | 5                     | 5               |
 | Micro          | 5                     | 5               |
@@ -76,7 +76,7 @@ The maximum number of replication slots and WAL senders depends on your compute 
 
 <Admonition type="caution">
 
-As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute instance, ensure that you are using fewer slots than the maximum number of replication slots available for the new compute instance.
 
 </Admonition>
 
@@ -102,27 +102,25 @@ The following sections explain how these attributes affect disk performance.
 
 The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, the default disk type of gp3 has a maximum throughput of 1,000 Mbps and a maximum IOPS of 16,000.
 
-| Compute Instance | Baseline Disk Throughput | Burst Disk Throughput | Baseline IOPS | Burst IOPS  |
-| ---------------- | ------------------------ | --------------------- | ------------- | ----------- |
-| Nano (free)      | 43 Mbps                  | 2,085 Mbps            | 250 IOPS      | 11,800 IOPS |
-| Micro            | 87 Mbps                  | 2,085 Mbps            | 500 IOPS      | 11,800 IOPS |
-| Small            | 174 Mbps                 | 2,085 Mbps            | 1,000 IOPS    | 11,800 IOPS |
-| Medium           | 347 Mbps                 | 2,085 Mbps            | 2,000 IOPS    | 11,800 IOPS |
-| Large            | 630 Mbps                 | 4,750 Mbps            | 3,600 IOPS    | 20,000 IOPS |
-| XL               | 1,188 Mbps               | 4,750 Mbps            | 6,000 IOPS    | 20,000 IOPS |
-| 2XL              | 2,375 Mbps               | 4,750 Mbps            | 12,000 IOPS   | 20,000 IOPS |
-| 4XL              | 4,750 Mbps               | N/A                   | 20,000 IOPS   | N/A         |
-| 8XL              | 9,500 Mbps               | N/A                   | 40,000 IOPS   | N/A         |
-| 12XL             | 14,250 Mbps              | N/A                   | 50,000 IOPS   | N/A         |
-| 16XL             | 19,000 Mbps              | N/A                   | 80,000 IOPS   | N/A         |
+| Compute Instance | Baseline Disk Throughput | Baseline IOPS |
+| ---------------- | --------------- | ------------ |
+| Nano (free)      | 43 Mbps        | 250 IOPS     |
+| Micro            | 87 Mbps        | 500 IOPS     |
+| Small            | 174 Mbps       | 1,000 IOPS   |
+| Medium           | 347 Mbps       | 2,000 IOPS   |
+| Large            | 630 Mbps       | 3,600 IOPS   |
+| XL               | 1,188 Mbps     | 6,000 IOPS   |
+| 2XL              | 2,375 Mbps     | 12,000 IOPS  |
+| 4XL              | 4,750 Mbps     | 20,000 IOPS   |
+| 8XL              | 9,500 Mbps     | 40,000 IOPS   |
+| 12XL             | 14,250 Mbps    | 50,000 IOPS   |
+| 16XL             | 19,000 Mbps    | 80,000 IOPS   |
 
-Smaller compute instances like Nano, Micro, and Small, have a baseline and burst IOPS and throughput. These smaller instances can burst up to the burst IOPS and throughput for 30 minutes in a day. This means you can achieve higher performance for short bursts before reverting to your baseline limits. For example, the Micro compute can burst up to a throughput of 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps.
-
-Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur, but you won't have burst credits to exceed these limits.
+Smaller compute instances like Nano, Micro, and Small have baseline performance levels. Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur.
 
 ### Choosing the right compute instance for consistent disk performance
 
-If you need consistent disk performance, choose the 4XL or larger compute instance which has the same baseline and maximum disk throughput and IOPS. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
+If you need consistent disk performance, choose the 4XL or larger compute instance. If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has exceeded the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget. Projects that use any disk IO budget are good candidates for upgrading to a larger compute instance with higher throughput.
 
 ### Provisioned Disk throughput and IOPS
 
@@ -136,23 +134,17 @@ Be aware that increasing IOPS or throughput incurs additional charges.
 
 ### Disk types
 
-When selecting your disk, it’s essential to focus on the performance needs of your workload. Below is a comparison between the two disk types we offer:
+When selecting your disk, it's essential to focus on the performance needs of your workload. Here's a comparison of our available disk types:
 
-**gp3 (General Purpose SSD)**
-This is our standard, versatile option and offers great value for most use cases. It’s ideal for general workloads that require moderate IOPS and throughput, such as small to medium-sized databases, development environments, and everyday tasks.
+| Feature | gp3 (General Purpose SSD) | io2 (High Performance SSD) |
+|---------|---------------------------|---------------------------|
+| Use Case | General workloads, development environments, small to medium databases | High-performance needs, large-scale databases, mission-critical applications |
+| Max Disk Size | 16 TB | 60 TB |
+| Max IOPS | 16,000 IOPS (at 32 GB disk size) | 80,000 IOPS (at 80 GB disk size) |
+| Throughput | 125 MiB/s (default) to 1,000 MiB/s (maximum) | Automatically scales with IOPS |
+| Best For | Great value for most use cases | Low latency and very high IOPS requirements |
 
-- Disk Size: Up to 16 TB
-- IOPS: Can scale up to 16,000 IOPS based on your disk attributes, with max IOPS achievable at 32 GB disk size.
-- Throughput: 125 MiB/s (default) to 1,000 MiB/s (maximum)
-
-**io2 (Provisioned IOPS SSD)**
-This option is designed for high-performance needs where low latency and very high IOPS are crucial. If you’re running large-scale databases or mission-critical applications, io2 provides the performance you need.
-
-- Disk Size: Up to 60 TB
-- IOPS: Can scale up to 80,000 IOPS based on your disk attributes, with max IOPS achievable at 80 GB disk size.
-- Throughput: Automatically scales with IOPS
-
-or general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
+For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
 <Admonition type="information">
 
