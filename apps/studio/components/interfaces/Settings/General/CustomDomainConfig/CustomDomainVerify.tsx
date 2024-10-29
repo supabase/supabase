@@ -195,7 +195,8 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
             <Button
               type="default"
               onClick={onCancelCustomDomain}
-              disabled={isDeleting || isReverifyLoading || isValidating}
+              loading={isDeleting}
+              disabled={isReverifyLoading || isValidating}
               className="self-end"
             >
               Cancel

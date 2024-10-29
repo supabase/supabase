@@ -82,8 +82,6 @@ const ChartHandler = ({
     { enabled: provider === 'daily-stats' && data === undefined }
   )
 
-  console.log(attribute, dailyStatsData)
-
   const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
     useInfraMonitoringQuery(
       {
