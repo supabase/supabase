@@ -35,6 +35,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  workflow_run?: string
 }
 export type LogData = CustomLogData & PreviewLogData
 

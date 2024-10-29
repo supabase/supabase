@@ -235,30 +235,11 @@ export const BranchRow = ({
                   </Link>
                 </Button>
                 {branchingWorkflowLogsEnabled && (
-                  <ButtonTooltip
-                    type="default"
-                    asChild
-                    disabled={branch.status === 'CREATING_PROJECT'}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text:
-                          branch.status === 'CREATING_PROJECT'
-                            ? 'Branch is still creating. Logs will be available once the branch is active'
-                            : undefined,
-                      },
-                    }}
-                  >
-                    <Link
-                      href={
-                        branch.status === 'CREATING_PROJECT'
-                          ? '#'
-                          : `/project/${branch.project_ref}/logs/workflow-run-logs`
-                      }
-                    >
+                  <Button type="default" asChild>
+                    <Link href={`/project/${branch.project_ref}/logs/workflow-run-logs`}>
                       View Logs
                     </Link>
-                  </ButtonTooltip>
+                  </Button>
                 )}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
