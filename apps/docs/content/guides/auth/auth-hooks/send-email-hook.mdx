@@ -10,12 +10,12 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
 
 Email sending depends on two settings: Email Provider and Auth Hook status.
 
-| Email Provider Enabled | Auth Hook Enabled | Result                                                               |
-| ---------------------- | ----------------- | -------------------------------------------------------------------- |
-| True                   | True              | Auth Hook handles email sending (SMTP not used)                      |
-| True                   | False             | SMTP handles email sending (custom if configured, default otherwise) |
-| False                  | True              | Email Signups Disabled                                               |
-| False                  | False             | Email Signups Disabled                                               |
+| Email Provider | Auth Hook | Result                                                               |
+| -------------- | --------- | -------------------------------------------------------------------- |
+| Enabled        | Enabled   | Auth Hook handles email sending (SMTP not used)                      |
+| Enabled        | Disabled  | SMTP handles email sending (custom if configured, default otherwise) |
+| Disabled       | Enabled   | Email Signups Disabled                                               |
+| Disabled       | Disabled  | Email Signups Disabled                                               |
 
 **Inputs**
 
