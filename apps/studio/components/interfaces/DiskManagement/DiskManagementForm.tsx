@@ -51,17 +51,14 @@ import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgrad
 import { NoticeBar } from './ui/NoticeBar'
 
 export function DiskManagementForm() {
-  const { project } = useProjectContext()
+  const {
+    project,
+    // isLoading is used to avoud a useCheckPermissions() race condition
+    isLoading: isProjectLoading,
+  } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
-  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
-  const [messageState, setMessageState] = useState<{
-    message: string
-    type: 'error' | 'success'
-  } | null>(null)
-  const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
   /**
    * Permissions
@@ -74,9 +71,19 @@ export function DiskManagementForm() {
   })
 
   /**
-   * Queries for form data
+   * Component States
    */
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const [messageState, setMessageState] = useState<{
+    message: string
+    type: 'error' | 'success'
+  } | null>(null)
+  const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
+  /**
+   * Fetch form data
+   */
   const {
     data: databases,
     isLoading: isReadReplicasLoading,
@@ -213,7 +220,7 @@ export function DiskManagementForm() {
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
-  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration
+  const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({})
@@ -339,8 +346,7 @@ export function DiskManagementForm() {
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern
               className="-space-y-px"
-              // open={advancedSettingsOpen}
-              defaultOpen
+              open={advancedSettingsOpen}
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
             >
               <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">

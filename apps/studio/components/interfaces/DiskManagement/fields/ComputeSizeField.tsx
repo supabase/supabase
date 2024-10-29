@@ -99,7 +99,9 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
                 .fill(0)
                 .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
             ) : addonsError ? (
-              <FormMessage message={addonsError?.message} type="error" />
+              <FormMessage message={'Failed to load Compute size options'} type="error">
+                <p>{addonsError?.message}</p>
+              </FormMessage>
             ) : (
               availableOptions.map((compute: ComputeOption) => {
                 // @ts-expect-error
