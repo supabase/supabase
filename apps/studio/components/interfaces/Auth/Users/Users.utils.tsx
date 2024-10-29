@@ -115,6 +115,20 @@ const phoneProviders = providers.phone.map((x) => {
   return key
 })
 
+function toPrettyJsonString(value: unknown): string | undefined {
+  if (!value) return undefined
+  if (typeof value === 'string') return value
+  if (Array.isArray(value)) return value.map((item) => toPrettyJsonString(item)).join(' ')
+
+  try {
+    return JSON.stringify(value)
+  } catch (error) {
+    // ignore the error
+  }
+
+  return undefined
+}
+
 export function getDisplayName(user: User, fallback = '-'): string {
   const {
     custom_claims,
@@ -149,39 +163,44 @@ export function getDisplayName(user: User, fallback = '-'): string {
     first_name: cc_first_name,
   } = custom_claims ?? {}
 
-  const last =
+  const last = toPrettyJsonString(
     familyName ||
-    family_name ||
-    surname ||
-    lastName ||
-    last_name ||
-    ccFamilyName ||
-    cc_family_name ||
-    ccSurname ||
-    ccLastName ||
-    cc_last_name
+      family_name ||
+      surname ||
+      lastName ||
+      last_name ||
+      ccFamilyName ||
+      cc_family_name ||
+      ccSurname ||
+      ccLastName ||
+      cc_last_name
+  )
 
-  const first =
+  const first = toPrettyJsonString(
     givenName ||
-    given_name ||
-    firstName ||
-    first_name ||
-    ccGivenName ||
-    cc_given_name ||
-    ccFirstName ||
-    cc_first_name
+      given_name ||
+      firstName ||
+      first_name ||
+      ccGivenName ||
+      cc_given_name ||
+      ccFirstName ||
+      cc_first_name
+  )
 
   return (
-    displayName ||
-    display_name ||
-    ccDisplayName ||
-    cc_display_name ||
-    fullName ||
-    full_name ||
-    ccFullName ||
-    cc_full_name ||
-    (first && last && `${first} ${last}`) ||
-    fallback
+    toPrettyJsonString(
+      displayName ||
+        display_name ||
+        ccDisplayName ||
+        cc_display_name ||
+        fullName ||
+        full_name ||
+        ccFullName ||
+        cc_full_name ||
+        (first && last && `${first} ${last}`) ||
+        last ||
+        first
+    ) || fallback
   )
 }
 

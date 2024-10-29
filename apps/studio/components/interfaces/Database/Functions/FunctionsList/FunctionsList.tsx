@@ -5,6 +5,7 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -17,18 +18,10 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import {
-  AiIconAnimation,
-  Button,
-  Input,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-} from 'ui'
+import { useAppStateSnapshot } from 'state/app-state'
+import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionsListProps {
   createFunction: () => void
@@ -136,39 +129,47 @@ const FunctionsList = ({
 
             <div className="flex items-center gap-x-2">
               {!isLocked && (
-                <ButtonTooltip
-                  disabled={!canCreateFunctions}
-                  onClick={() => createFunction()}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text: !canCreateFunctions
-                        ? 'You need additional permissions to create functions'
-                        : undefined,
-                    },
-                  }}
-                >
-                  Create a new function
-                </ButtonTooltip>
-              )}
-              {enableFunctionsAssistant && (
-                <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>
-                    <Button
+                <>
+                  <ButtonTooltip
+                    disabled={!canCreateFunctions}
+                    onClick={() => createFunction()}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateFunctions
+                          ? 'You need additional permissions to create functions'
+                          : undefined,
+                      },
+                    }}
+                  >
+                    Create a new function
+                  </ButtonTooltip>
+                  {enableFunctionsAssistant && (
+                    <ButtonTooltip
                       type="default"
+                      disabled={!canCreateFunctions}
                       className="px-1 pointer-events-auto"
                       icon={
                         <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
                       }
-                      onClick={() => setAiAssistantPanel({ open: true, editor: 'functions' })}
+                      onClick={() =>
+                        setAiAssistantPanel({
+                          open: true,
+                          editor: 'functions',
+                          entity: undefined,
+                        })
+                      }
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: !canCreateFunctions
+                            ? 'You need additional permissions to create functions'
+                            : 'Create with Supabase Assistant',
+                        },
+                      }}
                     />
-                  </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">
-                    {!canCreateFunctions
-                      ? 'You need additional permissions to create functions'
-                      : 'Create with Supabase Assistant'}
-                  </TooltipContent_Shadcn_>
-                </Tooltip_Shadcn_>
+                  )}
+                </>
               )}
             </div>
           </div>
