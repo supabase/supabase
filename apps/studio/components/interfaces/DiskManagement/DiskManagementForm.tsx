@@ -346,7 +346,8 @@ export function DiskManagementForm() {
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern
               className="-space-y-px"
-              open={advancedSettingsOpen}
+              // open={advancedSettingsOpen}
+              defaultOpen
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
             >
               <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
