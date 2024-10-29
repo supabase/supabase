@@ -230,36 +230,34 @@ const StorageSettings = () => {
                   </p>
                 </div>
               </div>
-            </div>
-            <div className="bg-surface-100  overflow-hidden border-muted rounded-md border shadow">
-              <div className="flex flex-col gap-0 divide-y divide-border-muted">
-                <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
-                  <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
-                    <p className="text-sm">Image Transformation</p>
+
+              <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
+                <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
+                  <p className="text-sm">Image Transformation</p>
+                </div>
+                <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
+                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="imageTransformationEnabled"
+                      render={({ field }) => (
+                        <Switch
+                          size="large"
+                          disabled={isFreeTier}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
                   </div>
-                  <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
-                    <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="imageTransformationEnabled"
-                        render={({ field }) => (
-                          <Switch
-                            size="large"
-                            disabled={isFreeTier}
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        )}
-                      />
-                    </div>
-                    <p className={'text-sm text-foreground-light col-start-5 col-span-8'}>
-                      Toggle image transformation feature.
-                      <br /> When disabled transformation endpoints will not be reachable
-                    </p>
-                  </div>
+                  <p className={'text-sm text-foreground-light col-start-5 col-span-8'}>
+                    Toggle image transformation feature.
+                    <br /> When disabled transformation endpoints will not be reachable
+                  </p>
                 </div>
               </div>
             </div>
+
             {isFreeTier && (
               <div className="px-6 pb-6">
                 <UpgradeToPro
