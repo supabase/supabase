@@ -355,7 +355,7 @@ export const ConnectionPooling = () => {
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}
                         <a
-                          href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size"
                           target="_blank"
                           rel="noreferrer"
                           className="underline"
@@ -393,7 +393,7 @@ export const ConnectionPooling = () => {
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}
                         <a
-                          href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size"
                           target="_blank"
                           rel="noreferrer"
                           className="underline"
