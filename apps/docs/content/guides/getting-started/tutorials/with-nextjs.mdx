@@ -385,7 +385,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -405,7 +405,7 @@ export async function login(formData) {
 }
 
 export async function signup(formData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const data = {
     email: formData.get('email'),
@@ -512,7 +512,7 @@ export async function GET(request) {
   redirectTo.searchParams.delete('type')
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -720,7 +720,7 @@ import AccountForm from './account-form'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const {
     data: { user },

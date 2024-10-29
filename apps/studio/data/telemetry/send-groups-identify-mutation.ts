@@ -7,13 +7,12 @@ import type { ResponseError } from 'types'
 
 export type SendGroupsIdentifyVariables = components['schemas']['TelemetryGroupsIdentityBody']
 
-export async function sendGroupsIdentify({
-  consent,
-  body,
-}: {
-  consent: boolean
-  body: SendGroupsIdentifyVariables
-}) {
+export async function sendGroupsIdentify({ body }: { body: SendGroupsIdentifyVariables }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
   if (!consent) return undefined
 
   const { data, error } = await post(`/platform/telemetry/groups/identify`, {
@@ -34,13 +33,8 @@ export const useSendGroupsIdentifyMutation = ({
   UseMutationOptions<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>,
   'mutationFn'
 > = {}) => {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
-      : null) === 'true'
-
   return useMutation<SendGroupsIdentifyData, ResponseError, SendGroupsIdentifyVariables>(
-    (vars) => sendGroupsIdentify({ consent, body: vars }),
+    (vars) => sendGroupsIdentify({ body: vars }),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)

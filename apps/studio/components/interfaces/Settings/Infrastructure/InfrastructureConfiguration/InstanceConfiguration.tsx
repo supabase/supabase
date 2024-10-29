@@ -207,7 +207,7 @@ const InstanceConfigurationUI = () => {
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <div className="nowheel">
+    <div className="nowheel border-y">
       <div
         className={`h-[500px] w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
@@ -231,7 +231,9 @@ const InstanceConfigurationUI = () => {
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to deploy replicas',
+                      text: !canManageReplicas
+                        ? 'You need additional permissions to deploy replicas'
+                        : undefined,
                     },
                   }}
                 >

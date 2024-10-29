@@ -1,10 +1,11 @@
 import clsx from 'clsx'
+import { ChevronDown, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
@@ -19,7 +20,6 @@ import {
   SidePanel,
 } from 'ui'
 import { HTTPArgument } from './EditHookPanel'
-import { Trash, Plus, ChevronDown } from 'lucide-react'
 
 interface HTTPRequestFieldsProps {
   type: 'http_request' | 'supabase_function'
@@ -48,12 +48,12 @@ const HTTPRequestFields = ({
 }: HTTPRequestFieldsProps) => {
   const { project: selectedProject } = useProjectContext()
   const { ref } = useParams()
-  const { data: settings } = useProjectApiQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: functions } = useEdgeFunctionsQuery({ projectRef: ref })
 
   const edgeFunctions = functions ?? []
-  const apiService = settings?.autoApiService
-  const apiKey = apiService?.serviceApiKey ?? '[YOUR API KEY]'
+  const { serviceKey } = getAPIKeys(settings)
+  const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <>

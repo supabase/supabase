@@ -11,7 +11,7 @@ import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, ChevronRight, FilePlus, Plus } from 'lucide-react'
+import { ArrowUpRight, ChevronRight, DatabaseIcon, FilePlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -30,6 +30,7 @@ import {
   Separator,
 } from 'ui'
 import {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideMenuItem,
@@ -276,14 +277,16 @@ export function LogsSidebarMenuV2() {
           </div>
         )}
         {savedQueries.length === 0 && (
-          <div className="mx-4">
-            <Alert_Shadcn_ className="p-3">
-              <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="text-xs">
-                You can create and save queries from the "Create query" button in the top left.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+          <InnerSideBarEmptyPanel
+            className="mx-4"
+            title="No queries created yet"
+            description="Create and save your queries to use them in the explorer"
+            actions={
+              <Button asChild type="default">
+                <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
+              </Button>
+            }
+          />
         )}
         {savedQueries.map((query) => (
           <SavedQueriesItem item={query} key={query.id} />

@@ -27,6 +27,11 @@ import {
 
 import 'dotenv/config'
 
+const REPOSITORY_ID = 'MDEwOlJlcG9zaXRvcnkyMTQ1ODcxOTM='
+const TROUBLESHOOTING_CATEGORY_ID = 'DIC_kwDODMpXOc4CUvEr'
+const REPOSITORY_OWNER = 'supabase'
+const REPOSITORY_NAME = 'supabase'
+
 /**
  * @typedef {import('./Troubleshooting.utils.common.mjs').TroubleshootingEntry} TroubleshootingEntry
  * @typedef {import('./Troubleshooting.utils.common.mjs').TroubleshootingMetadata} TroubleshootingMetadata
@@ -89,7 +94,19 @@ async function syncTroubleshootingEntries() {
       const discussion = entry.data.github_url
         ? await getGithubIdForDiscussion(discussions, entry)
         : await createGithubDiscussion(entry)
-      const id = await insertNewTroubleshootingEntry(entry, discussion)
+
+      let id
+      try {
+        id = await insertNewTroubleshootingEntry(entry, discussion)
+      } catch (error) {
+        console.error(`[ERROR] Failed to insert new entry for ${entry.data.title}: %O`, error)
+        console.log(
+          `[INFO] Rolling back discussion creation for ${entry.data.title} (GitHub ID ${discussion.id})`
+        )
+        await rollbackGithubDiscussion(discussion.id)
+        throw error
+      }
+
       await updateFileId(entry, id)
     } else {
       // The database entry already exists, so check for updates.
@@ -105,7 +122,7 @@ async function syncTroubleshootingEntries() {
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
       console.error(
-        `Failed to insert and/or update GitHub discussion for ${troubleshootingEntries[index].filePath}:\n%O`,
+        `[ERROR] Failed to insert and/or update for ${troubleshootingEntries[index].filePath}:\n%O`,
         result.reason
       )
       hasErrors = true
@@ -136,7 +153,7 @@ async function entryExists(entry) {
   }
 
   console.log(
-    `Entry for ${entry.data.title} already exists. Not creating a new one to prevent duplicates.`
+    `[INFO] Entry for ${entry.data.title} already exists. Not creating a new one to prevent duplicates.`
   )
   return true
 }
@@ -165,7 +182,7 @@ function calculateChecksum(content) {
  * @throws If the database insertion fails
  */
 async function insertNewTroubleshootingEntry(entry, discussion) {
-  console.log(`Inserting entry for ${entry.data.title} into DB`)
+  console.log(`[INFO] Inserting entry for ${entry.data.title} into DB`)
 
   const now = new Date().toISOString()
   const checksum = calculateChecksum(entry.content)
@@ -210,7 +227,7 @@ async function updateChecksumIfNeeded(entry) {
 
   const newChecksum = calculateChecksum(entry.content)
   if (data.checksum !== newChecksum) {
-    console.log(`Content changed for ${entry.data.title}. Updating checksum.`)
+    console.log(`[INFO] Content changed for ${entry.data.title}. Updating checksum.`)
 
     const now = new Date().toISOString()
     const { error } = await supabaseAdmin()
@@ -237,8 +254,8 @@ async function updateChecksumIfNeeded(entry) {
 function addCanonicalUrl(entry) {
   const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry.data)
   const content =
-    entry.contentWithoutJsx +
-    `\n\n_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._`
+    `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
+    entry.contentWithoutJsx
   return content
 }
 
@@ -246,14 +263,14 @@ function addCanonicalUrl(entry) {
  * @param {TroubleshootingEntry} entry
  */
 async function createGithubDiscussion(entry) {
-  console.log(`Creating GitHub discussion for ${entry.data.title}`)
+  console.log(`[INFO] Creating GitHub discussion for ${entry.data.title}`)
   const content = addCanonicalUrl(entry)
 
   const mutation = `
     mutation {
       createDiscussion(input: {
-        repositoryId: "MDEwOlJlcG9zaXRvcnkyMTQ1ODcxOTM=",
-        categoryId: "DIC_kwDODMpXOc4CUvEr",
+        repositoryId: "${REPOSITORY_ID}",
+        categoryId: "${TROUBLESHOOTING_CATEGORY_ID}",
         body: "${content}",
         title: "${entry.data.title}"
       }) {
@@ -265,8 +282,10 @@ async function createGithubDiscussion(entry) {
     }
     `
 
-  const { discussion } = await octokit().graphql(mutation)
-  console.log(`Created GitHub discussion for ${entry.data.title}`)
+  const {
+    createDiscussion: { discussion },
+  } = await octokit().graphql(mutation)
+  console.log(`[INFO] Created GitHub discussion for ${entry.data.title}: %s`, discussion.url)
   return discussion
 }
 
@@ -274,11 +293,10 @@ async function createGithubDiscussion(entry) {
  * @returns {Promise<{id: string, url: string}[]>}
  */
 async function getAllTroubleshootingDiscussions() {
-  const troubleshootingCategoryId = 'DIC_kwDODMpXOc4CUvEr'
   const query = `
     query getDiscussions($cursor: String) {
-      repository(owner: "supabase", name: "supabase") {
-        discussions(first: 100, after: $cursor, categoryId: "${troubleshootingCategoryId}") {
+      repository(owner: "${REPOSITORY_OWNER}", name: "${REPOSITORY_NAME}") {
+        discussions(first: 100, after: $cursor, categoryId: "${TROUBLESHOOTING_CATEGORY_ID}") {
           pageInfo {
             hasNextPage
             endCursor
@@ -333,7 +351,7 @@ async function getGithubIdForDiscussion(discussions, entry) {
  * @throws If stored discussion ID for entry not found
  */
 async function updateGithubDiscussion(entry) {
-  console.log(`Updating discussion content for ${entry.data.title}`)
+  console.log(`[INFO] Updating discussion content for ${entry.data.title}`)
 
   const { data, error } = await supabaseAdmin()
     .from('troubleshooting_entries')
@@ -351,12 +369,37 @@ async function updateGithubDiscussion(entry) {
         discussionId: "${data.github_id}",
         body: "${content}",
       }) {
+        discussion {
+          id
+        }
       }
     }
     `
 
   await octokit().graphql(mutation)
-  console.log(`Updated discussion content for ${entry.data.title}`)
+  console.log(`[INFO] Updated discussion content for ${entry.data.title}`)
+}
+
+/** @param {string} id */
+async function rollbackGithubDiscussion(id) {
+  try {
+    const mutation = `
+    mutation {
+      deleteDiscussion(input: {
+        id: "${id}",
+      }) {
+        discussion {
+          id
+        }
+      }
+    }
+    `
+
+    await octokit().graphql(mutation)
+    console.log(`[INFO] Rolled back discussion creation for ${id}`)
+  } catch (error) {
+    console.error(`[ERROR] Failed to rollback discussion creation for ${id}: %O`, error)
+  }
 }
 
 /**
@@ -366,7 +409,7 @@ async function updateGithubDiscussion(entry) {
  * @throws Passes through readFile and writeFile errors without catching
  */
 async function updateFileId(entry, id) {
-  console.log(`Writing database ID to file for ${entry.filePath}`)
+  console.log(`[INFO] Writing database ID to file for ${entry.filePath}`)
 
   const fileContents = await readFile(entry.filePath, 'utf-8')
   const { data, content } = matter(fileContents, {
@@ -388,7 +431,7 @@ async function main() {
       process.exit(1)
     }
   } catch (error) {
-    console.error(error)
+    console.error(`[ERROR] %O`, error)
     process.exit(1)
   }
 }

@@ -1,5 +1,6 @@
 import { StreamingTextResponse } from 'ai'
 import { chatSql } from 'ai-commands/edge'
+import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -70,12 +71,13 @@ async function handlePost(request: NextRequest) {
     messages: { content: string; role: 'user' | 'assistant' }[]
     existingSql?: string
     entityDefinitions: string[]
+    context?: SupportedAssistantEntities
   }>)
 
-  const { messages, existingSql, entityDefinitions } = body
+  const { messages, existingSql, entityDefinitions, context } = body
 
   try {
-    const stream = await chatSql(openai, messages, existingSql, entityDefinitions)
+    const stream = await chatSql(openai, messages, existingSql, entityDefinitions, context)
     return new StreamingTextResponse(stream)
   } catch (error) {
     if (error instanceof Error) {

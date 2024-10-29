@@ -30,12 +30,12 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -73,6 +73,8 @@ const TableList = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
+
+  const prefetchEditorTablePage = usePrefetchEditorTablePage()
 
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
@@ -273,7 +275,9 @@ const TableList = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create tables',
+                text: !canUpdateTables
+                  ? 'You need additional permissions to create tables'
+                  : undefined,
               },
             }}
           >
@@ -475,6 +479,9 @@ const TableList = ({
                                   className="flex items-center space-x-2"
                                   onClick={() =>
                                     router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                  }
+                                  onMouseEnter={() =>
+                                    prefetchEditorTablePage({ id: x.id ? String(x.id) : undefined })
                                   }
                                 >
                                   <Eye size={12} />

@@ -1,7 +1,8 @@
+import { cache } from 'react'
 import { z } from 'zod'
 
-import { supabaseAdmin } from '~/lib/supabaseAdmin'
 import { cache_fullProcess_withDevCacheBust } from '~/features/helpers.fs'
+import { supabaseAdmin } from '~/lib/supabaseAdmin'
 import {
   getAllTroubleshootingEntriesInternal,
   getArticleSlug as getArticleSlugInternal,
@@ -104,8 +105,4 @@ async function getTroubleshootingUpdatedDatesInternal() {
     return acc
   }, new Map<string, Date>())
 }
-export const getTroubleshootingUpdatedDates = cache_fullProcess_withDevCacheBust(
-  getTroubleshootingUpdatedDatesInternal,
-  TROUBLESHOOTING_DIRECTORY,
-  () => JSON.stringify([])
-)
+export const getTroubleshootingUpdatedDates = cache(getTroubleshootingUpdatedDatesInternal)

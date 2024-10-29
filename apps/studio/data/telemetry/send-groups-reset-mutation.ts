@@ -7,13 +7,12 @@ import type { ResponseError } from 'types'
 
 export type SendGroupsResetVariables = components['schemas']['TelemetryGroupsResetBody']
 
-export async function sendGroupsReset({
-  consent,
-  body,
-}: {
-  consent: boolean
-  body: SendGroupsResetVariables
-}) {
+export async function sendGroupsReset({ body }: { body: SendGroupsResetVariables }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
   if (!consent) return undefined
 
   const { data, error } = await post(`/platform/telemetry/groups/reset`, {
@@ -34,13 +33,8 @@ export const useSendGroupsResetMutation = ({
   UseMutationOptions<SendGroupsResetData, ResponseError, SendGroupsResetVariables>,
   'mutationFn'
 > = {}) => {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH)
-      : null) === 'true'
-
   return useMutation<SendGroupsResetData, ResponseError, SendGroupsResetVariables>(
-    (vars) => sendGroupsReset({ consent, body: vars }),
+    (vars) => sendGroupsReset({ body: vars }),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)

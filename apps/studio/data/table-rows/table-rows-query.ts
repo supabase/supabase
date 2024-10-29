@@ -1,4 +1,4 @@
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import type { QueryClient, QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { Query } from 'components/grid/query/Query'
@@ -7,13 +7,17 @@ import {
   JSON_TYPES,
   TEXT_TYPES,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { sqlKeys } from 'data/sql/keys'
 import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
-import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import {
+  isRoleImpersonationEnabled,
+  useIsRoleImpersonationEnabled,
+} from 'state/role-impersonation-state'
 import {
   ExecuteSqlData,
   ExecuteSqlError,
@@ -204,6 +208,21 @@ export type TableRowsVariables = GetTableRowsArgs & {
 export type TableRowsData = TableRows
 export type TableRowsError = ExecuteSqlError
 
+function getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }: TableRowsVariables) {
+  return [
+    ...(queryKey ?? []),
+    {
+      table: {
+        name: table?.name,
+        schema: table?.schema,
+        columns: table?.columns.map((c) => c.name),
+      },
+      impersonatedRole,
+      ...args,
+    },
+  ]
+}
+
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
   { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
@@ -218,18 +237,7 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
         projectRef: projectRef ?? 'ref',
         role: impersonatedRole,
       }),
-      queryKey: [
-        ...(queryKey ?? []),
-        {
-          table: {
-            name: table?.name,
-            schema: table?.schema,
-            columns: table?.columns.map((c) => c.name),
-          },
-          impersonatedRole,
-          ...args,
-        },
-      ],
+      queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
       isRoleImpersonationEnabled,
     },
     {
@@ -245,5 +253,28 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
       ...options,
     }
+  )
+}
+
+export function prefetchTableRows(
+  client: QueryClient,
+  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables
+) {
+  return client.fetchQuery(
+    sqlKeys.query(projectRef, getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args })),
+    ({ signal }) =>
+      executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
+            projectRef: projectRef ?? 'ref',
+            role: impersonatedRole,
+          }),
+          queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+        },
+        signal
+      )
   )
 }

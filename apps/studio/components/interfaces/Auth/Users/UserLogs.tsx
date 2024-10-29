@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { User } from 'data/auth/users-query'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { Button, cn, CriticalIcon, Separator } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './UserPanel'
 
@@ -103,7 +103,6 @@ export const UserLogs = ({ user }: UserLogsProps) => {
             <div className="border border-b-0 rounded-t divide-y">
               {authLogs.map((log) => {
                 const status = ((log.status ?? '-') as any).toString()
-                const formattedTime = dayjs(log.timestamp).format('DD MMM HH:mm:ss')
                 const is400 = status.startsWith('4')
                 const is500 = status.startsWith('5')
 
@@ -112,8 +111,8 @@ export const UserLogs = ({ user }: UserLogsProps) => {
                     key={log.id}
                     className="flex items-center transition font-mono px-2 py-1.5 bg-surface-100 divide-x"
                   >
-                    <p className="text-xs text-foreground-light min-w-[120px] w-[120px] px-1">
-                      {formattedTime}
+                    <p className="text-xs text-foreground-light min-w-[125px] w-[125px] px-1">
+                      <TimestampInfo value={log.timestamp / 1000} />
                     </p>
                     <div className="flex items-center text-xs text-foreground-light h-[22px] min-w-[70px] w-[70px] px-2">
                       <div

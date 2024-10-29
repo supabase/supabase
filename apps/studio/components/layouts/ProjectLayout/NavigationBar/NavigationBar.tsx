@@ -7,8 +7,13 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsAPIDocsSidePanelEnabled,
+  useIsDatabaseFunctionsAssistantEnabled,
+} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -16,6 +21,7 @@ import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -26,13 +32,20 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
   Separator,
   Theme,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
   singleThemes,
 } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { useProjectContext } from '../ProjectContext'
+import { CommandOption } from './CommandOption'
 import {
   generateOtherRoutes,
   generateProductRoutes,
@@ -41,9 +54,6 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -62,6 +72,7 @@ const NavigationBar = () => {
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const isFunctionsAssistantEnabled = useIsDatabaseFunctionsAssistantEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [allowNavPanelToExpand] = useLocalStorageQuery(
@@ -108,7 +119,7 @@ const NavigationBar = () => {
     )
   }
 
-  const SearchButton = (
+  const CommandButton = !isFunctionsAssistantEnabled ? (
     <NavigationIconButton
       size="tiny"
       onClick={() => {
@@ -138,6 +149,41 @@ const NavigationBar = () => {
     >
       Search
     </NavigationIconButton>
+  ) : (
+    <HoverCard_Shadcn_ openDelay={10}>
+      <HoverCardTrigger_Shadcn_ asChild>
+        <NavigationIconButton
+          size="tiny"
+          type="text"
+          icon={<Command size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+        >
+          Commands
+        </NavigationIconButton>
+      </HoverCardTrigger_Shadcn_>
+      <HoverCardContent_Shadcn_ side="right" className="w-48 p-1 flex flex-col gap-y-1">
+        <CommandOption
+          icon={
+            <div className="px-1">
+              <Search size={16} />
+            </div>
+          }
+          label="Search"
+          shortcut="K"
+          onClick={() => {
+            setCommandMenuOpen(true)
+            snap.setNavigationPanelOpen(false)
+          }}
+        />
+        <CommandOption
+          icon={
+            <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+          }
+          label="Assistant"
+          shortcut="I"
+          onClick={() => snap.setAiAssistantPanel({ open: true, editor: null })}
+        />
+      </HoverCardContent_Shadcn_>
+    </HoverCard_Shadcn_>
   )
 
   const UserAccountButton = (
@@ -312,13 +358,13 @@ const NavigationBar = () => {
             <>
               {!allowNavPanelToExpand && (
                 <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild>{SearchButton}</TooltipTrigger_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>{CommandButton}</TooltipTrigger_Shadcn_>
                   <TooltipContent_Shadcn_ side="right">
-                    <span>Search</span>
+                    <span>Commands</span>
                   </TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               )}
-              {allowNavPanelToExpand && SearchButton}
+              {allowNavPanelToExpand && CommandButton}
             </>
           )}
 
