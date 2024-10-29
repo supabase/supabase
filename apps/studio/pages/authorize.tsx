@@ -22,6 +22,7 @@ import { Alert, Button, Listbox } from 'ui'
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { auth_id } = useParams()
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const {
@@ -33,18 +34,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
-  const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
+  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
   })
-  const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
+  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       router.push('/projects')
     },
   })
-  const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
     if (isSuccessOrganizations && organizations.length > 0) {
@@ -61,7 +61,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to approve request: No organization selected')
     }
 
-    approveRequest({ id: auth_id, slug: selectedOrgSlug })
+    setIsSubmitting(true)
+    approveRequest(
+      { id: auth_id, slug: selectedOrgSlug },
+      { onError: () => setIsSubmitting(false) }
+    )
   }
 
   const onDeclineRequest = async () => {
@@ -72,7 +76,11 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to decline request: No organization selected')
     }
 
-    declineRequest({ id: auth_id, slug: selectedOrgSlug })
+    setIsSubmitting(true)
+    declineRequest(
+      { id: auth_id, slug: selectedOrgSlug },
+      { onError: () => setIsSubmitting(false) }
+    )
   }
 
   if (isLoading) {
