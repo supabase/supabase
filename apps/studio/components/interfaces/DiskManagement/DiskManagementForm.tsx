@@ -53,14 +53,11 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { setProjectStatus } from 'data/projects/projects-query'
 
 export function DiskManagementForm() {
-  const showDiskAndComputeForm = useFlag('diskAndComputeForm')
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
-
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
-  const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [messageState, setMessageState] = useState<{
     message: string
@@ -194,8 +191,6 @@ export function DiskManagementForm() {
 
   const { watch, formState } = form
 
-  const watchedComputeSize = watch('computeSize')
-
   // const isAllocatedStorageDirty = !!dirtyFields.totalSize
 
   const disableInput =
@@ -208,23 +203,8 @@ export function DiskManagementForm() {
     // Initialize field values properly when data has been loaded, preserving any user changes
     if (isSuccess) {
       console.log('FORM resetting', form.formState)
-      // const currentValues = form.getValues()
-      // const dirtyFields = form.formState.dirtyFields
 
-      // const newValues = {
-      //   ...defaultValues,
-      //   ...Object.fromEntries(
-      //     Object.entries(currentValues).filter(
-      //       ([key]) => dirtyFields[key as keyof typeof dirtyFields]
-      //     )
-      //   ),
-      // }
-      form.reset(defaultValues, {
-        // keepDirtyValues: true, // This preserves which fields have been changed
-        // keepTouched: true,
-        // keepDirty: true,
-        // keepValues: true,
-      })
+      form.reset(defaultValues, {})
     }
   }, [isSuccess])
 

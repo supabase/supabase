@@ -146,34 +146,31 @@ export const DiskManagementReviewAndSubmitDialog = ({
 
   const { formState, getValues } = form
 
-  /**
-   * Queries
-   * */
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const {
-    data: addons,
-    isLoading: isAddonsLoading,
-    error: addonsError,
-    isSuccess: isAddonsSuccess,
-  } = useProjectAddonsQuery({ projectRef: project?.ref })
-
   const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
       project_id: project?.id,
     },
   })
 
+  /**
+   * Queries
+   * */
+  const {
+    data: subscription,
+    // request deps in Form handle errors and loading
+  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const {
+    data: addons,
+    // request deps in Form handle errors and loading
+  } = useProjectAddonsQuery({ projectRef: project?.ref })
+
   const planId = subscription?.plan.id ?? 'free'
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const replicaTooltipText = `Price change includes primary database and ${numReplicas} replica${numReplicas > 1 ? 's' : ''}`
 
-  /**
-   * Handle compute instances
-   */
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []
   }, [addons])
-
   const availableOptions = useMemo(() => {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
@@ -183,7 +180,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
   })
-
   const diskSizePrice = calculateDiskSizePrice({
     planId: planId,
     oldSize: formState.defaultValues?.totalSize || 0,
@@ -192,7 +188,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
     newStorageType: getValues('storageType') as DiskType,
     numReplicas,
   })
-
   const iopsPrice = calculateIOPSPrice({
     oldStorageType: form.formState.defaultValues?.storageType as DiskType,
     oldProvisionedIOPS: form.formState.defaultValues?.provisionedIOPS || 0,
@@ -200,7 +195,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
     newProvisionedIOPS: form.getValues('provisionedIOPS'),
     numReplicas,
   })
-
   const throughputPrice = calculateThroughputPrice({
     storageType: form.getValues('storageType') as DiskType,
     newThroughput: form.getValues('throughput') || 0,
@@ -241,7 +235,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
           Review changes
         </ButtonTooltip>
       </DialogTrigger>
-      {loading && <h1>is loading</h1>}
       <DialogContent className="min-w-[620px]">
         <DialogHeader>
           <DialogTitle>Review changes</DialogTitle>
