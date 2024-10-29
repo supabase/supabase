@@ -48,6 +48,7 @@ import CodeEditor from '../CodeEditor/CodeEditor'
 import { AIAssistant } from './AIAssistant'
 import { generateCTA, generatePlaceholder, generateTitle, validateQuery } from './AIAssistant.utils'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
+import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 
 export const AiAssistantPanel = () => {
   const os = detectOS()
@@ -58,7 +59,7 @@ export const AiAssistantPanel = () => {
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
   const isEnabled = useIsDatabaseFunctionsAssistantEnabled()
 
-  const { open, editor, content } = aiAssistantPanel
+  const { open, editor, content, entity } = aiAssistantPanel
   const previousEditor = usePrevious(editor)
 
   const [isAcknowledged, setIsAcknowledged] = useLocalStorage(
@@ -73,11 +74,18 @@ export const AiAssistantPanel = () => {
   const [showWarning, setShowWarning] = useState<boolean>(false)
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
 
+  const { data: existingDefinition } = useEntityDefinitionQuery({
+    id: entity?.id,
+    type: editor,
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   // [Joshen] JFYI I'm opting to just have the assistant always show and not toggle-able
   // I don't really see any negatives of keeping it open (or benefits from hiding) tbh
   // const [showAssistant, setShowAssistant] = useState(true)
-  const title = generateTitle(editor)
-  const placeholder = generatePlaceholder(editor)
+  const title = generateTitle(editor, entity)
+  const placeholder = generatePlaceholder(editor, entity, existingDefinition)
   const ctaText = generateCTA(editor)
   const editorRef = useRef<IStandaloneCodeEditor | undefined>()
   const editorModel = editorRef.current?.getModel()
@@ -128,7 +136,7 @@ export const AiAssistantPanel = () => {
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     // [Joshen] Don't need entity definitions if calling here cause support action
-    // via AI here is just to explain code segment, no need for context
+    // via AI here is just to explain code segment, no need for entity definitions context
     body: {},
   })
 
@@ -236,6 +244,17 @@ export const AiAssistantPanel = () => {
     [editorModel]
   )
 
+  const onTogglePanel = () => {
+    if (open) {
+      // [Joshen] Save the code content when closing - should allow users to continue from
+      // where they left off IF they are opening the assistant again in the same "editor" context
+      const existingValue = editorRef.current?.getValue() ?? ''
+      setAiAssistantPanel({ open: false, content: existingValue })
+    } else {
+      setAiAssistantPanel({ open: true, editor: null, entity: undefined })
+    }
+  }
+
   useEffect(() => {
     if (open) {
       // [Joshen] Only reset the assistant if the editor changed
@@ -265,14 +284,12 @@ export const AiAssistantPanel = () => {
   // [Joshen] Just to test the concept of a universal assistant of sorts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.metaKey && e.code === 'KeyI') {
-        setAiAssistantPanel({ open: true, editor: null })
-      }
+      if (e.metaKey && e.code === 'KeyI') onTogglePanel()
     }
     if (project !== undefined && isEnabled) window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [project, isEnabled])
+  }, [project, isEnabled, open])
 
   // [Joshen] Whenever the deps change recalculate the height of the editor
   useEffect(() => {
@@ -281,19 +298,7 @@ export const AiAssistantPanel = () => {
   }, [error, showWarning, isExecuting, numResults, showResults])
 
   return (
-    <Sheet
-      open={open}
-      onOpenChange={() => {
-        if (open) {
-          // [Joshen] Save the code content when closing - should allow users to continue from
-          // where they left off IF they are opening the assistant again in the same "editor" context
-          const existingValue = editorRef.current?.getValue() ?? ''
-          setAiAssistantPanel({ open: false, content: existingValue })
-        } else {
-          setAiAssistantPanel({ open: true })
-        }
-      }}
-    >
+    <Sheet open={open} onOpenChange={() => onTogglePanel()}>
       <SheetContent showClose={true} className={cn('flex gap-0 w-[1200px]')}>
         {/* Assistant */}
         <AIAssistant
@@ -352,10 +357,7 @@ export const AiAssistantPanel = () => {
                 actions={{
                   runQuery: { enabled: true, callback: () => onExecuteSql() },
                   explainCode: { enabled: true, callback: onExplainSql },
-                  closeAssistant: {
-                    enabled: true,
-                    callback: () => setAiAssistantPanel({ open: false }),
-                  },
+                  closeAssistant: { enabled: true, callback: () => onTogglePanel() },
                 }}
               />
             </div>
@@ -426,11 +428,7 @@ export const AiAssistantPanel = () => {
                 </div>
               )}
               <SheetFooter className="bg-surface-100 flex items-center !justify-end px-5 py-4 w-full border-t">
-                <Button
-                  type="default"
-                  disabled={isExecuting}
-                  onClick={() => setAiAssistantPanel({ open: false })}
-                >
+                <Button type="default" disabled={isExecuting} onClick={() => onTogglePanel()}>
                   Cancel
                 </Button>
                 <Button
