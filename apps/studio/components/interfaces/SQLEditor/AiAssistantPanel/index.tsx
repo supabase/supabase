@@ -36,7 +36,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
-import ReactMarkdown from 'react-markdown'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -47,7 +46,6 @@ interface AiAssistantPanelProps {
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
 }
-const openAiKey = process.env.OPENAI_API_KEY
 
 export const AiAssistantPanel = ({
   selectedMessage,
@@ -291,18 +289,6 @@ export const AiAssistantPanel = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      {!openAiKey && (
-        <div className="sticky p-5 flex-0 border-t">
-          <Alert_Shadcn_>
-            <AlertTitle_Shadcn_>OpenAI API key not found</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <ReactMarkdown>
-                Please set the `OPENAI_API_KEY` environment variable in your `config.toml` file.
-              </ReactMarkdown>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-        </div>
-      )}
       <div className="sticky p-5 flex-0 border-t">
         <AssistantChatForm
           textAreaRef={inputRef}
