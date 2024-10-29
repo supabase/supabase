@@ -6,6 +6,17 @@ subtitle: 'Use a custom email provider to send authentication messages'
 
 The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
 
+## Email Sending Behavior
+
+Email sending depends on two settings: Email Provider and Auth Hook status.
+
+| Email Provider Enabled | Auth Hook Enabled | Result                                                               |
+| ---------------------- | ----------------- | -------------------------------------------------------------------- |
+| True                   | True              | Auth Hook handles email sending (SMTP not used)                      |
+| True                   | False             | SMTP handles email sending (custom if configured, default otherwise) |
+| False                  | True              | Email Signups Disabled                                               |
+| False                  | False             | Email Signups Disabled                                               |
+
 **Inputs**
 
 | Field   | Type                                              | Description                                                                        |
