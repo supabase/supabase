@@ -254,8 +254,8 @@ async function updateChecksumIfNeeded(entry) {
 function addCanonicalUrl(entry) {
   const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry.data)
   const content =
-    entry.contentWithoutJsx +
-    `\n\n_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._`
+    `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
+    entry.contentWithoutJsx
   return content
 }
 
