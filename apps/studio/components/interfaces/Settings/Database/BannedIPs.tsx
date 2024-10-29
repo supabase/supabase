@@ -99,7 +99,9 @@ const BannedIPs = () => {
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to unban networks',
+                      text: !canUnbanNetworks
+                        ? 'You need additional permissions to unban networks'
+                        : undefined,
                     },
                   }}
                 >

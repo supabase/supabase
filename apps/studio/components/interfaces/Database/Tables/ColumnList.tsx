@@ -72,7 +72,9 @@ const ColumnList = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create columns',
+                text: !canUpdateColumns
+                  ? 'You need additional permissions to create columns'
+                  : undefined,
               },
             }}
           >

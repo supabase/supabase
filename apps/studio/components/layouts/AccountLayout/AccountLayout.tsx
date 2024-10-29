@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -12,7 +13,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 export interface AccountLayoutProps {
   title: string
@@ -28,12 +28,11 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
   const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
-    if (enablePostHogTelemetry) await sendReset()
+    await sendReset()
     await signOut()
     await router.push('/sign-in')
   }

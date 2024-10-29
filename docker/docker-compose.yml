@@ -9,7 +9,7 @@ name: supabase
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240923-2e3e90c
+    image: supabase/studio:20241014-c083b3b
     restart: unless-stopped
     healthcheck:
       test:
@@ -224,7 +224,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.10.1
+    image: supabase/storage-api:v1.11.13
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -283,7 +283,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.83.2
+    image: supabase/postgres-meta:v0.84.2
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -301,7 +301,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.58.3
+    image: supabase/edge-runtime:v1.59.0
     restart: unless-stopped
     depends_on:
       analytics:

@@ -42,7 +42,9 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
                 side: 'bottom',
                 text: isReservedSecret
                   ? 'This is a reserved secret and cannot be deleted'
-                  : 'You need additional permissions to delete edge function secrets',
+                  : !canUpdateSecrets
+                    ? 'You need additional permissions to delete edge function secrets'
+                    : undefined,
               },
             }}
           />

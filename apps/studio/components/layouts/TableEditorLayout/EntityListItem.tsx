@@ -46,6 +46,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { Markdown } from 'components/interfaces/Markdown'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 
 export interface EntityListItemProps {
   id: number
@@ -277,8 +278,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   return (
-    <Link
+    <EditorTablePageLink
       title={entity.name}
+      id={String(entity.id)}
       href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
@@ -447,7 +449,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-    </Link>
+    </EditorTablePageLink>
   )
 }
 

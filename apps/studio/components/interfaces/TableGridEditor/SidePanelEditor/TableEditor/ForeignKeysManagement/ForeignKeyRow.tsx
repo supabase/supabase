@@ -1,12 +1,13 @@
 import clsx from 'clsx'
 import { useParams } from 'common'
-import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import { Badge, Button, cn } from 'ui'
-import { ArrowRight } from 'lucide-react'
 
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { BASE_PATH } from 'lib/constants'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import Link from 'next/link'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
@@ -78,8 +79,9 @@ export const ForeignKeyRow = ({
               }
             >
               <Link
+                target="_blank"
+                rel="norefererer"
                 href={`/project/${ref}/editor/${foreignKey.tableId}`}
-                onClick={() => closePanel()}
               >
                 {foreignKey.schema}.{foreignKey.table}
               </Link>

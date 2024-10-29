@@ -454,18 +454,6 @@ const ComputeInstanceSidePanel = () => {
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             ) : null}
-
-            {hasChanges &&
-              subscription?.billing_via_partner &&
-              subscription.scheduled_plan_change?.target_plan !== undefined && (
-                <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                  <CriticalIcon />
-                  <AlertDescription_Shadcn_>
-                    You have a scheduled subscription change that will be canceled if you change
-                    your compute size.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-              )}
           </div>
         </SidePanel.Content>
       </SidePanel>

@@ -11,6 +11,7 @@ import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wo
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useKey } from 'react-use'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { ChevronRight } from 'lucide-react'
 
 interface Props {
   open: boolean
@@ -39,15 +40,40 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
   const AccordionMenuItem = ({ menuItem }: any) => (
     <>
       {menuItem.title === 'Product' ? (
-        Object.values(menuItem.subMenu)?.map((component: any) => (
-          <MenuItem
-            key={component.name}
-            title={component.name}
-            href={component.url}
-            description={component.description_short}
-            icon={component.icon}
-          />
-        ))
+        <>
+          {Object.values(menuItem.subMenu)?.map((component: any) => (
+            <MenuItem
+              key={component.name}
+              title={component.name}
+              href={component.url}
+              description={component.description_short}
+              icon={component.icon}
+            />
+          ))}
+          <Link
+            href="/features"
+            className="
+              flex items-center justify-between group text-sm
+              p-4 mt-4 gap-2
+              rounded-lg border
+              bg-alternative-200 text-foreground-light
+              hover:text-foreground hover:border-foreground-muted
+              focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none
+              focus-visible:rounded focus-visible:ring-foreground-lighter
+            "
+          >
+            <div className="flex flex-col gap-1 !leading-3">
+              <span>Features</span>
+              <span className="text-foreground-lighter text-xs leading-4">
+                Explore everything you can do with Supabase.
+              </span>
+            </div>
+            <ChevronRight
+              strokeWidth={2}
+              className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-80 group-hover:translate-x-0 group-hover:opacity-100"
+            />
+          </Link>
+        </>
       ) : menuItem.title === 'Developers' ? (
         <div className="px-3 mb-2 flex flex-col gap-2">
           {menuItem.subMenu['navigation'].map((column: any) => (
@@ -70,7 +96,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
           ))}
 
           <div className="flex flex-col py-2">
-            <label className="text-muted text-xs uppercase tracking-widest font-mono">
+            <label className="text-foreground-lighter text-xs uppercase tracking-widest font-mono">
               Troubleshooting
             </label>
             <TextLink

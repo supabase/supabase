@@ -216,7 +216,9 @@ const BranchManagement = () => {
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to create branches',
+                        text: !canCreateBranches
+                          ? 'You need additional permissions to create branches'
+                          : undefined,
                       },
                     }}
                   >
@@ -271,7 +273,9 @@ const BranchManagement = () => {
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            text: 'You need additional permissions to disable branching',
+                            text: !canDisableBranching
+                              ? 'You need additional permissions to disable branching'
+                              : undefined,
                           },
                         }}
                       >
