@@ -149,7 +149,7 @@ const StorageSettings = () => {
                                 type="number"
                                 {...field}
                                 className="w-full"
-                                disabled={!canUpdateStorageSettings}
+                                disabled={isFreeTier || !canUpdateStorageSettings}
                               />
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -238,7 +238,7 @@ const StorageSettings = () => {
                     type="primary"
                     htmlType="submit"
                     loading={isUpdating}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!canUpdateStorageSettings || isFreeTier || isUpdating}
                   >
                     Save
                   </Button>
