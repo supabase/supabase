@@ -230,7 +230,7 @@ const StorageSettings = () => {
                     type="default"
                     htmlType="reset"
                     onClick={() => form.reset()}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Cancel
                   </Button>
@@ -238,7 +238,7 @@ const StorageSettings = () => {
                     type="primary"
                     htmlType="submit"
                     loading={isUpdating}
-                    disabled={!canUpdateStorageSettings || isFreeTier || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Save
                   </Button>
