@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { CreateWrapper } from 'components/interfaces/Database'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
@@ -17,6 +17,8 @@ const DatabaseWrappersNew: NextPageWithLayout = () => {
   return <CreateWrapper />
 }
 
-DatabaseWrappersNew.getLayout = (page) => <DatabaseLayout title="Wrappers">{page}</DatabaseLayout>
+DatabaseWrappersNew.getLayout = (page) => (
+  <ProjectIntegrationsLayout title="Wrappers">{page}</ProjectIntegrationsLayout>
+)
 
 export default DatabaseWrappersNew

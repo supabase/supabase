@@ -11,7 +11,7 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateProjectIntegrationsMenu } from './ProjectIntegrationsMenu.utils'
 
 export interface ProjectIntegrationsLayoutProps {
-  title?: string
+  title: string
 }
 
 const ProjectIntegrationsMenu = () => {
@@ -46,9 +46,11 @@ const ProjectIntegrationsMenu = () => {
 
 const ProjectIntegrationsLayout = ({
   children,
+  title,
 }: PropsWithChildren<ProjectIntegrationsLayoutProps>) => {
   return (
     <ProjectLayout
+      title={title}
       product="Integrations"
       productMenu={<ProjectIntegrationsMenu />}
       isBlocking={false}
