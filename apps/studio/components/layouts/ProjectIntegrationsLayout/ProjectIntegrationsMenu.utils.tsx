@@ -60,6 +60,12 @@ export const generateProjectIntegrationsMenu = (
           items: [],
           label: 'BETA',
         },
+        {
+          name: 'Queues',
+          key: 'queues',
+          url: `/project/${ref}/integrations/queues`,
+          items: [],
+        },
       ],
     },
   ]
