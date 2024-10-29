@@ -22,7 +22,8 @@ import { Alert, Button, Listbox } from 'ui'
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { auth_id } = useParams()
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isApproving, setIsApproving] = useState(false)
+  const [isDeclining, setIsDeclining] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
   const {
@@ -61,11 +62,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to approve request: No organization selected')
     }
 
-    setIsSubmitting(true)
-    approveRequest(
-      { id: auth_id, slug: selectedOrgSlug },
-      { onError: () => setIsSubmitting(false) }
-    )
+    setIsApproving(true)
+    approveRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsApproving(false) })
   }
 
   const onDeclineRequest = async () => {
@@ -76,11 +74,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to decline request: No organization selected')
     }
 
-    setIsSubmitting(true)
-    declineRequest(
-      { id: auth_id, slug: selectedOrgSlug },
-      { onError: () => setIsSubmitting(false) }
-    )
+    setIsDeclining(true)
+    declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
   }
 
   if (isLoading) {
@@ -152,12 +147,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       footer={
         <div className="flex items-center justify-end py-4 px-8">
           <div className="flex items-center space-x-2">
-            <Button type="default" disabled={isSubmitting || isExpired} onClick={onDeclineRequest}>
+            <Button
+              type="default"
+              loading={isDeclining}
+              disabled={isApproving || isExpired}
+              onClick={onDeclineRequest}
+            >
               Decline
             </Button>
             <Button
-              loading={isSubmitting}
-              disabled={isSubmitting || isExpired}
+              loading={isApproving}
+              disabled={isDeclining || isExpired}
               onClick={onApproveRequest}
             >
               Authorize {requester?.name}
