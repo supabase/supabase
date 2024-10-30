@@ -10,7 +10,11 @@ import {
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from '../ui/DiskManagement.constants'
-import { calculateComputeSizeRequiredForIops, calculateIOPSPrice } from '../DiskManagement.utils'
+import {
+  calculateComputeSizeRequiredForIops,
+  calculateIOPSPrice,
+  mapAddOnVariantIdToComputeSize,
+} from '../DiskManagement.utils'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
 import { InputPostTab } from '../ui/InputPostTab'
@@ -58,20 +62,16 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
             description={
               <span className="flex flex-col gap-y-2">
                 <ComputeSizeReccomendationSection
-                  computeSize={watchedComputeSize}
-                  iops={watchedIOPS}
+                  form={form}
                   actions={
                     <Button
                       type="default"
                       onClick={() => {
-                        setValue(
-                          'computeSize',
-                          `ci_${reccomendedComputeSize.toLocaleLowerCase()}` as components['schemas']['AddonVariantId']
-                        )
+                        setValue('computeSize', reccomendedComputeSize)
                         trigger('provisionedIOPS')
                       }}
                     >
-                      Update to {reccomendedComputeSize}
+                      Update to {mapAddOnVariantIdToComputeSize(reccomendedComputeSize)}
                     </Button>
                   }
                 />

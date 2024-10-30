@@ -37,8 +37,6 @@ export function DiskCountdownRadial() {
     return () => clearInterval(timer)
   }, [remainingTime])
 
-  console.log('isWithinCooldownWindow IN COMPONENT', isWithinCooldownWindow)
-
   return (
     <AnimatePresence>
       {remainingTime > 0 && isSuccess && (

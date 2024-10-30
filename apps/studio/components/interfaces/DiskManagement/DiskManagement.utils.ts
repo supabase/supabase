@@ -1,16 +1,14 @@
-import { components } from 'api-types'
+import { ProjectDetail } from 'data/projects/project-detail-query'
+import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { ComputeInstanceAddonVariantId, ComputeInstanceSize } from './DiskMangement.types'
 import {
+  COMPUTE_BASELINE_IOPS,
   DISK_LIMITS,
   DISK_PRICING,
   DiskType,
   PLAN_DETAILS,
-  COMPUTE_BASELINE_IOPS,
 } from './ui/DiskManagement.constants'
-import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useMemo } from 'react'
-import { Project } from 'types'
-import { ProjectDetail } from 'data/projects/project-detail-query'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -248,7 +246,9 @@ export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): numb
   return COMPUTE_BASELINE_IOPS[computeSize as keyof typeof COMPUTE_BASELINE_IOPS] || 0
 }
 
-export const calculateComputeSizeRequiredForIops = (iops: number) => {
+export const calculateComputeSizeRequiredForIops = (
+  iops: number
+): ComputeInstanceAddonVariantId => {
   if (iops === undefined || iops === null) {
     throw new Error('IOPS is required')
   }
@@ -256,13 +256,14 @@ export const calculateComputeSizeRequiredForIops = (iops: number) => {
   const computeSizes = Object.entries(COMPUTE_BASELINE_IOPS).sort((a, b) => a[1] - b[1])
   for (const [size, baselineIops] of computeSizes) {
     if (iops <= baselineIops) {
-      return size.toUpperCase().replace('CI_', '')
+      console.log('SIZE', size)
+      return size as ComputeInstanceAddonVariantId
     }
   }
 
   // fallback to largest compute size
   // this should never happen though :-/
-  return computeSizes[computeSizes.length - 1][0].toUpperCase().replace('CI_', '')
+  return computeSizes[computeSizes.length - 1][0] as ComputeInstanceAddonVariantId
 }
 
 export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number => {
@@ -287,7 +288,7 @@ export const formatComputeName = (compute: string) => {
 
 export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
-): AddonVariantId => {
+): ComputeInstanceAddonVariantId => {
   if (!computeSize) throw new Error('Compute size is required')
 
   return {
@@ -302,5 +303,25 @@ export const mapComputeSizeNameToAddonVariantId = (
     '8xlarge': 'ci_8xlarge',
     '12xlarge': 'ci_12xlarge',
     '16xlarge': 'ci_16xlarge',
-  }[computeSize] as AddonVariantId
+  }[computeSize] as ComputeInstanceAddonVariantId
+}
+
+export const mapAddOnVariantIdToComputeSize = (
+  addonVariantId: ComputeInstanceAddonVariantId
+): ComputeInstanceSize => {
+  if (!addonVariantId) throw new Error('addonVariantId is required')
+
+  return {
+    ci_nano: 'Nano',
+    ci_micro: 'Micro',
+    ci_small: 'Small',
+    ci_medium: 'Medium',
+    ci_large: 'Large',
+    ci_xlarge: 'XL',
+    ci_2xlarge: '2XL',
+    ci_4xlarge: '4XL',
+    ci_8xlarge: '8XL',
+    ci_12xlarge: '12XL',
+    ci_16xlarge: '16XL',
+  }[addonVariantId] as ComputeInstanceSize
 }

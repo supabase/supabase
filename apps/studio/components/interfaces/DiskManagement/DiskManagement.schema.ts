@@ -1,21 +1,13 @@
 import { z } from 'zod'
 import {
-  DISK_LIMITS,
-  DiskType,
-  THROUGHPUT_RANGE,
-  IOPS_RANGE,
-  DISK_TYPE_LABELS,
-} from './ui/DiskManagement.constants'
-import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
   calculateIopsRequiredForThroughput,
   calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsAllowedForDiskSizeWithio2,
 } from './DiskManagement.utils'
-import { components } from 'api-types'
-
-type AddonVariantId = components['schemas']['AddonVariantId'] | 'ci_nano'
+import { ComputeInstanceAddonVariantId } from './DiskMangement.types'
+import { DISK_LIMITS, DiskType, IOPS_RANGE, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -26,7 +18,7 @@ const baseSchema = z.object({
   provisionedIOPS: z.number().describe('Provisioned IOPS for storage type'),
   throughput: z.number().optional().describe('Throughput in MB/s for gp3'),
   computeSize: z
-    .custom<AddonVariantId>((val): val is AddonVariantId => true)
+    .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
     .describe('Compute size'),
 })
 

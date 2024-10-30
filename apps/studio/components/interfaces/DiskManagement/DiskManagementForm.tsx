@@ -52,6 +52,7 @@ import { NoticeBar } from './ui/NoticeBar'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { Admonition } from 'ui-patterns'
 import Link from 'next/link'
+import { AddonVariantId } from 'data/subscriptions/types'
 
 export function DiskManagementForm() {
   const {
@@ -270,7 +271,8 @@ export function DiskManagementForm() {
       if (payload.computeSize !== form.formState.defaultValues?.computeSize) {
         await updateSubscriptionAddon({
           projectRef: projectRef,
-          variant: payload.computeSize,
+          // cast variant to AddonVariantId to satisfy type
+          variant: payload.computeSize as AddonVariantId,
           type: 'compute_instance',
           suppressToast: true,
         })

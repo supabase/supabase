@@ -1,25 +1,28 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { RotateCcw } from 'lucide-react'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   calculateComputeSizeRequiredForIops,
   calculateMaxIopsAllowedForComputeSize,
+  mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-
-import { Button, DialogSection, WarningIcon } from 'ui'
-import { RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 } from './DiskManagement.constants'
-import { ComputeBadge } from 'ui-patterns'
+import {
+  COMPUTE_BASELINE_IOPS,
+  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
+} from './DiskManagement.constants'
+import { UseFormReturn } from 'react-hook-form'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
 
 export function ComputeSizeReccomendationSection({
-  iops,
-  computeSize,
   actions,
+  form,
 }: {
-  iops: number
-  computeSize: string
   actions?: React.ReactNode
+  form: UseFormReturn<DiskStorageSchemaType>
 }) {
-  const compute = calculateComputeSizeRequiredForIops(iops)
-
+  const { watch } = form
+  const computeSize = watch('computeSize')
+  const iops = watch('provisionedIOPS')
+  const computeSizeRecommendedForIops = calculateComputeSizeRequiredForIops(iops)
   const maxIOPSforComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize ?? 'ci_micro')
   const isVisible =
     iops > maxIOPSforComputeSize && !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize)
@@ -33,19 +36,23 @@ export function ComputeSizeReccomendationSection({
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.15 }}
         >
-          <DialogSection className="bg-alternative text-sm text-foreground-light flex items-start gap-4 relative w-full border rounded-md">
-            <WarningIcon />
-            <div className="flex flex-col gap-2 flex-grow">
+          <Admonition
+            type="default"
+            title={`Your instance can only support a baseline IOPS of ${COMPUTE_BASELINE_IOPS[computeSize]}`}
+          >
+            <div className="flex flex-col gap-2">
               <div>
-                <p className="text-sm text-foreground">{compute} Compute size is recommended.</p>
-                <span className="text-sm text-foreground-light">
-                  To achieve optimal IOPS performance use{' '}
-                  <span className="text-foreground">{compute}</span> compute size.
-                </span>
+                <p className="text-sm text-foreground-light">
+                  To achieve sustained IOPS performance we recommend using{' '}
+                  <span className="text-foreground">
+                    {mapAddOnVariantIdToComputeSize(computeSizeRecommendedForIops)}
+                  </span>{' '}
+                  compute size.
+                </p>
               </div>
               {actions && <div>{actions}</div>}
             </div>
-          </DialogSection>
+          </Admonition>
         </motion.div>
       )}
     </AnimatePresence>

@@ -13,6 +13,7 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskManagement.utils'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import FormMessage from '../ui/FormMessage'
+import { ComputeInstanceAddonVariantId } from '../DiskMangement.types'
 
 /**
  * to do: this could be a type from api-types
@@ -104,7 +105,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
         >
           <RadioGroupCard
             className={!addonsError ? 'grid grid-cols-2 xl:grid-cols-3 flex-wrap gap-3' : ''}
-            onValueChange={(value: components['schemas']['AddonVariantId']) => {
+            onValueChange={(value: ComputeInstanceAddonVariantId) => {
               setValue('computeSize', value, {
                 shouldDirty: true,
                 shouldValidate: true,
