@@ -18,19 +18,19 @@ Since every project on a paid plan is already paying for a Micro instance you ca
 
 </Admonition>
 
-| Compute Size | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Database Max Connections[^1] | Connection Pooler Max Clients | Max DB Size (Recommended)[^2] |
-| ------------ | ---------------- | ----------------- | ----------------------- | ------------ | ---------------------------- | ----------------------------- | ----------------------------- |
-| Nano[^3]     | $0               | $0                | Shared                  | Up to 0.5 GB | 60                           | 200                           | 500 MB                        |
-| Micro        | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 60                           | 200                           | 10 GB                         |
-| Small        | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 90                           | 400                           | 50 GB                         |
-| Medium       | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 120                          | 600                           | 100 GB                        |
-| Large        | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 160                          | 800                           | 200 GB                        |
-| XL           | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 240                          | 1,000                         | 500 GB                        |
-| 2XL          | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 380                          | 1,500                         | 1 TB                          |
-| 4XL          | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 480                          | 3,000                         | 2 TB                          |
-| 8XL          | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 490                          | 6,000                         | 4 TB                          |
-| 12XL         | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 500                          | 9,000                         | 6 TB                          |
-| 16XL         | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 500                          | 12,000                        | 10 TB                         |
+| Compute Size | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Max DB Size (Recommended)[^2] |
+| ------------ | ---------------- | ----------------- | ----------------------- | ------------ | ----------------------------- |
+| Nano[^3]     | $0               | $0                | Shared                  | Up to 0.5 GB | 500 MB                        |
+| Micro        | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 10 GB                         |
+| Small        | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 50 GB                         |
+| Medium       | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 100 GB                        |
+| Large        | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 200 GB                        |
+| XL           | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 500 GB                        |
+| 2XL          | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 1 TB                          |
+| 4XL          | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 2 TB                          |
+| 8XL          | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 4 TB                          |
+| 12XL         | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 6 TB                          |
+| 16XL         | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 10 TB                         |
 
 [^1]: Database max connections are recommended values and can be customized depending on your use case.
 [^2]: Database size for each compute instance is the default recommendation but the actual performance of your database has many contributing factors, including resources available to it and the size of the data contained within it. See the [shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model) for more information.
@@ -54,25 +54,27 @@ Compute instance changes are usually applied with less than 2 minutes of downtim
 
 When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
 
-### Postgres replication slots and WAL senders
+## Limits 
 
-[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
+### Postgres replication slots, WAL senders, and connections
 
-The maximum number of replication slots and WAL senders depends on your compute instance size, as follows:
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication). Each compute instance also has limits on the maximum number of database connections and connection pooler clients it can handle.
 
-| Compute instance | Max Replication Slots | Max WAL Senders |
-| -------------- | --------------------- | --------------- |
-| Nano (free)    | 5                     | 5               |
-| Micro          | 5                     | 5               |
-| Small          | 5                     | 5               |
-| Medium         | 5                     | 5               |
-| Large          | 8                     | 8               |
-| XL             | 24                    | 24              |
-| 2XL            | 80                    | 80              |
-| 4XL            | 80                    | 80              |
-| 8XL            | 80                    | 80              |
-| 12XL           | 80                    | 80              |
-| 16XL           | 80                    | 80              |
+The maximum number of replication slots, WAL senders, database connections, and pooler clients depends on your compute instance size, as follows:
+
+| Compute instance | Max Replication Slots | Max WAL Senders | Database Max Connections[^1] | Connection Pooler Max Clients |
+| -------------- | --------------------- | --------------- | ---------------------------- | ----------------------------- |
+| Nano (free)    | 5                     | 5               | 60                           | 200                           |
+| Micro          | 5                     | 5               | 60                           | 200                           |
+| Small          | 5                     | 5               | 90                           | 400                           |
+| Medium         | 5                     | 5               | 120                          | 600                           |
+| Large          | 8                     | 8               | 160                          | 800                           |
+| XL             | 24                    | 24              | 240                          | 1,000                         |
+| 2XL            | 80                    | 80              | 380                          | 1,500                         |
+| 4XL            | 80                    | 80              | 480                          | 3,000                         |
+| 8XL            | 80                    | 80              | 490                          | 6,000                         |
+| 12XL           | 80                    | 80              | 500                          | 9,000                         |
+| 16XL           | 80                    | 80              | 500                          | 12,000                        |
 
 <Admonition type="caution">
 
@@ -80,7 +82,7 @@ As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/para
 
 </Admonition>
 
-## Disks
+## Disk
 
 Supabase databases are backed by high performance SSD disks. The _effective performance_ depends on a combination of all the following factors:
 
