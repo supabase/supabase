@@ -4,7 +4,10 @@ import { Button } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import useTable from 'hooks/misc/useTable'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
@@ -38,7 +41,12 @@ const ColumnForeignKey = ({
   })
 
   const id = _id ? Number(_id) : undefined
-  const { data: table } = useTable(id)
+  const { data: tableData } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const table = getTableLikeFromTableEditor(tableData)
 
   const getRelationStatus = (fk: ForeignKey) => {
     const existingRelation = (data ?? []).find((x) => x.id === fk.id)

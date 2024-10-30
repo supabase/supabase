@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
+import { TableLike } from 'data/table-editor/table-editor-query'
 import { tableKeys } from 'data/tables/keys'
 import { viewKeys } from 'data/views/keys'
-import type { TableLike } from 'hooks/misc/useTable'
 import type { ResponseError } from 'types'
 
 export type DatabaseColumnDeleteVariables = {

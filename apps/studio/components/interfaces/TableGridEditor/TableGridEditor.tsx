@@ -11,15 +11,12 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useEncryptedColumnsQuery } from 'data/encrypted-columns/encrypted-columns-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
+import type { Entity, TableLike } from 'data/table-editor/table-editor-query'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useEntityType from 'hooks/misc/useEntityType'
 import useLatest from 'hooks/misc/useLatest'
-import type { TableLike } from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
@@ -39,12 +36,16 @@ export interface TableGridEditorProps {
 
   isLoadingSelectedTable?: boolean
   selectedTable?: TableLike
+  entityType?: Entity
+  encryptedColumns?: string[]
 }
 
 const TableGridEditor = ({
   theme = 'dark',
   isLoadingSelectedTable = false,
   selectedTable,
+  entityType,
+  encryptedColumns,
 }: TableGridEditorProps) => {
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
@@ -57,13 +58,6 @@ const TableGridEditor = ({
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
-
-  const { data: encryptedColumns } = useEncryptedColumnsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-    tableName: selectedTable?.name,
-  })
 
   const queryClient = useQueryClient()
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -124,14 +118,6 @@ const TableGridEditor = ({
     },
   })
 
-  const { data } = useForeignKeyConstraintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-  })
-  const foreignKeyMeta = data || []
-
-  const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
@@ -151,7 +137,6 @@ const TableGridEditor = ({
 
   const gridTable = getSupaTable({
     encryptedColumns,
-    foreignKeyMeta,
     selectedTable,
     entityType: entityType?.type,
   })
@@ -257,6 +242,7 @@ const TableGridEditor = ({
         table={gridTable}
         headerActions={
           <GridHeaderActions
+            entityType={entityType as Entity}
             table={selectedTable as TableLike}
             canEditViaTableEditor={canEditViaTableEditor}
           />
@@ -288,7 +274,7 @@ const TableGridEditor = ({
           ) : null
         }
       >
-        {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
+        {(isViewSelected || isTableSelected) && <TableDefinition entityType={entityType} />}
       </SupabaseGrid>
 
       <SidePanelEditor

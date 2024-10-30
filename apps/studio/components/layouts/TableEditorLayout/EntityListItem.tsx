@@ -21,14 +21,16 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { Entity } from 'data/table-editor/table-editor-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -45,8 +47,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { Markdown } from 'components/interfaces/Markdown'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 
 export interface EntityListItemProps {
   id: number
