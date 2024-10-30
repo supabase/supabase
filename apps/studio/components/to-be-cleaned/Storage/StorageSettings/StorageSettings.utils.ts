@@ -1,4 +1,3 @@
-import { ProjectApiResponse } from 'data/config/project-api-query'
 import { StorageSizeUnits } from './StorageSettings.constants'
 
 const k = 1024

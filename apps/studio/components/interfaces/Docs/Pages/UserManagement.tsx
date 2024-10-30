@@ -20,7 +20,7 @@ export default function UserManagement({ selectedLang, showApiKey }: UserManagem
   const keyToShow = showApiKey ? showApiKey : 'SUPABASE_KEY'
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const endpoint = settings?.app_config?.endpoint ?? ''
+  const endpoint = `https://${settings?.app_config?.endpoint ?? ''}`
 
   return (
     <>

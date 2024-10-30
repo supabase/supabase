@@ -39,10 +39,6 @@ export interface paths {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
   }
-  '/partners/flyio/organizations/{organization_id}/billing': {
-    /** Gets the organizations current unbilled charges */
-    get: operations['FlyBillingController_getResourceBilling']
-  }
   '/partners/flyio/organizations/{organization_id}/extensions': {
     /** Gets all databases that belong to the given Fly organization id */
     get: operations['FlyOrganizationsController_getOrgExtensions']
@@ -348,10 +344,6 @@ export interface paths {
     /** Preview subscription changes */
     post: operations['SubscriptionController_previewSubscriptionChange']
   }
-  '/platform/organizations/{slug}/billing/subscription/schedule': {
-    /** Deletes any upcoming subscription schedule */
-    delete: operations['SubscriptionController_deleteSubscriptionSchedule']
-  }
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
@@ -484,12 +476,10 @@ export interface paths {
     get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
-    /** Gets the given organization's tax IDs */
-    get: operations['TaxIdsController_getTaxIds']
+    /** Gets the given organization's tax ID */
+    get: operations['TaxIdsController_getTaxId']
     /** Creates or updates a tax ID for the given organization */
     put: operations['TaxIdsController_updateTaxId']
-    /** Creates a tax ID for the given organization */
-    post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
     delete: operations['TaxIdsController_deleteTaxId']
   }
@@ -786,6 +776,10 @@ export interface paths {
   '/platform/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
   }
   '/platform/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
@@ -1189,10 +1183,6 @@ export interface paths {
     /** Processes Orb events */
     post: operations['OrbWebhooksController_processEvent']
   }
-  '/system/organizations/{slug}/billing/partner/usage-and-costs': {
-    /** Gets the partner usage and costs */
-    get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
-  }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['OrgSubscriptionSystemController_getSubscription']
@@ -1241,7 +1231,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['SystemFunctionsController_createFunction']
+    post: operations['v1-create-a-function']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
@@ -1710,6 +1700,10 @@ export interface paths {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
   }
+  '/v0/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
+  }
   '/v0/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
     get: operations['v1-provision-a-warehouse-tenant']
@@ -2137,7 +2131,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['FunctionsController_createFunction']
+    post: operations['v1-create-a-function']
   }
   '/v1/projects/{ref}/functions/{function_slug}': {
     /**
@@ -2763,7 +2757,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
     }
     CreateBranchBody: {
       branch_name: string
@@ -3034,13 +3028,6 @@ export interface components {
       type: string
       value: string
     }
-    CreateTaxIdResponse: {
-      country: string
-      created: number
-      id: string
-      type: string
-      value: string
-    }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
       jwks_url?: string
@@ -3303,9 +3290,6 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
-    }
-    DeleteTaxIdBody: {
-      id: string
     }
     DeleteVercelConnectionResponse: {
       id: string
@@ -3615,7 +3599,6 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
-      usage_based_billing_project_addons: boolean
       usage_billing_enabled: boolean
     }
     GetUserContentByIdResponse: {
@@ -3709,11 +3692,6 @@ export interface components {
       id: number
       sender_id: number
       user_id: number
-    }
-    GoogleAnalyticBody: {
-      language?: string
-      screen_resolution?: string
-      session_id: string
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
@@ -3915,18 +3893,6 @@ export interface components {
     HealthResponse: {
       healthy: boolean
     }
-    IdentifyUserBody: {
-      auth0_id?: string
-      first_name?: string
-      free_project_limit?: number
-      gotrue_id: string
-      id: number
-      is_alpha_user?: boolean
-      last_name?: string
-      mobile?: string
-      primary_email: string
-      username?: string
-    }
     IntegrationConnectionVercel: {
       foreign_project_id: string
       metadata: Record<string, never>
@@ -4023,7 +3989,7 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
       user_id: number
     }
     LFEndpoint: {
@@ -5095,47 +5061,6 @@ export interface components {
     ResizeBody: {
       volume_size_gb: number
     }
-    ResourceBillingItem: {
-      /**
-       * @description Costs of the item in cents
-       * @example 100
-       */
-      costs: number
-      /**
-       * @description In case of a usage item, the free usage included in the customers Plan
-       * @example 100
-       */
-      freeUnitsInPlan?: number
-      /**
-       * @description Non-Unique identifier of the item
-       * @example usage_egress
-       */
-      itemIdentifier: string
-      /**
-       * @description Descriptive name of the billing item
-       * @example Pro Plan
-       */
-      itemName: string
-      /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration' | 'compute_credits'
-      /**
-       * @description In case of a usage item, the billable usage amount, free usage has been deducted
-       * @example 100
-       */
-      usageBillable?: number
-      /**
-       * @description In case of a usage item, the total usage
-       * @example 100
-       */
-      usageTotal?: number
-    }
-    ResourceBillingResponse: {
-      /** @description Whether the user is exceeding the included quotas in the Plan - only relevant for users on usage-capped Plans. */
-      exceedsPlanLimits: boolean
-      items: components['schemas']['ResourceBillingItem'][]
-      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped Plans. */
-      overusageAllowed: boolean
-    }
     ResourceProvisioningConfigResponse: {
       /**
        * @description Pooler connection string
@@ -5708,30 +5633,11 @@ export interface components {
     }
     TaxId: {
       country: string
-      id: string
       type: string
       value: string
     }
     TaxIdResponse: {
-      data: components['schemas']['TaxId'][]
-    }
-    TaxIdV2: {
-      country: string
-      type: string
-      value: string
-    }
-    TaxIdV2Response: {
-      tax_id: components['schemas']['TaxIdV2'] | null
-    }
-    TelemetryEventBody: {
-      action: string
-      category: string
-      ga?: components['schemas']['GoogleAnalyticBody']
-      label?: Record<string, never>
-      page_location?: string
-      page_referrer?: string
-      page_title?: string
-      value?: string
+      tax_id: components['schemas']['TaxId'] | null
     }
     TelemetryEventBodyV2: {
       action: string
@@ -5757,20 +5663,10 @@ export interface components {
       reset_organization?: boolean
       reset_project?: boolean
     }
-    TelemetryIdentifyBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      user: components['schemas']['IdentifyUserBody']
-    }
     TelemetryIdentifyBodyV2: {
       organization_slug?: string
       project_ref?: string
       user_id: string
-    }
-    TelemetryPageBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      referrer: string
-      route?: string
-      title: string
     }
     TelemetryPageBodyV2: {
       page_title: string
@@ -5834,8 +5730,6 @@ export interface components {
       addon_type: components['schemas']['ProjectAddonType']
       addon_variant: components['schemas']['AddonVariantId']
       price_id?: string
-      /** @enum {string} */
-      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
       skip_outstanding_invoice_check?: boolean
     }
     UpdateAddonBody: {
@@ -7038,21 +6932,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['FlyOrganization']
-        }
-      }
-    }
-  }
-  /** Gets the organizations current unbilled charges */
-  FlyBillingController_getResourceBilling: {
-    parameters: {
-      path: {
-        organization_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ResourceBillingResponse']
         }
       }
     }
@@ -8711,27 +8590,6 @@ export interface operations {
       }
     }
   }
-  /** Deletes any upcoming subscription schedule */
-  SubscriptionController_deleteSubscriptionSchedule: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete upcoming subscription schedule */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets the Stripe customer */
   CustomerController_getCustomer: {
     parameters: {
@@ -9548,8 +9406,8 @@ export interface operations {
       }
     }
   }
-  /** Gets the given organization's tax IDs */
-  TaxIdsController_getTaxIds: {
+  /** Gets the given organization's tax ID */
+  TaxIdsController_getTaxId: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -9565,7 +9423,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to retrieve the organization's tax IDs */
+      /** @description Failed to retrieve the organization's tax ID */
       500: {
         content: never
       }
@@ -9587,35 +9445,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['TaxIdV2Response']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create the tax ID */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Creates a tax ID for the given organization */
-  TaxIdsController_createTaxId: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTaxIdBody']
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateTaxIdResponse']
+          'application/json': components['schemas']['TaxIdResponse']
         }
       }
       403: {
@@ -9635,13 +9465,8 @@ export interface operations {
         slug: string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DeleteTaxIdBody']
-      }
-    }
     responses: {
-      200: {
+      204: {
         content: never
       }
       403: {
@@ -10074,19 +9899,11 @@ export interface operations {
       }
     }
   }
-  /**
-   * Create a function
-   * @description Creates a function and adds it to the specified project.
-   */
+  /** Creates project pg.function */
   FunctionsController_createFunction: {
     parameters: {
-      query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
-        import_map_path?: string
+      header: {
+        'x-connection-encrypted': string
       }
       path: {
         /** @description Project ref */
@@ -10095,20 +9912,19 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
+        'application/json': components['schemas']['CreateFunctionBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['PostgresFunction']
         }
       }
       403: {
         content: never
       }
-      /** @description Failed to create project's function */
+      /** @description Failed to create pg.function */
       500: {
         content: never
       }
@@ -12084,6 +11900,27 @@ export interface operations {
         content: never
       }
       /** @description Failed to fetch warehouse queries */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Parses a warehouse query */
+  'v1-parse-warehouse-query': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to parse warehouse query */
       500: {
         content: never
       }
@@ -14497,24 +14334,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the partner usage and costs */
-  PartnerBillingSystemController_getPartnerUsageAndCosts: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to retrieve subscription */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets the current subscription */
   OrgSubscriptionSystemController_getSubscription: {
     parameters: {
@@ -14751,7 +14570,7 @@ export interface operations {
    * Create a function
    * @description Creates a function and adds it to the specified project.
    */
-  SystemFunctionsController_createFunction: {
+  'v1-create-a-function': {
     parameters: {
       query?: {
         slug?: string

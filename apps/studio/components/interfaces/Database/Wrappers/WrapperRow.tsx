@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Collapsible } from 'ui'
 import type { WrapperMeta } from './Wrappers.types'
@@ -119,11 +120,15 @@ const WrapperRow = ({
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables ? (
                           wrapper.tables.map((table: any) => (
-                            <Link key={table.id} href={`/project/${ref}/editor/${table.id}`}>
+                            <EditorTablePageLink
+                              key={table.id}
+                              projectRef={ref}
+                              id={String(table.id)}
+                            >
                               <div className="text-sm border rounded px-2 py-1 transition bg-surface-200 hover:bg-overlay-hover">
                                 {table.name}
                               </div>
-                            </Link>
+                            </EditorTablePageLink>
                           ))
                         ) : (
                           <p className="text-sm text-foreground-light">No tables available</p>

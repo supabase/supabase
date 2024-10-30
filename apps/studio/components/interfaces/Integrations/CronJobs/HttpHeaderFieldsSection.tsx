@@ -3,7 +3,7 @@ import { useFieldArray } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   Button,
   cn,
@@ -32,9 +32,9 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   })
 
   const { ref } = useParams()
-  const { data: settings } = useProjectApiQuery({ projectRef: ref })
-  const apiService = settings?.autoApiService
-  const apiKey = apiService?.serviceApiKey ?? '[YOUR API KEY]'
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
+  const { serviceKey } = getAPIKeys(settings)
+  const apiKey = serviceKey?.api_key ?? '[YOUR API KEY]'
 
   return (
     <SheetSection>

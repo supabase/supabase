@@ -66,7 +66,7 @@ const httpRequestSchema = z.object({
     .string()
     .trim()
     .min(1, 'Please provide a URL')
-    .regex(urlRegex, 'Please provide a valid URL')
+    .regex(urlRegex(), 'Please provide a valid URL')
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
@@ -316,7 +316,9 @@ export const CreateCronJobSheet = ({
                           tooltip={{
                             content: {
                               side: 'bottom',
-                              text: 'You need additional permissions to enable database extensions',
+                              text: !canToggleExtensions
+                                ? 'You need additional permissions to enable database extensions'
+                                : undefined,
                             },
                           }}
                         >

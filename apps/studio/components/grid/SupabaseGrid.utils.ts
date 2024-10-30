@@ -1,12 +1,20 @@
+import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import type { Filter } from 'components/grid/types'
 import { compact } from 'lodash'
-import type { Dictionary } from 'types'
+
+import type { Filter } from 'components/grid/types'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import {
+  ForeignKeyConstraint,
+  ForeignKeyConstraintsData,
+} from 'data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { TableLike } from 'hooks/misc/useTable'
+import type { Dictionary, SchemaView } from 'types'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-
 /**
  * Ensure that if editable is false, we should remove all editing actions
  * to prevent rare-case bugs with the UI
@@ -122,6 +130,54 @@ export function parseSupaTable(
     columns: supaColumns,
     estimateRowCount: table.live_rows_estimate,
   }
+}
+
+export function getSupaTable({
+  selectedTable,
+  entityType,
+  foreignKeyMeta,
+  encryptedColumns,
+}: {
+  selectedTable: TableLike
+  entityType?: ENTITY_TYPE
+  foreignKeyMeta: ForeignKeyConstraintsData
+  encryptedColumns: string[]
+}) {
+  // [Joshen] We can tweak below to eventually support composite keys as the data
+  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
+  const formattedRelationships = (
+    ('relationships' in selectedTable && selectedTable.relationships) ||
+    []
+  ).map((relationship: PostgresRelationship) => {
+    const relationshipMeta = foreignKeyMeta.find(
+      (fk: ForeignKeyConstraint) => fk.id === relationship.id
+    )
+    return {
+      ...relationship,
+      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+    }
+  })
+
+  const isViewSelected =
+    entityType === ENTITY_TYPE.VIEW || entityType === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isForeignTableSelected = entityType === ENTITY_TYPE.FOREIGN_TABLE
+
+  return !isViewSelected && !isForeignTableSelected
+    ? parseSupaTable(
+        {
+          table: selectedTable as PostgresTable,
+          columns: (selectedTable as PostgresTable).columns ?? [],
+          primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
+          relationships: formattedRelationships,
+        },
+        encryptedColumns
+      )
+    : parseSupaTable({
+        table: selectedTable as SchemaView,
+        columns: (selectedTable as SchemaView).columns ?? [],
+        primaryKeys: [],
+        relationships: [],
+      })
 }
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)

@@ -19,6 +19,8 @@ import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { DatetimeHelper } from '../Settings/Logs/Logs.types'
 import dayjs from 'dayjs'
 import { useKeyboardShortcuts } from 'components/grid/components/common/Hooks'
+import { useWarehouseLogDetailQuery } from 'data/analytics/warehouse-collection-log-detail-query'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 
 const INTERVALS: DatetimeHelper[] = [
   {
@@ -154,6 +156,19 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       </span>
     )
   }
+
+  // Selected Log Detail
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const {
+    data: selectedLogDetail,
+    isLoading: selectedLogDetailLoading,
+    error: selectedLogDetailError,
+  } = useWarehouseLogDetailQuery({
+    ref: projectRef,
+    collectionName: collection?.name,
+    logId: selectedLogId ?? undefined,
+  })
+
   return (
     <div className="relative flex flex-col flex-grow h-full">
       <ShimmerLine active={isLoading} />
@@ -248,9 +263,11 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
               hasEditorValue={false}
               projectRef={projectRef}
               isLoading={isLoading}
+              onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+              selectedLog={selectedLogDetail?.result[0] ?? undefined}
+              selectedLogError={selectedLogDetailError ?? undefined}
+              isSelectedLogLoading={!!selectedLogId && selectedLogDetailLoading}
               data={results}
-              params={{ sql }}
-              maxHeight="calc(100vh - 139px)"
               showHeader={false}
               EmptyState={
                 <ProductEmptyState title="No events found" size="large">
@@ -277,20 +294,18 @@ order by timestamp desc limit ${filters.limit} offset ${filters.offset}
       </LoadingOpacity>
 
       {!isError && (
-        <div className="border-t flex flex-row justify-between p-2">
-          <div className="flex items-center gap-2">
+        <div className="border-t flex flex-row justify-between">
+          <div className="flex items-center gap-2 p-2">
             {results.length > 0 && (
-              <>
-                <Button
-                  onClick={loadMore}
-                  icon={<Rewind />}
-                  type="default"
-                  loading={isLoading}
-                  disabled={isLoading}
-                >
-                  Load more
-                </Button>
-              </>
+              <Button
+                onClick={loadMore}
+                icon={<Rewind />}
+                type="default"
+                loading={isLoading}
+                disabled={isLoading}
+              >
+                Load more
+              </Button>
             )}
             {filters.offset !== 0 && (
               <>

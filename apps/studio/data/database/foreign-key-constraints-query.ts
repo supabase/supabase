@@ -1,5 +1,12 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+
+import { sqlKeys } from 'data/sql/keys'
+import {
+  executeSql,
+  ExecuteSqlData,
+  ExecuteSqlError,
+  useExecuteSqlQuery,
+} from '../sql/execute-sql-query'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -96,6 +103,22 @@ export type ForeignKeyConstraintsVariables = GetForeignKeyConstraintsVariables &
 export type ForeignKeyConstraintsData = ForeignKeyConstraint[]
 export type ForeignKeyConstraintsError = ExecuteSqlError
 
+function select(
+  data:
+    | {
+        result: any
+      }
+    | undefined
+) {
+  return (data?.result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
+    return {
+      ...foreignKey,
+      source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
+      target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
+    }
+  })
+}
+
 export const useForeignKeyConstraintsQuery = <
   TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData,
 >(
@@ -107,19 +130,30 @@ export const useForeignKeyConstraintsQuery = <
       projectRef,
       connectionString,
       sql: getForeignKeyConstraintsQuery({ schema }),
-      queryKey: ['foreign-key-constraints'],
+      queryKey: ['foreign-key-constraints', schema],
     },
     {
-      select(data) {
-        return ((data as any)?.result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
-          return {
-            ...foreignKey,
-            source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),
-            target_columns: foreignKey.target_columns.replace('{', '').replace('}', '').split(','),
-          }
-        })
-      },
+      select,
       ...options,
     }
   )
+}
+
+export function prefetchForeignKeyConstraints(
+  client: QueryClient,
+  { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables
+) {
+  return client
+    .fetchQuery(sqlKeys.query(projectRef, ['foreign-key-constraints', schema]), ({ signal }) =>
+      executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: getForeignKeyConstraintsQuery({ schema }),
+          queryKey: ['foreign-key-constraints', schema],
+        },
+        signal
+      )
+    )
+    .then((data) => select(data) as ForeignKeyConstraintsData)
 }

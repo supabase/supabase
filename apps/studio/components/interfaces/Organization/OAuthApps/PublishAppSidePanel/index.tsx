@@ -2,6 +2,7 @@ import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { Edit, ExternalLink, Upload } from 'lucide-react'
 
 import { useParams } from 'common'
 import {
@@ -23,12 +24,10 @@ import {
   Input,
   Modal,
   SidePanel,
-  Upload,
   cn,
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
-import { Edit, ExternalLink } from 'lucide-react'
 
 export interface PublishAppSidePanelProps {
   visible: boolean

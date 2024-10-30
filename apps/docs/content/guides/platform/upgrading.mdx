@@ -99,7 +99,7 @@ If you upgrade to a paid plan while your project is paused, any expired one-clic
 
 If the 90 day project restore window has expired but you need to access data contained within your project using SQL, you can attempt to restore the project into a local Postgres instance. Supabase publishes tooling that can be used for that purpose. Be aware that this workflow does not produce a complete Supabase environment with REST/Auth/Storage. Instead, it creates a standalone Postgres instance that is maximally compatible with your project's backup file to assist with recovering your data.
 
-Downloaded backups are plain text SQL files that can be executed in Postgres to restore your project's schema and data. If you need you access data within a backup we recommend restoring into a Postgres instance built using the Supabase open source build tooling to ensure that the local instance is as similar to the original project as possible. Here are the steps to start Supabase Postgres locally and restore the backup:
+Downloaded backups are plain text SQL files that can be executed in Postgres to restore your project's schema and data. If you need to access data within a backup we recommend restoring into a Postgres instance built using the Supabase open source build tooling to ensure that the local instance is as similar to the original project as possible. Here are the steps to start Supabase Postgres locally and restore the backup:
 
 Install [nix](https://nixos.org/):
 

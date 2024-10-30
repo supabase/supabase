@@ -1,6 +1,8 @@
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+
 import type { Route } from 'components/ui/ui.types'
+import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
   Auth,
   Database,
@@ -11,8 +13,8 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings, FileText, List, Lightbulb, Blocks } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -24,6 +26,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       label: 'Table Editor',
       icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      linkComponent: <EditorIndexPageLink projectRef={ref} />,
     },
     {
       key: 'sql',
