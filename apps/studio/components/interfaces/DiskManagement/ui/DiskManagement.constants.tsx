@@ -162,7 +162,7 @@ export const DISK_TYPE_OPTIONS = [
   },
   {
     type: 'io2',
-    name: 'Provisioned IOPS SSD',
-    description: 'High IOPS for mission-critical applications.',
+    name: 'High Performance SSD',
+    description: 'High performance for mission critical applications',
   },
 ]

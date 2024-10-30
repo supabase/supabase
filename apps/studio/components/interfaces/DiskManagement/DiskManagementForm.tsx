@@ -303,11 +303,7 @@ export function DiskManagementForm() {
                   You will need to upgrade to at least the Pro Plan to configure compute and disk
                 </p>
                 <Button type="default" asChild>
-                  <Link
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
-                  >
+                  <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
                     Upgrade plan
                   </Link>
                 </Button>
