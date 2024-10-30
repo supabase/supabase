@@ -371,6 +371,22 @@ export function DiskManagementForm() {
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <NoticeBar
+                  visible={RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
+                    form.watch('computeSize')
+                  )}
+                  title="LARGE Compute size required to configure Advanced disk settings"
+                  actions={
+                    <Button
+                      type="default"
+                      onClick={() => {
+                        form.setValue('computeSize', 'ci_large')
+                      }}
+                    >
+                      Change to LARGE Compute
+                    </Button>
+                  }
+                />
                 <StorageTypeField form={form} disableInput={disableDiskInputs} />
                 <IOPSField form={form} disableInput={disableDiskInputs} />
                 <ThroughputField form={form} disableInput={disableDiskInputs} />

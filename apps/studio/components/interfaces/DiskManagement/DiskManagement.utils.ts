@@ -218,7 +218,7 @@ export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => 
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
   if (!iops) throw Error('IOPS is required')
-  return Math.max(1, Math.ceil(iops / 3000))
+  return Math.max(1, Math.ceil(iops / 500))
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithio2 = (totalSize: number) => {
@@ -228,7 +228,7 @@ export const calculateMaxIopsAllowedForDiskSizeWithio2 = (totalSize: number) => 
 
 export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {
   if (!iops) throw Error('IOPS is required')
-  return Math.max(4, Math.ceil(iops / 500))
+  return Math.max(4, Math.ceil(iops / 1000))
 }
 
 export const calculateMaxThroughput = (iops: number) => {
