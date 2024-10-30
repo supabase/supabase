@@ -1,8 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, handleError } from 'data/fetchers'
-import { tableKeys } from './keys'
 
 export type TableVariables = {
   id?: number
@@ -37,30 +35,4 @@ export async function getTable(
 
   if (error) handleError(error)
   return data as unknown as PostgresTable
-}
-
-export type TableData = Awaited<ReturnType<typeof getTable>>
-export type TableError = unknown
-
-export const useTableQuery = <TData = TableData>(
-  { projectRef, connectionString, id }: TableVariables,
-  { enabled = true, ...options }: UseQueryOptions<TableData, TableError, TData> = {}
-) =>
-  useQuery<TableData, TableError, TData>(
-    tableKeys.table(projectRef, id),
-    ({ signal }) => getTable({ projectRef, connectionString, id }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
-      staleTime: 0,
-      ...options,
-    }
-  )
-
-export function prefetchTable(
-  client: QueryClient,
-  { projectRef, connectionString, id }: TableVariables
-) {
-  return client.fetchQuery(tableKeys.table(projectRef, id), ({ signal }) =>
-    getTable({ id, projectRef, connectionString }, signal)
-  )
 }

@@ -32,7 +32,7 @@ import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { Entity } from 'data/table-editor/table-editor-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
+import { getTable } from 'data/tables/get-table'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {

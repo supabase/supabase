@@ -1,12 +1,13 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import type {
+  PostgresColumn,
+  PostgresMaterializedView,
+  PostgresTable,
+  PostgresView,
+} from '@supabase/postgres-meta'
 import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { ForeignTable } from 'data/foreign-tables/foreign-table-query'
-import { MaterializedView } from 'data/materialized-views/materialized-view-query'
 import { sqlKeys } from 'data/sql/keys'
-import { Table } from 'data/tables/table-query'
-import { View } from 'data/views/view-query'
 import {
   executeSql,
   ExecuteSqlData,
@@ -18,7 +19,10 @@ import { getTableEditorSql } from './table-editor-query-sql'
 type TableEditorArgs = {
   id?: number
 }
-
+export type Table = PostgresTable
+export type View = PostgresView
+export type MaterializedView = PostgresMaterializedView
+export type ForeignTable = PostgresTable
 export type TableLike = Table | View | MaterializedView | ForeignTable
 
 export type Entity = {
