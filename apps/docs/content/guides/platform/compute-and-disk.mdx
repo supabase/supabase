@@ -54,34 +54,6 @@ Compute instance changes are usually applied with less than 2 minutes of downtim
 
 When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade as needed.
 
-## Limits 
-
-### Postgres replication slots, WAL senders, and connections
-
-[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication). Each compute instance also has limits on the maximum number of database connections and connection pooler clients it can handle.
-
-The maximum number of replication slots, WAL senders, database connections, and pooler clients depends on your compute instance size, as follows:
-
-| Compute instance | Max Replication Slots | Max WAL Senders | Database Max Connections[^1] | Connection Pooler Max Clients |
-| -------------- | --------------------- | --------------- | ---------------------------- | ----------------------------- |
-| Nano (free)    | 5                     | 5               | 60                           | 200                           |
-| Micro          | 5                     | 5               | 60                           | 200                           |
-| Small          | 5                     | 5               | 90                           | 400                           |
-| Medium         | 5                     | 5               | 120                          | 600                           |
-| Large          | 8                     | 8               | 160                          | 800                           |
-| XL             | 24                    | 24              | 240                          | 1,000                         |
-| 2XL            | 80                    | 80              | 380                          | 1,500                         |
-| 4XL            | 80                    | 80              | 480                          | 3,000                         |
-| 8XL            | 80                    | 80              | 490                          | 6,000                         |
-| 12XL           | 80                    | 80              | 500                          | 9,000                         |
-| 16XL           | 80                    | 80              | 500                          | 12,000                        |
-
-<Admonition type="caution">
-
-As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute instance, ensure that you are using fewer slots than the maximum number of replication slots available for the new compute instance.
-
-</Admonition>
-
 ## Disk
 
 Supabase databases are backed by high performance SSD disks. The _effective performance_ depends on a combination of all the following factors:
@@ -104,19 +76,19 @@ The following sections explain how these attributes affect disk performance.
 
 The compute size of your project sets the upper limit for disk throughput and IOPS. The table below shows the limits for each instance size. For instance, an 8XL compute instance has a maximum throughput of 9,500 MiB/s and a maximum IOPS of 40,000.
 
-| Compute Instance | Disk Throughput | IOPS |
-| ---------------- | --------------- | ------------ |
-| Nano (free)      | 43 MiB/s        | 250 IOPS     |
-| Micro            | 87 MiB/s        | 500 IOPS     |
-| Small            | 174 MiB/s       | 1,000 IOPS   |
-| Medium           | 347 MiB/s       | 2,000 IOPS   |
-| Large            | 630 MiB/s       | 3,600 IOPS   |
-| XL               | 1,188 MiB/s     | 6,000 IOPS   |
-| 2XL              | 2,375 MiB/s     | 12,000 IOPS  |
-| 4XL              | 4,750 MiB/s     | 20,000 IOPS   |
-| 8XL              | 9,500 MiB/s     | 40,000 IOPS   |
-| 12XL             | 14,250 MiB/s    | 50,000 IOPS   |
-| 16XL             | 19,000 MiB/s    | 80,000 IOPS   |
+| Compute Instance | Disk Throughput | IOPS        |
+| ---------------- | --------------- | ----------- |
+| Nano (free)      | 43 MiB/s        | 250 IOPS    |
+| Micro            | 87 MiB/s        | 500 IOPS    |
+| Small            | 174 MiB/s       | 1,000 IOPS  |
+| Medium           | 347 MiB/s       | 2,000 IOPS  |
+| Large            | 630 MiB/s       | 3,600 IOPS  |
+| XL               | 1,188 MiB/s     | 6,000 IOPS  |
+| 2XL              | 2,375 MiB/s     | 12,000 IOPS |
+| 4XL              | 4,750 MiB/s     | 20,000 IOPS |
+| 8XL              | 9,500 MiB/s     | 40,000 IOPS |
+| 12XL             | 14,250 MiB/s    | 50,000 IOPS |
+| 16XL             | 19,000 MiB/s    | 80,000 IOPS |
 
 Smaller compute instances like Nano, Micro, and Small have baseline performance levels that can occasionally be exceeded. Larger compute-instances (4XL and above) are designed for sustained, high performance with specific IOPS and throughput limits. If you hit your IOPS or throughput limit, throttling will occur.
 
@@ -138,13 +110,13 @@ Be aware that increasing IOPS or throughput incurs additional charges.
 
 When selecting your disk, it's essential to focus on the performance needs of your workload. Here's a comparison of our available disk types:
 
-|  | gp3 (General Purpose SSD) | io2 (High Performance SSD) |
-|---------|---------------------------|---------------------------|
-| **Use Case** | General workloads, development environments, small to medium databases | High-performance needs, large-scale databases, mission-critical applications |
-| **Max Disk Size** | 16 TB | 60 TB |
-| **Max IOPS** | 16,000 IOPS (at 32 GB disk size) | 80,000 IOPS (at 80 GB disk size) |
-| **Throughput** | 125 MiB/s (default) to 1,000 MiB/s (maximum) | Automatically scales with IOPS |
-| **Best For** | Great value for most use cases | Low latency and very high IOPS requirements |
+|                   | General Purpose SSD (gp3)                                              | High Performance SSD (io2)                                                   |
+| ----------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| **Use Case**      | General workloads, development environments, small to medium databases | High-performance needs, large-scale databases, mission-critical applications |
+| **Max Disk Size** | 16 TB                                                                  | 60 TB                                                                        |
+| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                       | 80,000 IOPS (at 80 GB disk size)                                             |
+| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                           | Automatically scales with IOPS                                               |
+| **Best For**      | Great value for most use cases                                         | Low latency and very high IOPS requirements                                  |
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 
@@ -156,8 +128,36 @@ Compute instance size changes will not change your selected disk type or disk si
 
 ### Disk size
 
-- gp3 disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughput per provisioned IOPS.
-- io2 disks can be provisioned with 1,000 IOPS per GB of disk size.
+- General Purpose (gp3) disks come with a baseline of 3,000 IOPS and 125 MiB/s. You can provision additional 500 IOPS for every GB of disk size and additional 0.25 MiB/s throughput per provisioned IOPS.
+- High Performance (io2) disks can be provisioned with 1,000 IOPS per GB of disk size.
+
+## Limits and Constraints
+
+### Postgres replication slots, WAL senders, and connections
+
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication). Each compute instance also has limits on the maximum number of database connections and connection pooler clients it can handle.
+
+The maximum number of replication slots, WAL senders, database connections, and pooler clients depends on your compute instance size, as follows:
+
+| Compute instance | Max Replication Slots | Max WAL Senders | Database Max Connections[^1] | Connection Pooler Max Clients |
+| ---------------- | --------------------- | --------------- | ---------------------------- | ----------------------------- |
+| Nano (free)      | 5                     | 5               | 60                           | 200                           |
+| Micro            | 5                     | 5               | 60                           | 200                           |
+| Small            | 5                     | 5               | 90                           | 400                           |
+| Medium           | 5                     | 5               | 120                          | 600                           |
+| Large            | 8                     | 8               | 160                          | 800                           |
+| XL               | 24                    | 24              | 240                          | 1,000                         |
+| 2XL              | 80                    | 80              | 380                          | 1,500                         |
+| 4XL              | 80                    | 80              | 480                          | 3,000                         |
+| 8XL              | 80                    | 80              | 490                          | 6,000                         |
+| 12XL             | 80                    | 80              | 500                          | 9,000                         |
+| 16XL             | 80                    | 80              | 500                          | 12,000                        |
+
+<Admonition type="caution">
+
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute instance, ensure that you are using fewer slots than the maximum number of replication slots available for the new compute instance.
+
+</Admonition>
 
 ### Constraints
 
