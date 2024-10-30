@@ -34,7 +34,7 @@ ClickHouse is very excited to partner with Supabase to make it easy for customer
 
 </Quote>
 
-## Combining Supabase + ClickHouse
+## Using Postgres and ClickHouse together
 
 Before diving into those changes, some context on how most customers use Supabase and ClickHouse together. While both are databases, they serve different use-cases:
 
@@ -143,16 +143,14 @@ Supabase now provides granular control over disk usage for your Postgres databas
   }}
 />
 
-This is driven directly by customers using tools like PeerDB. With adjustable WAL configuration, it's important that developers can manage the disk as well.
-
-For example, on the Pro Plan's 8GB disk, you can configure your project with options like:
+This is driven directly by customers using tools like PeerDB. With adjustable WAL configuration, it's important that developers can manage the disk as well. For example, on the Pro Plan's 8GB disk, you can configure your project with options like:
 
 - Default: 7GB database space, 1GB Write Ahead Log
 - Custom example: 6GB database space, 2 GB Write Ahead Log
 
 Additionally, we're introducing High-performance Disks. High-performance Disks. We'll release more details about this later.
 
-## ClickHouse updates
+### ClickHouse platform updates
 
 The ClickHouse team have also been busy. They've released a number of updates to their platform, including:
 
