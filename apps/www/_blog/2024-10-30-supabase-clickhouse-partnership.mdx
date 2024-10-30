@@ -42,34 +42,26 @@ Before diving into those changes, some context on how most customers use Supabas
 
 Postgres is a row-oriented database, ClickHouse is column-oriented. The ClickHouse team have a [great write up about the difference](https://clickhouse.com/docs/en/intro#row-oriented-vs-column-oriented-storage) between the two formats.
 
-<div>
-  <Img
-    className="border-none"
-    alt="Browser proxy diagram"
-    zoomable={false}
-    src={{
-      light: '/images/blog/clickhouse-supabase/postgres-clickhouse--light.png',
-      dark: '/images/blog/clickhouse-supabase/postgres-clickhouse--dark.png',
-    }}
-  />
-</div>
+<Img
+  alt="Browser proxy diagram"
+  src={{
+    light: '/images/blog/clickhouse-supabase/postgres-clickhouse--light.png',
+    dark: '/images/blog/clickhouse-supabase/postgres-clickhouse--dark.png',
+  }}
+/>
 
 To provide an interface between these, Supabase customers generally use:
 
 1. [clickhouse_fdw](https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse) to query their ClickHouse data from their Postgres database.
 2. [PeerDB](https://www.peerdb.io/) to replicate their data from Postgres to ClickHouse.
 
-<div>
-  <Img
-    className="border-none"
-    alt="Browser proxy diagram"
-    zoomable={false}
-    src={{
-      light: '/images/blog/clickhouse-supabase/postgres-clickhouse-integration--light.png',
-      dark: '/images/blog/clickhouse-supabase/postgres-clickhouse-integration--dark.png',
-    }}
-  />
-</div>
+<Img
+  alt="Browser proxy diagram"
+  src={{
+    light: '/images/blog/clickhouse-supabase/postgres-clickhouse-integration--light.png',
+    dark: '/images/blog/clickhouse-supabase/postgres-clickhouse-integration--dark.png',
+  }}
+/>
 
 ## Building a better ClickHouse & Supabase Experience
 
@@ -142,17 +134,13 @@ The new CLI config includes the following Postgres parameters:
 
 Supabase now provides granular control over disk usage for your Postgres database:
 
-<div>
-  <Img
-    className="border-none"
-    alt="Disk management"
-    zoomable={false}
-    src={{
-      light: '/images/blog/clickhouse-supabase/disk-management.png',
-      dark: '/images/blog/clickhouse-supabase/disk-management.png',
-    }}
-  />
-</div>
+<Img
+  alt="Disk management"
+  src={{
+    light: '/images/blog/clickhouse-supabase/disk-management.png',
+    dark: '/images/blog/clickhouse-supabase/disk-management.png',
+  }}
+/>
 
 This is driven directly by customers using tools like PeerDB. With adjustable WAL configuration, it's important that developers can manage the disk as well.
 
@@ -167,17 +155,13 @@ Additionally, we're introducing High-performance Disks. High-performance Disks. 
 
 Improving the experience between Postgres and ClickHouse is the first phase of this partnership. Over the coming months we'll release platform integrations. If you're already using Supabase and ClickHouse together please [reach out](https://supabase.com/enterprise) so that you can be a design partner for this integration.
 
-<div>
-  <Img
-    className="border-none"
-    alt="Supabase integrations"
-    zoomable={false}
-    src={{
-      light: '/images/blog/clickhouse-supabase/integrations.png',
-      dark: '/images/blog/clickhouse-supabase/integrations.png',
-    }}
-  />
-</div>
+<Img
+  alt="Supabase integrations"
+  src={{
+    light: '/images/blog/clickhouse-supabase/integrations.png',
+    dark: '/images/blog/clickhouse-supabase/integrations.png',
+  }}
+/>
 
 If you simply want to try out the tools and updates we've described above, you can get started with all of then, free of charge:
 
