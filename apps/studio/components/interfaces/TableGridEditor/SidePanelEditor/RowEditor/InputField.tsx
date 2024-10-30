@@ -7,14 +7,22 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  FormControl_Shadcn_,
   Input,
   Listbox,
   Select,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectGroup_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
 } from 'ui'
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export interface InputFieldProps {
   field: RowField
@@ -258,33 +266,39 @@ const InputField = ({
     // value in the next renders. This makes the ListBox an uncontrolled component but it works.
     // PS: This is the third time we're fixing this in a month. If you have to fix this again, just
     // use Input for booleans.
-    const defaultValue = field.value === 'null' ? field.defaultValue : field.value
+    const defaultValue =
+      field.value === 'null' ? field.defaultValue : !field.isNullable ? undefined : field.value
 
     return (
-      <Listbox
-        size="small"
+      <FormItemLayout
+        isReactForm={false}
         layout="horizontal"
-        name={field.name}
         label={field.name}
         labelOptional={field.format}
-        descriptionText={field.comment}
-        value={defaultValue === null ? 'null' : defaultValue}
-        onChange={(value: string) => {
-          if (value === 'null') onUpdateField({ [field.name]: null })
-          else onUpdateField({ [field.name]: value })
-        }}
+        description={field.comment}
+        className="[&>div:first-child>span]:text-foreground-lighter"
       >
-        {options.map((option) => (
-          <Listbox.Option
-            id={option.value}
-            key={option.value}
-            label={option.label}
-            value={option.value}
-          >
-            {option.label}
-          </Listbox.Option>
-        ))}
-      </Listbox>
+        <Select_Shadcn_
+          value={defaultValue === null ? 'null' : defaultValue}
+          onValueChange={(value: string) => {
+            if (value === 'null') onUpdateField({ [field.name]: null })
+            else onUpdateField({ [field.name]: value })
+          }}
+        >
+          <SelectTrigger_Shadcn_>
+            <SelectValue_Shadcn_ placeholder="Select a value" />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            <SelectGroup_Shadcn_>
+              {options.map((option) => (
+                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem_Shadcn_>
+              ))}
+            </SelectGroup_Shadcn_>
+          </SelectContent_Shadcn_>
+        </Select_Shadcn_>
+      </FormItemLayout>
     )
   }
 
