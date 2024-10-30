@@ -12,7 +12,7 @@ interface SpamValidationProps {
 // [Joshen] Referring to this to understand SpamAssasin results:
 // https://www.mailercheck.com/articles/spamassassin-score#test
 // TLDR: A total score of above 5 is considered spam, ideal score is 0 - 2
-// Any individual metric above 0 is a considered to be a warning
+// Any individual metric above 0 is considered to be a warning
 
 export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
   const totalSpamScore = (validationResult?.rules ?? []).reduce((a, b) => a + b.score, 0)
