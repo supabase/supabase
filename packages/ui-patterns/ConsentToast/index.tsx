@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
+import { PrivacySettings } from '../PrivacySettings'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -25,15 +26,17 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
         <p className="text-sm text-foreground">
-          We use first-party cookies to improve our services.
+          We use{' '}
           <Link
-            className="inline sm:hidden underline text-light"
-            target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/privacy"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="inline hover:underline"
           >
-            Learn more
-          </Link>
+            first-party cookies
+          </Link>{' '}
+          to improve our services.{' '}
+          <PrivacySettings className="inline sm:hidden underline text-light">
+            Privacy settings
+          </PrivacySettings>
         </p>
       </div>
       <div className="flex items-center space-x-2">
@@ -54,9 +57,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
           Opt out
         </Button>
         <Button asChild type="text" className="hidden sm:block text-light hover:text-foreground">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/privacy">
-            Learn more
-          </Link>
+          <PrivacySettings>Privacy settings</PrivacySettings>
         </Button>
       </div>
     </div>
