@@ -256,16 +256,9 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-    // Ivan: The value coming in from backend is processed (NULL converted to 'null' string) so that
-    // it's properly selected in the listbox. The issue is with the internal implementation of the
-    // Listbox where the default column value is only considered when field.value is null
-    // (the JS kind). Since we're converting that null into 'null', defaultValue isn't used as it
-    // should. To fix this, we're only setting the defaultValue of the listbox and not setting the
-    // value in the next renders. This makes the ListBox an uncontrolled component but it works.
-    // PS: This is the third time we're fixing this in a month. If you have to fix this again, just
-    // use Input for booleans.
     const defaultValue =
-      field.value === 'null' ? field.defaultValue : !field.isNullable ? undefined : field.value
+      field.defaultValue ||
+      (field.value === null ? undefined : field.value === 'null' ? field.defaultValue : field.value)
 
     return (
       <FormItemLayout
