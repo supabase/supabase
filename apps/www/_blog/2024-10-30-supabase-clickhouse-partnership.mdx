@@ -115,7 +115,7 @@ The Wrapper now has support for ClickHouse [Parameterized Views](https://clickho
 
 Many of our customers use [PeerDB](https://www.peerdb.io/) to replicate data from Postgres to ClickHouse. This has occasionally presented challenges, particularly with Postgres's default 1GB WAL size, which, for large data volumes, can result in data loss if the WAL exceeds this size.
 
-To resolve this, we've added 13 [configurable Postgres parameters](https://supabase.com/docs/guides/database/custom-postgres-config), enabling you to adjust replication settings through the CLI. For example, you can increase the default WAL size to 2GB:
+To resolve this, we've added 13 [configurable Postgres parameters](/docs/guides/database/custom-postgres-config), enabling you to adjust replication settings through the CLI. For example, you can increase the default WAL size to 2GB:
 
 ```bash
 supabase --experimental --project-ref xxxx-yyy \
@@ -145,11 +145,11 @@ Supabase now provides granular control over disk usage for your Postgres databas
 <div>
   <Img
     className="border-none"
-    alt="Browser proxy diagram"
+    alt="Disk management"
     zoomable={false}
     src={{
-      light: '/images/blog/clickhouse-supabase/diagram--light.png',
-      dark: '/images/blog/clickhouse-supabase/diagram--dark.png',
+      light: '/images/blog/clickhouse-supabase/disk-management.png',
+      dark: '/images/blog/clickhouse-supabase/disk-management.png',
     }}
   />
 </div>
@@ -170,11 +170,11 @@ Improving the experience between Postgres and ClickHouse is the first phase of t
 <div>
   <Img
     className="border-none"
-    alt="Browser proxy diagram"
+    alt="Supabase integrations"
     zoomable={false}
     src={{
-      light: '/images/blog/clickhouse-supabase/diagram--light.png',
-      dark: '/images/blog/clickhouse-supabase/diagram--dark.png',
+      light: '/images/blog/clickhouse-supabase/integrations.png',
+      dark: '/images/blog/clickhouse-supabase/integrations.png',
     }}
   />
 </div>
