@@ -93,9 +93,10 @@ export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
 // }
 
 export const COMPUTE_BASELINE_IOPS = {
-  ci_micro: 250,
-  ci_small: 500,
-  ci_medium: 1000,
+  ci_nano: 250,
+  ci_micro: 500,
+  ci_small: 1000,
+  ci_medium: 2000,
   ci_large: 3600,
   ci_xlarge: 6000,
   ci_2xlarge: 12000,
@@ -105,6 +106,7 @@ export const COMPUTE_BASELINE_IOPS = {
   ci_16xlarge: 80000,
 }
 export const COMPUTE_MAX_IOPS = {
+  ci_nano: 11800,
   ci_micro: 11800,
   ci_small: 11800,
   ci_medium: 11800,
@@ -117,9 +119,10 @@ export const COMPUTE_MAX_IOPS = {
   ci_16xlarge: 80000,
 }
 export const COMPUTE_BASELINE_THROUGHPUT = {
-  ci_micro: 43,
-  ci_small: 87,
-  ci_medium: 174,
+  ci_nano: 43,
+  ci_micro: 87,
+  ci_small: 174,
+  ci_medium: 347,
   ci_large: 630,
   ci_xlarge: 1188,
   ci_2xlarge: 2375,
@@ -129,6 +132,7 @@ export const COMPUTE_BASELINE_THROUGHPUT = {
   ci_16xlarge: 19000,
 }
 export const COMPUTE_MAX_THROUGHPUT = {
+  ci_nano: 2085,
   ci_micro: 2085,
   ci_small: 2085,
   ci_medium: 2085,
@@ -141,9 +145,14 @@ export const COMPUTE_MAX_THROUGHPUT = {
   ci_16xlarge: 19000,
 }
 
-export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_micro', 'ci_small', 'ci_medium']
+export const RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3 = ['ci_nano', 'ci_micro', 'ci_small', 'ci_medium']
 
-export const RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 = ['ci_micro', 'ci_small', 'ci_medium']
+export const RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3 = [
+  'ci_nano',
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+]
 
 export const DISK_TYPE_OPTIONS = [
   {

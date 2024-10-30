@@ -19,6 +19,7 @@ export function ComputeSizeReccomendationSection({
   actions?: React.ReactNode
 }) {
   const compute = calculateComputeSizeRequiredForIops(iops)
+
   const maxIOPSforComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize ?? 'ci_micro')
   const isVisible =
     iops > maxIOPSforComputeSize && !RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3.includes(computeSize)
