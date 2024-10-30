@@ -12,6 +12,9 @@ export type Table = PostgresTable
 
 export type TableResponse = Table | { error?: any }
 
+/**
+ * @deprecated use `useTableEditorQuery` instead
+ */
 export async function getTable(
   { id, projectRef, connectionString }: TableVariables,
   signal?: AbortSignal

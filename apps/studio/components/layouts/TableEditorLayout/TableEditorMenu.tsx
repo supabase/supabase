@@ -106,12 +106,13 @@ const TableEditorMenu = () => {
     id,
   })
 
+  const selectedTable = getTableLikeFromTableEditor(tableData)
+
   useEffect(() => {
-    const selectedTable = getTableLikeFromTableEditor(tableData)
-    if (selectedTable) {
+    if (selectedTable?.schema) {
       setSelectedSchema(selectedTable.schema)
     }
-  }, [tableData])
+  }, [selectedTable?.schema])
 
   return (
     <>
