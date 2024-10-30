@@ -37,7 +37,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
     if (storageType === 'io2') {
       // Validation rules for io2
 
-      if (provisionedIOPS > 256000) {
+      if (provisionedIOPS > IOPS_RANGE[DiskType.IO2].max) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message:
@@ -48,7 +48,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
 
       const maxIOPSforDiskSizeWithio2 = calculateMaxIopsAllowedForDiskSizeWithio2(totalSize)
 
-      if (provisionedIOPS < 100) {
+      if (provisionedIOPS < IOPS_RANGE[DiskType.IO2].min) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Provisioned IOPS must be at least 100',

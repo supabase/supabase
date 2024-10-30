@@ -343,7 +343,11 @@ export function DiskManagementForm() {
             <ComputeSizeField form={form} disabled={disableComputeInputs} />
             <Separator />
             <DiskCountdownRadial />
-            <DiskSizeField form={form} disableInput={disableDiskInputs} />
+            <DiskSizeField
+              form={form}
+              disableInput={disableDiskInputs}
+              setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
+            />
             {/* {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />} */}
             <Separator />
             <Collapsible_Shadcn_

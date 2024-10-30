@@ -5,7 +5,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
 import { UseFormReturn } from 'react-hook-form'
-import { FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
+import { Button, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton, cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { calculateDiskSizePrice } from '../DiskManagement.utils'
@@ -17,13 +17,19 @@ import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
 import FormMessage from '../ui/FormMessage'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { DiskTypeReccomendationSection } from '../ui/DiskTypeReccomendationSection'
 
 type DiskSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
   disableInput: boolean
+  setAdvancedSettingsOpenState: (state: boolean) => void
 }
 
-export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
+export function DiskSizeField({
+  form,
+  disableInput,
+  setAdvancedSettingsOpenState,
+}: DiskSizeFieldProps) {
   const { ref: projectRef } = useParams()
   const { control, formState, setValue, trigger, getValues, resetField, watch } = form
   const org = useSelectedOrganization()
@@ -141,6 +147,22 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
               subscription?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
           </span>
+          <DiskTypeReccomendationSection
+            form={form}
+            actions={
+              <Button
+                type="default"
+                onClick={() => {
+                  setValue('storageType', 'io2')
+                  trigger('provisionedIOPS')
+                  trigger('totalSize')
+                  setAdvancedSettingsOpenState(true)
+                }}
+              >
+                Change to High Performance SSD
+              </Button>
+            }
+          />
         </div>
       </div>
       <div className="col-span-8">
