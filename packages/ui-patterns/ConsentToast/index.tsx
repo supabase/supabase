@@ -8,7 +8,6 @@ import {
   useTelemetryProps,
 } from 'common'
 import { noop } from 'lodash'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
@@ -26,14 +25,15 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
     <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
         <p className="text-sm text-foreground">
-          We use{' '}
-          <Link
+          We use first-party cookies to improve our services.{' '}
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
             href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
-            className="inline hover:underline"
+            className="underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground-light transition-all"
           >
-            first-party cookies
-          </Link>{' '}
-          to improve our services.{' '}
+            Learn more
+          </a>{' '}
           <PrivacySettings className="inline sm:hidden underline text-light">
             Privacy settings
           </PrivacySettings>
