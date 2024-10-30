@@ -72,10 +72,10 @@ export const DiskMangementCoolDownSection: React.FC = () => {
             </div>
             <div className="flex flex-col gap-0 flex-grow">
               <p className="text-sm text-foreground">
-                For 6 hours you will not be able to change disk configuration.
+                For 6 hours you will not be able to change any disk attributes.
               </p>
               <p className="text-sm text-foreground-light">
-                This is due to a cooldown period between disk changes.
+                There is a cooldown period enforced for any disk attribute modifications
               </p>
             </div>
             {/* <button

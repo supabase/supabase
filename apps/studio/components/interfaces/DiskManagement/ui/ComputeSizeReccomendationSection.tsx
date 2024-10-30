@@ -38,7 +38,7 @@ export function ComputeSizeReccomendationSection({
         >
           <Admonition
             type="default"
-            title={`Your instance can only support a baseline IOPS of ${COMPUTE_BASELINE_IOPS[computeSize]}`}
+            title={`Your Compute size can only support a baseline IOPS of ${COMPUTE_BASELINE_IOPS[computeSize]}`}
           >
             <div className="flex flex-col gap-2">
               <div>
