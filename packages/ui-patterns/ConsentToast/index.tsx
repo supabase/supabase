@@ -30,15 +30,27 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
             target="_blank"
             rel="noreferrer noopener"
             href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
-            className="underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground-light transition-all"
+            className="hidden sm:block underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground-light transition-all"
           >
             Learn more
           </a>{' '}
-          <PrivacySettings className="inline sm:hidden underline text-light">
+        </p>
+        <div className="flex items-center justify-start gap-x-2 sm:hidden">
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="underline underline-offset-2 text-foreground-light hover:decoration-foreground-light transition-all"
+          >
+            Learn more
+          </a>
+          <span className="text-foreground-lighter text-xs">•</span>
+          <PrivacySettings className="underline underline-offset-2 inline text-light">
             Privacy settings
           </PrivacySettings>
-        </p>
+        </div>
       </div>
+
       <div className="flex items-center space-x-2">
         <Button
           type="default"
