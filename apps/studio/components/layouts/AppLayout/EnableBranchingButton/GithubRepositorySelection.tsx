@@ -4,7 +4,8 @@ import {
   IntegrationConnection,
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import type { GitHubConnection } from 'data/integrations/github-connections-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Check, Loader2 } from 'lucide-react'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {
   Badge,
@@ -13,8 +14,6 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormMessage_Shadcn_,
-  IconCheck,
-  IconLoader,
   Input_Shadcn_,
   Modal,
 } from 'ui'
@@ -90,7 +89,7 @@ const GithubRepositorySelection = ({
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="relative">
+                  <FormItem_Shadcn_ className="flex flex-col gap-y-1 relative">
                     <label className="text-sm text-foreground-light">
                       Choose your production branch
                     </label>
@@ -99,9 +98,9 @@ const GithubRepositorySelection = ({
                     </FormControl_Shadcn_>
                     <div className="absolute top-9 right-3">
                       {isChecking ? (
-                        <IconLoader className="animate-spin" />
+                        <Loader2 size={14} className="animate-spin" />
                       ) : isValid ? (
-                        <IconCheck className="text-brand" strokeWidth={2} />
+                        <Check size={14} className="text-brand" strokeWidth={2} />
                       ) : null}
                     </div>
 

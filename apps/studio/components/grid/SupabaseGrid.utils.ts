@@ -1,16 +1,20 @@
+import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { compact } from 'lodash'
+
+import type { Filter } from 'components/grid/types'
+import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import {
+  ForeignKeyConstraint,
+  ForeignKeyConstraintsData,
+} from 'data/database/foreign-key-constraints-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { TableLike } from 'hooks/misc/useTable'
+import type { Dictionary, SchemaView } from 'types'
+import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-import type { Dictionary } from 'types'
-import { getGridColumns } from './utils/gridColumns'
-import { FilterOperatorOptions } from './components/header/filter'
-import type { Filter } from 'components/grid/types'
-
-export function defaultErrorHandler(error: any) {
-  console.error('Supabase grid error: ', error)
-}
-
 /**
  * Ensure that if editable is false, we should remove all editing actions
  * to prevent rare-case bugs with the UI
@@ -31,19 +35,18 @@ export function cleanupProps(props: SupabaseGridProps) {
   }
 }
 
-export function formatSortURLParams(sort?: string[]) {
-  return (
-    Array.isArray(sort)
-      ? sort
-          .map((s) => {
-            const [column, order] = s.split(':')
-            // Reject any possible malformed sort param
-            if (!column || !order) return undefined
-            else return { column, ascending: order === 'asc' }
-          })
-          .filter((s) => s !== undefined)
-      : []
-  ) as Sort[]
+export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+  if (Array.isArray(sort)) {
+    return compact(
+      sort.map((s) => {
+        const [column, order] = s.split(':')
+        // Reject any possible malformed sort param
+        if (!column || !order) return undefined
+        else return { table: tableName, column, ascending: order === 'asc' }
+      })
+    )
+  }
+  return []
 }
 
 export function formatFilterURLParams(filter?: string[]): Filter[] {
@@ -65,58 +68,6 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
           .filter((f) => f !== undefined)
       : []
   ) as Filter[]
-}
-
-export async function initTable(
-  props: SupabaseGridProps,
-  state: InitialStateType,
-  dispatch: (value: any) => void,
-  sort?: string[], // Comes directly from URL param
-  filter?: string[] // Comes directly from URL param
-): Promise<{ savedState: { sorts?: string[]; filters?: string[] } }> {
-  const savedState = props.projectRef
-    ? onLoadStorage(props.projectRef, props.table.name, props.table.schema)
-    : undefined
-
-  // Check for saved state on initial load and also, load sort and filters via URL param only if given
-  // Otherwise load from local storage to resume user session
-  if (
-    !state.isInitialComplete &&
-    sort === undefined &&
-    filter === undefined &&
-    (savedState?.sorts || savedState?.filters)
-  ) {
-    return {
-      savedState: {
-        sorts: savedState.sorts,
-        filters: savedState.filters,
-      },
-    }
-  }
-
-  const gridColumns = getGridColumns(props.table, {
-    projectRef: props.projectRef,
-    tableId: props.tableId,
-    editable: props.editable,
-    defaultWidth: props.gridProps?.defaultColumnWidth,
-    onAddColumn: props.editable ? props.onAddColumn : undefined,
-    onExpandJSONEditor: props.onExpandJSONEditor,
-    onExpandTextEditor: props.onExpandTextEditor,
-  })
-
-  dispatch({
-    type: 'INIT_TABLE',
-    payload: {
-      table: props.table,
-      gridProps: props.gridProps,
-      gridColumns,
-      savedState,
-      editable: props.editable,
-      onError: props.onError ?? defaultErrorHandler,
-    },
-  })
-
-  return { savedState: {} }
 }
 
 export function parseSupaTable(
@@ -172,20 +123,61 @@ export function parseSupaTable(
   })
 
   return {
+    id: table.id,
     name: table.name,
     comment: table.comment,
     schema: table.schema,
     columns: supaColumns,
+    estimateRowCount: table.live_rows_estimate,
   }
 }
 
-function onLoadStorage(storageRef: string, tableName: string, schema?: string | null) {
-  const storageKey = getStorageKey(STORAGE_KEY_PREFIX, storageRef)
-  const jsonStr = localStorage.getItem(storageKey)
-  if (!jsonStr) return
-  const json = JSON.parse(jsonStr)
-  const tableKey = !schema || schema == 'public' ? tableName : `${schema}.${tableName}`
-  return json[tableKey]
+export function getSupaTable({
+  selectedTable,
+  entityType,
+  foreignKeyMeta,
+  encryptedColumns,
+}: {
+  selectedTable: TableLike
+  entityType?: ENTITY_TYPE
+  foreignKeyMeta: ForeignKeyConstraintsData
+  encryptedColumns: string[]
+}) {
+  // [Joshen] We can tweak below to eventually support composite keys as the data
+  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
+  const formattedRelationships = (
+    ('relationships' in selectedTable && selectedTable.relationships) ||
+    []
+  ).map((relationship: PostgresRelationship) => {
+    const relationshipMeta = foreignKeyMeta.find(
+      (fk: ForeignKeyConstraint) => fk.id === relationship.id
+    )
+    return {
+      ...relationship,
+      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
+    }
+  })
+
+  const isViewSelected =
+    entityType === ENTITY_TYPE.VIEW || entityType === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isForeignTableSelected = entityType === ENTITY_TYPE.FOREIGN_TABLE
+
+  return !isViewSelected && !isForeignTableSelected
+    ? parseSupaTable(
+        {
+          table: selectedTable as PostgresTable,
+          columns: (selectedTable as PostgresTable).columns ?? [],
+          primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
+          relationships: formattedRelationships,
+        },
+        encryptedColumns
+      )
+    : parseSupaTable({
+        table: selectedTable as SchemaView,
+        columns: (selectedTable as SchemaView).columns ?? [],
+        primaryKeys: [],
+        relationships: [],
+      })
 }
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)
@@ -218,6 +210,6 @@ function saveStorage(
   localStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
-function getStorageKey(prefix: string, ref: string) {
+export function getStorageKey(prefix: string, ref: string) {
   return `${prefix}_${ref}`
 }

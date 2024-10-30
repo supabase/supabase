@@ -119,7 +119,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -193,7 +193,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email.
         name: Sign in with email.
@@ -236,7 +236,7 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
+          When the third-party provider successfully authenticates the user, the provider will redirect the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). It does not redirect the user immediately after invoking this method.
           You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
         js: |
           ```js
@@ -1066,6 +1066,112 @@ functions:
 
           </TabPanel>
           </Tabs>
+        hideCodeBlock: true
+      - id: query-nested-foreign-tables-through-a-join-table
+        name: Query nested foreign tables through a join table
+        code: |
+          ```ts
+            const { data, error } = await supabase
+              .from('games')
+              .select(`
+                game_id:id,
+                away_team:teams!games_away_team_fkey (
+                  users (
+                    id,
+                    name
+                  )
+                )
+              `)
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+
+                primary key (user_id, team_id)
+              );
+            create table
+              games (
+                id int8 primary key,
+                home_team int8 not null references teams,
+                away_team int8 not null references teams,
+                name text
+              );
+
+            insert into users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            insert into
+              games (id, home_team, away_team, name)
+            values
+              (1, 1, 2, 'Green vs Blue'),
+              (2, 2, 1, 'Blue vs Green');
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "game_id": 1,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      },
+                      {
+                        "id": 2,
+                        "name": "Evan"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "game_id": 2,
+                  "away_team": {
+                    "users": [
+                      {
+                        "id": 1,
+                        "name": "Kiran"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          You can use the result of a joined table to gather data in
+          another foreign table. With multiple references to the same foreign
+          table you must specify the column on which to conduct the join.
         hideCodeBlock: true
       - id: filtering-through-foreign-tables
         name: Filtering through referenced tables
@@ -3752,7 +3858,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 

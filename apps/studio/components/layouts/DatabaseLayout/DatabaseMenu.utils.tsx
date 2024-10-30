@@ -9,10 +9,11 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
+    cronUiEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, cronUiEnabled } = flags || {}
 
   return [
     {
@@ -98,15 +99,16 @@ export const generateDatabaseMenu = (
             ]
           : []),
         {
-          name: 'Wrappers',
-          key: 'wrappers',
-          url: `/project/${ref}/database/wrappers`,
-          items: [],
-        },
-        {
           name: 'Migrations',
           key: 'migrations',
           url: `/project/${ref}/database/migrations`,
+          items: [],
+        },
+        {
+          name: 'Wrappers',
+          key: 'wrappers',
+          url: `/project/${ref}/integrations/wrappers`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         ...(!!pgNetExtensionExists
@@ -114,7 +116,8 @@ export const generateDatabaseMenu = (
               {
                 name: 'Webhooks',
                 key: 'hooks',
-                url: `/project/${ref}/database/hooks`,
+                url: `/project/${ref}/integrations/hooks`,
+                rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
                 items: [],
               },
             ]
@@ -139,13 +142,15 @@ export const generateDatabaseMenu = (
         {
           name: 'Security Advisor',
           key: 'security-advisor',
-          url: `/project/${ref}/database/security-advisor`,
+          url: `/project/${ref}/advisors/security`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
         {
           name: 'Performance Advisor',
           key: 'performance-advisor',
-          url: `/project/${ref}/database/performance-advisor`,
+          url: `/project/${ref}/advisors/performance`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
       ],

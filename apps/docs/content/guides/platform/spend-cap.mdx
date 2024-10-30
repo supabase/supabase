@@ -12,14 +12,17 @@ This Spend Cap determines whether your organization can exceed the free quota al
 
 Supabase charges for certain usage line items in your organization. Those line items include:
 
-- Database Size
+- Disk Size
 - Storage Size
 - Egress
 - Storage Image Transformations
 - Realtime concurrent peak connections
 - Realtime messages
 - Edge function invocations
-- Number of Edge functions
+- Log Drain Events
+- Monthly Active Users
+- Monthly Active Third-Party Users
+- Monthly Active SSO Users
 
 You can view the pricing, and free quota allowance of each line item on the [pricing page](/pricing).
 
@@ -28,11 +31,17 @@ This will show you how much you have spent so far in the current billing cycle, 
 
 ## Can I use the spend cap to limit my compute costs?
 
-The spend cap does not apply to compute usage. Each project is a dedicated server and database and incurs compute costs depending on the selected instance size. Costs for compute are predictable, as the maximum amount is number of hours in month \* hourly compute price (per project).
+The spend cap does not apply to compute usage. Each project is a dedicated server and database and incurs compute costs depending on the selected compute size. Costs for compute are predictable, as the maximum amount is number of hours in month \* hourly compute price (per project).
 
 Launching additional projects on a paid plan incurs compute costs, even if your spend cap is toggled on.
 
-Read more about [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+Read more about [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
+
+## What's not covered by the Spend Cap?
+
+The Spend Cap does not apply to compute or project add-ons such as Custom Domains or IPv4. If you launch additional projects, opt into project add-ons, spin up branches or read replicas on a paid plan, it will incur additional costs.
+
+The Spend Cap also does not apply to Log Drain events given they have no included quota and are an explicit opt-in.
 
 ## How can I turn the Spend Cap on or off?
 

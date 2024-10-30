@@ -1,26 +1,26 @@
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, IconDatabase } from 'ui'
+import { CodeBlock, Tabs } from 'ui'
 import components from '~/components'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
-import { Tabs, TabPanel } from '~/components/Tabs'
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-import { IRefFunctionSection } from './Reference.types'
+import type { IRefFunctionSection } from './Reference.types'
+import { Database } from 'icons'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
-
-  // gracefully return nothing if function does not exist
   if (!item) return <></>
 
   const hasTsRef = item['$ref'] || null
 
   const tsDefinition =
     hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
-  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params
+  const parameters =
+    item.overwriteParams ??
+    (hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params)
   const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment?.shortText : ''
 
   return (
@@ -100,7 +100,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                   size="tiny"
                   type="rounded-pills"
                   scrollable
-                  queryGroup="example"
                 >
                   {item.examples &&
                     item.examples.map((example, exampleIndex) => {
@@ -123,12 +122,6 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               : example?.code?.startsWith('```kotlin')
                                 ? 'kotlin'
                                 : 'js'
-                      //                     `
-                      // import { createClient } from '@supabase/supabase-js'
-
-                      // // Create a single supabase client for interacting with your database
-                      // const supabase = createClient('https://xyzcompany.supabase.co', 'public-anon-key')
-                      // `
                       const staticExample = item.examples[exampleIndex]
 
                       const response = staticExample.response
@@ -136,7 +129,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const tables = staticExample?.data?.tables
 
                       return (
-                        <TabPanel
+                        <Tabs.Panel
                           id={example.id}
                           key={exampleIndex}
                           label={example.name}
@@ -165,7 +158,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                         <div className="bg-background px-5 py-2">
                                           <div className="flex gap-2 items-center">
                                             <div className="text-brand">
-                                              <IconDatabase size={16} />
+                                              <Database size={16} />
                                             </div>
                                             <h5 className="text-xs text-foreground">
                                               {table.name}
@@ -217,7 +210,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               </div>
                             </RefDetailCollapse>
                           )}
-                        </TabPanel>
+                        </Tabs.Panel>
                       )
                     })}
                 </Tabs>

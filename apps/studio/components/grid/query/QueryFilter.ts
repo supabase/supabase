@@ -1,11 +1,11 @@
-import type { Filter, FilterOperator, QueryTable, Sort } from '../types'
 import type { Dictionary } from 'types'
+import type { Filter, FilterOperator, QueryTable, Sort } from '../types'
 import { IQueryModifier, QueryModifier } from './QueryModifier'
 
 export interface IQueryFilter {
   filter: (column: string, operator: FilterOperator, value: string) => IQueryFilter
   match: (criteria: Dictionary<any>) => IQueryFilter
-  order: (column: string, ascending?: boolean, nullsFirst?: boolean) => IQueryFilter
+  order: (table: string, column: string, ascending?: boolean, nullsFirst?: boolean) => IQueryFilter
 }
 
 export class QueryFilter implements IQueryFilter, IQueryModifier {
@@ -31,8 +31,9 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
     return this
   }
 
-  order(column: string, ascending = true, nullsFirst = false) {
+  order(table: string, column: string, ascending = true, nullsFirst = false) {
     this.sorts.push({
+      table: table,
       column: column,
       ascending,
       nullsFirst,

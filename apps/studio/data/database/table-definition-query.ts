@@ -1,5 +1,5 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 
 type GetTableDefinition = {
@@ -7,6 +7,7 @@ type GetTableDefinition = {
   name?: string
 }
 
+// [Joshen] Eventually move this into entity-definition-query
 export const getTableDefinitionQuery = ({ schema = 'public', name }: GetTableDefinition) => {
   const sql = /* SQL */ `
     ${CREATE_PG_GET_TABLEDEF_SQL}
@@ -29,7 +30,7 @@ export type TableDefinitionVariables = GetTableDefinition & {
 }
 
 export type TableDefinitionData = string
-export type TableDefinitionError = unknown
+export type TableDefinitionError = ExecuteSqlError
 
 export const useTableDefinitionQuery = <TData extends TableDefinitionData = TableDefinitionData>(
   { projectRef, connectionString, schema, name }: TableDefinitionVariables,

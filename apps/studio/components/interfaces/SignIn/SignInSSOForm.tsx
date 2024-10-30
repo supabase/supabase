@@ -1,23 +1,25 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import * as Sentry from '@sentry/nextjs'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 
-const signInSchema = object({
-  email: string().email('Must be a valid email').required('Email is required'),
-})
+const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
 const SignInSSOForm = () => {
   const queryClient = useQueryClient()
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
-
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
+  const [lastSignInUsed, setLastSignInUsed] = useLastSignIn()
+  const signInSchema = object({
+    email: string().email('Must be a valid email').required('Email is required'),
+  })
   const onSignIn = async ({ email }: { email: string }) => {
     const toastId = toast.loading('Signing in...')
 
@@ -46,7 +48,7 @@ const SignInSSOForm = () => {
 
     if (!error) {
       await queryClient.resetQueries()
-
+      setLastSignInUsed('sso')
       if (data) {
         // redirect to SSO identity provider page
         window.location.href = data.url
@@ -54,7 +56,11 @@ const SignInSSOForm = () => {
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(error.message, { id: toastId })
+      toast.error(`Failed to sign in: ${error.message}`, { id: toastId })
+
+      if (!WHITELIST_ERRORS.includes(error.message)) {
+        Sentry.captureMessage('[CRITICAL] Failed to sign in via SSO: ' + error.message)
+      }
     }
   }
 

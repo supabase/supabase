@@ -1,14 +1,14 @@
 import { useParams } from 'common'
 import { get as _get, find } from 'lodash'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'
 import { Bucket, useBucketsQuery } from 'data/storage/buckets-query'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { formatPoliciesForStorage } from './Storage.utils'
 
 export interface DeleteBucketModalProps {
@@ -45,19 +45,26 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         ['policies'],
         []
       )
-      await Promise.all(
-        bucketPolicies.map((policy: any) =>
-          deletePolicy({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            id: policy.id,
-          })
-        )
-      )
 
-      toast.success(`Successfully deleted bucket ${bucket!.name}`)
-      router.push(`/project/${projectRef}/storage/buckets`)
-      onClose()
+      try {
+        await Promise.all(
+          bucketPolicies.map((policy: any) =>
+            deletePolicy({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              id: policy.id,
+            })
+          )
+        )
+
+        toast.success(`Successfully deleted bucket ${bucket?.name}`)
+        router.push(`/project/${projectRef}/storage/buckets`)
+        onClose()
+      } catch (error) {
+        toast.success(
+          `Successfully deleted bucket ${bucket?.name}. However, there was a problem deleting the policies tied to the bucket. Please review them in the storage policies section`
+        )
+      }
     },
   })
 

@@ -1,9 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { useFlag } from 'hooks/ui/useFlag'
 import { post } from 'lib/common/fetch'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
+import { sqlKeys } from 'data/sql/keys'
 
 export type UserCreateVariables = {
   projectRef?: string
@@ -49,10 +51,7 @@ export async function createUser({ protocol, endpoint, serviceApiKey, user }: Us
       },
     }
   )
-  if (response.error) {
-    throw response.error
-  }
-
+  if (response.error) throw response.error
   return response
 }
 
@@ -67,12 +66,25 @@ export const useUserCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const userManagementV2 = useFlag('userManagementV2')
+
   return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
     (vars) => createUser(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(authKeys.users(projectRef))
+
+        if (userManagementV2) {
+          Promise.all([
+            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+            queryClient.invalidateQueries(
+              sqlKeys.query(projectRef, authKeys.usersCount(projectRef))
+            ),
+          ])
+        } else {
+          await queryClient.invalidateQueries(authKeys.users(projectRef))
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

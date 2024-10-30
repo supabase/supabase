@@ -23,7 +23,14 @@ There are a few important differences from a spreadsheet, but it's a good starti
 
 When creating a table, it's best practice to add columns at the same time.
 
-![Tables and columns](/docs/img/guides/database/tables-columns.png)
+<Image
+  alt="Tables and columns"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/creating-tables.png',
+    light: '/docs/img/database/managing-tables/creating-tables--light.png',
+  }}
+/>
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
 
@@ -252,6 +259,22 @@ try await supabase.from("movies")
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+client.from_("movies").insert([
+    {
+        "name": "The Empire Strikes Back",
+        "description": "After the Rebels are brutally overpowered by the Empire on the ice planet Hoth, Luke Skywalker begins Jedi training with Yoda."
+    },
+    {
+        "name": "Return of the Jedi",
+        "description": "After a daring mission to rescue Han Solo from Jabba the Hutt, the Rebels dispatch to Endor to destroy the second Death Star."
+    }
+]).execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -306,7 +329,14 @@ If you receive an error `FATAL:  password authentication failed for user "postgr
 
 Tables can be "joined" together using Foreign Keys.
 
-![Foreign Keys](/docs/img/guides/database/foreign-keys.png)
+<Image
+  alt="Foreign Keys"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/joining-tables.png',
+    light: '/docs/img/database/managing-tables/joining-tables--light.png',
+  }}
+/>
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
@@ -377,7 +407,14 @@ create table performances (
 
 Tables belong to `schemas`. Schemas are a way of organizing your tables, often for security reasons.
 
-![Schemas and tables](/docs/img/guides/database/schema-tables.png)
+<Image
+  alt="Schemas and tables"
+  zoomable
+  src={{
+    dark: '/docs/img/database/managing-tables/schemas.png',
+    light: '/docs/img/database/managing-tables/schemas--light.png',
+  }}
+/>
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.
 
@@ -400,12 +437,6 @@ create table private.salaries (
 ## Views
 
 A View is a convenient shortcut to a query. Creating a view does not involve new tables or data. When run, an underlying query is executed, returning its results to the user.
-
-<Admonition type="caution">
-
-By default, PostgreSQL views bypass Row Level Security unless you change their owner (see https://github.com/supabase/supabase/discussions/901). PostgreSQL v15 (coming soon) will have a more intuitive control for this through [security invoker views](https://www.depesz.com/2022/03/22/waiting-for-postgresql-15-add-support-for-security-invoker-views/) and the previous step won't be needed.
-
-</Admonition>
 
 Say we have the following tables from a database of a university:
 
@@ -457,6 +488,21 @@ Once done, we can now access the underlying query with:
 
 ```sql
 select * from transcripts;
+```
+
+### View security
+
+By default, views are accessed with their creator's permission ("security definer"). If a privileged role creates a view, others accessing it will use that role's elevated permissions. To enforce row level security policies, define the view with the "security invoker" modifier.
+
+```sql
+-- alter a security_definer view to be security_invoker
+alter view <view name>
+set (security_invoker = true);
+
+-- create a view with the security_invoker modifier
+create view <view name> with(security_invoker=true) as (
+  select * from <some table>
+);
 ```
 
 ### When to use views

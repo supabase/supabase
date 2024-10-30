@@ -1,9 +1,10 @@
-import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { capitalize } from 'lodash'
+import { BarChart2, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, useMemo, useState } from 'react'
-import { IconBarChart2, IconExternalLink } from 'ui'
 
+import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   CPUWarnings,
@@ -19,6 +20,7 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
@@ -26,17 +28,30 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
-import { capitalize } from 'lodash'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+
+const NON_DEDICATED_IO_RESOURCES = [
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+]
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
-  const [dateRange, setDateRange] = useState<any>()
   const project = useSelectedProject()
+  const organization = useSelectedOrganization()
+  const state = useDatabaseSelectorStateSnapshot()
+  const [dateRange, setDateRange] = useState<any>()
 
   const { data: subscription, isLoading: isLoadingSubscription } = useOrgSubscriptionQuery({
     orgSlug: organization?.slug,
@@ -50,6 +65,9 @@ const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
+  const hasDedicatedIOResources =
+    computeInstance !== undefined &&
+    !NON_DEDICATED_IO_RESOURCES.includes(computeInstance.variant.identifier)
 
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
@@ -130,6 +148,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const { data: memoryUsageData, isLoading: isLoadingMemoryUsageData } = useInfraMonitoringQuery({
@@ -139,6 +158,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const { data: ioBudgetData, isLoading: isLoadingIoBudgetData } = useInfraMonitoringQuery({
@@ -148,6 +168,7 @@ const InfrastructureActivity = () => {
     startDate,
     endDate,
     dateFormat,
+    databaseIdentifier: state.selectedDatabaseId,
   })
 
   const hasLatest = dayjs(endDate!).isAfter(dayjs().startOf('day'))
@@ -157,10 +178,9 @@ const InfrastructureActivity = () => {
       ? Number(ioBudgetData.data.slice(-1)[0].disk_io_consumption)
       : 0
 
-  const highestIoBudgetConsumption = Math.max(
-    ...(ioBudgetData?.data || []).map((x) => Number(x.disk_io_consumption) ?? 0),
-    0
-  )
+  const highestIoBudgetConsumption = (ioBudgetData?.data || [])
+    .map((x) => Number(x.disk_io_consumption) ?? 0)
+    .reduce((a, b) => Math.max(a, b), 0)
 
   const chartMeta: { [key: string]: { data: DataPoint[]; isLoading: boolean } } = {
     max_cpu_usage: {
@@ -191,8 +211,7 @@ const InfrastructureActivity = () => {
       </ScaffoldContainer>
       <ScaffoldContainer className="sticky top-0 py-6 border-b bg-studio z-10">
         <div className="flex items-center gap-x-4">
-          {/* [Joshen] Metrics for replicas not available yet */}
-          {/* {readReplicasEnabled && <DatabaseSelector />} */}
+          <DatabaseSelector />
           {!isLoadingSubscription && (
             <>
               <DateRangePicker
@@ -239,7 +258,7 @@ const InfrastructureActivity = () => {
                           <Link href={link.url} target="_blank" rel="noreferrer">
                             <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                               <p className="text-sm m-0">{link.name}</p>
-                              <IconExternalLink size={16} strokeWidth={1.5} />
+                              <ExternalLink size={16} strokeWidth={1.5} />
                             </div>
                           </Link>
                         </div>
@@ -264,7 +283,7 @@ const InfrastructureActivity = () => {
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                         currentComputeInstanceSpecs.max_disk_io_mbs ? (
                           <p className="text-sm text-foreground-light">
-                            Your current compute can has a baseline and maximum disk throughput of{' '}
+                            Your current compute has a baseline and maximum disk throughput of{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                           </p>
                         ) : (
@@ -369,7 +388,23 @@ const InfrastructureActivity = () => {
                       </p>
                     ))}
                   </div>
-                  {chartMeta[attribute.key].isLoading ? (
+                  {attribute.key === 'disk_io_consumption' && hasDedicatedIOResources ? (
+                    <>
+                      <Admonition
+                        type="note"
+                        title={`Your compute instance of ${computeInstance.variant.name} comes with dedicated I/O resources`}
+                        description="Your project thus does not rely on I/O balance or burst capacity as larger
+                      add-ons are designed for sustained, high performance with specific IOPS and
+                      throughput limits without needing to burst."
+                      >
+                        <Button asChild type="default" icon={<ExternalLink />}>
+                          <Link href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops">
+                            Documentation
+                          </Link>
+                        </Button>
+                      </Admonition>
+                    </>
+                  ) : chartMeta[attribute.key].isLoading ? (
                     <div className="space-y-2">
                       <ShimmeringLoader />
                       <ShimmeringLoader className="w-3/4" />
@@ -389,7 +424,7 @@ const InfrastructureActivity = () => {
                     <Panel>
                       <Panel.Content>
                         <div className="flex flex-col items-center justify-center space-y-2">
-                          <IconBarChart2 className="text-foreground-light mb-2" />
+                          <BarChart2 size={18} className="text-foreground-light mb-2" />
                           <p className="text-sm">No data in period</p>
                           <p className="text-sm text-foreground-light">
                             May take a few minutes to show

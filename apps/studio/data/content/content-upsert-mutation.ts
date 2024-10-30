@@ -1,14 +1,14 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import type { components } from 'data/api'
-import { put } from 'data/fetchers'
+import { handleError, put } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
-  content: Content['content']
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
+  content: Partial<Content['content']>
 }
 
 export type UpsertContentVariables = {
@@ -21,7 +21,6 @@ export async function upsertContent(
   signal?: AbortSignal
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
-    // @ts-ignore API codegen is wrong
     params: { path: { ref: projectRef } },
     body: {
       id: payload.id,
@@ -35,7 +34,7 @@ export async function upsertContent(
     },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
 
   return data
 }

@@ -1,7 +1,5 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import type { VercelFramework } from './integrations.types'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { get, handleError } from 'data/fetchers'
 import { integrationKeys } from './keys'
 
 export type VercelProjectsVariables = {
@@ -31,10 +29,7 @@ export async function getVercelProjects(
     }
   )
 
-  if (error) {
-    throw error
-  }
-
+  if (error) handleError(error)
   return data.projects
 }
 

@@ -54,7 +54,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage react-native-elements react-native-url-polyfill
+      cd my-app && npx expo install @supabase/supabase-js @react-native-async-storage/async-storage @rneui/themed react-native-url-polyfill
       ```
 
     </StepHikeCompact.Code>
@@ -119,7 +119,7 @@ hideToc: true
       import React, { useState } from 'react'
       import { Alert, StyleSheet, View } from 'react-native'
       import { supabase } from '../lib/supabase'
-      import { Button, Input } from 'react-native-elements'
+      import { Button, Input } from '@rneui/themed'
 
       export default function Auth() {
         const [email, setEmail] = useState('')

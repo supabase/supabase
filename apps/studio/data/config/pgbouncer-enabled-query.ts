@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { configKeys } from './keys'
-import type { ResponseError } from 'types'
-import { get } from 'data/fetchers'
+
+import { get, handleError } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
+import type { ResponseError } from 'types'
+import { configKeys } from './keys'
 
 type PgBouncerVariables = {
   projectRef?: string
@@ -16,7 +17,7 @@ export async function getPgBouncerStatus({ projectRef }: PgBouncerVariables, sig
     params: { path: { ref: projectRef } },
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

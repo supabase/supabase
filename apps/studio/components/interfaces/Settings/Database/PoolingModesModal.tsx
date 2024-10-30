@@ -1,38 +1,33 @@
+import { AlertTriangleIcon, ExternalLink } from 'lucide-react'
+
 import { useParams } from 'common'
-import { AlertTriangleIcon } from 'lucide-react'
+import { Markdown } from 'components/interfaces/Markdown'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  Dialog,
   DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
-  Dialog,
-  IconExternalLink,
+  DialogSection,
   DialogSectionSeparator,
+  DialogTitle,
 } from 'ui'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 
 export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
-  const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const readReplicasEnabled = project?.is_read_replicas_enabled
 
   const { data } = usePoolingConfigurationQuery({ projectRef: projectRef })
-  const primaryConfig = readReplicasEnabled
-    ? data?.find((x) => x.identifier === state.selectedDatabaseId)
-    : data?.find((x) => x.database_type === 'PRIMARY')
+  const primaryConfig = data?.find((x) => x.identifier === state.selectedDatabaseId)
 
   const navigateToPoolerSettings = () => {
     const el = document.getElementById('connection-pooler')
@@ -42,11 +37,11 @@ export const PoolingModesModal = () => {
   return (
     <Dialog open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
       <DialogContent hideClose className="sm:max-w-4xl">
-        <DialogHeader className="pb-0">
+        <DialogHeader>
           <DialogTitle>
             <div className="w-full flex items-center justify-between">
-              <p className="text-lg max-w-2xl">Which pooling mode should I use?</p>
-              <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+              <p className="max-w-2xl">Which pooling mode should I use?</p>
+              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <a
                   href="https://supabase.com/docs/guides/database/connecting-to-postgres#how-connection-pooling-works"
                   target="_blank"
@@ -57,15 +52,16 @@ export const PoolingModesModal = () => {
               </Button>
             </div>
           </DialogTitle>
-          <DialogDescription className="text-lg max-w-2xl">
+          <DialogDescription className="max-w-2xl">
             A connection pooler is a system (external to Postgres) which manages Postgres
             connections by allocating connections whenever clients make requests.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
-        <Markdown
-          className="px-6 max-w-full [&>h3]:text-sm"
-          content={`
+        <DialogSection>
+          <Markdown
+            className="max-w-full [&>h3]:text-sm"
+            content={`
 Each pooling mode handles connections differently.
 
 ### Transaction mode
@@ -81,7 +77,8 @@ This mode is similar to connecting to your database directly. There is full supp
      : 'To get the best of both worlds, as a starting point, we recommend using session mode just when you need support for prepared statements and transaction mode in other cases.'
  }
 `}
-        />
+          />
+        </DialogSection>
         {primaryConfig?.pool_mode === 'session' && (
           <div className="px-6">
             <Alert_Shadcn_ variant="warning">
@@ -110,7 +107,7 @@ This mode is similar to connecting to your database directly. There is full supp
         )}
         <DialogFooter>
           <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>
-            <Button type="secondary">Close</Button>
+            <Button type="default">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

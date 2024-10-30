@@ -1,6 +1,3 @@
-<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M4.55762 4.52319L9.07535 14.8547L10.2522 10.2968L15.0002 9.11499L4.55762 4.52319Z" fill="#133929" stroke="#4CC38A" stroke-miterlimit="10" stroke-linejoin="bevel"/>
-<path d="M1.36621 1.28163L3.49715 3.47772" stroke="#4CC38A" stroke-miterlimit="10"/>
-<line x1="5.3623" y1="0.984375" x2="5.3623" y2="3.33325" stroke="#4CC38A" stroke-miterlimit="10"/>
-<line x1="3.41797" y1="5.20288" x2="1.05225" y2="5.20288" stroke="#4CC38A" stroke-miterlimit="10"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="17" fill="none">
+  <path fill="#85E0B7" fill-rule="evenodd" d="M2.5 3.9a.5.5 0 0 1 .5-.5h.025a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5Zm1.975.008a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H4.975a.5.5 0 0 1-.5-.5ZM2.5 6.868a.5.5 0 0 1 .5-.5h.025a.5.5 0 1 1 0 1H3a.5.5 0 0 1-.5-.5Zm1.975.007a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H4.975a.5.5 0 0 1-.5-.5ZM2.518 9.872a.5.5 0 0 1 .5-.5h.007a.5.5 0 1 1 0 1h-.007a.5.5 0 0 1-.5-.5Zm1.957.007a.5.5 0 0 1 .5-.5H13a.5.5 0 0 1 0 1H4.975a.5.5 0 0 1-.5-.5Zm-1.098 2.66a.5.5 0 0 1 .002.707l-.006.007a.5.5 0 0 1-.71-.704l.007-.007a.5.5 0 0 1 .707-.003Zm1.098.362a.5.5 0 0 1 .5-.5H13a.5.5 0 1 1 0 1H4.975a.5.5 0 0 1-.5-.5Z" clip-rule="evenodd"/>
 </svg>

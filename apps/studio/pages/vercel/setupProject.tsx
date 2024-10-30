@@ -4,10 +4,9 @@ import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ChangeEvent, createContext, useContext, useEffect, useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Button, Input, Listbox } from 'ui'
 
-import type { Dictionary } from 'types'
 import VercelIntegrationLayout from 'components/layouts/VercelIntegrationLayout'
 import {
   createVercelEnv,
@@ -18,13 +17,14 @@ import { Loading } from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import {
-  AWS_REGIONS,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   PRICING_TIER_PRODUCT_IDS,
   PROVIDERS,
 } from 'lib/constants'
-import { passwordStrength } from 'lib/helpers'
+import passwordStrength from 'lib/password-strength'
 import { VERCEL_INTEGRATION_CONFIGS } from 'lib/vercelConfigs'
+import { AWS_REGIONS } from 'shared-data'
+import type { Dictionary } from 'types'
 
 interface ISetupProjectStore {
   token: string
@@ -150,7 +150,7 @@ const CreateProject = observer(() => {
   const [dbPass, setDbPass] = useState('')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region)
+  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value: string) => checkPasswordStrength(value), 300)
@@ -232,10 +232,9 @@ const CreateProject = observer(() => {
         organizationId: Number(_store.supabaseOrgId),
         name: projectName,
         dbPass: dbPass,
-        dbRegion: dbRegion,
+        dbRegion,
         dbSql: dbSql || '',
         dbPricingTierId: PRICING_TIER_PRODUCT_IDS.FREE,
-        configurationId: _store.configurationId,
         authSiteUrl: _store.selectedVercelProjectUrl,
       })
     } catch (error) {
@@ -287,7 +286,7 @@ const CreateProject = observer(() => {
             descriptionText="Select a region close to your users for the best performance."
           >
             {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i]
+              const label = Object.values(AWS_REGIONS)[i].displayName
               return (
                 <Listbox.Option
                   key={option}

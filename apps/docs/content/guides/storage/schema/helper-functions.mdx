@@ -17,7 +17,7 @@ Returns the name of a file. For example, if your file is stored in `public/subfo
 This example demonstrates how you would allow any user to download a file called `favicon.ico`:
 
 ```sql
-create policy "Allow authenticated uploads"
+create policy "Allow public downloads"
 on storage.objects
 for select
 to public

@@ -2,7 +2,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 
@@ -34,13 +33,11 @@ export const useLoadBalancersQuery = <TData = LoadBalancersData>(
   { projectRef }: LoadBalancersVariables,
   { enabled = true, ...options }: UseQueryOptions<LoadBalancersData, LoadBalancersError, TData> = {}
 ) => {
-  const { data } = useProjectDetailQuery({ ref: projectRef })
-
   return useQuery<LoadBalancersData, LoadBalancersError, TData>(
     replicaKeys.loadBalancers(projectRef),
     ({ signal }) => getLoadBalancers({ projectRef }, signal),
     {
-      enabled: enabled && data?.is_read_replicas_enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

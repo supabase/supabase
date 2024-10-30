@@ -1,16 +1,5 @@
+import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  IconEdit,
-  IconMoreVertical,
-  IconSearch,
-  IconTrash,
-  Input,
-} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
@@ -22,7 +11,16 @@ import {
   EnumeratedType,
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Input,
+} from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
@@ -31,7 +29,7 @@ import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 const EnumeratedTypes = () => {
   const { project } = useProjectContext()
   const [search, setSearch] = useState('')
-  const [selectedSchema, setSelectedSchema] = useState('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
@@ -45,12 +43,13 @@ const EnumeratedTypes = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const enumeratedTypes =
+  const enumeratedTypes = (data ?? []).filter((type) => type.enums.length > 0)
+  const filteredEnumeratedTypes =
     search.length > 0
-      ? (data ?? []).filter(
+      ? enumeratedTypes.filter(
           (x) => x.schema === selectedSchema && x.name.toLowerCase().includes(search.toLowerCase())
         )
-      : (data ?? []).filter((x) => x.schema === selectedSchema)
+      : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
   const protectedSchemas = (schemas ?? []).filter((schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
@@ -60,26 +59,25 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <SchemaSelector
-            className="w-[260px]"
-            size="small"
-            showError={false}
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={setSelectedSchema}
-          />
-          <Input
-            size="small"
-            value={search}
-            className="w-64"
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for a type"
-            icon={<IconSearch size={14} />}
-          />
-        </div>
+      <div className="flex items-center gap-2 flex-wrap">
+        <SchemaSelector
+          className="w-[260px]"
+          size="small"
+          showError={false}
+          selectedSchemaName={selectedSchema}
+          onSelectSchema={setSelectedSchema}
+        />
+        <Input
+          size="small"
+          value={search}
+          className="w-64"
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search for a type"
+          icon={<Search size={14} />}
+        />
+
         {!isLocked && (
-          <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
+          <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
             Create type
           </Button>
         )}
@@ -103,7 +101,7 @@ const EnumeratedTypes = () => {
           ]}
           body={
             <>
-              {enumeratedTypes.length === 0 && search.length === 0 && (
+              {filteredEnumeratedTypes.length === 0 && search.length === 0 && (
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No enumerated types created yet</p>
@@ -113,7 +111,7 @@ const EnumeratedTypes = () => {
                   </Table.td>
                 </Table.tr>
               )}
-              {enumeratedTypes.length === 0 && search.length > 0 && (
+              {filteredEnumeratedTypes.length === 0 && search.length > 0 && (
                 <Table.tr>
                   <Table.td colSpan={4}>
                     <p className="text-sm text-foreground">No results found</p>
@@ -123,8 +121,8 @@ const EnumeratedTypes = () => {
                   </Table.td>
                 </Table.tr>
               )}
-              {enumeratedTypes.length > 0 &&
-                enumeratedTypes.map((type) => (
+              {filteredEnumeratedTypes.length > 0 &&
+                filteredEnumeratedTypes.map((type) => (
                   <Table.tr key={type.id}>
                     <Table.td className="w-20">
                       <p className="w-20 truncate">{type.schema}</p>
@@ -136,23 +134,21 @@ const EnumeratedTypes = () => {
                         <div className="flex justify-end items-center space-x-2">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
-                                <IconMoreVertical />
-                              </Button>
+                              <Button type="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-32">
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedTypeToEdit(type)}
                               >
-                                <IconEdit size="tiny" />
+                                <Edit size={14} />
                                 <p>Update type</p>
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="space-x-2"
                                 onClick={() => setSelectedTypeToDelete(type)}
                               >
-                                <IconTrash stroke="red" size="tiny" />
+                                <Trash size={14} />
                                 <p>Delete type</p>
                               </DropdownMenuItem>
                             </DropdownMenuContent>

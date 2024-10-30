@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
 import { StyleSheet, View, Alert } from 'react-native'
-import { Button, Input } from 'react-native-elements'
+import { Button, Input } from '@rneui/themed'
 import { Session } from '@supabase/supabase-js'
 import Avatar from './Avatar'
 
@@ -81,13 +81,13 @@ export default function Account({ session }: { session: Session }) {
   return (
     <View>
       <View>
-        <Avatar 
+        <Avatar
           size={200}
-          url={avatarUrl} 
+          url={avatarUrl}
           onUpload={(url: string) => {
             setAvatarUrl(url)
             updateProfile({ username, website, avatar_url: url })
-          }} 
+          }}
         />
       </View>
       <View style={[styles.verticallySpaced, styles.mt20]}>

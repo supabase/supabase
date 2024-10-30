@@ -1,36 +1,46 @@
-import {
-  genQueryParams,
-  genSingleLogQuery,
+import { useQuery } from '@tanstack/react-query'
+import { LOGS_TABLES, genQueryParams } from 'components/interfaces/Settings/Logs/Logs.constants'
+import type {
   LogData,
   Logs,
   LogsEndpointParams,
-  LOGS_TABLES,
   QueryType,
-} from 'components/interfaces/Settings/Logs'
-import { API_URL } from 'lib/constants'
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import { genSingleLogQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { get } from 'lib/common/fetch'
-import { useQuery } from '@tanstack/react-query'
+import { API_URL } from 'lib/constants'
 
 interface SingleLogHook {
-  logData: LogData | undefined
+  data: LogData | undefined
   error: string | Object | null
   isLoading: boolean
   refresh: () => void
 }
-function useSingleLog(
-  projectRef: string,
-  queryType?: QueryType,
-  paramsToMerge?: Partial<LogsEndpointParams>,
-  id?: string | null
-): SingleLogHook {
+
+type SingleLogParams = {
+  id?: string
+  projectRef: string
+  queryType?: QueryType
+  paramsToMerge?: Partial<LogsEndpointParams>
+}
+function useSingleLog({
+  projectRef,
+  id,
+  queryType,
+  paramsToMerge,
+}: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
   const sql = id && table ? genSingleLogQuery(table, id) : ''
+
   const params: LogsEndpointParams = { ...paramsToMerge, project: projectRef, sql }
+
   const endpointUrl = `${API_URL}/projects/${projectRef}/analytics/endpoints/logs.all?${genQueryParams(
     params as any
   )}`
 
-  const enabled = Boolean(id && table)
+  const isWarehouseQuery = queryType === 'warehouse'
+  // Warehouse queries are handled differently
+  const enabled = Boolean(id && table && !isWarehouseQuery)
 
   const {
     data,
@@ -39,7 +49,7 @@ function useSingleLog(
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', projectRef, 'log', id],
+    ['projects', projectRef, 'single-log', id, queryType],
     ({ signal }) => get(endpointUrl, { signal }) as Promise<Logs>,
     {
       enabled,
@@ -50,8 +60,9 @@ function useSingleLog(
   )
 
   let error: null | string | object = rcError ? (rcError as any).message : null
+  const result = data?.result ? data.result[0] : undefined
   return {
-    logData: data?.result ? data.result[0] : undefined,
+    data: result,
     isLoading: (enabled && isLoading) || isRefetching,
     error,
     refresh: () => refetch(),

@@ -1,12 +1,12 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
-type ContentBase = {
-  id?: string
+export type ContentBase = {
+  id: string
   name: string
   description?: string
   visibility: 'user' | 'project' | 'org' | 'public'
@@ -34,6 +34,8 @@ export type Content = ContentBase &
         content: LogSqlSnippets.Content
       }
   )
+
+export type ContentType = 'sql' | 'report' | 'log_sql'
 
 export async function getContent(
   projectRef: string | undefined,
@@ -72,15 +74,3 @@ export const useContentQuery = <TData = ContentData>(
     ({ signal }) => getContent(projectRef, signal),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
-
-export const useContentPrefetch = (projectRef: string | undefined) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(contentKeys.list(projectRef), ({ signal }) =>
-        getContent(projectRef, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -21,6 +21,7 @@ const SQLCard = ({ title, description, sql, onClick }: SQLCardProps) => {
       loading={loading}
       onClick={() => handleOnClick()}
       description={description}
+      className="xl:h-48 p-6"
     />
   )
 }

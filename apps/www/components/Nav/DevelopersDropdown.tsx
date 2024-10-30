@@ -1,11 +1,10 @@
-import React from 'react'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import { IconChevronRight } from 'ui'
 
-import Announcements from '~/data/Announcements.json'
 import { data as DevelopersData } from 'data/Developers'
+import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' assert { type: 'json' }
 
-type Props = {
+type LinkProps = {
   text: string
   description?: string
   url?: string
@@ -22,15 +21,15 @@ const DevelopersDropdown = () => (
             {column.label}
           </label>
           <ul className="flex flex-col gap-4">
-            {column.links.map(({ icon: Icon, ...link }: Props) => (
+            {column.links.map(({ icon: Icon, ...link }: LinkProps) => (
               <li key={link.text}>
                 <Link
                   href={link.url!}
                   className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
                 >
-                  {Icon && <Icon size={16} strokeWidth={1.2} />}
+                  {Icon && <Icon size={16} strokeWidth={1.3} />}
                   <span>{link.text}</span>
-                  <IconChevronRight
+                  <ChevronRight
                     strokeWidth={2}
                     className="w-3 -ml-1 transition-all will-change-transform -translate-x-1 opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
                   />
@@ -41,27 +40,27 @@ const DevelopersDropdown = () => (
         </div>
       ))}
     </div>
-    <div className="bg-overlay flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
+    <div className="bg-surface-75 flex flex-col w-[550px] xl:w-[480px] border-t xl:border-t-0 xl:border-l">
       <div className="flex-col gap-2 py-8 px-10">
         <Link
           href="/blog"
           className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
         >
           <span>Blog</span>
-          <IconChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
+          <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
         <ul className="flex flex-col gap-5">
-          {Announcements.map((announcement: any) => (
-            <li key={announcement.title}>
+          {blogPosts?.map((post) => (
+            <li key={post.title}>
               <Link
-                href={announcement.url}
+                href={post.url}
                 className="group flex flex-col focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
               >
                 <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">
-                  {announcement.title}
+                  {post.title}
                 </p>
                 <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed !mb-0 group-hover:text-foreground-light group-focus-visible:text-foreground-light">
-                  {announcement.description}
+                  {post.description}
                 </p>
               </Link>
             </li>

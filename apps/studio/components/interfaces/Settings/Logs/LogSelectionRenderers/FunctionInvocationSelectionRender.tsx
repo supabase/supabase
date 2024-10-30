@@ -1,6 +1,6 @@
 import { filterFunctionsRequestResponse } from 'lib/logs'
-import { PreviewLogData } from '..'
 import { LOGS_TAILWIND_CLASSES } from '../Logs.constants'
+import type { PreviewLogData } from '../Logs.types'
 import {
   jsonSyntaxHighlight,
   ResponseCodeFormatter,
@@ -29,6 +29,7 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         <SelectionDetailedRow label="Method" value={method} />
         <SelectionDetailedTimestampRow value={log.timestamp} />
         <SelectionDetailedRow label="Execution Time" value={`${executionTimeMs}ms`} />
+        <SelectionDetailedRow label="Execution ID" value={metadata.execution_id} />
         <SelectionDetailedRow label="Deployment ID" value={deploymentId} />
         <SelectionDetailedRow label="Log ID" value={log.id} />
         {requestUrl !== undefined && (
@@ -39,8 +40,8 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         )}
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-foreground mb-4">Request Metadata</h3>
-        <pre className="text-sm syntax-highlight overflow-x-auto">
+        <h3 className="text-foreground-light mb-4 font-mono text-sm uppercase">Request Metadata</h3>
+        <pre className="text-sm syntax-highlight overflow-x-auto mb-4">
           <div
             className="text-wrap"
             dangerouslySetInnerHTML={{
@@ -50,8 +51,10 @@ const FunctionInvocationSelectionRender = ({ log }: { log: PreviewLogData }) => 
         </pre>
       </div>
       <div className={`${LOGS_TAILWIND_CLASSES.log_selection_x_padding}`}>
-        <h3 className="text-lg text-foreground mb-4">Response Metadata</h3>
-        <pre className="text-sm syntax-highlight overflow-x-auto">
+        <h3 className="text-foreground-light mb-4 font-mono text-sm uppercase">
+          Response Metadata
+        </h3>
+        <pre className="text-sm syntax-highlight overflow-x-auto mb-4">
           <div
             dangerouslySetInnerHTML={{
               __html: response ? jsonSyntaxHighlight(filterFunctionsRequestResponse(response)) : '',

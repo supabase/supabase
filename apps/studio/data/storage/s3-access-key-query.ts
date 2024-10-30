@@ -1,25 +1,26 @@
-import { useQuery } from '@tanstack/react-query'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
+import { get, handleError } from 'data/fetchers'
+import { ResponseError } from 'types'
 import { storageCredentialsKeys } from './s3-access-key-keys'
-import { get } from 'data/fetchers'
 
-type FetchStorageCredentials = {
-  projectRef?: string
-}
-async function fetchStorageCredentials({ projectRef }: FetchStorageCredentials) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+type StorageCredentialsVariables = { projectRef?: string }
 
-  const res = await get('/platform/storage/{ref}/credentials', {
-    params: {
-      path: {
-        ref: projectRef,
-      },
-    },
+async function fetchStorageCredentials(
+  { projectRef }: StorageCredentialsVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+
+  const { data, error } = await get('/platform/storage/{ref}/credentials', {
+    params: { path: { ref: projectRef } },
+    signal,
   })
 
+  if (error) handleError(error)
+
   // Generated types by openapi are wrong so we need to cast it.
-  return res.data as any as {
+  return data as unknown as {
     data: {
       id: string
       created_at: string
@@ -29,17 +30,14 @@ async function fetchStorageCredentials({ projectRef }: FetchStorageCredentials) 
   }
 }
 
-type StorageCredentialsQuery = {
-  projectRef?: string
-}
-export function useStorageCredentialsQuery({ projectRef }: StorageCredentialsQuery) {
-  const keys = storageCredentialsKeys.credentials(projectRef)
+export type StorageCredentialsData = Awaited<ReturnType<typeof fetchStorageCredentials>>
 
-  const query = useQuery({
-    queryKey: keys,
-    queryFn: () => fetchStorageCredentials({ projectRef }),
-    enabled: projectRef !== undefined,
-  })
-
-  return query
-}
+export const useStorageCredentialsQuery = <TData = StorageCredentialsData>(
+  { projectRef }: StorageCredentialsVariables,
+  { enabled = true, ...options }: UseQueryOptions<StorageCredentialsData, ResponseError, TData> = {}
+) =>
+  useQuery<StorageCredentialsData, ResponseError, TData>(
+    storageCredentialsKeys.credentials(projectRef),
+    ({ signal }) => fetchStorageCredentials({ projectRef }, signal),
+    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+  )

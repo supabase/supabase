@@ -1,8 +1,15 @@
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
+import { databaseKeys } from './keys'
 
-export const getEntityDefinitionsQuery = (limit = 100) => {
+export const getEntityDefinitionsQuery = ({
+  schemas,
+  limit = 100,
+}: {
+  schemas: string[]
+  limit?: number
+}) => {
   const sql = /* SQL */ `
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
@@ -25,13 +32,7 @@ with records as (
         'create materialized view ', concat(nc.nspname, '.', c.relname), ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
-      when 'f' then pg_temp.pg_get_tabledef(
-        concat(nc.nspname),
-        concat(c.relname),
-        false,
-        'FKEYS_INTERNAL',
-        'NO_TRIGGERS'
-      )
+      when 'f' then concat('create foreign table ', nc.nspname, '.', c.relname, ' ( ... )')
       when 'p' then pg_temp.pg_get_tabledef(
         concat(nc.nspname),
         concat(c.relname),
@@ -54,7 +55,7 @@ with records as (
       )
       or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
     )
-    and nc.nspname = 'public'
+    and nc.nspname IN (${schemas.map((schema) => `'${schema}'`).join(', ')})
   order by c.relname asc
   limit ${limit}
   offset 0
@@ -78,29 +79,34 @@ export type EntityDefinitionsVariables = {
   limit?: number
   projectRef?: string
   connectionString?: string
+  schemas: string[]
 }
 
 type EntityDefinition = { id: number; sql: string }
 export type EntityDefinitionsData = EntityDefinition[]
-export type EntityDefinitionsError = unknown
+export type EntityDefinitionsError = ExecuteSqlError
 
 export const useEntityDefinitionsQuery = <
   TData extends EntityDefinitionsData = EntityDefinitionsData,
 >(
-  { limit, projectRef, connectionString }: EntityDefinitionsVariables,
-  options: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
+  { schemas, limit, projectRef, connectionString }: EntityDefinitionsVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ExecuteSqlData, EntityDefinitionsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getEntityDefinitionsQuery(limit),
-      queryKey: ['entity-definitions'],
+      sql: getEntityDefinitionsQuery({ schemas, limit }),
+      queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
     },
     {
       select(data) {
         return data.result[0].data.definitions
       },
+      enabled: enabled && schemas.length > 0,
       ...options,
     }
   )

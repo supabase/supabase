@@ -10,7 +10,7 @@
     "std/server": "https://deno.land/std@0.177.0/http/server.ts",
     "stripe": "https://esm.sh/stripe@11.1.0?target=deno",
     "sift": "https://deno.land/x/sift@0.6.0/mod.ts",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2.7.1",
+    "@supabase/supabase-js": "jsr:@supabase/supabase-js@2",
     "postgres": "https://deno.land/x/postgres@v0.17.0/mod.ts",
     "puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts",
     "React": "https://esm.sh/react@18.2.0?deno-std=0.177.0",

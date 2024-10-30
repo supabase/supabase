@@ -1,5 +1,6 @@
 import type { PostgresMaterializedView } from '@supabase/postgres-meta'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
+
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { materializedViewKeys } from './keys'
@@ -59,3 +60,12 @@ export const useMaterializedViewQuery = <TData = MaterializedViewData>(
       ...options,
     }
   )
+
+export function prefetchMaterializedView(
+  client: QueryClient,
+  { projectRef, connectionString, id }: MaterializedViewVariables
+) {
+  return client.fetchQuery(materializedViewKeys.materializedView(projectRef, id), ({ signal }) =>
+    getMaterializedView({ id, projectRef, connectionString }, signal)
+  )
+}

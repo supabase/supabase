@@ -1,25 +1,27 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, Input, Modal } from 'ui'
+import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
   subscription?: OrgSubscription
+  projects: ProjectInfo[]
   onClose: (success?: boolean) => void
 }
 
-// [Joshen] For context - Exit survey is only when going to free plan from a paid plan
-const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProps) => {
+// [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
+const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
@@ -28,21 +30,32 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
   const [selectedReasons, dispatchSelectedReasons] = useReducer(reducer, [])
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
-  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
-    useSendDowngradeFeedbackMutation()
-  const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
-    useOrgSubscriptionUpdateMutation({
+  const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
+    {
       onError: (error) => {
+        resetCaptcha()
         toast.error(`Failed to downgrade project: ${error.message}`)
       },
-    })
+    }
+  )
+  const { mutateAsync: sendExitSurvey, isLoading: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
-  const projectsWithComputeInstances =
-    subscription?.project_addons.filter((project) =>
-      project.addons.find((addon) => addon.type === 'compute_instance')
-    ) ?? []
-  const hasComputeInstance = projectsWithComputeInstances.length > 0
+  const projectsWithComputeDowngrade = projects.filter((project) => {
+    const computeSizesThatDoNotResultInComputeDowngrade = ['nano']
+
+    if (subscription?.nano_enabled === false) {
+      computeSizesThatDoNotResultInComputeDowngrade.push('micro')
+    }
+
+    return !computeSizesThatDoNotResultInComputeDowngrade.includes(project.infra_compute_size!)
+  })
+
+  const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
+
+  const willPlanDowngradeHappenImmediately =
+    subscription?.billing_via_partner === false || subscription?.billing_partner !== 'fly'
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -76,31 +89,35 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
 
-    try {
-      await updateOrgSubscription({ slug, tier: 'tier_free' })
-      resetCaptcha()
-    } finally {
-    }
-
-    try {
-      await sendExitSurvey({
-        orgSlug: slug,
-        reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
-        message,
-        exitAction: 'downgrade',
-      })
-    } finally {
-    }
-
-    toast.success(
-      hasComputeInstance
-        ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
-        : 'Successfully downgraded organization to the free plan',
-      { duration: hasComputeInstance ? 8000 : 4000 }
+    updateOrgSubscription(
+      { slug, tier: 'tier_free' },
+      {
+        onSuccess: async () => {
+          resetCaptcha()
+          try {
+            await sendExitSurvey({
+              orgSlug: slug,
+              reasons: selectedReasons.reduce((a, b) => `${a}- ${b}\n`, ''),
+              message,
+              exitAction: 'downgrade',
+            })
+          } catch (error) {
+            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
+          } finally {
+            toast.success(
+              willPlanDowngradeHappenImmediately
+                ? hasProjectsWithComputeDowngrade
+                  ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+                  : 'Successfully downgraded organization to the Free Plan'
+                : 'Your organization is scheduled for the downgrade at the end of your current billing cycle',
+              { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
+            )
+            onClose(true)
+            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+          }
+        },
+      }
     )
-
-    onClose(true)
-    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }
 
   return (
@@ -130,10 +147,10 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
         size="xlarge"
         visible={visible}
         onCancel={onClose}
-        header="We're sad that you're leaving"
+        header="Help us improve."
       >
         <Modal.Content>
-          <div className="py-6 space-y-4">
+          <div className="space-y-4">
             <p className="text-sm text-foreground-light">
               We always strive to improve Supabase as much as we can. Please let us know the reasons
               you are canceling your subscription so that we can improve in the future.
@@ -178,25 +195,25 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
                 />
               </div>
             </div>
-            {hasComputeInstance && (
+            {hasProjectsWithComputeDowngrade && (
               <Alert
                 withIcon
                 variant="warning"
-                title={`${projectsWithComputeInstances.length} of your project${
-                  projectsWithComputeInstances.length > 1 ? 's' : ''
-                } will be restarted upon hitting confirm`}
+                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted ${willPlanDowngradeHappenImmediately ? 'upon clicking confirm' : 'once the downgrade takes effect at the end of your current billing cycle'}`}
               >
-                This is due to changes in compute instances from the downgrade. Affected project(s)
-                include {projectsWithComputeInstances.map((project) => project.name).join(', ')}.
+                This is due to changes in compute instances from the downgrade. Affected projects
+                include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
               </Alert>
             )}
           </div>
         </Modal.Content>
 
         <div className="flex items-center justify-between border-t px-4 py-4">
-          <p className="text-xs text-foreground-lighter">
-            The unused amount for the remaining of your billing cycle will be refunded as credits
-          </p>
+          {willPlanDowngradeHappenImmediately && (
+            <p className="text-xs text-foreground-lighter">
+              The unused amount for the remaining of your billing cycle will be refunded as credits
+            </p>
+          )}
           <div className="flex items-center space-x-2">
             <Button type="default" onClick={() => onClose()}>
               Cancel

@@ -1,24 +1,30 @@
 import { useSearchParamsShallow } from 'common'
 import { xor } from 'lodash'
-import { Children, useEffect, useRef, type PropsWithChildren } from 'react'
-import { type Tabs, type TabsProps } from 'ui'
+import { Children, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
+import { type TabsProps } from 'ui'
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
 
 const LOCAL_STORAGE_KEY = 'supabase.ui-patterns.ComplexTabs.withQueryParams.v0'
+
+interface QueryParamsProps {
+  queryGroup?: string
+}
 
 /**
  * Wraps the basic `Tabs` component from the `ui` library so it stores
  * selection state in query params.
  */
 const withQueryParams =
-  (Component: typeof Tabs) =>
+  <Props extends PropsWithChildren<TabsProps>>(
+    Component: FC<Omit<Props, 'children' | 'queryGroup' | 'onClick'>>
+  ) =>
   ({
     children: childrenUnvalidated,
     queryGroup: queryGroupTemp,
     onClick,
     ...props
-  }: PropsWithChildren<TabsProps & { queryGroup?: string }>) => {
+  }: Props & QueryParamsProps) => {
     const children = Children.toArray(childrenUnvalidated)
     const tabIdsTemp = children
       .map((child) => !!child && typeof child === 'object' && 'props' in child && child.props.id)
@@ -116,3 +122,4 @@ const withQueryParams =
   }
 
 export { withQueryParams }
+export type { QueryParamsProps }

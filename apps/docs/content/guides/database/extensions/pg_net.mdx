@@ -309,9 +309,9 @@ order by "created" desc;
 
 ## Configuration
 
-<Admonition type="note" label="Only Self-Hosted Deployments can Modify Configuration Variables">
+<Admonition type="note" label="Must be on pg_net v0.10.0 or above to reconfigure ">
 
-See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for self-hosting instructions.
+Supabase supports reconfiguring pg*net starting from v0.10.0+. For the latest release, initiate a postgres upgrade in the [Infrastructure Settings](https://supabase.com/dashboard/project/*/settings/infrastructure).
 
 </Admonition>
 
@@ -329,18 +329,11 @@ where "name" like 'pg_net%';
 
 ### Alter settings
 
-Note, that doing `ALTER SYSTEM` requires SUPERUSER but on PostgreSQL >= 15, you can do:
+Change variables:
 
 ```sql
-grant alter system on parameter pg_net.ttl to <role>;
-grant alter system on parameter pg_net.batch_size to <role>;
-```
-
-Then variables can be changed:
-
-```sql
-alter system set pg_net.ttl to '1 hour'
-alter system set pg_net.batch_size to 500;
+alter role "postgres" set pg_net.ttl to '24 hour';
+alter role "postgres" set pg_net.batch_size to 500;
 ```
 
 Then reload the settings and restart the `pg_net` background worker with:

@@ -16,8 +16,8 @@ export async function getBranch({ id }: BranchVariables, signal?: AbortSignal) {
     params: { path: { branch_id: id } },
     signal,
   })
-  if (error) handleError(error)
 
+  if (error) handleError(error)
   return data
 }
 

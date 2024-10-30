@@ -1,18 +1,18 @@
-import { IconGitCommit } from 'ui'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import { createAppAuth } from '@octokit/auth-app'
+import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+import { Octokit as OctokitRest } from '@octokit/rest'
 import dayjs from 'dayjs'
+import { GitCommit } from 'lucide-react'
+import { GetServerSideProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { NextSeo } from 'next-seo'
+import Link from 'next/link'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import { deletedDiscussions } from '~/lib/changelog.utils'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { createAppAuth } from '@octokit/auth-app'
-import { Octokit as OctokitRest } from '@octokit/rest'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
-import { GetServerSideProps } from 'next'
-import Link from 'next/link'
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
-import { deletedDiscussions } from '~/lib/changelog.utils'
 
 export type Discussion = {
   id: string
@@ -88,9 +88,9 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     28108378,
   ]
 
-  const releases = await (
-    await fetchGitHubReleases()
-  ).filter((release) => release.id && oldReleases.includes(release.id))
+  const releases = (await fetchGitHubReleases()).filter(
+    (release) => release.id && oldReleases.includes(release.id)
+  )
 
   // uses the graphql api
   async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
@@ -165,21 +165,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process discussions
   const formattedDiscussions = await Promise.all(
     discussions.map(async (item: any): Promise<any> => {
-      const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
-      // Find a date rewrite for the current item's title
-      const dateRewrite = deletedDiscussions.find((rewrite) => {
-        return item.title && rewrite.title && item.title.includes(rewrite.title)
-      })
+      try {
+        const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+        // Find a date rewrite for the current item's title
+        const dateRewrite = deletedDiscussions.find((rewrite) => {
+          return item.title && rewrite.title && item.title.includes(rewrite.title)
+        })
 
-      // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
-      const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
+        // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
+        const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
 
-      return {
-        ...item,
-        source: discussionsMdxSource,
-        type: 'discussion',
-        created_at,
-        url: item.url,
+        return {
+          ...item,
+          source: discussionsMdxSource,
+          type: 'discussion',
+          created_at,
+          url: item.url,
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
@@ -187,21 +191,25 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
   // Process releases
   const formattedReleases = await Promise.all(
     releases.map(async (item: any): Promise<any> => {
-      const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      try {
+        const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
 
-      return {
-        ...item,
-        source: releasesMdxSource,
-        type: 'release',
-        created_at: item.created_at,
-        title: item.name ?? '',
-        url: item.html_url ?? '',
+        return {
+          ...item,
+          source: releasesMdxSource,
+          type: 'release',
+          created_at: item.created_at,
+          title: item.name ?? '',
+          url: item.html_url ?? '',
+        }
+      } catch (err) {
+        console.error(`Problem processing discussion MDX: ${err}`)
       }
     })
   )
 
   // Combine discussions and releases into a single array of entries
-  const combinedEntries = formattedDiscussions.concat(formattedReleases)
+  const combinedEntries = formattedDiscussions.concat(formattedReleases).filter(Boolean)
 
   const sortedCombinedEntries = combinedEntries.sort((a, b) => {
     const dateA = dayjs(a.created_at)
@@ -273,7 +281,7 @@ function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
                       >
                         <div className="flex w-full items-baseline gap-6">
                           <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
-                            <IconGitCommit size={14} strokeWidth={1.5} />
+                            <GitCommit size={14} strokeWidth={1.5} />
                           </div>
                           <div className="flex w-full flex-col gap-1">
                             {entry.title && (

@@ -1,3 +1,4 @@
+import { Plus } from 'lucide-react'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -5,9 +6,9 @@ import { useRouter } from 'next/router'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import CardButton from 'components/ui/CardButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Button, IconPlus } from 'ui'
+import { Button } from 'ui'
 
 const Header = () => {
   return (
@@ -75,7 +76,7 @@ const GenericOrganizationPage: NextPage = () => {
                 </p>
               </div>
               <div>
-                <Button asChild icon={<IconPlus />}>
+                <Button asChild icon={<Plus />}>
                   <Link href="/new">New organization</Link>
                 </Button>
               </div>

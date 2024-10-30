@@ -1,13 +1,15 @@
 import type { PostgresColumn } from '@supabase/postgres-meta'
-import type { SupaRow } from 'components/grid'
-import type { Dictionary } from 'types'
-import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
-import type { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { SupaRow } from 'components/grid/types'
+import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
+import type { Dictionary } from 'types'
 import { proxy, useSnapshot } from 'valtio'
 
-type ForeignKey = {
-  foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
+export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
+
+type ForeignKeyState = {
+  foreignKey: ForeignKey
   row: Dictionary<any>
   column: PostgresColumn
 }
@@ -18,10 +20,10 @@ export type SidePanel =
   | { type: 'column'; column?: PostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate' }
   | { type: 'schema'; mode: 'new' | 'edit' }
-  | { type: 'json'; jsonValue: JsonEditValue }
+  | { type: 'json'; jsonValue: EditValue }
   | {
       type: 'foreign-row-selector'
-      foreignKey: ForeignKey
+      foreignKey: ForeignKeyState
     }
   | { type: 'csv-import' }
 
@@ -54,16 +56,16 @@ export type UIState =
 
 export const createTableEditorState = () => {
   const state = proxy({
-    selectedSchemaName: 'public',
-    setSelectedSchemaName: (schemaName: string) => {
-      state.selectedSchemaName = schemaName
+    enforceExactCount: false,
+    setEnforceExactCount: (value: boolean) => {
+      state.enforceExactCount = value
     },
 
     page: 1,
     setPage: (page: number) => {
       state.page = page
     },
-    rowsPerPage: 100,
+    rowsPerPage: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
     setRowsPerPage: (rowsPerPage: number) => {
       state.rowsPerPage = rowsPerPage
     },
@@ -165,7 +167,7 @@ export const createTableEditorState = () => {
     },
 
     /* Misc */
-    onExpandJSONEditor: (jsonValue: JsonEditValue) => {
+    onExpandJSONEditor: (jsonValue: EditValue) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'json', jsonValue },
@@ -177,7 +179,7 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'cell', value: { column, row } },
       }
     },
-    onEditForeignKeyColumnValue: (foreignKey: ForeignKey) => {
+    onEditForeignKeyColumnValue: (foreignKey: ForeignKeyState) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'foreign-row-selector', foreignKey },

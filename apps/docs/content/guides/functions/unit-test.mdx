@@ -13,7 +13,7 @@ Deno has a built-in test runner that you can use for testing JavaScript or TypeS
 
 ## Folder structure
 
-We recommend creating your testing in a `supabase/tests` directory, using the same name as the Function followed by `-test.ts`:
+We recommend creating your testing in a `supabase/functions/tests` directory, using the same name as the Function followed by `-test.ts`:
 
 ```bash
 └── supabase
@@ -34,13 +34,11 @@ The following script is a good example to get started with testing your Edge Fun
 
 ```typescript function-one-test.ts
 // Import required libraries and modules
-import {
-  assert,
-  assertExists,
-  assertEquals,
-} from 'https://deno.land/std@0.192.0/testing/asserts.ts'
-import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0'
-import { delay } from 'https://deno.land/x/delay@v0.2.0/mod.ts'
+import { assert, assertEquals } from 'https://deno.land/std@0.192.0/testing/asserts.ts'
+import { createClient, SupabaseClient } from 'jsr:@supabase/supabase-js@2'
+
+// Will load the .env file to Deno.env
+import 'https://deno.land/x/dotenv@v3.2.2/load.ts'
 
 // Set up the configuration for the Supabase client
 const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
@@ -135,19 +133,19 @@ To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let'
 
    ```bash
    # creates the file
-   touch .env.local
+   touch .env
    # adds the SUPABASE_URL secret
-   echo "SUPABASE_URL=http://localhost:54321" >> .env.local
+   echo "SUPABASE_URL=http://localhost:54321" >> .env
    # adds the SUPABASE_ANON_KEY secret
-   echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env.local
+   echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env
    # Alternatively, you can open it in your editor:
-   open .env.local
+   open .env
    ```
 
 4. To run the tests, use the following command in your terminal:
 
    ```bash
-   deno test --allow-all supabase/functions/function-one-test.ts --env-file .env.local
+   deno test --allow-all supabase/functions/tests/function-one-test.ts
    ```
 
 ## Resources

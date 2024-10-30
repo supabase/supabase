@@ -1,10 +1,11 @@
 import { noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Alert, Button, Modal } from 'ui'
+import { StorageItem } from '../Storage.types'
 
 interface ConfirmDeleteModalProps {
   visible: boolean
-  selectedItemsToDelete: any[]
+  selectedItemsToDelete: StorageItem[]
   onSelectCancel: () => void
   onSelectDelete: () => void
 }
@@ -58,11 +59,9 @@ const ConfirmDeleteModal = ({
       }
     >
       <Modal.Content>
-        <div className="my-4">
-          <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
-            {description}
-          </Alert>
-        </div>
+        <Alert withIcon variant="danger" title={`This action cannot be undone.`}>
+          {description}
+        </Alert>
       </Modal.Content>
     </Modal>
   )

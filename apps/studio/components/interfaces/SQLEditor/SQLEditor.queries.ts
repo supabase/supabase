@@ -220,7 +220,7 @@ insert into public.countries (name,iso2,iso3,local_name,continent) values
   ('Central African Republic','CF','CAF','Centrafrique','Africa'),
   ('Chad','TD','TCD','Tchad/Tshad','Africa'),
   ('Chile','CL','CHL','Chile','South America'),
-  ('China','CN','CHN','Zhongquo','Asia'),
+  ('China','CN','CHN','Zhongguo','Asia'),
   ('Christmas Island','CX','CXR','Christmas Island','Oceania'),
   ('Cocos (Keeling) Islands','CC','CCK','Cocos (Keeling) Islands','Oceania'),
   ('Colombia','CO','COL','Colombia','South America'),
@@ -551,8 +551,9 @@ alter table public.messages
 
 -- inserts a row into public.users and assigns roles
 create function public.handle_new_user()
-returns trigger as
-$$
+returns trigger
+set search_path = ''
+as $$
   declare is_admin boolean;
   begin
     insert into public.users (id, username)
@@ -676,8 +677,9 @@ create policy "Can update own user data." on users
 * This trigger automatically creates a user entry when a new user signs up via Supabase Auth.
 */
 create function public.handle_new_user()
-returns trigger as
-$$
+returns trigger
+set search_path = ''
+as $$
   begin
     insert into public.users (id, full_name, avatar_url)
     values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
@@ -693,7 +695,7 @@ create trigger on_auth_user_created
 
 /**
 * CUSTOMERS
-* Note: this is a private table that contains a mapping of user IDs to Strip customer IDs.
+* Note: this is a private table that contains a mapping of user IDs to Stripe customer IDs.
 */
 create table customers (
   -- UUID from auth.users
@@ -846,7 +848,9 @@ create policy "Users can update own profile." on profiles
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
 -- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_user()
-returns trigger as $$
+returns trigger
+set search_path = ''
+as $$
 begin
   insert into public.profiles (id, full_name, avatar_url)
   values (new.id, new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'avatar_url');
@@ -1234,8 +1238,20 @@ $$;
     id: 24,
     type: 'template',
     title: 'Install dbdev',
-    description: 'dbdev is a client for installing 3rd party packages into your database.',
+    description:
+      'dbdev is a client for installing Trusted Language Extensions (TLE) into your database.',
     sql: `
+/*---------------------
+---- install dbdev ----
+-----------------------
+Requires:
+  - pg_tle: https://github.com/aws/pg_tle
+  - pgsql-http: https://github.com/pramsey/pgsql-http
+
+Warning:
+Restoring a logical backup of a database with a TLE installed can fail.
+For this reason, dbdev should only be used with databases with physical backups enabled.
+*/
 create extension if not exists http with schema extensions;
 create extension if not exists pg_tle;
 select pgtle.uninstall_extension_if_exists('supabase-dbdev');
@@ -1277,12 +1293,12 @@ create extension "supabase-dbdev";
     type: 'template',
     title: 'Large objects',
     description: 'List large objects (tables/indexes) in your database.',
-    sql: `SELECT 
+    sql: `SELECT
     SCHEMA_NAME,
     relname,
     table_size
   FROM
-    (SELECT 
+    (SELECT
       pg_catalog.pg_namespace.nspname AS SCHEMA_NAME,
       relname,
       pg_relation_size(pg_catalog.pg_class.oid) AS table_size
@@ -1361,12 +1377,12 @@ grant all
 
 revoke execute
   on function public.hook_mfa_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.mfa_failed_verification_attempts
-  from authenticated, anon;
-  
+  from authenticated, anon, public;
+
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {
@@ -1433,12 +1449,12 @@ grant all
 
 revoke execute
   on function public.hook_password_verification_attempt
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 revoke all
   on table public.password_failed_verification_attempts
-  from authenticated, anon;
-  
+  from authenticated, anon, public;
+
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
   {
@@ -1487,7 +1503,7 @@ grant execute
 
 revoke execute
   on function public.custom_access_token_hook
-  from authenticated, anon;
+  from authenticated, anon, public;
 
 grant usage on schema public to supabase_auth_admin;`.trim(),
   },
@@ -1511,7 +1527,7 @@ end;
 $$;
 -- Permissions for the hook
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
-revoke execute on function public.custom_access_token_hook from authenticated, anon;
+revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
   },
 ]

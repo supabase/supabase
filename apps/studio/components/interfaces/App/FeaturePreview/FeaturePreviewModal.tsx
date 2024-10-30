@@ -1,65 +1,25 @@
-import { useTelemetryProps } from 'common'
-import { FlaskConical } from 'lucide-react'
+import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconEye, IconEyeOff, Modal, ScrollArea, cn } from 'ui'
 
-import { useFlag } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAppStateSnapshot } from 'state/app-state'
-import APISidePanelPreview from './APISidePanelPreview'
-import CLSPreview from './CLSPreview'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
-import RLSAIAssistantPreview from './RLSAIAssistantPreview'
-import { SQLEditorAIAssistantPreview } from './SQLEditorAIAssistantPreview'
+import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const FeaturePreviewModal = () => {
-  const isAIConversational = useFlag('sqlEditorConversationalAi')
-
-  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      content: <APISidePanelPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-      name: 'Supabase Assistant for RLS policies',
-      content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-      name: 'Column-level privileges',
-      content: <CLSPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    },
-    // the user should only be able to see the panel for the AI assistant if the feature flag is true
-    ...(isAIConversational
-      ? [
-          {
-            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
-            name: 'SQL Editor Conversational Assistant ',
-            content: <SQLEditorAIAssistantPreview />,
-            discussionsUrl: 'https://github.com/orgs/supabase/discussions/21967',
-          },
-        ]
-      : []),
-  ]
-
-  const router = useRouter()
   const snap = useAppStateSnapshot()
-  const telemetryProps = useTelemetryProps()
   const featurePreviewContext = useFeaturePreviewContext()
+  const { mutate: sendEvent } = useSendEventMutation()
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+  const isNotReleased =
+    selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
@@ -75,15 +35,11 @@ const FeaturePreviewModal = () => {
 
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    Telemetry.sendEvent(
-      {
-        category: 'ui_feature_previews',
-        action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-        label: selectedFeatureKey,
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'ui_feature_previews',
+      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
+      label: selectedFeatureKey,
+    })
   }
 
   function handleCloseFeaturePreviewModal() {
@@ -102,7 +58,7 @@ const FeaturePreviewModal = () => {
       onCancel={handleCloseFeaturePreviewModal}
     >
       {FEATURE_PREVIEWS.length > 0 ? (
-        <div className="flex border-t">
+        <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
               {FEATURE_PREVIEWS.map((feature) => {
@@ -118,9 +74,9 @@ const FeaturePreviewModal = () => {
                     )}
                   >
                     {isEnabled ? (
-                      <IconEye size={14} strokeWidth={2} className="text-brand" />
+                      <Eye size={14} strokeWidth={2} className="text-brand" />
                     ) : (
-                      <IconEyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                      <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
                     )}
                     <p className="text-sm truncate" title={feature.name}>
                       {feature.name}
@@ -132,18 +88,27 @@ const FeaturePreviewModal = () => {
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
+                <p>{selectedFeature?.name}</p>
+                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+              </div>
+              <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
-                  <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
                       Give feedback
                     </Link>
                   </Button>
                 )}
-                <Button type="default" onClick={() => toggleFeature()}>
-                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                </Button>
+                {isNotReleased ? (
+                  <Button disabled type="default">
+                    Coming soon
+                  </Button>
+                ) : (
+                  <Button type="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+                  </Button>
+                )}
               </div>
             </div>
             {selectedFeature?.content}
@@ -158,7 +123,7 @@ const FeaturePreviewModal = () => {
               Have an idea for the dashboard? Let us know via Github Discussions!
             </p>
           </div>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
               target="_blank"

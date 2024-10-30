@@ -135,11 +135,11 @@ create or replace function get_boards_for_authenticated_user()
 returns setof bigint
 language sql
 security definer
-set search_path = public
+set search_path = ''
 stable
 as $$
     select board_id
-    from user_boards
+    from public.user_boards
     where user_id = auth.uid()
 $$;
 ```

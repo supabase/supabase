@@ -1,10 +1,9 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ReactNode, forwardRef } from 'react'
+import { ReactNode, forwardRef, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Admonition,
   Alert_Shadcn_,
   Button,
   Dialog,
@@ -22,6 +21,7 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
+import { Admonition } from './../admonition'
 import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
@@ -37,7 +37,7 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
   alert?: {
     base?: React.ComponentProps<typeof Alert_Shadcn_>
     title?: string
@@ -100,6 +100,10 @@ const TextConfirmModal = forwardRef<
       onConfirm()
     }
 
+    useEffect(() => {
+      if (confirmString) form.reset()
+    }, [confirmString])
+
     return (
       <Dialog
         open={visible}
@@ -144,7 +148,7 @@ const TextConfirmModal = forwardRef<
                 control={form.control}
                 name="confirmValue"
                 render={({ field }) => (
-                  <FormItem_Shadcn_>
+                  <FormItem_Shadcn_ className="flex flex-col gap-y-1">
                     <FormLabel_Shadcn_ {...label}>
                       Type <span className="text-foreground break-all">{confirmString}</span> to
                       confirm.
@@ -159,7 +163,7 @@ const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button size="medium" block type="default" disabled={loading}>
+                  <Button size="medium" block type="default" disabled={loading} onClick={onCancel}>
                     {cancelLabel}
                   </Button>
                 )}

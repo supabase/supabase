@@ -1,7 +1,7 @@
 import { CodeBlock } from 'ui'
 import Param from '~/components/Params'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import { Tabs, TabPanel } from '~/components/Tabs'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {
@@ -24,10 +24,10 @@ const ApiOperationSection = (props) => {
           <code className="text-md flex gap-4 text-md text-foreground-lighter break-all">
             <span
               className="
-                uppercase 
-                whitespace-nowrap 
-                bg-foreground text-background 
-                flex items-center justify-center 
+                uppercase
+                whitespace-nowrap
+                bg-foreground text-background
+                flex items-center justify-center
                 rounded-full font-mono font-medium text-xs px-2 py-0.5"
             >
               {operation.operation}

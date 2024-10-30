@@ -1,8 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { usageKeys } from './keys'
-import type { ResponseError } from 'types'
+
 import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
+import { usageKeys } from './keys'
 
 export type OrgUsageVariables = {
   orgSlug?: string
@@ -26,7 +27,7 @@ export async function getOrgUsage(
     },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 
@@ -42,6 +43,7 @@ export const useOrgUsageQuery = <TData = OrgUsageData>(
     ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
     {
       enabled: enabled && typeof orgSlug !== 'undefined',
+      staleTime: 1000 * 60 * 30, // 30 mins, underlying usage data only refreshes once an hour, so safe to cache for a while
       ...options,
     }
   )

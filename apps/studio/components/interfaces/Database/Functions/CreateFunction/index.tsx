@@ -1,17 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { useEffect, useState } from 'react'
-import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import z from 'zod'
 import { Plus, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import z from 'zod'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
@@ -25,8 +25,8 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Modal,
   Radio,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
@@ -34,7 +34,6 @@ import {
   Select_Shadcn_,
   Separator,
   Sheet,
-  ScrollArea,
   SheetContent,
   SheetFooter,
   SheetSection,
@@ -50,7 +49,7 @@ import { FunctionEditor } from './FunctionEditor'
 const FORM_ID = 'create-function-sidepanel'
 
 interface CreateFunctionProps {
-  func?: PostgresFunction
+  func?: DatabaseFunction
   visible: boolean
   setVisible: (value: boolean) => void
 }
@@ -82,6 +81,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
+  const language = form.watch('language')
 
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
     useDatabaseFunctionCreateMutation()
@@ -103,7 +103,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     if (isEditing) {
       updateDatabaseFunction(
         {
-          id: func.id,
+          func,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
@@ -256,7 +256,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in <code>plpgsql</code>.
+                            The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
@@ -269,6 +269,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       >
                         <FunctionEditor
                           field={field}
+                          language={language}
                           focused={focusedEditor}
                           setFocused={setFocusedEditor}
                         />
@@ -593,15 +594,32 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
   )
 }
 
+const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
+
 const FormFieldLanguage = () => {
   const { project } = useProjectContext()
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: enabledExtensions } = useDatabaseExtensionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select(data) {
+        return partition(data, (ext) => !isNull(ext.installed_version))[0]
+      },
+    }
+  )
 
-  const [enabledExtensions] = partition(data ?? [], (ext) => !isNull(ext.installed_version))
+  const allowedLanguages = useMemo(() => {
+    return ALL_ALLOWED_LANGUAGES.filter((lang) => {
+      if (lang.startsWith('pl')) {
+        return enabledExtensions?.find((ex) => ex.name === lang) !== undefined
+      }
+
+      return true
+    })
+  }, [enabledExtensions])
 
   return (
     <FormField_Shadcn_
@@ -614,15 +632,11 @@ const FormFieldLanguage = () => {
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
-              {enabledExtensions
-                .filter((ex) => {
-                  return ex.name.startsWith('pl')
-                })
-                .map((option) => (
-                  <SelectItem_Shadcn_ value={option.name} key={option.name}>
-                    {option.name}
-                  </SelectItem_Shadcn_>
-                ))}
+              {allowedLanguages.map((option) => (
+                <SelectItem_Shadcn_ value={option} key={option}>
+                  {option}
+                </SelectItem_Shadcn_>
+              ))}
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </FormItemLayout>

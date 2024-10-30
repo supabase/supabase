@@ -1,55 +1,36 @@
-import { useParams } from 'common'
-import toast from 'react-hot-toast'
-import { format } from 'sql-formatter'
-import { AiIconAnimation, Button } from 'ui'
+import { ExternalLink, Loader2 } from 'lucide-react'
+import Link from 'next/link'
 
+import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { useSqlEditor } from '../SQLEditor'
-import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
-import { DiffType } from '../SQLEditor.types'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { AiIconAnimation, Button } from 'ui'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
   id: string
   isExecuting?: boolean
+  isDisabled?: boolean
+  onDebug: () => void
+  isDebugging?: boolean
 }
 
-const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
+const UtilityTabResults = ({
+  id,
+  isExecuting,
+  isDisabled,
+  isDebugging,
+  onDebug,
+}: UtilityTabResultsProps) => {
   const { ref } = useParams()
-  const snap = useSqlEditorStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
   const organization = useSelectedOrganization()
+  const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const { sqlDiff, setDebugSolution, setAiInput, setSqlDiff, setSelectedDiffType } = useSqlEditor()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
-  const { data } = useEntityDefinitionsQuery(
-    {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-    },
-    { enabled: includeSchemaMetadata }
-  )
-
-  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-
-  const snippet = snap.snippets[id]
-  const result = snap.results[id]?.[0]
-  const isUtilityPanelCollapsed = (snippet?.splitSizes?.[1] ?? 0) === 0
-
+  const result = snapV2.results[id]?.[0]
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -59,12 +40,11 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     result?.error?.message?.includes('canceling statement due to statement timeout') ||
     result?.error?.message?.includes('upstream request timeout')
 
-  if (isUtilityPanelCollapsed) return null
-
   if (isExecuting) {
     return (
-      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Running...</p>
+      <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <Loader2 size={14} className="animate-spin" />
+        <p className="m-0 border-0 font-mono text-sm">Running...</p>
       </div>
     )
   } else if (result?.error) {
@@ -74,6 +54,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     const readReplicaError =
       state.selectedDatabaseId !== ref &&
       result.error.message.includes('in a read-only transaction')
+    const payloadTooLargeError = result.error.message.includes(
+      'Query is too large to be run via the SQL Editor'
+    )
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
@@ -104,7 +87,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div className="">
+            <div className="flex flex-col gap-y-1">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
                   <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
@@ -112,15 +95,34 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                   </pre>
                 ))
               ) : (
-                <>
-                  <p className="font-mono text-sm">Error: {result.error?.message}</p>
-                  {readReplicaError && (
-                    <p className="text-sm text-foreground-light">
-                      Note: Read replicas are for read only queries. Run write queries on the
-                      primary database instead.
-                    </p>
-                  )}
-                </>
+                <p className="font-mono text-sm tracking-tight">Error: {result.error?.message}</p>
+              )}
+              {result.autoLimit && (
+                <p className="text-sm text-foreground-light">
+                  Note: A limit of {result.autoLimit} was applied to your query. If this was the
+                  cause of a syntax error, try selecting "No limit" instead and re-run the query.
+                </p>
+              )}
+              {readReplicaError && (
+                <p className="text-sm text-foreground-light">
+                  Note: Read replicas are for read only queries. Run write queries on the primary
+                  database instead.
+                </p>
+              )}
+              {payloadTooLargeError && (
+                <p className="text-sm text-foreground-light flex items-center gap-x-1">
+                  Run this query by{' '}
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/project/${ref}/settings/database`}
+                    className="underline transition hover:text-foreground flex items-center gap-x-1"
+                  >
+                    connecting to your database directly
+                    <ExternalLink size={12} />
+                  </Link>
+                  .
+                </p>
               )}
             </div>
           )}
@@ -132,7 +134,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                 type="default"
                 onClick={() => {
                   state.setSelectedDatabaseId(ref)
-                  snap.resetResult(id)
+                  snapV2.resetResult(id)
                 }}
               >
                 Switch to primary database
@@ -140,41 +142,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             )}
             {!hasHipaaAddon && (
               <Button
-                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugSqlLoading} />}
-                disabled={!!sqlDiff || isDebugSqlLoading}
-                onClick={async () => {
-                  try {
-                    const { solution, sql } = await debugSql({
-                      sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                      errorMessage: result.error.message,
-                      entityDefinitions,
-                    })
-
-                    const formattedSql =
-                      sqlAiDisclaimerComment +
-                      '\n\n' +
-                      format(sql, {
-                        language: 'postgresql',
-                        keywordCase: 'lower',
-                      })
-                    setAiInput('')
-                    setDebugSolution(solution)
-                    setSqlDiff({
-                      original: snippet.snippet.content.sql,
-                      modified: formattedSql,
-                    })
-                    setSelectedDiffType(DiffType.Modification)
-                  } catch (error: unknown) {
-                    // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
-                    // that's not relevant for the user - so we prettify it here by avoiding to return the
-                    // entire error body from the assistant
-                    if (isError(error)) {
-                      toast.error(
-                        `Sorry, the assistant failed to debug your query! Please try again with a different one.`
-                      )
-                    }
-                  }
-                }}
+                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugging} />}
+                disabled={!!isDisabled || isDebugging}
+                onClick={onDebug}
               >
                 Debug with Supabase AI
               </Button>
@@ -191,13 +161,15 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
         </p>
       </div>
     )
+  } else if (result.rows.length <= 0) {
+    return (
+      <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
+        <p className="m-0 border-0 px-6 py-4 font-mono text-sm">Success. No rows returned</p>
+      </div>
+    )
   }
 
-  return (
-    <div className="h-full flex flex-col">
-      <Results id={id} rows={result.rows} />
-    </div>
-  )
+  return <Results rows={result.rows} />
 }
 
 export default UtilityTabResults

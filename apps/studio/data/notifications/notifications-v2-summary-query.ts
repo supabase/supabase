@@ -1,7 +1,7 @@
 import type { Notification } from '@supabase/shared-types/out/notifications'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { notificationKeys } from './keys'
 
@@ -11,7 +11,7 @@ export async function getNotificationsSummary(signal?: AbortSignal) {
   const { data, error } = await get('/platform/notifications/summary', {
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

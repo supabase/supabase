@@ -3,18 +3,12 @@
   "version": "0.0.0",
   "main": "index.js",
   "license": "MIT",
-  "files": [
-    "eslint-preset.js"
-  ],
   "dependencies": {
     "@mertasan/tailwindcss-variables": "^2.2.3",
     "@radix-ui/colors": "^0.1.8",
     "@tailwindcss/forms": "^0.5.0",
     "@tailwindcss/typography": "^0.5.9",
     "deepmerge": "^4.2.2",
-    "eslint-config-next": "^14.2.3",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-react": "7.33.2",
     "mini-svg-data-uri": "^1.4.3",
     "tailwindcss-radix": "^2.0.0"
   },

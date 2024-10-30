@@ -1,3 +1,4 @@
+import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -18,6 +19,7 @@ import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import * as Sentry from '@sentry/nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
@@ -29,29 +31,28 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import { PortalToast, Toaster } from 'ui'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { ErrorInfo, useMemo, useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
+import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
+import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
+import { SonnerToaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -77,9 +78,7 @@ loader.config({
 // the dashboard, all other layout components should not be doing that
 
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-  const consentToastId = useRef<string>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -107,77 +106,67 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
-  useEffect(() => {
-    // Check for telemetry consent
-    if (typeof window !== 'undefined') {
-      const onAcceptConsent = () => {
-        snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
+  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    Sentry.withScope(function (scope) {
+      scope.setTag('globalErrorBoundary', true)
+      Sentry.captureException(error)
+    })
 
-      const onOptOut = () => {
-        snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
-      }
-
-      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    console.error(error.stack)
+  }
 
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <AuthContainer>
-          <ProfileProvider>
+    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <AuthContainer>
             <FlagProvider>
-              <Head>
-                <title>Supabase</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-              <PageTelemetry>
-                <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                      <AppBannerContextProvider>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
-                      </AppBannerContextProvider>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
-              </PageTelemetry>
+              <ProfileProvider>
+                <Head>
+                  <title>Supabase</title>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                <PageTelemetry>
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider
+                        defaultTheme="system"
+                        themes={['dark', 'light', 'classic-dark']}
+                        enableSystem
+                        disableTransitionOnChange
+                      >
+                        <AppBannerContextProvider>
+                          <CommandProvider>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <StudioCommandMenu />
+                                <GenerateSql />
+                                <FeaturePreviewModal />
+                                <AiAssistantPanel />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                            <SonnerToaster position="top-right" />
+                          </CommandProvider>
+                        </AppBannerContextProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                </PageTelemetry>
 
-              <HCaptchaLoadedStore />
-              <Toaster />
-              <PortalToast />
-              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+                {!isTestEnv && <HCaptchaLoadedStore />}
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+              </ProfileProvider>
             </FlagProvider>
-          </ProfileProvider>
-        </AuthContainer>
-      </Hydrate>
-    </QueryClientProvider>
+          </AuthContainer>
+        </Hydrate>
+      </QueryClientProvider>
+    </ErrorBoundary>
   )
 }
 

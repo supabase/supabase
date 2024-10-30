@@ -1,9 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 // import { post } from 'lib/common/fetch'
 import { handleError, post } from 'data/fetchers'
-import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 export type SendUpgradeFeedbackVariables = {

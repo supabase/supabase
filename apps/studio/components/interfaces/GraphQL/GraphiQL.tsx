@@ -35,18 +35,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
 
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { XIcon } from 'lucide-react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-} from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { AlertTriangle, XIcon } from 'lucide-react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -404,7 +399,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
 
                   {!rlsBypassedWarningDismissed && (
                     <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
-                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTriangle strokeWidth={2} />
                       <AlertTitle_Shadcn_ className="leading-5 text-foreground">
                         Please note that queries and mutations run in GraphiQL now use the service
                         role key by default.

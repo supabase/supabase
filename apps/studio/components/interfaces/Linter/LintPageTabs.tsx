@@ -75,7 +75,7 @@ const LintPageTabs = ({
         setCurrentTab(value as LINTER_LEVELS)
         setSelectedLint(null)
         const { sort, search, ...rest } = router.query
-        router.push({ ...router, query: { ...rest, preset: value } })
+        router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
     >
       <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>

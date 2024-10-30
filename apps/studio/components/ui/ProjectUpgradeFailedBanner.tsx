@@ -3,10 +3,11 @@ import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, IconX } from 'ui'
+import { Alert, Button } from 'ui'
 
 import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
 import { IS_PLATFORM } from 'lib/constants'
+import { X } from 'lucide-react'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
@@ -56,7 +57,7 @@ const ProjectUpgradeFailedBanner = () => {
             <Button
               type="text"
               className="px-1"
-              icon={<IconX size={16} strokeWidth={1.5} />}
+              icon={<X size={16} strokeWidth={1.5} />}
               onClick={() => acknowledgeMessage()}
             />
           </div>

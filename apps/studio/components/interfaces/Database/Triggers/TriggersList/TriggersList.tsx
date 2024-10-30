@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { useState } from 'react'
-import { Button, IconSearch, Input } from 'ui'
+import { Button, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
@@ -13,8 +13,10 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { Search } from 'lucide-react'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
@@ -30,7 +32,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
   const { data: schemas } = useSchemasQuery({
@@ -84,30 +86,31 @@ const TriggersList = ({
           </ProductEmptyState>
         </div>
       ) : (
-        <div className="w-full space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <SchemaSelector
-                className="w-[260px]"
-                size="small"
-                showError={false}
-                selectedSchemaName={selectedSchema}
-                onSelectSchema={setSelectedSchema}
-              />
-              <Input
-                placeholder="Search for a trigger"
-                size="small"
-                icon={<IconSearch size="tiny" />}
-                value={filterString}
-                className="w-64"
-                onChange={(e) => setFilterString(e.target.value)}
-              />
-            </div>
-
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <SchemaSelector
+              className="w-[260px]"
+              size="small"
+              showError={false}
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={setSelectedSchema}
+            />
+            <Input
+              placeholder="Search for a trigger"
+              size="small"
+              icon={<Search size="14" />}
+              value={filterString}
+              className="w-64"
+              onChange={(e) => setFilterString(e.target.value)}
+            />
             {!isLocked && (
               <Tooltip.Root delayDuration={0}>
                 <Tooltip.Trigger asChild>
-                  <Button disabled={!canCreateTriggers} onClick={() => createTrigger()}>
+                  <Button
+                    className="ml-auto"
+                    disabled={!canCreateTriggers}
+                    onClick={() => createTrigger()}
+                  >
                     Create a new trigger
                   </Button>
                 </Tooltip.Trigger>
@@ -135,22 +138,14 @@ const TriggersList = ({
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <Table
-            className="table-fixed"
             head={
               <>
-                <Table.th key="name" className="space-x-4">
-                  Name
-                </Table.th>
-                <Table.th key="table" className="hidden lg:table-cell">
-                  Table
-                </Table.th>
-                <Table.th key="function" className="hidden xl:table-cell">
-                  Function
-                </Table.th>
-                <Table.th key="events" className="hidden xl:table-cell">
-                  Events
-                </Table.th>
-                <Table.th key="enabled" className="hidden w-20 xl:table-cell">
+                <Table.th key="name">Name</Table.th>
+                <Table.th key="table">Table</Table.th>
+                <Table.th key="function">Function</Table.th>
+                <Table.th key="events">Events</Table.th>
+                <Table.th key="orientation">Orientation</Table.th>
+                <Table.th key="enabled" className="w-20">
                   Enabled
                 </Table.th>
                 <Table.th key="buttons" className="w-1/12"></Table.th>

@@ -34,7 +34,7 @@ pg_cron is not fully supported on Fly Postgres. Read more about this [Fly Postgr
 
 ```sql
 -- Example: enable the "pg_cron" extension
-create extension pg_cron with schema extensions;
+create extension pg_cron with schema pg_catalog;
 
 grant usage on schema cron to postgres;
 grant all privileges on all tables in schema cron to postgres;
@@ -99,7 +99,15 @@ select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
 
 ```sql
-select cron.schedule('call-db-function', '*/5 * * * *', 'CALL hello_world()');
+select cron.schedule('call-db-function', '*/5 * * * *', 'SELECT hello_world()');
+```
+
+### Call a database stored procedure
+
+To use a stored procedure, you can call it like this:
+
+```sql
+select cron.schedule('call-db-procedure', '*/5 * * * *', 'CALL my_procedure()');
 ```
 
 ### Invoke Supabase Edge Function every 30 seconds
@@ -121,8 +129,9 @@ select
     select
       net.http_post(
           url:='https://project-ref.supabase.co/functions/v1/function-name',
-          headers:='{"Content-Type": "application/json", "Authorization": "Bearer YOUR_ANON_KEY"}'::jsonb,
-          body:=concat('{"time": "', now(), '"}')::jsonb
+          headers:=jsonb_build_object('Content-Type','application/json', 'Authorization', 'Bearer ' || 'YOUR_ANON_KEY'),
+          body:=jsonb_build_object('time', now() ),
+          timeout_milliseconds:=5000
       ) as request_id;
     $$
   );
@@ -151,6 +160,8 @@ cron.alter_job(
   active boolean default null
 )
 ```
+
+It is also possible to modify a job by using the `cron.schedule()` function, with the same job name. This will replace the existing job, in the manner of an upsert.
 
 ### Unschedule a job
 

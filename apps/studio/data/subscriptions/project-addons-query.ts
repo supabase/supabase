@@ -1,7 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { subscriptionKeys } from './keys'
+
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { subscriptionKeys } from './keys'
 
 export type ProjectAddonsVariables = {
   projectRef?: string
@@ -18,7 +19,7 @@ export async function getProjectAddons(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

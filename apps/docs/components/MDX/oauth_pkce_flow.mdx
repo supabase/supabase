@@ -1,0 +1,242 @@
+For a PKCE flow, for example in Server-Side Auth, you need an extra step to handle the code exchange. When calling `signInWithOAuth`, provide a `redirectTo` URL which points to a callback route. This redirect URL should be added to your [redirect allow list](/docs/guides/auth/redirect-urls).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client"
+  queryGroup="environment"
+>
+<TabPanel id="client" label="Client">
+
+In the browser, `signInWithOAuth` automatically redirects to the OAuth provider's authentication endpoint, which then redirects to your endpoint.
+
+```js
+await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: `http://example.com/auth/callback`,
+  },
+})
+```
+
+</TabPanel>
+
+<TabPanel id="server" label="Server">
+
+In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(data.url) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+At the callback endpoint, handle the code exchange to save the user session.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
+
+Create a new file at `app/auth/callback/route.ts` and populate with the following:
+
+```ts app/auth/callback/route.ts
+import { NextResponse } from 'next/server'
+// The client you created from the Server-Side Auth instructions
+import { createClient } from '@/utils/supabase/server'
+
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  // if "next" is in param, use it as the redirect URL
+  const next = searchParams.get('next') ?? '/'
+
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      if (isLocalEnv) {
+        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+    }
+  }
+
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
+}
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+Create a new file at `src/routes/auth/callback/+server.js` and populate with the following:
+
+```js src/routes/auth/callback/+server.js
+import { redirect } from '@sveltejs/kit';
+
+export const GET = async (event) => {
+	const {
+		url,
+		locals: { supabase }
+	} = event;
+	const code = url.searchParams.get('code') as string;
+	const next = url.searchParams.get('next') ?? '/';
+
+  if (code) {
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      throw redirect(303, `/${next.slice(1)}`);
+    }
+  }
+
+  // return the user to an error page with instructions
+  throw redirect(303, '/auth/auth-code-error');
+};
+```
+
+</TabPanel>
+
+<TabPanel id="astro" label="Astro">
+
+Create a new file at `src/pages/auth/callback.ts` and populate with the following:
+
+```ts src/pages/auth/callback.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { type APIRoute } from 'astro'
+
+export const GET: APIRoute = async ({ request, cookies, redirect }) => {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/'
+
+  if (code) {
+    const supabase = createServerClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return parseCookieHeader(Astro.request.headers.get('Cookie') ?? '')
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              Astro.cookies.set(name, value, options)
+            )
+          },
+        },
+      }
+    )
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!error) {
+      return redirect(next)
+    }
+  }
+
+  // return the user to an error page with instructions
+  return redirect('/auth/auth-code-error')
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix" label="Remix">
+
+Create a new file at `app/routes/auth.callback.tsx` and populate with the following:
+
+```ts app/routes/auth.callback.tsx
+import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const requestUrl = new URL(request.url)
+  const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/'
+  const headers = new Headers()
+
+  if (code) {
+    const cookies = parse(request.headers.get('Cookie') ?? '')
+    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            headers.append('Set-Cookie', serializeCookieHeader(name, value, options))
+          )
+        },
+      },
+    })
+
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+
+    if (!error) {
+      return redirect(next, { headers })
+    }
+  }
+
+  // return the user to an error page with instructions
+  return redirect('/auth/auth-code-error', { headers })
+}
+```
+
+</TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a new route in your express app and populate with the following:
+
+```js app.js
+...
+app.get("/auth/callback", async function (req, res) {
+  const code = req.query.code
+  const next = req.query.next ?? "/"
+
+  if (code) {
+    const supabase = createServerClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_ANON_KEY, {
+    cookies: {
+      getAll() {
+        return parseCookieHeader(context.req.headers.cookie ?? '')
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
+        )
+      },
+    },
+  })
+    await supabase.auth.exchangeCodeForSession(code)
+  }
+
+  res.redirect(303, `/${next.slice(1)}`)
+})
+```
+
+</TabPanel>
+</Tabs>

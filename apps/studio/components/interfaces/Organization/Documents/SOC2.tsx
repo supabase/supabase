@@ -1,30 +1,40 @@
-import { useParams } from 'common'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { Download } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconDownload, Modal } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getDocument } from 'data/documents/document-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const SOC2 = () => {
   const { slug } = useParams()
+  const canReadSubscriptions = useCheckPermissions(
+    PermissionAction.BILLING_READ,
+    'stripe.subscriptions'
+  )
+
   const {
     data: subscription,
     error,
     isLoading,
     isError,
     isSuccess,
-  } = useOrgSubscriptionQuery({ orgSlug: slug })
+  } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
   const currentPlan = subscription?.plan
+
   const [isOpen, setIsOpen] = useState(false)
 
   const fetchSOC2 = async (orgSlug: string) => {
@@ -43,33 +53,39 @@ const SOC2 = () => {
         <p className="text-base m-0">SOC2 Type 2</p>
         <div className="space-y-2 text-sm text-foreground-light m-0">
           <p>
-            Organizations on Teams plan or above have access to our most recent SOC2 Type 2 report.
+            Organizations on Team Plan or above have access to our most recent SOC2 Type 2 report.
           </p>
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
-        {isLoading && (
-          <div className="space-y-2">
-            <ShimmeringLoader />
-            <ShimmeringLoader className="w-3/4" />
-            <ShimmeringLoader className="w-1/2" />
-          </div>
-        )}
-
-        {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
-
-        {isSuccess && (
-          <div className="flex items-center justify-center h-full">
-            {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
-              <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
-                <Button type="default">Upgrade to Teams</Button>
-              </Link>
-            ) : (
-              <Button type="default" iconRight={<IconDownload />} onClick={() => setIsOpen(true)}>
-                Download SOC2 Type 2 Report
-              </Button>
+        {!canReadSubscriptions ? (
+          <NoPermission resourceText="access our SOC2 Type 2 report" />
+        ) : (
+          <>
+            {isLoading && (
+              <div className="space-y-2">
+                <ShimmeringLoader />
+                <ShimmeringLoader className="w-3/4" />
+                <ShimmeringLoader className="w-1/2" />
+              </div>
             )}
-          </div>
+
+            {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
+
+            {isSuccess && (
+              <div className="flex items-center justify-center h-full">
+                {currentPlan?.id === 'free' || currentPlan?.id === 'pro' ? (
+                  <Link href={`/org/${slug}/billing?panel=subscriptionPlan`}>
+                    <Button type="default">Upgrade to Team</Button>
+                  </Link>
+                ) : (
+                  <Button type="default" icon={<Download />} onClick={() => setIsOpen(true)}>
+                    Download SOC2 Type 2 Report
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
         )}
         <ConfirmationModal
           visible={isOpen}

@@ -1,6 +1,6 @@
 {
   "private": true,
-  "engines" : {
+  "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
@@ -10,9 +10,8 @@
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.9.0",
-    "@supabase/realtime-js": "^2.10.0-next.5",
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/supabase-js": "2.44.0",
     "autoprefixer": "10.4.17",
     "geist": "^1.2.1",
     "next": "latest",
@@ -21,11 +20,6 @@
     "react-dom": "18.2.0",
     "tailwindcss": "3.4.1",
     "typescript": "5.3.3"
-  },
-  "overrides": {
-    "@supabase/supabase-js": {
-      "@supabase/realtime-js": "^2.10.0-next.6"
-    }
   },
   "devDependencies": {
     "@types/node": "20.11.5",

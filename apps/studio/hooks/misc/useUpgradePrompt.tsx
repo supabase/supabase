@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs'
+import { maybeShowUpgradePrompt } from 'components/interfaces/Settings/Logs/Logs.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useEffect, useState } from 'react'
 import { useSelectedOrganization } from './useSelectedOrganization'
 
 export const useUpgradePrompt = (from: string) => {

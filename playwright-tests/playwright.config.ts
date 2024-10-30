@@ -29,7 +29,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     // record a video for failed tests, but only for local testing. We can't store videos on CI atm.
-    video: process.env.CI ? 'off' : 'retain-on-failure',
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -72,8 +72,16 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'NODE_ENV=test npm --prefix ../apps/studio run dev',
+    // using npm run dev instead of turbo because turbo doesn't stop the server after a test (doesn't handle SIGTERM).
+    command: 'npm run dev',
+    cwd: '../apps/studio',
     url: 'http://localhost:8082',
     reuseExistingServer: !process.env.CI,
+    env: {
+      NODE_ENV: 'test',
+    },
+    // Show the nextjs logs in the terminal. Useful for debugging.
+    // stdout: 'pipe',
+    // stderr: 'pipe',
   },
 })

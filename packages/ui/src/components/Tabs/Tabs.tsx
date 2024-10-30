@@ -1,5 +1,14 @@
+'use client'
+
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { Children, useMemo, useState, type KeyboardEvent, type PropsWithChildren } from 'react'
+import {
+  Children,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type RefObject,
+} from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 
 export interface TabsProps {
@@ -18,12 +27,19 @@ export interface TabsProps {
   addOnAfter?: React.ReactNode
   listClassNames?: string
   baseClassNames?: string
+  refs?: {
+    base: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+  }
 }
 
 interface TabsSubComponents {
   Panel: React.FC<PropsWithChildren<PanelProps>>
 }
 
+/**
+ * @deprecated Use ./Tabs_shadcn_ instead
+ */
 const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
@@ -38,6 +54,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   addOnAfter,
   listClassNames,
   baseClassNames,
+  refs,
   children: _children,
 }) => {
   const children = Children.toArray(_children) as PanelPropsProps[]
@@ -69,8 +86,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   if (listClassNames) listClasses.push(listClassNames)
 
   return (
-    <TabsPrimitive.Root value={activeTab} className={[__styles.base, baseClassNames].join(' ')}>
-      <TabsPrimitive.List className={listClasses.join(' ')}>
+    <TabsPrimitive.Root
+      value={activeTab}
+      className={[__styles.base, baseClassNames].join(' ')}
+      ref={refs?.base}
+    >
+      <TabsPrimitive.List className={listClasses.join(' ')} ref={refs?.list}>
         {addOnBefore}
         {children.map((tab) => {
           const isActive = activeTab === tab.props.id
@@ -123,6 +144,9 @@ interface PanelProps {
   className?: string
 }
 
+/**
+ * @deprecated Use ./TabsContent_Shadcn_ instead
+ */
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
   let __styles = styleHandler('tabs')
 

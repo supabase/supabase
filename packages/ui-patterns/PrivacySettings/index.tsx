@@ -1,4 +1,6 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+'use client'
+
+import { handleResetTelemetry, LOCAL_STORAGE_KEYS } from 'common'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Modal, Toggle } from 'ui'
@@ -26,6 +28,10 @@ export const PrivacySettings = ({
   const handleCancel = () => {
     setTelemetryValue(hasAccepted)
     setIsOpen(false)
+  }
+
+  const handleOptOutTelemetry = async () => {
+    handleResetTelemetry(process.env.NEXT_PUBLIC_API_URL!)
   }
 
   return (
@@ -75,18 +81,26 @@ export const PrivacySettings = ({
           <Modal.Content>
             <Toggle
               checked={telemetryValue}
-              onChange={() => setTelemetryValue((prev) => !prev)}
+              onChange={() => {
+                if (telemetryValue) {
+                  // [Joshen] Will be toggle off, so trigger reset event
+                  handleOptOutTelemetry()
+                }
+                setTelemetryValue((prev) => !prev)
+              }}
               label="Telemetry"
               descriptionText={
                 <>
                   By opting in to sending telemetry data, Supabase can improve the overall user
                   experience.{' '}
-                  <Link
-                    href="https://supabase.com/privacy#cookieless-analytics"
+                  <a
+                    target="_blank"
+                    rel="noreferrer noopener"
                     className="underline"
+                    href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
                   >
                     Learn more
-                  </Link>
+                  </a>
                 </>
               }
             />

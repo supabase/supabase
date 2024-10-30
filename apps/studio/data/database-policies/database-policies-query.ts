@@ -1,6 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
 
@@ -32,7 +32,7 @@ export async function getDatabasePolicies(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

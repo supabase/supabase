@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -12,7 +12,6 @@ import {
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -21,10 +20,11 @@ import { useNotificationsSummaryQuery } from 'data/notifications/notifications-v
 import { useNotificationsV2UpdateMutation } from 'data/notifications/notifications-v2-update-mutation'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { ArchiveIcon, InboxIcon } from 'lucide-react'
 import { useNotificationsStateSnapshot } from 'state/notifications'
+import { CriticalIcon, WarningIcon } from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ArchiveIcon, InboxIcon } from 'lucide-react'
 
 const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)

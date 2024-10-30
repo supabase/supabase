@@ -1,17 +1,25 @@
 import { useQuery } from '@tanstack/react-query'
+import { Dispatch, SetStateAction, useState } from 'react'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useState } from 'react'
+} from 'components/interfaces/Settings/Logs/Logs.constants'
 import type {
-  LogsEndpointParams,
-  Logs,
   LogData,
+  Logs,
+  LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { API_URL } from 'lib/constants'
 import { get, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import {
+  checkForILIKEClause,
+  checkForWildcard,
+  checkForWithClause,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import { IS_PLATFORM } from 'common'
+
 export interface LogsQueryHook {
   params: LogsEndpointParams
   isLoading: boolean
@@ -21,11 +29,13 @@ export interface LogsQueryHook {
   changeQuery: (newQuery?: string) => void
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
+  enabled?: boolean
 }
 
 const useLogsQuery = (
   projectRef: string,
-  initialParams: Partial<LogsEndpointParams> = {}
+  initialParams: Partial<LogsEndpointParams> = {},
+  enabled = true
 ): LogsQueryHook => {
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
@@ -39,9 +49,14 @@ const useLogsQuery = (
       : defaultHelper.calcTo(),
   })
 
-  const enabled = typeof projectRef !== 'undefined' && Boolean(params.sql)
+  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
 
   const queryParams = genQueryParams(params as any)
+
+  const usesWith = checkForWithClause(params.sql || '')
+  const usesILIKE = checkForILIKEClause(params.sql || '')
+  const usesWildcard = checkForWildcard(params.sql || '')
+
   const {
     data,
     error: rqError,
@@ -55,7 +70,7 @@ const useLogsQuery = (
         signal,
       }),
     {
-      enabled,
+      enabled: _enabled,
       refetchOnWindowFocus: false,
     }
   )
@@ -65,13 +80,35 @@ const useLogsQuery = (
   if (!error && data?.error) {
     error = data?.error
   }
+
+  if (IS_PLATFORM) {
+    if (usesWith) {
+      error = {
+        message: 'The parser does not yet support WITH and subquery statements.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-with-keyword-and-subqueries-are-not-supported',
+      }
+    }
+    if (usesILIKE) {
+      error = {
+        message: 'BigQuery does not support ILIKE. Use REGEXP_CONTAINS instead.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
+      }
+    }
+    if (usesWildcard) {
+      error = {
+        message:
+          'Wildcard (*) queries are not supported. Please remove the wildcard and try again.',
+        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-wildcard-operator--to-select-columns-is-not-supported',
+      }
+    }
+  }
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
 
   return {
     params,
-    isLoading: (enabled && isLoading) || isRefetching,
+    isLoading: (_enabled && isLoading) || isRefetching,
     logData: isResponseOk(data) && data.result ? data.result : [],
     error,
     changeQuery,

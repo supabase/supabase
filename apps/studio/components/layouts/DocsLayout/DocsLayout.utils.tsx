@@ -1,7 +1,7 @@
-import SVG from 'react-inlinesvg'
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { IconBook, IconBookOpen } from 'ui'
 import { BASE_PATH } from 'lib/constants'
+import { ArrowUpRight, Book, BookOpen } from 'lucide-react'
+import SVG from 'react-inlinesvg'
 
 export const generateDocsMenu = (
   ref: string,
@@ -71,7 +71,7 @@ export const generateDocsMenu = (
         {
           name: 'GraphiQL',
           key: 'graphiql',
-          url: `/project/${ref}/api/graphiql`,
+          url: `/project/${ref}/integrations/graphiql`,
           icon: (
             <SVG
               src={`${BASE_PATH}/img/graphql.svg`}
@@ -81,6 +81,7 @@ export const generateDocsMenu = (
             />
           ),
           items: [],
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
         },
       ],
     },
@@ -91,7 +92,7 @@ export const generateDocsMenu = (
           name: 'Guides',
           key: 'guides',
           url: `https://supabase.com/docs`,
-          icon: <IconBook size={14} strokeWidth={2} />,
+          icon: <Book size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
         },
@@ -99,7 +100,7 @@ export const generateDocsMenu = (
           name: 'API Reference',
           key: 'api-reference',
           url: `https://supabase.com/docs/guides/api`,
-          icon: <IconBookOpen size={14} strokeWidth={2} />,
+          icon: <BookOpen size={14} strokeWidth={2} />,
           items: [],
           isExternal: true,
         },

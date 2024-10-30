@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -9,9 +9,9 @@ import { configKeys } from './keys'
 export type ProjectPostgrestConfigUpdateVariables = {
   projectRef: string
   dbSchema: string
-  maxRows: string
+  maxRows: number
   dbExtraSearchPath: string
-  dbPool: string | null
+  dbPool: number | null
 }
 
 export async function updateProjectPostgrestConfig({

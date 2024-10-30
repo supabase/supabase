@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router'
 
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { LogsLayout } from 'components/layouts'
+import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
@@ -10,15 +11,14 @@ export const LogPage: NextPageWithLayout = () => {
 
   return (
     <LogsPreviewer
+      condensedLayout
+      queryType="api"
       projectRef={ref as string}
-      condensedLayout={true}
-      // @ts-ignore
-      tableName={'edge_logs'}
-      queryType={'api'}
+      tableName={LogsTableName.EDGE}
     />
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
+LogPage.getLayout = (page) => <LogsLayout title="Edge Logs">{page}</LogsLayout>
 
 export default LogPage

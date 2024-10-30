@@ -1,7 +1,8 @@
 import clsx from 'clsx'
 import { useState } from 'react'
-import { Button, Collapsible, IconChevronDown, SidePanel } from 'ui'
+import { Button, Collapsible, SidePanel } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
+import { ChevronDown } from 'lucide-react'
 
 interface SpreadSheetImportConfigurationProps {
   spreadsheetData: SpreadsheetData
@@ -25,7 +26,7 @@ const SpreadsheetImportConfiguration = ({
             <Button
               type="text"
               icon={
-                <IconChevronDown
+                <ChevronDown
                   size={18}
                   strokeWidth={2}
                   className={clsx('text-foreground-light', expandConfiguration && 'rotate-180')}

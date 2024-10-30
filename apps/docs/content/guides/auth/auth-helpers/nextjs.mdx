@@ -3,6 +3,7 @@ id: 'nextjs'
 title: 'Supabase Auth with the Next.js App Router'
 description: 'Authentication and Authorization helpers for creating an authenticated Supabase client with the Next.js 13 App Router.'
 sidebar_label: 'Next.js'
+sitemapPriority: 0.5
 ---
 
 <Admonition type="caution">
@@ -19,8 +20,8 @@ The `auth-helpers` package has been replaced with the `@supabase/ssr` package. W
   size="medium"
   className="text-foreground-light border-b mt-8 pb-2"
   >
-  
-  <Accordion.Item
+
+  <AccordionItem
         header="See legacy docs"
         id="legacy-docs"
       >
@@ -217,7 +218,7 @@ export async function GET(request: NextRequest) {
   const code = requestUrl.searchParams.get('code')
 
   if (code) {
-    const cookieStore = cookies()
+    const cookieStore = await cookies()
     const supabase = createRouteHandlerClient<Database>({ cookies: () => cookieStore })
     await supabase.auth.exchangeCodeForSession(code)
   }
@@ -1327,6 +1328,6 @@ export default function() {
 
 For an example of creating multiple Supabase clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
 
-</Accordion.Item>
+</AccordionItem>
 
 </Accordion>

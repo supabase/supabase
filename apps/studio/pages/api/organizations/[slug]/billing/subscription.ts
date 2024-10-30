@@ -28,12 +28,10 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>
     usage_billing_enabled: false,
     plan: {
       id: 'enterprise',
-      name: '',
-      price: 0,
+      name: 'Enterprise',
     },
     addons: [],
     project_addons: [],
-    usage_fees: [],
     payment_method_type: '',
     billing_via_partner: false,
     billing_partner: 'fly',

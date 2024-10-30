@@ -25,15 +25,11 @@ select
   a.name,
   b.date_of_purchase
 from
-  customers a
-  join orders b
-    on a.id = b.customer_id
-where
-  a.sign_up_date > '2023-01-01'
-  and b.status = 'shipped'
-order by
-  b.date_of_purchase;
-limit 10
+  customers as a
+  join orders as b on a.id = b.customer_id
+where a.sign_up_date > '2023-01-01' and b.status = 'shipped'
+order by b.date_of_purchase
+limit 10;
 ```
 
 In this query, there are several parts that indexes could likely help in optimizing the performance:

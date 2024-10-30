@@ -140,6 +140,7 @@ export type Imetadata = {
     }
     supabaseDirectory?: string
     supabaseChangesOnly?: boolean
+    branchLimit?: number
   }
   link?: VercelGitLink
   name: string
@@ -154,6 +155,8 @@ export type IntegrationProjectConnection = {
   supabase_project_ref: string
   foreign_project_id: string
   organization_integration_id: string
+  env_sync_targets?: string[]
+  public_env_var_prefix?: string
   metadata: Imetadata
 }
 
@@ -264,8 +267,11 @@ export type GitHubConnectionCreateVariables = {
   connection: components['schemas']['CreateGitHubConnectionsBody']
 }
 
+export type EnvironmentTargets = 'production' | 'preview' | 'development'
+
 export type UpdateConnectionPayload = {
   id: string
   organizationIntegrationId: string
-  metadata: Imetadata
+  envSyncTargets: EnvironmentTargets[]
+  publicEnvVarPrefix?: string
 }

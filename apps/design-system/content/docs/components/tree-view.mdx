@@ -1,0 +1,121 @@
+---
+title: Tree View
+description: A tree view that assembles all the functionalities of the Accordion component to create a tree view.
+component: true
+links:
+  doc: https://dgreene1.github.io/react-accessible-treeview/
+  api: https://dgreene1.github.io/react-accessible-treeview/docs/api
+source:
+  reactAccessibleTreeview: true
+---
+
+<ComponentPreview name="tree-view-demo" peekCode wide />
+
+## Usage
+
+```tsx
+import { TreeView, TreeViewItem } from 'ui'
+import { flattenTree } from 'react-accessible-treeview'
+```
+
+```tsx
+const data: {
+  name: ''
+  children: [
+    {
+      name: 'Current batch'
+    },
+    {
+      name: 'Older queries'
+    },
+    {
+      name: 'query all users'
+    },
+    {
+      name: 'users in last day'
+    },
+    {
+      name: 'new users over time'
+    },
+  ]
+}
+
+function App() {
+  return (
+    <TreeView
+      {...args}
+      data={flattenTree(args.data)}
+      aria-label="directory tree"
+      nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
+        <TreeViewItem
+          isExpanded={isExpanded}
+          isBranch={isBranch}
+          isSelected={isSelected}
+          level={level}
+          xPadding={16}
+          name={element.name}
+          {...getNodeProps()}
+        />
+      )}
+    />
+  )
+}
+```
+
+## Examples
+
+### With directories
+
+Use a `children` node in your data object to create a tree view with directories.
+
+```tsx {9-16}
+const data = {
+  //..
+  children: [
+    {
+      name: 'Current batch',
+    },
+    {
+      name: 'Older queries',
+      children: [
+        {
+          name: 'all countries',
+        },
+        {
+          name: 'add new countries',
+        },
+      ],
+    },
+  ],
+}
+```
+
+<ComponentPreview name="tree-view-directories" />
+
+### With inline editing
+
+The Tree View can be edited in the app to enable different types of inline editing.
+
+In this example, right click on any item to rename it, and we traverse the data object setting `isEditing` to true.
+`TreeViewItem` then accepts a `isEditing` prop to show and focus an inline input to edit.
+
+<ComponentPreview name="tree-view-edit" />
+
+### With multi selection
+
+Use the `multiSelect`, `togglableSelect`, `clickAction` set to "EXCLUSIVE_SELECT" to enable a multi-select tree view.
+
+An example can be seen on the [react-accessible-treeview docs](https://dgreene1.github.io/react-accessible-treeview/docs/examples-MultiSelectDirectoryTree).
+
+```tsx {4-6}
+<TreeView
+  data={flattenTree(args.data)}
+  aria-label="directory tree"
+  multiSelect
+  togglableSelect
+  clickAction="EXCLUSIVE_SELECT"
+  // other options..
+/>
+```
+
+<ComponentPreview name="tree-view-multi-select" />

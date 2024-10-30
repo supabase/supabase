@@ -22,7 +22,7 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
     if ((error as ResponseError).message === 'Preview branching is not enabled for this project.') {
       return []
     } else {
-      throw handleError(error)
+      handleError(error)
     }
   }
   return data

@@ -1,6 +1,6 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -23,7 +23,7 @@ import {
   Collapsible_Shadcn_,
   cn,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
@@ -168,7 +168,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
               {isLoadingIndexAdvisorResult && <GenericSkeletonLoader />}
               {isErrorIndexAdvisorResult && (
                 <AlertError
-                  ref={project?.ref}
+                  projectRef={project?.ref}
                   error={indexAdvisorError}
                   subject="Failed to retrieve result from index advisor"
                 />

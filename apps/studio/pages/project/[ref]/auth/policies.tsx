@@ -4,10 +4,9 @@ import { partition } from 'lodash'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
-import { AuthLayout } from 'components/layouts'
+import Policies from 'components/interfaces/Auth/Policies/Policies'
+import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
@@ -16,10 +15,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, usePermissionsLoaded, useUrlState } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Button, Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -63,7 +63,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -73,8 +72,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas, (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  const [protectedSchemas] = partition(
+    schemas,
+    (schema) => schema?.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
@@ -133,7 +133,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<ExternalLink size={14} strokeWidth={1.5} />} asChild>
+            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
               <a
                 target="_blank"
                 rel="noreferrer"
@@ -142,29 +142,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </a>
             </Button>
-
-            {isAiAssistantEnabled && (
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="primary"
-                    disabled={!canCreatePolicies || schemaHasNoTables}
-                    onClick={() => setShowPolicyAiEditor(true)}
-                  >
-                    Create a new policy
-                  </Button>
-                </TooltipTrigger_Shadcn_>
-                {(!canCreatePolicies || schemaHasNoTables) && (
-                  <TooltipContent_Shadcn_ side="bottom">
-                    {!canCreatePolicies
-                      ? 'You need additional permissions to create RLS policies'
-                      : schemaHasNoTables
-                        ? `No table in schema ${schema} to create policies on`
-                        : null}
-                  </TooltipContent_Shadcn_>
-                )}
-              </Tooltip_Shadcn_>
-            )}
           </div>
         </div>
       </div>
@@ -201,6 +178,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           setShowPolicyAiEditor(false)
           setSelectedPolicyToEdit(undefined)
         }}
+        authContext="database"
       />
     </div>
   )

@@ -1,11 +1,35 @@
+import { X } from 'lucide-react'
 import RGL, { WidthProvider } from 'react-grid-layout'
-import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+
+import { useParams } from 'common'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 
-const GridResize = ({ startDate, endDate, interval, editableReport, setEditableReport }: any) => {
-  if (!editableReport) return null
+interface GridResizeProps {
+  startDate: string
+  endDate: string
+  interval: string
+  editableReport: any
+  disableUpdate: boolean
+  onRemoveChart: ({ metric }: { metric: { key: string } }) => void
+  setEditableReport: (payload: any) => void
+}
+
+const GridResize = ({
+  startDate,
+  endDate,
+  interval,
+  editableReport,
+  disableUpdate,
+  onRemoveChart,
+  setEditableReport,
+}: GridResizeProps) => {
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
 
   function onLayoutChange(layout: any) {
     let updatedLayout = editableReport.layout
@@ -23,6 +47,8 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
     setEditableReport(payload)
   }
 
+  if (!editableReport) return null
+
   return (
     <>
       <ReactGridLayout
@@ -34,7 +60,7 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
         containerPadding={[0, 0]}
         compactType="horizontal"
       >
-        {editableReport.layout.map((x: any, i: number) => {
+        {editableReport.layout.map((x: any) => {
           return (
             <div
               key={x.id}
@@ -47,13 +73,24 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
                 interval={interval}
                 attribute={x.attribute}
                 provider={x.provider}
-                label={x.label}
+                label={`${x.label}${ref !== state.selectedDatabaseId ? (x.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
                 customDateFormat={'MMM D, YYYY'}
-              />
+              >
+                {!disableUpdate && (
+                  <ButtonTooltip
+                    type="text"
+                    icon={<X />}
+                    className="ml-2 px-1"
+                    onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
+                    tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
+                  />
+                )}
+              </ChartHandler>
+
               <div className="absolute inset-x-0 top-3 ">
                 <div className="flex justify-around">
                   <div className="flex h-3 w-24 cursor-move flex-col space-y-2">
-                    <div className="hidden h-3 w-full border-4 border-dotted border-green-900 opacity-50 transition-all hover:opacity-100 group-hover:block"></div>
+                    <div className="hidden h-3 w-full border-4 border-dotted border-green-900 opacity-50 transition-all hover:opacity-100 group-hover:block" />
                   </div>
                 </div>
               </div>

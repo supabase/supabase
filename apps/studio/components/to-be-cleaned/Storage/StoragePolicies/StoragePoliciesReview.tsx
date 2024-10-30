@@ -29,34 +29,33 @@ const StoragePoliciesReview = ({
 
   return (
     <>
-      <Modal.Content>
-        <div className="space-y-6 py-8">
-          <div className="flex items-center justify-between space-y-8 space-x-4">
-            <div className="flex flex-col">
-              <p className="text-sm text-foreground-light">
-                These are the SQL statements that will be used to create your policies. The suffix
-                appended to the end of your policy name (<code>[hashString]_[number]</code>) just
-                functions as a unique identifier for each of your policies.
-              </p>
-            </div>
-          </div>
-          <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
-            {policyStatements.length === 0 && <ReviewEmptyState />}
-            {policyStatements.map((policy, idx) => {
-              let formattedSQLStatement = policy.statement || ''
-              return (
-                <div key={`policy_${idx}`} className="space-y-2">
-                  <span>{policy.description}</span>
-                  <div className="h-40">
-                    <SqlEditor readOnly defaultValue={formattedSQLStatement} />
-                  </div>
-                </div>
-              )
-            })}
+      <Modal.Content className="space-y-6">
+        <div className="flex items-center justify-between space-y-8 space-x-4">
+          <div className="flex flex-col">
+            <p className="text-sm text-foreground-light">
+              These are the SQL statements that will be used to create your policies. The suffix
+              appended to the end of your policy name (<code>[hashString]_[number]</code>) just
+              functions as a unique identifier for each of your policies.
+            </p>
           </div>
         </div>
+        <div className="space-y-4 overflow-y-auto" style={{ maxHeight: '25rem' }}>
+          {policyStatements.length === 0 && <ReviewEmptyState />}
+          {policyStatements.map((policy, idx) => {
+            let formattedSQLStatement = policy.statement || ''
+            return (
+              <div key={`policy_${idx}`} className="space-y-2">
+                <span>{policy.description}</span>
+                <div className="h-40">
+                  <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </Modal.Content>
-      <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 border-default">
+      <Modal.Separator />
+      <Modal.Content className="flex w-full items-center justify-end gap-2">
         <Button type="default" onClick={onSelectBack}>
           Back to edit
         </Button>
@@ -65,7 +64,7 @@ const StoragePoliciesReview = ({
             Save policy
           </Button>
         )}
-      </div>
+      </Modal.Content>
     </>
   )
 }

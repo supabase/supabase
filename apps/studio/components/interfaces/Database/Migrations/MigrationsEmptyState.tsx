@@ -1,9 +1,10 @@
 import clsx from 'clsx'
 import { useState } from 'react'
-import { Collapsible, IconMaximize2, IconMinimize2, IconTerminal } from 'ui'
+import { Collapsible } from 'ui'
 
 import { useParams } from 'common'
 import CommandRender from 'components/interfaces/Functions/CommandRender'
+import { Terminal, Minimize2, Maximize2 } from 'lucide-react'
 
 const MigrationsEmptyState = () => {
   const { ref } = useParams()
@@ -69,18 +70,18 @@ const MigrationsEmptyState = () => {
               <div className="flex items-center justify-between gap-3 w-full">
                 <div className="flex items-center gap-3">
                   <div className="flex items-center justify-center w-8 h-8 p-2 border rounded bg-alternative">
-                    <IconTerminal strokeWidth={2} />
+                    <Terminal strokeWidth={2} />
                   </div>
                   <h4>Terminal instructions</h4>
                 </div>
                 {showInstructions ? (
-                  <IconMinimize2
+                  <Minimize2
                     className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}
                   />
                 ) : (
-                  <IconMaximize2
+                  <Maximize2
                     className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
                     width={14}

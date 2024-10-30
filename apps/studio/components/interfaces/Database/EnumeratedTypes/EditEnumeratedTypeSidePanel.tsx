@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -15,9 +15,6 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
-  IconExternalLink,
-  IconPlus,
   Input_Shadcn_,
   SidePanel,
   cn,
@@ -29,6 +26,7 @@ import { useEnumeratedTypeUpdateMutation } from 'data/enumerated-types/enumerate
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
+import { AlertCircle, ExternalLink, Plus } from 'lucide-react'
 
 interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -197,7 +195,7 @@ const EditEnumeratedTypeSidePanel = ({
                             </FormLabel_Shadcn_>
                             {index === 0 && (
                               <Alert_Shadcn_>
-                                <IconAlertCircle strokeWidth={1.5} />
+                                <AlertCircle strokeWidth={1.5} />
                                 <AlertTitle_Shadcn_>
                                   Existing values cannot be deleted or sorted
                                 </AlertTitle_Shadcn_>
@@ -209,7 +207,7 @@ const EditEnumeratedTypeSidePanel = ({
                                   <Button
                                     asChild
                                     type="default"
-                                    icon={<IconExternalLink strokeWidth={1.5} />}
+                                    icon={<ExternalLink strokeWidth={1.5} />}
                                     className="mt-2"
                                   >
                                     <Link
@@ -245,7 +243,7 @@ const EditEnumeratedTypeSidePanel = ({
 
             <Button
               type="default"
-              icon={<IconPlus strokeWidth={1.5} />}
+              icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ isNew: true, originalValue: '', updatedValue: '' })}
             >
               Add value

@@ -14,7 +14,7 @@ export type UsersVariables = {
   filter?: Filter
 }
 
-export const USERS_PAGE_LIMIT = 10
+export const USERS_PAGE_LIMIT = 20
 export type User = components['schemas']['UserBody']
 
 export async function getUsers(
@@ -48,7 +48,7 @@ export async function getUsers(
     signal,
   })
 
-  if (error) throw handleError(error)
+  if (error) handleError(error)
   return data
 }
 

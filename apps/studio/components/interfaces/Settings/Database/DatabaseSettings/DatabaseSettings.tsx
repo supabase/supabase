@@ -1,41 +1,34 @@
-import { useParams, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertCircle,
-  Input,
-} from 'ui'
 
+import { useParams } from 'common'
+import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useSelectedProject } from 'hooks'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { pluckObjectFields } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input, WarningIcon } from 'ui'
+import {
+  DefaultSessionModeNotice,
+  IPv4AddonDirectConnectionNotice,
+  IPv4DeprecationNotice,
+} from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import ResetDbPassword from './ResetDbPassword'
 
 const DatabaseSettings = () => {
-  const router = useRouter()
   const { ref: projectRef, connectionString } = useParams()
-  const telemetryProps = useTelemetryProps()
   const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedProject = useSelectedProject()
 
-  const showReadReplicasUI = selectedProject?.is_read_replicas_enabled
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
+  const [poolingMode, setPoolingMode] = useState<'transaction' | 'session'>('transaction')
 
   const {
     data: poolingInfo,
@@ -47,44 +40,37 @@ const DatabaseSettings = () => {
     projectRef,
   })
   const {
-    data,
-    error: projectSettingsError,
-    isLoading: isLoadingProjectSettings,
-    isError: isErrorProjectSettings,
-    isSuccess: isSuccessProjectSettings,
-  } = useProjectSettingsQuery({ projectRef })
-  const {
     data: databases,
     error: readReplicasError,
     isLoading: isLoadingReadReplicas,
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
-  const error = showReadReplicasUI ? readReplicasError : projectSettingsError || poolingInfoError
-  const isLoading = showReadReplicasUI
-    ? isLoadingReadReplicas
-    : isLoadingProjectSettings || isLoadingPoolingInfo
-  const isError = showReadReplicasUI
-    ? isErrorReadReplicas
-    : isErrorProjectSettings || isErrorPoolingInfo
-  const isSuccess = showReadReplicasUI
-    ? isSuccessReadReplicas
-    : isSuccessProjectSettings && isSuccessPoolingInfo
+  const {
+    data: addons,
+    error: addOnsError,
+    isLoading: isLoadingAddons,
+    isError: isErrorAddons,
+    isSuccess: isSuccessAddons,
+  } = useProjectAddonsQuery({ projectRef })
+  const { mutate: sendEvent } = useSendEventMutation()
+
+  const error = readReplicasError || poolingInfoError || addOnsError
+  const isLoading = isLoadingReadReplicas || isLoadingPoolingInfo || isLoadingAddons
+  const isError = isErrorReadReplicas || isErrorPoolingInfo || isErrorAddons
+  const isSuccess = isSuccessReadReplicas && isSuccessPoolingInfo && isSuccessAddons
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
   )
-  const primaryConfig = showReadReplicasUI
-    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
-    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
+  const primaryConfig = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+  const defaultPoolingMode = primaryConfig?.pool_mode
+  const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
   const isMd5 = primaryConfig?.connectionString.includes('?options=reference')
 
-  const { project } = data ?? {}
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-  const dbConnectionInfo = showReadReplicasUI
-    ? pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
-    : pluckObjectFields(project || emptyState, DB_FIELDS)
+  const dbConnectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
 
   const connectionInfo = snap.usePoolerConnection
     ? {
@@ -96,15 +82,11 @@ const DatabaseSettings = () => {
     : dbConnectionInfo
 
   const handleCopy = (labelValue?: string) =>
-    Telemetry.sendEvent(
-      {
-        category: 'settings',
-        action: 'copy_connection_string',
-        label: labelValue ? labelValue : '',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'settings',
+      action: 'copy_connection_string',
+      label: labelValue ? labelValue : '',
+    })
 
   useEffect(() => {
     if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
@@ -129,7 +111,7 @@ const DatabaseSettings = () => {
               <div className="flex items-center gap-x-2">
                 <h5 className="mb-0">Connection parameters</h5>
               </div>
-              {showReadReplicasUI && <DatabaseSelector />}
+              <DatabaseSelector />
             </div>
           }
         >
@@ -151,14 +133,23 @@ const DatabaseSettings = () => {
                   <UsePoolerCheckbox
                     id="connection-params"
                     checked={snap.usePoolerConnection}
+                    ipv4AddonAdded={!!ipv4Addon}
                     poolingMode={poolingMode}
                     onCheckedChange={snap.setUsePoolerConnection}
                     onSelectPoolingMode={setPoolingMode}
                   />
-                  {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
+                  {defaultPoolingMode === 'session' && poolingMode === 'transaction' && (
+                    <DefaultSessionModeNotice />
+                  )}
+                  {ipv4Addon !== undefined &&
+                    poolingMode === 'session' &&
+                    snap.usePoolerConnection && <IPv4AddonDirectConnectionNotice />}
+                  {ipv4Addon === undefined && !snap.usePoolerConnection && (
+                    <IPv4DeprecationNotice />
+                  )}
                   {isMd5 && (
                     <Alert_Shadcn_>
-                      <IconAlertCircle strokeWidth={2} />
+                      <WarningIcon />
                       <AlertTitle_Shadcn_>
                         If you are connecting to your database via a GUI client, use the{' '}
                         <span tabIndex={0}>connection string</span> above instead
@@ -228,7 +219,7 @@ const DatabaseSettings = () => {
                   value={
                     state.selectedDatabaseId !== projectRef
                       ? '[The password for your primary database]'
-                      : '[The password you provided when you created this project]'
+                      : '[The password for your database]'
                   }
                   label="Password"
                 />

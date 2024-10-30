@@ -1,0 +1,171 @@
+---
+id: 'auth-third-party-aws-cognito'
+title: 'Amazon Cognito (Amplify)'
+subtitle: 'Use Amazon Cognito via Amplify or standalone with your Supabase project'
+---
+
+Amazon Cognito User Pools (via AWS Amplify or on its own) can be used as a third-party authentication provider alongside Supabase Auth, or standalone, with your Supabase project.
+
+## Getting started
+
+1. First you need to add an integration to connect your Supabase project with your Amazon Cognito User Pool. You will need the pool's ID and region.
+2. Add a new Third-party Auth integration in your project's [Authentication settings](/dashboard/project/_/settings/auth) or configure it in the CLI.
+3. Assign the `role: 'authenticated'` custom claim to all JWTs by using a Pre-Token Generation Trigger.
+4. Finally setup the Supabase client in your application.
+
+## Setup the Supabase client library
+
+<Tabs type="underlined" queryGroup="cognito-create-client">
+
+<TabPanel id="ts" label="TypeScript (Amplify)">
+
+```typescript
+import { fetchAuthSession, Hub } from 'aws-amplify/auth'
+
+const supabase = createClient('https://<supabase-project>.supabase.co', 'SUPABASE_ANON_KEY', {
+  accessToken: async () => {
+    const tokens = await fetchAuthSession()
+
+    // Alternatively you can use tokens?.idToken instead.
+    return tokens?.accessToken
+  },
+})
+
+// if you're using Realtime you also need to set up a listener for Cognito auth changes
+Hub.listen('auth', () => {
+  fetchAuthSession().then((tokens) => supabase.realtime.setAuth(tokens?.accessToken))
+})
+```
+
+</TabPanel>
+
+<TabPanel id="swift" label="Swift (iOS)">
+
+```swift
+import Supabase
+import AWSPluginsCore
+
+struct UnexpectedAuthSessionError: Error {}
+
+let supabase = SupabaseClient(
+  supabaseURL: URL(string: "https://<supabase-project>.supabase.co")!,
+  supabaseKey: "SUPABASE_ANON_KEY",
+  options: SupabaseClientOptions(
+    auth: SupabaseClientOptions.AuthOptions(
+      accessToken: {
+        let session = try await Amplify.Auth.fetchAuthSession()
+
+        guard let cognitoTokenProvider = session as? AuthCognitoTokensProvider else {
+          throw UnexpectedAuthSessionError()
+        }
+
+        let tokens = try cognitoTokenProvider.getCognitoTokens().get()
+        return tokens.idToken
+      }
+    )
+  )
+)
+```
+
+</TabPanel>
+
+<TabPanel id="dart" label="Flutter">
+
+```dart
+import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_flutter/amplify_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+Future<void> main() async {
+  await Supabase.initialize(
+    url: 'https://<supabase-project>.supabase.co',
+    anonKey: 'SUPABASE_ANON_KEY',
+    accessToken: () async {
+      final session = await Amplify.Auth.fetchAuthSession();
+      final cognitoSession = session as CognitoAuthSession;
+      return cognitoSession.userPoolTokensResult.value.accessToken.raw;
+    },
+  );
+  runApp(const MyApp());
+}
+```
+
+</TabPanel>
+
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+import com.amplifyframework.auth.AuthSession
+import com.amplifyframework.auth.cognito.AWSCognitoAuthSession
+import com.amplifyframework.core.Amplify
+
+val supabase = createSupabaseClient(
+    "https://<supabase-project>.supabase.co",
+    "SUPABASE_ANON_KEY"
+) {
+    accessToken = {
+        getAccessToken()
+    }
+}
+
+suspend fun getAccessToken(): String? {
+    return suspendCoroutine {
+        Amplify.Auth.fetchAuthSession(
+            { result: AuthSession ->
+                val cognitoAuthSession = result as AWSCognitoAuthSession
+                it.resume(cognitoAuthSession.userPoolTokensResult.value?.accessToken)
+            },
+            { _ ->
+                // Handle error
+            })
+    }
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Add a new Third-Party Auth integration to your project
+
+In the dashboard navigate to your project's [Authentication settings](/dashboard/project/_/settings/auth) and find the Third-Party Auth section to add a new integration.
+
+In the CLI add the following config to your `supabase/config.toml` file:
+
+```toml
+[auth.third_party.aws_cognito]
+enabled = true
+user_pool_id = "<id>"
+user_pool_region = "<region>"
+```
+
+## Use a Pre-Token Generation Trigger to assign the authenticated role
+
+Your Supabase project inspects the `role` claim present in all JWTs sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization.
+
+By default, Amazon Cognito JWTs (both ID token and access tokens) do not contain a `role` claim in them. If you were to send such a JWT to your Supabase project, the `anon` role would be assigned when executing the Postgres query. Most of your app's logic will be accessible by the `authenticated` role.
+
+A recommended approach to do this is to configure a [Pre-Token Generation Trigger](https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-pre-token-generation.html) either `V1_0` (ID token only) or `V2_0` (both access and ID token). To do this you will need to create a new Lambda function (in any language and runtime) and assign it to the [Amazon Cognito User Pool's Lambda Triggers configuration](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html). For example, the Lambda function should look similar to this:
+
+<Tabs type="underlined" queryGroup="cognito-lambda">
+
+<TabPanel id="blocking-nodejs" label="Node.js">
+
+```javascript
+export const handler = async (event) => {
+  event.response = {
+    claimsOverrideDetails: {
+      claimsToAddOrOverride: {
+        role: 'authenticated',
+      },
+    },
+  }
+
+  return event
+}
+```
+
+</TabPanel>
+
+</Tabs>

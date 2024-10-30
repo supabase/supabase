@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { Alert, Button, Modal } from 'ui'
 
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
@@ -20,7 +20,7 @@ const DeletePaymentMethodModal = ({
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
         toast.success(
-          `Successfully removed payment method ending with ${selectedPaymentMethod!.card.last4}`
+          `Successfully removed payment method ending with ${selectedPaymentMethod?.card?.last4}`
         )
         onClose()
       },
@@ -36,7 +36,7 @@ const DeletePaymentMethodModal = ({
     <Modal
       visible={selectedPaymentMethod !== undefined}
       size="medium"
-      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card.last4}`}
+      header={`Confirm to delete payment method ending with ${selectedPaymentMethod?.card?.last4}`}
       onCancel={() => onClose()}
       customFooter={
         <div className="flex items-center gap-2">
@@ -54,13 +54,11 @@ const DeletePaymentMethodModal = ({
         </div>
       }
     >
-      <div className="py-4">
-        <Modal.Content>
-          <Alert withIcon variant="info" title="This will permanently delete your payment method.">
-            <p>You can re-add the payment method any time.</p>
-          </Alert>
-        </Modal.Content>
-      </div>
+      <Modal.Content>
+        <Alert withIcon variant="info" title="This will permanently delete your payment method.">
+          <p>You can re-add the payment method any time.</p>
+        </Alert>
+      </Modal.Content>
     </Modal>
   )
 }
