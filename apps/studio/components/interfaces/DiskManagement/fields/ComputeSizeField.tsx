@@ -14,6 +14,9 @@ import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskMa
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import FormMessage from '../ui/FormMessage'
 
+/**
+ * to do: this could be a type from api-types
+ */
 type ComputeOption = {
   identifier: components['schemas']['AddonVariantId']
   name: string
@@ -30,24 +33,42 @@ type ComputeSizeFieldProps = {
 }
 
 export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
-  const project = useProjectContext()
   const { ref } = useParams()
   const { control, formState, setValue, trigger } = form
 
+  const {
+    /**
+     * projectContext is used for:
+     *   - cloud provider
+     *   - infra_compute_size
+     */
+    project,
+    /**
+     * isLoading is used to avoud a useCheckPermissions() race condition
+     */
+    isLoading: isProjectLoading,
+    /**
+     * to do: there is no error/isError variables available for useProjectContext
+     */
+  } = useProjectContext()
   const {
     data: addons,
     isLoading: isAddonsLoading,
     error: addonsError,
   } = useProjectAddonsQuery({ projectRef: ref })
 
+  const isLoading = isProjectLoading || isAddonsLoading
+
   const availableAddons = useMemo(() => {
     return addons?.available_addons ?? []
   }, [addons])
-
   const availableOptions = useMemo(() => {
-    // @ts-expect-error
+    /**
+     * Returns the available compute options for the project
+     * Also handles backwards compatibility for older API versions
+     * Also handles a case in which Nano is not available from the API
+     */
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
-    // @ts-expect-error
   }, [availableAddons, project?.cloud_provider])
 
   const computeSizePrice = calculateComputeSizePrice({
@@ -94,7 +115,7 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
             defaultValue={field.value}
             value={field.value}
           >
-            {isAddonsLoading ? (
+            {isLoading ? (
               Array(10)
                 .fill(0)
                 .map((_, i) => <Skeleton key={i} className="w-full h-[110px] rounded-md" />)
@@ -104,7 +125,6 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
               </FormMessage>
             ) : (
               availableOptions.map((compute: ComputeOption) => {
-                // @ts-expect-error
                 const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
                 return (
                   <RadioGroupCardItem

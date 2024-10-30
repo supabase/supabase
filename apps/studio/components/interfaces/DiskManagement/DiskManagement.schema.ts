@@ -9,7 +9,7 @@ import {
 } from './DiskManagement.utils'
 import { components } from 'api-types'
 
-type AddonVariantId = components['schemas']['AddonVariantId']
+type AddonVariantId = components['schemas']['AddonVariantId'] | 'ci_nano'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
@@ -27,8 +27,6 @@ const baseSchema = z.object({
 export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, computeSize } = data
-
-    const computeLabel = computeSize?.toUpperCase().replace('CI_', '')
 
     if (totalSize < defaultTotalSize) {
       ctx.addIssue({
@@ -65,7 +63,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
 
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${diskSizeRequiredForIopsWithIo2}GB required. Current max is ${maxIOPSforDiskSizeWithio2} IOPS.`,
+            message: `Larger Disk size of at least ${diskSizeRequiredForIopsWithIo2} GB required. Current max is ${maxIOPSforDiskSizeWithio2} IOPS.`,
             path: ['provisionedIOPS'],
           })
         } else {
@@ -119,7 +117,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
 
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${diskSizeRequiredForIopsWithGp3}GB required. Current max is ${maxIopsAllowedForDiskSizeWithGp3} IOPS.`,
+            message: `Larger Disk size of at least ${diskSizeRequiredForIopsWithGp3} GB required. Current max is ${maxIopsAllowedForDiskSizeWithGp3} IOPS.`,
             path: ['provisionedIOPS'],
           })
         } else {
@@ -137,7 +135,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
         if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least 125`,
+            message: `Throughput must be at least 125 MiB/s`,
             path: ['throughput'],
           })
         }
@@ -145,7 +143,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const iopsRequiredForThroughput = calculateIopsRequiredForThroughput(throughput)
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Need at least ${iopsRequiredForThroughput}IOPS to support ${throughput}MB/s.`,
+            message: `Need at least ${iopsRequiredForThroughput} IOPS to support ${throughput} MiB/s.`,
             path: ['throughput'],
           })
         }

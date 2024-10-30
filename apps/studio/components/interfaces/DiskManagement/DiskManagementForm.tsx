@@ -49,6 +49,7 @@ import {
 } from './ui/DiskManagement.constants'
 import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
 import { NoticeBar } from './ui/NoticeBar'
+import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 
 export function DiskManagementForm() {
   const {
@@ -149,8 +150,10 @@ export function DiskManagementForm() {
   /**
    * Handle compute instances
    */
-  const selectedAddons = addons?.selected_addons ?? []
-  const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
+  // const selectedAddons = addons?.selected_addons ?? []
+  // const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
+  // const projectComputeSize = project?.infra_compute_size
+  // const isNanoCompute = projectComputeSize === 'nano'
 
   /**
    * Handle default values
@@ -162,7 +165,9 @@ export function DiskManagementForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
-    computeSize: subscriptionCompute?.variant.identifier,
+    computeSize: project?.infra_compute_size
+      ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
+      : undefined,
   }
 
   const form = useForm<DiskStorageSchemaType>({
@@ -336,6 +341,14 @@ export function DiskManagementForm() {
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+            {/* TESTING */}
+            <div className="bg-alternative border p-3 rounded text-xs font-mono">
+              <div>project.infra_compute_size: {project?.infra_compute_size}</div>
+              <div>project.status: {project?.status}</div>
+              <div className="mt-2">form status:</div>
+              <pre className="mt-2 text-xs">{JSON.stringify(form.getValues(), null, 2)}</pre>
+            </div>
+            {/* TESTING */}
             <Separator />
             <ComputeSizeField form={form} />
             <Separator />
@@ -346,8 +359,7 @@ export function DiskManagementForm() {
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern
               className="-space-y-px"
-              // open={advancedSettingsOpen}
-              defaultOpen
+              open={advancedSettingsOpen}
               onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
             >
               <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">

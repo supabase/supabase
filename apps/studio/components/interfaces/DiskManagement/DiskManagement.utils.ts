@@ -6,9 +6,11 @@ import {
   PLAN_DETAILS,
   COMPUTE_BASELINE_IOPS,
 } from './ui/DiskManagement.constants'
-import { INSTANCE_MICRO_SPECS } from 'lib/constants'
-import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
+import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useMemo } from 'react'
+import { Project } from 'types'
+import { ProjectDetail } from 'data/projects/project-detail-query'
 
 // Included disk size only applies to primary, not replicas
 export const calculateDiskSizePrice = ({
@@ -189,6 +191,25 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
     })
   }
 
+  computeOptions.unshift({
+    identifier: 'ci_nano',
+    name: 'Nano',
+    price_description: '$0/hour (~$0/month)',
+    price: 0,
+    price_interval: 'hourly',
+    price_type: 'usage',
+    // @ts-ignore API types it as Record<string, never>
+    meta: {
+      cpu_cores: INSTANCE_NANO_SPECS.cpu_cores,
+      cpu_dedicated: INSTANCE_NANO_SPECS.cpu_dedicated,
+      memory_gb: INSTANCE_NANO_SPECS.memory_gb,
+      baseline_disk_io_mbs: INSTANCE_NANO_SPECS.baseline_disk_io_mbs,
+      max_disk_io_mbs: INSTANCE_NANO_SPECS.max_disk_io_mbs,
+      connections_direct: INSTANCE_NANO_SPECS.connections_direct,
+      connections_pooler: INSTANCE_NANO_SPECS.connections_pooler,
+    } as ProjectAddonVariantMeta,
+  })
+
   return computeOptions
 }
 
@@ -262,4 +283,24 @@ export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): numbe
 
 export const formatComputeName = (compute: string) => {
   return compute.toUpperCase().replace('CI_', '')
+}
+
+export const mapComputeSizeNameToAddonVariantId = (
+  computeSize: ProjectDetail['infra_compute_size']
+): AddonVariantId => {
+  if (!computeSize) throw new Error('Compute size is required')
+
+  return {
+    nano: 'ci_nano',
+    micro: 'ci_micro',
+    small: 'ci_small',
+    medium: 'ci_medium',
+    large: 'ci_large',
+    xlarge: 'ci_xlarge',
+    '2xlarge': 'ci_2xlarge',
+    '4xlarge': 'ci_4xlarge',
+    '8xlarge': 'ci_8xlarge',
+    '12xlarge': 'ci_12xlarge',
+    '16xlarge': 'ci_16xlarge',
+  }[computeSize] as AddonVariantId
 }

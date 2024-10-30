@@ -145,7 +145,11 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
       </div>
       <div className="col-span-8">
         <DiskSpaceBar form={form} />
-        {error && <FormMessage message={error?.message} type="error" />}
+        {error && (
+          <FormMessage message="Failed to load disk size data" type="error">
+            {error?.message}
+          </FormMessage>
+        )}
         <DiskManagementDiskSizeReadReplicas
           isDirty={formState.dirtyFields.totalSize !== undefined}
           totalSize={(formState.defaultValues?.totalSize || 0) * 1.25}
