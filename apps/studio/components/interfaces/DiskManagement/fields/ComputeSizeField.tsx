@@ -30,9 +30,10 @@ type ComputeOption = {
 
 type ComputeSizeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
+  disabled?: boolean
 }
 
-export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
+export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
   const { control, formState, setValue, trigger } = form
 
@@ -114,6 +115,7 @@ export function ComputeSizeField({ form }: ComputeSizeFieldProps) {
             }}
             defaultValue={field.value}
             value={field.value}
+            disabled={disabled}
           >
             {isLoading ? (
               Array(10)

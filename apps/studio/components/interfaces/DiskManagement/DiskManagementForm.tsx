@@ -50,6 +50,8 @@ import {
 import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
 import { NoticeBar } from './ui/NoticeBar'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
+import { Admonition } from 'ui-patterns'
+import Link from 'next/link'
 
 export function DiskManagementForm() {
   const {
@@ -199,19 +201,20 @@ export function DiskManagementForm() {
 
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
 
-  // const planId = subscription?.plan.id ?? 'free'
-  const isPlanUpgradeRequired =
-    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
+  const isPlanUpgradeRequired = subscription?.plan.id === 'free'
+  const isSpendCapEnabled = !subscription?.usage_billing_enabled
 
   const { watch, formState } = form
 
   // const isAllocatedStorageDirty = !!dirtyFields.totalSize
 
-  const disableInput =
+  const disableDiskInputs =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
     !canUpdateDiskConfiguration
+
+  const disableComputeInputs = isPlanUpgradeRequired
 
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
@@ -283,78 +286,67 @@ export function DiskManagementForm() {
     }
   }
 
-  // if (planId === 'team') {
-  //   return (
-  //     <div id="disk-management">
-  //       <FormHeader
-  //         title="Disk Management"
-  //         docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
-  //       />
-  //       <Alert_Shadcn_>
-  //         <InfoIcon />
-  //         <AlertTitle_Shadcn_>
-  //           Disk size configuration is not available for projects on the Free Plan
-  //         </AlertTitle_Shadcn_>
-  //         <AlertDescription_Shadcn_>
-  //           <p>
-  //             If you are intending to use more than 500MB of disk space, then you will need to
-  //             upgrade to at least the Pro Plan.
-  //           </p>
-  //           <Button asChild type="default" className="mt-3">
-  //             <Link
-  //               target="_blank"
-  //               rel="noreferrer"
-  //               href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
-  //             >
-  //               Upgrade plan
-  //             </Link>
-  //           </Button>
-  //         </AlertDescription_Shadcn_>
-  //       </Alert_Shadcn_>
-  //     </div>
-  //   )
-  // }
-
   // return <></>
 
   return (
     <>
-      {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
-        <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-          <DiskMangementRestartRequiredSection
-            visible={isProjectResizing}
-            title="Your project will now automatically restart."
-            description="Your project will be unavailable for up to 2 mins."
-          />
-          <NoticeBar
-            visible={isProjectRequestingDiskChanges}
-            title="Disk configuration changes have been requested"
-            description="The requested changes will be applied to your disk shortly"
-          />
-          <NoticeBar
-            visible={noPermissions}
-            title="You do not have permission to update disk configuration"
-            description="Please contact your organization administrator to update your disk configuration"
-          />
-        </ScaffoldContainer>
-      ) : null}
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+            {isPlanUpgradeRequired && (
+              // <ScaffoldContainer className="relative flex flex-col gap-10">
+              <Admonition
+                type="default"
+                title="Compute and Disk configuration is not available on the Free Plan"
+              >
+                <p>
+                  You will need to upgrade to at least the Pro Plan to configure compute and disk
+                </p>
+                <Button type="default" asChild>
+                  <Link
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}
+                  >
+                    Upgrade plan
+                  </Link>
+                </Button>
+              </Admonition>
+              // </ScaffoldContainer>
+            )}
+            {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
+              <div className="relative flex flex-col gap-10">
+                <DiskMangementRestartRequiredSection
+                  visible={isProjectResizing}
+                  title="Your project will now automatically restart."
+                  description="Your project will be unavailable for up to 2 mins."
+                />
+                <NoticeBar
+                  visible={isProjectRequestingDiskChanges}
+                  title="Disk configuration changes have been requested"
+                  description="The requested changes will be applied to your disk shortly"
+                />
+                <NoticeBar
+                  visible={noPermissions}
+                  title="You do not have permission to update disk configuration"
+                  description="Please contact your organization administrator to update your disk configuration"
+                />
+              </div>
+            ) : null}
             {/* TESTING */}
-            <div className="bg-alternative border p-3 rounded text-xs font-mono">
+            {/* <div className="bg-alternative border p-3 rounded text-xs font-mono">
               <div>project.infra_compute_size: {project?.infra_compute_size}</div>
               <div>project.status: {project?.status}</div>
               <div className="mt-2">form status:</div>
               <pre className="mt-2 text-xs">{JSON.stringify(form.getValues(), null, 2)}</pre>
-            </div>
+            </div> */}
             {/* TESTING */}
             <Separator />
-            <ComputeSizeField form={form} />
+            <ComputeSizeField form={form} disabled={disableComputeInputs} />
             <Separator />
             <DiskCountdownRadial />
-            <DiskSizeField form={form} disableInput={disableInput} />
-            {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
+            <DiskSizeField form={form} disableInput={disableDiskInputs} />
+            {/* {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />} */}
             <Separator />
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern
@@ -377,9 +369,9 @@ export function DiskManagementForm() {
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                <StorageTypeField form={form} disableInput={disableInput} />
-                <IOPSField form={form} disableInput={disableInput} />
-                <ThroughputField form={form} disableInput={disableInput} />
+                <StorageTypeField form={form} disableInput={disableDiskInputs} />
+                <IOPSField form={form} disableInput={disableDiskInputs} />
+                <ThroughputField form={form} disableInput={disableDiskInputs} />
               </CollapsibleContent_Shadcn_>
             </Collapsible_Shadcn_>
           </ScaffoldContainer>
