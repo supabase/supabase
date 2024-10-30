@@ -11,6 +11,7 @@ import { INSTANCE_MICRO_SPECS } from 'lib/constants'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const Row = ({ label, stat }: { label: string; stat: React.ReactNode | string }) => {
   return (
@@ -35,6 +36,8 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
+
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   // returns hardcoded values for infra
   const cpuArchitecture = getCloudProviderArchitecture(project.cloud_provider)
@@ -66,7 +69,11 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
     e.preventDefault()
     e.stopPropagation()
 
-    router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
+    if (diskAndComputeFormEnabled) {
+      router.push(`/project/${project?.ref}/settings/compute-and-disk`)
+    } else {
+      router.push(`/project/${project?.ref}/settings/addons?panel=computeInstance`)
+    }
   }
 
   const highestComputeAvailable = availableCompute?.[availableCompute.length - 1].identifier

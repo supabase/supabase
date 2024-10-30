@@ -72,6 +72,7 @@ const DeployNewReplicaPanel = ({
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const diskManagementV2 = useFlag('diskManagementV2')
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
@@ -304,7 +305,9 @@ const DeployNewReplicaPanel = ({
                     href={
                       isFreePlan
                         ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                        : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        : diskAndComputeFormEnabled
+                          ? `/project/${projectRef}/settings/compute-and-disk`
+                          : `/project/${projectRef}/settings/addons?panel=computeInstance`
                     }
                   >
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
@@ -411,7 +414,9 @@ const DeployNewReplicaPanel = ({
                         href={
                           isFreePlan
                             ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            : diskAndComputeFormEnabled
+                              ? `/project/${projectRef}/settings/compute-and-disk`
+                              : `/project/${projectRef}/settings/addons?panel=computeInstance`
                         }
                       >
                         Upgrade compute size
