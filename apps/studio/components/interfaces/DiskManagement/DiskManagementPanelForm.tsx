@@ -60,7 +60,7 @@ import {
   calculateThroughputPrice,
 } from './DiskManagement.utils'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
-import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
+import { DiskManagementPlanUpgradeRequired } from './ui/SpendCapDisabledSection'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,

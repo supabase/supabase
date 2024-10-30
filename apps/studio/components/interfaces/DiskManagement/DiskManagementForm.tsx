@@ -47,7 +47,10 @@ import {
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
-import { DiskManagementPlanUpgradeRequired } from './ui/DiskManagementPlanUpgradeRequired'
+import {
+  DiskManagementPlanUpgradeRequired,
+  SpendCapDisabledSection,
+} from './ui/SpendCapDisabledSection'
 import { NoticeBar } from './ui/NoticeBar'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { Admonition } from 'ui-patterns'
@@ -125,15 +128,17 @@ export function DiskManagementForm() {
     }
   )
   const {
-    data: addons,
     isLoading: isAddonsLoading,
     error: addonsError,
     isSuccess: isAddonsSuccess,
   } = useProjectAddonsQuery({ projectRef })
-  const { remainingDuration: initialRemainingTime, isWithinCooldownWindow } =
-    useRemainingDurationForDiskAttributeUpdate({
-      projectRef,
-    })
+  const {
+    isWithinCooldownWindow,
+    isLoading: isCooldownLoading,
+    isSuccess: isCooldownSuccess,
+  } = useRemainingDurationForDiskAttributeUpdate({
+    projectRef,
+  })
   const {
     isLoading: isDiskUtilizationLoading,
     error: diskUtilError,
@@ -188,26 +193,24 @@ export function DiskManagementForm() {
     isDiskAttributesLoading ||
     isDiskUtilizationLoading ||
     isReadReplicasLoading ||
-    isSubscriptionLoading
-  const error =
-    addonsError ?? diskAttributesError ?? diskUtilError ?? readReplicasError ?? subscriptionError
+    isSubscriptionLoading ||
+    isCooldownLoading
   const isSuccess =
     isAddonsSuccess &&
     isDiskAttributesSuccess &&
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
-    isSubscriptionSuccess
+    isSubscriptionSuccess &&
+    isCooldownSuccess
+
+  const error =
+    addonsError ?? diskAttributesError ?? diskUtilError ?? readReplicasError ?? subscriptionError
 
   const isRequestingChanges = data?.requested_modification !== undefined
-
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
-
   const isPlanUpgradeRequired = subscription?.plan.id === 'free'
-  const isSpendCapEnabled = !subscription?.usage_billing_enabled
 
-  const { watch, formState } = form
-
-  // const isAllocatedStorageDirty = !!dirtyFields.totalSize
+  const { formState } = form
 
   const disableDiskInputs =
     isRequestingChanges ||
@@ -220,8 +223,6 @@ export function DiskManagementForm() {
   useEffect(() => {
     // Initialize field values properly when data has been loaded, preserving any user changes
     if (isSuccess) {
-      console.log('FORM resetting', form.formState)
-
       form.reset(defaultValues, {})
     }
   }, [isSuccess])
@@ -332,23 +333,23 @@ export function DiskManagementForm() {
               </div>
             ) : null}
             {/* TESTING */}
-            <div className="bg-alternative border p-3 rounded text-xs font-mono">
+            {/* <div className="bg-alternative border p-3 rounded text-xs font-mono">
               <div>project.infra_compute_size: {project?.infra_compute_size}</div>
               <div>project.status: {project?.status}</div>
               <div className="mt-2">form status:</div>
               <pre className="mt-2 text-xs">{JSON.stringify(form.getValues(), null, 2)}</pre>
-            </div>
+            </div> */}
             {/* TESTING */}
             <Separator />
             <ComputeSizeField form={form} disabled={disableComputeInputs} />
             <Separator />
             <DiskCountdownRadial />
+            <SpendCapDisabledSection />
             <DiskSizeField
               form={form}
               disableInput={disableDiskInputs}
               setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
             />
-            {/* {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />} */}
             <Separator />
             <Collapsible_Shadcn_
               // TO DO: wrap component into pattern

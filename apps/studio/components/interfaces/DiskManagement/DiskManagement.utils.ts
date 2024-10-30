@@ -325,3 +325,8 @@ export const mapAddOnVariantIdToComputeSize = (
     ci_16xlarge: '16XL',
   }[addonVariantId] as ComputeInstanceSize
 }
+
+export const formatNumber = (num: number): string => {
+  if (!num) throw Error('Number is required')
+  return num.toLocaleString('en-US')
+}
