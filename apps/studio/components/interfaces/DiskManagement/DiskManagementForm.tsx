@@ -47,10 +47,7 @@ import {
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
-import {
-  DiskManagementPlanUpgradeRequired,
-  SpendCapDisabledSection,
-} from './ui/SpendCapDisabledSection'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { NoticeBar } from './ui/NoticeBar'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { Admonition } from 'ui-patterns'
