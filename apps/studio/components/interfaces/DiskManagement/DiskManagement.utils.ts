@@ -1,7 +1,11 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { AddonVariantId, PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
-import { ComputeInstanceAddonVariantId, ComputeInstanceSize } from './DiskMangement.types'
+import {
+  ComputeInstanceAddonVariantId,
+  ComputeInstanceSize,
+  InfraInstanceSize,
+} from './DiskMangement.types'
 import {
   COMPUTE_BASELINE_IOPS,
   DISK_LIMITS,
@@ -328,4 +332,10 @@ export const mapAddOnVariantIdToComputeSize = (
 export const formatNumber = (num: number): string => {
   if (!num) throw Error('Number is required')
   return num.toLocaleString('en-US')
+}
+
+export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
+  if (!plan) throw new Error('Plan is required')
+  if (!infraComputeSize) throw new Error('Current compute size required')
+  return plan !== 'free' && infraComputeSize === 'nano'
 }

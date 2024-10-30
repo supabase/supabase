@@ -49,7 +49,7 @@ import {
 } from './ui/DiskManagement.constants'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { NoticeBar } from './ui/NoticeBar'
-import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
+import { mapComputeSizeNameToAddonVariantId, showMicroUpgrade } from './DiskManagement.utils'
 import { Admonition } from 'ui-patterns'
 import Link from 'next/link'
 import { AddonVariantId } from 'data/subscriptions/types'
@@ -288,28 +288,30 @@ export function DiskManagementForm() {
 
   // return <></>
 
+  const showUpgradeBadge = showMicroUpgrade(
+    subscription?.plan.id ?? 'free',
+    project?.infra_compute_size ?? 'nano'
+  )
+
   return (
     <>
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
           <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-            {isPlanUpgradeRequired && (
-              // <ScaffoldContainer className="relative flex flex-col gap-10">
-              <Admonition
-                type="default"
-                title="Compute and Disk configuration is not available on the Free Plan"
-              >
-                <p>
-                  You will need to upgrade to at least the Pro Plan to configure compute and disk
-                </p>
+            <NoticeBar
+              type="default"
+              visible={isPlanUpgradeRequired}
+              title="Compute and Disk configuration is not available on the Free Plan"
+              actions={
                 <Button type="default" asChild>
                   <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
                     Upgrade plan
                   </Link>
                 </Button>
-              </Admonition>
-              // </ScaffoldContainer>
-            )}
+              }
+              description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
+            />
+
             {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
               <div className="relative flex flex-col gap-10">
                 <DiskMangementRestartRequiredSection
@@ -318,11 +320,13 @@ export function DiskManagementForm() {
                   description="Your project will be unavailable for up to 2 mins."
                 />
                 <NoticeBar
+                  type="default"
                   visible={isProjectRequestingDiskChanges}
                   title="Disk configuration changes have been requested"
                   description="The requested changes will be applied to your disk shortly"
                 />
                 <NoticeBar
+                  type="default"
                   visible={noPermissions}
                   title="You do not have permission to update disk configuration"
                   description="Please contact your organization administrator to update your disk configuration"
@@ -370,9 +374,11 @@ export function DiskManagementForm() {
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                 <NoticeBar
-                  visible={RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
-                    form.watch('computeSize')
-                  )}
+                  type="default"
+                  visible={
+                    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
+                    subscription?.plan.id !== 'free'
+                  }
                   title="LARGE Compute size required to configure Advanced disk settings"
                   actions={
                     <Button

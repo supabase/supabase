@@ -28,3 +28,16 @@ export type ComputeInstanceSize =
   | '8XL'
   | '12XL'
   | '16XL'
+
+export type InfraInstanceSize =
+  | 'nano'
+  | 'micro'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'xlarge'
+  | '2xlarge'
+  | '4xlarge'
+  | '8xlarge'
+  | '12xlarge'
+  | '16xlarge'

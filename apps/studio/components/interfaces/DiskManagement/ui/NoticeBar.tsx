@@ -1,27 +1,27 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
+import { ComponentProps } from 'react'
 import { Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns'
 
-interface NoticeBarProps {
+interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {
   title?: string
   description?: string
   icon?: LucideIcon
   visible: boolean
   actions?: React.ReactNode
 }
-
-export function NoticeBar({ visible, title, description, actions }: NoticeBarProps) {
+export function NoticeBar({ visible, description, actions, ...props }: NoticeBarProps) {
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, height: 0, y: 4 }}
+          animate={{ opacity: 1, height: 'auto', y: 0 }}
+          exit={{ opacity: 0, height: 0, y: 4 }}
+          transition={{ duration: 0.15 }}
         >
-          <Admonition type="default" title={title}>
+          <Admonition {...props}>
             {description}
             <div className="flex flex-col gap-2">
               {actions && <div className="mt-2">{actions}</div>}

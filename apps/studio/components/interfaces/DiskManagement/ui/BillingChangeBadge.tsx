@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { formatCurrency } from 'lib/helpers'
 import { ChevronRight } from 'lucide-react'
-import { Badge, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Badge, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 interface BillingChangeBadgeProps {
   beforePrice?: number
@@ -9,6 +9,7 @@ interface BillingChangeBadgeProps {
   show: boolean | undefined
   tooltip?: string
   className?: string
+  free?: boolean
 }
 
 const BillingChangeBadge = ({
@@ -17,6 +18,7 @@ const BillingChangeBadge = ({
   show,
   tooltip,
   className,
+  free,
 }: BillingChangeBadgeProps) => {
   return (
     <AnimatePresence>
@@ -30,7 +32,14 @@ const BillingChangeBadge = ({
           // whileHover={{ scale: 1.05 }}
           // whileTap={{ scale: 0.95 }}
         >
-          <Badge variant="default" className={`bg-alternative bg-opacity-100 ${className}`}>
+          <Badge
+            variant="default"
+            className={cn(
+              !free ? `bg-alternative` : `bg-warning-200 border-warning-500 text-warning`,
+              `bg-opacity-100`,
+              className
+            )}
+          >
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <div className="flex items-center gap-1">
@@ -44,7 +53,7 @@ const BillingChangeBadge = ({
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.12 }}
                   >
-                    {formatCurrency(afterPrice)}/month
+                    {free ? 'Free' : `${formatCurrency(afterPrice)}/month`}
                   </motion.span>
                 </div>
               </TooltipTrigger_Shadcn_>

@@ -27,7 +27,7 @@ type Props = {
   name?: string
 }
 
-const ContainerVariants = cva('relative grid gap-2', {
+const ContainerVariants = cva('relative grid gap-10', {
   variants: {
     size: {
       tiny: 'text-xs',

@@ -3,23 +3,30 @@ import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { CpuIcon, Microchip } from 'lucide-react'
+import { CpuIcon, DiamondPlus, Lock, Microchip, Sparkle, Sparkles } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
+import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
-import { calculateComputeSizePrice, getAvailableComputeOptions } from '../DiskManagement.utils'
+import {
+  calculateComputeSizePrice,
+  getAvailableComputeOptions,
+  showMicroUpgrade,
+} from '../DiskManagement.utils'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import FormMessage from '../ui/FormMessage'
 import { ComputeInstanceAddonVariantId } from '../DiskMangement.types'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { NoticeBar } from '../ui/NoticeBar'
 
 /**
  * to do: this could be a type from api-types
  */
 type ComputeOption = {
-  identifier: components['schemas']['AddonVariantId']
+  identifier: ComputeInstanceAddonVariantId
   name: string
   price: number
   price_interval: 'monthly' | 'hourly'
@@ -36,7 +43,15 @@ type ComputeSizeFieldProps = {
 
 export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const { ref } = useParams()
+  const org = useSelectedOrganization()
   const { control, formState, setValue, trigger } = form
+
+  const {
+    /**
+     * no error/isError states handled here, as a parent component handles them
+     */
+    data: subscription,
+  } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
   const {
     /**
@@ -79,6 +94,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     newComputeSize: form.getValues('computeSize'),
   })
 
+  const showUpgradeBadge = showMicroUpgrade(
+    subscription?.plan.id ?? 'free',
+    project?.infra_compute_size ?? 'nano'
+  )
+
   return (
     <FormField_Shadcn_
       name="computeSize"
@@ -98,8 +118,17 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 }
                 beforePrice={Number(computeSizePrice.oldPrice)}
                 afterPrice={Number(computeSizePrice.newPrice)}
+                free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
               />
               <p>Hardware resources allocated to your postgres database</p>
+              <NoticeBar
+                showIcon={false}
+                type="default"
+                className="mt-3"
+                visible={showUpgradeBadge && form.watch('computeSize') !== 'ci_micro'}
+                title="Free Compute upgrade to Micro"
+                description="Paid Plans include a free upgrade to Micro compute."
+              />
             </>
           }
         >
@@ -128,13 +157,22 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             ) : (
               availableOptions.map((compute: ComputeOption) => {
                 const cpuArchitecture = getCloudProviderArchitecture(project?.cloud_provider)
+
+                const lockedOption =
+                  subscription?.plan.id !== 'free' &&
+                  project?.infra_compute_size !== 'nano' &&
+                  compute.identifier === 'ci_nano'
+
                 return (
                   <RadioGroupCardItem
                     key={compute.identifier}
                     showIndicator={false}
                     value={compute.identifier}
-                    className="text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] w-full h-[110px]"
-                    disabled={disabled}
+                    className={cn(
+                      'text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] w-full h-[110px]',
+                      lockedOption && 'opacity-50'
+                    )}
+                    disabled={disabled || lockedOption}
                     // @ts-expect-error
                     label={
                       <div className="w-full flex flex-col gap-3 justify-between">
@@ -146,15 +184,28 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             }
                           />
                           <div className="flex items-center space-x-1">
-                            <span className="text-foreground text-sm font-semibold">
-                              ${compute.price}
-                            </span>
-                            <span className="text-foreground-light translate-y-[1px]">
-                              {' '}
-                              / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                            </span>
+                            {lockedOption ? (
+                              <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
+                                <Lock size={14} />
+                              </div>
+                            ) : showUpgradeBadge && compute.identifier === 'ci_micro' ? (
+                              <div className="w-full text-warning-600 flex items-center gap-1 bg-warning-200 py-0.5 px-2 rounded-full border border-warning-500">
+                                <span className="font-mono">FREE UPGRADE</span>
+                              </div>
+                            ) : (
+                              <>
+                                <span className="text-foreground text-sm font-semibold">
+                                  ${compute.price}
+                                </span>
+                                <span className="text-foreground-light translate-y-[1px]">
+                                  {' '}
+                                  / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                </span>
+                              </>
+                            )}
                           </div>
                         </div>
+
                         <div className="w-full">
                           <div className="px-3 text-sm flex flex-col gap-1">
                             <div className="text-foreground-light flex gap-2 items-center">
