@@ -70,11 +70,14 @@ import {
   DiskManagementThroughputReadReplicas,
 } from './ui/DiskManagementReadReplicas'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useFlag } from 'hooks/ui/useFlag'
+import { NoticeBar } from './ui/NoticeBar'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
@@ -266,6 +269,30 @@ export function DiskManagementPanelForm() {
 
     return () => clearInterval(timer)
   }, [remainingTime])
+
+  if (diskAndComputeFormEnabled) {
+    return (
+      <div id="disk-management">
+        <FormHeader
+          title="Disk Management"
+          docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+        />
+        <NoticeBar
+          visible={true}
+          type="default"
+          title="Disk Management has moved"
+          description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
+          actions={
+            <Button type="default" asChild>
+              <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                Go to Compute and Disk
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    )
+  }
 
   if (planId === 'free') {
     return (
