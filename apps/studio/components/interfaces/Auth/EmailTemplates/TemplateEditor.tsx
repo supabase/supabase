@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect, useMemo, useState } from 'react'
+import { debounce } from 'lodash'
+import { Code, Monitor } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -9,10 +11,12 @@ import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
-import { AlertTitle_Shadcn_, Alert_Shadcn_, Form, Input, Tabs } from 'ui'
-import { Code, Monitor, Info } from 'lucide-react'
+import { Form, Input, Tabs } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { SpamValidation } from './SpamValidation'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -39,8 +43,16 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
 
   const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
   const messageProperty = properties[messageSlug]
+  const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+
+  const { mutate: validateSpam } = useValidateSpamMutation({
+    onSuccess: (res) => setValidationResult(res),
+  })
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debounceValidateSpam = useCallback(debounce(validateSpam, 1000), [])
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
@@ -79,6 +91,17 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [hasUnsavedChanges])
+
+  useEffect(() => {
+    if (projectRef && id) {
+      const [subjectKey] = Object.keys(properties)
+      validateSpam({
+        projectRef,
+        template: { subject: authConfig[subjectKey], content: authConfig[messageSlug] },
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
 
   return (
     <Form id={formId} className="!border-t-0" initialValues={INITIAL_VALUES} onSubmit={onSubmit}>
@@ -127,7 +150,7 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                 })}
               </FormSectionContent>
             </FormSection>
-            <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0">
+            <FormSection className="!mt-0 grid-cols-12 !border-t-0 !pt-0 pb-7">
               <FormSectionContent fullWidth loading={false}>
                 {messageProperty && (
                   <>
@@ -147,7 +170,8 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                       />
                     </div>
                     <Tabs defaultActiveId="source" type="underlined" size="tiny">
-                      <Tabs.Panel id={'source'} icon={<Code />} label="Source">
+                      <Tabs.Panel id="source" icon={<Code size={14} />} label="Source">
+                        <SpamValidation validationResult={validationResult} />
                         <div className="relative h-96">
                           <CodeEditor
                             id="code-id"
@@ -156,23 +180,26 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                             className="!mb-0 h-96 overflow-hidden rounded border"
                             onInputChange={(e: string | undefined) => {
                               setBodyValue(e ?? '')
-                              if (bodyValue !== e) {
-                                setHasUnsavedChanges(true)
+                              if (bodyValue !== e) setHasUnsavedChanges(true)
+
+                              if (projectRef) {
+                                const [subjectKey] = Object.keys(values)
+                                debounceValidateSpam({
+                                  projectRef,
+                                  template: { subject: values[subjectKey], content: e ?? '' },
+                                })
                               }
                             }}
-                            options={{ wordWrap: 'off', contextmenu: false }}
+                            options={{ wordWrap: 'on', contextmenu: false }}
                             value={bodyValue}
                           />
                         </div>
                       </Tabs.Panel>
-                      <Tabs.Panel id={'preview'} icon={<Monitor />} label="Preview">
-                        <Alert_Shadcn_ className="mb-2" variant="default">
-                          <Info strokeWidth={1.5} />
-                          <AlertTitle_Shadcn_>
-                            The preview may differ slightly from the actual rendering in the email
-                            client.
-                          </AlertTitle_Shadcn_>
-                        </Alert_Shadcn_>
+                      <Tabs.Panel id="preview" icon={<Monitor size={14} />} label="Preview">
+                        <Admonition
+                          type="default"
+                          title="The preview may differ slightly from the actual rendering in the email client"
+                        />
                         <iframe
                           className="!mb-0 overflow-hidden h-96 w-full rounded border"
                           title={id}
