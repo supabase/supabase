@@ -201,16 +201,18 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           )}
         </AnimatePresence>
       </div>
-      <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
-        <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
-          <span>Used Space</span>
+      {!show && (
+        <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
+            <span>Used Space</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
+            <span>Available space</span>
+          </div>
         </div>
-        <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
-          <span>Available space</span>
-        </div>
-      </div>
+      )}
       <p className="text-xs text-foreground-lighter mt-4">
         <span className="font-semibold">Note:</span> Disk Size refers to the total space your
         project occupies on disk, including the database itself (currently{' '}
