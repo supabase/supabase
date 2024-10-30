@@ -334,12 +334,12 @@ export function DiskManagementForm() {
               </div>
             ) : null}
             {/* TESTING */}
-            {/* <div className="bg-alternative border p-3 rounded text-xs font-mono">
+            <div className="bg-alternative border p-3 rounded text-xs font-mono">
               <div>project.infra_compute_size: {project?.infra_compute_size}</div>
               <div>project.status: {project?.status}</div>
               <div className="mt-2">form status:</div>
               <pre className="mt-2 text-xs">{JSON.stringify(form.getValues(), null, 2)}</pre>
-            </div> */}
+            </div>
             {/* TESTING */}
             <Separator />
             <ComputeSizeField form={form} disabled={disableComputeInputs} />

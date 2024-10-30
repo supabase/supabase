@@ -134,6 +134,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     showIndicator={false}
                     value={compute.identifier}
                     className="text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] w-full h-[110px]"
+                    disabled={disabled}
                     // @ts-expect-error
                     label={
                       <div className="w-full flex flex-col gap-3 justify-between">
