@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Message as MessageType } from 'ai'
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
+import { IS_PLATFORM } from 'common/constants/environment'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
@@ -36,6 +37,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
+import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
+import ReactMarkdown from 'react-markdown'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -112,6 +115,25 @@ export const AiAssistantPanel = ({
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
+  const [isApiKeySet, setIsApiKeySet] = useState<boolean>(true)
+
+  // check to see if the OPENAI_API_KEY env var is set in self-hosted
+  // so we can disable the chat editor and add a warning about manually adding the key
+  useEffect(() => {
+    if (IS_PLATFORM) return
+
+    const checkApiKey = async () => {
+      try {
+        const response = await fetch(`${BASE_PATH}/api/ai/sql/check-api-key`)
+        setIsApiKeySet(response.status === 200)
+      } catch (error) {
+        console.error('Error checking API key:', error)
+        setIsApiKeySet(false)
+      }
+    }
+
+    checkApiKey()
+  }, [])
 
   const confirmOptInToShareSchemaData = async () => {
     if (!canUpdateOrganization) {
@@ -289,11 +311,21 @@ export const AiAssistantPanel = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <div className="sticky p-5 flex-0 border-t">
+      <div className="sticky p-5 flex-0 border-t grid gap-4">
+        {!isApiKeySet && !IS_PLATFORM && (
+          <Alert>
+            <AlertTitle>OpenAI API key not set</AlertTitle>
+            <AlertDescription>
+              <ReactMarkdown>
+                Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.
+              </ReactMarkdown>
+            </AlertDescription>
+          </Alert>
+        )}
         <AssistantChatForm
           textAreaRef={inputRef}
           loading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || isApiKeySet}
           icon={
             <AiIconAnimation
               allowHoverEffect
