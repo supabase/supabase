@@ -325,7 +325,7 @@ export const AiAssistantPanel = ({
         <AssistantChatForm
           textAreaRef={inputRef}
           loading={isLoading}
-          disabled={isLoading || isApiKeySet}
+          disabled={isLoading || !isApiKeySet}
           icon={
             <AiIconAnimation
               allowHoverEffect
