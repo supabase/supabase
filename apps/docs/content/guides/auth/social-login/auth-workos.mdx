@@ -58,7 +58,7 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 ![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-## Add login code to your client app
+## Add auth code to your client app
 
 <Tabs
   scrollable
@@ -71,21 +71,66 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 <CreateClientSnippet />
 
-When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `workos` as the `provider`:
+When your user signs in, call [`getAuthorizationUrl()`](https://workos.com/docs/reference/sso/get-authorization-url)
 
 ```js
-async function signInWithWorkOS() {
-  const { data, error } = await supabase.auth.signInWithOAuth({
-    provider: 'workos',
-    options: {
-      queryParams: {
-        connection: '<your_connection>',
-        organization: '<your_organization',
-        workos_provider: '<your_provider>',
-      },
-    },
-  })
+import { WorkOS } from '@workos-inc/node';
+import { NextResponse } from 'next/server';
+
+// Fail fast if required environment variables are not set
+const apiKey = process.env.WORKOS_API_KEY;
+const clientId = process.env.WORKOS_CLIENT_ID;
+// Optionally, set a fallback Redirect URI
+const redirectUri = process.env.REDIRECT_URI || 'http://localhost:3000/auth/callback';
+
+if (!apiKey) {
+  throw new Error('WORKOS_API_KEY is not set in the environment variables.');
 }
+
+if (!clientId) {
+  throw new Error('WORKOS_CLIENT_ID is not set in the environment variables.');
+}
+
+const workos = new WorkOS(apiKey);
+
+export async function GET() {
+  // Use your Organization ID from the WorkOS dashboard: https://dashboard.workos.com
+  const organization = 'org_XXXXXX';
+
+  const authorizationUrl = workos.sso.getAuthorizationUrl({
+    organization,
+    redirectUri,
+    clientId,
+  });
+
+  return NextResponse.json({ url: authorizationUrl });
+}
+```
+
+When your user successfully signs in via social logins, magic link email or a configured SSO provider, you then exchange the code returned by WorkOS for an authenticated user profile:
+
+```js
+import { WorkOS } from '@workos-inc/node';
+
+const apiKey = process.env.WORKOS_API_KEY;
+const clientId = process.env.WORKOS_CLIENT_ID;
+
+if (!apiKey) {
+  throw new Error('WORKOS_API_KEY is not set in the environment variables.');
+}
+
+if (!clientId) {
+  throw new Error('WORKOS_CLIENT_ID is not set in the environment variables.');
+}
+
+const workos = new WorkOS(apiKey);
+
+const { access_token, profile } = await workos.sso.getProfileAndToken({
+  // Read the code query param from the Redirect URL that WorkOS returns after successful auth
+  // This static code is provided by way of example:
+  code: '01DMEK0J53CVMC32CK5SE0KZ8Q',
+  clientId: clientId,
+});
 ```
 
 Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
