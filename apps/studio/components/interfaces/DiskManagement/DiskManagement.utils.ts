@@ -256,7 +256,6 @@ export const calculateComputeSizeRequiredForIops = (
   const computeSizes = Object.entries(COMPUTE_BASELINE_IOPS).sort((a, b) => a[1] - b[1])
   for (const [size, baselineIops] of computeSizes) {
     if (iops <= baselineIops) {
-      console.log('SIZE', size)
       return size as ComputeInstanceAddonVariantId
     }
   }

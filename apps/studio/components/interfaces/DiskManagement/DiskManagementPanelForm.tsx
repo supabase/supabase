@@ -200,7 +200,6 @@ export function DiskManagementPanelForm() {
       : undefined
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
-    console.log('submitting')
     if (projectRef === undefined) return console.error('Project ref is required')
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }

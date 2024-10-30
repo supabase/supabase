@@ -110,7 +110,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                 shouldDirty: true,
                 shouldValidate: true,
               })
-              console.log('SET VALUE ON COMPUTE')
               trigger('provisionedIOPS')
               trigger('throughput')
             }}
