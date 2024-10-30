@@ -17,14 +17,23 @@ import type { FormSchema } from 'types'
 import { Form, Input, Tabs } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { SpamValidation } from './SpamValidation'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 interface TemplateEditorProps {
   template: FormSchema
-  authConfig: Record<string, string>
 }
 
-const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
+const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
+  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
+
+  // [Joshen] Error state is handled in the parent
+  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+
+  const { mutate: validateSpam } = useValidateSpamMutation({
+    onSuccess: (res) => setValidationResult(res),
+  })
+
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => toast.error(`Failed to update email templates: ${error.message}`),
   })
@@ -35,24 +44,26 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   const INITIAL_VALUES = useMemo(() => {
     const result: { [x: string]: string } = {}
     Object.keys(properties).forEach((key) => {
-      result[key] = (authConfig && authConfig[key]) ?? ''
+      result[key] = ((authConfig && authConfig[key as keyof typeof authConfig]) ?? '') as string
     })
     return result
   }, [authConfig, properties])
-  const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
-  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT`
+  const messageSlug = `MAILER_TEMPLATES_${id}_CONTENT` as keyof typeof authConfig
   const messageProperty = properties[messageSlug]
+  const builtInSMTP =
+    isSuccess &&
+    authConfig &&
+    (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
+
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
 
-  const { mutate: validateSpam } = useValidateSpamMutation({
-    onSuccess: (res) => setValidationResult(res),
-  })
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceValidateSpam = useCallback(debounce(validateSpam, 1000), [])
+  const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
+  const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
   const onSubmit = (values: any, { resetForm }: any) => {
     const payload = { ...values }
@@ -93,11 +104,15 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   }, [hasUnsavedChanges])
 
   useEffect(() => {
-    if (projectRef && id) {
+    if (projectRef && id && !!authConfig) {
       const [subjectKey] = Object.keys(properties)
+
       validateSpam({
         projectRef,
-        template: { subject: authConfig[subjectKey], content: authConfig[messageSlug] },
+        template: {
+          subject: authConfig[subjectKey as keyof typeof authConfig] as string,
+          content: authConfig[messageSlug],
+        },
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -221,11 +236,13 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
                     form={formId}
                     isSubmitting={isUpdatingConfig}
                     hasChanges={hasChanges}
-                    disabled={!canUpdateConfig}
+                    disabled={preventSaveFromSpamCheck || !canUpdateConfig}
                     helper={
-                      !canUpdateConfig
-                        ? 'You need additional permissions to update authentication settings'
-                        : undefined
+                      preventSaveFromSpamCheck
+                        ? 'Please rectify all spam warnings before saving while using the built-in email service'
+                        : !canUpdateConfig
+                          ? 'You need additional permissions to update authentication settings'
+                          : undefined
                     }
                   />
                 </div>

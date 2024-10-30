@@ -67,11 +67,7 @@ const EmailTemplates = () => {
                       <EmailRateLimitsAlert />
                     </div>
                   ) : null}
-                  <TemplateEditor
-                    key={template.title}
-                    template={template}
-                    authConfig={authConfig as any}
-                  />
+                  <TemplateEditor key={template.title} template={template} />
                 </Tabs.Panel>
               )
             })}
