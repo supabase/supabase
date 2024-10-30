@@ -1,5 +1,11 @@
 import { z } from 'zod'
-import { DISK_LIMITS, DiskType, THROUGHPUT_RANGE, IOPS_RANGE } from './ui/DiskManagement.constants'
+import {
+  DISK_LIMITS,
+  DiskType,
+  THROUGHPUT_RANGE,
+  IOPS_RANGE,
+  DISK_TYPE_LABELS,
+} from './ui/DiskManagement.constants'
 import {
   calculateDiskSizeRequiredForIopsWithGp3,
   calculateDiskSizeRequiredForIopsWithIo2,
@@ -132,10 +138,10 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (throughput !== undefined) {
         const maxThroughput = Math.min(0.25 * provisionedIOPS, 1000)
 
-        if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
+        if (throughput > THROUGHPUT_RANGE['gp3'].max) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Throughput must be at least 125 MiB/s`,
+            message: `Throughput can not exceed ${maxThroughput} MiB/s`,
             path: ['throughput'],
           })
         }
@@ -144,6 +150,13 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             message: `Need at least ${iopsRequiredForThroughput} IOPS to support ${throughput} MiB/s.`,
+            path: ['throughput'],
+          })
+        }
+        if (throughput < THROUGHPUT_RANGE[DiskType.GP3].min) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Throughput must be at least 125 MiB/s`,
             path: ['throughput'],
           })
         }
