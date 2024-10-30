@@ -64,11 +64,11 @@ To provide an interface between these, Supabase customers generally use:
   }}
 />
 
-## Building a better ClickHouse & Supabase Experience
+## Improving the ClickHouse & Supabase experience
 
 We're making a number of changes to our platform based on the feedback we've had from customers.
 
-### Improved ClickHouse Foreign Data Wrapper
+### Updated ClickHouse Foreign Data Wrapper
 
 Using the [ClickHouse FDW](https://fdw.dev/catalog/clickhouse/), you can directly query your ClickHouse database from Postgres:
 
@@ -91,17 +91,15 @@ This means you can query your ClickHouse data using the Postgres tooling that yo
 The Wrapper now has support for ClickHouse [Parameterized Views](https://clickhouse.com/docs/en/sql-reference/statements/create/view#parameterized-view). With this update, you can pass query parameters directly to ClickHouse, taking full advantage of its analytical engine::
 
 ```sql
- create foreign table user_analytics (
+create foreign table user_analytics (
   id bigint,
   user_id bigint,
   _event text,
- )
-   server clickhouse_server
-   options (
-     table '(select * from UserAnalytics(event=${_event}))'
-   );
+)
+server clickhouse_server
+options ( table '(select * from UserAnalytics(event=${_event}))' );
 
- select * from user_analytics where _event='button_click';
+select * from user_analytics where _event='button_click';
 ```
 
 ### More granular replication control
@@ -110,7 +108,7 @@ Many of our customers use [PeerDB](https://www.peerdb.io/) to replicate data fro
 
 To resolve this, we've added 13 [configurable Postgres parameters](/docs/guides/database/custom-postgres-config), enabling you to adjust replication settings through the CLI. For example, you can increase the default WAL size to 2GB:
 
-```bash
+```
 supabase --experimental --project-ref xxxx-yyy \
 postgres-config update --config max_slot_wal_keep_size=2GB
 ```
@@ -157,9 +155,7 @@ The ClickHouse team have also been busy. They've released a number of updates to
 1. A native Supabase OAuth integration in PeerDB for Postgres CDC to ClickHouse.
 2. Support for IPV6 in PeerDB Cloud.
 
-You can learn more about these features in the post they released today:
-
-[Supabase Partnership: Native Postgres Replication to ClickHouse, clickhouse_fdw and more](https://clickhouse.com/blog/2024-10-30-supabase-partnership-native-postgres-replication-to-clickhouse/)
+You can learn more about these features in the [Supabase Partnership](https://clickhouse.com/blog/supabase-partnership-native-postgres-replication-clickhouse-fdw) post they released today.
 
 ## What's next?
 
