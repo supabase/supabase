@@ -101,10 +101,9 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <div className="flex items-center space-x-2">
               <Button
                 type="default"
+                className="self-end"
                 onClick={onCancelCustomDomain}
                 loading={isDeleting}
-                disabled={isDeleting}
-                className="self-end"
               >
                 Cancel
               </Button>

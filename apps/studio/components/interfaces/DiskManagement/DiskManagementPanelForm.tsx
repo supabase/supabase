@@ -1,11 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -19,9 +13,15 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { GB } from 'lib/constants'
+import { ExternalLink, HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -42,8 +42,18 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
+import { Markdown } from '../Markdown'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
+import {
+  calculateDiskSizePrice,
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from './DiskManagement.utils'
+import { getDiskStorageSchema } from './DiskManagementPanelSchema'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
@@ -55,18 +65,11 @@ import {
   THROUGHPUT_RANGE,
 } from './ui/DiskManagement.constants'
 import {
-  calculateDiskSizePrice,
-  calculateIOPSPrice,
-  calculateThroughputPrice,
-} from './DiskManagement.utils'
-import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
-import { DiskManagementPlanUpgradeRequired } from './ui/SpendCapDisabledSection'
-import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
 } from './ui/DiskManagementReadReplicas'
-import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
@@ -161,6 +164,7 @@ export function DiskManagementPanelForm() {
     totalSize: size_gb,
     computeSize: undefined,
   }
+  const DiskStorageSchema = getDiskStorageSchema(size_gb)
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
     defaultValues,
@@ -617,8 +621,31 @@ export function DiskManagementPanelForm() {
                       label="Disk Size"
                       layout="horizontal"
                       description={
-                        includedDiskGB > 0 &&
-                        `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
+                        <>
+                          {includedDiskGB > 0 &&
+                            `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+                          {field.value < size_gb && (
+                            <Admonition
+                              className="mt-2"
+                              type="default"
+                              title="Reducing your project's disk size?"
+                              description={
+                                <Markdown
+                                  className="[&>p]:!leading-normal"
+                                  content={`Your disk size will automatically "right-size" when you [upgrade your project](/project/${projectRef}/settings/infrastructure).`}
+                                />
+                              }
+                            >
+                              <div className="flex items-center gap-x-2">
+                                <Button asChild type="default" icon={<ExternalLink />}>
+                                  <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
+                                    Documentation
+                                  </Link>
+                                </Button>
+                              </div>
+                            </Admonition>
+                          )}
+                        </>
                       }
                     >
                       <div className="mt-1 relative flex gap-2 items-center">
@@ -717,7 +744,7 @@ export function DiskManagementPanelForm() {
               <DiskCountdownRadial />
             )}
 
-            {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
+            <SpendCapDisabledSection />
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">

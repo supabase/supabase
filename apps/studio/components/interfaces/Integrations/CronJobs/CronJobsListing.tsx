@@ -66,7 +66,7 @@ export const CronJobsListing = () => {
       <div className="w-full space-y-4">
         <FormHeader
           title="Cron jobs"
-          description="Use cron jobs to schedule and automate tasks such as running SQL queries or maintenance routines at specified intervals."
+          description="Schedule and automate tasks like running queries or maintenance routines at specified intervals"
           actions={
             <>
               <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>

@@ -10,10 +10,20 @@ const EMPTY_DASHBOARD_HISTORY: {
   editor: undefined,
 }
 
+export type CommonDatabaseEntity = {
+  id: number
+  name: string
+  schema: string
+  [key: string]: any
+}
+
 type AiAssistantPanelType = {
   open: boolean
   editor?: SupportedAssistantEntities | null
+  // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
   content?: string
+  // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
+  entity?: CommonDatabaseEntity
 }
 
 export const appState = proxy({
@@ -43,16 +53,11 @@ export const appState = proxy({
   },
 
   isOptedInTelemetry: false,
-  setIsOptedInTelemetry: (value: boolean | null, flag = LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT) => {
+  setIsOptedInTelemetry: (value: boolean | null) => {
     appState.isOptedInTelemetry = value === null ? false : value
     if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(flag, value.toString())
+      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
-    // [Joshen] Eventually once we completely move to PH, we should just set local storage
-    // directly here, but since currently it's dependent on a feature flag, will need to pass in as a prop
-    // if (typeof window !== 'undefined') {
-    //   localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
-    // }
   },
   showEnableBranchingModal: false,
   setShowEnableBranchingModal: (value: boolean) => {
@@ -100,9 +105,19 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  aiAssistantPanel: { open: false, editor: null, content: '' } as AiAssistantPanelType,
+  aiAssistantPanel: {
+    open: false,
+    editor: null,
+    content: '',
+    entity: undefined,
+  } as AiAssistantPanelType,
   setAiAssistantPanel: (value: AiAssistantPanelType) => {
-    appState.aiAssistantPanel = { ...appState.aiAssistantPanel, ...value }
+    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
+      ...value,
+    }
   },
 })
 

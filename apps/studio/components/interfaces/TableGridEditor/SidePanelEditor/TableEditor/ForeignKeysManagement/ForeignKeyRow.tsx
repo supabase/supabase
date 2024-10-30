@@ -7,6 +7,7 @@ import { Badge, Button, cn } from 'ui'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { BASE_PATH } from 'lib/constants'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import Link from 'next/link'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
@@ -77,13 +78,13 @@ export const ForeignKeyRow = ({
                 />
               }
             >
-              <EditorTablePageLink
-                projectRef={ref}
-                id={String(foreignKey.tableId)}
-                onClick={() => closePanel()}
+              <Link
+                target="_blank"
+                rel="norefererer"
+                href={`/project/${ref}/editor/${foreignKey.tableId}`}
               >
                 {foreignKey.schema}.{foreignKey.table}
-              </EditorTablePageLink>
+              </Link>
             </Button>
           </div>
         </div>
