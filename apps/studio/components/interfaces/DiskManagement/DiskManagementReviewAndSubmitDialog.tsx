@@ -37,6 +37,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
   getAvailableComputeOptions,
+  mapAddOnVariantIdToComputeSize,
 } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
@@ -84,12 +85,10 @@ const TableDataRow = ({
         <Badge variant="default" className="bg-alternative bg-opacity-100">
           <div className="flex items-center gap-1">
             <span className="text-xs font-mono text-foreground-muted">
-              {defaultValue.toString().replace('ci_', '')}
+              {defaultValue.toString()}
             </span>
             <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
-            <span className="text-xs font-mono text-foreground">
-              {newValue.toString().replace('ci_', '')}
-            </span>
+            <span className="text-xs font-mono text-foreground">{newValue.toString()}</span>
           </div>
         </Badge>
       ) : (
@@ -258,8 +257,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {form.formState.defaultValues?.computeSize !== form.getValues('computeSize') && (
               <TableDataRow
                 attribute="Compute size"
-                defaultValue={form.formState.defaultValues?.computeSize ?? ''}
-                newValue={form.getValues('computeSize')}
+                defaultValue={mapAddOnVariantIdToComputeSize(
+                  form.formState.defaultValues?.computeSize ?? 'ci_nano'
+                )}
+                newValue={mapAddOnVariantIdToComputeSize(form.getValues('computeSize'))}
                 unit="-"
                 beforePrice={Number(computeSizePrice.oldPrice)}
                 afterPrice={Number(computeSizePrice.newPrice)}

@@ -27,7 +27,7 @@ export const DiskMangementRestartRequiredSection: React.FC<Props> = ({
             <div className="w-12 h-12">
               <div className="relative w-10 h-10 m-1 bg-alternative text-foreground border rounded-full flex items-center justify-center">
                 <RotateCcw strokeWidth={1} />
-                <WarningIcon className="absolute -right-2 -top-2" />
+                <WarningIcon className="absolute -right-1.5 -top-1.5" />
               </div>
             </div>
             <div className="flex flex-col gap-0 flex-grow">
