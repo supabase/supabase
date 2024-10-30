@@ -3,7 +3,7 @@ import { Check } from 'lucide-react'
 import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { cn, WarningIcon } from 'ui'
+import { cn, CriticalIcon, WarningIcon } from 'ui'
 
 interface SpamValidationProps {
   validationResult?: ValidateSpamResponse
@@ -11,21 +11,32 @@ interface SpamValidationProps {
 
 // [Joshen] Referring to this to understand SpamAssasin results:
 // https://www.mailercheck.com/articles/spamassassin-score#test
-// TLDR: A total score of above 5 is considered spam, ideal score is 0 - 2
+// TLDR: A total score of above 5 is considered spam, ideal score is 0 - 2, everything in between is a warning
 // Any individual metric above 0 is considered to be a warning
 
 export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
   const totalSpamScore = (validationResult?.rules ?? []).reduce((a, b) => a + b.score, 0)
-  const hasSpamWarning = totalSpamScore >= 5
+  const hasSpamWarning = totalSpamScore > 2
+  const exceedsThreshold = totalSpamScore >= 5
   const sortedRules = (validationResult?.rules ?? []).sort((a, b) => b.score - a.score)
 
   return (
     <InformationBox
       className={cn('mb-2', hasSpamWarning && '!bg-alternative')}
-      icon={hasSpamWarning ? <WarningIcon /> : <Check size={16} className="text-brand" />}
+      icon={
+        exceedsThreshold ? (
+          <CriticalIcon />
+        ) : hasSpamWarning ? (
+          <WarningIcon />
+        ) : (
+          <Check size={16} className="text-brand" />
+        )
+      }
       title={
         hasSpamWarning
-          ? 'Email content has been identified as spam and deliverability may be affected'
+          ? exceedsThreshold
+            ? 'Email content has been identified as spam and deliverability may be affected'
+            : 'Email has a high probability of being marked as spam and deliverability may be affected'
           : 'Email content is unlikely to be marked as spam'
       }
       description={
@@ -34,12 +45,12 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
             Spam score by SpamAssasin: <span className="text-foreground">{totalSpamScore}</span>
           </p>
           <p className="mt-1">
-            A score above 5 is considered spam, which results in a high probability that your email
-            will land in the spam folder.
+            A score above 5 is considered spam, whereas an ideal score is 0 - 2. Higher scores
+            indicate the chances of your email landing in the spam folder.
             {sortedRules.length > 0
               ? hasSpamWarning
-                ? ` The following issues need to rectified to improve your email's deliverability in order or priority:`
-                : ` The following issues can be addressed to improve your email's deliverability:`
+                ? ` Rectify the following issues to improve your email's deliverability in order of priority:`
+                : ` Address the following issues to improve your email's deliverability:`
               : ''}
           </p>
 
