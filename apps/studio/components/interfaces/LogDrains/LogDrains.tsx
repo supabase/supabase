@@ -187,7 +187,7 @@ export function LogDrains({
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <div className="text-foreground-light">
+            <div className="text-foreground-light text-sm">
               <p>
                 Are you sure you want to delete{' '}
                 <span className="text-foreground">{selectedLogDrain?.name}</span>?
