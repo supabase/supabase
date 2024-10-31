@@ -379,7 +379,7 @@ export function DiskManagementForm() {
                     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
                     subscription?.plan.id !== 'free'
                   }
-                  title="LARGE Compute size required to configure Advanced disk settings"
+                  title="Advanced Disk settings require LARGE Compute size or above"
                   actions={
                     <Button
                       type="default"
