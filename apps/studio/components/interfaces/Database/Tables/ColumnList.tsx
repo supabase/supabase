@@ -7,13 +7,17 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
@@ -36,9 +40,18 @@ const ColumnList = ({
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
-  const { id, ref } = useParams()
+  const { id: _id, ref } = useParams()
+  const id = _id ? Number(_id) : undefined
+
+  const { project } = useProjectContext()
+  const { data, error, isError, isLoading, isSuccess } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
+
   const [filterString, setFilterString] = useState<string>('')
-  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
   const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
 
   const columns =
