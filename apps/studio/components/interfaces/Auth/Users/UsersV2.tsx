@@ -308,7 +308,7 @@ export const UsersV2 = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                Sorted by {sortColumn.replace('_', ' ')}
+                Sorted by {sortColumn.replaceAll('_', ' ')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44" align="start">
@@ -323,7 +323,7 @@ export const UsersV2 = () => {
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger>Sort by last signed in at</DropdownMenuSubTrigger>
+                  <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioItem value="last_sign_in_at:asc">
                       Ascending
