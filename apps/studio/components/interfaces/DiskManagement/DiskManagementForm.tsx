@@ -153,14 +153,6 @@ export function DiskManagementForm() {
   })
 
   /**
-   * Handle compute instances
-   */
-  // const selectedAddons = addons?.selected_addons ?? []
-  // const subscriptionCompute = selectedAddons.find((addon) => addon.type === 'compute_instance')
-  // const projectComputeSize = project?.infra_compute_size
-  // const isNanoCompute = projectComputeSize === 'nano'
-
-  /**
    * Handle default values
    */
   // @ts-ignore [Joshen TODO] check whats happening here
@@ -286,11 +278,6 @@ export function DiskManagementForm() {
     }
   }
 
-  const showUpgradeBadge = showMicroUpgrade(
-    subscription?.plan.id ?? 'free',
-    project?.infra_compute_size ?? 'nano'
-  )
-
   return (
     <>
       <Form_Shadcn_ {...form}>
@@ -331,14 +318,6 @@ export function DiskManagementForm() {
                 />
               </div>
             ) : null}
-            {/* TESTING */}
-            {/* <div className="bg-alternative border p-3 rounded text-xs font-mono">
-              <div>project.infra_compute_size: {project?.infra_compute_size}</div>
-              <div>project.status: {project?.status}</div>
-              <div className="mt-2">form status:</div>
-              <pre className="mt-2 text-xs">{JSON.stringify(form.getValues(), null, 2)}</pre>
-            </div> */}
-            {/* TESTING */}
             <Separator />
             <ComputeSizeField form={form} disabled={disableComputeInputs} />
             <Separator />
