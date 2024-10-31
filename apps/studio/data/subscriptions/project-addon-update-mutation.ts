@@ -43,7 +43,6 @@ type ProjectAddonUpdateData = Awaited<ReturnType<typeof updateSubscriptionAddon>
 export const useProjectAddonUpdateMutation = ({
   onSuccess,
   onError,
-  suppressToast,
   ...options
 }: Omit<
   UseMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
@@ -61,9 +60,7 @@ export const useProjectAddonUpdateMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          if (!suppressToast) {
-            toast.error(`Failed to update addon: ${data.message}`)
-          }
+          toast.error(`Failed to update addon: ${data.message}`)
         } else {
           onError(data, variables, context)
         }

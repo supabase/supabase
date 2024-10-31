@@ -213,9 +213,14 @@ export function DiskManagementForm() {
   const noPermissions = isPermissionsLoaded && !canUpdateDiskConfiguration && !isProjectLoading
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
-    useUpdateDiskAttributesMutation({})
+    useUpdateDiskAttributesMutation({
+      // this is to supress to toast message
+      onError: () => {},
+    })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
+      // this is to supress to toast message
+      onError: () => {},
       onSuccess: () => {
         /**
          * Manually set project status to RESIZING
