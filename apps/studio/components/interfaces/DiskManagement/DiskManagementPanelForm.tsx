@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ExternalLink, HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -10,6 +10,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -43,8 +44,10 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
+import { Markdown } from '../Markdown'
 import BillingChangeBadge from './BillingChangeBadge'
 import { DiskCountdownRadial } from './DiskCountdownRadial'
 import {
@@ -60,7 +63,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { getDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
+import { DiskStorageSchemaType, getDiskStorageSchema } from './DiskManagementPanelSchema'
 import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
 import {
   DiskManagementDiskSizeReadReplicas,
@@ -68,8 +71,6 @@ import {
   DiskManagementThroughputReadReplicas,
 } from './DiskManagementReadReplicas'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { Admonition } from 'ui-patterns'
-import { Markdown } from '../Markdown'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
@@ -634,13 +635,10 @@ export function DiskManagementPanelForm() {
                                 />
                               }
                             >
-                              <div className="flex items-center gap-x-2">
-                                <Button asChild type="default" icon={<ExternalLink />}>
-                                  <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
-                                    Documentation
-                                  </Link>
-                                </Button>
-                              </div>
+                              <DocsButton
+                                abbrev={false}
+                                href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size"
+                              />
                             </Admonition>
                           )}
                         </>

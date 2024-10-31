@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import { FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -13,6 +13,7 @@ import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSetti
 import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -53,6 +54,7 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DocsButton } from '../DocsButton'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
 import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
 import { generatePrompt, retrieveDocsUrl } from './AIAssistant.utils'
@@ -60,7 +62,6 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
-import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 
 const ANIMATION_DURATION = 0.3
 
@@ -702,13 +703,7 @@ export const AIAssistant = ({
                           ?
                         </TooltipContent_Shadcn_>
                       </Tooltip_Shadcn_>
-                      {docsUrl !== undefined && (
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <a href={docsUrl} target="_blank" rel="noreferrer">
-                            Documentation
-                          </a>
-                        </Button>
-                      )}
+                      {docsUrl !== undefined && <DocsButton href={docsUrl} />}
                     </div>
                   </motion.div>
                 )}

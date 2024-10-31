@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -286,11 +287,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                     </>
                   )}
                   <div className="flex items-center justify-between">
-                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                      <Link href={provider.link} target="_blank" rel="noreferrer">
-                        Documentation
-                      </Link>
-                    </Button>
+                    <DocsButton href={provider.link} />
                     <div className="flex items-center gap-x-3">
                       <Button
                         type="default"

@@ -10,6 +10,7 @@ import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
@@ -190,25 +191,21 @@ const BranchManagement = () => {
                     All branches
                   </Button>
                 </div>
-                <div className="flex items-center justify-between space-x-2">
+                <div className="flex items-center justify-between gap-x-2">
                   <Button
-                    type={'text'}
-                    icon={<MessageCircle className="text-muted" strokeWidth={1} />}
                     asChild
+                    type="text"
+                    icon={<MessageCircle className="text-muted" strokeWidth={1} />}
                   >
-                    <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://github.com/orgs/supabase/discussions/18937"
+                    >
                       Branching Feedback
                     </a>
                   </Button>
-                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/platform/branching"
-                    >
-                      Documentation
-                    </Link>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/platform/branching" />
                   <ButtonTooltip
                     type="primary"
                     disabled={!canCreateBranches}

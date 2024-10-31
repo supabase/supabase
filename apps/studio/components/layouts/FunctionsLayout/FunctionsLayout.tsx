@@ -14,6 +14,7 @@ import { Code, ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -121,16 +122,10 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                         }
                       />
                     )}
-                    <Button
-                      asChild
-                      type="default"
+                    <DocsButton
                       className="translate-y-[1px]"
-                      icon={<ExternalLink size={14} strokeWidth={1.5} />}
-                    >
-                      <Link href="https://supabase.com/docs/guides/functions" target="_link">
-                        Documentation
-                      </Link>
-                    </Button>
+                      href="https://supabase.com/docs/guides/functions"
+                    />
                   </div>
                 </div>
               </div>
