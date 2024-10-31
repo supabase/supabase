@@ -161,20 +161,6 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
         })
       }
     }
-
-    // const maxIOPSforComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize)
-
-    // // console.log('provisionedIOPS in schame', provisionedIOPS)
-
-    // if (provisionedIOPS > maxIOPSforComputeSize) {
-    //   const computeSizeRequiredForIops = calculateComputeSizeRequiredForIops(provisionedIOPS)
-
-    //   ctx.addIssue({
-    //     code: z.ZodIssueCode.custom,
-    //     message: `${computeSizeRequiredForIops} Compute size required for this amount of IOPS.`,
-    //     path: ['provisionedIOPS'],
-    //   })
-    // }
   })
 
   return schema
