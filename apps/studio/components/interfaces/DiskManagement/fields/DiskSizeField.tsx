@@ -142,7 +142,7 @@ export function DiskSizeField({
               diskSizePrice.oldPrice !== diskSizePrice.newPrice
             }
           />
-          <span className="text-foreground-muted text-sm">
+          <span className="text-foreground-lighter text-sm">
             {includedDiskGB > 0 &&
               subscription?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}

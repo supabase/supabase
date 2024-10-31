@@ -61,6 +61,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
             id={field.name}
             description={
               <span className="flex flex-col gap-y-2">
+                <p>Use higher IOPS for high-throughput apps.</p>
                 <ComputeSizeReccomendationSection
                   form={form}
                   actions={
@@ -100,8 +101,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
                   afterPrice={Number(iopsPrice.newPrice)}
                   className="mb-2"
                 />
-                <p>Input/output operations per second.</p>
-                <p>Higher IOPS for high-throughput apps.</p>
+                <p className="text-foreground-lighter">Input/output operations per second.</p>
               </>
             }
           >

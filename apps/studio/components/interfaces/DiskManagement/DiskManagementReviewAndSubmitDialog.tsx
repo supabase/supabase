@@ -243,7 +243,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         <div className="flex flex-col gap-2 p-5">
           <DiskMangementRestartRequiredSection
             visible={form.formState.defaultValues?.computeSize !== form.getValues('computeSize')}
-            title="Compute resizes trigger project restarts."
+            title="Resizing your Compute will trigger a project restart"
             description="Project will restart automatically on confirmation."
           />
           {hasDiskConfigChanges && <DiskMangementCoolDownSection />}

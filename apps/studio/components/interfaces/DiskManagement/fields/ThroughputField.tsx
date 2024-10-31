@@ -75,18 +75,21 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
             control={control}
             render={({ field }) => (
               <FormItemLayout
-                label="Throughput (MB/s)"
+                label="Throughput"
                 layout="horizontal"
                 description={
-                  !formState.errors.throughput && (
-                    <DiskManagementThroughputReadReplicas
-                      isDirty={formState.dirtyFields.throughput !== undefined}
-                      oldThroughput={throughput_mbps ?? 0}
-                      newThroughput={field.value ?? 0}
-                      oldStorageType={formState.defaultValues?.storageType as DiskType}
-                      newStorageType={getValues('storageType') as DiskType}
-                    />
-                  )
+                  <span className="flex flex-col gap-y-2">
+                    <p>Higher throughput suits applications with high data transfer needs.</p>
+                    {!formState.errors.throughput && (
+                      <DiskManagementThroughputReadReplicas
+                        isDirty={formState.dirtyFields.throughput !== undefined}
+                        oldThroughput={throughput_mbps ?? 0}
+                        newThroughput={field.value ?? 0}
+                        oldStorageType={formState.defaultValues?.storageType as DiskType}
+                        newStorageType={getValues('storageType') as DiskType}
+                      />
+                    )}
+                  </span>
                 }
                 labelOptional={
                   <>
@@ -100,8 +103,9 @@ export function ThroughputField({ form, disableInput }: ThroughputFieldProps) {
                       afterPrice={Number(throughputPrice.newPrice)}
                       className="mb-2"
                     />
-                    <p>Amount of data read/written to the disk per second.</p>
-                    <p>Higher throughput suits applications with high data transfer needs.</p>
+                    <p className="text-foreground-lighter">
+                      Amount of data read/written per second.
+                    </p>
                   </>
                 }
               >
