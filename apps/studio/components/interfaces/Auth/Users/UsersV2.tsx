@@ -323,6 +323,17 @@ export const UsersV2 = () => {
                   </DropdownMenuSubContent>
                 </DropdownMenuSub>
                 <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by last signed in at</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="last_sign_in_at:asc">
+                      Ascending
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="last_sign_in_at:desc">
+                      Descending
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
                   <DropdownMenuSubTrigger>Sort by email</DropdownMenuSubTrigger>
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioItem value="email:asc">Ascending</DropdownMenuRadioItem>
