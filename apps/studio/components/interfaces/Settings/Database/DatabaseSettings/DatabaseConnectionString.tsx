@@ -1,4 +1,4 @@
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { useParams } from 'common'
@@ -6,6 +6,7 @@ import { getAddons } from 'components/interfaces/Billing/Subscription/Subscripti
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
@@ -17,7 +18,6 @@ import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
-  Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
@@ -181,14 +181,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 )}
               >
                 <DatabaseSelector />
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <a
-                    target="_blank"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres"
-                  >
-                    Documentation
-                  </a>
-                </Button>
+                <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres" />
               </div>
             </div>
             <Tabs

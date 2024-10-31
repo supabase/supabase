@@ -249,7 +249,9 @@ const SidePanelEditor = ({
       }
 
       await Promise.all([
-        queryClient.invalidateQueries(tableKeys.table(project?.ref, selectedTable!.id)),
+        queryClient.invalidateQueries(
+          sqlKeys.query(project?.ref, ['table-editor', selectedTable?.id])
+        ),
         queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
           sqlKeys.query(project?.ref, [
@@ -463,6 +465,7 @@ const SidePanelEditor = ({
         } else {
           queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
           await Promise.all([
+            queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['table-editor', table.id])),
             queryClient.invalidateQueries(
               sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
             ),
@@ -474,7 +477,6 @@ const SidePanelEditor = ({
               ])
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
-            queryClient.invalidateQueries(tableKeys.table(project?.ref, table.id)),
           ])
 
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })

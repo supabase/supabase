@@ -27,7 +27,7 @@ const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithou
         ref={ref}
         {...restProps}
         className={cn(
-          'w-full flex gap-1 items-center group px-3 text-xs font-normal font-mono uppercase text-lighter tracking-wide group-hover:not-disabled:text-foreground',
+          'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide group-hover:not-disabled:text-foreground',
           className
         )}
       />

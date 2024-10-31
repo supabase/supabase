@@ -1,8 +1,8 @@
 import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import type { Entity } from './entity-type-query'
-import { entityTypeKeys } from './keys'
+import { Entity } from 'data/table-editor/table-editor-query'
 import { ENTITY_TYPE } from './entity-type-constants'
+import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
   projectRef?: string

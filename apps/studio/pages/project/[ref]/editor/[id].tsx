@@ -4,9 +4,15 @@ import { useRouter } from 'next/router'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import useTable from 'hooks/misc/useTable'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -15,13 +21,21 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
 
-  const { data: selectedTable, isLoading } = useTable(id)
+  const { project } = useProjectContext()
+  const { data, isLoading } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
 
   return (
     <>
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
+        entityType={data?.entity}
+        encryptedColumns={data?.encrypted_columns ?? undefined}
         theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs

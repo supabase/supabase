@@ -1,9 +1,6 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -11,11 +8,12 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { Button, Sheet, SheetContent } from 'ui'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { DocsButton } from 'components/ui/DocsButton'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
 import { CronJobCard } from './CronJobCard'
 import { CronJobsDisabledState } from './CronJobsDisabledState'
 import DeleteCronJob from './DeleteCronJob'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export const CronJobsListing = () => {
   const { project } = useProjectContext()
@@ -69,15 +67,7 @@ export const CronJobsListing = () => {
           description="Schedule and automate tasks like running queries or maintenance routines at specified intervals"
           actions={
             <>
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/database/extensions/pg_cron"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </Link>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
               <Button
                 type="primary"
                 onClick={() =>
