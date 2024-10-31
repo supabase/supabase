@@ -6,6 +6,7 @@ import { del, handleError } from 'data/fetchers'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
+import { sqlKeys } from 'data/sql/keys'
 
 export type TableDeleteVariables = {
   projectRef: string
@@ -55,13 +56,11 @@ export const useTableDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { id, projectRef, schema } = variables
         await Promise.all([
+          queryClient.invalidateQueries(sqlKeys.query(projectRef, ['table-editor', id])),
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           // invalidate all views from this schema
           queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
-          // invalidate the view if there's a view with this id
-          queryClient.invalidateQueries(viewKeys.view(projectRef, id)),
         ])
 
         await onSuccess?.(data, variables, context)
