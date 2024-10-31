@@ -41,7 +41,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (provisionedIOPS > IOPS_RANGE[DiskType.IO2].max) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.IO2].max)} for io2 disk type. Please reach out to support if you need higher IOPS than this.`,
+          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.IO2].max)} for io2 Disk type. Please reach out to support if you need higher IOPS than this.`,
           path: ['provisionedIOPS'],
         })
       }
@@ -61,7 +61,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
 
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Larger disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
+            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
             path: ['provisionedIOPS'],
           })
         } else {
@@ -84,7 +84,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
+          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
           path: ['totalSize'],
         })
       }
@@ -96,7 +96,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (provisionedIOPS > IOPS_RANGE[DiskType.GP3].max) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.GP3].max)} for GP3 Disk. Change the disk type to io2 for higher IOPS support.`,
+          message: `IOPS can not exceed ${formatNumber(IOPS_RANGE[DiskType.GP3].max)} for GP3 Disk. Change the Disk type to io2 for higher IOPS support.`,
           path: ['provisionedIOPS'],
         })
       }
@@ -114,7 +114,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
 
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: `Larger disk size of at least ${formatNumber(diskSizeRequiredForIopsWithGp3)} GB required. Current max is ${formatNumber(maxIopsAllowedForDiskSizeWithGp3)} IOPS.`,
+            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithGp3)} GB required. Current max is ${formatNumber(maxIopsAllowedForDiskSizeWithGp3)} IOPS.`,
             path: ['provisionedIOPS'],
           })
         } else {
@@ -156,7 +156,7 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
       if (totalSize > DISK_LIMITS[DiskType.GP3].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
+          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
           path: ['totalSize'],
         })
       }
