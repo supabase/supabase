@@ -31,6 +31,10 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
       return ''
     }
   } else {
+    if (column.format === 'bool' && row[column.name] === null) {
+      return 'null'
+    }
+
     return DATETIME_TYPES.includes(column.format)
       ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
       : parseValue(row[column.name], column.format)
