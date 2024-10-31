@@ -211,6 +211,7 @@ export function getTableEditorSql(id?: number) {
         join pg_namespace n on n.oid = c.relnamespace
       where
         c.relkind = 'f'
+        and c.oid = ${id}
     ),
     column_info as (
       select
