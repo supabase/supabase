@@ -1,7 +1,8 @@
-import { Check, ChevronDown, ExternalLink } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import InformationBox from 'components/ui/InformationBox'
 import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -12,7 +13,6 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Button,
   CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
@@ -119,15 +119,11 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             <code className="text-xs text-foreground">public</code> schema to{' '}
             <span className="text-brand">prevent accidental exposure of data</span>.
           </p>
-          <Button asChild type="default" icon={<ExternalLink />} className="w-min mt-4">
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/database/hardening-data-api"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton
+            abbrev={false}
+            className="w-min mt-4"
+            href="https://supabase.com/docs/guides/database/hardening-data-api"
+          />
         </DialogSection>
 
         <DialogSectionSeparator />

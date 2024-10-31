@@ -2,7 +2,6 @@ import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
@@ -11,6 +10,7 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import type { Entity, TableLike } from 'data/table-editor/table-editor-query'
@@ -23,7 +23,6 @@ import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
-import { Button } from 'ui'
 import GridHeaderActions from './GridHeaderActions'
 import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
@@ -199,15 +198,7 @@ const TableGridEditor = ({
               row before updating or deleting the row.
             </p>
             <div className="mt-3">
-              <Button asChild type="outline" icon={<ExternalLink />}>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/docs/guides/database/tables#primary-keys"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
             </div>
           </div>
         ),

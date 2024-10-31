@@ -1,16 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button } from 'ui'
-
-import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export const CronJobsDisabledState = () => {
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
@@ -42,39 +39,22 @@ export const CronJobsDisabledState = () => {
           </div>
 
           <div className="flex items-center gap-3 mt-4">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button type="primary" onClick={() => setShowEnableExtensionModal(true)}>
-                  Enable Cron Jobs
-                </Button>
-              </Tooltip.Trigger>
-              {!canToggleExtensions && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to enable pg_cron for this project
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
-            <Button asChild type="text" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions/pg_cron"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
+            <ButtonTooltip
+              type="primary"
+              disabled={!canToggleExtensions}
+              onClick={() => setShowEnableExtensionModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canToggleExtensions
+                    ? 'You need additional permissions to enable pg_cron for this project'
+                    : undefined,
+                },
+              }}
+            >
+              Enable Cron Jobs
+            </ButtonTooltip>
+            <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
           </div>
         </ProductEmptyState>
       </div>

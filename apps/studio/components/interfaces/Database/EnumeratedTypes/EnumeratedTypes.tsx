@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -59,28 +60,33 @@ const EnumeratedTypes = () => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
-        <SchemaSelector
-          className="w-[260px]"
-          size="small"
-          showError={false}
-          selectedSchemaName={selectedSchema}
-          onSelectSchema={setSelectedSchema}
-        />
-        <Input
-          size="small"
-          value={search}
-          className="w-64"
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search for a type"
-          icon={<Search size={14} />}
-        />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-x-2">
+          <SchemaSelector
+            className="w-[260px]"
+            size="small"
+            showError={false}
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={setSelectedSchema}
+          />
+          <Input
+            size="small"
+            value={search}
+            className="w-64"
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search for a type"
+            icon={<Search size={14} />}
+          />
+        </div>
 
-        {!isLocked && (
-          <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
-            Create type
-          </Button>
-        )}
+        <div className="flex items-center gap-x-2">
+          <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
+          {!isLocked && (
+            <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
+              Create type
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="enumerated types" />}

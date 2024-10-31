@@ -19,6 +19,7 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -53,16 +54,10 @@ const DatabaseWrappers: NextPageWithLayout = () => {
           />
         </ScaffoldSectionContent>
         <ScaffoldSectionDetail className="xl:!col-span-4 flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="no-underline"
-              href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton
+            className="no-underline"
+            href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
+          />
           {isWrappersEnabled && <WrappersDropdown />}
         </ScaffoldSectionDetail>
 

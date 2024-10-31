@@ -1,11 +1,12 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { sortBy } from 'lodash'
-import Link from 'next/link'
+import { Loader, Search, X } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { VaultSecret } from 'types'
@@ -14,7 +15,6 @@ import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
 import SecretRow from './SecretRow'
-import { Search, X, ExternalLink, Loader } from 'lucide-react'
 
 const SecretsManagement = () => {
   const { search } = useParams()
@@ -110,44 +110,23 @@ const SecretsManagement = () => {
               </Listbox>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/vault"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Vault Documentation
-              </Link>
-            </Button>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="primary"
-                  disabled={!canManageSecrets}
-                  onClick={() => setShowAddSecretModal(true)}
-                >
-                  Add new secret
-                </Button>
-              </Tooltip.Trigger>
-              {!canManageSecrets && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to add secrets
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+          <div className="flex items-center gap-x-2">
+            <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+            <ButtonTooltip
+              type="primary"
+              disabled={!canManageSecrets}
+              onClick={() => setShowAddSecretModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageSecrets
+                    ? 'You need additional permissions to add secrets'
+                    : undefined,
+                },
+              }}
+            >
+              Add new secret
+            </ButtonTooltip>
           </div>
         </div>
 
