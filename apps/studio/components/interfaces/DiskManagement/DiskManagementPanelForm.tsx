@@ -790,6 +790,7 @@ export function DiskManagementPanelForm() {
                     disabled={disableInput}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
+                    buttonSize={'tiny'}
                   />
                 </div>
               </CardContent>

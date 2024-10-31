@@ -15,6 +15,7 @@ import {
   AlertTitle_Shadcn_,
   Badge,
   Button,
+  ButtonProps,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -134,6 +135,7 @@ interface DiskSizeMeterProps {
     type: 'error' | 'warning'
     message: string
   }
+  buttonSize?: ButtonProps['size']
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({
@@ -145,6 +147,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
   loading,
   onSubmit,
   message,
+  buttonSize = 'medium',
 }: DiskSizeMeterProps) => {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
@@ -218,7 +221,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          size="medium"
+          size={buttonSize}
           htmlType="submit"
           type="primary"
           onClick={async (e) => {
