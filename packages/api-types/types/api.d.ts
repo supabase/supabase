@@ -145,6 +145,10 @@ export interface paths {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
   }
+  '/platform/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
+  }
   '/platform/cli/login': {
     /** Create CLI login session */
     post: operations['CliLoginController_createCliLoginSession']
@@ -1345,6 +1349,10 @@ export interface paths {
   '/v0/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
+  }
+  '/v0/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
   }
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
@@ -6777,6 +6785,18 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
+    ValidateSpamBody: {
+      content: string
+      subject: string
+    }
+    ValidateSpamResponse: {
+      rules: components['schemas']['ValidateSpamRule'][]
+    }
+    ValidateSpamRule: {
+      desc: string
+      name: string
+      score: number
+    }
     ValidationError: {
       message: string
     }
@@ -7481,6 +7501,28 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete factors */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Validate spam based on the given email content */
+  ValidateController_validateSpam: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateSpamBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ValidateSpamResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to validate spam based on the given email content */
       500: {
         content: never
       }
