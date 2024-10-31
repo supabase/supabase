@@ -1,18 +1,10 @@
 ---
 id: 'auth-workos'
-title: 'Login with WorkOS'
+title: 'SSO and Social Login with WorkOS'
 description: 'Add WorkOS AuthKit to your Supabase project'
 ---
 
-To enable WorkOS Auth for your project, you need to set up a WorkOS application and add the credentials to your Supabase Dashboard. [WorkOS AuthKit](https://authkit.com) provides email/password authentication and social login by default, with the ability to enable SSO through a simple dashboard toggle.
-
-## Overview
-
-In this guide, we will set up WorkOS AuthKit. AuthKit gives you social logins and email-based authentication for free.
-
-Once installed, AuthKit enables you to add Single-Sign-On(SSO), supporting many different providers, via toggles in the WorkOS dashboard with no additional code changes.
-
-There are 5 steps to set up AuthKit:
+[WorkOS AuthKit](https://authkit.com) provides email/password authentication and social login by default. Once AuthKit is installed, you can enable SSO through a dashboard toggle.
 
 ## Step 1. Create a WorkOS organization
 
@@ -23,20 +15,11 @@ Log in to the WorkOS dashboard and visit the Organizations tab to create an orga
 
 ![Get your Environment's Client ID and Secret](/docs/img/guides/auth-workos/workos-dashboard-get-client-id-and-key.png)
 
-Visit the getting started page of the WorkOS dashboard, at [https://dashboard.workos.com/get-started](https://dashboard.workos.com/get-started), to obtain the following values:
+Visit the getting started page of the WorkOS dashboard, at [https://dashboard.workos.com/get-started](https://dashboard.workos.com/get-started), to obtain the following values from the Quickstart panel:
 * `WORKOS_CLIENT_ID`
-* `WORKOS_API_KEY`
+* `WORKOS_API_KEY`A
 
-## Step 3. Connect a WorkOS supported identity provider
-
-With AuthKit, you get email-based authentication and social logins for free, but you can optionally configure addiitonal OAuth providers
-at any time within the WorkOS dashboard on the Authentication tab:
-
-![Configure SSO or OAuth providers at your leisure](/docs/img/guides/auth-workos/workos-auth-config-dashboard.png)
-
-You can pick between any one of the many identity providers that WorkOS supports.
-
-## Step 4. Add your WorkOS credentials to your Supabase project
+## Step 3. Add your WorkOS credentials to your Supabase project
 
 ![Enter your WorkOS application details in your Supabase app's auth provider settings panel](/docs/img/guides/auth-workos/supabase-workos-configuration.png)
 
@@ -50,7 +33,7 @@ You can pick between any one of the many identity providers that WorkOS supports
 1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy
 1. Click Save
 
-## Step 5. Set your Supabase redirect URI in the WorkOS Dashboard
+## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
 
 Visit the WorkOS dashboard and click the redirects button in the left navigation panel.
 
@@ -58,7 +41,13 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 ![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-## Add auth code to your client app
+## Step 5. Connect a WorkOS supported identity provider
+
+With AuthKit, you get email-based authentication and social logins for free, but you can configure OAuth providers in the WorkOS dashboard on the Authentication tab:
+
+![Configure SSO or OAuth providers at your leisure](/docs/img/guides/auth-workos/workos-auth-config-dashboard.png)
+
+## Install and configure AuthKit
 
 <Tabs
   scrollable
@@ -67,9 +56,189 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
   defaultActiveId="js"
   queryGroup="language"
 >
-<TabPanel id="js" label="JavaScript">
 
-<CreateClientSnippet />
+<TabPanel id="nextjs" label="Next.js">
+
+## Install dependencies
+For a Next.js integration, use the authkit-nextjs library. Start by installing it in your Next.js project via npm.
+
+`npm install @workos-inc/authkit-nextjs`
+
+## Set secrets
+
+To make calls to WorkOS, provide the API key and the client ID. Store these values as managed secrets and pass them to the SDKs either as environment variables or directly in your app’s configuration depending on your preferences.
+
+```bash
+WORKOS_API_KEY='sk_test_x0K3p7n2B9q4M5v8R1w6T0y3F4h7J9l2S5d8Q6b3N0m4C7v9X2p5L8n1W4t7K'
+WORKOS_CLIENT_ID='project_02FHKBFC8H6N99F94NG00K896G'
+WORKOS_COOKIE_PASSWORD="<your password>" # generate a secure password here
+```
+
+The SDK requires you to set a strong password to encrypt cookies. This password must be at least 32 characters long. You can generate a secure password by using the
+[1Password generator](https://1password.com/password-generator) or the openssl library via the command line:
+
+```bash
+openssl rand -base64 24
+```
+
+## Add AuthKit to your app
+
+### Provider
+The AuthKitProvider component adds protections for auth edge cases and is required to wrap your app layout.
+
+```typescript layout.tsx
+import { AuthKitProvider } from '@workos-inc/authkit-nextjs';
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body>
+        <AuthKitProvider>{children}</AuthKitProvider>
+      </body>
+    </html>
+  );
+}
+```
+
+### Middleware
+[Next.js middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
+
+```typescript middleware.ts
+import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
+
+export default authkitMiddleware();
+
+// Match against pages that require authentication
+// Leave this out if you want authentication on every page in your application
+export const config = { matcher: ['/'] };
+```
+
+### Callback route
+When a user has authenticated via AuthKit, they will be redirected to your app’s callback route. Make sure this route matches the WORKOS_REDIRECT_URI environment variable and the configured redirect URI in your WorkOS dashboard.
+
+```typescript /app/callback/route.ts
+import { handleAuth } from '@workos-inc/authkit-nextjs';
+
+// Redirect the user to `/` after successful sign in
+// The redirect can be customized: `handleAuth({ returnPathname: '/foo' })`
+export const GET = handleAuth();
+```
+### Access authentication data in your Next.js application
+We’ll need to direct users to sign in (or sign up) using AuthKit before redirecting them back to your application. We’ll do this by generating an AuthKit authorization URL server side and redirecting the user to it.
+
+The `withAuth` method is used to retrieve the current logged in user and their details.
+
+```javascript page.jsx
+import Link from 'next/link';
+import {
+  getSignInUrl,
+  getSignUpUrl,
+  withAuth,
+} from '@workos-inc/authkit-nextjs';
+
+export default async function HomePage() {
+  // Retrieves the user from the session or returns `null` if no user is signed in
+  const { user } = await withAuth();
+
+  // Get the URL to redirect the user to AuthKit to sign in
+  const signInUrl = await getSignInUrl();
+
+  // Get the URL to redirect the user to AuthKit to sign up
+  const signUpUrl = await getSignUpUrl();
+
+  /**
+   * If a signed-in user is mandatory, you can use the `ensureSignedIn`
+   * configuration option. If logged out, the below will immediately redirect
+   * the user to AuthKit. After signing in, the user will automatically
+   * be redirected back to this page.
+   * */
+  // const { user } = await withAuth({ ensureSignedIn: true });
+
+  if (!user) {
+    return (
+      <>
+        <Link href={signInUrl}>Sign in</Link>;
+        <Link href={signUpUrl}>Sign up</Link>;
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
+    </>
+  );
+}
+```
+
+### Protected routes
+For routes where a signed in user is mandatory, you can use the `ensureSignedIn` option when using `withAuth`.
+
+```typescript app/protected/page.tsx
+import { withAuth } from '@workos-inc/authkit-nextjs';
+
+export default async function ProtectedPage() {
+  // If the user isn't signed in, they will be automatically redirected to AuthKit
+  const { user } = await withAuth({ ensureSignedIn: true });
+
+  return (
+    <>
+      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
+    </>
+  );
+}
+```
+If you prefer a “secure by default” approach where every route is automatically protected, look into implementing [middleware auth mode](https://github.com/workos/authkit-nextjs?tab=readme-ov-file#middleware-auth)  in the authkit-nextjs library.
+
+### Ending the session
+Finally, ensure the user can end their session by redirecting them to the logout URL. After successfully signing out, the user will be redirected to your app’s homepage, which is configured in the WorkOS dashboard.
+
+```javascript authkit-nextjs logout example
+import Link from 'next/link';
+import {
+  getSignInUrl,
+  getSignUpUrl,
+  withAuth,
+  signOut,
+} from '@workos-inc/authkit-nextjs';
+
+export default async function HomePage() {
+  // Retrieves the user from the session or returns `null` if no user is signed in
+  const { user } = await withAuth();
+
+  // Get the URL to redirect the user to AuthKit to sign in
+  const signInUrl = await getSignInUrl();
+
+  // Get the URL to redirect the user to AuthKit to sign up
+  const signUpUrl = await getSignUpUrl();
+
+  if (!user) {
+    return (
+      <>
+        <Link href={signInUrl}>Sign in</Link>;
+        <Link href={signUpUrl}>Sign up</Link>;
+      </>
+    );
+  }
+
+  return (
+    <form
+      action={async () => {
+        'use server';
+        await signOut();
+      }}
+    >
+      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
+      <button type="submit">Sign out</button>
+    </form>
+  );
+}
+```
+
+
+</TabPanel>
+
+<TabPanel id="js" label="Original">
 
 When your user signs in, call [`getAuthorizationUrl()`](https://workos.com/docs/reference/sso/get-authorization-url)
 
@@ -136,92 +305,9 @@ const { access_token, profile } = await workos.sso.getProfileAndToken({
 Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
 
 </TabPanel>
-<TabPanel id="flutter" label="Flutter">
-
-When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-signinwithoauth) with `workos` as the `provider`:
-
-```dart
-Future<void> signInWithWorkOS() async {
-  await supabase.auth.signInWithOAuth(
-    OAuthProvider.workos,
-    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
-    authScreenLaunchMode:
-        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
-    queryParams: {
-      'connection': '<your_connection>',
-      'organization': '<your_organization',
-      'workos_provider': '<your_provider>',
-    },
-  );
-}
-```
-
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `WorkOS` as the `Provider`:
-
-```kotlin
-suspend fun signInWithWorkOS() {
-	supabase.auth.signInWith(WorkOS) {
-		queryParams["connection"] = "<your_connection>"
-		queryParams["organization"] = "<your_organization>"
-		queryParams["workos_provider"] = "<your_provider>"
-	}
-}
-```
-
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
-
-</TabPanel>
-</Tabs>
-
-<OAuthPkceFlow />
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```js
-async function signOut() {
-  const { error } = await supabase.auth.signOut()
-}
-```
-
-</TabPanel>
-<TabPanel id="flutter" label="Flutter">
-
-When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```dart
-Future<void> signOut() async {
-  await supabase.auth.signOut();
-}
-```
-
-</TabPanel>
-<TabPanel id="kotlin" label="Kotlin">
-
-When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
-
-```kotlin
-suspend fun signOut() {
-	supabase.auth.signOut()
-}
-```
-
-</TabPanel>
 </Tabs>
 
 ## Resources
 
 - [WorkOS Documentation](https://workos.com/docs/sso/guide)
+- [AuthKit Documentation](https://authkit.com/)
