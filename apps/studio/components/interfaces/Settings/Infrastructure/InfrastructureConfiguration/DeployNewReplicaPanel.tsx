@@ -243,7 +243,7 @@ const DeployNewReplicaPanel = ({
               </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        ) : isAWSProvider ? (
+        ) : !isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
