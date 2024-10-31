@@ -83,7 +83,7 @@ export default function LaunchWeekIndex() {
         }}
       >
         <DefaultLayout>
-          <MetalTicket />
+          <MetalTicket username="Francesco Sansalvadore" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

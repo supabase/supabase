@@ -3,13 +3,20 @@
 import React, { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-// import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { useParams } from 'common'
 
-// TODO: add content in ticket and subtract it from shape
+const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco Sansalvadore' }) => {
+  // Will come from auth
+  const params = useParams()
 
-const ThreeCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLDivElement>(null)
+  // const textLines = ['Sansalvadore', 'Francesco']
+  const textLines = params?.username?.split(' ').reverse() || []
+  const LINE_HEIGHT = 1.4
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -28,110 +35,171 @@ const ThreeCanvas: React.FC = () => {
     )
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(isDesktop ? window.innerWidth / 2 : window.innerWidth, window.innerHeight)
+    renderer.shadowMap.enabled = true
     canvasRef.current.appendChild(renderer.domElement)
 
     // Controls
     const controls = new OrbitControls(camera, canvasRef.current)
     controls.target.set(0, 0.75, 0)
     controls.autoRotate
-    // controls.enableRotate = false
     controls.enableDamping = true
     controls.enableZoom = false
     controls.dampingFactor = 0.1
     controls.minPolarAngle = Math.PI / 2
     controls.maxPolarAngle = Math.PI / 2
 
+    const loader = new GLTFLoader()
+
     // Create a metal material
     const metalTexture = new THREE.TextureLoader().load('/images/launchweek/13/ticket/2000px.avif') // Load a metal texture image
     const metalMaterial = new THREE.MeshStandardMaterial({
       map: metalTexture,
       color: 0x9ea1a1,
-      metalness: 0.8,
-      roughness: 0.35,
+      metalness: 0.9,
+      roughness: 0.25,
     })
 
     // Environment Map
-    // const rgbeLoader = new RGBELoader()
-    // rgbeLoader.load('/images/launchweek/13/ticket/octagon_lamps_photo_studio_1k.hdr', (texture) => {
-    //   (texture) => {
-    //     texture.mapping = THREE.EquirectangularReflectionMapping
+    const rgbeLoader = new RGBELoader()
+    rgbeLoader.load('/images/launchweek/13/ticket/canary_wharf_1k.hdr', (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping
 
-    //     scene.environment = texture
+      scene.environment = texture
 
-    //     metalMaterial.envMap = texture
-    //     metalMaterial.envMapIntensity = 9
-    //   }
-    // )
+      metalMaterial.envMap = texture
+      metalMaterial.envMapIntensity = 7
+    })
 
-    // Load 3D model
-    const loader = new GLTFLoader()
-    let ticket3DImport: THREE.Object3D<THREE.Event> | null = null
+    let ticket3DImport: THREE.Mesh
 
-    loader.load(
-      '/images/launchweek/13/ticket/3D-ticket.glb',
-      (gltf) => {
-        console.log('success', gltf)
-        ticket3DImport = gltf.scene.children[0]
+    // loader.load('/images/launchweek/13/ticket/3D-ticket-cutout.glb', (gltf) => {
+    loader.load('/images/launchweek/13/ticket/3D-ticket-cutout-holes.glb', (gltf) => {
+      ticket3DImport = gltf.scene.children[0] as THREE.Mesh
+      ticket3DImport.rotation.x = Math.PI * 0.5
 
-        ticket3DImport.rotation.x = -Math.PI * 0.5
-        ticket3DImport.traverse((child) => {
-          if (child) {
-            child.traverse((node) => {
-              if ((node as THREE.Mesh).isMesh) {
-                ;(child as THREE.Mesh).material = metalMaterial
-              }
-            })
-          }
+      ticket3DImport.traverse((child) => {
+        if (child) {
+          child.traverse((node) => {
+            // @ts-ignore
+            child.material = metalMaterial
+            child.receiveShadow = true
+          })
+        }
+      })
+
+      scene.add(ticket3DImport)
+      camera.lookAt(ticket3DImport.position)
+
+      // Load font and add text geometry as a cut-out
+      const fontLoader = new FontLoader()
+      fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
+        const textMaterial = new THREE.MeshStandardMaterial({
+          color: 0x0f0f0f,
+          metalness: 0.8,
+          roughness: 0.55,
         })
 
-        scene.add(ticket3DImport)
-        camera.lookAt(ticket3DImport.position)
-      },
-      (progress) => {
-        console.error('progress', progress)
-      },
-      (error) => {
-        console.error('An error happened', error)
-      }
-    )
+        ticket3DImport.updateMatrix()
 
-    // Position the camera to see the plate vertically
+        textLines.map((text, index) => {
+          const textGeometry = new TextGeometry(text, {
+            font,
+            size: 0.95,
+            height: 0.4,
+          })
+          const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+          textMesh.updateMatrix()
+          textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2) // Adjust position as needed
+          textMesh.castShadow = true
+          scene.add(textMesh)
+
+          // if (ticket3DImport) {
+          //   ticket3DImport.updateMatrixWorld()
+          //   textMesh.updateMatrixWorld()
+          //   const csgTicket = CSG.fromMesh(ticket3DImport)
+          //   const csgText = CSG.fromMesh(textMesh)
+
+          //   const subtractedMesh = CSG.toMesh(csgTicket.subtract(csgText), ticket3DImport.matrix)
+          //   subtractedMesh.material = ticket3DImport.material
+          //   scene.remove(ticket3DImport) // Remove old ticket mesh
+          //   scene.add(subtractedMesh) // Add new ticket with cut-out
+          // }
+        })
+
+        const footerContent = [
+          {
+            text: 'LAUNCH WEEK 13',
+            position: { x: -5.8, y: -6.8, z: -0.2 },
+            size: 0.59,
+          },
+          {
+            text: '2-6 DEC 2024',
+            position: { x: -5.8, y: -7.7, z: -0.2 },
+            size: 0.55,
+          },
+        ]
+
+        footerContent.map((line) => {
+          const textGeometry = new TextGeometry(line.text, {
+            font,
+            size: line.size,
+            height: 0.4,
+          })
+          const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+          textMesh.updateMatrix()
+          textMesh.position.set(line.position.x, line.position.y, line.position.z) // Adjust position as needed
+          textMesh.castShadow = true
+          scene.add(textMesh)
+        })
+      })
+    })
+
     camera.position.z = 30
-
-    // Add realistic lighting
-    const ambientLight = new THREE.AmbientLight(0x404040, 20) // Soft ambient light
-    scene.add(ambientLight)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 30)
+    // scene.add(ambientLight)
 
     // Top right light
-    const topRightLight = new THREE.DirectionalLight(0xffffff, 2)
-    topRightLight.position.set(10, 20, 10)
-    scene.add(topRightLight)
+    const topRightLight = new THREE.SpotLight(0xffffff, 1)
+    topRightLight.position.set(2, 8, 10)
+    topRightLight.castShadow = true
+    // scene.add(topRightLight)
 
     // Bottom left light
-    const bottomLeftLight = new THREE.DirectionalLight(0xffffff, 2)
-    bottomLeftLight.position.set(-5, -25, 10)
-    scene.add(bottomLeftLight)
+    const bottomLeftLight = new THREE.SpotLight(0x44ff4f, 2)
+    bottomLeftLight.position.set(-5, -5, 10)
+    bottomLeftLight.target.position.set(0, 0, 0)
+    bottomLeftLight.castShadow = true
+    // scene.add(bottomLeftLight)
+
+    // const topRightLightHelper = new THREE.SpotLightHelper(topRightLight)
+    // const topRightLightCameraHelper = new THREE.CameraHelper(topRightLight.shadow.camera)
+    // const bottomLeftLightHelper = new THREE.SpotLightHelper(bottomLeftLight)
+    // const bottomLeftLightCameraHelper = new THREE.CameraHelper(bottomLeftLight.shadow.camera)
+
+    // Helpers
+    // scene.add(topRightLightHelper)
+    // scene.add(topRightLightCameraHelper)
+    // scene.add(bottomLeftLightHelper)
+    // scene.add(bottomLeftLightCameraHelper)
 
     // Left light
     const leftLight = new THREE.PointLight(0xffffff, 0.015)
     leftLight.position.set(50, 0, 100)
-
-    scene.add(leftLight)
+    leftLight.castShadow = true
+    // scene.add(leftLight)
 
     // Right light
     const rightLight = new THREE.PointLight(0xffffff, 0.015)
     rightLight.position.set(-50, 0, 100)
-    scene.add(rightLight)
-
-    let orbit: THREE.Object3D
+    rightLight.castShadow = true
+    // scene.add(rightLight)
 
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate)
-
-      // plate.rotation.y += 0.005 // slow rotation
       renderer.render(scene, camera)
     }
+
     animate()
 
     // Handle window resize
@@ -144,11 +212,13 @@ const ThreeCanvas: React.FC = () => {
       renderer.setSize(isDesktop ? window.innerWidth / 2 : window.innerWidth, window.innerHeight)
     }
 
+    let orbit: THREE.Object3D
+
     // orbit object on mousemove
     const handleMouseMoveRotate = (e: any) => {
       let scale = -0.001
       orbit.rotateY((e.movementX - 1) * scale)
-      orbit.rotateX(e.movementY * scale * 0.5)
+      orbit.rotateX(e.movementY * scale * 0.1)
       orbit.rotation.z = 0
       // TODO: reset initial rotation when mouse leaves the canvas
     }
@@ -175,7 +245,7 @@ const ThreeCanvas: React.FC = () => {
       canvasRef.current?.removeChild(renderer.domElement)
       renderer.dispose()
     }
-  }, [])
+  }, [params])
 
   return (
     <div className="relative flex justify-end items-center max-h-screen bg-alternative overflow-hidden">
