@@ -17,7 +17,7 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { DISK_TYPE_OPTIONS } from '../ui/DiskManagement.constants'
+import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from '../ui/DiskManagement.constants'
 import FormMessage from '../ui/FormMessage'
 
 type StorageTypeFieldProps = {
@@ -39,12 +39,26 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
         <FormItemLayout layout="horizontal" label="Storage type">
           <Select_Shadcn_
             {...field}
-            onValueChange={async (e) => {
+            onValueChange={async (e: DiskType) => {
               field.onChange(e)
-              // only trigger provisionedIOPS due to other input being hidden
+
+              /**
+               * Set default IOPS if not dirty
+               * This is to ensure that the IOPS is set to the minimum value if the user has not changed it
+               */
+              if (e === 'gp3') {
+                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                  form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.GP3].minIops)
+                }
+              } else {
+                if (!form.getFieldState('provisionedIOPS').isDirty) {
+                  form.setValue('provisionedIOPS', DISK_LIMITS[DiskType.IO2].minIops)
+                }
+              }
+
+              // trigger other fields to validate
               await trigger('provisionedIOPS')
               await trigger('totalSize')
-              trigger('provisionedIOPS')
             }}
             defaultValue={field.value}
             disabled={disableInput || isError}
