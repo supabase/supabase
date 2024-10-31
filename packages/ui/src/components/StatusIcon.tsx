@@ -1,5 +1,6 @@
 import { SVGProps, forwardRef } from 'react'
 import { cn } from '../lib/utils'
+import { Check } from 'lucide-react'
 
 export interface StatusIconProps {
   hideBackground?: boolean
