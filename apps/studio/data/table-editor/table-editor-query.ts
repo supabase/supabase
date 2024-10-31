@@ -36,6 +36,8 @@ export type Entity = {
 
 export type TableEditor = {
   entity: Entity
+  // [Joshen] We can probably deprecate this one since we're deprecating pg sodium and TCE
+  // https://supabase.com/docs/guides/database/extensions/pgsodium#encryption-key-location
   encrypted_columns: string[] | null
   table_info: Table | null
   view_info: View | null

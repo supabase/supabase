@@ -97,6 +97,7 @@ export function parseSupaTable(
         targetTableName: null,
         targetColumnName: null,
         deletionAction: undefined,
+        updateAction: undefined,
       },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
@@ -114,6 +115,7 @@ export function parseSupaTable(
       temp.foreignKey.targetTableName = relationship.target_table_name
       temp.foreignKey.targetColumnName = relationship.target_column_name
       temp.foreignKey.deletionAction = relationship.deletion_action
+      temp.foreignKey.updateAction = relationship.update_action
     }
     return temp
   })
