@@ -30,8 +30,6 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const {
     data: diskUtil,
     // to do, error handling
-    isLoading: isDiskUtilizationLoading,
-    error: diskUtilError,
   } = useDiskUtilizationQuery({
     projectRef: ref,
   })

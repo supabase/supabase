@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react'
 import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
 
-export const DiskMangementCoolDownSection = () => {
+export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(100)
   const [showCountdown, setShowCountdown] = useState(false)
   const [isJumping, setIsJumping] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const startCountdown = () => {
@@ -40,7 +39,7 @@ export const DiskMangementCoolDownSection = () => {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {visible && (
         <motion.div
           initial={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}

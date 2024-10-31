@@ -177,13 +177,7 @@ export function DiskManagementForm() {
   /**
    * State handling
    */
-  const isLoading =
-    isAddonsLoading ||
-    isDiskAttributesLoading ||
-    isDiskUtilizationLoading ||
-    isReadReplicasLoading ||
-    isSubscriptionLoading ||
-    isCooldownLoading
+
   const isSuccess =
     isAddonsSuccess &&
     isDiskAttributesSuccess &&
@@ -191,9 +185,6 @@ export function DiskManagementForm() {
     isReadReplicasSuccess &&
     isSubscriptionSuccess &&
     isCooldownSuccess
-
-  const error =
-    addonsError ?? diskAttributesError ?? diskUtilError ?? readReplicasError ?? subscriptionError
 
   const isRequestingChanges = data?.requested_modification !== undefined
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)

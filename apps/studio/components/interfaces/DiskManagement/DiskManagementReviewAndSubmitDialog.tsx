@@ -247,7 +247,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             title="Resizing your Compute will trigger a project restart"
             description="Project will restart automatically on confirmation."
           />
-          {hasDiskConfigChanges && <DiskMangementCoolDownSection />}
+          <DiskMangementCoolDownSection visible={hasDiskConfigChanges} />
         </div>
         <DialogSectionSeparator />
         <Table>
