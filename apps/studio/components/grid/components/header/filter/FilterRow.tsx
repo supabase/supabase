@@ -27,7 +27,9 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
       ? 'yyyy-mm-dd hh:mm:ss+zz'
       : column?.format === 'timestamp'
         ? 'yyyy-mm-dd hh:mm:ss'
-        : 'Enter a value'
+        : column?.format === 'text' && filter.operator !== 'is' && filter.operator !== 'in'
+          ? 'Enter a value (defaults to empty string)'
+          : 'Enter a value'
 
   return (
     <div className="flex w-full items-center justify-between gap-x-1 px-3">
