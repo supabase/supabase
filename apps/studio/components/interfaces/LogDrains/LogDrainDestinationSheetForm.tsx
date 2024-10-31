@@ -438,6 +438,7 @@ export function LogDrainDestinationSheetForm({
                       formControl={form.control}
                     />
                     <LogDrainFormItem
+                      type="password"
                       value="password"
                       label="Password"
                       placeholder="glc_ABCD1234567890"
