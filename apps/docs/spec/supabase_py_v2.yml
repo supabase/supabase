@@ -6907,6 +6907,7 @@ functions:
             "path": "public/avatar1.png",
             "full_path": "avatars/public/avatar1.png"
           }
+          ```
   - id: from-update
     title: from_.update()
     description: Replaces an existing file at the specified path with a new one.
@@ -6960,6 +6961,7 @@ functions:
             "path": "public/avatar1.png",
             "full_path": "avatars/public/avatar1.png"
           }
+          ```
   - id: from-move
     title: 'from_.move()'
     description: Moves an existing file to a new path in the same bucket.
@@ -6991,6 +6993,7 @@ functions:
           {
             "message": "Successfully moved"
           }
+          ```
   - id: from-copy
     title: 'from_.copy()'
     description: Copies an existing file to a new path in the same bucket.
@@ -7022,6 +7025,7 @@ functions:
           {
             "path": "avatars/private/avatar2.png"
           }
+          ```
 
   - id: from-create-signed-urls
     title: 'from_.create_signed_urls()'
@@ -7079,7 +7083,7 @@ functions:
           ```
   - id: from-create-signed-url
     title: 'from_.create_signed_url()'
-    description: Creates multiple signed URLs. Use a signed URL to share a file for a fixed amount of time.
+    description: Creates a signed URL for a file. Use a signed URL to share a file for a fixed amount of time.
     notes: |
       - RLS policy permissions required:
         - `buckets` table permissions: none
@@ -7090,7 +7094,7 @@ functions:
         isOptional: false
         type: string
         description: |
-          The file path, including the current file name. For example `'folder/image.png'`.
+          The file path, including the file name. For example `'folder/image.png'`.
       - name: expires_in
         isOptional: false
         type: number
