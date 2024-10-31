@@ -4,13 +4,12 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useEffect, useRef, useState } from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
+import { formatQuery } from 'data/sql/format-sql-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { timeout } from 'lib/helpers'
 import { cn } from 'ui'
 import { Loading } from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { formatQuery } from 'data/sql/format-sql-query'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
 const DEFAULT_ACTIONS = {

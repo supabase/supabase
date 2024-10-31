@@ -365,7 +365,7 @@ export const TAX_IDS: TaxId[] = [
     type: 'kr_brn',
     country: 'Korea',
     placeholder: '123-45-67890',
-    countryIso2: 'Kr',
+    countryIso2: 'KR',
   },
   {
     name: 'LI UID',

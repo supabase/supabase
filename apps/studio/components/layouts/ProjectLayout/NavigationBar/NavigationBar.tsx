@@ -119,7 +119,7 @@ const NavigationBar = () => {
     )
   }
 
-  const CommandButton = isFunctionsAssistantEnabled ? (
+  const CommandButton = !isFunctionsAssistantEnabled ? (
     <NavigationIconButton
       size="tiny"
       onClick={() => {

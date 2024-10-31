@@ -1,3 +1,4 @@
+import { CommonDatabaseEntity } from 'state/app-state'
 import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
 
 const PLACEHOLDER_PREFIX = `-- Press tab to use this code
@@ -5,12 +6,17 @@ const PLACEHOLDER_PREFIX = `-- Press tab to use this code
 
 const PLACEHOLDER_LIMIT = `Just three examples will do.`
 
-export const generateTitle = (editor?: SupportedAssistantEntities | null) => {
+export const generateTitle = (
+  editor?: SupportedAssistantEntities | null,
+  entity?: CommonDatabaseEntity
+) => {
   switch (editor) {
     case 'functions':
-      return 'Create a new function'
+      if (entity === undefined) return 'Create a new function'
+      else return `Edit function: ${entity.name}`
     case 'rls-policies':
-      return 'Create a new RLS policy'
+      if (entity === undefined) return 'Create a new RLS policy'
+      else return `Edit RLS policy: ${entity.name}`
     default:
       return 'SQL Scratch Pad'
   }
@@ -27,10 +33,15 @@ export const generateCTA = (editor?: SupportedAssistantEntities | null) => {
   }
 }
 
-export const generatePlaceholder = (editor?: SupportedAssistantEntities | null) => {
+export const generatePlaceholder = (
+  editor?: SupportedAssistantEntities | null,
+  entity?: CommonDatabaseEntity,
+  existingDefinition?: string
+) => {
   switch (editor) {
     case 'functions':
-      return `${PLACEHOLDER_PREFIX}
+      if (entity === undefined) {
+        return `${PLACEHOLDER_PREFIX}
 CREATE FUNCTION *schema*.*function_name*(*param1 type*, *param2 type*)\n
 &nbsp;&nbsp;RETURNS *return_type*\n
 &nbsp;&nbsp;LANGUAGE *plpgsql*\n
@@ -44,6 +55,26 @@ BEGIN\n
 END;\n
 $$;
 `
+      } else {
+        return `${PLACEHOLDER_PREFIX}
+-- To rename the function\n
+ALTER FUNCTION *${entity.name}* RENAME TO *new_name*;\n
+&nbsp;\n
+-- To change the schema of the function\n
+ALTER FUNCTION *${entity.name}* SET SCHEMA *new_schema*;\n
+&nbsp;\n
+-- To update the function body or the arguments, use\n
+-- the create or replace statement instead\n
+${existingDefinition
+  ?.replaceAll(
+    '\n ',
+    `\n\
+  &nbsp;&nbsp;`
+  )
+  .replaceAll('\n', '\n\n')
+  .trim()}
+`
+      }
     case 'rls-policies':
       return `${PLACEHOLDER_PREFIX}
 CREATE POLICY *name* ON *table_name*\n

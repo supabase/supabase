@@ -10,10 +10,20 @@ const EMPTY_DASHBOARD_HISTORY: {
   editor: undefined,
 }
 
+export type CommonDatabaseEntity = {
+  id: number
+  name: string
+  schema: string
+  [key: string]: any
+}
+
 type AiAssistantPanelType = {
   open: boolean
   editor?: SupportedAssistantEntities | null
+  // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
   content?: string
+  // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
+  entity?: CommonDatabaseEntity
 }
 
 export const appState = proxy({
@@ -95,9 +105,19 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  aiAssistantPanel: { open: false, editor: null, content: '' } as AiAssistantPanelType,
+  aiAssistantPanel: {
+    open: false,
+    editor: null,
+    content: '',
+    entity: undefined,
+  } as AiAssistantPanelType,
   setAiAssistantPanel: (value: AiAssistantPanelType) => {
-    appState.aiAssistantPanel = { ...appState.aiAssistantPanel, ...value }
+    const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+    appState.aiAssistantPanel = {
+      ...appState.aiAssistantPanel,
+      content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,
+      ...value,
+    }
   },
 })
 
