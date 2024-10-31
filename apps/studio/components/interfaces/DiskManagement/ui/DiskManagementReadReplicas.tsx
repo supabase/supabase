@@ -1,16 +1,16 @@
+import { AnimatePresence, motion } from 'framer-motion'
+
 import { useParams } from 'common'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
 import {
   Alert_Shadcn_ as Alert,
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,
   InfoIcon,
 } from 'ui'
-import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'
 import { BillingChangeBadge } from './BillingChangeBadge'
+import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'
 
 interface DiskManagementDiskSizeReadReplicasProps {
   isDirty: boolean
@@ -30,7 +30,6 @@ export const DiskManagementDiskSizeReadReplicas = ({
   newStorageType,
 }: DiskManagementDiskSizeReadReplicasProps) => {
   const { ref: projectRef } = useParams()
-  const [isOpen, setIsOpen] = useState(false)
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)

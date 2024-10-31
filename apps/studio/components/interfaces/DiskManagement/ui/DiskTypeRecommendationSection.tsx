@@ -1,14 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ReactNode } from 'react'
 import { UseFormReturn } from 'react-hook-form'
+
 import { Admonition } from 'ui-patterns/admonition'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType, IOPS_RANGE } from './DiskManagement.constants'
+import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from './DiskManagement.constants'
 
 export function DiskTypeReccomendationSection({
   actions,
   form,
 }: {
-  actions?: React.ReactNode
+  actions?: ReactNode
   form: UseFormReturn<DiskStorageSchemaType>
 }) {
   const { watch } = form

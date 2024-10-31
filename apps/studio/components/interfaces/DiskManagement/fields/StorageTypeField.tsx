@@ -1,8 +1,11 @@
+import { UseFormReturn } from 'react-hook-form'
+
 import { useParams } from 'common'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
+  buttonVariants,
+  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Select_Shadcn_,
@@ -11,8 +14,6 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Skeleton,
-  buttonVariants,
-  cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
