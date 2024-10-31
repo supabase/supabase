@@ -9,6 +9,7 @@ import { Message as MessageType } from 'ai'
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
+import { Markdown } from 'components/interfaces/Markdown'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -22,7 +23,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
-import ReactMarkdown from 'react-markdown'
 import {
   AiIconAnimation,
   Alert_Shadcn_,
@@ -301,11 +301,13 @@ export const AiAssistantPanel = ({
           <Alert>
             <AlertTitle>OpenAI API key not set</AlertTitle>
             <AlertDescription>
-              <ReactMarkdown>
-                {IS_PLATFORM
-                  ? 'AI Assistant will not be able to reply to prompts'
-                  : 'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
-              </ReactMarkdown>
+              <Markdown
+                content={
+                  IS_PLATFORM
+                    ? 'AI Assistant will not be able to reply to prompts'
+                    : 'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
+                }
+              />
             </AlertDescription>
           </Alert>
         )}
