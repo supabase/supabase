@@ -78,7 +78,7 @@ export const AiAssistantPanel = ({
     selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
 
   const { data: check } = useCheckOpenAIKeyQuery()
-  const isApiKeySet = !!check?.hasKey
+  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -302,11 +302,7 @@ export const AiAssistantPanel = ({
             <AlertTitle>OpenAI API key not set</AlertTitle>
             <AlertDescription>
               <Markdown
-                content={
-                  IS_PLATFORM
-                    ? 'AI Assistant will not be able to reply to prompts'
-                    : 'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
-                }
+                content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
               />
             </AlertDescription>
           </Alert>

@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get, isResponseOk } from 'lib/common/fetch'
-import { BASE_PATH } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { resourceKeys } from './keys'
 
 // check to see if the OPENAI_API_KEY env var is set in self-hosted
@@ -27,5 +27,5 @@ export const useCheckOpenAIKeyQuery = <TData = ResourceData>({
   useQuery<ResourceData, ResourceError, TData>(
     resourceKeys.apiKey(),
     ({ signal }) => checkOpenAIKey(signal),
-    options
+    { enabled: !IS_PLATFORM && enabled, ...options }
   )
