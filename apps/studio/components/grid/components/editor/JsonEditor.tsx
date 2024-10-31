@@ -7,10 +7,13 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useTrackedState } from 'components/grid/store/Store'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
 import { Popover, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
@@ -56,8 +59,14 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as string

@@ -21,6 +21,7 @@ import {
 } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
@@ -33,7 +34,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
 
@@ -397,11 +397,10 @@ const InfrastructureActivity = () => {
                       add-ons are designed for sustained, high performance with specific IOPS and
                       throughput limits without needing to burst."
                       >
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <Link href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops">
-                            Documentation
-                          </Link>
-                        </Button>
+                        <DocsButton
+                          abbrev={false}
+                          href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops"
+                        />
                       </Admonition>
                     </>
                   ) : chartMeta[attribute.key].isLoading ? (

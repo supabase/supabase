@@ -5,10 +5,13 @@ import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import {
   Button,
   Popover,
@@ -17,13 +20,13 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
 import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,
@@ -40,8 +43,14 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as unknown as string

@@ -6,7 +6,7 @@ import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import type { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/get-table'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {

@@ -4,9 +4,9 @@ import { toast } from 'sonner'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
+import { TableLike } from 'data/table-editor/table-editor-query'
 import { tableKeys } from 'data/tables/keys'
 import { viewKeys } from 'data/views/keys'
-import type { TableLike } from 'hooks/misc/useTable'
 import type { ResponseError } from 'types'
 
 export type DatabaseColumnDeleteVariables = {
@@ -62,7 +62,9 @@ export const useDatabaseColumnDeleteMutation = ({
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           ...(table !== undefined
             ? [
-                queryClient.invalidateQueries(tableKeys.table(projectRef, table.id)),
+                queryClient.invalidateQueries(
+                  sqlKeys.query(projectRef, ['table-editor', table.id])
+                ),
                 queryClient.invalidateQueries(
                   sqlKeys.query(projectRef, [table.schema, table.name])
                 ),
@@ -72,9 +74,6 @@ export const useDatabaseColumnDeleteMutation = ({
                 // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
                 // which has a view dependent on it
                 queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, table.schema)),
-                // invalidate the view if there's a view with this id, not sure if this is needed because you can't delete a
-                // column from a view
-                queryClient.invalidateQueries(viewKeys.view(projectRef, table.id)),
               ]
             : []),
         ])

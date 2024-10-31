@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -16,8 +17,9 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { GB } from 'lib/constants'
-import { ExternalLink, HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -46,6 +48,9 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { Markdown } from '../Markdown'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import { DiskType, IOPS_RANGE, PLAN_DETAILS, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import {
   calculateDiskSizePrice,
@@ -54,24 +59,14 @@ import {
 } from './DiskManagement.utils'
 import { getDiskStorageSchema } from './DiskManagementPanelSchema'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
-import {
-  COMPUTE_MAX_IOPS,
-  COMPUTE_MAX_THROUGHPUT,
-  DiskType,
-  IOPS_RANGE,
-  PLAN_DETAILS,
-  THROUGHPUT_RANGE,
-} from './ui/DiskManagement.constants'
+import { COMPUTE_MAX_IOPS, COMPUTE_MAX_THROUGHPUT } from './ui/DiskManagement.constants'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
 } from './ui/DiskManagementReadReplicas'
-import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useFlag } from 'hooks/ui/useFlag'
 import { NoticeBar } from './ui/NoticeBar'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
@@ -662,13 +657,10 @@ export function DiskManagementPanelForm() {
                                 />
                               }
                             >
-                              <div className="flex items-center gap-x-2">
-                                <Button asChild type="default" icon={<ExternalLink />}>
-                                  <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
-                                    Documentation
-                                  </Link>
-                                </Button>
-                              </div>
+                              <DocsButton
+                                abbrev={false}
+                                href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size"
+                              />
                             </Admonition>
                           )}
                         </>
