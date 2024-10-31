@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,6 +7,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   Form_Shadcn_,
@@ -36,9 +36,9 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
-import { useFlag } from 'hooks/ui/useFlag'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -510,18 +510,13 @@ export function LogDrainDestinationSheetForm({
               isReactForm={false}
               layout="horizontal"
               label={
-                <div className="text-foreground-light">
+                <div className="flex flex-col gap-y-2 text-foreground-light">
                   Additional drain cost
-                  <div className="text-foreground-lighter mt-2">
-                    <Link
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline flex gap-1 items-center"
-                      href="https://supabase.com/docs/guides/platform/log-drains"
-                    >
-                      Documentation <ExternalLink className="w-4 h-4" />
-                    </Link>
-                  </div>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href="https://supabase.com/docs/guides/platform/log-drains"
+                  />
                 </div>
               }
             >

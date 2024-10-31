@@ -1,12 +1,11 @@
-import { ExternalLink } from 'lucide-react'
-
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { Button, Tabs } from 'ui'
+import { Tabs } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
@@ -34,15 +33,7 @@ const EmailTemplates = () => {
           description="Customize the emails that will be sent out to your users."
         />
         <div className="mb-6">
-          <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/auth/auth-email-templates"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton href="https://supabase.com/docs/guides/auth/auth-email-templates" />
         </div>
       </div>
       {isError && (
