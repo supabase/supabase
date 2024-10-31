@@ -4,11 +4,13 @@ import { Info } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { Message as MessageType } from 'ai'
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -20,6 +22,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
+import ReactMarkdown from 'react-markdown'
 import {
   AiIconAnimation,
   Alert_Shadcn_,
@@ -37,8 +40,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
-import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
-import ReactMarkdown from 'react-markdown'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -75,6 +76,9 @@ export const AiAssistantPanel = ({
     useLocalStorageQuery(LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING(ref as string), true)
   const shouldShowNotOptimizedAlert =
     selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
+
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = !!check?.hasKey
 
   const { data } = useEntityDefinitionsQuery(
     {
@@ -115,25 +119,6 @@ export const AiAssistantPanel = ({
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
-  const [isApiKeySet, setIsApiKeySet] = useState<boolean>(true)
-
-  // check to see if the OPENAI_API_KEY env var is set in self-hosted
-  // so we can disable the chat editor and add a warning about manually adding the key
-  useEffect(() => {
-    if (IS_PLATFORM) return
-
-    const checkApiKey = async () => {
-      try {
-        const response = await fetch(`${BASE_PATH}/api/ai/sql/check-api-key`)
-        setIsApiKeySet(response.status === 200)
-      } catch (error) {
-        console.error('Error checking API key:', error)
-        setIsApiKeySet(false)
-      }
-    }
-
-    checkApiKey()
-  }, [])
 
   const confirmOptInToShareSchemaData = async () => {
     if (!canUpdateOrganization) {
@@ -312,12 +297,14 @@ export const AiAssistantPanel = ({
       </div>
 
       <div className="sticky p-5 flex-0 border-t grid gap-4">
-        {!isApiKeySet && !IS_PLATFORM && (
+        {!isApiKeySet && (
           <Alert>
             <AlertTitle>OpenAI API key not set</AlertTitle>
             <AlertDescription>
               <ReactMarkdown>
-                Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.
+                {IS_PLATFORM
+                  ? 'AI Assistant will not be able to reply to prompts'
+                  : 'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
               </ReactMarkdown>
             </AlertDescription>
           </Alert>

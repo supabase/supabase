@@ -1,9 +1,24 @@
-import { NextApiResponse } from 'next'
+import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
 
-export default function handler(res: NextApiResponse) {
+export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { method } = req
+
+  switch (method) {
+    case 'GET':
+      return handleGet(req, res)
+    default:
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
+  }
+}
+
+const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (process.env.OPENAI_API_KEY) {
-    res.status(200).send('OK')
+    return res.status(200).json({ hasKey: true })
   } else {
-    res.status(401).send('API key not found')
+    return res.status(404).json({ hasKey: false })
   }
 }
