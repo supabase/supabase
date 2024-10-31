@@ -1,6 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -15,14 +22,10 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
-import { ChevronRight } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import {
   Button,
   cn,
@@ -34,6 +37,7 @@ import {
 } from 'ui'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
+import { mapComputeSizeNameToAddonVariantId, showMicroUpgrade } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { ComputeSizeField } from './fields/ComputeSizeField'
@@ -47,12 +51,8 @@ import {
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
-import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { NoticeBar } from './ui/NoticeBar'
-import { mapComputeSizeNameToAddonVariantId, showMicroUpgrade } from './DiskManagement.utils'
-import { Admonition } from 'ui-patterns'
-import Link from 'next/link'
-import { AddonVariantId } from 'data/subscriptions/types'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementForm() {
   const {

@@ -1,19 +1,19 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
-import React from 'react'
+
 import { DialogSection, WarningIcon } from 'ui'
 
-interface Props {
+interface DiskMangementRestartRequiredSectionProps {
   visible: boolean
   title: string
   description: string
 }
 
-export const DiskMangementRestartRequiredSection: React.FC<Props> = ({
+export const DiskMangementRestartRequiredSection = ({
   visible,
   title,
   description,
-}) => {
+}: DiskMangementRestartRequiredSectionProps) => {
   return (
     <AnimatePresence>
       {visible && (

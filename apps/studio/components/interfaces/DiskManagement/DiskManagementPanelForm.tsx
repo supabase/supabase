@@ -1,5 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AnimatePresence, motion } from 'framer-motion'
+import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+
 import { useParams } from 'common'
 import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -14,16 +21,10 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AnimatePresence, motion } from 'framer-motion'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useFlag } from 'hooks/ui/useFlag'
 import { GB } from 'lib/constants'
-import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -48,9 +49,6 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { Markdown } from '../Markdown'
-import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
-import { DiskType, IOPS_RANGE, PLAN_DETAILS, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import {
   calculateDiskSizePrice,
@@ -59,7 +57,16 @@ import {
 } from './DiskManagement.utils'
 import { getDiskStorageSchema } from './DiskManagementPanelSchema'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { COMPUTE_MAX_IOPS, COMPUTE_MAX_THROUGHPUT } from './ui/DiskManagement.constants'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import {
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  DiskType,
+  IOPS_RANGE,
+  PLAN_DETAILS,
+  THROUGHPUT_RANGE,
+} from './ui/DiskManagement.constants'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
