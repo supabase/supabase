@@ -131,8 +131,13 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium truncate max-w-72">{drain.name}</TableCell>
-                <TableCell className="text-foreground-light truncate max-w-72">
+                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                  {drain.name}
+                </TableCell>
+                <TableCell
+                  className="text-foreground-light truncate max-w-72"
+                  title={drain.description}
+                >
                   {drain.description}
                 </TableCell>
                 <TableCell className="text-right font-mono">{drain.type}</TableCell>
