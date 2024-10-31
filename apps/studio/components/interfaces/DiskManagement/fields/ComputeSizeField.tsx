@@ -61,7 +61,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
      */
     project,
     /**
-     * isLoading is used to avoud a useCheckPermissions() race condition
+     * isLoading is used to avoid a useCheckPermissions() race condition
      */
     isLoading: isProjectLoading,
     /**

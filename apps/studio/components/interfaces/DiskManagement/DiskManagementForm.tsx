@@ -57,7 +57,7 @@ import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 export function DiskManagementForm() {
   const {
     project,
-    // isLoading is used to avoud a useCheckPermissions() race condition
+    // isLoading is used to avoid a useCheckPermissions() race condition
     isLoading: isProjectLoading,
   } = useProjectContext()
   const org = useSelectedOrganization()
@@ -285,8 +285,6 @@ export function DiskManagementForm() {
       })
     }
   }
-
-  // return <></>
 
   const showUpgradeBadge = showMicroUpgrade(
     subscription?.plan.id ?? 'free',
