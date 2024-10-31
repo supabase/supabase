@@ -346,13 +346,14 @@ export function DiskManagementForm() {
                 />
               </CollapsibleTrigger_Shadcn_>
               <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <StorageTypeField form={form} disableInput={disableDiskInputs} />
                 <NoticeBar
                   type="default"
                   visible={
                     RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
                     subscription?.plan.id !== 'free'
                   }
-                  title="Advanced Disk settings require LARGE Compute size or above"
+                  title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
                   actions={
                     <Button
                       type="default"
@@ -364,7 +365,6 @@ export function DiskManagementForm() {
                     </Button>
                   }
                 />
-                <StorageTypeField form={form} disableInput={disableDiskInputs} />
                 <IOPSField form={form} disableInput={disableDiskInputs} />
                 <ThroughputField form={form} disableInput={disableDiskInputs} />
               </CollapsibleContent_Shadcn_>
