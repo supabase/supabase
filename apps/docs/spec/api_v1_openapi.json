@@ -924,6 +924,30 @@
       }
     },
     "/v1/projects/{ref}": {
+      "get": {
+        "operationId": "v1-get-project",
+        "summary": "Gets a specific project that belongs to the authenticated user",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
+            }
+          },
+          "500": { "description": "Failed to retrieve project" }
+        },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      },
       "delete": {
         "operationId": "v1-delete-a-project",
         "summary": "Deletes the given project",
@@ -1546,8 +1570,7 @@
           },
           "500": { "description": "Failed to retrieve project's Postgres config" }
         },
-        "tags": ["Database"],
-        "security": [{ "bearer": [] }]
+        "tags": ["Database"]
       },
       "put": {
         "operationId": "v1-update-postgres-config",
@@ -1578,10 +1601,10 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to update project's Postgres config" }
         },
-        "tags": ["Database"],
-        "security": [{ "bearer": [] }]
+        "tags": ["Database"]
       }
     },
     "/v1/projects/{ref}/config/database/pgbouncer": {
@@ -1911,7 +1934,7 @@
     },
     "/v1/projects/{ref}/functions": {
       "post": {
-        "operationId": "createFunction",
+        "operationId": "v1-create-a-function",
         "summary": "Create a function",
         "description": "Creates a function and adds it to the specified project.",
         "parameters": [
@@ -2514,7 +2537,8 @@
               "PAUSING",
               "RESTORING",
               "RESTORE_FAILED",
-              "PAUSE_FAILED"
+              "PAUSE_FAILED",
+              "RESIZING"
             ],
             "type": "string"
           },
@@ -2645,7 +2669,8 @@
               "PAUSING",
               "RESTORING",
               "RESTORE_FAILED",
-              "PAUSE_FAILED"
+              "PAUSE_FAILED",
+              "RESIZING"
             ],
             "type": "string"
           }
@@ -3374,6 +3399,7 @@
           "wal_keep_size": { "type": "string" },
           "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
+          "restart_database": { "type": "boolean" },
           "session_replication_role": { "enum": ["origin", "replica", "local"], "type": "string" }
         }
       },

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Calendar, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import {
@@ -13,12 +13,11 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
-import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, Button } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
@@ -40,9 +39,6 @@ const Subscription = () => {
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
-
-  const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
-    useOrganizationBillingSubscriptionCancelSchedule()
 
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
@@ -98,38 +94,6 @@ const Subscription = () => {
                       {currentPlan?.name ?? 'Unknown'}
                     </p>
                   </div>
-
-                  {subscription?.scheduled_plan_change &&
-                    subscription?.scheduled_plan_change?.target_plan !== subscription.plan.id && (
-                      <Alert_Shadcn_ className="mb-2" title="Scheduled downgrade">
-                        <Calendar className="h-4 w-4" />
-                        <AlertTitle_Shadcn_>Scheduled downgrade</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                          <div>
-                            Your organization will automatically be downgraded from the{' '}
-                            <span>{subscription.plan.name}</span> plan to the{' '}
-                            <span className="capitalize">
-                              {subscription?.scheduled_plan_change?.target_plan}
-                            </span>{' '}
-                            plan on{' '}
-                            {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}.
-                            If you would like to stay on the <span>{subscription.plan.name}</span>{' '}
-                            plan, cancel the scheduled downgrade.
-                          </div>
-                          <div>
-                            <Button
-                              type="default"
-                              loading={cancelSubscriptionScheduleLoading}
-                              onClick={() => {
-                                return cancelSubscriptionSchedule({ slug: slug! })
-                              }}
-                            >
-                              Cancel downgrade
-                            </Button>
-                          </div>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
 
                   <div>
                     <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>

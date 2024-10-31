@@ -1,6 +1,6 @@
 import type { Filter, ServiceError, SupaTable } from 'components/grid/types'
 import { isNumericalColumn } from 'components/grid/utils/types'
-import type { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/get-table'
 
 /**
  * temporary fix until we implement a better filter UI

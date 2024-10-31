@@ -16,6 +16,9 @@ import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.ut
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
 
+// 60 seconds/minute * 60 minutes/hour * 24 hours/day
+export const revalidate = 86_400
+
 export default async function GlobalTroubleshootingPage() {
   const troubleshootingEntries = await getAllTroubleshootingEntries()
   const keywords = await getAllTroubleshootingKeywords()

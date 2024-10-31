@@ -73,6 +73,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/features</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/ga-week</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>

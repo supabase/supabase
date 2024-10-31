@@ -6,17 +6,30 @@ import { ColumnList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import useTable from 'hooks/misc/useTable'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseTables: NextPageWithLayout = () => {
-  const { id } = useParams()
   const snap = useTableEditorStateSnapshot()
-  const { data: selectedTable, isLoading } = useTable(Number(id))
+
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
+
+  const { project } = useProjectContext()
+  const { data, isLoading } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
 
   return (
     <>

@@ -25,7 +25,7 @@ export type ReplicationLagError = ExecuteSqlError
 
 export const useReplicationLagQuery = <TData extends ReplicationLagData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,
-  { enabled, ...options }: UseQueryOptions<ExecuteSqlData, ReplicationLagError, TData> = {}
+  { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ReplicationLagError, TData> = {}
 ) =>
   useExecuteSqlQuery(
     {

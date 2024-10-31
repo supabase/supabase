@@ -1,14 +1,14 @@
-import { useParams } from 'common'
 import dynamic from 'next/dynamic'
 import { forwardRef, HTMLAttributes } from 'react'
 
+import { useParams } from 'common'
 import { getConnectionStrings } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseSettings.utils'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { pluckObjectFields } from 'lib/helpers'
-import type { projectKeys } from './Connect.types'
 import { cn } from 'ui'
+import type { projectKeys } from './Connect.types'
 
 interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
   projectKeys: projectKeys
@@ -23,13 +23,13 @@ interface ConnectContentTabProps extends HTMLAttributes<HTMLDivElement> {
 const ConnectTabContentNew = forwardRef<HTMLDivElement, ConnectContentTabProps>(
   ({ projectKeys, filePath, ...props }, ref) => {
     const { ref: projectRef } = useParams()
-    const { data } = useProjectSettingsQuery({ projectRef })
+
+    const { data: settings } = useProjectSettingsV2Query({ projectRef })
     const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef })
 
-    const { project } = data ?? {}
     const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
     const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
-    const connectionInfo = pluckObjectFields(project || emptyState, DB_FIELDS)
+    const connectionInfo = pluckObjectFields(settings || emptyState, DB_FIELDS)
     const poolingConfiguration = poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
     const connectionStringsPooler =

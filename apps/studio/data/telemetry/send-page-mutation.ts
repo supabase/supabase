@@ -3,12 +3,11 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { isBrowser } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendPageGA = components['schemas']['TelemetryPageBody']
-type SendPagePH = components['schemas']['TelemetryPageBodyV2']
+type SendPage = components['schemas']['TelemetryPageBodyV2']
 
 export type SendPageVariables = {
   url: string
@@ -16,13 +15,16 @@ export type SendPageVariables = {
 
 type SendPagePayload = any
 
-export async function sendPage(type: 'GA' | 'PH', body: SendPagePayload) {
-  const headers = type === 'PH' ? { Version: '2' } : undefined
-  const { data, error } = await post(`/platform/telemetry/page`, {
-    body,
-    headers,
-    credentials: 'include',
-  })
+export async function sendPage({ body }: { body: SendPagePayload }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
+  if (!consent) return undefined
+
+  const headers = { Version: '2' }
+  const { data, error } = await post(`/platform/telemetry/page`, { body, headers })
   if (error) handleError(error)
   return data
 }
@@ -35,13 +37,16 @@ export const useSendPageMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
   const router = useRouter()
-  const usePostHogParameters = useFlag('enablePosthogChanges')
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-  const payload = usePostHogParameters
-    ? ({
+  return useMutation<SendPageData, ResponseError, SendPageVariables>(
+    (vars) => {
+      const { url } = vars
+      const type = 'PH'
+      const body: SendPage = {
+        page_url: url,
         page_title: title,
         pathname: router.pathname,
         ph: {
@@ -52,24 +57,8 @@ export const useSendPageMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-      } as SendPagePH)
-    : ({
-        title,
-        referrer,
-        ga: {
-          screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-          language: router?.locale ?? 'en-US',
-        },
-      } as SendPageGA)
-
-  return useMutation<SendPageData, ResponseError, SendPageVariables>(
-    (vars) => {
-      const { url } = vars
-      const type = usePostHogParameters ? 'PH' : 'GA'
-      const body = usePostHogParameters
-        ? ({ page_url: url, ...payload } as SendPagePH)
-        : ({ route: url, ...payload } as SendPageGA)
-      return sendPage(type, body)
+      }
+      return sendPage({ body })
     },
     {
       async onSuccess(data, variables, context) {

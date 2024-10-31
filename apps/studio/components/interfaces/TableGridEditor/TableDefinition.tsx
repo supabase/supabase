@@ -11,20 +11,19 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableDefinitionQuery } from 'data/database/table-definition-query'
 import { useViewDefinitionQuery } from 'data/database/view-definition-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import useEntityType from 'hooks/misc/useEntityType'
+import { Entity } from 'data/table-editor/table-editor-query'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
 
 export interface TableDefinitionProps {
-  id?: number
+  entityType?: Entity
 }
 
-const TableDefinition = ({ id }: TableDefinitionProps) => {
+const TableDefinition = ({ entityType }: TableDefinitionProps) => {
   const { ref } = useParams()
   const editorRef = useRef(null)
   const monacoRef = useRef(null)
   const { resolvedTheme } = useTheme()
-  const entityType = useEntityType(id)
   const { project } = useProjectContext()
 
   const viewResult = useViewDefinitionQuery(

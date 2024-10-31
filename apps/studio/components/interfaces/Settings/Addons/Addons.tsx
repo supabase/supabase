@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -7,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
@@ -26,7 +26,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -48,14 +48,14 @@ const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setPanel } = useAddonsPagePanel()
-  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-
+  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -105,7 +105,7 @@ const Addons = () => {
     return computeMeta
   }, [selectedProject, computeInstance])
 
-  const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
+  const canUpdateIPv4 = settings?.db_ip_addr_config === 'ipv6'
 
   return (
     <>

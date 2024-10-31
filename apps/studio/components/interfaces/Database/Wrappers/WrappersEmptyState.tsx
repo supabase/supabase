@@ -19,7 +19,7 @@ const WrappersEmptyState = () => {
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {WRAPPERS.map((wrapper) => (
           <CardButton
-            linkHref={`/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`}
+            linkHref={`/project/${ref}/integrations/wrappers/new?type=${wrapper.name.toLowerCase()}`}
             title={wrapper.label}
             fixedHeight={false}
           >

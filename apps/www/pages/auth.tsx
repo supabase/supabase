@@ -7,11 +7,13 @@ import NextImage from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, Image } from 'ui'
+import { useBreakpoint } from 'common'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductsNav from '~/components/Products/ProductsNav'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import EventCallout from '~/components/EventCallout'
 
 import Solutions from 'data/Solutions'
 import { PRODUCT_NAMES } from 'shared-data/products'
@@ -26,7 +28,7 @@ const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function AuthPage() {
-  // base path for images
+  const isMobile = useBreakpoint(768)
   const { basePath } = useRouter()
 
   const meta_title = 'Auth | Built-in user management'
@@ -52,6 +54,12 @@ function AuthPage() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.AUTHENTICATION} />
         <ProductHeader
+          callout={
+            <EventCallout
+              size={isMobile ? 'tiny' : 'small'}
+              className="mb-4 lg:mb-8 -mt-8 lg:-mt-10"
+            />
+          }
           icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}
           h1={[

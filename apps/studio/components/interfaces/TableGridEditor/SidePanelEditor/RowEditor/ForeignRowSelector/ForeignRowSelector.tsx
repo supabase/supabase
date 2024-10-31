@@ -13,13 +13,15 @@ import RefreshButton from 'components/grid/components/header/RefreshButton'
 import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -41,13 +43,12 @@ const ForeignRowSelector = ({
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
 
-  const { data: table } = useTableQuery({
+  const { data: tableData } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
   })
-
-  const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
+  const table = getTableLikeFromTableEditor(tableData)
 
   const supaTable =
     table &&
@@ -58,7 +59,7 @@ const ForeignRowSelector = ({
         primaryKeys: (table as PostgresTable).primary_keys,
         relationships: (table as PostgresTable).relationships,
       },
-      encryptedColumns
+      tableData?.encrypted_columns ?? undefined
     )
 
   const [params, setParams] = useState<any>({ filter: [], sort: [] })

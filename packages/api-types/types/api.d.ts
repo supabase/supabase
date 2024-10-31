@@ -39,10 +39,6 @@ export interface paths {
     /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['FlyOrganizationsController_getOrganization']
   }
-  '/partners/flyio/organizations/{organization_id}/billing': {
-    /** Gets the organizations current unbilled charges */
-    get: operations['FlyBillingController_getResourceBilling']
-  }
   '/partners/flyio/organizations/{organization_id}/extensions': {
     /** Gets all databases that belong to the given Fly organization id */
     get: operations['FlyOrganizationsController_getOrgExtensions']
@@ -101,6 +97,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/platform/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/platform/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -122,14 +122,32 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/platform/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/platform/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/platform/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
+  }
+  '/platform/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
   }
   '/platform/cli/login': {
     /** Create CLI login session */
@@ -330,10 +348,6 @@ export interface paths {
     /** Preview subscription changes */
     post: operations['SubscriptionController_previewSubscriptionChange']
   }
-  '/platform/organizations/{slug}/billing/subscription/schedule': {
-    /** Deletes any upcoming subscription schedule */
-    delete: operations['SubscriptionController_deleteSubscriptionSchedule']
-  }
   '/platform/organizations/{slug}/customer': {
     /** Gets the Stripe customer */
     get: operations['CustomerController_getCustomer']
@@ -457,17 +471,19 @@ export interface paths {
     /** Sets up a payment method */
     post: operations['SetupIntentOrgController_setUpPaymentMethod']
   }
+  '/platform/organizations/{slug}/projects': {
+    /** Gets all projects for the given organization */
+    get: operations['OrganizationProjectsController_getProjects']
+  }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
     get: operations['OrganizationRolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
-    /** Gets the given organization's tax IDs */
-    get: operations['TaxIdsController_getTaxIds']
+    /** Gets the given organization's tax ID */
+    get: operations['TaxIdsController_getTaxId']
     /** Creates or updates a tax ID for the given organization */
     put: operations['TaxIdsController_updateTaxId']
-    /** Creates a tax ID for the given organization */
-    post: operations['TaxIdsController_createTaxId']
     /** Delete the tax ID with the given ID */
     delete: operations['TaxIdsController_deleteTaxId']
   }
@@ -764,6 +780,10 @@ export interface paths {
   '/platform/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
   }
   '/platform/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
@@ -1167,10 +1187,6 @@ export interface paths {
     /** Processes Orb events */
     post: operations['OrbWebhooksController_processEvent']
   }
-  '/system/organizations/{slug}/billing/partner/usage-and-costs': {
-    /** Gets the partner usage and costs */
-    get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
-  }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['OrgSubscriptionSystemController_getSubscription']
@@ -1219,7 +1235,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['SystemFunctionsController_createFunction']
+    post: operations['v1-create-a-function']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
@@ -1286,6 +1302,10 @@ export interface paths {
     /** Updates GoTrue config */
     patch: operations['GoTrueConfigController_updateGoTrueConfig']
   }
+  '/v0/auth/{ref}/config/hooks': {
+    /** Updates GoTrue config hooks */
+    patch: operations['GoTrueConfigController_updateGoTrueConfigHooks']
+  }
   '/v0/auth/{ref}/invite': {
     /** Sends an invite to the given email */
     post: operations['AuthInviteController_sendInvite']
@@ -1307,14 +1327,32 @@ export interface paths {
     get: operations['TemplateController_getTemplate']
   }
   '/v0/auth/{ref}/users': {
-    /** Gets users */
+    /**
+     * Gets users
+     * @deprecated
+     */
     get: operations['UsersController_getUsers']
-    /** Delete user with given ID */
+    /** Creates user */
+    post: operations['UsersController_createUser']
+    /**
+     * Delete user with given ID
+     * @deprecated
+     */
     delete: operations['UsersController_deleteUser']
+  }
+  '/v0/auth/{ref}/users/{id}': {
+    /** Delete user with given ID */
+    delete: operations['UsersController_deleteUserById']
+    /** Updates user with given ID */
+    patch: operations['UsersController_updateUserById']
   }
   '/v0/auth/{ref}/users/{id}/factors': {
     /** Delete all factors associated to a user */
     delete: operations['FactorsController_deleteFactors']
+  }
+  '/v0/auth/{ref}/validate/spam': {
+    /** Validate spam based on the given email content */
+    post: operations['ValidateController_validateSpam']
   }
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
@@ -1669,6 +1707,10 @@ export interface paths {
   '/v0/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
     get: operations['v1-list-all-warehouse-queries']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/query/parse': {
+    /** Parses a warehouse query */
+    get: operations['v1-parse-warehouse-query']
   }
   '/v0/projects/{ref}/analytics/warehouse/tenant': {
     /** Gets project's warehouse tenant from logflare */
@@ -2097,7 +2139,7 @@ export interface paths {
      * Create a function
      * @description Creates a function and adds it to the specified project.
      */
-    post: operations['FunctionsController_createFunction']
+    post: operations['v1-create-a-function']
   }
   '/v1/projects/{ref}/functions/{function_slug}': {
     /**
@@ -2723,7 +2765,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
     }
     CreateBranchBody: {
       branch_name: string
@@ -2994,13 +3036,6 @@ export interface components {
       type: string
       value: string
     }
-    CreateTaxIdResponse: {
-      country: string
-      created: number
-      id: string
-      type: string
-      value: string
-    }
     CreateThirdPartyAuthBody: {
       custom_jwks?: Record<string, never>
       jwks_url?: string
@@ -3022,12 +3057,54 @@ export interface components {
       table: string
       table_id?: number
     }
+    CreateUserBody: {
+      email: string
+      email_confirm: boolean
+      password: string
+    }
     CreateUserContentFolderResponse: {
       id: string
       name: string
       owner_id: number
       parent_id?: string | null
       project_id: number
+    }
+    CreateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     CreateVercelConnectionResponse: {
       env_sync_error?: components['schemas']['SyncVercelEnvError']
@@ -3116,6 +3193,21 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3135,6 +3227,8 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -3204,9 +3298,6 @@ export interface components {
       id: string
       saml?: components['schemas']['SamlDescriptor']
       updated_at?: string
-    }
-    DeleteTaxIdBody: {
-      id: string
     }
     DeleteVercelConnectionResponse: {
       id: string
@@ -3516,7 +3607,6 @@ export interface components {
       plan: components['schemas']['BillingSubscriptionPlan']
       project_addons: components['schemas']['BillingProjectAddonResponse'][]
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
-      usage_based_billing_project_addons: boolean
       usage_billing_enabled: boolean
     }
     GetUserContentByIdResponse: {
@@ -3610,11 +3700,6 @@ export interface components {
       id: number
       sender_id: number
       user_id: number
-    }
-    GoogleAnalyticBody: {
-      language?: string
-      screen_resolution?: string
-      session_id: string
     }
     GoTrueConfigResponse: {
       API_MAX_REQUEST_DURATION: number | null
@@ -3816,18 +3901,6 @@ export interface components {
     HealthResponse: {
       healthy: boolean
     }
-    IdentifyUserBody: {
-      auth0_id?: string
-      first_name?: string
-      free_project_limit?: number
-      gotrue_id: string
-      id: number
-      is_alpha_user?: boolean
-      last_name?: string
-      mobile?: string
-      primary_email: string
-      username?: string
-    }
     IntegrationConnectionVercel: {
       foreign_project_id: string
       metadata: Record<string, never>
@@ -3924,7 +3997,7 @@ export interface components {
       name: string
       token: string
       /** @enum {string} */
-      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic'
+      type: 'postgres' | 'bigquery' | 'webhook' | 'datadog' | 'elastic' | 'loki'
       user_id: number
     }
     LFEndpoint: {
@@ -4168,6 +4241,9 @@ export interface components {
        * @example fly_123456789
        */
       supabase_org_id: string
+    }
+    OrganizationProjectsResponse: {
+      projects: components['schemas']['ProjectWithDatabases'][]
     }
     OrganizationResponse: {
       billing_email: string | null
@@ -4669,6 +4745,19 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
+    ProjectDatabase: {
+      cloud_provider: string
+      disk_last_modified_at?: string
+      disk_throughput_mbps?: number
+      /** @enum {string} */
+      disk_type?: 'gp3' | 'io2'
+      disk_volume_size_gb?: number
+      identifier: string
+      infra_compute_size?: components['schemas']['DbInstanceSize']
+      region: string
+      status: components['schemas']['DatabaseStatus']
+      type: components['schemas']['DatabaseType']
+    }
     ProjectDetailResponse: {
       cloud_provider: string
       connectionString: string
@@ -4852,6 +4941,23 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    /** @enum {string} */
+    ProjectStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INACTIVE'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTARTING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORING'
+      | 'RESTORE_FAILED'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4875,6 +4981,14 @@ export interface components {
       app_version: string
       postgres_version: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
+    }
+    ProjectWithDatabases: {
+      databases: components['schemas']['ProjectDatabase'][]
+      is_branch: boolean
+      name: string
+      ref: string
+      region: string
+      status: components['schemas']['ProjectStatus']
     }
     Provider: {
       created_at?: string
@@ -4954,47 +5068,6 @@ export interface components {
     }
     ResizeBody: {
       volume_size_gb: number
-    }
-    ResourceBillingItem: {
-      /**
-       * @description Costs of the item in cents
-       * @example 100
-       */
-      costs: number
-      /**
-       * @description In case of a usage item, the free usage included in the customers Plan
-       * @example 100
-       */
-      freeUnitsInPlan?: number
-      /**
-       * @description Non-Unique identifier of the item
-       * @example usage_egress
-       */
-      itemIdentifier: string
-      /**
-       * @description Descriptive name of the billing item
-       * @example Pro Plan
-       */
-      itemName: string
-      /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration' | 'compute_credits'
-      /**
-       * @description In case of a usage item, the billable usage amount, free usage has been deducted
-       * @example 100
-       */
-      usageBillable?: number
-      /**
-       * @description In case of a usage item, the total usage
-       * @example 100
-       */
-      usageTotal?: number
-    }
-    ResourceBillingResponse: {
-      /** @description Whether the user is exceeding the included quotas in the Plan - only relevant for users on usage-capped Plans. */
-      exceedsPlanLimits: boolean
-      items: components['schemas']['ResourceBillingItem'][]
-      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped Plans. */
-      overusageAllowed: boolean
     }
     ResourceProvisioningConfigResponse: {
       /**
@@ -5568,30 +5641,11 @@ export interface components {
     }
     TaxId: {
       country: string
-      id: string
       type: string
       value: string
     }
     TaxIdResponse: {
-      data: components['schemas']['TaxId'][]
-    }
-    TaxIdV2: {
-      country: string
-      type: string
-      value: string
-    }
-    TaxIdV2Response: {
-      tax_id: components['schemas']['TaxIdV2'] | null
-    }
-    TelemetryEventBody: {
-      action: string
-      category: string
-      ga?: components['schemas']['GoogleAnalyticBody']
-      label?: Record<string, never>
-      page_location?: string
-      page_referrer?: string
-      page_title?: string
-      value?: string
+      tax_id: components['schemas']['TaxId'] | null
     }
     TelemetryEventBodyV2: {
       action: string
@@ -5617,20 +5671,10 @@ export interface components {
       reset_organization?: boolean
       reset_project?: boolean
     }
-    TelemetryIdentifyBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      user: components['schemas']['IdentifyUserBody']
-    }
     TelemetryIdentifyBodyV2: {
       organization_slug?: string
       project_ref?: string
       user_id: string
-    }
-    TelemetryPageBody: {
-      ga?: components['schemas']['GoogleAnalyticBody']
-      referrer: string
-      route?: string
-      title: string
     }
     TelemetryPageBodyV2: {
       page_title: string
@@ -5694,8 +5738,6 @@ export interface components {
       addon_type: components['schemas']['ProjectAddonType']
       addon_variant: components['schemas']['AddonVariantId']
       price_id?: string
-      /** @enum {string} */
-      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
       skip_outstanding_invoice_check?: boolean
     }
     UpdateAddonBody: {
@@ -6140,6 +6182,23 @@ export interface components {
       SMTP_USER?: string
       URI_ALLOW_LIST?: string
     }
+    UpdateGoTrueConfigHooksBody: {
+      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_SECRETS?: string
+      HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_SECRETS?: string
+      HOOK_SEND_SMS_URI?: string
+    }
     UpdateMemberBody: {
       role_id: number
     }
@@ -6357,6 +6416,46 @@ export interface components {
       schema?: string
       table?: string
       table_id?: number
+    }
+    UpdateUserBody: {
+      ban_duration?: string
+    }
+    UpdateUserReponse: {
+      aud?: string
+      banned_until?: string
+      confirmation_sent_at?: string
+      confirmation_token?: string
+      confirmed_at?: string
+      created_at?: string
+      deleted_at?: string
+      email?: string
+      email_change?: string
+      email_change_confirm_status?: number
+      email_change_sent_at?: string
+      email_change_token_current?: string
+      email_change_token_new?: string
+      email_confirmed_at?: string
+      encrypted_password?: string
+      id?: string
+      instance_id?: string
+      invited_at?: string
+      is_anonymous?: boolean
+      is_sso_user?: boolean
+      is_super_admin?: boolean
+      last_sign_in_at?: string
+      phone?: string
+      phone_change?: string
+      phone_change_sent_at?: string
+      phone_change_token?: string
+      phone_confirmed_at?: string
+      raw_app_meta_data?: Record<string, never>
+      raw_user_meta_data?: Record<string, never>
+      reauthentication_sent_at?: string
+      reauthentication_token?: string
+      recovery_sent_at?: string
+      recovery_token?: string
+      role?: string
+      updated_at?: string
     }
     UpdateVercelConnectionsBody: {
       env_sync_targets?: ('production' | 'preview' | 'development')[]
@@ -6686,6 +6785,18 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
+    ValidateSpamBody: {
+      content: string
+      subject: string
+    }
+    ValidateSpamResponse: {
+      rules: components['schemas']['ValidateSpamRule'][]
+    }
+    ValidateSpamRule: {
+      desc: string
+      name: string
+      score: number
+    }
     ValidationError: {
       message: string
     }
@@ -6841,21 +6952,6 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['FlyOrganization']
-        }
-      }
-    }
-  }
-  /** Gets the organizations current unbilled charges */
-  FlyBillingController_getResourceBilling: {
-    parameters: {
-      path: {
-        organization_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ResourceBillingResponse']
         }
       }
     }
@@ -7078,6 +7174,34 @@ export interface operations {
       }
     }
   }
+  /** Updates GoTrue config hooks */
+  GoTrueConfigController_updateGoTrueConfigHooks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateGoTrueConfigHooksBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GoTrueConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update GoTrue config hooks */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Sends an invite to the given email */
   AuthInviteController_sendInvite: {
     parameters: {
@@ -7216,7 +7340,10 @@ export interface operations {
       }
     }
   }
-  /** Gets users */
+  /**
+   * Gets users
+   * @deprecated
+   */
   UsersController_getUsers: {
     parameters: {
       query: {
@@ -7245,7 +7372,38 @@ export interface operations {
       }
     }
   }
-  /** Delete user with given ID */
+  /** Creates user */
+  UsersController_createUser: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateUserBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Delete user with given ID
+   * @deprecated
+   */
   UsersController_deleteUser: {
     parameters: {
       path: {
@@ -7273,6 +7431,57 @@ export interface operations {
       }
     }
   }
+  /** Delete user with given ID */
+  UsersController_deleteUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete user */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates user with given ID */
+  UsersController_updateUserById: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateUserBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateUserReponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update user with given ID */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Delete all factors associated to a user */
   FactorsController_deleteFactors: {
     parameters: {
@@ -7292,6 +7501,28 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete factors */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Validate spam based on the given email content */
+  ValidateController_validateSpam: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateSpamBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ValidateSpamResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to validate spam based on the given email content */
       500: {
         content: never
       }
@@ -8401,27 +8632,6 @@ export interface operations {
       }
     }
   }
-  /** Deletes any upcoming subscription schedule */
-  SubscriptionController_deleteSubscriptionSchedule: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to delete upcoming subscription schedule */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets the Stripe customer */
   CustomerController_getCustomer: {
     parameters: {
@@ -9195,6 +9405,29 @@ export interface operations {
       }
     }
   }
+  /** Gets all projects for the given organization */
+  OrganizationProjectsController_getProjects: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationProjectsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve projects */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the given organization's roles */
   OrganizationRolesController_getAllRolesV2: {
     parameters: {
@@ -9215,8 +9448,8 @@ export interface operations {
       }
     }
   }
-  /** Gets the given organization's tax IDs */
-  TaxIdsController_getTaxIds: {
+  /** Gets the given organization's tax ID */
+  TaxIdsController_getTaxId: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -9232,7 +9465,7 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to retrieve the organization's tax IDs */
+      /** @description Failed to retrieve the organization's tax ID */
       500: {
         content: never
       }
@@ -9254,35 +9487,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['TaxIdV2Response']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to create the tax ID */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Creates a tax ID for the given organization */
-  TaxIdsController_createTaxId: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreateTaxIdBody']
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateTaxIdResponse']
+          'application/json': components['schemas']['TaxIdResponse']
         }
       }
       403: {
@@ -9302,13 +9507,8 @@ export interface operations {
         slug: string
       }
     }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['DeleteTaxIdBody']
-      }
-    }
     responses: {
-      200: {
+      204: {
         content: never
       }
       403: {
@@ -9741,19 +9941,11 @@ export interface operations {
       }
     }
   }
-  /**
-   * Create a function
-   * @description Creates a function and adds it to the specified project.
-   */
+  /** Creates project pg.function */
   FunctionsController_createFunction: {
     parameters: {
-      query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
-        import_map_path?: string
+      header: {
+        'x-connection-encrypted': string
       }
       path: {
         /** @description Project ref */
@@ -9762,20 +9954,19 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateFunctionBody']
-        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
+        'application/json': components['schemas']['CreateFunctionBody']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['FunctionResponse']
+          'application/json': components['schemas']['PostgresFunction']
         }
       }
       403: {
         content: never
       }
-      /** @description Failed to create project's function */
+      /** @description Failed to create pg.function */
       500: {
         content: never
       }
@@ -11756,6 +11947,27 @@ export interface operations {
       }
     }
   }
+  /** Parses a warehouse query */
+  'v1-parse-warehouse-query': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to parse warehouse query */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's warehouse tenant from logflare */
   'v1-provision-a-warehouse-tenant': {
     parameters: {
@@ -12089,6 +12301,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateSecretsResponse']
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to update project's secrets config */
       500: {
@@ -14161,24 +14376,6 @@ export interface operations {
       }
     }
   }
-  /** Gets the partner usage and costs */
-  PartnerBillingSystemController_getPartnerUsageAndCosts: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      /** @description Failed to retrieve subscription */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets the current subscription */
   OrgSubscriptionSystemController_getSubscription: {
     parameters: {
@@ -14415,7 +14612,7 @@ export interface operations {
    * Create a function
    * @description Creates a function and adds it to the specified project.
    */
-  SystemFunctionsController_createFunction: {
+  'v1-create-a-function': {
     parameters: {
       query?: {
         slug?: string

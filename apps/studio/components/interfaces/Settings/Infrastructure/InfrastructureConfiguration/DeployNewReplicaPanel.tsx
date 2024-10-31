@@ -1,4 +1,4 @@
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -12,6 +12,7 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
@@ -51,7 +52,6 @@ import {
   cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
-import { Admonition } from 'ui-patterns'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -98,10 +98,7 @@ const DeployNewReplicaPanel = ({
 
   // @ts-ignore
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
-  const showNewDiskManagementUI =
-    diskManagementV2 &&
-    subscription?.usage_based_billing_project_addons &&
-    project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
   const additionalCostIOPS = calculateIOPSPrice({
@@ -245,7 +242,7 @@ const DeployNewReplicaPanel = ({
               </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        ) : !isAWSProvider ? (
+        ) : isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
@@ -256,17 +253,11 @@ const DeployNewReplicaPanel = ({
                 Projects provisioned by other cloud providers currently will not be able to use read
                 replicas
               </span>
-              <div className="mt-3">
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </Button>
-              </div>
+              <DocsButton
+                abbrev={false}
+                className="mt-3"
+                href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+              />
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : currentPgVersion < 15 ? (
@@ -313,15 +304,10 @@ const DeployNewReplicaPanel = ({
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
                   </Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </Button>
+                <DocsButton
+                  abbrev={false}
+                  href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                />
               </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
@@ -359,15 +345,10 @@ const DeployNewReplicaPanel = ({
                 >
                   Enable physical backups
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </Button>
+                <DocsButton
+                  abbrev={false}
+                  href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                />
               </AlertDescription_Shadcn_>
             )}
           </Alert_Shadcn_>
