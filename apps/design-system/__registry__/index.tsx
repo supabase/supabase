@@ -1787,6 +1787,72 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "inner-side-menu-demo": {
+      name: "inner-side-menu-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-demo")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-static-titles": {
+      name: "inner-side-menu-static-titles",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-static-titles")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-static-titles.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-loading": {
+      name: "inner-side-menu-loading",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-loading")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-loading.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-multiple-sections": {
+      name: "inner-side-menu-multiple-sections",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-multiple-sections")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-multiple-sections.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-empty": {
+      name: "inner-side-menu-empty",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-empty")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-empty.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "inner-side-menu-with-search": {
+      name: "inner-side-menu-with-search",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/inner-side-menu-with-search")),
+      source: "",
+      files: ["registry/default/example/inner-side-menu-with-search.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "multi-select-demo": {
       name: "multi-select-demo",
       type: "components:example",
