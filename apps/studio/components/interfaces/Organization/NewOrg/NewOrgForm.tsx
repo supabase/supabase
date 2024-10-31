@@ -54,7 +54,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const elements = useElements()
   const queryClient = useQueryClient()
   const [state, setState] = useQueryStates({
-    plan: parseAsStringLiteral(['free', 'team', 'pro']).withDefault('free'),
+    plan: parseAsStringLiteral(Object.keys(PRICING_TIER_LABELS_ORG)).withDefault('FREE'),
     name: parseAsString.withDefault(''),
     kind: parseAsStringLiteral(Object.keys(ORG_KIND_TYPES)).withDefault(ORG_KIND_DEFAULT),
     size: parseAsString.withDefault(ORG_SIZE_DEFAULT),
@@ -66,12 +66,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     name: orgName,
     kind: orgKind,
     spend_cap: isSpendCapEnabled,
-    plan,
+    plan: dbPricingTierKey,
     size: orgSize,
     returnTo,
     auth_id,
   } = state
-  const dbPricingTierKey = plan.toLocaleUpperCase()
 
   // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
