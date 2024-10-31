@@ -66,32 +66,6 @@ export const PLAN_DETAILS: Record<PlanType, PlanDetails> = {
   enterprise: { includedDiskGB: { gp3: 8, io2: 0 } },
 }
 
-// export const COMPUTE_SIZE_MAX_IOPS = {
-//   ci_micro: 11800,
-//   ci_small: 11800,
-//   ci_medium: 11800,
-//   ci_large: 4750,
-//   ci_xlarge: 20000,
-//   ci_2xlarge: 20000,
-//   ci_4xlarge: 20000,
-//   ci_8xlarge: 40000,
-//   ci_12xlarge: 50000,
-//   ci_16xlarge: 80000,
-// }
-
-// export const COMPUTE_SIZE_MAX_THROUGHPUT = {
-//   ci_micro: 260.625,
-//   ci_small: 260.625,
-//   ci_medium: 260.625,
-//   ci_large: 593.75,
-//   ci_xlarge: 593.75,
-//   ci_2xlarge: 593.75,
-//   ci_4xlarge: 593.75,
-//   ci_8xlarge: 1187.5,
-//   ci_12xlarge: 1781.25,
-//   ci_16xlarge: 2375,
-// }
-
 export const COMPUTE_BASELINE_IOPS = {
   ci_nano: 250,
   ci_micro: 500,
