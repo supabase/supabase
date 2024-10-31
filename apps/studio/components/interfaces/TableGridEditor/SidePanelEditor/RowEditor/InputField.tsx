@@ -21,6 +21,7 @@ import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.const
 import { DateTimeInput } from './DateTimeInput'
 import type { EditValue, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
+import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 
 export interface InputFieldProps {
   field: RowField
@@ -256,9 +257,7 @@ const InputField = ({
       ...(field.isNullable ? [{ value: 'null', label: 'NULL' }] : []),
     ]
 
-    const defaultValue =
-      field.defaultValue ||
-      (field.value === null ? undefined : field.value === 'null' ? field.defaultValue : field.value)
+    const defaultValue = field.value === null ? undefined : field.value
 
     return (
       <FormItemLayout
@@ -271,10 +270,7 @@ const InputField = ({
       >
         <Select_Shadcn_
           value={defaultValue === null ? 'null' : defaultValue}
-          onValueChange={(value: string) => {
-            if (value === 'null') onUpdateField({ [field.name]: null })
-            else onUpdateField({ [field.name]: value })
-          }}
+          onValueChange={(value: string) => onUpdateField({ [field.name]: value })}
         >
           <SelectTrigger_Shadcn_>
             <SelectValue_Shadcn_ placeholder="Select a value" />
