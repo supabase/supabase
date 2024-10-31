@@ -271,7 +271,11 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 unit="-"
                 beforePrice={Number(computeSizePrice.oldPrice)}
                 afterPrice={Number(computeSizePrice.newPrice)}
-                upgradeIncluded={true}
+                upgradeIncluded={
+                  subscription?.plan.id !== 'free' &&
+                  project?.infra_compute_size === 'nano' &&
+                  form.getValues('computeSize') === 'ci_micro'
+                }
               />
             )}
             {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (

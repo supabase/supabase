@@ -212,7 +212,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           </div>
         </div>
       )}
-      <p className="text-xs text-foreground-lighter mt-4">
+      <p className="text-xs text-foreground-lighter my-4">
         <span className="font-semibold">Note:</span> Disk Size refers to the total space your
         project occupies on disk, including the database itself (currently{' '}
         <span>{formatBytes(databaseSizeBytes, 2, 'GB')}</span>), additional files like the
