@@ -128,9 +128,11 @@ export const useConsent = () => {
   }, [])
 
   useEffect(() => {
-    setTimeout(() => {
-      consentValue === null && triggerConsentToast()
-    }, 300)
+    if (isBrowser) {
+      setTimeout(() => {
+        consentValue === null && triggerConsentToast()
+      }, 300)
+    }
   }, [consentValue])
 
   return {
