@@ -7,7 +7,7 @@ import {
   calculateMaxIopsAllowedForDiskSizeWithio2,
   formatNumber,
 } from './DiskManagement.utils'
-import { ComputeInstanceAddonVariantId } from './DiskMangement.types'
+import { ComputeInstanceAddonVariantId } from './DiskManagement.types'
 import { DISK_LIMITS, DiskType, IOPS_RANGE, THROUGHPUT_RANGE } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({

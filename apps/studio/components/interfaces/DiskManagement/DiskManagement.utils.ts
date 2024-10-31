@@ -5,7 +5,7 @@ import {
   ComputeInstanceAddonVariantId,
   ComputeInstanceSize,
   InfraInstanceSize,
-} from './DiskMangement.types'
+} from './DiskManagement.types'
 import {
   COMPUTE_BASELINE_IOPS,
   DISK_LIMITS,

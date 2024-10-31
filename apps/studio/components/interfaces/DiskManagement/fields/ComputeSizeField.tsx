@@ -17,7 +17,7 @@ import {
 } from '../DiskManagement.utils'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import FormMessage from '../ui/FormMessage'
-import { ComputeInstanceAddonVariantId } from '../DiskMangement.types'
+import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NoticeBar } from '../ui/NoticeBar'
