@@ -233,7 +233,7 @@ const Addons = () => {
                       </div>
                     )}
 
-                    {!diskAndComputeFormEnabled ? (
+                    {true ? (
                       <ProjectUpdateDisabledTooltip
                         projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                         projectNotActive={!isProjectActive}

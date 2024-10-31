@@ -36,8 +36,8 @@ const BillingChangeBadge = ({
           <Badge
             variant="default"
             className={cn(
-              !free ? `bg-alternative` : `bg-warning-200 border-warning-500 text-warning`,
-              `bg-opacity-100`,
+              !free ? `bg-alternative` : `bg-violet-200 border-violet-900 text-violet-1100`,
+              `bg-opacity-100 text-warning`,
               className
             )}
           >
@@ -50,11 +50,14 @@ const BillingChangeBadge = ({
                   <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
                   <motion.span
                     key={afterPrice} // This key will change whenever any form value changes
-                    className="text-xs font-mono text-foreground"
+                    className={cn(
+                      free ? 'text-violet-1100' : 'text-foreground',
+                      'text-xs font-mono'
+                    )}
                     animate={{ scale: [1, 1.1, 1] }}
                     transition={{ duration: 0.12 }}
                   >
-                    {free ? 'Free' : `${formatCurrency(afterPrice)}/month`}
+                    {`${formatCurrency(afterPrice)}/month`}
                   </motion.span>
                 </div>
               </TooltipTrigger_Shadcn_>

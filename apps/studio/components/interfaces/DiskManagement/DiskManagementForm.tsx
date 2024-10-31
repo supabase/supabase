@@ -90,14 +90,14 @@ export function DiskManagementForm() {
    */
   const {
     data: databases,
-    isLoading: isReadReplicasLoading,
-    error: readReplicasError,
+    // isLoading: isReadReplicasLoading,
+    // error: readReplicasError,
     isSuccess: isReadReplicasSuccess,
   } = useReadReplicasQuery({ projectRef })
   const {
     data,
-    isLoading: isDiskAttributesLoading,
-    error: diskAttributesError,
+    // isLoading: isDiskAttributesLoading,
+    // error: diskAttributesError,
     isSuccess: isDiskAttributesSuccess,
   } = useDiskAttributesQuery(
     { projectRef },
@@ -125,28 +125,28 @@ export function DiskManagementForm() {
     }
   )
   const {
-    isLoading: isAddonsLoading,
-    error: addonsError,
+    // isLoading: isAddonsLoading,
+    // error: addonsError,
     isSuccess: isAddonsSuccess,
   } = useProjectAddonsQuery({ projectRef })
   const {
     isWithinCooldownWindow,
-    isLoading: isCooldownLoading,
+    // isLoading: isCooldownLoading,
     isSuccess: isCooldownSuccess,
   } = useRemainingDurationForDiskAttributeUpdate({
     projectRef,
   })
   const {
-    isLoading: isDiskUtilizationLoading,
-    error: diskUtilError,
+    // isLoading: isDiskUtilizationLoading,
+    // error: diskUtilError,
     isSuccess: isDiskUtilizationSuccess,
   } = useDiskUtilizationQuery({
     projectRef,
   })
   const {
     data: subscription,
-    isLoading: isSubscriptionLoading,
-    error: subscriptionError,
+    // isLoading: isSubscriptionLoading,
+    // error: subscriptionError,
     isSuccess: isSubscriptionSuccess,
   } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
@@ -214,12 +214,12 @@ export function DiskManagementForm() {
 
   const { mutateAsync: updateDiskConfiguration, isLoading: isUpdatingDisk } =
     useUpdateDiskAttributesMutation({
-      // this is to supress to toast message
+      // this is to suppress to toast message
       onError: () => {},
     })
   const { mutateAsync: updateSubscriptionAddon, isLoading: isUpdatingCompute } =
     useProjectAddonUpdateMutation({
-      // this is to supress to toast message
+      // this is to suppress to toast message
       onError: () => {},
       onSuccess: () => {
         /**

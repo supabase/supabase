@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
-import { useMemo } from 'react'
+import { ComponentProps, useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -39,11 +39,13 @@ import {
   calculateThroughputPrice,
   getAvailableComputeOptions,
   mapAddOnVariantIdToComputeSize,
+  showMicroUpgrade,
 } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
+import { InfraInstanceSize } from './DiskManagement.types'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -63,6 +65,7 @@ interface TableDataRowProps {
   afterPrice: number
   hidePrice?: boolean
   priceTooltip?: string
+  upgradeIncluded?: boolean
 }
 
 const TableDataRow = ({
@@ -74,6 +77,7 @@ const TableDataRow = ({
   afterPrice,
   hidePrice = false,
   priceTooltip,
+  upgradeIncluded = false,
 }: TableDataRowProps) => (
   <TableRow>
     <TableCell className="pl-5">
@@ -101,14 +105,15 @@ const TableDataRow = ({
     </TableCell>
     <TableCell className="text-xs font-mono">{unit}</TableCell>
     <TableCell className="text-right pr-5">
-      {hidePrice ? (
+      {!upgradeIncluded && hidePrice ? (
         <span className="text-xs font-mono">-</span>
-      ) : beforePrice !== afterPrice ? (
+      ) : beforePrice !== afterPrice || upgradeIncluded ? (
         <BillingChangeBadge
           show={true}
           beforePrice={beforePrice}
           afterPrice={afterPrice}
           tooltip={priceTooltip}
+          free={upgradeIncluded}
         />
       ) : (
         <span className="text-xs font-mono">{formatCurrency(beforePrice)}</span>
@@ -179,6 +184,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     availableOptions,
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
+    plan: subscription?.plan.id ?? 'free',
   })
   const diskSizePrice = calculateDiskSizePrice({
     planId: planId,
@@ -265,6 +271,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 unit="-"
                 beforePrice={Number(computeSizePrice.oldPrice)}
                 afterPrice={Number(computeSizePrice.newPrice)}
+                upgradeIncluded={true}
               />
             )}
             {form.formState.defaultValues?.storageType !== form.getValues('storageType') && (

@@ -49,6 +49,7 @@ export const calculateComputeSizePrice = ({
   availableOptions,
   oldComputeSize,
   newComputeSize,
+  plan,
 }: {
   availableOptions: {
     identifier: string
@@ -56,8 +57,19 @@ export const calculateComputeSizePrice = ({
   }[]
   oldComputeSize: string
   newComputeSize: string
+  plan: PlanId
 }) => {
-  const oldPrice = availableOptions?.find((x) => x.identifier === oldComputeSize)?.price ?? 0
+  let _oldComputeSize = oldComputeSize
+
+  if (plan !== 'free') {
+    /**
+     * override the old compute size to micro if the plan is not free
+     * this is to handle the case in which nano compute is a paid entity
+     */
+    _oldComputeSize = 'ci_micro'
+  }
+
+  const oldPrice = availableOptions?.find((x) => x.identifier === _oldComputeSize)?.price ?? 0
   const newPrice = availableOptions?.find((x) => x.identifier === newComputeSize)?.price ?? 0
 
   const oldPriceMonthly = oldPrice * 720

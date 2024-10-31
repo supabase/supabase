@@ -93,6 +93,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     availableOptions: availableOptions,
     oldComputeSize: form.formState.defaultValues?.computeSize || 'ci_micro',
     newComputeSize: form.getValues('computeSize'),
+    plan: subscription?.plan.id ?? 'free',
   })
 
   const showUpgradeBadge = showMicroUpgrade(
@@ -127,10 +128,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
               <NoticeBar
                 showIcon={false}
                 type="default"
-                className="mt-3"
-                visible={showUpgradeBadge && form.watch('computeSize') !== 'ci_micro'}
-                title="Free Compute upgrade to Micro"
-                description="Paid Plans include a free upgrade to Micro compute."
+                className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
+                visible={showUpgradeBadge && form.watch('computeSize') === 'ci_nano'}
+                title={'Upgrade to Micro Compute at no additional charge'}
+                description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
               />
             </>
           }
@@ -166,72 +167,84 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   project?.infra_compute_size !== 'nano' &&
                   compute.identifier === 'ci_nano'
 
+                const price =
+                  subscription?.plan.id !== 'free' &&
+                  project?.infra_compute_size === 'nano' &&
+                  compute.identifier === 'ci_nano'
+                    ? availableOptions.find(
+                        (option: ComputeOption) => option.identifier === 'ci_micro'
+                      )?.price
+                    : compute.price
+
                 return (
                   <RadioGroupCardItem
                     key={compute.identifier}
                     showIndicator={false}
                     value={compute.identifier}
                     className={cn(
-                      'text-sm text-left flex flex-col gap-0 px-0 py-3 overflow-hidden [&_label]:w-full group] w-full h-[110px]',
+                      'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group] w-full h-[110px]',
                       lockedOption && 'opacity-50'
                     )}
                     disabled={disabled || lockedOption}
                     // @ts-expect-error
                     label={
-                      <div className="w-full flex flex-col gap-3 justify-between">
-                        <div className="px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
-                          <ComputeBadge
-                            className="inline-flex font-semibold"
-                            infraComputeSize={
-                              compute.name as components['schemas']['DbInstanceSize']
-                            }
-                          />
-                          <div className="flex items-center space-x-1">
-                            {lockedOption ? (
-                              <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                <Lock size={14} />
-                              </div>
-                            ) : showUpgradeBadge && compute.identifier === 'ci_micro' ? (
-                              <div className="w-full text-warning-600 flex items-center gap-1 bg-warning-200 py-0.5 px-2 rounded-full border border-warning-500">
-                                <span className="font-mono">FREE UPGRADE</span>
-                              </div>
-                            ) : (
-                              <>
-                                <span className="text-foreground text-sm font-semibold">
-                                  ${compute.price}
-                                </span>
-                                <span className="text-foreground-light translate-y-[1px]">
-                                  {' '}
-                                  / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
-                                </span>
-                              </>
-                            )}
+                      <>
+                        {showUpgradeBadge && compute.identifier === 'ci_micro' && (
+                          <div className="absolute -top-4 -right-3 text-violet-1100 flex items-center gap-1 bg-surface-75 py-0.5 px-2 rounded-full border border-violet-900">
+                            <span>No additional charge</span>
                           </div>
-                        </div>
+                        )}
+                        <div className="w-full flex flex-col gap-3 justify-between">
+                          <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                            <ComputeBadge
+                              className="inline-flex font-semibold"
+                              infraComputeSize={
+                                compute.name as components['schemas']['DbInstanceSize']
+                              }
+                            />
+                            <div className="flex items-center space-x-1">
+                              {lockedOption ? (
+                                <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
+                                  <Lock size={14} />
+                                </div>
+                              ) : (
+                                <>
+                                  <span className="text-foreground text-sm font-semibold">
+                                    ${price}
+                                  </span>
+                                  <span className="text-foreground-light translate-y-[1px]">
+                                    {' '}
+                                    / {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
 
-                        <div className="w-full">
-                          <div className="px-3 text-sm flex flex-col gap-1">
-                            <div className="text-foreground-light flex gap-2 items-center">
-                              <Microchip
-                                strokeWidth={1}
-                                size={14}
-                                className="text-foreground-lighter"
-                              />
-                              <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
-                            </div>
-                            <div className="text-foreground-light flex gap-2 items-center">
-                              <CpuIcon
-                                strokeWidth={1}
-                                size={14}
-                                className="text-foreground-lighter"
-                              />
-                              <span>
-                                {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
-                              </span>
+                          <div className="w-full">
+                            <div className="px-3 text-sm flex flex-col gap-1">
+                              <div className="text-foreground-light flex gap-2 items-center">
+                                <Microchip
+                                  strokeWidth={1}
+                                  size={14}
+                                  className="text-foreground-lighter"
+                                />
+                                <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
+                              </div>
+                              <div className="text-foreground-light flex gap-2 items-center">
+                                <CpuIcon
+                                  strokeWidth={1}
+                                  size={14}
+                                  className="text-foreground-lighter"
+                                />
+                                <span>
+                                  {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
+                                </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </>
                     }
                   />
                 )
