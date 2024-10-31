@@ -1,7 +1,8 @@
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
+
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_ as AlertDescription,
   AlertTitle_Shadcn_ as AlertTitle,

@@ -1,13 +1,14 @@
+import { AnimatePresence, motion } from 'framer-motion'
+import { Info } from 'lucide-react'
+import MotionNumber from 'motion-number'
+import { UseFormReturn } from 'react-hook-form'
+
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { AnimatePresence, motion } from 'framer-motion'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
-import { Info } from 'lucide-react'
-import MotionNumber from 'motion-number'
-import { UseFormReturn } from 'react-hook-form'
 import {
   badgeVariants,
   cn,
@@ -15,8 +16,8 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>

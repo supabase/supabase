@@ -1,5 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { ReactNode } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+
 import { Admonition } from 'ui-patterns/admonition'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,
   calculateMaxIopsAllowedForComputeSize,
@@ -9,14 +13,12 @@ import {
   COMPUTE_BASELINE_IOPS,
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from './DiskManagement.constants'
-import { UseFormReturn } from 'react-hook-form'
-import { DiskStorageSchemaType } from '../DiskManagement.schema'
 
 export function ComputeSizeReccomendationSection({
   actions,
   form,
 }: {
-  actions?: React.ReactNode
+  actions?: ReactNode
   form: UseFormReturn<DiskStorageSchemaType>
 }) {
   const { watch } = form
@@ -43,7 +45,7 @@ export function ComputeSizeReccomendationSection({
             <div className="flex flex-col gap-2">
               <div>
                 <p className="text-sm text-foreground-light">
-                  To achieve sustained IOPS performance we recommend using{' '}
+                  To achieve sustained IOPS performance we recommend using the{' '}
                   <span className="text-foreground">
                     {mapAddOnVariantIdToComputeSize(computeSizeRecommendedForIops)}
                   </span>{' '}

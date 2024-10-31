@@ -1,9 +1,10 @@
-import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { AnimatePresence, motion } from 'framer-motion'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+
+import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
 
-export const DiskMangementCoolDownSection: React.FC = () => {
+export const DiskMangementCoolDownSection = () => {
   const [progress, setProgress] = useState(100)
   const [showCountdown, setShowCountdown] = useState(false)
   const [isJumping, setIsJumping] = useState(false)
@@ -78,13 +79,6 @@ export const DiskMangementCoolDownSection: React.FC = () => {
                 There is a cooldown period enforced for any disk attribute modifications
               </p>
             </div>
-            {/* <button
-              type="button"
-              className="text-foreground-lighter hover:text-foreground-light transition-colors self-start p-1"
-              onClick={() => setIsVisible(false)}
-            >
-              <X size={14} />
-            </button> */}
           </DialogSection>
         </motion.div>
       )}

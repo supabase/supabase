@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { LucideIcon } from 'lucide-react'
 import { ComponentProps } from 'react'
-import { Card, CardContent } from 'ui'
+
 import { Admonition } from 'ui-patterns'
 
 interface NoticeBarProps extends Omit<ComponentProps<typeof Admonition>, 'description'> {

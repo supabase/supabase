@@ -1,25 +1,26 @@
+import { CpuIcon, Lock, Microchip } from 'lucide-react'
+import { useMemo } from 'react'
+import { UseFormReturn } from 'react-hook-form'
+
 import { components } from 'api-types'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { CpuIcon, DiamondPlus, Lock, Microchip, Sparkle, Sparkles } from 'lucide-react'
-import { useMemo } from 'react'
-import { UseFormReturn } from 'react-hook-form'
 import { cn, FormField_Shadcn_, RadioGroupCard, RadioGroupCardItem, Skeleton } from 'ui'
 import { ComputeBadge } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   getAvailableComputeOptions,
   showMicroUpgrade,
 } from '../DiskManagement.utils'
-import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
-import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { NoticeBar } from '../ui/NoticeBar'
 
 /**

@@ -1,27 +1,26 @@
-import { components } from 'api-types'
 import { UseFormReturn } from 'react-hook-form'
+
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { Button, cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { BillingChangeBadge } from '../ui/BillingChangeBadge'
-import { ComputeSizeReccomendationSection } from '../ui/ComputeSizeReccomendationSection'
-import {
-  COMPUTE_BASELINE_IOPS,
-  DiskType,
-  IOPS_RANGE,
-  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
-} from '../ui/DiskManagement.constants'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import {
   calculateComputeSizeRequiredForIops,
   calculateIOPSPrice,
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
-import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { BillingChangeBadge } from '../ui/BillingChangeBadge'
+import { ComputeSizeReccomendationSection } from '../ui/ComputeSizeRecommendationSection'
+import {
+  COMPUTE_BASELINE_IOPS,
+  DiskType,
+  RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
+} from '../ui/DiskManagement.constants'
 import { DiskManagementIOPSReadReplicas } from '../ui/DiskManagementReadReplicas'
-import { InputPostTab } from '../ui/InputPostTab'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useParams } from 'common'
-import { InputVariants } from '@ui/components/shadcn/ui/input'
 import FormMessage from '../ui/FormMessage'
+import { InputPostTab } from '../ui/InputPostTab'
 
 type IOPSFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

@@ -1,7 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
+
+import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { useParams } from 'common'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { calculateThroughputPrice } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import {
   COMPUTE_BASELINE_THROUGHPUT,
@@ -9,15 +16,9 @@ import {
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
   THROUGHPUT_RANGE,
 } from '../ui/DiskManagement.constants'
-import { calculateThroughputPrice } from '../DiskManagement.utils'
-import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DiskManagementThroughputReadReplicas } from '../ui/DiskManagementReadReplicas'
-import { InputPostTab } from '../ui/InputPostTab'
-import { useEffect } from 'react'
 import FormMessage from '../ui/FormMessage'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useParams } from 'common'
-import { InputVariants } from '@ui/components/shadcn/ui/input'
+import { InputPostTab } from '../ui/InputPostTab'
 
 type ThroughputFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>

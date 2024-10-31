@@ -1,7 +1,7 @@
-import React, { forwardRef } from 'react'
+import { forwardRef, ReactNode } from 'react'
 
 interface InputPostTabProps {
-  children: React.ReactNode
+  children: ReactNode
   label: string
 }
 
