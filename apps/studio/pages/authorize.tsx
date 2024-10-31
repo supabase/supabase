@@ -13,6 +13,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -23,7 +24,6 @@ import {
   Button,
   Listbox,
 } from 'ui'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -174,13 +174,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
               Decline
             </Button>
             {isLoadingOrganizations ? (
-              <Button
-                loading={isApproving}
-                disabled={isDeclining || isExpired}
-                onClick={onApproveRequest}
-              >
-                Authorize {requester?.name}
-              </Button>
+              <Button loading={isLoadingOrganizations}>Authorize {requester?.name}</Button>
             ) : isSuccessOrganizations && organizations.length === 0 ? (
               <Link href={`/new?${searchParams.toString()}`}>
                 <Button loading={isLoadingOrganizations}>Create an organization</Button>
@@ -198,7 +192,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
         </div>
       }
     >
-      <div className="w-full px-8 py-6 space-y-4">
+      <div className="w-full px-8 py-6 space-y-8">
         {/* API Authorization requester details */}
         <AuthorizeRequesterDetails
           icon={requester.icon}
