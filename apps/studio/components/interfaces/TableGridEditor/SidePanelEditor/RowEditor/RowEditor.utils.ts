@@ -180,6 +180,11 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   }
 }
 
+// [Joshen] JFYI this presents a small problem in particular when creating a new row
+// given that we don't include null properties. Because of that if the column has a default
+// value, the column value will then always be the default value, instead of null
+// which may be considered a bug if e.g for a boolean column the user specifically selects "NULL" option
+// This would probably also apply to other column types like numbers (e.g user specifically wants a null value)
 export const generateRowObjectFromFields = (
   fields: RowField[],
   includeNullProperties = false
@@ -205,6 +210,7 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
+      if (field.name === 'bool_default_true') console.log(field)
       if (value === 'null') rowObject[field.name] = null
       else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {
