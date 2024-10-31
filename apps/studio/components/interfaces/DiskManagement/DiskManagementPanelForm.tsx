@@ -732,7 +732,7 @@ export function DiskManagementPanelForm() {
                     </FormItemLayout>
                   )}
                 />
-                <div className="grid grid-cols-12 gap-3">
+                <div className="grid grid-cols-12 gap-10">
                   {/* You can add additional content in the remaining 4 columns if needed */}
                   <div className="col-span-4">
                     {/* Additional content or information can go here */}
