@@ -43,7 +43,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <SSLConfiguration />
           {showNewDiskManagementUI ? (
             // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
-            showDiskAndComputeForm && <DiskManagementPanelForm />
+            <DiskManagementPanelForm />
           ) : (
             <DiskSizeConfiguration />
           )}
