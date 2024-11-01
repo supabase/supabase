@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_EMAIL_ABUSE_URL as string
-const supabaseServiceKey = process.env.NEXT_PUBLIC_EMAIL_ABUSE_SERVICE_KEY as string
+const supabaseServiceKey = process.env.EMAIL_ABUSE_SERVICE_KEY as string
 
 export async function POST(req: NextRequest, { params }: { params: { ref: string } }) {
   const ref = params.ref
