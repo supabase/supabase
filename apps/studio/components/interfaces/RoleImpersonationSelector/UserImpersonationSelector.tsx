@@ -1,10 +1,10 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { ChevronDown, ExternalLink, User as IconUser, Loader2, Search, X } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { useUsersQuery } from 'data/auth/users-query'
+import { User, useUsersInfiniteQuery } from 'data/auth/users-infinite-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import {
   Button,
@@ -16,31 +16,30 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import { User } from 'data/auth/users-infinite-query'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 
 const UserImpersonationSelector = () => {
   const [searchText, setSearchText] = useState('')
   const [aal, setAal] = useState<AuthenticatorAssuranceLevels>('aal1')
+  const state = useRoleImpersonationStateSnapshot()
   const debouncedSearchText = useDebounce(searchText, 300)
 
   const { project } = useProjectContext()
-  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } = useUsersQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      keywords: debouncedSearchText || undefined,
-    },
-    {
-      keepPreviousData: true,
-    }
-  )
 
+  const { data, isSuccess, isLoading, isError, error, isFetching, isPreviousData } =
+    useUsersInfiniteQuery(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        keywords: debouncedSearchText,
+      },
+      {
+        keepPreviousData: true,
+      }
+    )
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
   const isSearching = isPreviousData && isFetching
-
-  const state = useRoleImpersonationStateSnapshot()
-
   const impersonatingUser =
     state.role?.type === 'postgrest' && state.role.role === 'authenticated' && state.role.user
 
@@ -160,9 +159,9 @@ const UserImpersonationSelector = () => {
           {isError && <AlertError error={error} subject="Failed to retrieve users" />}
 
           {isSuccess &&
-            (data.result.length > 0 ? (
+            (users.length > 0 ? (
               <ul className="divide-y max-h-[150px] overflow-y-scroll" role="list">
-                {data.result.map((user) => (
+                {users.map((user) => (
                   <li key={user.id} role="listitem">
                     <UserRow user={user} onClick={impersonateUser} />
                   </li>
