@@ -257,6 +257,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
       connectionString: project?.connectionString,
       table,
       filters,
+      enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
     },
     { keepPreviousData: true }

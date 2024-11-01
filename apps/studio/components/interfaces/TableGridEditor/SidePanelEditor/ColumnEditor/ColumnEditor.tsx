@@ -1,10 +1,10 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common'
 import { isEmpty, noop } from 'lodash'
 import { ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import {
@@ -398,7 +398,6 @@ const ColumnEditor = ({
               </Alert_Shadcn_>
             </FormSectionContent>
           </FormSection>
-          <SidePanel.Separator />
         </>
       )}
     </SidePanel>

@@ -1,40 +1,32 @@
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
 import { find, isUndefined } from 'lodash'
-import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { SupabaseGrid } from 'components/grid/SupabaseGrid'
-import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { getSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import {
-  ForeignKeyConstraint,
-  useForeignKeyConstraintsQuery,
-} from 'data/database/foreign-key-constraints-query'
+import { DocsButton } from 'components/ui/DocsButton'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
+import type { Entity, TableLike } from 'data/table-editor/table-editor-query'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useEntityType from 'hooks/misc/useEntityType'
 import useLatest from 'hooks/misc/useLatest'
-import type { TableLike } from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import type { Dictionary, SchemaView } from 'types'
-import { Button } from 'ui'
+import type { Dictionary } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
-import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
 export interface TableGridEditorProps {
@@ -43,12 +35,16 @@ export interface TableGridEditorProps {
 
   isLoadingSelectedTable?: boolean
   selectedTable?: TableLike
+  entityType?: Entity
+  encryptedColumns?: string[]
 }
 
 const TableGridEditor = ({
   theme = 'dark',
   isLoadingSelectedTable = false,
   selectedTable,
+  entityType,
+  encryptedColumns,
 }: TableGridEditorProps) => {
   const router = useRouter()
   const { ref: projectRef, id } = useParams()
@@ -61,11 +57,6 @@ const TableGridEditor = ({
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
   const isReadOnly = !canEditTables && !canEditColumns
-
-  const encryptedColumns = useEncryptedColumns({
-    schemaName: selectedTable?.schema,
-    tableName: selectedTable?.name,
-  })
 
   const queryClient = useQueryClient()
   const { mutate: mutateUpdateTableRow } = useTableRowUpdateMutation({
@@ -126,14 +117,6 @@ const TableGridEditor = ({
     },
   })
 
-  const { data } = useForeignKeyConstraintsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-  })
-  const foreignKeyMeta = data || []
-
-  const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
@@ -148,42 +131,14 @@ const TableGridEditor = ({
   const isViewSelected =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isTableSelected = entityType?.type === ENTITY_TYPE.TABLE
-  const isForeignTableSelected = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
   const isLocked = EXCLUDED_SCHEMAS.includes(entityType?.schema ?? '')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
-  // [Joshen] We can tweak below to eventually support composite keys as the data
-  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (
-    ('relationships' in selectedTable && selectedTable.relationships) ||
-    []
-  ).map((relationship: PostgresRelationship) => {
-    const relationshipMeta = foreignKeyMeta.find(
-      (fk: ForeignKeyConstraint) => fk.id === relationship.id
-    )
-    return {
-      ...relationship,
-      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    }
+  const gridTable = getSupaTable({
+    encryptedColumns,
+    selectedTable,
+    entityType: entityType?.type,
   })
-
-  const gridTable =
-    !isViewSelected && !isForeignTableSelected
-      ? parseSupaTable(
-          {
-            table: selectedTable as PostgresTable,
-            columns: (selectedTable as PostgresTable).columns ?? [],
-            primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
-            relationships: formattedRelationships,
-          },
-          encryptedColumns
-        )
-      : parseSupaTable({
-          table: selectedTable as SchemaView,
-          columns: (selectedTable as SchemaView).columns ?? [],
-          primaryKeys: [],
-          relationships: [],
-        })
 
   const gridKey = `${selectedTable.schema}_${selectedTable.name}`
 
@@ -243,15 +198,7 @@ const TableGridEditor = ({
               row before updating or deleting the row.
             </p>
             <div className="mt-3">
-              <Button asChild type="outline" icon={<ExternalLink />}>
-                <a
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/docs/guides/database/tables#primary-keys"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
             </div>
           </div>
         ),
@@ -286,6 +233,7 @@ const TableGridEditor = ({
         table={gridTable}
         headerActions={
           <GridHeaderActions
+            entityType={entityType as Entity}
             table={selectedTable as TableLike}
             canEditViaTableEditor={canEditViaTableEditor}
           />
@@ -317,7 +265,7 @@ const TableGridEditor = ({
           ) : null
         }
       >
-        {(isViewSelected || isTableSelected) && <TableDefinition id={selectedTable?.id} />}
+        {(isViewSelected || isTableSelected) && <TableDefinition entityType={entityType} />}
       </SupabaseGrid>
 
       <SidePanelEditor

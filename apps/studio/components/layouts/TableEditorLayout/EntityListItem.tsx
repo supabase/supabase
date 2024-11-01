@@ -21,16 +21,18 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { Entity } from 'data/table-editor/table-editor-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
+import { getTable } from 'data/tables/get-table'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -45,7 +47,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { Markdown } from 'components/interfaces/Markdown'
 
 export interface EntityListItemProps {
   id: number
@@ -277,8 +278,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   return (
-    <Link
+    <EditorTablePageLink
       title={entity.name}
+      id={String(entity.id)}
       href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
@@ -447,7 +449,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-    </Link>
+    </EditorTablePageLink>
   )
 }
 

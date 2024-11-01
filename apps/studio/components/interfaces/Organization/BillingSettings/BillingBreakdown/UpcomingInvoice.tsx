@@ -113,7 +113,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <th className="py-2 font-medium text-right text-sm text-foreground-light pr-4">
                   Usage
                 </th>
-                <th className="py-2 font-medium text-left text-sm text-foreground-light">
+                <th className="py-2 pr-2 font-medium text-left text-sm text-foreground-light max-w-[200px]">
                   Unit price
                 </th>
                 <th className="py-2 font-medium text-right text-sm text-foreground-light">Cost</th>
@@ -124,6 +124,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <tr key={item.description} className="border-b">
                   <td className="py-2 text-sm max-w-[200px]" colSpan={item.proration ? 3 : 1}>
                     {item.description ?? 'Unknown'}
+                    {item.usage_metric &&
+                      billingMetricUnit(item.usage_metric) &&
+                      ` (${billingMetricUnit(item.usage_metric)})`}
                   </td>
                   {!item.proration && (
                     <td className="py-2 text-sm text-right pr-4">
@@ -131,12 +134,12 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     </td>
                   )}
                   {!item.proration && (
-                    <td className="py-2 text-sm">
+                    <td className="py-2 pr-2 text-sm max-w-[200px]">
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
                           ? formatCurrency(item.unit_price)
-                          : null}
+                          : `${item.unit_price_desc}`}
                     </td>
                   )}
                   <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>

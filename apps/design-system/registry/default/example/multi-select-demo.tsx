@@ -2,25 +2,42 @@ import { useState } from 'react'
 import {
   MultiSelector,
   MultiSelectorContent,
-  MultiSelectorInput,
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
 
 export default function MultiSelectDemo() {
-  const [value, setValue] = useState<string[]>([])
+  const [selectedValues, setSelectedValues] = useState<string[]>([])
+
+  const fruits = [
+    { value: 'Apple', isDisabled: false },
+    { value: 'Banana', isDisabled: false },
+    { value: 'Cherry', isDisabled: false },
+    { value: 'Date', isDisabled: false },
+    { value: 'Elderberrie', isDisabled: false },
+    { value: 'Fig', isDisabled: false },
+    { value: 'Grape', isDisabled: false },
+    { value: 'Kiwi', isDisabled: true },
+    { value: 'Mango', isDisabled: false },
+    { value: 'Strawberry', isDisabled: false },
+  ]
 
   return (
-    <MultiSelector values={value} onValuesChange={setValue} size="small">
-      <MultiSelectorTrigger>
-        <MultiSelectorInput placeholder="Select items" />
-      </MultiSelectorTrigger>
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
+      <MultiSelectorTrigger
+        className="w-72"
+        label="Select fruits"
+        badgeLimit="wrap"
+        showIcon={false}
+      />
       <MultiSelectorContent>
         <MultiSelectorList>
-          <MultiSelectorItem value="1">Item 1</MultiSelectorItem>
-          <MultiSelectorItem value="2">Item 2</MultiSelectorItem>
-          <MultiSelectorItem value="3">Item 3</MultiSelectorItem>
+          {fruits.map(({ value, isDisabled }) => (
+            <MultiSelectorItem key={value} value={value} disabled={isDisabled}>
+              {value}
+            </MultiSelectorItem>
+          ))}
         </MultiSelectorList>
       </MultiSelectorContent>
     </MultiSelector>

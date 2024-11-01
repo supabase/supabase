@@ -22,31 +22,37 @@ import { Alert, Button, Listbox } from 'ui'
 const APIAuthorizationPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { auth_id } = useParams()
+  const [isApproving, setIsApproving] = useState(false)
+  const [isDeclining, setIsDeclining] = useState(false)
   const [selectedOrgSlug, setSelectedOrgSlug] = useState<string>()
 
-  const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
+  const {
+    data: organizations,
+    isSuccess: isSuccessOrganizations,
+    isLoading: isLoadingOrganizations,
+  } = useOrganizationsQuery()
   const { data: requester, isLoading, isError, error } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
   const isExpired = dayjs().isAfter(dayjs(requester?.expires_at))
 
-  const { mutate: approveRequest, isLoading: isApproving } = useApiAuthorizationApproveMutation({
+  const { mutate: approveRequest } = useApiAuthorizationApproveMutation({
     onSuccess: (res) => {
       window.location.href = res.url
     },
   })
-  const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
+  const { mutate: declineRequest } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
       toast.success('Declined API authorization request')
       router.push('/projects')
     },
   })
-  const isSubmitting = isApproving || isDeclining
 
   useEffect(() => {
-    if (!isLoadingOrganizations) {
-      setSelectedOrgSlug(organizations?.[0].slug ?? undefined)
+    if (isSuccessOrganizations && organizations.length > 0) {
+      setSelectedOrgSlug(organizations[0].slug)
     }
-  }, [isLoadingOrganizations])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessOrganizations])
 
   const onApproveRequest = async () => {
     if (!auth_id) {
@@ -56,7 +62,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to approve request: No organization selected')
     }
 
-    approveRequest({ id: auth_id, slug: selectedOrgSlug })
+    setIsApproving(true)
+    approveRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsApproving(false) })
   }
 
   const onDeclineRequest = async () => {
@@ -67,7 +74,8 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       return toast.error('Unable to decline request: No organization selected')
     }
 
-    declineRequest({ id: auth_id, slug: selectedOrgSlug })
+    setIsDeclining(true)
+    declineRequest({ id: auth_id, slug: selectedOrgSlug }, { onError: () => setIsDeclining(false) })
   }
 
   if (isLoading) {
@@ -113,7 +121,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   if (isApproved) {
     const approvedOrganization = organizations?.find(
-      (org) => org.slug === requester.approved_organization_slug
+      (org) => org?.slug === requester.approved_organization_slug
     )
 
     return (
@@ -139,12 +147,17 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
       footer={
         <div className="flex items-center justify-end py-4 px-8">
           <div className="flex items-center space-x-2">
-            <Button type="default" disabled={isSubmitting || isExpired} onClick={onDeclineRequest}>
+            <Button
+              type="default"
+              loading={isDeclining}
+              disabled={isApproving || isExpired}
+              onClick={onDeclineRequest}
+            >
               Decline
             </Button>
             <Button
-              loading={isSubmitting}
-              disabled={isSubmitting || isExpired}
+              loading={isApproving}
+              disabled={isDeclining || isExpired}
               onClick={onApproveRequest}
             >
               Authorize {requester?.name}
@@ -184,9 +197,9 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
           >
             {(organizations ?? []).map((organization) => (
               <Listbox.Option
-                key={organization.slug}
-                label={organization.name}
-                value={organization.slug}
+                key={organization?.slug}
+                label={organization?.name}
+                value={organization?.slug}
               >
                 {organization.name}
               </Listbox.Option>

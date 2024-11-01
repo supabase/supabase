@@ -1,14 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { ExternalLink } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
 
 import { Query } from 'components/grid/query/Query'
 import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
+import { DocsButton } from 'components/ui/DocsButton'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import type { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/get-table'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
@@ -109,15 +108,7 @@ export const useTableRowDeleteMutation = ({
                       View "{referencingTable}" table
                     </Link>
                   </Button> */}
-                  <Button asChild type="outline" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/database/postgres/cascade-deletes" />
                 </div>
               ),
             })
@@ -130,15 +121,7 @@ export const useTableRowDeleteMutation = ({
                     each row before updating or deleting the row.
                   </p>
                   <div className="mt-3">
-                    <Button asChild type="outline" icon={<ExternalLink />}>
-                      <a
-                        target="_blank"
-                        rel="noreferrer"
-                        href="https://supabase.com/docs/guides/database/tables#primary-keys"
-                      >
-                        Documentation
-                      </a>
-                    </Button>
+                    <DocsButton href="https://supabase.com/docs/guides/database/tables#primary-keys" />
                   </div>
                 </div>
               ),

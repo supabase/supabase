@@ -44,7 +44,7 @@ export default (isMobile?: boolean) => ({
     image: <FunctionsHero />,
     ctas: [
       {
-        label: 'Launch a free database',
+        label: 'Create a free account',
         href: '/dashboard',
         type: 'primary' as any,
       },

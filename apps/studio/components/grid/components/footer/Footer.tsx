@@ -1,9 +1,12 @@
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GridFooter } from 'components/ui/GridFooter'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import useEntityType from 'hooks/misc/useEntityType'
-import useTable from 'hooks/misc/useTable'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import RefreshButton from '../header/RefreshButton'
 import { Pagination } from './pagination'
@@ -14,12 +17,20 @@ export interface FooterProps {
 }
 
 const Footer = ({ isRefetching }: FooterProps) => {
+  const { project } = useProjectContext()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
-  const entityType = useEntityType(selectedTable?.id)
+
   const state = useTrackedState()
   const { selectedRows, allRowsSelected } = state
+
+  const { data } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
+  const entityType = data?.entity
 
   const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
 

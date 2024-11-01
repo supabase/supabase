@@ -11,6 +11,7 @@ import {
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (
@@ -24,16 +25,10 @@ const MigrationsPage: NextPageWithLayout = () => {
           />
         </ScaffoldSectionContent>
         <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="no-underline"
-              href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton
+            className="no-underline"
+            href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations"
+          />
         </ScaffoldSectionDetail>
         <div className="col-span-12 mt-3">
           <Migrations />

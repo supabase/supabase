@@ -75,7 +75,7 @@ export default function JwtGenerator({}) {
   }
 
   return (
-    <div>
+    <div className="border rounded-lg p-4">
       <div className="grid mb-8">
         <label htmlFor="secret">JWT Secret:</label>
         <Input
@@ -88,7 +88,7 @@ export default function JwtGenerator({}) {
         />
       </div>
       <div className="grid mb-8">
-        <label htmlFor="service">Preconfigured Payload:</label>
+        <label htmlFor="service">Key:</label>
         <Select id="service" style={{ fontFamily: 'monospace' }} onChange={handleKeySelection}>
           <Select.Option value="anon">ANON_KEY</Select.Option>
           <Select.Option value="service">SERVICE_KEY</Select.Option>
@@ -96,7 +96,7 @@ export default function JwtGenerator({}) {
       </div>
 
       <div className="grid mb-8">
-        <label htmlFor="token">Payload:</label>
+        <label htmlFor="token">The JWT will be generated from this info:</label>
         <Input.TextArea
           id="token"
           type="text"

@@ -15,11 +15,10 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { Entity, TableLike } from 'data/table-editor/table-editor-query'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useEntityType from 'hooks/misc/useEntityType'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
@@ -28,11 +27,11 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: TableLike
+  entityType: Entity
   canEditViaTableEditor: boolean
 }
 
-const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
-  const entityType = useEntityType(table?.id)
+const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
 
