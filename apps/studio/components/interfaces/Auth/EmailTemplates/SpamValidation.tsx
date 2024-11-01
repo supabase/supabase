@@ -4,6 +4,7 @@ import Table from 'components/to-be-cleaned/Table'
 import InformationBox from 'components/ui/InformationBox'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { cn, WarningIcon } from 'ui'
+import { Markdown } from 'components/interfaces/Markdown'
 
 interface SpamValidationProps {
   validationResult?: ValidateSpamResponse
@@ -29,28 +30,30 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
       description={
         hasSpamWarning ? (
           <>
-            <p>
-              {spamRules.length > 0
-                ? hasSpamWarning
-                  ? ` Rectify the following issues to improve your email's deliverability in order of priority:`
-                  : ` Address the following issues to improve your email's deliverability:`
-                : ''}
-            </p>
-
             {spamRules.length > 0 && (
-              <Table
-                className="mt-3"
-                head={[
-                  <Table.th key="name">Warning</Table.th>,
-                  <Table.th key="desc">Description</Table.th>,
-                ]}
-                body={spamRules.map((rule) => (
-                  <Table.tr key={rule.name}>
-                    <Table.td>{rule.name}</Table.td>
-                    <Table.td>{rule.desc}</Table.td>
-                  </Table.tr>
-                ))}
-              />
+              <div className="flex flex-col gap-y-3">
+                <p>
+                  {hasSpamWarning
+                    ? ` Rectify the following issues to improve your email's deliverability in order of priority:`
+                    : ` Address the following issues to improve your email's deliverability:`}
+                </p>
+                <Table
+                  head={[
+                    <Table.th key="name">Warning</Table.th>,
+                    <Table.th key="desc">Description</Table.th>,
+                  ]}
+                  body={spamRules.map((rule) => (
+                    <Table.tr key={rule.name}>
+                      <Table.td>{rule.name}</Table.td>
+                      <Table.td>{rule.desc}</Table.td>
+                    </Table.tr>
+                  ))}
+                />
+                <Markdown
+                  className="!max-w-none"
+                  content="Spam validation is powered by [SpamAssassin](https://spamassassin.apache.org/doc.html). Full list of all available warnings can be found [here](https://gist.github.com/ychaouche/a2faff159c2a1fea16019156972c7f8b)."
+                />
+              </div>
             )}
           </>
         ) : null
