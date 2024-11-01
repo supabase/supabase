@@ -12,7 +12,7 @@ import {
   mapAddOnVariantIdToComputeSize,
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
-import { ComputeSizeReccomendationSection } from '../ui/ComputeSizeRecommendationSection'
+import { ComputeSizeRecommendationSection } from '../ui/ComputeSizeRecommendationSection'
 import {
   COMPUTE_BASELINE_IOPS,
   DiskType,
@@ -61,7 +61,7 @@ export function IOPSField({ form, disableInput }: IOPSFieldProps) {
             description={
               <span className="flex flex-col gap-y-2">
                 <p>Use higher IOPS for high-throughput apps.</p>
-                <ComputeSizeReccomendationSection
+                <ComputeSizeRecommendationSection
                   form={form}
                   actions={
                     <Button
