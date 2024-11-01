@@ -99,7 +99,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
                 flex flex-col
                 gap-4 md:gap-8
                 text-foreground-light
-                !py-10
+                !pt-10 !pb-4
               "
             >
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
@@ -186,6 +186,16 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
             </SectionContainer>
           </header>
           <SectionContainer className="!pt-0">
+            <div className="w-full max-w-3xl mx-auto pb-4 mb-8 border-b flex flex-col md:flex-row gap-4 md:gap-8 flex-wrap text-sm text-foreground-lighter">
+              <div className="flex gap-2">
+                <h2>Status:</h2>
+                <span>{feature.status?.stage}</span>
+              </div>
+              <div className="flex gap-2">
+                <h2>Available on Self Hosted:</h2>
+                <span>{feature.status?.availableOnSelfHosted ? 'Yes' : 'No'}</span>
+              </div>
+            </div>
             <main className="max-w-xl mx-auto flex flex-col items-start gap-8">
               <div className="prose prose-docs">
                 <ReactMarkdown>{feature.description}</ReactMarkdown>

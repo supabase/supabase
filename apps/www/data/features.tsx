@@ -39,6 +39,13 @@ enum ADDITIONAL_PRODUCTS {
 
 export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
 
+export enum PRODUCT_STAGES {
+  PRIVATE_ALPHA = 'Private Alpha',
+  PUBLIC_ALPHA = 'Public Alpha',
+  BETA = 'Beta',
+  GA = 'General Availability',
+}
+
 export type FeatureType = {
   /**
    * name of the feature
@@ -79,6 +86,13 @@ export type FeatureType = {
    * url to docs or blog page for this feature
    */
   docsUrl?: string
+  /**
+   * feature metadata on its status
+   */
+  status?: {
+    stage: PRODUCT_STAGES
+    availableOnSelfHosted: true
+  }
 }
 
 export const features: FeatureType[] = [
@@ -149,6 +163,10 @@ Supabase automatically generates a comprehensive RESTful API from your database 
     heroImageLight: '/images/features/auto-generated-rest-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/api#rest-api-overview',
     slug: 'auto-generated-rest-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated GraphQL API via pg_graphql',
