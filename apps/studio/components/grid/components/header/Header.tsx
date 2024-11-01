@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
+import { Markdown } from 'components/interfaces/Markdown'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
@@ -27,10 +28,12 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
-import { Markdown } from 'components/interfaces/Markdown'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -378,6 +381,23 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button
+              type="link"
+              className="px-0.5 hover:bg-background"
+              icon={
+                <X
+                  size={12}
+                  className="text-foreground-light hover:text-foreground transition-colors"
+                />
+              }
+              onClick={deselectRows}
+            />
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Clear selection</TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+
         <DropdownMenu>
           <DropdownMenuTrigger>
             <Button
@@ -416,9 +436,20 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
               </Button>
             </Tooltip.Trigger>
             {!allRowsSelected && totalRows > allRows.length && (
-              <Button type="link" onClick={() => onSelectAllRows()}>
+              <Button type="outline" onClick={() => onSelectAllRows()}>
                 Select all rows in table
               </Button>
+            )}
+            {selectedRows.size > 0 && (
+              <div className="text-xs text-foreground-light flex items-center gap-2 ml-2">
+                <span>
+                  {allRowsSelected
+                    ? `All rows in table selected`
+                    : selectedRows.size > 1
+                      ? `${selectedRows.size} rows selected`
+                      : `${selectedRows.size} row selected`}
+                </span>
+              </div>
             )}
             {allRowsSelected && isImpersonatingRole && (
               <Tooltip.Portal>

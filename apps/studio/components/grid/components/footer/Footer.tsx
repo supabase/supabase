@@ -49,18 +49,7 @@ const Footer = ({ isRefetching }: FooterProps) => {
   return (
     <GridFooter>
       {selectedView === 'data' && <Pagination />}
-      {selectedRows.size > 0 && (
-        <div className="text-xs text-foreground-light flex items-center gap-2 ml-2">
-          <span className="text-lg">&middot;</span>
-          <span>
-            {allRowsSelected
-              ? `All rows in table selected`
-              : selectedRows.size > 1
-                ? `${selectedRows.size} rows selected`
-                : `${selectedRows.size} row selected`}
-          </span>
-        </div>
-      )}
+
       <div className="ml-auto flex items-center gap-x-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
