@@ -21,6 +21,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
+  DialogSection,
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
@@ -333,7 +334,6 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
-
           <Button
             block
             type={'warning'}
@@ -346,14 +346,21 @@ export const DiskManagementReviewAndSubmitDialog = ({
           >
             Confirm changes
           </Button>
-
-          {message && (
-            <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
-              <WarningIcon />
-              <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
-            </Alert_Shadcn_>
-          )}
         </DialogFooter>
+        {message && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <Alert_Shadcn_
+                variant={message.type === 'error' ? 'destructive' : 'default'}
+                className=""
+              >
+                <WarningIcon />
+                <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
+              </Alert_Shadcn_>
+            </DialogSection>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

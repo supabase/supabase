@@ -219,6 +219,7 @@ export function DiskManagementForm() {
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
     let payload = data
+    setMessageState(null)
     try {
       if (
         payload.storageType !== form.formState.defaultValues?.storageType ||
