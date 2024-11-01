@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_EMAIL_ABUSE_URL as string
-const supabaseAnonKey = process.env.NEXT_PUBLIC_EMAIL_ABUSE_ANON_KEY as string
+const supabaseServiceKey = process.env.NEXT_PUBLIC_EMAIL_ABUSE_SERVICE_KEY as string
 
 export async function POST(req: NextRequest, { params }: { params: { ref: string } }) {
   const ref = params.ref
   const { reason, email } = await req.json()
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey)
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   if (!ref) {
     return NextResponse.json(
