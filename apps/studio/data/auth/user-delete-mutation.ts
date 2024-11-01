@@ -33,7 +33,6 @@ export const useUserDeleteMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const userManagementV2 = useFlag('userManagementV2')
 
   return useMutation<UserDeleteData, ResponseError, UserDeleteVariables>(
     (vars) => deleteUser(vars),
@@ -41,16 +40,10 @@ export const useUserDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        if (userManagementV2) {
-          await Promise.all([
-            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-            queryClient.invalidateQueries(
-              sqlKeys.query(projectRef, authKeys.usersCount(projectRef))
-            ),
-          ])
-        } else {
-          await queryClient.invalidateQueries(authKeys.users(projectRef))
-        }
+        await Promise.all([
+          queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+          queryClient.invalidateQueries(sqlKeys.query(projectRef, authKeys.usersCount(projectRef))),
+        ])
 
         await onSuccess?.(data, variables, context)
       },
