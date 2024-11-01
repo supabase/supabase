@@ -133,7 +133,7 @@ interface DiskSizeMeterProps {
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
 
   buttonSize?: ButtonProps['size']
-  message: DiskManagementMessage | null
+  message?: DiskManagementMessage | null
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({
