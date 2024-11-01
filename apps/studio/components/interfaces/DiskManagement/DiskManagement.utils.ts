@@ -1,5 +1,5 @@
 import { ProjectDetail } from 'data/projects/project-detail-query'
-import { AddonVariantId, PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { PlanId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import {
   ComputeInstanceAddonVariantId,
@@ -228,37 +228,30 @@ export function getAvailableComputeOptions(availableAddons: any[], projectCloudP
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithGp3 = (totalSize: number) => {
-  if (!totalSize) throw Error('Total size is required')
   return Math.min(3000 * totalSize, 16000)
 }
 
 export const calculateDiskSizeRequiredForIopsWithGp3 = (iops: number) => {
-  if (!iops) throw Error('IOPS is required')
   return Math.max(1, Math.ceil(iops / 500))
 }
 
 export const calculateMaxIopsAllowedForDiskSizeWithio2 = (totalSize: number) => {
-  if (!totalSize) throw Error('Total size is required')
   return Math.min(500 * totalSize, 256000)
 }
 
 export const calculateDiskSizeRequiredForIopsWithIo2 = (iops: number) => {
-  if (!iops) throw Error('IOPS is required')
   return Math.max(4, Math.ceil(iops / 1000))
 }
 
 export const calculateMaxThroughput = (iops: number) => {
-  if (!iops) throw Error('IOPS is required')
   return Math.min(0.256 * iops, 1000)
 }
 
 export const calculateIopsRequiredForThroughput = (throughput: number) => {
-  if (!throughput) throw Error('Throughput is required')
   return Math.max(125, Math.ceil(throughput / 0.256))
 }
 
 export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): number => {
-  if (!computeSize) throw Error('Compute size is required')
   return COMPUTE_BASELINE_IOPS[computeSize as keyof typeof COMPUTE_BASELINE_IOPS] || 0
 }
 
@@ -276,17 +269,12 @@ export const calculateComputeSizeRequiredForIops = (
     }
   }
 
-  // fallback to largest compute size
-  // this should never happen though :-/
+  // fallback to largest compute size - this should never happen though :-/
   return computeSizes[computeSizes.length - 1][0] as ComputeInstanceAddonVariantId
 }
 
 export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number => {
-  if (provisionedIOPS === undefined || provisionedIOPS === null) {
-    throw new Error('Provisioned IOPS is required')
-  }
-
-  if (typeof provisionedIOPS !== 'number' || isNaN(provisionedIOPS) || provisionedIOPS < 0) {
+  if (isNaN(provisionedIOPS) || provisionedIOPS < 0) {
     throw new Error('Provisioned IOPS must be a non-negative number')
   }
 
@@ -324,8 +312,6 @@ export const mapComputeSizeNameToAddonVariantId = (
 export const mapAddOnVariantIdToComputeSize = (
   addonVariantId: ComputeInstanceAddonVariantId
 ): ComputeInstanceSize => {
-  if (!addonVariantId) throw new Error('addonVariantId is required')
-
   return {
     ci_nano: 'Nano',
     ci_micro: 'Micro',
@@ -342,12 +328,9 @@ export const mapAddOnVariantIdToComputeSize = (
 }
 
 export const formatNumber = (num: number): string => {
-  if (!num) throw Error('Number is required')
   return num.toLocaleString('en-US')
 }
 
 export const showMicroUpgrade = (plan: PlanId, infraComputeSize: InfraInstanceSize): boolean => {
-  if (!plan) throw new Error('Plan is required')
-  if (!infraComputeSize) throw new Error('Current compute size required')
   return plan !== 'free' && infraComputeSize === 'nano'
 }
