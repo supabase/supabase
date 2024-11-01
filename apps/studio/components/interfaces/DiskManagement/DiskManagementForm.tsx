@@ -192,11 +192,14 @@ export function DiskManagementForm() {
 
   const { formState } = form
 
+  const isFlyArchitecture = project?.cloud_provider === 'FLY'
+
   const disableDiskInputs =
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
-    !canUpdateDiskConfiguration
+    !canUpdateDiskConfiguration ||
+    isFlyArchitecture
 
   const disableComputeInputs = isPlanUpgradeRequired
 
@@ -319,56 +322,67 @@ export function DiskManagementForm() {
             <Separator />
             <DiskCountdownRadial />
             <SpendCapDisabledSection />
-            <DiskSizeField
-              form={form}
-              disableInput={disableDiskInputs}
-              setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
+            <NoticeBar
+              type="default"
+              visible={isFlyArchitecture}
+              title="Disk configuration is not available on Fly Postgres"
+              description="Please contact Fly support if you need to update your disk configuration"
             />
-            <Separator />
-            <Collapsible_Shadcn_
-              // TO DO: wrap component into pattern
-              className="-space-y-px"
-              open={advancedSettingsOpen}
-              onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
-            >
-              <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
-                <div className="flex flex-col items-start">
-                  <span className="text-sm text-foreground">Advanced disk settings</span>
-                  <span className="text-sm text-foreground-light">
-                    Specify additional settings for your disk, including IOPS, throughput, and disk
-                    type.
-                  </span>
-                </div>
-                <ChevronRight
-                  size={16}
-                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
-                  strokeWidth={1}
+            {!isFlyArchitecture && (
+              <>
+                <DiskSizeField
+                  form={form}
+                  disableInput={disableDiskInputs}
+                  setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
                 />
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                <StorageTypeField form={form} disableInput={disableDiskInputs} />
-                <NoticeBar
-                  type="default"
-                  visible={
-                    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
-                    subscription?.plan.id !== 'free'
-                  }
-                  title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
-                  actions={
-                    <Button
+                <Separator />
+                <Collapsible_Shadcn_
+                  // TO DO: wrap component into pattern
+                  className="-space-y-px"
+                  open={advancedSettingsOpen}
+                  onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
+                >
+                  <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                    <div className="flex flex-col items-start">
+                      <span className="text-sm text-foreground">Advanced disk settings</span>
+                      <span className="text-sm text-foreground-light">
+                        Specify additional settings for your disk, including IOPS, throughput, and
+                        disk type.
+                      </span>
+                    </div>
+                    <ChevronRight
+                      size={16}
+                      className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
+                      strokeWidth={1}
+                    />
+                  </CollapsibleTrigger_Shadcn_>
+                  <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                    <StorageTypeField form={form} disableInput={disableDiskInputs} />
+                    <NoticeBar
                       type="default"
-                      onClick={() => {
-                        form.setValue('computeSize', 'ci_large')
-                      }}
-                    >
-                      Change to LARGE Compute
-                    </Button>
-                  }
-                />
-                <IOPSField form={form} disableInput={disableDiskInputs} />
-                <ThroughputField form={form} disableInput={disableDiskInputs} />
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+                      visible={
+                        RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
+                          form.watch('computeSize')
+                        ) && subscription?.plan.id !== 'free'
+                      }
+                      title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
+                      actions={
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            form.setValue('computeSize', 'ci_large')
+                          }}
+                        >
+                          Change to LARGE Compute
+                        </Button>
+                      }
+                    />
+                    <IOPSField form={form} disableInput={disableDiskInputs} />
+                    <ThroughputField form={form} disableInput={disableDiskInputs} />
+                  </CollapsibleContent_Shadcn_>
+                </Collapsible_Shadcn_>
+              </>
+            )}
           </ScaffoldContainer>
           <AnimatePresence>
             {isDirty ? (
