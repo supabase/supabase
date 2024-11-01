@@ -257,11 +257,7 @@ export const calculateMaxIopsAllowedForComputeSize = (computeSize: string): numb
 
 export const calculateComputeSizeRequiredForIops = (
   iops: number
-): ComputeInstanceAddonVariantId => {
-  if (iops === undefined || iops === null) {
-    throw new Error('IOPS is required')
-  }
-
+): ComputeInstanceAddonVariantId | undefined => {
   const computeSizes = Object.entries(COMPUTE_BASELINE_IOPS).sort((a, b) => a[1] - b[1])
   for (const [size, baselineIops] of computeSizes) {
     if (iops <= baselineIops) {
@@ -273,13 +269,20 @@ export const calculateComputeSizeRequiredForIops = (
   return computeSizes[computeSizes.length - 1][0] as ComputeInstanceAddonVariantId
 }
 
-export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number => {
+export const calculateDiskSizeRequiredForIops = (provisionedIOPS: number): number | undefined => {
+  if (!provisionedIOPS) {
+    console.error('IOPS is required')
+    return undefined
+  }
+
   if (isNaN(provisionedIOPS) || provisionedIOPS < 0) {
-    throw new Error('Provisioned IOPS must be a non-negative number')
+    console.error('IOPS must be a non-negative number')
+    return undefined
   }
 
   if (provisionedIOPS > 256000) {
-    throw new Error('Maximum allowed IOPS is 256000')
+    console.error('Maximum allowed IOPS is 256000')
+    return undefined
   }
 
   return Math.max(1, Math.ceil(provisionedIOPS / 1000))
@@ -292,8 +295,6 @@ export const formatComputeName = (compute: string) => {
 export const mapComputeSizeNameToAddonVariantId = (
   computeSize: ProjectDetail['infra_compute_size']
 ): ComputeInstanceAddonVariantId => {
-  if (!computeSize) throw new Error('Compute size is required')
-
   return {
     nano: 'ci_nano',
     micro: 'ci_micro',
@@ -306,11 +307,11 @@ export const mapComputeSizeNameToAddonVariantId = (
     '8xlarge': 'ci_8xlarge',
     '12xlarge': 'ci_12xlarge',
     '16xlarge': 'ci_16xlarge',
-  }[computeSize] as ComputeInstanceAddonVariantId
+  }[computeSize ?? 'nano'] as ComputeInstanceAddonVariantId
 }
 
 export const mapAddOnVariantIdToComputeSize = (
-  addonVariantId: ComputeInstanceAddonVariantId
+  addonVariantId: ComputeInstanceAddonVariantId = 'ci_nano'
 ): ComputeInstanceSize => {
   return {
     ci_nano: 'Nano',
