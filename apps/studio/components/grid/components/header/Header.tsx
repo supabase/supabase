@@ -271,7 +271,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   }
 
   const onRowsDelete = () => {
-    console.log({ totalRows, countData })
     const numRows = allRowsSelected ? totalRows : selectedRows.size
     const rowIdxs = Array.from(selectedRows) as number[]
     const rows = allRows.filter((x) => rowIdxs.includes(x.idx))
