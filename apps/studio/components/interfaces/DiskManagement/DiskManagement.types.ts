@@ -41,3 +41,8 @@ export type InfraInstanceSize =
   | '8xlarge'
   | '12xlarge'
   | '16xlarge'
+
+export interface DiskManagementMessage {
+  message: string
+  type: 'error' | 'success'
+}

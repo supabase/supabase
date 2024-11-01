@@ -46,7 +46,7 @@ import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequ
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
-import { InfraInstanceSize } from './DiskManagement.types'
+import { DiskManagementMessage, InfraInstanceSize } from './DiskManagement.types'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -131,11 +131,9 @@ interface DiskSizeMeterProps {
   disabled?: boolean
   setIsDialogOpen: (isOpen: boolean) => void
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
-  message?: {
-    type: 'error' | 'warning'
-    message: string
-  }
+
   buttonSize?: ButtonProps['size']
+  message: DiskManagementMessage
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({

@@ -53,6 +53,7 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { DiskManagementMessage } from './DiskManagement.types'
 
 export function DiskManagementForm() {
   const {
@@ -79,10 +80,7 @@ export function DiskManagementForm() {
    */
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
-  const [messageState, setMessageState] = useState<{
-    message: string
-    type: 'error' | 'success'
-  } | null>(null)
+  const [message, setMessageState] = useState<DiskManagementMessage | null>(null)
   const [advancedSettingsOpen, setAdvancedSettingsOpenState] = useState(false)
 
   /**
@@ -417,6 +415,7 @@ export function DiskManagementForm() {
                     isDialogOpen={isDialogOpen}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
+                    messageState={message}
                   />
                 </div>
               </motion.div>
