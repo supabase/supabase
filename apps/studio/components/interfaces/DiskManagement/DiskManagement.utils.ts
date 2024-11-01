@@ -61,7 +61,7 @@ export const calculateComputeSizePrice = ({
 }) => {
   let _oldComputeSize = oldComputeSize
 
-  if (plan !== 'free') {
+  if (plan !== 'free' && oldComputeSize === 'ci_nano') {
     /**
      * override the old compute size to micro if the plan is not free
      * this is to handle the case in which nano compute is a paid entity
