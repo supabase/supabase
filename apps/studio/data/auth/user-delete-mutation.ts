@@ -3,10 +3,9 @@ import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
-import { useFlag } from 'hooks/ui/useFlag'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
-import type { User } from './users-query'
+import type { User } from './users-infinite-query'
 
 export type UserDeleteVariables = {
   projectRef: string
