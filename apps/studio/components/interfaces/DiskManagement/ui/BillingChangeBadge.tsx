@@ -29,9 +29,6 @@ const BillingChangeBadge = ({
           animate={{ opacity: 1, x: 0, height: 'auto' }}
           exit={{ opacity: 0, x: -4, height: 0 }}
           transition={{ type: 'spring', stiffness: 800, damping: 40, duration: 0.3 }}
-          // key={afterPrice} // This key will change whenever any form value changes
-          // whileHover={{ scale: 1.05 }}
-          // whileTap={{ scale: 0.95 }}
         >
           <Badge
             variant="default"
