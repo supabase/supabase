@@ -10,9 +10,11 @@ import {
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export function SpendCapDisabledSection() {
   const org = useSelectedOrganization()
+  const project = useSelectedProject()
 
   const {
     data,
@@ -23,7 +25,11 @@ export function SpendCapDisabledSection() {
     orgSlug: org?.slug,
   })
 
-  const isSpendCapEnabled = isSuccess && data?.plan.id !== 'free' && !data?.usage_billing_enabled
+  const isSpendCapEnabled =
+    isSuccess &&
+    data?.plan.id !== 'free' &&
+    !data?.usage_billing_enabled &&
+    project?.cloud_provider !== 'FLY'
 
   return (
     <AnimatePresence>
