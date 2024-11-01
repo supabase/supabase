@@ -1,8 +1,8 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
