@@ -22,6 +22,7 @@ import {
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
+import { InstanceSpecs } from 'lib/constants'
 
 /**
  * to do: this could be a type from api-types
@@ -31,10 +32,7 @@ type ComputeOption = {
   name: string
   price: number
   price_interval: 'monthly' | 'hourly'
-  meta?: {
-    memory_gb?: number
-    cpu_cores?: number
-  }
+  meta?: InstanceSpecs
 }
 
 type ComputeSizeFieldProps = {
@@ -229,7 +227,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   size={14}
                                   className="text-foreground-lighter"
                                 />
-                                <span>{compute.meta?.memory_gb ?? 0} GB memory</span>
+                                <span>
+                                  {compute.identifier === 'ci_nano' && 'Up to '}
+                                  {compute.meta?.memory_gb ?? 0} GB memory
+                                </span>
                               </div>
                               <div className="text-foreground-light flex gap-2 items-center">
                                 <CpuIcon
@@ -238,7 +239,10 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   className="text-foreground-lighter"
                                 />
                                 <span>
-                                  {compute.meta?.cpu_cores ?? 0}-core {cpuArchitecture} CPU
+                                  {compute.meta?.cpu_cores ?? 0}
+                                  {compute.meta?.cpu_cores !== 'Shared' &&
+                                    `-core ${cpuArchitecture}`}{' '}
+                                  CPU
                                 </span>
                               </div>
                             </div>
