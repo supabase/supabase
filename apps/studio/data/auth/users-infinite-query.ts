@@ -13,7 +13,7 @@ export type UsersVariables = {
   keywords?: string
   filter?: Filter
   providers?: string[]
-  sort?: 'created_at' | 'email' | 'phone'
+  sort?: 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
 }
 
