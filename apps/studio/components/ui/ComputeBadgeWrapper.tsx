@@ -52,12 +52,13 @@ export const ComputeBadgeWrapper = ({ project }: ComputeBadgeWrapperProps) => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
+  const computeInstanceMeta = computeInstance?.variant?.meta
 
-  let meta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
-  // some older instances on micro compute are missing metadata
-  if (meta === undefined && project.infra_compute_size === 'micro') {
-    meta = INSTANCE_MICRO_SPECS
-  }
+  const meta = (
+    computeInstanceMeta === undefined && project.infra_compute_size === 'micro'
+      ? INSTANCE_MICRO_SPECS
+      : computeInstanceMeta
+  ) as ProjectAddonVariantMeta
 
   const availableCompute = addons?.available_addons.find(
     (addon) => addon.name === 'Compute Instance'

@@ -122,31 +122,15 @@ export function DiskManagementForm() {
       },
     }
   )
-  const {
-    // isLoading: isAddonsLoading,
-    // error: addonsError,
-    isSuccess: isAddonsSuccess,
-  } = useProjectAddonsQuery({ projectRef })
-  const {
-    isWithinCooldownWindow,
-    // isLoading: isCooldownLoading,
-    isSuccess: isCooldownSuccess,
-  } = useRemainingDurationForDiskAttributeUpdate({
+  const { isSuccess: isAddonsSuccess } = useProjectAddonsQuery({ projectRef })
+  const { isWithinCooldownWindow, isSuccess: isCooldownSuccess } =
+    useRemainingDurationForDiskAttributeUpdate({
+      projectRef,
+    })
+  const { isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
     projectRef,
   })
-  const {
-    // isLoading: isDiskUtilizationLoading,
-    // error: diskUtilError,
-    isSuccess: isDiskUtilizationSuccess,
-  } = useDiskUtilizationQuery({
-    projectRef,
-  })
-  const {
-    data: subscription,
-    // isLoading: isSubscriptionLoading,
-    // error: subscriptionError,
-    isSuccess: isSubscriptionSuccess,
-  } = useOrgSubscriptionQuery({
+  const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
 
@@ -276,153 +260,149 @@ export function DiskManagementForm() {
   }
 
   return (
-    <>
-      <Form_Shadcn_ {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
-          <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
-            <NoticeBar
-              type="default"
-              visible={isPlanUpgradeRequired}
-              title="Compute and Disk configuration is not available on the Free Plan"
-              actions={
-                <Button type="default" asChild>
-                  <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>
-                    Upgrade plan
-                  </Link>
-                </Button>
-              }
-              description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
-            />
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
+        <ScaffoldContainer className="relative flex flex-col gap-10" bottomPadding>
+          <NoticeBar
+            type="default"
+            visible={isPlanUpgradeRequired}
+            title="Compute and Disk configuration is not available on the Free Plan"
+            actions={
+              <Button type="default" asChild>
+                <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+              </Button>
+            }
+            description="You will need to upgrade to at least the Pro Plan to configure compute and disk"
+          />
 
-            {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
-              <div className="relative flex flex-col gap-10">
-                <DiskMangementRestartRequiredSection
-                  visible={isProjectResizing}
-                  title="Your project will now automatically restart."
-                  description="Your project will be unavailable for up to 2 mins."
-                />
-                <NoticeBar
+          {isProjectResizing || isProjectRequestingDiskChanges || noPermissions ? (
+            <div className="relative flex flex-col gap-10">
+              <DiskMangementRestartRequiredSection
+                visible={isProjectResizing}
+                title="Your project will now automatically restart."
+                description="Your project will be unavailable for up to 2 mins."
+              />
+              <NoticeBar
+                type="default"
+                visible={isProjectRequestingDiskChanges}
+                title="Disk configuration changes have been requested"
+                description="The requested changes will be applied to your disk shortly"
+              />
+              <NoticeBar
+                type="default"
+                visible={noPermissions}
+                title="You do not have permission to update disk configuration"
+                description="Please contact your organization administrator to update your disk configuration"
+              />
+            </div>
+          ) : null}
+          <Separator />
+          <ComputeSizeField form={form} disabled={disableComputeInputs} />
+          <Separator />
+          <DiskCountdownRadial />
+          <SpendCapDisabledSection />
+          <NoticeBar
+            type="default"
+            visible={isFlyArchitecture}
+            title="Disk configuration is not available on Fly Postgres"
+            description="Please contact Fly support if you need to update your disk configuration"
+          />
+          {!isFlyArchitecture && (
+            <>
+              <DiskSizeField
+                form={form}
+                disableInput={disableDiskInputs}
+                setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
+              />
+              <Separator />
+              <Collapsible_Shadcn_
+                // TO DO: wrap component into pattern
+                className="-space-y-px"
+                open={advancedSettingsOpen}
+                onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
+              >
+                <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm text-foreground">Advanced disk settings</span>
+                    <span className="text-sm text-foreground-light">
+                      Specify additional settings for your disk, including IOPS, throughput, and
+                      disk type.
+                    </span>
+                  </div>
+                  <ChevronRight
+                    size={16}
+                    className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
+                    strokeWidth={1}
+                  />
+                </CollapsibleTrigger_Shadcn_>
+                <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                  <StorageTypeField form={form} disableInput={disableDiskInputs} />
+                  <NoticeBar
+                    type="default"
+                    visible={
+                      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
+                        form.watch('computeSize')
+                      ) && subscription?.plan.id !== 'free'
+                    }
+                    title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
+                    actions={
+                      <Button
+                        type="default"
+                        onClick={() => {
+                          form.setValue('computeSize', 'ci_large')
+                        }}
+                      >
+                        Change to LARGE Compute
+                      </Button>
+                    }
+                  />
+                  <IOPSField form={form} disableInput={disableDiskInputs} />
+                  <ThroughputField form={form} disableInput={disableDiskInputs} />
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
+            </>
+          )}
+        </ScaffoldContainer>
+        <AnimatePresence>
+          {isDirty ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.1, delay: 0.2 }}
+              className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
+            >
+              <div
+                className={cn(
+                  MAX_WIDTH_CLASSES,
+                  PADDING_CLASSES,
+                  'flex items-center gap-3 justify-end'
+                )}
+              >
+                <FormFooterChangeBadge formState={formState} />
+                <Button
                   type="default"
-                  visible={isProjectRequestingDiskChanges}
-                  title="Disk configuration changes have been requested"
-                  description="The requested changes will be applied to your disk shortly"
-                />
-                <NoticeBar
-                  type="default"
-                  visible={noPermissions}
-                  title="You do not have permission to update disk configuration"
-                  description="Please contact your organization administrator to update your disk configuration"
+                  onClick={() => form.reset()}
+                  disabled={!isDirty}
+                  size="medium"
+                >
+                  Cancel
+                </Button>
+                <DiskManagementReviewAndSubmitDialog
+                  loading={isUpdatingConfig}
+                  disabled={noPermissions}
+                  form={form}
+                  numReplicas={readReplicas.length}
+                  isDialogOpen={isDialogOpen}
+                  onSubmit={onSubmit}
+                  setIsDialogOpen={setIsDialogOpen}
+                  message={message}
                 />
               </div>
-            ) : null}
-            <Separator />
-            <ComputeSizeField form={form} disabled={disableComputeInputs} />
-            <Separator />
-            <DiskCountdownRadial />
-            <SpendCapDisabledSection />
-            <NoticeBar
-              type="default"
-              visible={isFlyArchitecture}
-              title="Disk configuration is not available on Fly Postgres"
-              description="Please contact Fly support if you need to update your disk configuration"
-            />
-            {!isFlyArchitecture && (
-              <>
-                <DiskSizeField
-                  form={form}
-                  disableInput={disableDiskInputs}
-                  setAdvancedSettingsOpenState={setAdvancedSettingsOpenState}
-                />
-                <Separator />
-                <Collapsible_Shadcn_
-                  // TO DO: wrap component into pattern
-                  className="-space-y-px"
-                  open={advancedSettingsOpen}
-                  onOpenChange={() => setAdvancedSettingsOpenState((prev) => !prev)}
-                >
-                  <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
-                    <div className="flex flex-col items-start">
-                      <span className="text-sm text-foreground">Advanced disk settings</span>
-                      <span className="text-sm text-foreground-light">
-                        Specify additional settings for your disk, including IOPS, throughput, and
-                        disk type.
-                      </span>
-                    </div>
-                    <ChevronRight
-                      size={16}
-                      className="text-foreground-light transition-all group-data-[state=open]:rotate-90"
-                      strokeWidth={1}
-                    />
-                  </CollapsibleTrigger_Shadcn_>
-                  <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <StorageTypeField form={form} disableInput={disableDiskInputs} />
-                    <NoticeBar
-                      type="default"
-                      visible={
-                        RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
-                          form.watch('computeSize')
-                        ) && subscription?.plan.id !== 'free'
-                      }
-                      title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
-                      actions={
-                        <Button
-                          type="default"
-                          onClick={() => {
-                            form.setValue('computeSize', 'ci_large')
-                          }}
-                        >
-                          Change to LARGE Compute
-                        </Button>
-                      }
-                    />
-                    <IOPSField form={form} disableInput={disableDiskInputs} />
-                    <ThroughputField form={form} disableInput={disableDiskInputs} />
-                  </CollapsibleContent_Shadcn_>
-                </Collapsible_Shadcn_>
-              </>
-            )}
-          </ScaffoldContainer>
-          <AnimatePresence>
-            {isDirty ? (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
-                transition={{ duration: 0.1, delay: 0.2 }}
-                className="z-10 w-full left-0 right-0 sticky bottom-0 bg-surface-100 border-t h-16 items-center flex"
-              >
-                <div
-                  className={cn(
-                    MAX_WIDTH_CLASSES,
-                    PADDING_CLASSES,
-                    'flex items-center gap-3 justify-end'
-                  )}
-                >
-                  <FormFooterChangeBadge formState={formState} />
-                  <Button
-                    type="default"
-                    onClick={() => form.reset()}
-                    disabled={!isDirty}
-                    size="medium"
-                  >
-                    Cancel
-                  </Button>
-                  <DiskManagementReviewAndSubmitDialog
-                    loading={isUpdatingConfig}
-                    disabled={noPermissions}
-                    form={form}
-                    numReplicas={readReplicas.length}
-                    isDialogOpen={isDialogOpen}
-                    onSubmit={onSubmit}
-                    setIsDialogOpen={setIsDialogOpen}
-                    messageState={message}
-                  />
-                </div>
-              </motion.div>
-            ) : null}
-          </AnimatePresence>
-        </form>
-      </Form_Shadcn_>
-    </>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      </form>
+    </Form_Shadcn_>
   )
 }

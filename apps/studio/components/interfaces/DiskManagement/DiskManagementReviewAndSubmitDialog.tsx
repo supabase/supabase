@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronRight } from 'lucide-react'
-import { ComponentProps, useMemo } from 'react'
+import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -33,6 +33,7 @@ import {
   WarningIcon,
 } from 'ui'
 import { DiskStorageSchemaType } from './DiskManagement.schema'
+import { DiskManagementMessage } from './DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -40,13 +41,11 @@ import {
   calculateThroughputPrice,
   getAvailableComputeOptions,
   mapAddOnVariantIdToComputeSize,
-  showMicroUpgrade,
 } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
-import { DiskManagementMessage, InfraInstanceSize } from './DiskManagement.types'
 
 const TableHeaderRow = () => (
   <TableRow>
@@ -133,7 +132,7 @@ interface DiskSizeMeterProps {
   onSubmit: (values: DiskStorageSchemaType) => Promise<void>
 
   buttonSize?: ButtonProps['size']
-  message: DiskManagementMessage
+  message: DiskManagementMessage | null
 }
 
 export const DiskManagementReviewAndSubmitDialog = ({

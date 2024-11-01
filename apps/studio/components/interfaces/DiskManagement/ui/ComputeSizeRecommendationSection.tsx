@@ -14,16 +14,19 @@ import {
   RESTRICTED_COMPUTE_FOR_IOPS_ON_GP3,
 } from './DiskManagement.constants'
 
-export function ComputeSizeReccomendationSection({
-  actions,
-  form,
-}: {
+interface ComputeSizeRecommendationSectionProps {
   actions?: ReactNode
   form: UseFormReturn<DiskStorageSchemaType>
-}) {
+}
+
+export function ComputeSizeRecommendationSection({
+  actions,
+  form,
+}: ComputeSizeRecommendationSectionProps) {
   const { watch } = form
   const computeSize = watch('computeSize')
   const iops = watch('provisionedIOPS')
+
   const computeSizeRecommendedForIops = calculateComputeSizeRequiredForIops(iops)
   const maxIOPSforComputeSize = calculateMaxIopsAllowedForComputeSize(computeSize ?? 'ci_micro')
   const isVisible =
