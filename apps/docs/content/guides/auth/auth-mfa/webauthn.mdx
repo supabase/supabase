@@ -83,7 +83,7 @@ As far as possible, maintain a generic flow that you can reuse in both cases wit
 
 You can enroll a WebAuthn factor with a single step:
 
-```
+```ts
 import { browserSupportsWebAuthn } from '@supabase/supabase-js'
 if (supabase.auth.browserSupportsWebAuthn()) {
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn'})
@@ -95,7 +95,7 @@ if (supabase.auth.browserSupportsWebAuthn()) {
 
 Or in multiple-steps by setting the `useMultiStepEnroll` parameter to true.
 
-```
+```ts
 const { data: { factorId }, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
 
 const { data: {options}, error } = await supabase.auth.mfa.challenge({ factorId })
@@ -144,13 +144,13 @@ Visit the MDN Documentation for a full description of each field [here](https://
 
 Once a user has registered a factor, they can proceed to log in. In single-step mode this is accomplished with:
 
-```jsx
+```ts
 const { data, error } = await supabase.auth.mfa.verify({ factorType: 'webauthn' })
 ```
 
 As with enrollment, developers have the option of performing verification over multiple steps.
 
-```
+```ts
 const { data: factors, error } = await supabase.auth.mfa.listFactors()
 const { data, error } = await supabase.auth.mfa.challenge({
 	factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
@@ -165,31 +165,24 @@ Note that you do not have to specify a `factorId` parameter. Unlike MFA (Phone) 
 
 ## Factor Management
 
-## Mapping AAGUIDs
-- TODO: Provide an example and send [community sourced mapping](https://github.com/passkeydeveloper/passkey-authenticator-aaguids)
+Use the WebAuthn AAGUID to identify the type of authenticator used (e.g. Chrome Profile on Mac, Yubikey). There is a [community sourced JSON](https://github.com/passkeydeveloper/passkey-authenticator-aaguids) which maps an AAGUID to the name of the passkey
 
-## Best Practices
+```ts
+import aaguids from './aaguids.json' with { type: 'json' };
 
-You can use the following directives to help control availability of a credential in an iframe. Add these directives so that WebAuthn pop-ups for authentication can be shown in the iframe.
+const { data, error } = await supabase.auth.mfa.listFactors()
 
-- [`publickey-credentials-create`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy/publickey-credentials-create): Controls the availability of [`navigator.credentials.create()`](https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/create) with the `publicKey` option.
-- [`publickey-credentials-get`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy/publickey-credentials-get): Controls the availability of [`navigator.credentials.get()`](https://developer.mozilla.org/en-US/docs/Web/API/CredentialsContainer/get) with the `publicKey` option.
-
-Both directives have a default allowlist value of `"self"`, meaning that by default these methods can be used in top-level document contexts.
-
-```jsx
-<iframe
-  src="https://auth.provider.com"
-  allow="publickey-credentials-get *">
-</iframe>
+const provider_name = aaguids[data.webauthn.webauthn_aaguid]?.name || 'Unknown';
 ```
 
-```html
-<iframe
-  src="https://auth.provider.com"allow="publickey-credentials-create 'self' https://a.auth.provider.com https://b.auth.provider.com"></iframe>
-```
+You can confirm that the mapping is accurate by using the helper site [on this page](https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/?combined)
 
 ## Frequently Asked Questions
 
-- Passkeys -> Coming in 2025
+### Are Passkeys Supported?
+
+We do not the use of WebAuthn devices as a Sign In or Sign Up method. Please check back in the future.
+
+
 - Attestation Service -> Not currently enabled
+- `getClaims` method
