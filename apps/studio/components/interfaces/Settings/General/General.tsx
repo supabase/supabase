@@ -123,7 +123,7 @@ const General = () => {
                       label="Project name"
                       disabled={isBranch || !canUpdateProject}
                     />
-                    <Input copy disabled id="ref" size="small" label="Reference ID" />
+                    <Input copy disabled id="ref" size="small" label="Project ID" />
                   </FormSectionContent>
                 </FormSection>
               </FormPanel>
