@@ -56,7 +56,9 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
                   <TableBody>
                     {spamRules.map((rule) => (
                       <TableRow key={rule.name}>
-                        <TableCell className="pl-0 font-mono">{rule.name}</TableCell>
+                        <TableCell className="pl-0 font-mono text-xs text-foreground">
+                          {rule.name}
+                        </TableCell>
                         <TableCell className="pr-0">{rule.desc}</TableCell>
                       </TableRow>
                     ))}
