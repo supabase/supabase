@@ -186,14 +186,23 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
             </SectionContainer>
           </header>
           <SectionContainer className="!pt-0">
-            <div className="w-full max-w-3xl mx-auto pb-4 mb-8 border-b flex flex-col md:flex-row gap-4 md:gap-8 flex-wrap text-sm text-foreground-lighter">
-              <div className="flex gap-2">
-                <h2>Status:</h2>
-                <span>{feature.status?.stage}</span>
+            <div className="prose w-full max-w-3xl mx-auto pb-4 mb-8 border-b flex flex-col md:flex-row gap-4 md:gap-8 flex-wrap justify-center text-sm text-foreground-lighter">
+              <div className="flex gap-2 items-center">
+                <span>Stage:</span>
+                <code>{feature.status?.stage}</code>
               </div>
-              <div className="flex gap-2">
-                <h2>Available on Self Hosted:</h2>
-                <span>{feature.status?.availableOnSelfHosted ? 'Yes' : 'No'}</span>
+              <div className="flex gap-2 items-center">
+                <span>Available on self-hosted:</span>
+                {feature.status?.selfHostedTooling ? (
+                  <code className="flex gap-1.5 px-0">
+                    Requires
+                    <Link href={feature.status?.selfHostedTooling.link} target="_blank">
+                      {feature.status?.selfHostedTooling?.label}
+                    </Link>
+                  </code>
+                ) : (
+                  <code>{feature.status?.availableOnSelfHosted ? 'Yes' : 'N/A'}</code>
+                )}
               </div>
             </div>
             <main className="max-w-xl mx-auto flex flex-col items-start gap-8">

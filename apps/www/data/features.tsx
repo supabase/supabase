@@ -91,7 +91,11 @@ export type FeatureType = {
    */
   status?: {
     stage: PRODUCT_STAGES
-    availableOnSelfHosted: true
+    availableOnSelfHosted: boolean
+    selfHostedTooling?: {
+      label: string
+      link: string
+    }
   }
 }
 
@@ -120,6 +124,10 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     heroImageLight: '/images/features/postgres-database-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/overview',
     slug: 'postgres-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vector database',
@@ -141,6 +149,10 @@ Supabase provides an open source toolkit for developing AI applications using Po
     heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated REST API via PostgREST',
@@ -196,6 +208,10 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
     heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
     slug: 'auto-generated-graphql-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database backups',
@@ -231,6 +247,14 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
     heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
     slug: 'database-backups',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'wal-g',
+        link: 'https://github.com/wal-g/wal-g',
+      },
+    },
   },
   {
     title: 'Custom domains',
@@ -256,6 +280,10 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
     slug: 'custom-domains',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Network restrictions',
@@ -289,6 +317,10 @@ By implementing Network Restrictions, you create a more secure environment for y
     heroImageLight: '/images/features/network-restrictions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'SSL enforcement',
@@ -324,6 +356,10 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     heroImageLight: '/images/features/ssl-enforcement-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
     slug: 'ssl-enforcement',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Branching',
@@ -356,6 +392,10 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Terraform provider',
@@ -392,6 +432,10 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
     heroImageLight: '/images/features/terraform-provider-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/terraform',
     slug: 'terraform-provider',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Read replicas',
@@ -427,6 +471,10 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Fly Postgres',
@@ -461,6 +509,10 @@ By leveraging Fly Postgres, you can achieve improved global performance for your
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/platform/fly-postgres',
     slug: 'fly-postgres',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Postgres Extensions',
@@ -501,6 +553,10 @@ By leveraging these extensions, you can implement complex features more easily, 
     heroImageLight: '/images/features/postgres-extensions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions',
     slug: 'postgres-extensions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database Webhooks',
@@ -523,6 +579,10 @@ This feature is particularly useful for developers looking to automate workflows
     heroImageLight: '/images/features/database-webhooks-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
     slug: 'database-webhooks',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vault',
@@ -544,6 +604,10 @@ This feature is particularly useful for teams looking to enhance their security 
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Supavisor',
@@ -565,6 +629,10 @@ This feature is particularly valuable for teams looking to optimize their databa
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Realtime
   {
@@ -600,6 +668,10 @@ Supabase's Realtime Postgres Changes feature provides a powerful tool for creati
     heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Realtime Broadcast',
@@ -637,6 +709,10 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Realtime Presence',
@@ -673,6 +749,10 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Auth
   {
@@ -709,6 +789,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     heroImageLight: '/images/features/email-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/passwords',
     slug: 'email-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Social login',
@@ -744,6 +828,10 @@ Supabase's Social Login feature allows you to improve user experience and potent
     heroImageLight: '/images/features/social-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
     slug: 'social-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Phone logins',
@@ -778,6 +866,10 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
     heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
     slug: 'phone-logins',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Passwordless login via Magic Links',
@@ -813,6 +905,10 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-passwordless',
     slug: 'passwordless-login-via-magicklink',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Multi-Factor Authentication (MFA)',
@@ -848,6 +944,10 @@ Supabase's MFA feature provides a robust tool for enhancing application security
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-mfa',
     slug: 'multi-factor-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Authorization via Row Level Security',
@@ -883,6 +983,10 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
     docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
     slug: 'row-level-security',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Captcha protection',
@@ -918,6 +1022,10 @@ Supabase's Captcha Protection feature provides a powerful tool for enhancing app
     heroImageLight: '/images/features/auth-captcha-protection-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-captcha',
     slug: 'auth-captcha-protection',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Server-side Auth',
@@ -952,6 +1060,10 @@ Supabase's Server-side Auth feature allows developers to create more secure and 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/server-side',
     slug: 'server-side-auth',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Storage
   {
@@ -989,6 +1101,10 @@ Supabase Storage simplifies adding robust file management to your applications, 
     heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
     slug: 'file-storage',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Content Delivery Network',
@@ -1024,6 +1140,14 @@ Supabase's CDN significantly improves the performance and user experience of you
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
     slug: 'cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Smart Content Delivery Network',
@@ -1059,6 +1183,14 @@ Supabase's Smart CDN optimizes both performance and content accuracy, providing 
     heroImage: 'https://www.youtube-nocookie.com/embed/NpEl20iuOtg',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn/smart-cdn',
     slug: 'smart-cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Image transformations',
@@ -1095,6 +1227,10 @@ Supabase's Image Transformations feature enables you to efficiently manage and s
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
     docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
     slug: 'image-transformations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Resumable uploads',
@@ -1131,6 +1267,10 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
     heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
     slug: 'resumable-uploads',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'S3 compatibility',
@@ -1168,6 +1308,10 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   // Functions
   {
@@ -1207,6 +1351,10 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Regional invocations',
@@ -1238,6 +1386,10 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'NPM compatibility',
@@ -1269,6 +1421,10 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
     docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Vector
   {
@@ -1301,6 +1457,10 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Platform
   {
@@ -1334,6 +1494,10 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Management API',
@@ -1366,6 +1530,10 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/project-management/api',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Role-Based Access Control (RBAC)',
@@ -1398,6 +1566,10 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Analytics
   {
@@ -1430,6 +1602,10 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SOC 2 Compliance',
@@ -1467,6 +1643,10 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/compliance',
     slug: 'soc-2-compliance',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Studio
   {
@@ -1490,6 +1670,10 @@ This feature is especially beneficial for teams looking to improve their databas
     docsUrl:
       'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
     slug: 'ai-query-assistance',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Logs & Analytics',
@@ -1512,6 +1696,10 @@ This feature is particularly valuable for teams looking to enhance their applica
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
     slug: 'logs-analytics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Visual Schema Designer',
@@ -1534,6 +1722,10 @@ This feature is particularly valuable for teams engaged in agile development pro
     heroImageLight: '/images/features/visual-schema-designer-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Policy Templates',
@@ -1556,6 +1748,10 @@ This feature is essential for organizations looking to maintain robust security 
     heroImageLight: '/images/features/policy-templates-light.png',
     docsUrl: '',
     slug: 'policy-templates',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SQL Editor',
@@ -1578,6 +1774,10 @@ This feature is particularly valuable for developers looking to streamline their
     heroImageLight: '/images/features/sql-editor-light.png',
     docsUrl: '',
     slug: 'sql-editor',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Security & Performance Advisor',
@@ -1600,6 +1800,10 @@ This feature is essential for organizations aiming to maintain high security sta
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
     docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
     slug: 'security-and-performance-advisor',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Postgres Roles',
@@ -1622,6 +1826,10 @@ This feature is particularly valuable for teams looking to implement robust secu
     heroImageLight: '/images/features/postgres-roles-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
     slug: 'postgres-roles',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Foreign Key Selector',
@@ -1644,6 +1852,10 @@ This feature is particularly beneficial for developers working with complex data
       'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
     docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Log Drains',
@@ -1665,5 +1877,9 @@ This feature is particularly useful for teams seeking to enhance their observabi
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
 ]
