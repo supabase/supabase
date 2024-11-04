@@ -116,13 +116,20 @@ const ColumnForeignKey = ({
           table={{
             id: table.id,
             name: table.name,
-            columns:
-              column.isNewColumn && column.name
-                ? (table.columns as any[]).concat(column)
-                : (table.columns as any[]).map((c) => {
-                    if (c.id === column.id) return { ...c, name: column.name }
-                    else return c
-                  }),
+            columns: (column.isNewColumn && column.name
+              ? (table.columns ?? []).concat(column as any)
+              : (table.columns ?? []).map((c) => {
+                  if (c.id === column.id) return { ...c, name: column.name }
+                  else return c
+                })
+            ).map((x) => {
+              return {
+                id: x.id,
+                name: x.name,
+                format: x.format,
+                isNewColumn: !!(x as unknown as ColumnField).isNewColumn,
+              }
+            }),
           }}
           foreignKey={selectedFk}
           onClose={() => {
