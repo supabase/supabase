@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { DISK_LIMITS, DiskType } from './DiskManagement.constants'
+import { DISK_LIMITS, DiskType } from './ui/DiskManagement.constants'
 
 const baseSchema = z.object({
   storageType: z.enum(['io2', 'gp3']).describe('Type of storage: io2 or gp3'),
