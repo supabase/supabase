@@ -1,1 +1,1 @@
-export * from './vercel-toolbar'
+export * from './vercel-toolbar-provider'

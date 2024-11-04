@@ -53,7 +53,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { VercelToolbarProvider } from 'next-providers/vercel-toolbar'
+import { VercelToolbarProvider } from 'next-providers/vercel-toolbar-provider'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
