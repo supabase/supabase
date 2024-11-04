@@ -53,6 +53,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { VercelToolbarProvider } from 'next-providers/vercel-toolbar'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -157,6 +158,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <GenerateSql />
                                 <FeaturePreviewModal />
                                 <AiAssistantPanel />
+                                <VercelToolbarProvider />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                             <SonnerToaster position="top-right" />

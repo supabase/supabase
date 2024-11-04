@@ -78,6 +78,7 @@
     "monaco-editor": "0.33.0",
     "motion-number": "^0.1.7",
     "next": "^14.2.10",
+    "next-providers": "*",
     "next-themes": "^0.3.0",
     "nuqs": "^1.17.8",
     "openai": "^4.20.1",
