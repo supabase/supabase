@@ -19,6 +19,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
+  const showDiskAndComputeForm = useFlag('diskAndComputeForm')
   const project = useSelectedProject()
 
   const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
@@ -40,7 +41,12 @@ const ProjectSettings: NextPageWithLayout = () => {
           </div>
 
           <SSLConfiguration />
-          {showNewDiskManagementUI ? <DiskManagementPanelForm /> : <DiskSizeConfiguration />}
+          {showNewDiskManagementUI ? (
+            // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
+            <DiskManagementPanelForm />
+          ) : (
+            <DiskSizeConfiguration />
+          )}
           <NetworkRestrictions />
           <BannedIPs />
         </div>

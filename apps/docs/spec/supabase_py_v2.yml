@@ -7258,7 +7258,7 @@ functions:
             "full_path": "avatars/folder/cat.jpg"
           }
           ```
-  
+
   - id: from-get-public-url
     title: 'from_.get_public_url()'
     description: |
@@ -7457,7 +7457,7 @@ functions:
             }
           ]
           ```
-  
+
   - id: from-list
     title: 'from_.list()'
     description: Lists all the files within a bucket.

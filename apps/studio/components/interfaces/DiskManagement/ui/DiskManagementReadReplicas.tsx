@@ -1,5 +1,4 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -10,7 +9,7 @@ import {
   AlertTitle_Shadcn_ as AlertTitle,
   InfoIcon,
 } from 'ui'
-import BillingChangeBadge from './BillingChangeBadge'
+import { BillingChangeBadge } from './BillingChangeBadge'
 import { DISK_LIMITS, DISK_PRICING, DiskType } from './DiskManagement.constants'
 
 interface DiskManagementDiskSizeReadReplicasProps {
@@ -31,7 +30,6 @@ export const DiskManagementDiskSizeReadReplicas = ({
   newStorageType,
 }: DiskManagementDiskSizeReadReplicasProps) => {
   const { ref: projectRef } = useParams()
-  const [isOpen, setIsOpen] = useState(false)
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
@@ -155,7 +153,7 @@ export const DiskManagementIOPSReadReplicas = ({
   if (readReplicas.length === 0) return null
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isDirty && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
@@ -218,7 +216,7 @@ export const DiskManagementThroughputReadReplicas = ({
   if (readReplicas.length === 0) return null
 
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       {isDirty && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
