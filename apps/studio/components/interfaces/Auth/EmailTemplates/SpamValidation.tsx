@@ -1,10 +1,9 @@
 import { Check } from 'lucide-react'
 
-import Table from 'components/to-be-cleaned/Table'
+import { Markdown } from 'components/interfaces/Markdown'
 import InformationBox from 'components/ui/InformationBox'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
-import { cn, WarningIcon } from 'ui'
-import { Markdown } from 'components/interfaces/Markdown'
+import { cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, WarningIcon } from 'ui'
 
 interface SpamValidationProps {
   validationResult?: ValidateSpamResponse
@@ -37,18 +36,22 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
                     ? ` Rectify the following issues to improve your email's deliverability in order of priority:`
                     : ` Address the following issues to improve your email's deliverability:`}
                 </p>
-                <Table
-                  head={[
-                    <Table.th key="name">Warning</Table.th>,
-                    <Table.th key="desc">Description</Table.th>,
-                  ]}
-                  body={spamRules.map((rule) => (
-                    <Table.tr key={rule.name}>
-                      <Table.td>{rule.name}</Table.td>
-                      <Table.td>{rule.desc}</Table.td>
-                    </Table.tr>
-                  ))}
-                />
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Warning</TableHead>
+                      <TableHead>Description</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {spamRules.map((rule) => (
+                      <TableRow key={rule.name}>
+                        <TableCell>{rule.name}</TableCell>
+                        <TableCell>{rule.desc}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
                 <Markdown
                   className="!max-w-none"
                   content="Spam validation is powered by [SpamAssassin](https://spamassassin.apache.org/doc.html). Full list of all available warnings can be found [here](https://gist.github.com/ychaouche/a2faff159c2a1fea16019156972c7f8b)."
