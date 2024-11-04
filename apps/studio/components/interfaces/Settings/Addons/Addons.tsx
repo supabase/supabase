@@ -233,7 +233,7 @@ const Addons = () => {
                       </div>
                     )}
 
-                    {true ? (
+                    {!diskAndComputeFormEnabled ? (
                       <ProjectUpdateDisabledTooltip
                         projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                         projectNotActive={!isProjectActive}
@@ -346,40 +346,44 @@ const Addons = () => {
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
-                    <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Max Disk Throughput
+                    {!diskAndComputeFormEnabled && (
+                      <>
+                        <div className="w-full flex items-center justify-between border-b py-2">
+                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
+                            <div className="group flex items-center space-x-2">
+                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                                Max Disk Throughput
+                              </p>
+                              <ChevronRight
+                                strokeWidth={1.5}
+                                size={16}
+                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                              />
+                            </div>
+                          </Link>
+                          <p className="text-sm">
+                            {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                           </p>
-                          <ChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
                         </div>
-                      </Link>
-                      <p className="text-sm">
-                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                      </p>
-                    </div>
-                    <div className="w-full flex items-center justify-between py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Baseline Disk Throughput
+                        <div className="w-full flex items-center justify-between py-2">
+                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
+                            <div className="group flex items-center space-x-2">
+                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                                Baseline Disk Throughput
+                              </p>
+                              <ChevronRight
+                                strokeWidth={1.5}
+                                size={16}
+                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                              />
+                            </div>
+                          </Link>
+                          <p className="text-sm">
+                            {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                           </p>
-                          <ChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
                         </div>
-                      </Link>
-                      <p className="text-sm">
-                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                      </p>
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
