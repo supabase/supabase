@@ -1,0 +1,20 @@
+{
+  "name": "next-providers",
+  "version": "0.0.0",
+  "license": "MIT",
+  "main": "./index.tsx",
+  "repository": "supabase/supabase",
+  "dependencies": {
+    "@vercel/toolbar": "^0.1.22",
+    "common": "*"
+  },
+  "devDependencies": {
+    "typescript": "~5.5.0",
+    "tsconfig": "*"
+  },
+  "peerDependencies": {
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
+  }
+}
