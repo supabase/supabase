@@ -1,4 +1,4 @@
-import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,22 +31,7 @@ import {
   useSnippets,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  Separator,
-  Skeleton,
-  TreeView,
-  Button,
-} from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
-import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { Separator, Skeleton, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -54,6 +39,9 @@ import {
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
 } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
+import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -83,11 +71,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const [selectedSnippetToRename, setSelectedSnippetToRename] = useState<Snippet>()
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
-
-  const COLLAPSIBLE_TRIGGER_CLASS_NAMES =
-    'flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90'
-  const COLLAPSIBLE_ICON_CLASS_NAMES = 'text-foreground-light transition-transform duration-200'
-  const COLLASIBLE_HEADER_CLASS_NAMES = 'text-foreground-light font-mono text-sm uppercase'
 
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
@@ -497,19 +480,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
             </>
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <InnerSideBarEmptyPanel
-              className="mx-3"
+              className="mx-3 px-4"
               title="No queries created yet"
-              description="Start writing in the edtior and it will auto save."
-              actions={
-                <Button
-                  type="default"
-                  onClick={() => {
-                    // handle create query here
-                  }}
-                >
-                  Create query
-                </Button>
-              }
+              description="Queries will be automatically saved once you start writing in the editor"
             />
           ) : (
             <TreeView
