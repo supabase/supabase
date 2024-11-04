@@ -418,7 +418,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                 <InnerSideBarEmptyPanel
                   title="No favorite queries"
                   className="mx-2"
-                  // @ts-expect-error - TODO: Fix this
                   description={
                     <>
                       Save a query to favorites for easy accessbility by clicking the{' '}
@@ -500,7 +499,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
             <InnerSideBarEmptyPanel
               className="mx-3"
               title="No queries created yet"
-              description="Something something something"
+              description="Start writing in the edtior and it will auto save."
               actions={
                 <Button
                   type="default"

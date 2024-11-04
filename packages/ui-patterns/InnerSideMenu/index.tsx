@@ -226,7 +226,7 @@ const InnerSideBarEmptyPanel = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<'div'> & {
     title: string
-    description?: string
+    description?: string | React.ReactNode
     illustration?: React.ReactNode
     actions?: React.ReactNode
   }
