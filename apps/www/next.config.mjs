@@ -69,6 +69,12 @@ const nextConfig = {
             value: 'DENY',
           },
         ],
+        has: [
+          {
+            type: 'host',
+            value: 'supabase.com',
+          },
+        ],
       },
       {
         source: '/.well-known/vercel/flags',
