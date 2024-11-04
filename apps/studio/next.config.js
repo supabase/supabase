@@ -516,6 +516,7 @@ const nextConfig = {
     'api-types',
     'icons',
     'libpg-query',
+    'providers',
   ],
   webpack(config) {
     config.module?.rules

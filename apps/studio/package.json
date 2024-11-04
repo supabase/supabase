@@ -120,6 +120,7 @@
     "tus-js-client": "^4.1.0",
     "ui": "*",
     "ui-patterns": "*",
+    "next-providers": "*",
     "uuid": "^9.0.1",
     "valtio": "^1.12.0",
     "vite-tsconfig-paths": "^4.3.2",
