@@ -88,7 +88,7 @@ export function DiskSizeField({
           name="totalSize"
           control={control}
           render={({ field }) => (
-            <FormItemLayout label="Disk Size" layout="vertical">
+            <FormItemLayout label="Disk Size" layout="vertical" id={field.name}>
               <div className="relative flex gap-2 items-center">
                 <InputPostTab label="GB">
                   {isLoading ? (
@@ -104,6 +104,7 @@ export function DiskSizeField({
                     <FormControl_Shadcn_>
                       <Input_Shadcn_
                         type="number"
+                        id={field.name}
                         {...field}
                         disabled={disableInput || isError}
                         className="w-32 font-mono rounded-r-none"

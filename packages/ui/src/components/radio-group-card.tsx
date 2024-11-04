@@ -48,7 +48,7 @@ const RadioGroupCardItem = React.forwardRef<
       )}
     >
       {props.children}
-      <div className="flex gap-2 w-full">
+      <label className="flex gap-2 w-full" id={props.id} htmlFor={props.value}>
         {showIndicator && (
           <div
             className="
@@ -70,9 +70,9 @@ const RadioGroupCardItem = React.forwardRef<
           </div>
         )}
 
-        <label
-          htmlFor={props.value}
+        <div
           className={cn(
+            'w-full',
             'text-xs transition-colors text-left',
             'text-light',
             'group-hover:text-foreground group-data-[state=checked]:text-foreground',
@@ -80,8 +80,8 @@ const RadioGroupCardItem = React.forwardRef<
           )}
         >
           {label}
-        </label>
-      </div>
+        </div>
+      </label>
     </RadioGroupPrimitive.Item>
   )
 })
