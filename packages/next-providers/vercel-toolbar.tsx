@@ -1,8 +1,7 @@
 import { VercelToolbar } from '@vercel/toolbar/next'
 import { useUser } from 'common'
-import { PropsWithChildren } from 'react'
 
-export function VercelToolbarProvider({ children }: PropsWithChildren<{}>) {
+export function VercelToolbarProvider() {
   const user = useUser()
 
   const isSupabaseTeam =
