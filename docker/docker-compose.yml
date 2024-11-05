@@ -496,7 +496,10 @@ services:
       timeout: 5s
       retries: 5
     depends_on:
-      rest:
+      db:
+        # Disable this if you are using an external Postgres database
+        condition: service_healthy
+      analytics:
         condition: service_healthy
     restart: unless-stopped
     volumes:
