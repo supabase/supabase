@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-query'
+import { User } from 'data/auth/users-infinite-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import {
   Button,
