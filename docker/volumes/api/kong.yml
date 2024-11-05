@@ -1,4 +1,4 @@
-_format_version: "2.1"
+_format_version: '2.1'
 _transform: true
 
 ###
@@ -65,7 +65,7 @@ services:
 
   ## Secure Auth routes
   - name: auth-v1
-    _comment: "GoTrue: /auth/v1/* -> http://auth:9999/*"
+    _comment: 'GoTrue: /auth/v1/* -> http://auth:9999/*'
     url: http://auth:9999/
     routes:
       - name: auth-v1-all
@@ -86,7 +86,7 @@ services:
 
   ## Secure REST routes
   - name: rest-v1
-    _comment: "PostgREST: /rest/v1/* -> http://rest:3000/*"
+    _comment: 'PostgREST: /rest/v1/* -> http://rest:3000/*'
     url: http://rest:3000/
     routes:
       - name: rest-v1-all
@@ -107,7 +107,7 @@ services:
 
   ## Secure GraphQL routes
   - name: graphql-v1
-    _comment: "PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql"
+    _comment: 'PostgREST: /graphql/v1/* -> http://rest:3000/rpc/graphql'
     url: http://rest:3000/rpc/graphql
     routes:
       - name: graphql-v1-all
@@ -133,7 +133,7 @@ services:
 
   ## Secure Realtime routes
   - name: realtime-v1-ws
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
     url: http://realtime-dev.supabase-${PROJECT_NAME}-realtime:4000/socket
     # url: http://realtime:4000/socket
     protocol: ws
@@ -154,8 +154,8 @@ services:
             - admin
             - anon
   - name: realtime-v1-rest
-    _comment: "Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*"
-    url: http://realtime-dev.supabase-${PROJECT_NAME}-realtime:4000/api
+    _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
+  url: http://realtime-dev.supabase-${PROJECT_NAME}realtime:4000/api
     # url: http://realtime:4000/api
     protocol: http
     routes:
@@ -176,7 +176,7 @@ services:
             - anon
   ## Storage routes: the storage server manages its own auth
   - name: storage-v1
-    _comment: "Storage: /storage/v1/* -> http://storage:5000/*"
+    _comment: 'Storage: /storage/v1/* -> http://storage:5000/*'
     url: http://storage:5000/
     routes:
       - name: storage-v1-all
@@ -188,7 +188,7 @@ services:
 
   ## Edge Functions routes
   - name: functions-v1
-    _comment: "Edge Functions: /functions/v1/* -> http://functions:9000/*"
+    _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
     routes:
       - name: functions-v1-all
@@ -200,7 +200,7 @@ services:
 
   ## Analytics routes
   - name: analytics-v1
-    _comment: "Analytics: /analytics/v1/* -> http://logflare:4000/*"
+    _comment: 'Analytics: /analytics/v1/* -> http://logflare:4000/*'
     url: http://analytics:4000/
     routes:
       - name: analytics-v1-all
@@ -210,7 +210,7 @@ services:
 
   ## Secure Database routes
   - name: meta
-    _comment: "pg-meta: /pg/* -> http://pg-meta:8080/*"
+    _comment: 'pg-meta: /pg/* -> http://pg-meta:8080/*'
     url: http://meta:8080/
     routes:
       - name: meta-all
@@ -229,7 +229,7 @@ services:
 
   ## Protected Dashboard - catch all remaining routes
   - name: dashboard
-    _comment: "Studio: /* -> http://studio:3000/*"
+    _comment: 'Studio: /* -> http://studio:3000/*'
     url: http://studio:3000/
     routes:
       - name: dashboard-all
@@ -243,7 +243,7 @@ services:
           hide_credentials: true
   ## Fastify Functions routes
   - name: fastify-v1
-    _comment: "FASTIFY Functions: /fastify/* -> http://172.17.0.1:11000/*"
+    _comment: 'FASTIFY Functions: /fastify/* -> http://172.17.0.1:11000/*'
     # url: http://172.17.0.1:11000/
     url: http://fastify:11000/
     routes:
@@ -255,7 +255,7 @@ services:
       - name: cors
   ## TRPC Docs routes
   - name: trpc-docs-v1
-    _comment: "TRPC Docs: /docs/* -> http://172.17.0.1:11000/*"
+    _comment: 'TRPC Docs: /docs/* -> http://172.17.0.1:11000/*'
     # url: http://172.17.0.1:11000/
     url: http://fastify:11000/
     routes:
@@ -265,3 +265,4 @@ services:
           - /docs/
     plugins:
       - name: cors
+
