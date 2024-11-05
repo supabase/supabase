@@ -361,6 +361,7 @@ function SidebarSkeleton({
   additionalNavItems,
 }: SkeletonProps) {
   const pathname = usePathname()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()

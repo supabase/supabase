@@ -43,6 +43,8 @@ const AnalyticsConfigPage = async () => {
                       .map((param: ReturnType<typeof specAnalyticsV0>['parameters']) => {
                         return (
                           <Param
+                            id={param.id}
+                            section={tag.id}
                             name={param.title}
                             type={param.type}
                             description={param.description}

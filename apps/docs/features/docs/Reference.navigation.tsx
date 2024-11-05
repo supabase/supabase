@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Fragment, type PropsWithChildren } from 'react'
 
 import { cn } from 'ui'
@@ -10,6 +11,7 @@ import {
   ReferenceNavigationScrollHandler,
 } from '~/features/docs/Reference.navigation.client'
 import { type AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
+import { SelfHostingDropdown } from '~/features/ui/SelfHostingDropdown'
 
 interface ReferenceNavigationProps {
   libraryId: string
@@ -22,7 +24,6 @@ interface ReferenceNavigationProps {
 
 export async function ReferenceNavigation({
   libraryId,
-  name,
   menuData,
   libPath,
   version,
@@ -38,9 +39,14 @@ export async function ReferenceNavigation({
     <ReferenceNavigationScrollHandler className="w-full flex flex-col pt-3 pb-5 gap-3">
       <div className="flex items-center gap-3">
         {'icon' in menuData && <MenuIconPicker icon={menuData.icon} width={21} height={21} />}
-        <span className="text-base text-brand-600">{name}</span>
+        <Link href="/guides/self-hosting" className="text-base text-brand-600">
+          Self-Hosting
+        </Link>
         <RefVersionDropdown library={libPath} currentVersion={version} />
       </div>
+      {libPath.startsWith('self-hosting-') && (
+        <SelfHostingDropdown service={libPath.replace('self-hosting-', '')} className="mb-2" />
+      )}
       <ul className="flex flex-col gap-2">
         {navSections.map((section) => (
           <Fragment key={section.id}>

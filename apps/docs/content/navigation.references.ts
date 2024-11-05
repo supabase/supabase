@@ -142,6 +142,7 @@ export const REFERENCES = {
     libPath: 'self-hosting-functions',
     versions: [],
     icon: 'reference-functions',
+    hasConfig: false,
   },
   self_hosting_realtime: {
     type: 'self-hosting',

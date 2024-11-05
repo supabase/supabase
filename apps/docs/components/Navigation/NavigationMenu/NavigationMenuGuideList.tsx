@@ -6,6 +6,7 @@ import { type NavMenuSection } from '../Navigation.types'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 import { usePathname } from 'next/navigation'
+import { PropsWithChildren } from 'react'
 
 const NavigationMenuGuideList = ({
   id,
@@ -37,6 +38,21 @@ const NavigationMenuGuideList = ({
   }
 
   return (
+    <NavigationMenuGuideListWrapper id={id} firstLevelRoute={firstLevelRoute}>
+      <NavigationMenuGuideListItems menu={menu} id={id} />
+    </NavigationMenuGuideListWrapper>
+  )
+}
+
+export function NavigationMenuGuideListWrapper({
+  id,
+  firstLevelRoute,
+  children,
+}: PropsWithChildren<{
+  id: string
+  firstLevelRoute?: string
+}>) {
+  return (
     <Accordion.Root
       collapsible={true}
       key={id}
@@ -44,7 +60,7 @@ const NavigationMenuGuideList = ({
       value={firstLevelRoute}
       className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
     >
-      <NavigationMenuGuideListItems menu={menu} id={id} />
+      {children}
     </Accordion.Root>
   )
 }
