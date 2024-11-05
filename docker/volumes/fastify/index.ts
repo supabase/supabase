@@ -65,7 +65,7 @@ await server.register(fastifySwaggerUi, {
 try {
 	console.log("Starting Server");
 	await server.listen({
-		host: process.env["HOST"] ?? "127.0.0.1",
+		host: process.env["HOST"] ?? "0.0.0.0",
 		port: Number.parseInt(process.env["PORT"] ?? "11000"),
 	});
 	console.log("Server started");
