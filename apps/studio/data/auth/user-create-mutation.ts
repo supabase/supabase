@@ -66,7 +66,6 @@ export const useUserCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const userManagementV2 = useFlag('userManagementV2')
 
   return useMutation<UserCreateData, ResponseError, UserCreateVariables>(
     (vars) => createUser(vars),
@@ -74,16 +73,10 @@ export const useUserCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        if (userManagementV2) {
-          Promise.all([
-            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-            queryClient.invalidateQueries(
-              sqlKeys.query(projectRef, authKeys.usersCount(projectRef))
-            ),
-          ])
-        } else {
-          await queryClient.invalidateQueries(authKeys.users(projectRef))
-        }
+        Promise.all([
+          queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+          queryClient.invalidateQueries(sqlKeys.query(projectRef, authKeys.usersCount(projectRef))),
+        ])
 
         await onSuccess?.(data, variables, context)
       },
