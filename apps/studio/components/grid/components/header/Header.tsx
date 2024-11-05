@@ -1,8 +1,7 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import saveAs from 'file-saver'
-import { ArrowUp, ChevronDown, Download, FileText, Trash, X } from 'lucide-react'
+import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
@@ -115,7 +114,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
       </div>
       {canAddNew && (
         <>
-          <div className="h-[20px] w-px border-r border-control"></div>
+          <div className="h-[20px] w-px border-r border-control" />
           <div className="flex items-center gap-2">
             {canCreateColumns && (
               <DropdownMenu>
@@ -378,75 +377,63 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   })
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
-        {editable && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
+    <div className="flex items-center gap-x-2">
+      {editable && (
+        <>
+          <ButtonTooltip
+            type="default"
+            size="tiny"
+            icon={<Trash />}
+            onClick={onRowsDelete}
+            disabled={allRowsSelected && isImpersonatingRole}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text:
+                  allRowsSelected && isImpersonatingRole
+                    ? 'Table truncation is not supported when impersonating a role'
+                    : undefined,
+              },
+            }}
+          >
+            {allRowsSelected
+              ? `Delete all rows in table`
+              : selectedRows.size > 1
+                ? `Delete ${selectedRows.size} rows`
+                : `Delete ${selectedRows.size} row`}
+          </ButtonTooltip>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
                 type="default"
                 size="tiny"
-                icon={<Trash />}
-                onClick={onRowsDelete}
-                disabled={allRowsSelected && isImpersonatingRole}
+                iconRight={<ChevronDown />}
+                loading={isExporting}
+                disabled={isExporting}
               >
-                {allRowsSelected
-                  ? `Delete all rows in table`
-                  : selectedRows.size > 1
-                    ? `Delete ${selectedRows.size} rows`
-                    : `Delete ${selectedRows.size} row`}
+                Export
               </Button>
-            </Tooltip.Trigger>
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button
-                  type="default"
-                  size="tiny"
-                  iconRight={<ChevronDown />}
-                  loading={isExporting}
-                  disabled={isExporting}
-                >
-                  Export
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-40">
-                <DropdownMenuItem onClick={onRowsExportCSV}>
-                  <span className="text-foreground-light">Export to CSV</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-40">
+              <DropdownMenuItem onClick={onRowsExportCSV}>
+                <span className="text-foreground-light">Export to CSV</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            {!allRowsSelected && totalRows > allRows.length && (
-              <>
-                <div className="h-6 ml-0.5">
-                  <Separator orientation="vertical" />
-                </div>
-                <Button type="text" onClick={() => onSelectAllRows()}>
-                  Select all rows in table
-                </Button>
-              </>
-            )}
-            {allRowsSelected && isImpersonatingRole && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      Table truncation is not supported when impersonating a role
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
-        )}
-      </div>
+          {!allRowsSelected && totalRows > allRows.length && (
+            <>
+              <div className="h-6 ml-0.5">
+                <Separator orientation="vertical" />
+              </div>
+              <Button type="text" onClick={() => onSelectAllRows()}>
+                Select all rows in table
+              </Button>
+            </>
+          )}
+        </>
+      )}
     </div>
   )
 }
