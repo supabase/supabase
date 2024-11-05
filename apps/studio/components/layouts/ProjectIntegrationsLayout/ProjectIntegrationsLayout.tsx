@@ -17,6 +17,7 @@ export interface ProjectIntegrationsLayoutProps {
 const ProjectIntegrationsMenu = () => {
   // if running on self-hosted, cron UI should be always enabled
   const cronUiEnabled = useFlag('cronUi') || !IS_PLATFORM
+  const queuesUiEnabled = useFlag('queues')
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -37,6 +38,7 @@ const ProjectIntegrationsMenu = () => {
         menu={generateProjectIntegrationsMenu(project, {
           pgNetExtensionExists,
           cronUiEnabled,
+          queuesUiEnabled,
           graphqlExtensionExists,
         })}
       />

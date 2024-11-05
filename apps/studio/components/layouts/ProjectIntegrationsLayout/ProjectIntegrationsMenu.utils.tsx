@@ -6,11 +6,13 @@ export const generateProjectIntegrationsMenu = (
   flags?: {
     pgNetExtensionExists: boolean
     cronUiEnabled: boolean
+    queuesUiEnabled: boolean
     graphqlExtensionExists: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, cronUiEnabled, graphqlExtensionExists } = flags || {}
+  const { pgNetExtensionExists, cronUiEnabled, queuesUiEnabled, graphqlExtensionExists } =
+    flags || {}
 
   return [
     {
@@ -60,12 +62,16 @@ export const generateProjectIntegrationsMenu = (
           items: [],
           label: 'BETA',
         },
-        {
-          name: 'Queues',
-          key: 'queues',
-          url: `/project/${ref}/integrations/queues`,
-          items: [],
-        },
+        ...(!!queuesUiEnabled
+          ? [
+              {
+                name: 'Queues',
+                key: 'queues',
+                url: `/project/${ref}/integrations/queues`,
+                items: [],
+              },
+            ]
+          : []),
       ],
     },
   ]
