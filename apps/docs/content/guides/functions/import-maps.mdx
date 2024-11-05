@@ -14,6 +14,12 @@ There are two ways to manage your dependencies in Supabase Edge Functions:
 
 ### Using deno.json (Recommended)
 
+<Admonition type="info">
+
+This feature requires Supabase CLI version 1.215.0 or higher.
+
+</Admonition>
+
 Each function can have its own `deno.json` or `deno.jsonc` file to manage dependencies and configure Deno-specific settings. For a complete list of supported options, see the [official Deno configuration documentation](https://docs.deno.com/runtime/manual/getting_started/configuration_file).
 
 ```json supabase/functions/my-function/deno.json
