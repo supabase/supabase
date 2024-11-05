@@ -155,7 +155,7 @@ services:
             - anon
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
-  url: http://realtime-dev.supabase-${PROJECT_NAME}realtime:4000/api
+    url: http://realtime-dev.supabase-${PROJECT_NAME}-realtime:4000/api
     # url: http://realtime:4000/api
     protocol: http
     routes:
