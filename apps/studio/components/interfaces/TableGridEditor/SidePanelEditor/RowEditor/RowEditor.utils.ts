@@ -49,7 +49,7 @@ export const generateRowFields = (
   const { primary_keys } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
-  return table.columns!.map((column) => {
+  return (table.columns ?? []).map((column) => {
     const value = getRowValue({ column, row })
     const foreignKey = foreignKeys.find((fk) => {
       return fk.columns.map((x) => x.source).includes(column.name)
