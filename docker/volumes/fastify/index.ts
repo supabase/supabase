@@ -3,7 +3,6 @@ import cors from "@fastify/cors";
 import fastify from "fastify";
 import fastifySwagger from "@fastify/swagger";
 import fastifySwaggerUi from "@fastify/swagger-ui";
-import fastifySupabase from "@psteinroe/fastify-supabase";
 import { fastifyTRPCOpenApiPlugin } from "trpc-openapi";
 import {
 	fastifyTRPCPlugin,
@@ -31,7 +30,6 @@ const server = fastify({
 
 // Setup CORS
 await server.register(cors);
-
 
 export async function createContext({ req, res }: CreateFastifyContextOptions) {
 	return { req, res, fastify: server };
@@ -64,8 +62,6 @@ await server.register(fastifySwaggerUi, {
 	uiConfig: { displayOperationId: true },
 });
 
-
-
 try {
 	console.log("Starting Server");
 	await server.listen({
@@ -76,11 +72,4 @@ try {
 } catch (err) {
 	server.log.error(err);
 	process.exit(1);
-}
-
-declare module "fastify" {
-	export interface FastifyRequest {
-		supabaseClient: SupabaseClient<Database>;
-		supabaseUser: User;
-	}
 }
