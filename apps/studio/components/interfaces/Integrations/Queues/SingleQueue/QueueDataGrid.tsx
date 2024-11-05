@@ -1,11 +1,11 @@
+import dayjs from 'dayjs'
 import { TextSearch } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import dayjs from 'dayjs'
-import { parseAsInteger, useQueryState } from 'nuqs'
 import { Badge, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
@@ -84,6 +84,42 @@ const messagesCols = [
   },
 ]
 
+const columns = messagesCols.map((col) => {
+  const result: Column<PostgresQueueMessage> = {
+    key: col.id,
+    name: col.name,
+    resizable: true,
+    minWidth: col.minWidth ?? 120,
+    width: col.width,
+    headerCellClass: 'first:pl-6 cursor-pointer',
+    renderHeaderCell: () => {
+      return (
+        <div className="flex items-center justify-between font-normal text-xs w-full">
+          <div className="flex items-center gap-x-2">
+            <p className="!text-foreground">{col.name}</p>
+            {col.description && <p className="text-foreground-lighter">{col.description}</p>}
+          </div>
+        </div>
+      )
+    },
+    renderCell: (props) => {
+      const value = col.value(props.row)
+
+      return (
+        <div
+          className={cn(
+            'w-full flex flex-col justify-center font-mono text-xs',
+            typeof value === 'number' ? 'text-right' : ''
+          )}
+        >
+          <span>{value}</span>
+        </div>
+      )
+    },
+  }
+  return result
+})
+
 export const QueueMessagesDataGrid = ({
   isLoading,
   messages,
@@ -98,42 +134,6 @@ export const QueueMessagesDataGrid = ({
     if (isLoading || !isAtBottom(event)) return
     fetchNextPage()
   }
-
-  const columns = messagesCols.map((col) => {
-    const result: Column<PostgresQueueMessage> = {
-      key: col.id,
-      name: col.name,
-      resizable: true,
-      minWidth: col.minWidth ?? 120,
-      width: col.width,
-      headerCellClass: 'first:pl-6 cursor-pointer',
-      renderHeaderCell: () => {
-        return (
-          <div className="flex items-center justify-between font-normal text-xs w-full">
-            <div className="flex items-center gap-x-2">
-              <p className="!text-foreground">{col.name}</p>
-              {col.description && <p className="text-foreground-lighter">{col.description}</p>}
-            </div>
-          </div>
-        )
-      },
-      renderCell: (props) => {
-        const value = col.value(props.row)
-
-        return (
-          <div
-            className={cn(
-              'w-full flex flex-col justify-center font-mono text-xs',
-              typeof value === 'number' ? 'text-right' : ''
-            )}
-          >
-            <span>{value}</span>
-          </div>
-        )
-      },
-    }
-    return result
-  })
 
   const selectedMessage = useMemo(
     () => messages.find((m) => m.msg_id === selectedMessageId),

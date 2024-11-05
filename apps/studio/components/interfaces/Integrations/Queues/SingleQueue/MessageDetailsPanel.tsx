@@ -87,64 +87,60 @@ export const MessageDetailsPanel = ({
           </TabsTrigger_Shadcn_>
         </TabsList_Shadcn_>
         <TabsContent_Shadcn_ value="details" className="w-full mt-0 overflow-y-auto grow">
-          {selectedMessage && (
-            <>
-              <div className="flex flex-col px-4 py-4 text-sm">
-                <RowData property="Message ID" value={`${selectedMessage.msg_id}`} />
-                <RowData
-                  property="Added at"
-                  value={dayjs(selectedMessage.enqueued_at).format(DATE_FORMAT)}
-                />
-                <RowData
-                  property="Available at"
-                  value={dayjs(selectedMessage.vt).format(DATE_FORMAT)}
-                />
-                <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
+          <div className="flex flex-col px-4 py-4 text-sm">
+            <RowData property="Message ID" value={`${selectedMessage.msg_id}`} />
+            <RowData
+              property="Added at"
+              value={dayjs(selectedMessage.enqueued_at).format(DATE_FORMAT)}
+            />
+            <RowData
+              property="Available at"
+              value={dayjs(selectedMessage.vt).format(DATE_FORMAT)}
+            />
+            <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
 
-                <div>
-                  <h3 className="text-foreground-light pt-1">Payload</h3>
-                  <MonacoEditor
-                    key={selectedMessage.msg_id}
-                    onChange={noop}
-                    width="100%"
-                    value={jsonString || 'NULL'}
-                    language="json"
-                    readOnly
-                  />
-                </div>
-              </div>
-              <Separator />
-              <div className="flex flex-col px-4 py-4">
-                {!selectedMessage.archived_at ? (
-                  <RowAction
-                    title="Archive message"
-                    description="The message will be marked as archived and hidden from future reads by consumers"
-                    button={{
-                      icon: <Archive />,
-                      text: 'Archive',
-                      isLoading: isLoading,
-                      onClick: () => {
-                        mutate({
-                          projectRef: project!.ref,
-                          connectionString: project?.connectionString,
-                          queryName: queueName!,
-                          messageId: selectedMessage.msg_id,
-                        })
-                      },
-                    }}
-                    success={
-                      isSuccess
-                        ? {
-                            title: 'Archived',
-                            description: 'The message is archived successfully.',
-                          }
-                        : undefined
-                    }
-                  />
-                ) : null}
-              </div>
-            </>
-          )}
+            <div>
+              <h3 className="text-foreground-light pt-1">Payload</h3>
+              <MonacoEditor
+                key={selectedMessage.msg_id}
+                onChange={noop}
+                width="100%"
+                value={jsonString || 'NULL'}
+                language="json"
+                readOnly
+              />
+            </div>
+          </div>
+          <Separator />
+          <div className="flex flex-col px-4 py-4">
+            {!selectedMessage.archived_at ? (
+              <RowAction
+                title="Archive message"
+                description="The message will be marked as archived and hidden from future reads by consumers"
+                button={{
+                  icon: <Archive />,
+                  text: 'Archive',
+                  isLoading: isLoading,
+                  onClick: () => {
+                    mutate({
+                      projectRef: project!.ref,
+                      connectionString: project?.connectionString,
+                      queryName: queueName!,
+                      messageId: selectedMessage.msg_id,
+                    })
+                  },
+                }}
+                success={
+                  isSuccess
+                    ? {
+                        title: 'Archived',
+                        description: 'The message is archived successfully.',
+                      }
+                    : undefined
+                }
+              />
+            ) : null}
+          </div>
         </TabsContent_Shadcn_>
       </Tabs_Shadcn_>
     </ResizablePanel>

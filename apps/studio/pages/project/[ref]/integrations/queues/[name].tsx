@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import DeleteQueue from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
@@ -39,12 +39,11 @@ const QueueMessagesPage: NextPageWithLayout = () => {
     },
     { staleTime: 30 }
   )
+  const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
   if (isLoading && isError) {
     return null
   }
-
-  const messages = data?.pages.flatMap((p) => p)
 
   return (
     <div className="h-full flex flex-col">

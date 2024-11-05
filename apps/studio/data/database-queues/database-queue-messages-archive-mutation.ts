@@ -50,8 +50,10 @@ export const useDatabaseQueueMessageArchiveMutation = ({
     DatabaseQueueMessageArchiveVariables
   >((vars) => archiveDatabaseQueueMessage(vars), {
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+      const { projectRef, queryName } = variables
+      await queryClient.invalidateQueries(
+        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
+      )
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
