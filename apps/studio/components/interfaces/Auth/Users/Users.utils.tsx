@@ -1,13 +1,13 @@
 import dayjs from 'dayjs'
+import { UserIcon } from 'lucide-react'
 import { UIEvent } from 'react'
 import { Column } from 'react-data-grid'
-import { UserIcon } from 'lucide-react'
 
-import { User } from 'data/auth/users-query'
+import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
-import { ColumnConfiguration, USERS_TABLE_COLUMNS, UsersTableColumn } from './UsersV2'
-import { HeaderCell } from './UsersGridComponents'
 import { cn } from 'ui'
+import { HeaderCell } from './UsersGridComponents'
+import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
 const SUPPORTED_CSP_AVATAR_URLS = [
   'https://avatars.githubusercontent.com',
