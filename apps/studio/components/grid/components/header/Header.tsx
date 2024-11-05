@@ -1,8 +1,7 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import saveAs from 'file-saver'
-import { ArrowUp, ChevronDown, Download, FileText, Trash, X } from 'lucide-react'
+import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Papa from 'papaparse'
 import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
@@ -378,27 +377,34 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   })
 
   return (
-    <div className="flex items-center gap-4">
-      <div className="flex items-center gap-2">
+    <div className="flex items-center gap-x-4">
+      <div className="flex items-center gap-x-2">
         {editable && (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
-              <Button
-                type="default"
-                size="tiny"
-                icon={<Trash />}
-                onClick={onRowsDelete}
-                disabled={allRowsSelected && isImpersonatingRole}
-              >
-                {allRowsSelected
-                  ? `Delete all rows in table`
-                  : selectedRows.size > 1
-                    ? `Delete ${selectedRows.size} rows`
-                    : `Delete ${selectedRows.size} row`}
-              </Button>
-            </Tooltip.Trigger>
+          <>
+            <ButtonTooltip
+              type="default"
+              size="tiny"
+              icon={<Trash />}
+              onClick={onRowsDelete}
+              disabled={allRowsSelected && isImpersonatingRole}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    allRowsSelected && isImpersonatingRole
+                      ? 'Table truncation is not supported when impersonating a role'
+                      : undefined,
+                },
+              }}
+            >
+              {allRowsSelected
+                ? `Delete all rows in table`
+                : selectedRows.size > 1
+                  ? `Delete ${selectedRows.size} rows`
+                  : `Delete ${selectedRows.size} row`}
+            </ButtonTooltip>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button
                   type="default"
                   size="tiny"
@@ -427,24 +433,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 </Button>
               </>
             )}
-            {allRowsSelected && isImpersonatingRole && (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      Table truncation is not supported when impersonating a role
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            )}
-          </Tooltip.Root>
+          </>
         )}
       </div>
     </div>
