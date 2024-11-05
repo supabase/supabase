@@ -1,10 +1,15 @@
+'use client'
+
 import * as Accordion from '@radix-ui/react-accordion'
 import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import React, { useEffect, useRef } from 'react'
+import React, { type PropsWithChildren, useEffect, useRef } from 'react'
 
+import { cn } from 'ui'
+
+import { NavMenuSection } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
@@ -141,18 +146,34 @@ const ContentLink = React.memo(function ContentLink(props: any) {
   )
 })
 
-const Content = (props) => {
-  const { menu, id } = props
+export function NavigationMenuGuideScaffold({ children }: PropsWithChildren) {
+  return <ul className={cn('relative w-full flex flex-col gap-0 pb-5')}>{children}</ul>
+}
 
+export function NavigationMenuGuideHeader({
+  id,
+  title,
+  href,
+  icon,
+}: {
+  id: string
+  title: string
+  href?: string
+  icon?: string
+}) {
   return (
-    <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
-      <Link href={menu.url ?? ''}>
-        <div className="flex items-center gap-3 my-3 text-brand-link">
-          <MenuIconPicker icon={menu.icon} />
-          <HeaderLink title={menu.title} url={menu.url} id={id} />
-        </div>
-      </Link>
+    <Link href={href ?? '#'}>
+      <div className="flex items-center gap-3 my-3 text-brand-link">
+        <MenuIconPicker icon={icon} />
+        <HeaderLink title={title} url={href} id={id} />
+      </div>
+    </Link>
+  )
+}
 
+export function NavigationMenuGuideListContents({ menu }: { menu: NavMenuSection }) {
+  return (
+    <>
       {menu.items.map((x) => {
         return (
           <div key={x.name}>
@@ -169,13 +190,24 @@ const Content = (props) => {
                   )
                 })}
               </div>
-            ) : (
+            ) : x.url ? (
               <ContentLink url={x.url} icon={x.icon} name={x.name} key={x.name} />
-            )}
+            ) : null}
           </div>
         )
       })}
-    </ul>
+    </>
+  )
+}
+
+const Content = (props) => {
+  const { menu, id } = props
+
+  return (
+    <NavigationMenuGuideScaffold>
+      <NavigationMenuGuideHeader id={id} title={menu.title} href={menu.url} icon={menu.icon} />
+      <NavigationMenuGuideListContents menu={menu} />
+    </NavigationMenuGuideScaffold>
   )
 }
 

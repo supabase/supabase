@@ -2,8 +2,8 @@ import { type PropsWithChildren } from 'react'
 
 import { IS_PLATFORM } from 'common'
 
-import { supabaseMisc } from '~/lib/supabaseMisc'
 import Layout from '~/layouts/guides'
+import { supabaseMisc } from '~/lib/supabaseMisc'
 
 const GuidesLayout = async ({ children }: PropsWithChildren) => {
   const partners = IS_PLATFORM ? await getPartners() : []

@@ -213,7 +213,7 @@ const MobileHeader = memo(function MobileHeader(props: MobileHeaderProps) {
         {mobileMenuOpen
           ? 'Close'
           : 'menuId' in props
-            ? levelsData[props.menuId]?.name ?? levelsData['home'].name
+            ? (levelsData[props.menuId]?.name ?? levelsData['home'].name)
             : props.menuName}
       </span>
     </div>
@@ -361,6 +361,7 @@ function SidebarSkeleton({
   additionalNavItems,
 }: SkeletonProps) {
   const pathname = usePathname()
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
