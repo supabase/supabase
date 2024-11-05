@@ -372,7 +372,12 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
       },
       {
         permanent: true,

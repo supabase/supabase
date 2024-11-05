@@ -177,7 +177,7 @@
     "link": "/guides/database/extensions/index_advisor",
     "github_url": "https://github.com/supabase/index_advisor",
     "product": "Index Advisor Report",
-    "product_url": "/project/{ref}/database/query-performance"
+    "product_url": "/project/{ref}/advisors/query-performance"
   },
   {
     "name": "intarray",
@@ -303,7 +303,7 @@
     "link": "/guides/database/extensions/pg_stat_statements",
     "github_url": null,
     "product": "Query Performance",
-    "product_url": "/project/{ref}/database/query-performance"
+    "product_url": "/project/{ref}/advisors/query-performance"
   },
   {
     "name": "pg_surgery",
