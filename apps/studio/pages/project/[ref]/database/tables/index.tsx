@@ -6,7 +6,7 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/get-table'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 

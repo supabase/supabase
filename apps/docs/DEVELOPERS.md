@@ -14,7 +14,7 @@ For a complete run-down on how all of our tools work together, see the main DEVE
 
 ## Local setup
 
-[supabase.com/docs](https://supabase.com/docs) is a Next.JS site. You can get setup by following the same steps for all of our other Next.JS projects:
+[supabase.com/docs](https://supabase.com/docs) is a Next.js site. You can get setup by following the same steps for all of our other Next.js projects:
 
 1. Follow the steps outlined in the Local Development section of the main [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md)
 2. If you work at Supabase, run `dev:secrets:pull` to pull down the internal environment variables. If you're a community member, create a `.env` file and add this line to it: `NEXT_PUBLIC_IS_PLATFORM=false`

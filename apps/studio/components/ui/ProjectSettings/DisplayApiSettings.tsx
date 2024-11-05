@@ -1,14 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
-import { Button, Input } from 'ui'
+import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { AlertCircle, BookOpen, Loader2 } from 'lucide-react'
+import { Button, Input } from 'ui'
 
 const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
   const { ref: projectRef } = useParams()
@@ -17,7 +16,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
     data: settings,
     isError: isProjectSettingsError,
     isLoading: isProjectSettingsLoading,
-  } = useProjectSettingsQuery({ projectRef })
+  } = useProjectSettingsV2Query({ projectRef })
   const {
     data,
     isError: isJwtSecretUpdateStatusError,
@@ -29,11 +28,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
 
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
-  // Get the API service
-  const apiService = (settings?.services ?? []).find(
-    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-  const apiKeys = apiService?.service_api_keys ?? []
+  const apiKeys = settings?.service_api_keys ?? []
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 

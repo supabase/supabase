@@ -1,22 +1,23 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ExternalLink, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Button } from 'ui'
+import { Badge } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
-import { Input } from 'ui-patterns/DataInputs/Input'
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
@@ -66,22 +67,16 @@ const EdgeFunctionSecrets = () => {
                   icon={<Search size={14} />}
                 />
                 <div className="flex items-center space-x-2">
-                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/functions/secrets"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton href="https://supabase.com/docs/guides/functions/secrets" />
                   <ButtonTooltip
                     disabled={!canUpdateSecrets}
                     onClick={() => setShowCreateSecret(true)}
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to update edge function secrets',
+                        text: !canUpdateSecrets
+                          ? 'You need additional permissions to update edge function secrets'
+                          : undefined,
                       },
                     }}
                   >
@@ -92,7 +87,12 @@ const EdgeFunctionSecrets = () => {
               <Table
                 head={[
                   <Table.th key="secret-name">Name</Table.th>,
-                  <Table.th key="secret-value">Digest</Table.th>,
+                  <Table.th key="secret-value" className="flex items-center gap-x-2">
+                    Digest{' '}
+                    <Badge color="scale" className="font-mono">
+                      SHA256
+                    </Badge>
+                  </Table.th>,
                   <Table.th key="actions" />,
                 ]}
                 body={

@@ -11,10 +11,12 @@ const VaultNavTabs = (props: PropsWithChildren<Props>) => {
   return (
     <NavMenu className="mb-4" aria-label="Vault menu">
       <NavMenuItem active={props.activeTab === 'secrets'}>
-        <Link href={`/project/${props.projRef}/settings/vault/secrets`}>Secrets Management</Link>
+        <Link href={`/project/${props.projRef}/integrations/vault/secrets`}>
+          Secrets Management
+        </Link>
       </NavMenuItem>
       <NavMenuItem active={props.activeTab === 'keys'}>
-        <Link href={`/project/${props.projRef}/settings/vault/keys`}>Encryption Keys</Link>
+        <Link href={`/project/${props.projRef}/integrations/vault/keys`}>Encryption Keys</Link>
       </NavMenuItem>
     </NavMenu>
   )

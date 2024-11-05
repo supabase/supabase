@@ -1,13 +1,18 @@
 import { noop } from 'lodash'
 import Link from 'next/link'
-import { AnchorHTMLAttributes, forwardRef } from 'react'
-import { cn } from 'ui'
-import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import {
+  AnchorHTMLAttributes,
+  cloneElement,
+  ComponentPropsWithoutRef,
+  forwardRef,
+  isValidElement,
+} from 'react'
+import { cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 import type { Route } from 'components/ui/ui.types'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
@@ -41,8 +46,18 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       `${isActive && '!bg-selection shadow-sm'}`,
     ]
 
+    const LinkComponent = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<typeof Link>>(
+      function LinkComponent(props, ref) {
+        if (route.linkComponent && isValidElement(route.linkComponent)) {
+          return cloneElement<any>(route.linkComponent, { ...props, ref })
+        }
+
+        return <Link ref={ref} {...props} />
+      }
+    )
+
     const linkContent = (
-      <Link
+      <LinkComponent
         role="button"
         aria-current={isActive}
         ref={ref}
@@ -73,7 +88,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
         >
           {route.label}
         </span>
-      </Link>
+      </LinkComponent>
     )
 
     if (!allowNavPanelToExpand) {

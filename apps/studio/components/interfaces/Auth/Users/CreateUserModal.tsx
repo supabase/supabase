@@ -1,13 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Lock, Mail } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
+import { useParams } from 'common'
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Button,
@@ -40,7 +40,11 @@ const CreateUserFormSchema = z.object({
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   const { ref: projectRef } = useParams()
 
-  const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
+  const {
+    data: settings,
+    isLoading,
+    isSuccess,
+  } = useProjectSettingsV2Query({ projectRef }, { enabled: visible })
 
   const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
@@ -56,8 +60,20 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     if (!isSuccess) {
       return toast.error(`Failed to create user: Error loading project config`)
     }
-    const { protocol, endpoint, serviceApiKey } = data.autoApiService
-    createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
+    const endpoint = settings?.app_config?.endpoint
+    const { serviceKey } = getAPIKeys(settings)
+
+    if (!endpoint) return toast.error(`Failed to create user: Unable to retrieve API endpoint`)
+    if (!serviceKey?.api_key)
+      return toast.error(`Failed to create user: Unable to retrieve API key`)
+
+    createUser({
+      projectRef,
+      endpoint,
+      protocol: 'https',
+      serviceApiKey: serviceKey.api_key,
+      user: values,
+    })
   }
 
   const form = useForm<z.infer<typeof CreateUserFormSchema>>({

@@ -9,7 +9,6 @@ import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -21,6 +20,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Button, Input } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
 
 /**
  * Filter tables by table name and policy name
@@ -133,17 +133,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<Search size={14} />}
             />
           </div>
-          <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-              >
-                Documentation
-              </a>
-            </Button>
-          </div>
+          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
         </div>
       </div>
 

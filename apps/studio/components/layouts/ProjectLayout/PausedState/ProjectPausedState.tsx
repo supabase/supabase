@@ -276,7 +276,9 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     tooltip={{
                       content: {
                         side: 'bottom',
-                        text: 'You need additional permissions to resume this project',
+                        text: !canResumeProject
+                          ? 'You need additional permissions to resume this project'
+                          : undefined,
                       },
                     }}
                   >

@@ -1,15 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import dayjs from 'dayjs'
-import { ExternalLink, Info } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ScaffoldContainer, ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import AlertError from 'components/ui/AlertError'
-import InformationBox from 'components/ui/InformationBox'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -17,7 +15,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Button, Listbox } from 'ui'
+import { Listbox } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
@@ -183,35 +182,21 @@ const Usage = () => {
 
       {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
-          <InformationBox
+          <Admonition
+            type="default"
             title="Usage filtered by project"
-            description={
-              <div className="space-y-3">
-                <p>
-                  You are currently viewing usage for the "
-                  {selectedProject?.name || selectedProjectRef}" project. Since your organization is
+            description={`You are currently viewing usage for the "
+                  ${selectedProject?.name || selectedProjectRef}" project. Since your organization is
                   using the new organization-based billing, the included quota is for your whole
                   organization and not just this project. For billing purposes, we sum up usage from
                   all your projects. To view your usage quota, set the project filter above back to
-                  "All Projects".
-                </p>
-                <div>
-                  <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                    <Link
-                      href="https://supabase.com/docs/guides/platform/org-based-billing"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Documentation
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            }
-            defaultVisibility
-            hideCollapse
-            icon={<Info />}
-          />
+                  "All Projects".`}
+          >
+            <DocsButton
+              abbrev={false}
+              href="https://supabase.com/docs/guides/platform/org-based-billing"
+            />
+          </Admonition>
         </ScaffoldContainer>
       ) : (
         <ScaffoldContainer id="restriction" className="mt-5">

@@ -4,7 +4,7 @@ import { RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
 import type { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
-import type { TableLike } from 'hooks/misc/useTable'
+import { TableLike } from 'data/table-editor/table-editor-query'
 import { Button } from 'ui'
 
 export type RefreshButtonProps = {

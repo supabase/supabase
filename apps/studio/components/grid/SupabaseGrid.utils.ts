@@ -1,12 +1,15 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
-import type { Filter } from 'components/grid/types'
 import { compact } from 'lodash'
-import type { Dictionary } from 'types'
+
+import type { Filter } from 'components/grid/types'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { TableLike } from 'data/table-editor/table-editor-query'
+import type { Dictionary, SchemaView } from 'types'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
 import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
-
 /**
  * Ensure that if editable is false, we should remove all editing actions
  * to prevent rare-case bugs with the UI
@@ -93,6 +96,7 @@ export function parseSupaTable(
         targetTableName: null,
         targetColumnName: null,
         deletionAction: undefined,
+        updateAction: undefined,
       },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
@@ -110,6 +114,7 @@ export function parseSupaTable(
       temp.foreignKey.targetTableName = relationship.target_table_name
       temp.foreignKey.targetColumnName = relationship.target_column_name
       temp.foreignKey.deletionAction = relationship.deletion_action
+      temp.foreignKey.updateAction = relationship.update_action
     }
     return temp
   })
@@ -122,6 +127,37 @@ export function parseSupaTable(
     columns: supaColumns,
     estimateRowCount: table.live_rows_estimate,
   }
+}
+
+export function getSupaTable({
+  selectedTable,
+  entityType,
+  encryptedColumns,
+}: {
+  selectedTable: TableLike
+  entityType?: ENTITY_TYPE
+  encryptedColumns?: string[]
+}) {
+  const isViewSelected =
+    entityType === ENTITY_TYPE.VIEW || entityType === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isForeignTableSelected = entityType === ENTITY_TYPE.FOREIGN_TABLE
+
+  return !isViewSelected && !isForeignTableSelected
+    ? parseSupaTable(
+        {
+          table: selectedTable as PostgresTable,
+          columns: (selectedTable as PostgresTable).columns ?? [],
+          primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
+          relationships: (selectedTable as PostgresTable).relationships ?? [],
+        },
+        encryptedColumns
+      )
+    : parseSupaTable({
+        table: selectedTable as SchemaView,
+        columns: (selectedTable as SchemaView).columns ?? [],
+        primaryKeys: [],
+        relationships: [],
+      })
 }
 
 export const saveStorageDebounced = AwesomeDebouncePromise(saveStorage, 500)

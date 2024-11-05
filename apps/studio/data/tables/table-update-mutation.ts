@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
+import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
@@ -58,8 +59,8 @@ export const useTableUpdateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, schema, id } = variables
         await Promise.all([
+          queryClient.invalidateQueries(sqlKeys.query(projectRef, ['table-editor', id])),
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(lintKeys.lint(projectRef)),
         ])
         await onSuccess?.(data, variables, context)
