@@ -489,7 +489,7 @@ services:
     command: 
       - /bin/sh
       - -c
-      - cd fastify && yarn && yarn build:start
+      - cd /home/node/fastify && yarn && yarn build:start
     healthcheck:
       test: curl -sSfL --head -o /dev/null "http://127.0.0.1:11000/api/health"
       interval: 10s
