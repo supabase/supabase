@@ -1,17 +1,16 @@
 import clsx from 'clsx'
+import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Badge, Button, Collapsible, SidePanel } from 'ui'
 
-import type { PostgresTable } from '@supabase/postgres-meta'
+import { Badge, Button, Collapsible, SidePanel } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
-import { ChevronDown, AlertCircle, ChevronRight, ArrowRight } from 'lucide-react'
 
 const MAX_ROWS = 20
 const MAX_HEADERS = 20
 
 interface SpreadsheetImportPreviewProps {
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   spreadsheetData: SpreadsheetData
   errors?: any[]
   selectedHeaders: string[]

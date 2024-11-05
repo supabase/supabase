@@ -12,7 +12,7 @@ import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
-import { getTable } from 'data/tables/get-table'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'
@@ -182,7 +182,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
       return setEventsError('Please select at least one event')
     }
 
-    const selectedTable = await getTable({
+    const selectedTable = await getTableEditor({
       id: values.table_id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,

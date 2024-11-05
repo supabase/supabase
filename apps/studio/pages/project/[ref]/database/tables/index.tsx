@@ -6,13 +6,13 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import type { Table } from 'data/tables/get-table'
+import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Table>()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Entity>()
 
   return (
     <>
@@ -40,7 +40,10 @@ const DatabaseTables: NextPageWithLayout = () => {
       </ScaffoldContainer>
 
       <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
-      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit} />
+      <SidePanelEditor
+        includeColumns
+        selectedTable={isTableLike(selectedTableToEdit) ? selectedTableToEdit : undefined}
+      />
     </>
   )
 }
