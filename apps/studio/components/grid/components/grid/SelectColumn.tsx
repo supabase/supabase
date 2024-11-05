@@ -1,6 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { Maximize2 } from 'lucide-react'
-import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useRef, useEffect } from 'react'
+import { ChangeEvent, InputHTMLAttributes, SyntheticEvent, useEffect, useRef } from 'react'
 import {
   CalculatedColumn,
   RenderCellProps,
@@ -144,10 +144,9 @@ function SelectCellFormatter({
             <Button
               type="text"
               size="tiny"
-              className="rdg-row__select-column__edit-action"
+              className="px-1 rdg-row__select-column__edit-action"
               icon={<Maximize2 />}
               onClick={onEditClick}
-              style={{ padding: '3px' }}
             />
           </Tooltip.Trigger>
           <Tooltip.Portal>

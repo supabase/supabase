@@ -12,6 +12,7 @@ import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -28,9 +29,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Tooltip_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -381,22 +379,13 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild>
-            <Button
-              type="link"
-              className="px-0.5 hover:bg-background"
-              icon={
-                <X
-                  size={12}
-                  className="text-foreground-light hover:text-foreground transition-colors"
-                />
-              }
-              onClick={deselectRows}
-            />
-          </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">Clear selection</TooltipContent_Shadcn_>
-        </Tooltip_Shadcn_>
+        <ButtonTooltip
+          type="link"
+          className="px-1 hover:bg-transparent"
+          icon={<X className="text-foreground-light hover:text-foreground transition-colors" />}
+          onClick={deselectRows}
+          tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}
+        />
 
         <DropdownMenu>
           <DropdownMenuTrigger>

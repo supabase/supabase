@@ -10,7 +10,6 @@ import {
 import { useUrlState } from 'hooks/ui/useUrlState'
 import RefreshButton from '../header/RefreshButton'
 import { Pagination } from './pagination'
-import { useTrackedState } from 'components/grid/store/Store'
 
 export interface FooterProps {
   isRefetching?: boolean
@@ -20,9 +19,6 @@ const Footer = ({ isRefetching }: FooterProps) => {
   const { project } = useProjectContext()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-
-  const state = useTrackedState()
-  const { selectedRows, allRowsSelected } = state
 
   const { data } = useTableEditorQuery({
     projectRef: project?.ref,
