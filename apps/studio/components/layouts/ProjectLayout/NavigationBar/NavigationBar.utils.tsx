@@ -62,7 +62,7 @@ export const generateProductRoutes = (
         (isProjectBuilding
           ? buildingUrl
           : isProjectActive
-            ? `/project/${ref}/database/tables`
+            ? `/project/${ref}/database/schemas`
             : `/project/${ref}/database/backups/scheduled`),
     },
     ...(authEnabled
