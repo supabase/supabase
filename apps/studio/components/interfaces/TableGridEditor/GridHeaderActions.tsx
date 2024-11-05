@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
@@ -7,9 +6,11 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useTrackedState } from 'components/grid/store/Store'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -20,11 +21,19 @@ import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
-import { useTrackedState } from 'components/grid/store/Store'
 
 export interface GridHeaderActionsProps {
   table: TableLike
@@ -163,68 +172,43 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
   return (
     <>
       {showHeaderActions && (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-x-2">
           {isReadOnly && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger className="w-full">
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <div className="border border-strong rounded bg-overlay-hover px-3 py-1 text-xs">
                   Viewing as read-only
                 </div>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to manage your project's data
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom">
+                You need additional permissions to manage your project's data
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
           {isTable ? (
             (table as PostgresTable).rls_enabled ? (
               <>
                 {policies.length < 1 && !isLocked ? (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild className="w-full">
-                      <Button
-                        asChild
-                        type="default"
-                        className="group"
-                        icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
-                      >
-                        <Link
-                          passHref
-                          href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
-                        >
-                          Add RLS policy
-                        </Link>
-                      </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="bottom">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <div className="text-xs text-foreground p-1 leading-relaxed">
-                            <p>RLS is enabled for this table, but no policies are set. </p>
-                            <p>Select queries may return 0 results.</p>
-                          </div>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    asChild
+                    type="default"
+                    className="group"
+                    icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        className: 'w-[280px]',
+                        text: 'RLS is enabled for this table, but no policies are set. Select queries may return 0 results.',
+                      },
+                    }}
+                  >
+                    <Link
+                      passHref
+                      href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                    >
+                      Add RLS policy
+                    </Link>
+                  </ButtonTooltip>
                 ) : (
                   <Button
                     asChild
