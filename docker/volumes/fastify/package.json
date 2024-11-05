@@ -1,0 +1,65 @@
+{
+    "name": "fastify",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+      "watch": "nodemon ./index.ts",
+      "build": "tsc -p tsconfig.json;",
+      "start:builded": "node build/index.js",
+      "start": "npx tsx ./index.ts",
+      "build:start": "yarn run build && yarn run start:builded",
+      "stripe-listen": "stripe listen --forward-to http://127.0.0.1:11000/trpc/stripePlatform.handleStripeWebhooks"
+    },
+    "type": "module",
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+      "@fastify/cors": "^9.0.1",
+      "@fastify/jwt": "^8.0.1",
+      "@fastify/swagger": "^8.14.0",
+      "@fastify/swagger-ui": "^4.0.0",
+      "@langchain/community": "^0.2.21",
+      "@langchain/core": "^0.2.18",
+      "@langchain/langgraph": "^0.0.34",
+      "@mailchimp/mailchimp_marketing": "^3.0.80",
+      "@mozilla/readability": "^0.5.0",
+      "@psteinroe/fastify-supabase": "^0.0.2",
+      "@sendgrid/mail": "^8.1.3",
+      "@sinclair/typebox": "^0.32.34",
+      "@supabase/supabase-js": "^2.43.5",
+      "@trpc/server": "^10.45.2",
+      "@types/imapflow": "^1.0.19",
+      "@types/pg": "^8.11.6",
+      "axios": "^1.7.5",
+      "base64-arraybuffer": "^1.0.2",
+      "cheerio": "^1.0.0-rc.12",
+      "date-fns": "^3.6.0",
+      "dotenv": "^16.4.5",
+      "fastify": "^4.28.0",
+      "fastify-plugin": "^4.5.1",
+      "imapflow": "^1.0.164",
+      "jsdom": "^24.1.1",
+      "langchain": "^0.2.11",
+      "openai": "^4.55.0",
+      "pdfjs-serverless": "^0.5.1",
+      "pg": "^8.12.0",
+      "puppeteer": "^22.15.0",
+      "stripe": "^16.6.0",
+      "trpc-openapi": "^1.2.0",
+      "whatsapp-web.js": "^1.26.0",
+      "zod": "^3.23.8"
+    },
+    "devDependencies": {
+      "@types/mailchimp__mailchimp_marketing": "^3.0.20",
+      "@types/node": "^20.14.8",
+      "typescript": "^5.5.3"
+    },
+    "overrides": {
+      "string-width": "4.2.3"
+    },
+    "resolutions": {
+      "string-width": "4.2.3"
+    }
+  }
+  

@@ -1,0 +1,23 @@
+{
+    "$schema": "https://json.schemastore.org/tsconfig",
+    "compilerOptions": {
+      "target": "ES2022",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "esModuleInterop": true,
+      "strict": true,
+      "resolveJsonModule": true,
+      "removeComments": true,
+      "newLine": "lf",
+      "noUnusedLocals": false,
+      "noFallthroughCasesInSwitch": true,
+      "isolatedModules": true,
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true,
+      "incremental": true,
+      "lib": [
+        "ESNext"
+      ],
+      "outDir": "./build"
+    }
+  }
