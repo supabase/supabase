@@ -39,6 +39,10 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
+import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface PostgresVersionDetails {
   postgresEngine: string
@@ -62,9 +66,18 @@ const ProjectUpgradeAlert = () => {
   const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
+  const org = useSelectedOrganization()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   const projectUpgradeDisabled = useFlag('disableProjectUpgrade')
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+  const planId = subscription?.plan.id ?? 'free'
+
+  const { data: diskAttributes } = useDiskAttributesQuery({ projectRef: ref })
+  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
+  const includedDiskGB = includedDiskGBMeta[diskAttributes?.attributes.type ?? 'gp3']
+  const isDiskSizeUpdated = diskAttributes?.attributes.size_gb !== includedDiskGB
 
   const { data } = useProjectUpgradeEligibilityQuery({ projectRef: ref })
   const currentPgVersion = (data?.current_app_version ?? '').split('supabase-postgres-')[1]
@@ -166,6 +179,12 @@ const ProjectUpgradeAlert = () => {
                   All services will be offline and you will not be able to downgrade back to
                   Postgres {currentPgVersion}.
                 </p>
+                {isDiskSizeUpdated && (
+                  <p className="text-sm">
+                    Your disk size will also be reverted back to {includedDiskGB}GB from{' '}
+                    {diskAttributes?.attributes.size_gb}GB with the upgrade.
+                  </p>
+                )}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
                     <AlertCircle className="h-4 w-4" strokeWidth={2} />
