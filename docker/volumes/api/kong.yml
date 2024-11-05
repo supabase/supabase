@@ -134,7 +134,8 @@ services:
   ## Secure Realtime routes
   - name: realtime-v1-ws
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
-    url: http://realtime-dev.supabase-realtime:4000/socket
+    # url: http://realtime-dev.supabase-realtime:4000/socket
+    url: http://realtime:4000/socket
     protocol: ws
     routes:
       - name: realtime-v1-ws
@@ -154,7 +155,8 @@ services:
             - anon
   - name: realtime-v1-rest
     _comment: 'Realtime: /realtime/v1/* -> ws://realtime:4000/socket/*'
-    url: http://realtime-dev.supabase-realtime:4000/api
+    # url: http://realtime-dev.supabase-realtime:4000/api
+    url: http://realtime:4000/api
     protocol: http
     routes:
       - name: realtime-v1-rest
@@ -239,3 +241,28 @@ services:
       - name: basic-auth
         config:
           hide_credentials: true
+  ## Fastify Functions routes
+  - name: fastify-v1
+    _comment: 'FASTIFY Functions: /fastify/* -> http://172.17.0.1:11000/*'
+    # url: http://172.17.0.1:11000/
+    url: http://fastify:11000/
+    routes:
+      - name: fastify-v1-all
+        strip_path: true
+        paths:
+          - /fastify/
+    plugins:
+      - name: cors
+  ## TRPC Docs routes
+  - name: trpc-docs-v1
+    _comment: 'TRPC Docs: /docs/* -> http://172.17.0.1:11000/*'
+    # url: http://172.17.0.1:11000/
+    url: http://fastify:11000/
+    routes:
+      - name: trpc-docs-all
+        strip_path: false
+        paths:
+          - /docs/
+    plugins:
+      - name: cors
+

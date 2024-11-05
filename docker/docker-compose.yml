@@ -4,11 +4,11 @@
 #   Stop:           docker compose down
 #   Destroy:        docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down -v --remove-orphans
 
-name: supabase
+name: supabase-${PROJECT_NAME}
 
 services:
   studio:
-    container_name: supabase-studio
+    container_name: supabase-${PROJECT_NAME}-studio
     image: supabase/studio:20241014-c083b3b
     restart: unless-stopped
     healthcheck:
@@ -48,7 +48,7 @@ services:
       # NEXT_ANALYTICS_BACKEND_PROVIDER: bigquery
 
   kong:
-    container_name: supabase-kong
+    container_name: supabase-${PROJECT_NAME}-kong
     image: kong:2.8.1
     restart: unless-stopped
     # https://unix.stackexchange.com/a/294837
@@ -76,7 +76,7 @@ services:
       - ./volumes/api/kong.yml:/home/kong/temp.yml:ro
 
   auth:
-    container_name: supabase-auth
+    container_name: supabase-${PROJECT_NAME}-auth
     image: supabase/gotrue:v2.158.1
     depends_on:
       db:
@@ -159,7 +159,7 @@ services:
 
 
   rest:
-    container_name: supabase-rest
+    container_name: supabase-${PROJECT_NAME}-rest
     image: postgrest/postgrest:v12.2.0
     depends_on:
       db:
@@ -171,6 +171,7 @@ services:
     environment:
       PGRST_DB_URI: postgres://authenticator:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
+      PGRST_DB_EXTRA_SEARCH_PATH: ${PGRST_DB_EXTRA_SEARCH_PATH}
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
       PGRST_DB_USE_LEGACY_GUCS: "false"
@@ -180,7 +181,7 @@ services:
 
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
-    container_name: realtime-dev.supabase-realtime
+    container_name: realtime-dev.supabase-${PROJECT_NAME}-realtime
     image: supabase/realtime:v2.30.34
     depends_on:
       db:
@@ -224,7 +225,7 @@ services:
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
-    container_name: supabase-storage
+    container_name: supabase-${PROJECT_NAME}-storage
     image: supabase/storage-api:v1.11.13
     depends_on:
       db:
@@ -267,7 +268,7 @@ services:
       - ./volumes/storage:/var/lib/storage:z
 
   imgproxy:
-    container_name: supabase-imgproxy
+    container_name: supabase-${PROJECT_NAME}-imgproxy
     image: darthsim/imgproxy:v3.8.0
     healthcheck:
       test: [ "CMD", "imgproxy", "health" ]
@@ -283,7 +284,7 @@ services:
       - ./volumes/storage:/var/lib/storage:z
 
   meta:
-    container_name: supabase-meta
+    container_name: supabase-${PROJECT_NAME}-meta
     image: supabase/postgres-meta:v0.84.2
     depends_on:
       db:
@@ -301,7 +302,7 @@ services:
       PG_META_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   functions:
-    container_name: supabase-edge-functions
+    container_name: supabase-${PROJECT_NAME}-edge-functions
     image: supabase/edge-runtime:v1.59.0
     restart: unless-stopped
     depends_on:
@@ -323,7 +324,7 @@ services:
       - /home/deno/functions/main
 
   analytics:
-    container_name: supabase-analytics
+    container_name: supabase-${PROJECT_NAME}-analytics
     image: supabase/logflare:1.4.0
     healthcheck:
       test: [ "CMD", "curl", "http://localhost:4000/health" ]
@@ -366,7 +367,7 @@ services:
 
   # Comment out everything below this point if you are using an external Postgres database
   db:
-    container_name: supabase-db
+    container_name: supabase-${PROJECT_NAME}-db
     image: supabase/postgres:15.1.1.78
     healthcheck:
       test: pg_isready -U postgres -h localhost
@@ -413,7 +414,7 @@ services:
       - db-config:/etc/postgresql-custom
 
   vector:
-    container_name: supabase-vector
+    container_name: supabase-${PROJECT_NAME}-vector
     image: timberio/vector:0.28.1-alpine
     healthcheck:
       test:
@@ -438,7 +439,7 @@ services:
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
-    container_name: supabase-pooler
+    container_name: supabase-${PROJECT_NAME}-pooler
     image: supabase/supavisor:1.1.56
     healthcheck:
       test: curl -sSfL --head -o /dev/null "http://127.0.0.1:4000/api/health"
@@ -456,7 +457,7 @@ services:
       - /app/bin/migrate && /app/bin/supavisor eval "$$(cat /etc/pooler/pooler.exs)" && /app/bin/server
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:5432
+      - ${POSTGRES_EXT_PORT}:5432
       - ${POOLER_PROXY_PORT_TRANSACTION}:6543
     environment:
       - PORT=4000
@@ -475,8 +476,31 @@ services:
       - POOLER_DEFAULT_POOL_SIZE=${POOLER_DEFAULT_POOL_SIZE}
       - POOLER_MAX_CLIENT_CONN=${POOLER_MAX_CLIENT_CONN}
       - POOLER_POOL_MODE=transaction
+      - GLOBAL_DOWNSTREAM_CERT_PATH=/etc/pooler/fullchain.pem
+      - GLOBAL_DOWNSTREAM_KEY_PATH=/etc/pooler/privkey.pem
     volumes:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
+      - /etc/letsencrypt/live/$API_ADDRESS/fullchain.pem:/etc/pooler/fullchain.pem:ro
+      - /etc/letsencrypt/live/$API_ADDRESS/privkey.pem:/etc/pooler/privkey.pem:ro
+  
+  fastify:
+    container_name: supabase-${PROJECT_NAME}-fastify
+    image: node:22.11.0-alpine
+    command: 
+      - /bin/sh
+      - -c
+      - cd fastify && yarn && yarn build:start
+    healthcheck:
+      test: curl -sSfL --head -o /dev/null "http://127.0.0.1:11000/api/health"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      rest:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./volumes/fastify:/home/node/fastify
 
 volumes:
   db-config:
