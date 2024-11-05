@@ -47,6 +47,9 @@ const ColumnForeignKey = ({
     id,
   })
   const table = getTableLikeFromTableEditor(tableData)
+  const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
+    return { id: c.id, name: c.name, format: column.format, isNewColumn: false }
+  })
 
   const getRelationStatus = (fk: ForeignKey) => {
     const existingRelation = (data ?? []).find((x) => x.id === fk.id)
@@ -118,8 +121,8 @@ const ColumnForeignKey = ({
             name: table.name,
             columns:
               column.isNewColumn && column.name
-                ? (table.columns as any[]).concat(column)
-                : (table.columns as any[]).map((c) => {
+                ? formattedColumnsForFkSelector.concat(column)
+                : formattedColumnsForFkSelector.map((c) => {
                     if (c.id === column.id) return { ...c, name: column.name }
                     else return c
                   }),

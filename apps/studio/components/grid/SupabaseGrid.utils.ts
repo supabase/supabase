@@ -3,7 +3,6 @@ import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
 
 import type { Filter } from 'components/grid/types'
-import { ForeignKeyConstraintsData } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { TableLike } from 'data/table-editor/table-editor-query'
 import type { Dictionary, SchemaView } from 'types'
