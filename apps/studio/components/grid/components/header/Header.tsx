@@ -114,7 +114,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
       </div>
       {canAddNew && (
         <>
-          <div className="h-[20px] w-px border-r border-control"></div>
+          <div className="h-[20px] w-px border-r border-control" />
           <div className="flex items-center gap-2">
             {canCreateColumns && (
               <DropdownMenu>
