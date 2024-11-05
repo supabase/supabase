@@ -17,6 +17,7 @@ import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_
 import { TableNode } from './SchemaTableNode'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -63,7 +64,15 @@ export const SchemaGraph = () => {
     includeColumns: true,
   })
 
-  const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
+  const { data: policiesData } = useDatabasePoliciesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const policies = (policiesData ?? [])
+    .filter((policy) => policy.schema === selectedSchema)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const schema = (schemas ?? []).find((s) => s.name === selectedSchema) as PostgresSchema
   const [_, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
@@ -95,15 +104,15 @@ export const SchemaGraph = () => {
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
-      getGraphDataFromTables(ref as string, schema, tables as PostgresTable[]).then(
+      getGraphDataFromTables(ref as string, schema, tables as PostgresTable[], policies).then(
         ({ nodes, edges }) => {
           reactFlowInstance.setNodes(nodes)
           reactFlowInstance.setEdges(edges)
-          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+          setTimeout(() => reactFlowInstance.fitView({}))
         }
       )
     }
-  }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
+  }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme, policies])
 
   return (
     <>

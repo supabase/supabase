@@ -1,8 +1,26 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Link2, Table2 } from 'lucide-react'
-import { Handle, NodeProps } from 'reactflow'
+import {
+  DiamondIcon,
+  ExternalLink,
+  Eye,
+  Fingerprint,
+  Hash,
+  Key,
+  Lock,
+  Table2,
+  Unlock,
+} from 'lucide-react'
 import Link from 'next/link'
+import { Handle, NodeProps } from 'reactflow'
 
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { PostgresPolicy } from '@supabase/postgres-meta'
+import {
+  Button,
+  cn,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Separator,
+} from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320
@@ -22,6 +40,8 @@ export type TableNodeData = {
     name: string
     format: string
   }[]
+  policies?: PostgresPolicy[]
+  rls_enabled: boolean
 }
 
 const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNodeData>) => {
@@ -30,6 +50,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
   const hiddenNodeConnector = '!h-px !w-px !min-w-0 !min-h-0 !cursor-grab !border-0 !opacity-0'
 
   const itemHeight = 'h-[22px]'
+  console.log('the data', { data })
 
   return (
     <>
@@ -142,6 +163,101 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               )}
             </div>
           ))}
+          {!data.rls_enabled ? (
+            <div className="text-[7px] flex items-center gap-2 px-2 leading-5 relative flex-row justify-items-start border-t-[0.5px] bg-surface-200  cursor-default h-[22px]">
+              <Unlock size={8} strokeWidth={1} className="flex-shrink-0 text-warning-600" />
+              <span className="text-foreground-lighter">RLS disabled</span>
+            </div>
+          ) : (
+            <>
+              {(!data.policies || data.policies.length === 0) && (
+                <div className="text-[7px] flex items-center gap-2 px-2 leading-5 relative flex-row justify-items-start border-t-[0.5px] bg-surface-200  cursor-default h-[22px]">
+                  <Lock size={8} strokeWidth={1} className="flex-shrink-0 text-brand-600" />
+                  <span className="text-foreground-lighter">RLS enabled, no policies created.</span>
+                </div>
+              )}
+              {data.policies && data.policies.length > 0 && (
+                <div className="border-t-[0.5px]">
+                  {data.policies.map((policy) => (
+                    <>
+                      <div
+                        key={policy.id}
+                        className={cn(
+                          'text-[7px] leading-3 px-2 flex items-center gap-2 text-foreground-light',
+                          'bg-surface-100 ',
+                          'hover:bg-scale-500 transition cursor-default',
+                          itemHeight
+                        )}
+                      >
+                        <Lock size={8} strokeWidth={1} className="flex-shrink-0 text-brand-600" />
+                        <span className="truncate max-w-28">{policy.name}</span>
+
+                        <Popover_Shadcn_>
+                          <PopoverTrigger_Shadcn_ asChild className="ml-auto">
+                            <Button type="text" className="px-0 w-[16px] h-[16px] rounded">
+                              <Eye size={10} className="text-foreground-light" strokeWidth={1.25} />
+                            </Button>
+                          </PopoverTrigger_Shadcn_>
+                          <PopoverContent_Shadcn_ className="w-48 p-0" side="bottom" align="center">
+                            <div className="text-[7px] p-2">{policy.name}</div>
+                            <Separator />
+                            {[
+                              { key: 'action', label: 'as' },
+                              {
+                                key: 'roles',
+                                label: 'to',
+                                format: (roles: string[]) => roles.join(', '),
+                              },
+                              { key: 'command', label: 'for' },
+                              { key: 'definition', label: 'using', type: 'code' },
+                              { key: 'check', label: 'with check', type: 'code' },
+                            ].map(
+                              ({
+                                key,
+                                label,
+                                format,
+                                type,
+                              }: {
+                                key: string
+                                label: string
+                                format?: (value: string[]) => string
+                                type?: string
+                              }) => {
+                                const value = policy[key as keyof typeof policy]
+                                if (!value || (Array.isArray(value) && !value.length)) return null
+
+                                return (
+                                  <>
+                                    <div
+                                      key={key}
+                                      className={cn('flex items-center gap-2 mt-1 px-2 pb-1')}
+                                    >
+                                      <span className="font-mono min-w-4">{label}</span>
+                                      {type === 'code' ? (
+                                        <span className="font-mono break-words leading-snug max-w-24">
+                                          {format ? format(value as string[]) : value}
+                                        </span>
+                                      ) : format ? (
+                                        format(value as string[])
+                                      ) : (
+                                        value
+                                      )}
+                                    </div>
+                                    <Separator />
+                                  </>
+                                )
+                              }
+                            )}
+                          </PopoverContent_Shadcn_>
+                        </Popover_Shadcn_>
+                      </div>
+                      <Separator />
+                    </>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
         </div>
       )}
     </>

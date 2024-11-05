@@ -1,5 +1,5 @@
 import dagre from '@dagrejs/dagre'
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPolicy, PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
 import 'reactflow/dist/style.css'
@@ -7,6 +7,7 @@ import 'reactflow/dist/style.css'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { tryParseJson } from 'lib/helpers'
 import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNodeData } from './SchemaTableNode'
+import { HeaderEditor } from '@graphiql/react'
 
 const NODE_SEP = 25
 const RANK_SEP = 50
@@ -14,7 +15,8 @@ const RANK_SEP = 50
 export async function getGraphDataFromTables(
   ref: string,
   schema: PostgresSchema,
-  tables: PostgresTable[]
+  tables: PostgresTable[],
+  policies: PostgresPolicy[]
 ): Promise<{
   nodes: Node<TableNodeData>[]
   edges: Edge[]
@@ -22,7 +24,7 @@ export async function getGraphDataFromTables(
   if (!tables.length) {
     return { nodes: [], edges: [] }
   }
-
+  console.log('tables over HeaderEditor', tables)
   const nodes = tables.map((table) => {
     const columns = (table.columns || []).map((column) => {
       return {
@@ -37,6 +39,7 @@ export async function getGraphDataFromTables(
       }
     })
 
+    const tablePolicies = policies.filter((policy) => policy.table === table.name)
     return {
       id: `${table.id}`,
       type: 'table',
@@ -46,6 +49,8 @@ export async function getGraphDataFromTables(
         name: table.name,
         isForeign: false,
         columns,
+        rls_enabled: table.rls_enabled,
+        policies: tablePolicies,
       } as TableNodeData,
       position: { x: 0, y: 0 },
     }
