@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -11,6 +12,7 @@ import { Search } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CreateQueueSheet } from './CreateQueueSheet'
+import { QueuesDisabledState } from './QueuesDisabledState'
 import { QueuesRows } from './QueuesRows'
 
 export const QueuesListing = () => {
@@ -38,6 +40,7 @@ export const QueuesListing = () => {
   })
 
   const pgmqExtension = (extensions ?? []).find((ext) => ext.name === 'pgmq')
+  // TODO: Change this to true for local development to work
   const pgmqExtensionInstalled = pgmqExtension?.installed_version
 
   useEffect(() => {
@@ -52,8 +55,7 @@ export const QueuesListing = () => {
   // this avoid showing loading screen when the extension is not installed. Otherwise, we'll have to wait for three
   // retries (which are sure to fail because the extension is not installed)
   if (isLoadingExtensions) return <GenericSkeletonLoader />
-  // TODO: Uncomment this once pgmq goes into production PG builds
-  // if (!pgmqExtensionInstalled) return <QueuesDisabledState />
+  if (!pgmqExtensionInstalled) return <QueuesDisabledState />
   if (isLoading) return <GenericSkeletonLoader />
   if (isError) return <AlertError error={error} subject="Failed to retrieve database queues" />
 
@@ -120,11 +122,13 @@ export const QueuesListing = () => {
           />
         </SheetContent>
       </Sheet>
-      {/* <EnableExtensionModal
-        visible={showEnableExtensionModal}
-        extension={pgmqExtension}
-        onCancel={() => setShowEnableExtensionModal(false)}
-      /> */}
+      {pgmqExtension ? (
+        <EnableExtensionModal
+          visible={showEnableExtensionModal}
+          extension={pgmqExtension}
+          onCancel={() => setShowEnableExtensionModal(false)}
+        />
+      ) : null}
     </>
   )
 }

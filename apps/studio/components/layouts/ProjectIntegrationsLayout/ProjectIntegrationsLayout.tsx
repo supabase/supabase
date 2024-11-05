@@ -30,6 +30,7 @@ const ProjectIntegrationsMenu = () => {
 
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const graphqlExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_graphql') !== undefined
+  const pgmqExtensionExists = (data ?? []).find((ext) => ext.name === 'pgmq') !== undefined
 
   return (
     <>
@@ -40,6 +41,7 @@ const ProjectIntegrationsMenu = () => {
           cronUiEnabled,
           queuesUiEnabled,
           graphqlExtensionExists,
+          pgmqExtensionExists,
         })}
       />
     </>
