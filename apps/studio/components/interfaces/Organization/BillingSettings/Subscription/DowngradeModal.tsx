@@ -78,6 +78,7 @@ const DowngradeModal = ({
     <Modal
       size="large"
       alignFooter="right"
+      variant="warning"
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
