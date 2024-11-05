@@ -20,7 +20,7 @@ export type UsersVariables = {
 export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody']
 
-const getUsersSQL = ({
+export const getUsersSQL = ({
   page = 0,
   verified,
   keywords,

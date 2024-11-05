@@ -53,20 +53,13 @@ export const useUserUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const userManagementV2 = useFlag('userManagementV2')
 
   return useMutation<UserUpdateData, ResponseError, UserUpdateVariables>(
     (vars) => updateUser(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
-        if (userManagementV2) {
-          await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
-        } else {
-          await queryClient.invalidateQueries(authKeys.users(projectRef))
-        }
-
+        await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
