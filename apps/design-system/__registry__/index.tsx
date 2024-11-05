@@ -654,6 +654,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "dialog-centered-off": {
+      name: "dialog-centered-off",
+      type: "components:example",
+      registryDependencies: ["dialog","button"],
+      component: React.lazy(() => import("@/registry/default/example/dialog-centered-off")),
+      source: "",
+      files: ["registry/default/example/dialog-centered-off.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "drawer-demo": {
       name: "drawer-demo",
       type: "components:example",
