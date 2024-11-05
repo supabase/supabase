@@ -7,11 +7,11 @@ import z from 'zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
+  Badge,
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
@@ -25,9 +25,7 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
@@ -199,7 +197,12 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                                   </p>
                                 </div>
                               </div>
-                              {!pgPartmanExtensionInstalled &&
+                              {definition.value === 'partitioned' ? (
+                                <div className="pt-2 pl-10">
+                                  <Badge variant="warning">COMING SOON</Badge>
+                                </div>
+                              ) : null}
+                              {/* {!pgPartmanExtensionInstalled &&
                               definition.value === 'partitioned' ? (
                                 <div className="w-full flex gap-x-2 pl-11 py-2 items-center">
                                   <WarningIcon />
@@ -207,7 +210,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                                     <code>pg_partman</code> needs to be installed to use this type
                                   </span>
                                 </div>
-                              ) : null}
+                              ) : null} */}
                             </RadioGroupStackedItem>
                           ))}
                         </RadioGroupStacked>
@@ -215,7 +218,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                     </FormItemLayout>
                   )}
                 />
-                {!pgPartmanExtensionInstalled && (
+                {/* {!pgPartmanExtensionInstalled && (
                   <Admonition
                     type="note"
                     // @ts-ignore
@@ -248,7 +251,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                       </div>
                     }
                   />
-                )}
+                )} */}
               </SheetSection>
               <Separator />
               {queueType === 'partitioned' && (

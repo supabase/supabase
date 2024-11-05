@@ -1,22 +1,24 @@
+import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseQueueDeleteMutation } from 'data/database-queues/database-queues-delete-mutation'
-import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteQueueProps {
-  queue: PostgresQueue
+  queueName: string
   visible: boolean
   onClose: () => void
 }
 
-const DeleteQueue = ({ queue, visible, onClose }: DeleteQueueProps) => {
+const DeleteQueue = ({ queueName, visible, onClose }: DeleteQueueProps) => {
   const { project } = useProjectContext()
+  const router = useRouter()
 
   const { mutate: deleteDatabaseQueue, isLoading } = useDatabaseQueueDeleteMutation({
     onSuccess: () => {
-      toast.success(`Successfully removed queue ${queue.queue_name}`)
+      toast.success(`Successfully removed queue ${queueName}`)
+      router.push(`/project/${project?.ref}/integrations/queues`)
       onClose()
     },
   })
@@ -25,13 +27,13 @@ const DeleteQueue = ({ queue, visible, onClose }: DeleteQueueProps) => {
     if (!project) return console.error('Project is required')
 
     deleteDatabaseQueue({
-      queueName: queue.queue_name,
+      queueName: queueName,
       projectRef: project.ref,
       connectionString: project.connectionString,
     })
   }
 
-  if (!queue) {
+  if (!queueName) {
     return null
   }
 
@@ -43,13 +45,13 @@ const DeleteQueue = ({ queue, visible, onClose }: DeleteQueueProps) => {
       onConfirm={handleDelete}
       title="Delete this queue"
       loading={isLoading}
-      confirmLabel={`Delete queue ${queue.queue_name}`}
+      confirmLabel={`Delete queue ${queueName}`}
       confirmPlaceholder="Type in name of queue"
-      confirmString={queue.queue_name ?? 'Unknown'}
+      confirmString={queueName ?? 'Unknown'}
       text={
         <>
           <span>This will delete the queue</span>{' '}
-          <span className="text-bold text-foreground">{queue.queue_name}</span>
+          <span className="text-bold text-foreground">{queueName}</span>
         </>
       }
       alert={{ title: 'You cannot recover this queue and its messages once deleted.' }}

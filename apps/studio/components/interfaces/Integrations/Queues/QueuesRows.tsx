@@ -1,31 +1,20 @@
 import dayjs from 'dayjs'
 import { includes, sortBy } from 'lodash'
-import { Edit3, MoreVertical, Trash } from 'lucide-react'
-import Link from 'next/link'
+import { ChevronRight } from 'lucide-react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { DATETIME_FORMAT } from 'lib/constants'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { useRouter } from 'next/router'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]
   filterString: string
-  deleteQueue: (fn: PostgresQueue) => void
 }
 
-export const QueuesRows = ({
-  queues: fetchedQueues,
-  filterString,
-  deleteQueue,
-}: QueuesRowsProps) => {
+export const QueuesRows = ({ queues: fetchedQueues, filterString }: QueuesRowsProps) => {
+  const router = useRouter()
   const { project: selectedProject } = useProjectContext()
 
   const filteredQueues = fetchedQueues.filter((x) =>
@@ -52,7 +41,13 @@ export const QueuesRows = ({
         const type = q.is_partitioned ? 'Partitioned' : q.is_unlogged ? 'Unlogged' : 'Regular'
 
         return (
-          <Table.tr key={q.queue_name}>
+          <Table.tr
+            key={q.queue_name}
+            onClick={() => {
+              router.push(`/project/${selectedProject?.ref}/integrations/queues/${q.queue_name}`)
+            }}
+            className="hover:"
+          >
             <Table.td className="truncate">
               <p title={q.queue_name}>{q.queue_name}</p>
             </Table.td>
@@ -64,26 +59,8 @@ export const QueuesRows = ({
             <Table.td className="table-cell">
               <p title={q.created_at}>{dayjs(q.created_at).format(DATETIME_FORMAT)}</p>
             </Table.td>
-            <Table.td className="text-right">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="default" className="px-1" icon={<MoreVertical />} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="left">
-                  <Link
-                    href={`/project/${selectedProject?.ref}/integrations/queues/${q.queue_name}`}
-                  >
-                    <DropdownMenuItem className="space-x-2">
-                      <Edit3 size={14} />
-                      <p>View queue messages</p>
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem className="space-x-2" onClick={() => deleteQueue(q)}>
-                    <Trash stroke="red" size={14} />
-                    <p>Delete queue</p>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <Table.td className="flex items-center justify-end">
+              <ChevronRight />
             </Table.td>
           </Table.tr>
         )

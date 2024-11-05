@@ -6,12 +6,11 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { PostgresQueue, useQueuesQuery } from 'data/database-queues/database-queues-query'
+import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { Search } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CreateQueueSheet } from './CreateQueueSheet'
-import DeleteQueue from './DeleteQueue'
 import { QueuesRows } from './QueuesRows'
 
 export const QueuesListing = () => {
@@ -21,7 +20,6 @@ export const QueuesListing = () => {
   // used for confirmation prompt in the Create Queue Sheet
   const [isClosingCreateQueueSheet, setIsClosingCreateQueueSheet] = useState(false)
   const [createQueueSheetShown, setCreateQueueSheetShown] = useState(false)
-  const [queueForDeletion, setQueueForDeletion] = useState<PostgresQueue | undefined>()
 
   const {
     data: queues,
@@ -104,13 +102,7 @@ export const QueuesListing = () => {
                   <Table.th key="buttons" className="table-cell"></Table.th>
                 </>
               }
-              body={
-                <QueuesRows
-                  queues={queues}
-                  filterString={searchQuery || ''}
-                  deleteQueue={setQueueForDeletion}
-                />
-              }
+              body={<QueuesRows queues={queues} filterString={searchQuery || ''} />}
             />
           </div>
         )}
@@ -128,11 +120,6 @@ export const QueuesListing = () => {
           />
         </SheetContent>
       </Sheet>
-      <DeleteQueue
-        visible={!!queueForDeletion}
-        onClose={() => setQueueForDeletion(undefined)}
-        queue={queueForDeletion!}
-      />
       {/* <EnableExtensionModal
         visible={showEnableExtensionModal}
         extension={pgmqExtension}
