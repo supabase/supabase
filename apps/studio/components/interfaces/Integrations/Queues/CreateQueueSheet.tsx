@@ -169,8 +169,8 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                     <FormItemLayout label="Type" layout="vertical" className="gap-1">
                       <FormControl_Shadcn_>
                         <RadioGroupStacked
-                          id="function_type"
-                          name="function_type"
+                          id="queue_type"
+                          name="queue_type"
                           value={field.value}
                           disabled={field.disabled}
                           onValueChange={field.onChange}
