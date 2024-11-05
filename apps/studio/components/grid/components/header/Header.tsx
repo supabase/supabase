@@ -29,6 +29,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Separator,
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
@@ -379,41 +380,13 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <ButtonTooltip
-          type="link"
-          className="px-1 hover:bg-transparent"
-          icon={<X className="text-foreground-light hover:text-foreground transition-colors" />}
-          onClick={deselectRows}
-          tooltip={{ content: { side: 'bottom', text: 'Clear selection' } }}
-        />
-
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button
-              type="primary"
-              size="tiny"
-              icon={<Download />}
-              loading={isExporting}
-              disabled={isExporting}
-            >
-              Export
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40">
-            <DropdownMenuItem onClick={onRowsExportCSV}>
-              <span className="text-foreground-light">Export to CSV</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
         {editable && (
           <Tooltip.Root delayDuration={0}>
             <Tooltip.Trigger asChild>
               <Button
                 type="default"
                 size="tiny"
-                icon={<Trash className="text-destructive-600" />}
+                icon={<Trash />}
                 onClick={onRowsDelete}
                 disabled={allRowsSelected && isImpersonatingRole}
               >
@@ -424,21 +397,35 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                     : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button
+                  type="default"
+                  size="tiny"
+                  iconRight={<ChevronDown />}
+                  loading={isExporting}
+                  disabled={isExporting}
+                >
+                  Export
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-40">
+                <DropdownMenuItem onClick={onRowsExportCSV}>
+                  <span className="text-foreground-light">Export to CSV</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {!allRowsSelected && totalRows > allRows.length && (
-              <Button type="outline" onClick={() => onSelectAllRows()}>
-                Select all rows in table
-              </Button>
-            )}
-            {selectedRows.size > 0 && (
-              <div className="text-xs text-foreground-light flex items-center gap-2 ml-2">
-                <span>
-                  {allRowsSelected
-                    ? `All rows in table selected`
-                    : selectedRows.size > 1
-                      ? `${selectedRows.size} rows selected`
-                      : `${selectedRows.size} row selected`}
-                </span>
-              </div>
+              <>
+                <div className="h-6 ml-0.5">
+                  <Separator orientation="vertical" />
+                </div>
+                <Button type="text" onClick={() => onSelectAllRows()}>
+                  Select all rows in table
+                </Button>
+              </>
             )}
             {allRowsSelected && isImpersonatingRole && (
               <Tooltip.Portal>
