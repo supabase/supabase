@@ -483,7 +483,6 @@ services:
       - ./volumes/pooler/pooler.exs:/etc/pooler/pooler.exs:ro
       - /etc/letsencrypt/live/$API_ADDRESS/fullchain.pem:/etc/pooler/fullchain.pem:ro
       - /etc/letsencrypt/live/$API_ADDRESS/privkey.pem:/etc/pooler/privkey.pem:ro
-  
   fastify:
     container_name: supabase-${PROJECT_NAME}-fastify
     image: node:22.11.0-alpine
@@ -505,6 +504,27 @@ services:
     restart: unless-stopped
     volumes:
       - ./volumes/fastify:/home/node/fastify
+  # fastify:
+  #   container_name: supabase-${PROJECT_NAME}-fastify
+  #   image: oven/bun
+  #   command: 
+  #     - /bin/sh
+  #     - -c
+  #     - cd /home/bun/app/fastify && bun install && bun index.ts
+  #   healthcheck:
+  #     test: curl -sSfL --head -o /dev/null "http://127.0.0.1:11000/api/health"
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #   depends_on:
+  #     db:
+  #       # Disable this if you are using an external Postgres database
+  #       condition: service_healthy
+  #     analytics:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./volumes/fastify:/home/bun/app/fastify
 
 volumes:
   db-config:
