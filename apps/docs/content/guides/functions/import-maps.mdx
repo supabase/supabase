@@ -130,6 +130,31 @@ import process from 'node:process'
 
 Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
 
+### Importing from Private Registries
+
+<Admonition type="info">
+
+This feature requires Supabase CLI version 1.207.9 or higher.
+
+</Admonition>
+
+Create a `.npmrc` file within `supabase/functions`. This will allow you to import the private packages into multiple functions. Alternatively, you can place the `.npmrc` file directly inside `supabase/functions/function-name` directory.)
+
+Add your registry details in the `.npmrc` file. Follow [this guide](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) to learn more about the syntax of npmrc files.
+
+```
+@myorg:registry=https://npm.registryhost.com
+//npm.registryhost.com/:_authToken=VALID_AUTH_TOKEN
+```
+
+After that, you can import the package directly in your function code or add it to the import_map.json (/docs/guides/functions/import-maps#using-import-maps).
+
+```ts
+import MyPackage from 'npm:@myorg/private-package@v1.0.1'
+
+// use MyPackage
+```
+
 ## Importing types
 
 If your [environment is set up properly](/docs/guides/functions/local-development) and the module you're importing is exporting types, the import will have types and autocompletion support.
