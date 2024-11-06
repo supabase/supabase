@@ -30,7 +30,9 @@ const DisplayConfigSettings = () => {
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
   const jwtSecret = config?.jwt_secret ?? ''
-  const apiUrl = `https://${settings?.app_config?.endpoint ?? '-'}`
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = endpoint ? `${protocol}://${endpoint}` : '-'
 
   return (
     <ConfigContentWrapper>
