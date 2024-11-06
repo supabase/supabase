@@ -49,10 +49,12 @@ const ProjectAPIDocs = () => {
   const apikey = showKeys
     ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
     : 'SUPABASE_CLIENT_ANON_KEY'
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}`
-      : `https://${settings?.app_config?.endpoint ?? ''}`
+      : `${protocol}://${hostEndpoint ?? ''}`
 
   return (
     <SidePanel

@@ -60,6 +60,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     if (!isSuccess) {
       return toast.error(`Failed to create user: Error loading project config`)
     }
+    const protocol = settings?.app_config?.protocol ?? 'https'
     const endpoint = settings?.app_config?.endpoint
     const { serviceKey } = getAPIKeys(settings)
 
@@ -70,7 +71,7 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     createUser({
       projectRef,
       endpoint,
-      protocol: 'https',
+      protocol,
       serviceApiKey: serviceKey.api_key,
       user: values,
     })
