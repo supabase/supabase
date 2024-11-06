@@ -231,7 +231,7 @@
     "link": "/guides/database/extensions/pg_cron",
     "github_url": "https://github.com/citusdata/pg_cron",
     "product": "Supabase Cron Jobs",
-    "product_url": "/project/{ref}/database/cron-jobs"
+    "product_url": "/project/{ref}/integrations/cron-jobs"
   },
   {
     "name": "pg_freespacemap",
