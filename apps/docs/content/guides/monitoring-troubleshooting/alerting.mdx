@@ -1,0 +1,41 @@
+---
+id: 'alerting'
+title: 'Alerting'
+description: 'Alerting on your Supabase project'
+---
+
+On the platform, Supabase will send emails to warn about different metrics that may need your attention. In addition, you will likely want to set up additional alerting for you and/or your team.
+
+
+## Email Alerts
+
+* Exhausted:
+    * Disk IO
+    * CPU Usage
+    * RAM Usage
+* Disk Resized
+
+
+## Prometheus Alerting
+
+<Admonition type="note">
+
+This section assumes that you have completed and configured collecting metrics for your project using the [Metrics docs](/docs/guides/monitoring-troubleshooting/metrics).
+
+</Admonition>
+
+When you have metrics reported into your own observability stack, you can set alerts based on your own needs. In this section, some example alerts are defined, as well as what the individual metrics mean.
+Alerts can be configured in Grafana using [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+
+### Direct Database (Client) Connections Exceeded
+
+Your maximum database connections are set depending on your [Compute size](/docs/guides/platform/compute-and-disk).
+In this example, we are creating an alert to notify when the number of direct database connections grows by more than 100 in the time window of one minute.
+
+<CH.Code>
+
+```
+rate(pg_stat_database_num_backends{suapabase_project_ref="PROJECT_REF"}[1m])>100
+```
+
+</CH.Code>
