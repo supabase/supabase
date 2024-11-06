@@ -379,59 +379,57 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-x-2">
       {editable && (
-        <>
-          <ButtonTooltip
+        <ButtonTooltip
+          type="default"
+          size="tiny"
+          icon={<Trash />}
+          onClick={onRowsDelete}
+          disabled={allRowsSelected && isImpersonatingRole}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                allRowsSelected && isImpersonatingRole
+                  ? 'Table truncation is not supported when impersonating a role'
+                  : undefined,
+            },
+          }}
+        >
+          {allRowsSelected
+            ? `Delete all rows in table`
+            : selectedRows.size > 1
+              ? `Delete ${selectedRows.size} rows`
+              : `Delete ${selectedRows.size} row`}
+        </ButtonTooltip>
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
             type="default"
             size="tiny"
-            icon={<Trash />}
-            onClick={onRowsDelete}
-            disabled={allRowsSelected && isImpersonatingRole}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  allRowsSelected && isImpersonatingRole
-                    ? 'Table truncation is not supported when impersonating a role'
-                    : undefined,
-              },
-            }}
+            iconRight={<ChevronDown />}
+            loading={isExporting}
+            disabled={isExporting}
           >
-            {allRowsSelected
-              ? `Delete all rows in table`
-              : selectedRows.size > 1
-                ? `Delete ${selectedRows.size} rows`
-                : `Delete ${selectedRows.size} row`}
-          </ButtonTooltip>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                size="tiny"
-                iconRight={<ChevronDown />}
-                loading={isExporting}
-                disabled={isExporting}
-              >
-                Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-              <DropdownMenuItem onClick={onRowsExportCSV}>
-                <span className="text-foreground-light">Export to CSV</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            Export
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40">
+          <DropdownMenuItem onClick={onRowsExportCSV}>
+            <span className="text-foreground-light">Export to CSV</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-          {!allRowsSelected && totalRows > allRows.length && (
-            <>
-              <div className="h-6 ml-0.5">
-                <Separator orientation="vertical" />
-              </div>
-              <Button type="text" onClick={() => onSelectAllRows()}>
-                Select all rows in table
-              </Button>
-            </>
-          )}
+      {!allRowsSelected && totalRows > allRows.length && (
+        <>
+          <div className="h-6 ml-0.5">
+            <Separator orientation="vertical" />
+          </div>
+          <Button type="text" onClick={() => onSelectAllRows()}>
+            Select all rows in table
+          </Button>
         </>
       )}
     </div>
