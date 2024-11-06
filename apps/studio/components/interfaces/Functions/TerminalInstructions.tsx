@@ -8,6 +8,8 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   Button,
   CollapsibleContent_Shadcn_,
@@ -15,8 +17,6 @@ import {
   Collapsible_Shadcn_,
 } from 'ui'
 import type { Commands } from './Functions.types'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean
