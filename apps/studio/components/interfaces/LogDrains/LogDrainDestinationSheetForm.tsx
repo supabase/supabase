@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,6 +7,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   Form_Shadcn_,
@@ -36,16 +36,16 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
-import { useFlag } from 'hooks/ui/useFlag'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().regex(urlRegex, 'Endpoint URL is required and must be a valid URL'),
+    url: z.string().regex(urlRegex(), 'Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -68,6 +68,8 @@ const formUnion = z.discriminatedUnion('type', [
     type: z.literal('loki'),
     url: z.string().min(1, { message: 'Loki URL is required' }),
     headers: z.record(z.string(), z.string()),
+    username: z.string().optional(),
+    password: z.string().optional(),
   }),
 ])
 
@@ -162,6 +164,8 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
+      username: defaultValues?.config?.username || '',
+      password: defaultValues?.config?.password || '',
     },
   })
 
@@ -422,9 +426,23 @@ export function LogDrainDestinationSheetForm({
                     <LogDrainFormItem
                       type="url"
                       value="url"
+                      placeholder="https://my-logs-endpoint.grafana.net/loki/api/v1/push"
                       label="Loki URL"
                       formControl={form.control}
                       description="The Loki HTTP(S) endpoint to send events."
+                    />
+                    <LogDrainFormItem
+                      value="username"
+                      label="Username"
+                      placeholder="123456789"
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      type="password"
+                      value="password"
+                      label="Password"
+                      placeholder="glc_ABCD1234567890"
+                      formControl={form.control}
                     />
                   </div>
                 )}
@@ -510,18 +528,13 @@ export function LogDrainDestinationSheetForm({
               isReactForm={false}
               layout="horizontal"
               label={
-                <div className="text-foreground-light">
+                <div className="flex flex-col gap-y-2 text-foreground-light">
                   Additional drain cost
-                  <div className="text-foreground-lighter mt-2">
-                    <Link
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline flex gap-1 items-center"
-                      href="https://supabase.com/docs/guides/platform/log-drains"
-                    >
-                      Documentation <ExternalLink className="w-4 h-4" />
-                    </Link>
-                  </div>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href="https://supabase.com/docs/guides/platform/log-drains"
+                  />
                 </div>
               }
             >

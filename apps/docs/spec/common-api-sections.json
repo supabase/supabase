@@ -502,9 +502,21 @@
     "title": "Storage",
     "items": [
       {
+        "id": "v1-get-storage-config",
+        "title": "Get storage config",
+        "slug": "v1-get-storage-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-buckets",
         "title": "List all buckets",
         "slug": "v1-list-all-buckets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-storage-config",
+        "title": "Update storage config",
+        "slug": "v1-update-storage-config",
         "type": "operation"
       }
     ]

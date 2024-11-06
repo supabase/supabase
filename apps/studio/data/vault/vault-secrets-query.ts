@@ -23,7 +23,7 @@ export type VaultSecretsError = ExecuteSqlError
 
 export const useVaultSecretsQuery = <TData extends VaultSecretsData = VaultSecretsData>(
   { projectRef, connectionString }: VaultSecretsVariables,
-  { enabled, ...options }: UseQueryOptions<ExecuteSqlData, VaultSecretsError, TData> = {}
+  { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, VaultSecretsError, TData> = {}
 ) => {
   return useExecuteSqlQuery(
     {

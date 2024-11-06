@@ -13,14 +13,14 @@ export type UsersVariables = {
   keywords?: string
   filter?: Filter
   providers?: string[]
-  sort?: 'created_at' | 'email' | 'phone'
+  sort?: 'created_at' | 'email' | 'phone' | 'last_sign_in_at'
   order?: 'asc' | 'desc'
 }
 
 export const USERS_PAGE_LIMIT = 50
 export type User = components['schemas']['UserBody']
 
-const getUsersSQL = ({
+export const getUsersSQL = ({
   page = 0,
   verified,
   keywords,

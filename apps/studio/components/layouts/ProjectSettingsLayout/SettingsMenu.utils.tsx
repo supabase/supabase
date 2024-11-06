@@ -3,6 +3,7 @@ import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
 import { ArrowUpRight } from 'lucide-react'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -15,6 +16,7 @@ export const generateSettingsMenu = (
     invoices?: boolean
     warehouse?: boolean
     logDrains?: boolean
+    diskAndCompute?: boolean
   }
 ): ProductMenuGroup[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -36,6 +38,16 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
+        ...(IS_PLATFORM && features?.diskAndCompute
+          ? [
+              {
+                name: 'Compute and Disk',
+                key: 'compute-and-disk',
+                url: `/project/${ref}/settings/compute-and-disk`,
+                items: [],
+              },
+            ]
+          : []),
         {
           name: 'Infrastructure',
           key: 'infrastructure',
@@ -52,14 +64,12 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...[
-          {
-            name: 'Add Ons',
-            key: 'addons',
-            url: `/project/${ref}/settings/addons`,
-            items: [],
-          },
-        ],
+        {
+          name: 'Add Ons',
+          key: 'addons',
+          url: `/project/${ref}/settings/addons`,
+          items: [],
+        },
         {
           name: 'Vault',
           key: 'vault',

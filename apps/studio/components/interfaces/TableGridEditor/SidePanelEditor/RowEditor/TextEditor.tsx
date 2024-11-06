@@ -8,10 +8,13 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import {
+  getTableLikeFromTableEditor,
+  useTableEditorQuery,
+} from 'data/table-editor/table-editor-query'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
@@ -35,8 +38,14 @@ export const TextEditor = ({
 }: TextEditorProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+  const selectedTable = getTableLikeFromTableEditor(data)
 
   const [strValue, setStrValue] = useState('')
   const [view, setView] = useState<'edit' | 'view'>('edit')

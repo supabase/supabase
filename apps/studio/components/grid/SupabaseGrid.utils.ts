@@ -1,15 +1,10 @@
-import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { compact } from 'lodash'
 
 import type { Filter } from 'components/grid/types'
-import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import {
-  ForeignKeyConstraint,
-  ForeignKeyConstraintsData,
-} from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { TableLike } from 'hooks/misc/useTable'
+import { TableLike } from 'data/table-editor/table-editor-query'
 import type { Dictionary, SchemaView } from 'types'
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
 import { STORAGE_KEY_PREFIX } from './constants'
@@ -101,6 +96,7 @@ export function parseSupaTable(
         targetTableName: null,
         targetColumnName: null,
         deletionAction: undefined,
+        updateAction: undefined,
       },
     }
     const primaryKey = primaryKeys.find((pk) => pk.name == column.name)
@@ -118,6 +114,7 @@ export function parseSupaTable(
       temp.foreignKey.targetTableName = relationship.target_table_name
       temp.foreignKey.targetColumnName = relationship.target_column_name
       temp.foreignKey.deletionAction = relationship.deletion_action
+      temp.foreignKey.updateAction = relationship.update_action
     }
     return temp
   })
@@ -135,29 +132,12 @@ export function parseSupaTable(
 export function getSupaTable({
   selectedTable,
   entityType,
-  foreignKeyMeta,
   encryptedColumns,
 }: {
   selectedTable: TableLike
   entityType?: ENTITY_TYPE
-  foreignKeyMeta: ForeignKeyConstraintsData
-  encryptedColumns: string[]
+  encryptedColumns?: string[]
 }) {
-  // [Joshen] We can tweak below to eventually support composite keys as the data
-  // returned from foreignKeyMeta should be easy to deal with, rather than pg-meta
-  const formattedRelationships = (
-    ('relationships' in selectedTable && selectedTable.relationships) ||
-    []
-  ).map((relationship: PostgresRelationship) => {
-    const relationshipMeta = foreignKeyMeta.find(
-      (fk: ForeignKeyConstraint) => fk.id === relationship.id
-    )
-    return {
-      ...relationship,
-      deletion_action: relationshipMeta?.deletion_action ?? FOREIGN_KEY_CASCADE_ACTION.NO_ACTION,
-    }
-  })
-
   const isViewSelected =
     entityType === ENTITY_TYPE.VIEW || entityType === ENTITY_TYPE.MATERIALIZED_VIEW
   const isForeignTableSelected = entityType === ENTITY_TYPE.FOREIGN_TABLE
@@ -168,7 +148,7 @@ export function getSupaTable({
           table: selectedTable as PostgresTable,
           columns: (selectedTable as PostgresTable).columns ?? [],
           primaryKeys: (selectedTable as PostgresTable).primary_keys ?? [],
-          relationships: formattedRelationships,
+          relationships: (selectedTable as PostgresTable).relationships ?? [],
         },
         encryptedColumns
       )

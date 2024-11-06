@@ -12,7 +12,7 @@ import {
   EdgeFunctionsResponse,
   useEdgeFunctionsQuery,
 } from 'data/edge-functions/edge-functions-query'
-import { getTable } from 'data/tables/table-query'
+import { getTable } from 'data/tables/get-table'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Radio, SidePanel } from 'ui'

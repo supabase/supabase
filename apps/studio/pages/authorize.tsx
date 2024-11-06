@@ -1,5 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { AlertCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -14,7 +16,14 @@ import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorizati
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import type { NextPageWithLayout } from 'types'
-import { Alert, Button, Listbox } from 'ui'
+import {
+  Alert,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Button,
+  Listbox,
+} from 'ui'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
@@ -141,6 +150,15 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
     )
   }
 
+  const searchParams = new URLSearchParams(location.search)
+  let pathname = location.pathname
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH
+  if (basePath) {
+    pathname = pathname.replace(basePath, '')
+  }
+
+  searchParams.set('returnTo', pathname)
+
   return (
     <FormPanel
       header={<p>Authorize API access for {requester?.name}</p>}
@@ -155,13 +173,21 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             >
               Decline
             </Button>
-            <Button
-              loading={isApproving}
-              disabled={isDeclining || isExpired}
-              onClick={onApproveRequest}
-            >
-              Authorize {requester?.name}
-            </Button>
+            {isLoadingOrganizations ? (
+              <Button loading={isLoadingOrganizations}>Authorize {requester?.name}</Button>
+            ) : isSuccessOrganizations && organizations.length === 0 ? (
+              <Link href={`/new?${searchParams.toString()}`}>
+                <Button loading={isLoadingOrganizations}>Create an organization</Button>
+              </Link>
+            ) : (
+              <Button
+                loading={isApproving}
+                disabled={isDeclining || isExpired}
+                onClick={onApproveRequest}
+              >
+                Authorize {requester?.name}
+              </Button>
+            )}
           </div>
         </div>
       }
@@ -188,6 +214,18 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
             <ShimmeringLoader />
             <ShimmeringLoader className="w-3/4" />
           </div>
+        ) : organizations?.length === 0 ? (
+          <Alert_Shadcn_ variant="warning">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle_Shadcn_>
+              Organization is needed for installing an integration
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="">
+              Your account isn't associated with any organizations. To use this integration, it must
+              be installed within an organization. You'll be redirected to create an organization
+              first.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <Listbox
             label="Select an organization to grant API access to"

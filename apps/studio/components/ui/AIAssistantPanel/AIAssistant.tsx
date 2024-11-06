@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { ExternalLink, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import { FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -9,10 +9,13 @@ import { toast } from 'sonner'
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -53,6 +56,7 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DocsButton } from '../DocsButton'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
 import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
 import { generatePrompt, retrieveDocsUrl } from './AIAssistant.utils'
@@ -60,7 +64,6 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
-import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 
 const ANIMATION_DURATION = 0.3
 
@@ -114,6 +117,9 @@ export const AIAssistant = ({
     selectedDatabaseEntity.length === 0 &&
     selectedSchemas.length === 0 &&
     selectedTables.length === 0
+
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
   const { data: existingDefinition } = useEntityDefinitionQuery({
     id: entity?.id,
@@ -456,6 +462,19 @@ export const AIAssistant = ({
                   description="Give us a moment while we work on bringing the Assistant back online"
                 />
               )}
+              {!isApiKeySet && (
+                <Admonition
+                  type="warning"
+                  title="OpenAI API key not set"
+                  description={
+                    <Markdown
+                      content={
+                        'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
+                      }
+                    />
+                  }
+                />
+              )}
               <div className="w-full border rounded">
                 <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
                   <DropdownMenu>
@@ -618,7 +637,7 @@ export const AIAssistant = ({
                     '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
                   )}
                   loading={isLoading}
-                  disabled={disablePrompts || isLoading}
+                  disabled={!isApiKeySet || disablePrompts || isLoading}
                   placeholder={
                     hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
                   }
@@ -629,7 +648,7 @@ export const AIAssistant = ({
                     sendMessageToAssistant(value)
                   }}
                 />
-                {!hasMessages && (
+                {!hasMessages && IS_PLATFORM && (
                   <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
                     The Assistant is in Alpha and your prompts might be rate limited
                   </div>
@@ -702,13 +721,7 @@ export const AIAssistant = ({
                           ?
                         </TooltipContent_Shadcn_>
                       </Tooltip_Shadcn_>
-                      {docsUrl !== undefined && (
-                        <Button asChild type="default" icon={<ExternalLink />}>
-                          <a href={docsUrl} target="_blank" rel="noreferrer">
-                            Documentation
-                          </a>
-                        </Button>
-                      )}
+                      {docsUrl !== undefined && <DocsButton href={docsUrl} />}
                     </div>
                   </motion.div>
                 )}
