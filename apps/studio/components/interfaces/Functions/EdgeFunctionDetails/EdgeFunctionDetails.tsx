@@ -19,6 +19,8 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -56,7 +58,7 @@ const EdgeFunctionDetails = () => {
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionUrl =
     customDomainData?.customDomain?.status === 'active'

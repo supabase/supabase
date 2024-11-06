@@ -44,6 +44,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -127,7 +128,8 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef: string, url: string, serviceKey: string, protocol: string) {
+  initStore(projectRef: string, url: string, serviceKey: string) {
+    const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
     this.projectRef = projectRef
     this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey

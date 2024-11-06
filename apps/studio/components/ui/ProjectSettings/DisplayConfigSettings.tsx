@@ -7,6 +7,8 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { Input } from 'ui'
 
 const DisplayConfigSettings = () => {
@@ -30,7 +32,7 @@ const DisplayConfigSettings = () => {
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
   const jwtSecret = config?.jwt_secret ?? ''
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = endpoint ? `${protocol}://${endpoint}` : '-'
 

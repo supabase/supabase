@@ -15,6 +15,8 @@ import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, WarningIcon } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -41,7 +43,7 @@ export const S3Connection = () => {
     { enabled: canReadS3Credentials }
   )
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
   const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)

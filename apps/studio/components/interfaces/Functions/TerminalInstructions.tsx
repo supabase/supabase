@@ -15,6 +15,8 @@ import {
   Collapsible_Shadcn_,
 } from 'ui'
 import type { Commands } from './Functions.types'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible_Shadcn_> {
   closable?: boolean
@@ -36,7 +38,7 @@ const TerminalInstructions = forwardRef<
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'

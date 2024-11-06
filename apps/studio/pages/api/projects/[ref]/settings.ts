@@ -1,7 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { extractResponse, PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { PROJECT_ENDPOINT } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,23 +18,20 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type ResponseData = extractResponse<'/platform/projects/{ref}/settings', 'get'>
-
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
-  const response = {
+  const response: components['schemas']['ProjectSettingsResponse'] = {
     app_config: {
       db_schema: 'public',
       endpoint: PROJECT_ENDPOINT,
-      // manually added to force the frontend to use the correct URL
-      protocol: PROJECT_ENDPOINT_PROTOCOL,
     },
     cloud_provider: 'AWS',
     db_dns_name: '-',
     db_host: 'localhost',
-    db_ip_addr_config: 'legacy' as const,
+    dp_ip_addr_config: 'legacy' as const,
     db_name: 'postgres',
-    db_port: '5432',
+    // @ts-expect-error API is typed wrongly
+    db_port: 5432,
     db_user: 'postgres',
     inserted_at: '2021-08-02T06:40:40.646Z',
     jwt_secret:

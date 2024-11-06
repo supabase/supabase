@@ -29,6 +29,8 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -128,7 +130,7 @@ const Connect = () => {
     return []
   }
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint ?? ''
   const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null

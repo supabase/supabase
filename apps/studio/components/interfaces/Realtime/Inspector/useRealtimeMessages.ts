@@ -8,8 +8,10 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState 
 import { toast } from 'sonner'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import type { LogData } from './Messages.types'
 
@@ -78,7 +80,7 @@ export const useRealtimeMessages = (
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
-  const protocol = settings?.app_config?.protocol ?? 'https'
+  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const endpoint = settings?.app_config?.endpoint
   // the default host is prod until the correct one comes through an API call.
   const host = settings ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`

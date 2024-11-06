@@ -21,7 +21,6 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   const storageExplorerStore = useStorageStore()
 
   const { data: settings, isLoading } = useProjectSettingsV2Query({ projectRef })
-  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const { serviceKey } = getAPIKeys(settings)
 
@@ -29,20 +28,16 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
   useEffect(() => {
     if (!isLoading && endpoint && serviceKey?.api_key) {
-      initializeStorageStore(protocol, endpoint, serviceKey.api_key)
+      initializeStorageStore(endpoint, serviceKey.api_key)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoading, projectRef, endpoint, serviceKey?.api_key])
 
-  const initializeStorageStore = async (
-    protocol: string,
-    endpoint: string,
-    serviceApiKey: string
-  ) => {
+  const initializeStorageStore = async (endpoint: string, serviceApiKey: string) => {
     if (isPaused) return
 
     if (endpoint) {
-      storageExplorerStore.initStore(projectRef!, endpoint, serviceApiKey, protocol)
+      storageExplorerStore.initStore(projectRef!, endpoint, serviceApiKey)
     } else {
       toast.error(
         'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io'

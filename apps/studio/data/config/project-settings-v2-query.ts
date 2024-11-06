@@ -8,12 +8,7 @@ import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectSettingsVariables = { projectRef?: string }
-
-// manually add protocol to the response to make the local/CLI environment
-type ProjectAppConfig = components['schemas']['ProjectAppConfigResponse'] & { protocol?: string }
-export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
-  app_config?: ProjectAppConfig
-}
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse']
 
 export async function getProjectSettings(
   { projectRef }: ProjectSettingsVariables,
