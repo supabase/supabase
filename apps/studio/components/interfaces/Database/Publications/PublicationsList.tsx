@@ -112,55 +112,57 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
           </Table.th>,
         ]}
         body={
-          isLoading
-            ? <SkeletonTableRow
-                columns={[
-                  {key: 'name', width: '25%'},
-                  {key: 'id', width: '25%'},
-                  {key: 'insert', isToggle: true},
-                  {key: 'update', isToggle: true},
-                  {key: 'delete', isToggle: true},
-                  {key: 'truncate', isToggle: true},
-                  {key: 'source', align: 'end'}
-                ]}
-              />
-            : publications.map((x) => (
-                <Table.tr className="border-t" key={x.name}>
-                  <Table.td className="px-4 py-3">{x.name}</Table.td>
-                  <Table.td>{x.id}</Table.td>
-                  {publicationEvents.map((event) => (
-                    <Table.td key={event.key}>
-                      <Toggle
-                        size="tiny"
-                        checked={(x as any)[event.key]}
-                        disabled={!canUpdatePublications}
-                        onChange={() => {
-                          setToggleListenEventValue({
-                            publication: x,
-                            event,
-                            currentStatus: (x as any)[event.key],
-                          })
-                        }}
-                      />
-                    </Table.td>
-                  ))}
-                  <Table.td className="px-4 py-3 pr-2">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        type="default"
-                        style={{ paddingTop: 3, paddingBottom: 3 }}
-                        onClick={() => onSelectPublication(x.id)}
-                      >
-                        {x.tables == null
-                          ? 'All tables'
-                          : `${x.tables.length} ${
-                              x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
-                            }`}
-                      </Button>
-                    </div>
+          isLoading ? (
+            <SkeletonTableRow
+              columns={[
+                { key: 'name', width: '25%' },
+                { key: 'id', width: '25%' },
+                { key: 'insert', isToggle: true },
+                { key: 'update', isToggle: true },
+                { key: 'delete', isToggle: true },
+                { key: 'truncate', isToggle: true },
+                { key: 'source', align: 'end' },
+              ]}
+            />
+          ) : (
+            publications.map((x) => (
+              <Table.tr className="border-t" key={x.name}>
+                <Table.td className="px-4 py-3">{x.name}</Table.td>
+                <Table.td>{x.id}</Table.td>
+                {publicationEvents.map((event) => (
+                  <Table.td key={event.key}>
+                    <Toggle
+                      size="tiny"
+                      checked={(x as any)[event.key]}
+                      disabled={!canUpdatePublications}
+                      onChange={() => {
+                        setToggleListenEventValue({
+                          publication: x,
+                          event,
+                          currentStatus: (x as any)[event.key],
+                        })
+                      }}
+                    />
                   </Table.td>
-                </Table.tr>
-              ))
+                ))}
+                <Table.td className="px-4 py-3 pr-2">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      type="default"
+                      style={{ paddingTop: 3, paddingBottom: 3 }}
+                      onClick={() => onSelectPublication(x.id)}
+                    >
+                      {x.tables == null
+                        ? 'All tables'
+                        : `${x.tables.length} ${
+                            x.tables.length > 1 || x.tables.length == 0 ? 'tables' : 'table'
+                          }`}
+                    </Button>
+                  </div>
+                </Table.td>
+              </Table.tr>
+            ))
+          )
         }
       />
 
