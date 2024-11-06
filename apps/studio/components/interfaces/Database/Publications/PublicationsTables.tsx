@@ -96,7 +96,22 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
           <Table.th key="header-desc" className="hidden text-left lg:table-cell">
             Description
           </Table.th>,
-          <Table.th key="header-all"></Table.th>,
+          <Table.th key="header-all">
+            {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+            <div className="flex flex-row space-x-3 items-center justify-end">
+              <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
+                All Tables
+              </div>
+              <Toggle
+                size="tiny"
+                align="right"
+                error=""
+                className="m-0 p-0 ml-2 mt-1 -mb-1"
+                checked={enabledForAllTables}
+                onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
+              />
+            </div> */}
+          </Table.th>,
         ]}
         body={
           isLoading ? (
