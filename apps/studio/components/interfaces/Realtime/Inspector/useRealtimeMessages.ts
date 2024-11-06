@@ -8,6 +8,7 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState 
 import { toast } from 'sonner'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -82,8 +83,11 @@ export const useRealtimeMessages = (
   const host = settings
     ? `https://${settings.app_config?.endpoint}`
     : `https://${projectRef}.supabase.co`
-
-  const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
+  // protocol should be ws for self host, and wss for hosted
+  // as per https://github.com/supabase/realtime-js
+  const realtimeUrl = IS_PLATFORM
+    ? `${host}/realtime/v1`.replace(/^http/i, 'ws')
+    : 'http://localhost:4000/socket'
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {

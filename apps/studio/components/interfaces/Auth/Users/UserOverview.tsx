@@ -157,7 +157,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
     updateUser({
       projectRef,
-      protocol: 'https',
       endpoint,
       serviceApiKey: serviceKey.api_key,
       userId: user.id,

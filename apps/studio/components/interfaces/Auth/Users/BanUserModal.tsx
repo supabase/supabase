@@ -77,7 +77,6 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
 
     updateUser({
       projectRef,
-      protocol: 'https',
       endpoint,
       serviceApiKey: serviceKey.api_key,
       userId: user.id,

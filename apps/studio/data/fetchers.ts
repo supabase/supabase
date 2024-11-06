@@ -46,6 +46,7 @@ export const get: typeof _get = async (url, init) => {
   const headers = await constructHeaders(init?.headers)
 
   // on self-hosted, we don't have a /platform prefix
+  // !IS_PLATFORM
   if (!IS_PLATFORM && url.startsWith('/platform')) {
     // @ts-ignore
     url = url.replace('/platform', '')

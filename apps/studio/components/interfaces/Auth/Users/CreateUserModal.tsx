@@ -70,7 +70,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
     createUser({
       projectRef,
       endpoint,
-      protocol: 'https',
       serviceApiKey: serviceKey.api_key,
       user: values,
     })

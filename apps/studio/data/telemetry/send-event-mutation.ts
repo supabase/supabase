@@ -3,6 +3,7 @@ import { components } from 'api-types'
 
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 

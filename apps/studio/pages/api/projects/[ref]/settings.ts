@@ -22,7 +22,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const response: components['schemas']['ProjectSettingsResponse'] = {
     app_config: {
       db_schema: 'public',
-      endpoint: '',
+      endpoint: 'localhost:8000',
     },
     cloud_provider: 'AWS',
     db_dns_name: '',

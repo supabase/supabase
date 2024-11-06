@@ -128,14 +128,10 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(
-    projectRef: string,
-    url: string,
-    serviceKey: string,
-    protocol: string = PROJECT_ENDPOINT_PROTOCOL
-  ) {
+  initStore(projectRef: string, url: string, serviceKey: string) {
+    const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
     this.projectRef = projectRef
-    this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
+    this.resumableUploadUrl = `${protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
   }
