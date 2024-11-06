@@ -8,13 +8,20 @@ import { projectKeys } from './keys'
 export type ProjectCloneVariables = {
   projectRef?: string
   cloneBackupId: number
+  name?: string
+  password?: string
 }
 
-export async function triggerClone({ projectRef, cloneBackupId }: ProjectCloneVariables) {
+export async function triggerClone({
+  projectRef,
+  cloneBackupId,
+  name,
+  password,
+}: ProjectCloneVariables) {
   if (!projectRef) throw new Error('Project ref is required')
   const { data, error } = await post('/platform/database/{ref}/clone', {
     params: { path: { ref: projectRef } },
-    body: { id: cloneBackupId },
+    body: { id: cloneBackupId, name, password },
   } as any) // REMOVE AS ANY WHEN GENERATED API TYPES ARE FIXED
 
   if (error) handleError(error)

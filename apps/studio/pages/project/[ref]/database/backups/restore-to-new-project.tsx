@@ -1,6 +1,5 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Alert } from '@ui/components/shadcn/ui/alert'
-import { FormControl, FormItem, FormLabel } from '@ui/components/shadcn/ui/form'
 import BackupsEmpty from 'components/interfaces/Database/Backups/BackupsEmpty'
 
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
@@ -11,6 +10,7 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
+import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupsQuery } from 'data/database/backups-query'
@@ -21,16 +21,12 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
-import { getDatabaseMajorVersion } from 'lib/helpers'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { getDatabaseMajorVersion, passwordStrength } from 'lib/helpers'
 import Link from 'next/link'
-import { useState } from 'react'
-import { gte } from 'semver'
+import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
 import type { NextPageWithLayout } from 'types'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Badge,
   Button,
   Dialog,
@@ -40,10 +36,18 @@ import {
   DialogDescription,
   DialogFooter,
   DialogSection,
-  Form,
   Input,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  Input_Shadcn_,
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { z } from 'zod'
+import { debounce } from 'lodash'
+import generator from 'generate-password-browser'
+import { toast } from 'sonner'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -114,7 +118,6 @@ const RestoreToNewProject = () => {
   )
 
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
-  console.log('dbVersion', dbVersion)
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
@@ -124,7 +127,52 @@ const RestoreToNewProject = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
 
   const isLoading = isPermissionsLoaded && cloneBackupsLoading && backupsLoading
-  const { mutate: triggerClone } = useProjectCloneMutation()
+  const { mutate: triggerClone } = useProjectCloneMutation({
+    onError: (error) => {
+      console.error('error', error)
+      toast.error('Failed to restore to new project')
+    },
+    onSuccess: () => {
+      toast.success('Restoration process started')
+    },
+  })
+
+  const FormSchema = z.object({
+    name: z.string().min(1),
+    password: z.string().min(1),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      name: '',
+      password: '',
+    },
+  })
+
+  const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
+  const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
+
+  const delayedCheckPasswordStrength = useRef(
+    debounce((value: string) => checkPasswordStrength(value), 300)
+  ).current
+
+  async function checkPasswordStrength(value: string) {
+    const { message, strength } = await passwordStrength(value)
+    setPasswordStrengthScore(strength)
+    setPasswordStrengthMessage(message)
+  }
+
+  function generateStrongPassword() {
+    const password = generator.generate({
+      length: 16,
+      numbers: true,
+      uppercase: true,
+    })
+
+    form.setValue('password', password)
+    delayedCheckPasswordStrength(password)
+  }
 
   if (isLoading) {
     return <GenericSkeletonLoader />
@@ -241,21 +289,21 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (cloneStatus?.status === 'IN_PROGRESS') {
-    return (
-      <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
-        <Loader2 className="animate-spin" />
-        <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_>
-          The new project is being created.
-          <br />
-          <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
-            Go to new project
-          </Link>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
-    )
-  }
+  // if (cloneStatus?.status === 'IN_PROGRESS') {
+  //   return (
+  //     <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
+  //       <Loader2 className="animate-spin" />
+  //       <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
+  //       <AlertDescription_Shadcn_>
+  //         The new project is being created.
+  //         <br />
+  //         <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
+  //           Go to new project
+  //         </Link>
+  //       </AlertDescription_Shadcn_>
+  //     </Alert_Shadcn_>
+  //   )
+  // }
 
   return (
     <>
@@ -328,51 +376,102 @@ const RestoreToNewProject = () => {
               This process will create a new project and restore your database to it.
             </DialogDescription>
           </DialogHeader>
-          <DialogSection className="pb-6 space-y-4 text-sm">
-            {/* <Form onSubmit={() => {}} initialValues={{}}>
-              <FormItem>
-                <FormLabel>Project name</FormLabel>
-                <FormControl>
-                  <Input />
-                </FormControl>
-              </FormItem>
-              <FormItem>
-                <FormLabel>Database password</FormLabel>
-                <FormControl>
-                  <Input />
-                </FormControl>
-              </FormItem>
-            </Form> */}
-          </DialogSection>
-          <DialogFooter>
-            <Button type="outline" onClick={() => setShowNewProjectDialog(false)}>
-              Cancel
-            </Button>
-            <Button>Create</Button>
-          </DialogFooter>
+          <Form_Shadcn_ {...form}>
+            <form
+              id={'create-new-project-form'}
+              onSubmit={form.handleSubmit((data) => {
+                if (!selectedBackupId) return
+                triggerClone({
+                  cloneBackupId: selectedBackupId,
+                  name: data.name,
+                  password: data.password,
+                })
+              })}
+            >
+              <DialogSection className="pb-6 space-y-4 text-sm">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout label="New Project Name">
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ placeholder="Enter a name" type="text" {...field} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItemLayout>
+                      <FormControl_Shadcn_>
+                        <Input
+                          id="db-password"
+                          label="Database Password"
+                          type="password"
+                          placeholder="Type in a strong password"
+                          value={field.value}
+                          copy={field.value?.length > 0}
+                          onChange={(e) => {
+                            const value = e.target.value
+                            field.onChange(value)
+                            if (value == '') {
+                              setPasswordStrengthScore(-1)
+                              setPasswordStrengthMessage('')
+                            } else delayedCheckPasswordStrength(value)
+                          }}
+                          descriptionText={
+                            <PasswordStrengthBar
+                              passwordStrengthScore={passwordStrengthScore}
+                              password={field.value}
+                              passwordStrengthMessage={passwordStrengthMessage}
+                              generateStrongPassword={generateStrongPassword}
+                            />
+                          }
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </DialogSection>
+              <DialogFooter>
+                <Button
+                  htmlType="reset"
+                  type="outline"
+                  onClick={() => setShowNewProjectDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button htmlType="submit">Create</Button>
+              </DialogFooter>
+            </form>
+          </Form_Shadcn_>
         </DialogContent>
       </Dialog>
 
       <Panel>
         {data?.backups.length === 0 && <BackupsEmpty />}
-        {data?.backups.map((backup) => (
-          <div className="flex p-4 gap-4 border-b" key={backup.id}>
-            <div>
-              <TimestampInfo value={backup.inserted_at} />
+        <div className="divide-y">
+          {data?.backups.map((backup) => (
+            <div className="flex p-4 gap-4" key={backup.id}>
+              <div>
+                <TimestampInfo value={backup.inserted_at} />
+              </div>
+              <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+              <Button
+                className="ml-auto"
+                type="outline"
+                onClick={() => {
+                  setSelectedBackupId(backup.id)
+                  setShowConfirmationDialog(true)
+                }}
+              >
+                Restore
+              </Button>
             </div>
-            <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-            <Button
-              className="ml-auto"
-              type="outline"
-              onClick={() => {
-                setSelectedBackupId(backup.id)
-                setShowConfirmationDialog(true)
-              }}
-            >
-              Restore
-            </Button>
-          </div>
-        ))}
+          ))}
+        </div>
       </Panel>
     </>
   )
