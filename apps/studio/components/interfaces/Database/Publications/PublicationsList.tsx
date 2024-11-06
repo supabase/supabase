@@ -12,7 +12,7 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import PublicationSkeleton from './PublicationSkeleton'
+import SkeletonTableRow from 'components/ui/SkeletonTableRow'
 import { Search, AlertCircle } from 'lucide-react'
 
 interface PublicationEvent {
@@ -113,7 +113,17 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
         ]}
         body={
           isLoading
-            ? Array.from({ length: 5 }).map((_, i) => <PublicationSkeleton key={i} index={i} />)
+            ? <SkeletonTableRow
+                columns={[
+                  {key: 'name', width: '25%'},
+                  {key: 'id', width: '25%'},
+                  {key: 'insert', isToggle: true},
+                  {key: 'update', isToggle: true},
+                  {key: 'delete', isToggle: true},
+                  {key: 'truncate', isToggle: true},
+                  {key: 'source', align: 'end'}
+                ]}
+              />
             : publications.map((x) => (
                 <Table.tr className="border-t" key={x.name}>
                   <Table.td className="px-4 py-3">{x.name}</Table.td>
