@@ -24,8 +24,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  console.log('AHH', PROJECT_ENDPOINT)
   const response: ProjectSettings = {
     app_config: {
       db_schema: 'public',
