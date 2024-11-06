@@ -43,6 +43,7 @@ import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { PLAN_DETAILS } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { Markdown } from 'components/interfaces/Markdown'
 
 interface PostgresVersionDetails {
   postgresEngine: string
@@ -180,10 +181,12 @@ const ProjectUpgradeAlert = () => {
                   Postgres {currentPgVersion}.
                 </p>
                 {isDiskSizeUpdated && (
-                  <p className="text-sm">
-                    Your disk size will also be reverted back to {includedDiskGB}GB from{' '}
-                    {diskAttributes?.attributes.size_gb}GB with the upgrade.
-                  </p>
+                  <Markdown
+                    extLinks
+                    className="text-foreground"
+                    content={`Your current disk size of ${diskAttributes?.attributes.size_gb}GB will also be
+                    [right-sized](https://supabase.com/docs/guides/platform/upgrading#disk-sizing) with the upgrade.`}
+                  />
                 )}
                 {(data?.potential_breaking_changes ?? []).length > 0 && (
                   <Alert_Shadcn_ variant="destructive" title="Breaking changes">
