@@ -241,7 +241,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (cloneStatus?.status === 'IN_PROGRESS' && false) {
+  if (cloneStatus?.status === 'IN_PROGRESS') {
     return (
       <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
         <Loader2 className="animate-spin" />
