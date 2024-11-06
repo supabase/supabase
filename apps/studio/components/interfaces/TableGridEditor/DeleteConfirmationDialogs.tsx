@@ -1,3 +1,4 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -21,7 +22,7 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Ch
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: Entity
+  selectedTable?: Entity | PostgresTable
   onAfterDeleteTable?: (tables: TablesData) => void
 }
 

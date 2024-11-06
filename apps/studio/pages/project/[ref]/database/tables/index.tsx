@@ -1,3 +1,4 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useState } from 'react'
 
 import { TableList } from 'components/interfaces/Database'
@@ -6,13 +7,12 @@ import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/Del
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
-  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Entity>()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<PostgresTable>()
 
   return (
     <>
@@ -40,10 +40,7 @@ const DatabaseTables: NextPageWithLayout = () => {
       </ScaffoldContainer>
 
       <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
-      <SidePanelEditor
-        includeColumns
-        selectedTable={isTableLike(selectedTableToEdit) ? selectedTableToEdit : undefined}
-      />
+      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit} />
     </>
   )
 }

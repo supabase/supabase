@@ -5,7 +5,6 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
-import { Entity } from 'data/table-editor/table-editor-types'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 
@@ -14,7 +13,7 @@ export type DatabaseColumnDeleteVariables = {
   connectionString?: string
   id: string
   cascade?: boolean
-  table?: Entity
+  table?: { id: number; schema: string; name: string }
 }
 
 export async function deleteDatabaseColumn({
