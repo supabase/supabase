@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ComponentProps, PropsWithChildren, useCallback } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -8,7 +9,6 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { prefetchEntityTypes } from 'data/entity-types/entity-types-infinite-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useRouter } from 'next/router'
 
 export function usePrefetchEditorIndexPage() {
   const router = useRouter()
@@ -31,12 +31,16 @@ export function usePrefetchEditorIndexPage() {
     prefetchSchemas(queryClient, {
       projectRef: project.ref,
       connectionString: project.connectionString,
+    }).catch(() => {
+      // eat prefetching errors as they are not critical
     })
     prefetchEntityTypes(queryClient, {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       sort: entityTypesSort,
       filterTypes: Object.values(ENTITY_TYPE),
+    }).catch(() => {
+      // eat prefetching errors as they are not critical
     })
   }, [entityTypesSort, project, queryClient, router])
 }

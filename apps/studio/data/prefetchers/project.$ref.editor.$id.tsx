@@ -42,37 +42,41 @@ export function usePrefetchEditorTablePage() {
         projectRef: project.ref,
         connectionString: project.connectionString,
         id,
-      }).then((tableData) => {
-        const entity = tableData.entity
-        const table = getTableLikeFromTableEditor(tableData)
-
-        if (entity && table) {
-          const supaTable = getSupaTable({
-            selectedTable: table,
-            encryptedColumns: tableData.encrypted_columns ?? undefined,
-            entityType: entity.type,
-          })
-
-          const { sorts: localSorts = [], filters: localFilters = [] } =
-            loadTableEditorSortsAndFiltersFromLocalStorage(
-              project.ref,
-              entity.name,
-              entity.schema
-            ) ?? {}
-
-          prefetchTableRows(queryClient, {
-            queryKey: [supaTable.schema, supaTable.name],
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            table: supaTable,
-            sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
-            filters: filters ?? formatFilterURLParams(localFilters),
-            page: 1,
-            limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
-            impersonatedRole: roleImpersonationState.role,
-          })
-        }
       })
+        .then((tableData) => {
+          const entity = tableData.entity
+          const table = getTableLikeFromTableEditor(tableData)
+
+          if (entity && table) {
+            const supaTable = getSupaTable({
+              selectedTable: table,
+              encryptedColumns: tableData.encrypted_columns ?? undefined,
+              entityType: entity.type,
+            })
+
+            const { sorts: localSorts = [], filters: localFilters = [] } =
+              loadTableEditorSortsAndFiltersFromLocalStorage(
+                project.ref,
+                entity.name,
+                entity.schema
+              ) ?? {}
+
+            return prefetchTableRows(queryClient, {
+              queryKey: [supaTable.schema, supaTable.name],
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              table: supaTable,
+              sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
+              filters: filters ?? formatFilterURLParams(localFilters),
+              page: 1,
+              limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
+              impersonatedRole: roleImpersonationState.role,
+            })
+          }
+        })
+        .catch(() => {
+          // eat prefetching errors as they are not critical
+        })
     },
     [project, queryClient, roleImpersonationState.role, router, tableEditorPrefetchingEnabled]
   )
