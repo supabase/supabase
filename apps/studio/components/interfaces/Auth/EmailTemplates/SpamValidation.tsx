@@ -1,5 +1,3 @@
-import { Check } from 'lucide-react'
-
 import { Markdown } from 'components/interfaces/Markdown'
 import InformationBox from 'components/ui/InformationBox'
 import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
@@ -14,13 +12,13 @@ interface SpamValidationProps {
 // are hence not visualized in the UI
 
 export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
-  const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
+  const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score >= 0)
   const hasSpamWarning = spamRules.length > 0
 
   return (
     <InformationBox
-      className={cn('mb-2', hasSpamWarning && '!bg-alternative')}
-      icon={hasSpamWarning ? <WarningIcon /> : <Check size={16} className="text-brand" />}
+      className={cn('mb-2', hasSpamWarning && '!bg-alternative/75', '!px-0', 'rounded-t-none')}
+      icon={hasSpamWarning && <WarningIcon />}
       title={
         hasSpamWarning
           ? 'Email has a high probability of being marked as spam and deliverability may be affected'
@@ -39,15 +37,15 @@ export const SpamValidation = ({ validationResult }: SpamValidationProps) => {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Warning</TableHead>
-                      <TableHead>Description</TableHead>
+                      <TableHead className="h-10">Warning</TableHead>
+                      <TableHead className="h-10">Description</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {spamRules.map((rule) => (
                       <TableRow key={rule.name}>
-                        <TableCell>{rule.name}</TableCell>
-                        <TableCell>{rule.desc}</TableCell>
+                        <TableCell className="py-2.5">{rule.name}</TableCell>
+                        <TableCell className="py-2.5">{rule.desc}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

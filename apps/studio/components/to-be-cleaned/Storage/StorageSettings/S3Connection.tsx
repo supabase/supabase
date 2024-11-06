@@ -41,9 +41,10 @@ export const S3Connection = () => {
     { enabled: canReadS3Credentials }
   )
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
-  const s3connectionUrl = getConnectionURL(projectRef ?? '', endpoint)
+  const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)
 
   return (
     <>

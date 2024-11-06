@@ -1251,6 +1251,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/routing',
         },
         {
+          name: 'Background Tasks',
+          url: '/guides/functions/background-tasks',
+        },
+        {
           name: 'Running AI Models',
           url: '/guides/functions/ai-models',
         },

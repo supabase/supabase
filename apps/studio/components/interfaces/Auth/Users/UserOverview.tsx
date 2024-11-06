@@ -149,7 +149,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
-    const endpoint = settings.app_config?.endpoint
+    const protocol = settings?.app_config?.protocol ?? 'https'
+    const endpoint = settings?.app_config?.endpoint
     const { serviceKey } = getAPIKeys(settings)
 
     if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
@@ -157,7 +158,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
     updateUser({
       projectRef,
-      protocol: 'https',
+      protocol,
       endpoint,
       serviceApiKey: serviceKey.api_key,
       userId: user.id,

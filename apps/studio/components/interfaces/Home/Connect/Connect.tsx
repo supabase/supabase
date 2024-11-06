@@ -128,8 +128,9 @@ const Connect = () => {
     return []
   }
 
-  const endpoint = settings?.app_config?.endpoint
-  const apiHost = canReadAPIKeys ? `https://${endpoint ?? '-'}` : ''
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
+  const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null
 
   const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }
@@ -150,7 +151,7 @@ const Connect = () => {
             <span>Connect</span>
           </Button>
         </DialogTrigger>
-        <DialogContent className={cn('sm:max-w-5xl p-0')}>
+        <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
           <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>

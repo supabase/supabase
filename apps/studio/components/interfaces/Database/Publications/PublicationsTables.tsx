@@ -87,7 +87,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
 
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-      {isSuccess && tables.length === 0 && <NoSearchResults />}
+      {isSuccess && tables?.length === 0 && <NoSearchResults />}
 
       <Table
         head={[
@@ -137,7 +137,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
             ))
           ) : (
             <Table.tr>
-              <Table.td colSpan={4}>No publications found</Table.td>
+              <Table.td colSpan={4}>No tables found</Table.td>
             </Table.tr>
           )
         }

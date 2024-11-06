@@ -3,6 +3,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
@@ -20,7 +21,7 @@ export async function sendPage({ body }: { body: SendPagePayload }) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent) return undefined
+  if (!consent || !IS_PLATFORM) return undefined
 
   const headers = { Version: '2' }
   const { data, error } = await post(`/platform/telemetry/page`, { body, headers })

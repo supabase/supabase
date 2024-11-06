@@ -9,16 +9,21 @@ export const generateDatabaseMenu = (
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
-    cronUiEnabled: boolean
   }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges, cronUiEnabled } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
 
   return [
     {
       title: 'Database Management',
       items: [
+        {
+          name: 'Schema Visualizer',
+          key: 'schemas',
+          url: `/project/${ref}/database/schemas`,
+          items: [],
+        },
         { name: 'Tables', key: 'tables', url: `/project/${ref}/database/tables`, items: [] },
         {
           name: 'Functions',
@@ -128,18 +133,6 @@ export const generateDatabaseMenu = (
       title: 'Tools',
       items: [
         {
-          name: 'Schema Visualizer',
-          key: 'schemas',
-          url: `/project/${ref}/database/schemas`,
-          items: [],
-        },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/database/query-performance`,
-          items: [],
-        },
-        {
           name: 'Security Advisor',
           key: 'security-advisor',
           url: `/project/${ref}/advisors/security`,
@@ -150,6 +143,13 @@ export const generateDatabaseMenu = (
           name: 'Performance Advisor',
           key: 'performance-advisor',
           url: `/project/${ref}/advisors/performance`,
+          rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
+          items: [],
+        },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/advisors/query-performance`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },
