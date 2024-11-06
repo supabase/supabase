@@ -8,7 +8,9 @@ export const useCopyUrl = (ref: string) => {
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  const apiUrl = `https://${settings?.app_config?.endpoint ?? '-'}`
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
 
   const onCopyUrl = (name: string, url: string | Promise<string>) => {
     const formattedUrl = Promise.resolve(url).then((url) => {
