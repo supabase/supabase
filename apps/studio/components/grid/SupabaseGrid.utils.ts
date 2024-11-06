@@ -62,11 +62,10 @@ export function formatFilterURLParams(filter?: string[]): Filter[] {
   ) as Filter[]
 }
 
-export function parseSupaTable(data: Entity): SupaTable {
-  const table = data
-  const columns = data.columns
-  const primaryKeys = isTableLike(data) ? data.primary_keys : []
-  const relationships = isTableLike(data) ? data.relationships : []
+export function parseSupaTable(table: Entity): SupaTable {
+  const columns = table.columns
+  const primaryKeys = isTableLike(table) ? table.primary_keys : []
+  const relationships = isTableLike(table) ? table.relationships : []
 
   const supaColumns: SupaColumn[] = columns.map((column) => {
     const temp = {

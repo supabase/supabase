@@ -44,7 +44,7 @@ const Policies = ({
     schema: string
     name: string
     rls_enabled: boolean
-  } | null>(null)
+  }>()
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
   const { mutate: updateTable } = useTableUpdateMutation({
@@ -66,7 +66,7 @@ const Policies = ({
 
   const closeConfirmModal = () => {
     setSelectedPolicyToDelete({})
-    setSelectedTableToToggleRLS(null)
+    setSelectedTableToToggleRLS(undefined)
   }
 
   const onSelectToggleRLS = (table: {
@@ -185,7 +185,7 @@ const Policies = ({
 
       <ConfirmModal
         danger={selectedTableToToggleRLS?.rls_enabled}
-        visible={selectedTableToToggleRLS !== null}
+        visible={selectedTableToToggleRLS !== undefined}
         title={`Confirm to ${
           selectedTableToToggleRLS?.rls_enabled ? 'disable' : 'enable'
         } Row Level Security`}

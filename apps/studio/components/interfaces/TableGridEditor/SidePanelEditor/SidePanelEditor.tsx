@@ -462,11 +462,11 @@ const SidePanelEditor = ({
           primaryKey,
         })
 
-        if (isTableLike(table)) {
-          await updateTableRealtime(table, isRealtimeEnabled)
-        }
         if (table === undefined) {
           return toast.error('Failed to update table')
+        }
+        if (isTableLike(table)) {
+          await updateTableRealtime(table, isRealtimeEnabled)
         }
 
         if (hasError) {
