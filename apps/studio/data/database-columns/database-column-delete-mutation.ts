@@ -4,8 +4,7 @@ import { toast } from 'sonner'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
-import { TableLike } from 'data/table-editor/table-editor-query'
-import { tableKeys } from 'data/tables/keys'
+import { tableEditorKeys } from 'data/table-editor/keys'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 
@@ -14,7 +13,7 @@ export type DatabaseColumnDeleteVariables = {
   connectionString?: string
   id: string
   cascade?: boolean
-  table?: TableLike
+  table?: { id: number; schema: string; name: string }
 }
 
 export async function deleteDatabaseColumn({
@@ -62,9 +61,7 @@ export const useDatabaseColumnDeleteMutation = ({
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           ...(table !== undefined
             ? [
-                queryClient.invalidateQueries(
-                  sqlKeys.query(projectRef, ['table-editor', table.id])
-                ),
+                queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
                 queryClient.invalidateQueries(
                   sqlKeys.query(projectRef, [table.schema, table.name])
                 ),
