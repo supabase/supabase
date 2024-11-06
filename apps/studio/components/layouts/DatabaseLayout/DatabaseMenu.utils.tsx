@@ -50,7 +50,13 @@ export const generateDatabaseMenu = (
           key: 'indexes',
           url: `/project/${ref}/database/indexes`,
           items: [],
-        }
+        },
+        {
+          name: 'Publications',
+          key: 'publications',
+          url: `/project/${ref}/database/publications`,
+          items: [],
+        },
       ],
     },
     {
