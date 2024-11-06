@@ -15,7 +15,7 @@ export async function triggerClone({ projectRef, cloneBackupId }: ProjectCloneVa
   const { data, error } = await post('/platform/database/{ref}/clone', {
     params: { path: { ref: projectRef } },
     body: { id: cloneBackupId },
-  })
+  } as any) // REMOVE AS ANY WHEN GENERATED API TYPES ARE FIXED
 
   if (error) handleError(error)
   return data
