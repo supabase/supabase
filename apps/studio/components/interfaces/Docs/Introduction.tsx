@@ -3,8 +3,6 @@ import Snippets from 'components/interfaces/Docs/Snippets'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import CodeSnippet from './CodeSnippet'
 import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
 
@@ -18,7 +16,7 @@ export default function Introduction({ selectedLang }: Props) {
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
 
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint
   const endpoint = `${protocol}://${hostEndpoint ?? ''}`
 

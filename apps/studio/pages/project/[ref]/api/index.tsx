@@ -9,8 +9,6 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 const PageConfig: NextPageWithLayout = () => {
   return <DocView />
@@ -39,7 +37,7 @@ const DocView = () => {
 
   const refreshDocs = async () => await refetch()
 
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'

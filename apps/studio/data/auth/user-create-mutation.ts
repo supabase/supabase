@@ -10,6 +10,7 @@ import { authKeys } from './keys'
 
 export type UserCreateVariables = {
   projectRef?: string
+  protocol: string
   endpoint: string
   serviceApiKey: string
   user: {
@@ -36,8 +37,7 @@ export type UserCreateResponse = {
   user_metadata: any
 }
 
-export async function createUser({ endpoint, serviceApiKey, user }: UserCreateVariables) {
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+export async function createUser({ protocol, endpoint, serviceApiKey, user }: UserCreateVariables) {
   const response = await post(
     `${protocol}://${endpoint}/auth/v1/admin/users`,
     {

@@ -2,7 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { components } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { PROJECT_ENDPOINT } from 'pages/api/constants'
+import { PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+
+type ProjectAppConfig = components['schemas']['ProjectAppConfigResponse'] & { protocol?: string }
+export type ProjectSettings = components['schemas']['ProjectSettingsResponse'] & {
+  app_config?: ProjectAppConfig
+}
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -20,10 +25,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
-  const response: components['schemas']['ProjectSettingsResponse'] = {
+  console.log('AHH', PROJECT_ENDPOINT)
+  const response: ProjectSettings = {
     app_config: {
       db_schema: 'public',
       endpoint: PROJECT_ENDPOINT,
+      // manually added to force the frontend to use the correct URL
+      protocol: PROJECT_ENDPOINT_PROTOCOL,
     },
     cloud_provider: 'AWS',
     db_dns_name: '-',

@@ -69,6 +69,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
     }
 
     const durationHours = data.unit === 'hours' ? Number(data.value) : Number(data.value) * 24
+    const protocol = settings?.app_config?.protocol ?? 'https'
     const endpoint = settings?.app_config?.endpoint
     const { serviceKey } = getAPIKeys(settings)
 
@@ -77,6 +78,7 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
 
     updateUser({
       projectRef,
+      protocol,
       endpoint,
       serviceApiKey: serviceKey.api_key,
       userId: user.id,

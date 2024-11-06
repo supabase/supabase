@@ -128,8 +128,7 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef: string, url: string, serviceKey: string) {
-    const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+  initStore(projectRef: string, url: string, serviceKey: string, protocol: string) {
     this.projectRef = projectRef
     this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey

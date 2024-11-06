@@ -2,15 +2,13 @@ import { toast } from 'sonner'
 
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 export const useCopyUrl = (ref: string) => {
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
 
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint ?? '-'}`
 

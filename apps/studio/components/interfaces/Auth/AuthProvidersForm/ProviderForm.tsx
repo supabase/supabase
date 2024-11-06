@@ -13,8 +13,7 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { BASE_PATH } from 'lib/constants'
 import {
   Alert,
   Alert_Shadcn_,
@@ -112,7 +111,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   }
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
   const apiUrl = `${protocol}://${endpoint}`
 

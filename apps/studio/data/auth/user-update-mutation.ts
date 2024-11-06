@@ -9,6 +9,7 @@ import { authKeys } from './keys'
 
 export type UserUpdateVariables = {
   projectRef?: string
+  protocol: string
   endpoint: string
   serviceApiKey: string
 
@@ -18,6 +19,7 @@ export type UserUpdateVariables = {
 }
 
 export async function updateUser({
+  protocol,
   endpoint,
   serviceApiKey,
   userId,
@@ -25,7 +27,6 @@ export async function updateUser({
 }: UserUpdateVariables) {
   // [Joshen] This is probably the only endpoint that needs the put method from lib/common/fetch
   // as it's not our internal API.
-  const protocol = IS_PLATFORM ? 'https' : PROJECT_ENDPOINT_PROTOCOL
   const response = await put(
     `${protocol}://${endpoint}/auth/v1/admin/users/${userId}`,
     { ban_duration: typeof banDuration === 'number' ? `${banDuration}h` : banDuration },
