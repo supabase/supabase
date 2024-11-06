@@ -22,7 +22,6 @@ export async function getProjectSettings(
   })
 
   if (error) handleError(error)
-  console.log(data)
   return data as unknown as ProjectSettings
 }
 
