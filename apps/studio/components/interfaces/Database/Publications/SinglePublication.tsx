@@ -12,7 +12,6 @@ import { useDatabasePublicationUpdateMutation } from 'data/database-publications
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import SkeletonTableRow from 'components/ui/SkeletonTableRow'
 import { AlertCircle } from 'lucide-react'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 interface PublicationEvent {
   event: string
@@ -27,12 +26,15 @@ interface SinglePublicationViewProps {
 const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) => {
   const { project } = useProjectContext()
 
-  const { data: publication, isLoading } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  }, {
-    select: (data) => data.find(pub => pub.name === publicationName)
-  })
+  const { data: publication, isLoading } = useDatabasePublicationsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select: (data) => data.find((pub) => pub.name === publicationName),
+    }
+  )
 
   const { mutate: updatePublications } = useDatabasePublicationUpdateMutation({
     onSuccess: () => {
@@ -51,7 +53,7 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
     { event: 'Insert', key: 'publish_insert', example: 'Adding a new todo "Buy groceries"' },
     { event: 'Update', key: 'publish_update', example: 'Marking a todo as completed' },
     { event: 'Delete', key: 'publish_delete', example: 'Deleting the "Buy groceries" todo' },
-    { event: 'Truncate', key: 'publish_truncate', example: 'Clearing all todos from the table' }
+    { event: 'Truncate', key: 'publish_truncate', example: 'Clearing all todos from the table' },
   ]
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
@@ -88,7 +90,9 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
         head={[
           <Table.th key="header.event">Event Type</Table.th>,
           <Table.th key="header.example">Example</Table.th>,
-          <Table.th key="header.status"><span className="sr-only">Enabled</span></Table.th>,
+          <Table.th key="header.status">
+            <span className="sr-only">Enabled</span>
+          </Table.th>,
         ]}
         body={
           isLoading ? (
@@ -99,7 +103,7 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
                 columns={[
                   { key: 'event', width: '25%' },
                   { key: 'example', width: '50%' },
-                  { key: 'status', isToggle: true, align: 'end' }
+                  { key: 'status', isToggle: true, align: 'end' },
                 ]}
               />
             ))
@@ -109,7 +113,7 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
                 <Table.td className="px-4 py-3">{event.event}</Table.td>
                 <Table.td className="px-4 py-3">{event.example}</Table.td>
                 <Table.td>
-                  <div className='flex justify-end gap-2'>
+                  <div className="flex justify-end gap-2">
                     <Toggle
                       size="tiny"
                       checked={(publication as any)[event.key]}

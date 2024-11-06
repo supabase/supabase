@@ -12,6 +12,7 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 import SinglePublicationView from 'components/interfaces/Database/Publications/SinglePublication'
 import { Loading } from 'components/ui/Loading'
+import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
@@ -20,16 +21,16 @@ import { Loading } from 'components/ui/Loading'
 const DatabasePublications: NextPageWithLayout = () => {
   const { project } = useProjectContext()
 
-  const { data, isLoading } = useDatabasePublicationsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  },
-  {
-    select: (data) => data.find(pub => pub.name === 'supabase_realtime')
-  })
+  const { data, isLoading } = useDatabasePublicationsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select: (data) => data.find((pub) => pub.name === 'supabase_realtime'),
+    }
+  )
   const realtimePublication = data ?? null
-
-  console.log("publications:", realtimePublication);
 
   const canViewPublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
@@ -41,28 +42,45 @@ const DatabasePublications: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="view database publications" />
   }
 
-  return (
+  return isLoading ? (
+    <Loading />
+  ) : realtimePublication ? (
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-10">
             <div>
-              <FormHeader title="Events" description='Which events would you like to broadcast' />
-              <SinglePublicationView publicationName={"supabase_realtime"} />
+              <FormHeader title="Events" description="Which events would you like to broadcast" />
+              <SinglePublicationView publicationName={'supabase_realtime'} />
             </div>
             <div>
-              <FormHeader title="Tables" description='Which tables would you like to broadcast the events on' />
-              <PublicationsTables
-                selectedPublication={realtimePublication}
+              <FormHeader
+                title="Tables"
+                description="Which tables would you like to broadcast the events on"
               />
+              <PublicationsTables selectedPublication={realtimePublication} />
             </div>
           </div>
         </div>
       </ScaffoldSection>
     </ScaffoldContainer>
+  ) : (
+    <div className="storage-container flex flex-grow">
+      <ProductEmptyState
+        title="Realtime is disabled"
+        infoButtonLabel="About realtime"
+        infoButtonUrl="https://supabase.com/docs/guides/realtime"
+      >
+        <p className="text-foreground-light text-sm">
+          Send and receive messages to connected clients.
+        </p>
+      </ProductEmptyState>
+    </div>
   )
 }
 
-DatabasePublications.getLayout = (page) => <RealtimeLayout title="Publications">{page}</RealtimeLayout>
+DatabasePublications.getLayout = (page) => (
+  <RealtimeLayout title="Publications">{page}</RealtimeLayout>
+)
 
 export default DatabasePublications

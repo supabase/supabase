@@ -112,7 +112,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
                 ]}
               />
             ))
-          ) : (
+          ) : tables ? (
             tables?.map((table: any) => (
               <PublicationsTableItem
                 key={table.id}
@@ -120,6 +120,10 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
                 selectedPublication={selectedPublication}
               />
             ))
+          ) : (
+            <Table.tr>
+              <Table.td colSpan={4}>No publications found</Table.td>
+            </Table.tr>
           )
         }
       />
