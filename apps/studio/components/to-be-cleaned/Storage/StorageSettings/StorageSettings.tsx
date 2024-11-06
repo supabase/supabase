@@ -35,6 +35,7 @@ import {
 } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -115,7 +116,7 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
+  const { fileSizeLimit: limit, unit: storageUnit, imageTransformationEnabled } = form.watch()
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -233,7 +234,7 @@ const StorageSettings = () => {
 
               <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                 <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
-                  <p className="text-sm">Image Transformation</p>
+                  <p className="text-sm">Enable Image Transformation</p>
                 </div>
                 <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
                   <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
@@ -250,10 +251,7 @@ const StorageSettings = () => {
                       )}
                     />
                   </div>
-                  <p className={'text-sm text-foreground-light col-start-5 col-span-8'}>
-                    Toggle image transformation feature.
-                    <br /> When disabled transformation endpoints will not be reachable
-                  </p>
+                  <Markdown content="Optimize and resize images on the fly. [Learn more](https://supabase.com/docs/guides/storage/serving/image-transformations)." />
                 </div>
               </div>
             </div>
