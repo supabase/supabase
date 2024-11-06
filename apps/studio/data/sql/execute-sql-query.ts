@@ -55,7 +55,11 @@ export async function executeSql(
       header: { 'x-connection-encrypted': connectionString ?? '' },
       path: { ref: projectRef },
       // @ts-ignore: This is just a client side thing to identify queries better
-      query: { key: queryKey?.filter((seg) => typeof seg === 'string').join('-') ?? '' },
+      query: {
+        key:
+          queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
+          '',
+      },
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),

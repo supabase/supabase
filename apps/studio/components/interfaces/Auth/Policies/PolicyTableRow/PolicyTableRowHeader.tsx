@@ -2,7 +2,6 @@ import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -18,9 +17,19 @@ import {
 } from 'ui'
 
 interface PolicyTableRowHeaderProps {
-  table: PostgresTable
+  table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }
   isLocked: boolean
-  onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectToggleRLS: (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => void
   onSelectCreatePolicy: () => void
 }
 

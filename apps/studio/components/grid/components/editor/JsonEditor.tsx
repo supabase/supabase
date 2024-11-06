@@ -1,4 +1,3 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { isNil } from 'lodash'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
@@ -7,10 +6,8 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useTrackedState } from 'components/grid/store/Store'
-import {
-  getTableLikeFromTableEditor,
-  useTableEditorQuery,
-} from 'data/table-editor/table-editor-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -61,12 +58,11 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const id = _id ? Number(_id) : undefined
   const project = useSelectedProject()
 
-  const { data } = useTableEditorQuery({
+  const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-  const selectedTable = getTableLikeFromTableEditor(data)
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as string
@@ -82,12 +78,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 
