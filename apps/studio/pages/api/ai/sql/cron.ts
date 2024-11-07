@@ -67,7 +67,10 @@ export default async function handler(req: NextRequest) {
 }
 
 export async function handlePost(req: NextRequest) {
-  const body = await req.json()
+  const body = await (req.json() as Promise<{
+    prompt: string
+  }>)
+
   const { prompt } = body
   console.log('prompt', prompt)
   try {
@@ -106,30 +109,3 @@ export async function handlePost(req: NextRequest) {
     )
   }
 }
-
-// async function handlePost(request: NextRequest) {
-//   const openai = new OpenAI({ apiKey: openAiKey })
-
-//   const body = await (request.json() as Promise<{
-//     messages: { content: string; role: 'user' | 'assistant' }[]
-//   }>)
-
-//   const { messages } = body
-
-//   try {
-//     const stream = await chatCron(openai, messages)
-//     return new StreamingTextResponse(stream)
-//   } catch (error) {
-//     console.error(error)
-
-//     return new Response(
-//       JSON.stringify({
-//         error: 'There was an error processing your request',
-//       }),
-//       {
-//         status: 500,
-//         headers: { 'Content-Type': 'application/json' },
-//       }
-//     )
-//   }
-// }

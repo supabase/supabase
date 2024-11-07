@@ -176,11 +176,11 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                           : 'text-foreground'
                       )}
                     >
-                      {isGeneratingCron ? '* * * * * *' : presetValue || '* * * * * *'}
+                      {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
                     </span>
                   ) : (
                     <span className="text-xl font-mono text-foreground-lighter">
-                      {isGeneratingCron ? '* * * * * *' : presetValue || '* * * * * *'}
+                      {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
                     </span>
                   )}
                   {scheduleString ? (
@@ -222,5 +222,27 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
         }}
       />
     </SheetSection>
+  )
+}
+
+const CronSyntaxLoader = () => {
+  return (
+    <div className="flex gap-2">
+      {['*', '*', '*', '*', '*', '*'].map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0.3 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.6,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            delay: i * 0.15,
+          }}
+        >
+          {char}
+        </motion.span>
+      ))}
+    </div>
   )
 }

@@ -1,10 +1,8 @@
-import { OpenAIStream } from 'ai'
-import { codeBlock, oneLine, stripIndent } from 'common-tags'
+import { SchemaBuilder } from '@serafin/schema-builder'
+import { stripIndent } from 'common-tags'
 import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
-import type { Message } from '../types'
-import { SchemaBuilder } from '@serafin/schema-builder'
-import { debugSql } from './functions'
+import { jsonrepair } from 'jsonrepair'
 
 /**
  * Responds to a natural language request for cron syntax.
@@ -87,14 +85,15 @@ export async function chatCron(openai: OpenAI, prompt: string) {
       ],
     })
 
-    // Parse the JSON string in arguments to get make sure we have the cron_expression
+    // Parse the JSON string in arguments using jsonrepair
     const functionArgs = response?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments
     if (!functionArgs) {
       throw new Error('No cron expression generated')
     }
 
-    // Parse the JSON string to get the cron_expression
-    const args = JSON.parse(functionArgs)
+    // Use jsonrepair before parsing
+    const repairedJsonString = jsonrepair(functionArgs)
+    const args = JSON.parse(repairedJsonString)
     console.log('args', args.cron_expression)
     return args.cron_expression
   } catch (error) {
