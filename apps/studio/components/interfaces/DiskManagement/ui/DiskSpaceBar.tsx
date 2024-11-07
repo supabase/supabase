@@ -92,7 +92,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 <div className="h-full flex">
                   <div
                     className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{ width: `${usedPercentage}%` }}
+                    style={{ width: `${usedPercentage >= 100 ? 100 : usedPercentage}%` }}
                   >
                     <div
                       className="absolute inset-0"
@@ -109,7 +109,9 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                   </div>
                   <div
                     className="bg-transparent border-r transition-all duration-500 ease-in-out"
-                    style={{ width: `${resizePercentage - usedPercentage}%` }}
+                    style={{
+                      width: `${resizePercentage - usedPercentage <= 0 ? 0 : resizePercentage - usedPercentage}%`,
+                    }}
                   />
                 </div>
               </motion.div>
