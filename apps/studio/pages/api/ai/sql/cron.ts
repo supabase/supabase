@@ -1,111 +1,58 @@
-import { StreamingTextResponse } from 'ai'
-import { chatCron } from 'ai-commands/edge'
-import { NextRequest } from 'next/server'
-import OpenAI from 'openai'
 import { ContextLengthError } from 'ai-commands'
+import { chatCron } from 'ai-commands/edge'
+import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-
-export const config = {
-  runtime: 'edge',
-  /* To avoid OpenAI errors, restrict to the Vercel Edge Function regions that
-  overlap with the OpenAI API regions.
-
-  Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
-  Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
-  */
-  regions: [
-    'arn1',
-    'bom1',
-    'cdg1',
-    'cle1',
-    'cpt1',
-    'dub1',
-    'fra1',
-    'gru1',
-    'hnd1',
-    'iad1',
-    'icn1',
-    'kix1',
-    'lhr1',
-    'pdx1',
-    'sfo1',
-    'sin1',
-    'syd1',
-  ],
-}
+import OpenAI from 'openai'
 
 const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
-export default async function handler(req: NextRequest) {
+async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(500).json({
+      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+    })
   }
 
   const { method } = req
 
   switch (method) {
     case 'POST':
-      return handlePost(req)
+      return handlePost(req, res)
     default:
-      return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
-        {
-          status: 405,
-          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
-        }
-      )
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
-export async function handlePost(req: NextRequest) {
-  const body = await (req.json() as Promise<{
-    prompt: string
-  }>)
+export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const {
+    body: { prompt },
+  } = req
 
-  const { prompt } = body
-  console.log('prompt', prompt)
   try {
     const result = await chatCron(openai, prompt)
-    return new Response(JSON.stringify(result), {
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return res.json(result)
   } catch (error) {
     if (error instanceof Error) {
       console.error(`AI cron generation failed: ${error.message}`)
 
       if (error instanceof ContextLengthError) {
-        return new Response(
-          JSON.stringify({
-            error:
-              'Your cron prompt is too large for Supabase AI to ingest. Try splitting it into smaller prompts.',
-          }),
-          {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          }
-        )
+        return res.status(400).json({
+          error:
+            'Your cron prompt is too large for Supabase AI to ingest. Try splitting it into smaller prompts.',
+        })
       }
     } else {
       console.log(`Unknown error: ${error}`)
     }
 
-    return new Response(
-      JSON.stringify({
-        error: 'There was an unknown error generating the cron syntax. Please try again.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(500).json({
+      error: 'There was an unknown error generating the cron syntax. Please try again.',
+    })
   }
 }
+
+const wrapper = (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
+
+export default wrapper

@@ -4,11 +4,7 @@ import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
 import { jsonrepair } from 'jsonrepair'
 
-/**
- * Responds to a natural language request for cron syntax.
- *
- * @returns A `ReadableStream` containing the response text and SQL.
- */
+// Responds to a natural language request for cron syntax.
 export async function chatCron(openai: OpenAI, prompt: string) {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
@@ -45,10 +41,6 @@ export async function chatCron(openai: OpenAI, prompt: string) {
       `,
     },
   ]
-
-  // if (prompt) {
-  //   initMessages.push({ role: 'user', content: prompt })
-  // }
 
   const generateCronSyntaxSchema = SchemaBuilder.emptySchema().addString('cron_expression', {
     description: stripIndent`
@@ -94,7 +86,7 @@ export async function chatCron(openai: OpenAI, prompt: string) {
     // Use jsonrepair before parsing
     const repairedJsonString = jsonrepair(functionArgs)
     const args = JSON.parse(repairedJsonString)
-    console.log('args', args.cron_expression)
+
     return args.cron_expression
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'context_length_exceeded') {
