@@ -40,6 +40,7 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
   const canReadVercelConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -53,8 +54,6 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
@@ -187,7 +186,7 @@ You can change the scope of the access for Supabase by configuring
                           >
                             <IntegrationConnectionItem
                               connection={connection}
-                              disabled={!canUpdateVercelConnection}
+                              disabled={isBranch || !canUpdateVercelConnection}
                               type={'Vercel' as IntegrationName}
                               onDeleteConnection={onDeleteVercelConnection}
                               className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
@@ -198,7 +197,7 @@ You can change the scope of the access for Supabase by configuring
                                   <VercelIntegrationConnectionForm
                                     connection={connection}
                                     integration={vercelIntegration}
-                                    disabled={!canUpdateVercelConnection}
+                                    disabled={isBranch || !canUpdateVercelConnection}
                                   />
                                 </div>
                               </div>
@@ -216,7 +215,7 @@ You can change the scope of the access for Supabase by configuring
                   )}
                   <EmptyIntegrationConnection
                     orgSlug={org?.slug}
-                    disabled={!canCreateVercelConnection}
+                    disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >
                     Add new project connection

@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useFlag } from 'hooks/ui/useFlag'
 import { put } from 'lib/common/fetch'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 

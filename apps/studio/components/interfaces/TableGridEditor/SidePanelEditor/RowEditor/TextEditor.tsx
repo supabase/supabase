@@ -1,5 +1,4 @@
 import { Editor } from '@monaco-editor/react'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
@@ -8,10 +7,8 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import {
-  getTableLikeFromTableEditor,
-  useTableEditorQuery,
-} from 'data/table-editor/table-editor-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -40,12 +37,11 @@ export const TextEditor = ({
   const id = _id ? Number(_id) : undefined
   const project = useSelectedProject()
 
-  const { data } = useTableEditorQuery({
+  const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-  const selectedTable = getTableLikeFromTableEditor(data)
 
   const [strValue, setStrValue] = useState('')
   const [view, setView] = useState<'edit' | 'view'>('edit')
@@ -55,12 +51,18 @@ export const TextEditor = ({
   const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined || row === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (
+      selectedTable === undefined ||
+      project === undefined ||
+      row === undefined ||
+      !isTableLike(selectedTable)
+    )
+      return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 

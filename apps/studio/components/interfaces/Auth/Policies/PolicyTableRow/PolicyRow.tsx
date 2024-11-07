@@ -11,6 +11,7 @@ import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -45,8 +46,9 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
-        ' '
+      className={cn(
+        'flex border-overlay',
+        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
       )}
     >
       <div className="flex grow flex-col space-y-1">

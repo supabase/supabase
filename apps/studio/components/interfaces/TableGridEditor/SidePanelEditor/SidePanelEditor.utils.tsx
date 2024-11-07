@@ -15,10 +15,10 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { getTable } from 'data/tables/get-table'
 import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
 import { timeout, tryParseJson } from 'lib/helpers'
@@ -497,8 +497,8 @@ export const createTable = async ({
 
     // Then add the primary key constraints here to support composite keys
     const primaryKeyColumns = columns
-      .filter((column: ColumnField) => column.isPrimaryKey)
-      .map((column: ColumnField) => column.name)
+      .filter((column) => column.isPrimaryKey)
+      .map((column) => column.name)
     if (primaryKeyColumns.length > 0) {
       await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
     }
@@ -521,7 +521,7 @@ export const createTable = async ({
           projectRef,
           connectionString,
           importContent.file,
-          table as PostgresTable,
+          table,
           importContent.selectedHeaders,
           (progress: number) => {
             toast.loading(
@@ -564,7 +564,7 @@ export const createTable = async ({
         await insertTableRows(
           projectRef,
           connectionString,
-          table as PostgresTable,
+          table,
           importContent.rows,
           importContent.selectedHeaders,
           (progress: number) => {
@@ -688,16 +688,12 @@ export const updateTable = async ({
         projectRef: projectRef,
         connectionString: connectionString,
         payload: columnPayload,
-        selectedTable: updatedTable as PostgresTable,
+        selectedTable: updatedTable,
       })
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
       if (originalColumn) {
-        const columnPayload = generateUpdateColumnPayload(
-          originalColumn,
-          updatedTable as PostgresTable,
-          column
-        )
+        const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
@@ -707,7 +703,7 @@ export const updateTable = async ({
             connectionString: connectionString,
             id: column.id,
             payload: columnPayload,
-            selectedTable: updatedTable as PostgresTable,
+            selectedTable: updatedTable,
             skipPKCreation,
             skipSuccessMessage,
           })
@@ -754,7 +750,7 @@ export const updateTable = async ({
   ])
 
   return {
-    table: await getTable({
+    table: await getTableEditor({
       projectRef,
       connectionString,
       id: table.id,

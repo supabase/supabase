@@ -4,6 +4,7 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -18,6 +19,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import { Alert, Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
@@ -141,48 +143,26 @@ const Subscription = () => {
                   </div>
 
                   {!subscription?.usage_billing_enabled && (
-                    <Alert
-                      withIcon
-                      variant="info"
+                    <Admonition
+                      type="default"
                       title="This organization is limited by the included usage"
-                      actions={
-                        currentPlan?.id === 'free' ? (
-                          <Button
-                            type="default"
-                            onClick={() => snap.setPanelKey('subscriptionPlan')}
-                          >
-                            Upgrade Plan
-                          </Button>
-                        ) : (
-                          <Button type="default" onClick={() => snap.setPanelKey('costControl')}>
-                            Adjust Spend Cap
-                          </Button>
-                        )
-                      }
                     >
-                      <div className="text-sm text-foreground-light mr-2">
-                        When this organization exceeds its{' '}
-                        <Link
-                          href={`/org/${slug}/usage`}
-                          className="text-sm text-green-900 transition hover:text-green-1000"
-                        >
-                          included usage quotas
-                        </Link>
-                        , its projects may become unresponsive.{' '}
-                        {currentPlan?.id === 'free' ? (
-                          <p className="pr-4 mt-1">
-                            If you wish to exceed the included usage, you should upgrade to a paid
-                            plan.
-                          </p>
-                        ) : (
-                          <p className="pr-4 mt-1">
-                            You currently have Spend Cap enabled - when you exceed your plan's
-                            limit, you will experience restrictions. To scale seamlessly and pay for
-                            over-usage, you can adjust your Cost Control settings.
-                          </p>
-                        )}
-                      </div>
-                    </Alert>
+                      <Markdown
+                        className="[&>p]:!leading-normal"
+                        content={`Projects may become unresponsive when this organization exceeds its [included usage quota](/org/${slug}/usage). To scale seamlessly and pay for over-usage, ${currentPlan?.id === 'free' ? 'upgrade to a paid plan.' : 'you can disable Spend Cap under the Cost Control settings.'}`}
+                      />
+                      <Button
+                        type="default"
+                        className="mt-1"
+                        onClick={() =>
+                          snap.setPanelKey(
+                            currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                          )
+                        }
+                      >
+                        {currentPlan?.id === 'free' ? 'Upgrade Plan' : 'Adjust Spend Cap'}
+                      </Button>
+                    </Admonition>
                   )}
 
                   <SparkBar

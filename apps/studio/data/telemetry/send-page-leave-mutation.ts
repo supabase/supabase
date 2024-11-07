@@ -3,6 +3,7 @@ import { components } from 'api-types'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
@@ -14,7 +15,7 @@ export async function sendPageLeave({ body }: { body: SendPageLeaveBody }) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent) return undefined
+  if (!consent || !IS_PLATFORM) return undefined
 
   const { data, error } = await post(`/platform/telemetry/page-leave`, {
     body,
