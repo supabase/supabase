@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -71,6 +72,11 @@ const CliLoginPage: NextPageWithLayout = () => {
               </Link>{' '}
               page.
             </p>
+            <Admonition
+              type="tip"
+              title="Browser login flow requires Supabase CLI version 1.219.0 and above."
+              className="mt-16"
+            />
           </>
         ) : (
           <Loading />
