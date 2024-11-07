@@ -185,16 +185,6 @@ export interface paths {
     /** Restore project with a physical backup */
     post: operations['BackupsController_restorePhysicalBackup']
   }
-  '/platform/database/{ref}/clone': {
-    /** List valid backups to clone from */
-    get: operations['CloneController_getValidBackups']
-    /** Clone the current project from a backup */
-    post: operations['CloneController_cloneCurrentProject']
-  }
-  '/platform/database/{ref}/clone/status': {
-    /** Retrieve the current status of an existing cloning process */
-    get: operations['CloneController_cloneProjectStatus']
-  }
   '/platform/database/{ref}/hook-enable': {
     /** Enables Database Webhooks on the project */
     post: operations['HooksController_enableHooks']
@@ -969,6 +959,10 @@ export interface paths {
     /** Run project lints */
     get: operations['ProjectRunLintsController_runProjectLints']
   }
+  '/platform/projects/{ref}/service-versions': {
+    /** Gets service versions for a specific project */
+    get: operations['ProjectServiceVersionsController_getServiceVersions']
+  }
   '/platform/projects/{ref}/settings': {
     /** Gets project's settings */
     get: operations['SettingsController_getProjectApi']
@@ -1239,6 +1233,20 @@ export interface paths {
     /** Allows a project to obtain temporary credentials. */
     post: operations['AwsCredentialsController_getTemporaryCredentials']
   }
+  '/system/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['SystemProjectDiskController_getDisk']
+    /** Modify database disk */
+    post: operations['SystemProjectDiskController_modifyDisk']
+  }
+  '/system/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['SystemProjectDiskController_getDiskUtilization']
+  }
+  '/system/projects/{ref}/disk/volume_info': {
+    /** Get AWS disk volume information */
+    get: operations['SystemProjectDiskController_getAwsDiskInfo']
+  }
   '/system/projects/{ref}/functions': {
     /**
      * List all functions
@@ -1395,16 +1403,6 @@ export interface paths {
   '/v0/database/{ref}/backups/restore-physical': {
     /** Restore project with a physical backup */
     post: operations['BackupsController_restorePhysicalBackup']
-  }
-  '/v0/database/{ref}/clone': {
-    /** List valid backups to clone from */
-    get: operations['CloneController_getValidBackups']
-    /** Clone the current project from a backup */
-    post: operations['CloneController_cloneCurrentProject']
-  }
-  '/v0/database/{ref}/clone/status': {
-    /** Retrieve the current status of an existing cloning process */
-    get: operations['CloneController_cloneProjectStatus']
   }
   '/v0/database/{ref}/hook-enable': {
     /** Enables Database Webhooks on the project */
@@ -4523,6 +4521,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
       work_mem?: string
@@ -4780,20 +4779,6 @@ export interface components {
       db_schema: string
       endpoint: string
     }
-    ProjectClonedResponse: {
-      source_project_ref: string
-      target_project_ref: string
-    }
-    ProjectClonedStatusResponse: {
-      inserted_at: string
-      project_id: number
-      source: components['schemas']['RefString']
-      /** @enum {string} */
-      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
-      target: components['schemas']['RefString']
-      target_project_id: number
-      updated_at: string
-    }
     ProjectCreationVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4850,10 +4835,6 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
-      v2MaintenanceWindow: {
-        end?: string
-        start?: string
-      }
       volumeSizeGb?: number
     }
     ProjectInfo: {
@@ -4981,10 +4962,9 @@ export interface components {
       cloud_provider: string
       db_dns_name: string
       db_host: string
-      /** @enum {string|null} */
-      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
+      db_ip_addr_config: string
       db_name: string
-      db_port: string
+      db_port: number
       db_user: string
       inserted_at: string
       jwt_secret?: string
@@ -5076,9 +5056,6 @@ export interface components {
     }
     RealtimeHealthResponse: {
       connected_cluster: number
-    }
-    RefString: {
-      ref: string
     }
     Relationship: {
       constraint_name: string
@@ -6336,6 +6313,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
       work_mem?: string
@@ -7615,6 +7593,9 @@ export interface operations {
   /** Retrieve CLI login session */
   CliLoginController_getCliLoginSession: {
     parameters: {
+      query?: {
+        device_code?: string
+      }
       path: {
         session_id: string
       }
@@ -7776,66 +7757,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to restore project with physical backup */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List valid backups to clone from */
-  CloneController_getValidBackups: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BackupsResponse']
-        }
-      }
-      /** @description Failed to list available valid backups */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Clone the current project from a backup */
-  CloneController_cloneCurrentProject: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ProjectClonedResponse']
-        }
-      }
-      /** @description Failed to clone the current project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Retrieve the current status of an existing cloning process */
-  CloneController_cloneProjectStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectClonedStatusResponse']
-        }
-      }
-      /** @description Failed to retrieve clone project status */
       500: {
         content: never
       }
@@ -13289,6 +13210,22 @@ export interface operations {
       }
     }
   }
+  /** Gets service versions for a specific project */
+  ProjectServiceVersionsController_getServiceVersions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': Record<string, never>
+        }
+      }
+    }
+  }
   /** Gets project's settings */
   SettingsController_getProjectApi: {
     parameters: {
@@ -14771,6 +14708,92 @@ export interface operations {
       }
     }
   }
+  /** Get database disk attributes */
+  SystemProjectDiskController_getDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Modify database disk */
+  SystemProjectDiskController_modifyDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DiskRequestBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get disk utilization */
+  SystemProjectDiskController_getDiskUtilization: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskUtilMetricsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get disk utilization */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get AWS disk volume information */
+  SystemProjectDiskController_getAwsDiskInfo: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
   /**
    * List all functions
    * @description Returns all functions you've previously added to the specified project.
@@ -16176,6 +16199,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1ServiceHealthResponse'][]
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to retrieve project's service health status */
       500: {
