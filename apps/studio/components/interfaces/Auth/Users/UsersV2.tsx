@@ -363,7 +363,7 @@ export const UsersV2 = () => {
           >
             Refresh
           </Button>
-          <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
+          <AddUserDropdown />
         </div>
       </div>
       <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />
