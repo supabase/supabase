@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
@@ -13,10 +12,8 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import {
-  getTableLikeFromTableEditor,
-  useTableEditorQuery,
-} from 'data/table-editor/table-editor-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
@@ -44,15 +41,20 @@ const ColumnList = ({
   const id = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
-  const { data, error, isError, isLoading, isSuccess } = useTableEditorQuery({
+  const {
+    data: selectedTable,
+    error,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-  const selectedTable = getTableLikeFromTableEditor(data)
 
   const [filterString, setFilterString] = useState<string>('')
-  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
+  const isTableEntity = isTableLike(selectedTable)
 
   const columns =
     (filterString.length === 0

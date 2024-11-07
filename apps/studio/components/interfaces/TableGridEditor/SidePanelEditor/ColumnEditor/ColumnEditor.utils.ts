@@ -1,9 +1,10 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
-import { find, isEqual, isNull } from 'lodash'
+import { isEqual, isNull } from 'lodash'
 import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { PartitionedTable, Table } from 'data/table-editor/table-editor-types'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -210,7 +211,8 @@ export const getColumnForeignKey = (
   foreignKeys: ForeignKeyConstraint[]
 ) => {
   const { relationships } = table
-  const foreignKey = find(relationships, (relationship) => {
+
+  const foreignKey = relationships.find((relationship) => {
     return (
       relationship.source_schema === column.schema &&
       relationship.source_table_name === column.table &&

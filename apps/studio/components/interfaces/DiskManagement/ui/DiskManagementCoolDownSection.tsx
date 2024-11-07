@@ -1,15 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { X } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
+import CountdownTimerRadial from 'components/ui/CountdownTimer/CountdownTimerRadial'
 import { DialogSection } from 'ui'
-import CountdownTimerRadial from '../../ui/CountdownTimer/CountdownTimerRadial'
 
-export const DiskMangementCoolDownSection: React.FC = () => {
+export const DiskMangementCoolDownSection = ({ visible }: { visible: boolean }) => {
   const [progress, setProgress] = useState(100)
   const [showCountdown, setShowCountdown] = useState(false)
   const [isJumping, setIsJumping] = useState(false)
-  const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
     const startCountdown = () => {
@@ -41,14 +39,15 @@ export const DiskMangementCoolDownSection: React.FC = () => {
 
   return (
     <AnimatePresence>
-      {isVisible && (
+      {visible && (
         <motion.div
           initial={{ opacity: 1, height: 'auto' }}
           exit={{ opacity: 0, height: 0 }}
           transition={{ duration: 0.15 }}
+          className="w-full"
         >
-          <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative">
-            <div className="w-12 h-12 opacity-75">
+          <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative w-full border rounded-md">
+            <div className="w-12 h-12">
               <AnimatePresence>
                 {showCountdown && (
                   <motion.div
@@ -73,19 +72,12 @@ export const DiskMangementCoolDownSection: React.FC = () => {
             </div>
             <div className="flex flex-col gap-0 flex-grow">
               <p className="text-sm text-foreground">
-                For 6 hours you will not be able to make further changes.
+                For 6 hours you will not be able to change any disk attributes.
               </p>
               <p className="text-sm text-foreground-light">
-                Due to a cooldown period between disk changes.
+                There is a cooldown period enforced for any disk attribute modifications
               </p>
             </div>
-            <button
-              type="button"
-              className="text-foreground-lighter hover:text-foreground-light transition-colors self-start p-1"
-              onClick={() => setIsVisible(false)}
-            >
-              <X size={14} />
-            </button>
           </DialogSection>
         </motion.div>
       )}

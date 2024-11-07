@@ -7,14 +7,11 @@ import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/
 import {
   formatFilterURLParams,
   formatSortURLParams,
-  getSupaTable,
+  parseSupaTable,
 } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  getTableLikeFromTableEditor,
-  prefetchTableEditor,
-} from 'data/table-editor/table-editor-query'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -42,37 +39,34 @@ export function usePrefetchEditorTablePage() {
         projectRef: project.ref,
         connectionString: project.connectionString,
         id,
-      }).then((tableData) => {
-        const entity = tableData.entity
-        const table = getTableLikeFromTableEditor(tableData)
-
-        if (entity && table) {
-          const supaTable = getSupaTable({
-            selectedTable: table,
-            encryptedColumns: tableData.encrypted_columns ?? undefined,
-            entityType: entity.type,
-          })
-
-          const { sorts: localSorts = [], filters: localFilters = [] } =
-            loadTableEditorSortsAndFiltersFromLocalStorage(
-              project.ref,
-              entity.name,
-              entity.schema
-            ) ?? {}
-
-          prefetchTableRows(queryClient, {
-            queryKey: [supaTable.schema, supaTable.name],
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            table: supaTable,
-            sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
-            filters: filters ?? formatFilterURLParams(localFilters),
-            page: 1,
-            limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
-            impersonatedRole: roleImpersonationState.role,
-          })
-        }
       })
+        .then((entity) => {
+          if (entity) {
+            const supaTable = parseSupaTable(entity)
+
+            const { sorts: localSorts = [], filters: localFilters = [] } =
+              loadTableEditorSortsAndFiltersFromLocalStorage(
+                project.ref,
+                entity.name,
+                entity.schema
+              ) ?? {}
+
+            prefetchTableRows(queryClient, {
+              queryKey: [supaTable.schema, supaTable.name],
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              table: supaTable,
+              sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
+              filters: filters ?? formatFilterURLParams(localFilters),
+              page: 1,
+              limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
+              impersonatedRole: roleImpersonationState.role,
+            })
+          }
+        })
+        .catch(() => {
+          // eat prefetching errors as they are not critical
+        })
     },
     [project, queryClient, roleImpersonationState.role, router, tableEditorPrefetchingEnabled]
   )

@@ -89,11 +89,11 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
 
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
 
-type InstanceSpecs = {
+export type InstanceSpecs = {
   baseline_disk_io_mbs: number
   connections_direct: number
   connections_pooler: number
-  cpu_cores: number
+  cpu_cores: number | 'Shared'
   cpu_dedicated: boolean
   max_disk_io_mbs: number
   memory_gb: number
@@ -103,7 +103,7 @@ export const INSTANCE_NANO_SPECS: InstanceSpecs = {
   baseline_disk_io_mbs: 43,
   connections_direct: 30,
   connections_pooler: 200,
-  cpu_cores: 2,
+  cpu_cores: 'Shared',
   cpu_dedicated: false,
   max_disk_io_mbs: 2085,
   memory_gb: 0.5,
