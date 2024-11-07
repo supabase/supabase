@@ -14,7 +14,7 @@ function AiPrompt({ className }: { className?: string }) {
     <Link
       className={cn(
         'group',
-        'block w-fit rounded-full border px-4 py-0.5 flex gap-2 items-center text-foreground-light text-sm',
+        'w-fit rounded-full border px-3 py-1 flex gap-2 items-center text-foreground-light text-sm',
         'hover:border-brand hover:text-brand focus-visible:text-brand',
         'transition-colors',
         className
@@ -22,11 +22,8 @@ function AiPrompt({ className }: { className?: string }) {
       href="#"
     >
       <Sparkles size={14} />
-      Set up your project with Supabase AI prompts.
-      <ChevronRight
-        size={14}
-        className="translate-y-[1px] group-hover:translate-x-1 transition-transform"
-      />
+      Start with Supabase AI prompts
+      <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
     </Link>
   )
 }
@@ -98,7 +95,7 @@ const HomePageCover = (props) => {
         p-5 md:p-8
         "
     >
-      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-1 md:gap-3">
+      <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-3">
         <div className="md:max-w-xs shrink w-fit xl:max-w-none">
           <div className="flex items-center gap-3 mb-3">
             <IconBackground>
@@ -107,7 +104,7 @@ const HomePageCover = (props) => {
             <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
           </div>
           <p className="text-foreground-light text-sm">
-            Discover how to set up a database to an app making queries in just a few minutes.
+            Set up and connect a database in just a few minutes.
           </p>
         </div>
         <div className="shrink-0">
