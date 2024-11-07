@@ -49,8 +49,10 @@ const CliLoginPage: NextPageWithLayout = () => {
       <div className={`flex flex-col items-center justify-center h-full`}>
         {device_code ? (
           <>
-            <p>Your Supabase Account is being used to sign in on Supabase CLI.</p>
-            <p>Enter this verification code on Supabase CLI to authorize access.</p>
+            <h1 className="text-xl py-2">
+              Your Supabase Account is being used to login on Supabase CLI.
+            </h1>
+            <p>Enter this verification code on Supabase CLI to authorize login.</p>
             <div className="flex flex-row gap-2 py-10">
               <InputOTP maxLength={8} value={device_code} disabled>
                 <InputOTPGroup>
@@ -61,7 +63,7 @@ const CliLoginPage: NextPageWithLayout = () => {
               </InputOTP>
               <CopyButton iconOnly size="large" type="text" className="px-2" text={device_code} />
             </div>
-            <p>Once verification completes, you can close this window.</p>
+            <p>After authorizing the login attempt, you can close this window.</p>
             <p>
               If you ever want to remove your new token, go to{' '}
               <Link href="/account/tokens" className="underline">
