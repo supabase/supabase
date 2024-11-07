@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -25,7 +26,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
+import { GB, PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   cn,
@@ -35,9 +36,11 @@ import {
   Form_Shadcn_,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
-import { mapComputeSizeNameToAddonVariantId, showMicroUpgrade } from './DiskManagement.utils'
+import { DiskManagementMessage } from './DiskManagement.types'
+import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { ComputeSizeField } from './fields/ComputeSizeField'
@@ -53,7 +56,6 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { DiskManagementMessage } from './DiskManagement.types'
 
 export function DiskManagementForm() {
   const {
@@ -127,7 +129,7 @@ export function DiskManagementForm() {
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
     })
-  const { isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
+  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
     projectRef,
   })
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
@@ -173,6 +175,9 @@ export function DiskManagementForm() {
   const isPlanUpgradeRequired = subscription?.plan.id === 'free'
 
   const { formState } = form
+  const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
+  const totalSize = formState.defaultValues?.totalSize || 0
+  const usedPercentage = (usedSize / totalSize) * 100
 
   const isFlyArchitecture = project?.cloud_provider === 'FLY'
 
@@ -300,7 +305,6 @@ export function DiskManagementForm() {
           <Separator />
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
           <Separator />
-          <DiskCountdownRadial />
           <SpendCapDisabledSection />
           <NoticeBar
             type="default"
@@ -310,6 +314,22 @@ export function DiskManagementForm() {
           />
           {!isFlyArchitecture && (
             <>
+              <div className="flex flex-col gap-y-3">
+                <DiskCountdownRadial />
+                {usedSize >= 90 && isWithinCooldownWindow && (
+                  <Admonition
+                    type="destructive"
+                    title="Database is currently at 90% of disk size"
+                    description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
+                  >
+                    <DocsButton
+                      abbrev={false}
+                      className="mt-2"
+                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                    />
+                  </Admonition>
+                )}
+              </div>
               <DiskSizeField
                 form={form}
                 disableInput={disableDiskInputs}

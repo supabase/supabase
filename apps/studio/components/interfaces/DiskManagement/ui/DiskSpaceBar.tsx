@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
 import MotionNumber from 'motion-number'
+import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
@@ -18,6 +19,7 @@ import {
 } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -25,7 +27,9 @@ interface DiskSpaceBarProps {
 
 export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const { ref } = useParams()
+  const { resolvedTheme } = useTheme()
   const { formState, watch } = form
+  const isDarkMode = resolvedTheme?.includes('dark')
 
   const {
     data: diskUtil,
@@ -50,6 +54,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { remainingDuration } = useRemainingDurationForDiskAttributeUpdate({ projectRef: ref })
 
   const databaseSizeBytes = data?.result[0].db_size ?? 0
   return (
@@ -91,7 +96,12 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
               >
                 <div className="h-full flex">
                   <div
-                    className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
+                    className={cn(
+                      usedPercentage >= 90 && remainingDuration > 0
+                        ? 'bg-destructive'
+                        : 'bg-foreground',
+                      'relative overflow-hidden transition-all duration-500 ease-in-out'
+                    )}
                     style={{ width: `${usedPercentage >= 100 ? 100 : usedPercentage}%` }}
                   >
                     <div
@@ -99,8 +109,8 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                       style={{
                         backgroundImage: `repeating-linear-gradient(
                             -45deg,
-                            rgba(255,255,255,0.1),
-                            rgba(255,255,255,0.1) 1px,
+                            ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
+                            ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
                             transparent 1px,
                             transparent 4px
                           )`,
@@ -128,15 +138,15 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 <div className="h-full flex">
                   <div
                     className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{ width: `${newUsedPercentage}%` }}
+                    style={{ width: `${newUsedPercentage >= 100 ? 100 : newUsedPercentage}%` }}
                   >
                     <div
                       className="absolute inset-0"
                       style={{
                         backgroundImage: `repeating-linear-gradient(
                             -45deg,
-                            rgba(255,255,255,0.1),
-                            rgba(255,255,255,0.1) 1px,
+                            ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
+                            ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
                             transparent 1px,
                             transparent 4px
                           )`,
@@ -153,10 +163,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 4 }}
-                transition={{
-                  duration: 0.12,
-                  delay: 0.12,
-                }}
+                transition={{ duration: 0.12, delay: 0.12 }}
                 className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
               >
                 New disk size
