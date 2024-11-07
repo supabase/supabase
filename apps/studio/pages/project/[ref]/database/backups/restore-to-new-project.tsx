@@ -127,6 +127,7 @@ const RestoreToNewProject = () => {
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
 
   const isLoading = isPermissionsLoaded && cloneBackupsLoading && backupsLoading
+
   const { mutate: triggerClone } = useProjectCloneMutation({
     onError: (error) => {
       console.error('error', error)
@@ -305,10 +306,12 @@ const RestoreToNewProject = () => {
   //   )
   // }
 
+  if (!isLoading && backups?.backups.length === 0) {
+    return <BackupsEmpty />
+  }
+
   return (
     <>
-      {!hasBackups && <BackupsEmpty />}
-
       <Dialog open={showConfirmationDialog} onOpenChange={setShowConfirmationDialog}>
         <DialogContent>
           <DialogHeader className="border-b">
@@ -443,7 +446,7 @@ const RestoreToNewProject = () => {
                 >
                   Cancel
                 </Button>
-                <Button htmlType="submit">Create</Button>
+                <Button htmlType="submit">Restore to new project</Button>
               </DialogFooter>
             </form>
           </Form_Shadcn_>
