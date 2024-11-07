@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -10,7 +9,7 @@ const MAX_ROWS = 20
 const MAX_HEADERS = 20
 
 interface SpreadsheetImportPreviewProps {
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   spreadsheetData: SpreadsheetData
   errors?: any[]
   selectedHeaders: string[]

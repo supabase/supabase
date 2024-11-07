@@ -2,7 +2,6 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
-import type { SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
@@ -10,7 +9,7 @@ import type { ResponseError } from 'types'
 export type TableRowTruncateVariables = {
   projectRef: string
   connectionString?: string
-  table: SupaTable
+  table: { name: string; schema?: string }
 }
 
 export function getTableRowTruncateSql({ table }: Pick<TableRowTruncateVariables, 'table'>) {

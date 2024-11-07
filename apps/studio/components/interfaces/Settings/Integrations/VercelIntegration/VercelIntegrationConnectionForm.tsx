@@ -175,6 +175,7 @@ const VercelIntegrationConnectionForm = ({
                     <Input_Shadcn_
                       {...field}
                       className="w-full"
+                      disabled={disabled}
                       placeholder="An empty prefix will result in no public env vars"
                     />
                   </FormControl_Shadcn_>
@@ -228,6 +229,7 @@ const VercelIntegrationConnectionForm = ({
           )}
 
           <FormActions
+            disabled={disabled}
             form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
             isSubmitting={isLoading}
