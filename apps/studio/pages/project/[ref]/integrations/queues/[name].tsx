@@ -24,18 +24,15 @@ const QueueMessagesPage: NextPageWithLayout = () => {
   const { name: queueName } = useParams()
   const { project } = useProjectContext()
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
-  const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([
-    'archived',
-    'available',
-    'scheduled',
-  ])
+  const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
   const { data, isLoading, isError, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       queueName: queueName!,
-      status: selectedTypes,
+      // when no types are selected, include all types of messages
+      status: selectedTypes.length === 0 ? ['archived', 'available', 'scheduled'] : selectedTypes,
     },
     { staleTime: 30 }
   )
