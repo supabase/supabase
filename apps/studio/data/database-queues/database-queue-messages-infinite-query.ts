@@ -1,4 +1,4 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { UseInfiniteQueryOptions, useInfiniteQuery } from '@tanstack/react-query'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { executeSql } from 'data/sql/execute-sql-query'
 import dayjs from 'dayjs'
@@ -48,25 +48,16 @@ export async function getDatabaseQueue({
     queueQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, NULL as archived_at FROM "pgmq"."q_${queueName}" WHERE vt > '${dayjs(new Date()).format(DATE_FORMAT)}'`
   }
 
+  let archivedQuery = ``
+  if (status.includes('archived')) {
+    archivedQuery = `SELECT msg_id, enqueued_at, read_ct, vt, message, archived_at FROM "pgmq"."a_${queueName}"`
+  }
+
   let query = `SELECT
       *
     FROM
       (
-        ${queueQuery}
-        ${
-          status.includes('archived')
-            ? `UNION ALL
-        SELECT
-          msg_id,
-          enqueued_at,
-          read_ct,
-          vt,
-          message,
-          archived_at
-        FROM
-          "pgmq"."a_${queueName}"`
-            : ''
-        }
+        ${[queueQuery, archivedQuery].filter(Boolean).join(' UNION ALL ')}
       ) AS combined`
   if (afterTimestamp) {
     query += ` WHERE enqueued_at > '${afterTimestamp}'`
