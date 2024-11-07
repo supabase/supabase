@@ -28,10 +28,10 @@ const CliLoginPage: NextPageWithLayout = () => {
       }
 
       try {
-        const session = await createCliLoginSession(session_id, public_key, token_name)
+        const { nonce } = await createCliLoginSession(session_id, public_key, token_name)
 
-        if (session) {
-          router.push(`/cli/login?device_code=${session.nonce.substring(0, 8)}`)
+        if (nonce) {
+          router.push(`/cli/login?device_code=${nonce.substring(0, 8)}`)
         } else {
           router.push(`/404`)
         }
