@@ -1,5 +1,3 @@
-import { SchemaBuilder } from '@serafin/schema-builder'
-import { stripIndent } from 'common-tags'
 import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
 import { jsonrepair } from 'jsonrepair'
@@ -9,7 +7,7 @@ export async function chatCron(openai: OpenAI, prompt: string) {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
       role: 'system',
-      content: stripIndent`
+      content: `
         You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
         Rules for responses:
@@ -42,18 +40,19 @@ export async function chatCron(openai: OpenAI, prompt: string) {
     },
   ]
 
-  const generateCronSyntaxSchema = SchemaBuilder.emptySchema().addString('cron_expression', {
-    description: stripIndent`
-        The generated cron expression.
-      `,
-  })
-
   const completionFunction = {
     name: 'generateCronSyntax',
-    description: stripIndent`
-      Generates a cron expression for a given natural language description.
-    `,
-    parameters: generateCronSyntaxSchema.schema as Record<string, unknown>,
+    description: 'Generates a cron expression for a given natural language description.',
+    parameters: {
+      type: 'object',
+      properties: {
+        cron_expression: {
+          type: 'string',
+          description: 'The generated cron expression.',
+        },
+      },
+      required: ['cron_expression'],
+    },
   }
 
   try {
