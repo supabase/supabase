@@ -56,6 +56,7 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 export function DiskManagementForm() {
   const {
@@ -66,6 +67,12 @@ export function DiskManagementForm() {
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
+
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = (resourceWarnings ?? [])?.find(
+    (warning) => warning.project === project?.ref
+  )
+  const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
 
   /**
    * Permissions
@@ -88,18 +95,8 @@ export function DiskManagementForm() {
   /**
    * Fetch form data
    */
-  const {
-    data: databases,
-    // isLoading: isReadReplicasLoading,
-    // error: readReplicasError,
-    isSuccess: isReadReplicasSuccess,
-  } = useReadReplicasQuery({ projectRef })
-  const {
-    data,
-    // isLoading: isDiskAttributesLoading,
-    // error: diskAttributesError,
-    isSuccess: isDiskAttributesSuccess,
-  } = useDiskAttributesQuery(
+  const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
+  const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
     {
       refetchInterval,
@@ -316,7 +313,7 @@ export function DiskManagementForm() {
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />
-                {usedSize >= 90 && isWithinCooldownWindow && (
+                {usedPercentage >= 90 && isWithinCooldownWindow && (
                   <Admonition
                     type="destructive"
                     title="Database is currently at 90% of disk size"
@@ -326,6 +323,19 @@ export function DiskManagementForm() {
                       abbrev={false}
                       className="mt-2"
                       href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                    />
+                  </Admonition>
+                )}
+                {isReadOnlyMode && (
+                  <Admonition
+                    type="destructive"
+                    title="Project is currently in read-only mode"
+                    description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
+                  >
+                    <DocsButton
+                      abbrev={false}
+                      className="mt-2"
+                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
                     />
                   </Admonition>
                 )}
