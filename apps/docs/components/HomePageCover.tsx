@@ -1,11 +1,35 @@
 'use client'
 
-import { useBreakpoint } from 'common'
+import { ChevronRight, Play, Sparkles } from 'lucide-react'
 import Link from 'next/link'
-import { IconBackground } from 'ui'
+
+import { useBreakpoint } from 'common'
+import { cn, IconBackground } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
 import DocsCoverLogo from './DocsCoverLogo'
-import { Play } from 'lucide-react'
+
+function AiPrompt({ className }: { className?: string }) {
+  return (
+    <Link
+      className={cn(
+        'group',
+        'block w-fit rounded-full border px-4 py-0.5 flex gap-2 items-center text-foreground-light text-sm',
+        'hover:border-brand hover:text-brand focus-visible:text-brand',
+        'transition-colors',
+        className
+      )}
+      href="#"
+    >
+      <Sparkles size={14} />
+      Set up your project with Supabase AI prompts.
+      <ChevronRight
+        size={14}
+        className="translate-y-[1px] group-hover:translate-x-1 transition-transform"
+      />
+    </Link>
+  )
+}
 
 const HomePageCover = (props) => {
   const isXs = useBreakpoint(639)
@@ -86,17 +110,20 @@ const HomePageCover = (props) => {
             Discover how to set up a database to an app making queries in just a few minutes.
           </p>
         </div>
-        <div className="flex shrink-0 flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
-          {frameworks.map((framework, i) => (
-            <Link key={i} href={framework.href} passHref className="no-underline">
-              <IconPanel
-                iconSize={iconSize}
-                hideArrow
-                tooltip={framework.tooltip}
-                icon={framework.icon}
-              />
-            </Link>
-          ))}
+        <div className="shrink-0">
+          <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">
+            {frameworks.map((framework, i) => (
+              <Link key={i} href={framework.href} passHref className="no-underline">
+                <IconPanel
+                  iconSize={iconSize}
+                  hideArrow
+                  tooltip={framework.tooltip}
+                  icon={framework.icon}
+                />
+              </Link>
+            ))}
+          </div>
+          <AiPrompt className="mt-6" />
         </div>
       </div>
     </div>
