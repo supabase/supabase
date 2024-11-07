@@ -6,34 +6,18 @@ import { createCliLoginSession } from 'data/cli/login'
 import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-} from 'ui'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { session_id, public_key, token_name, device_code } = useParams()
-  const [isSuccessfulLogin, setSuccessfulLogin] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
-    if (!isLoggedIn || !router.isReady) {
-      return
-    }
-
-    if (device_code) {
-      setSuccessfulLogin(true)
-      setIsOpen(true)
+    if (!isLoggedIn || !router.isReady || device_code) {
       return
     }
 
@@ -62,38 +46,22 @@ const CliLoginPage: NextPageWithLayout = () => {
 
   return (
     <APIAuthorizationLayout>
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent size="xlarge">
-          <DialogHeader>
-            <DialogTitle>
-              Your Supabase Account is being used to sign in on Supabase CLI.
-            </DialogTitle>
-
-            <DialogDescription>
-              Enter this verification code on Supabase CLI to authorize access.
-            </DialogDescription>
-          </DialogHeader>
-
-          <DialogSectionSeparator />
-
-          <DialogSection>
-            <p className="text-center text-4xl tracking-[.25em] text-foreground-light">
-              {device_code}
-              <CopyButton
-                iconOnly
-                size="large"
-                type="outline"
-                className="float-right px-2"
-                text={device_code ?? ''}
-              />
-            </p>
-          </DialogSection>
-        </DialogContent>
-      </Dialog>
       <div className={`flex flex-col items-center justify-center h-full`}>
-        {isSuccessfulLogin ? (
+        {device_code ? (
           <>
-            <p>Well done! Now close this window, go back to your terminal and hack away!</p>
+            <p>Your Supabase Account is being used to sign in on Supabase CLI.</p>
+            <p>Enter this verification code on Supabase CLI to authorize access.</p>
+            <div className="flex flex-row gap-2 py-10">
+              <InputOTP maxLength={8} value={device_code} disabled>
+                <InputOTPGroup>
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <InputOTPSlot className="text-xl" index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+              <CopyButton iconOnly size="large" type="text" className="px-2" text={device_code} />
+            </div>
+            <p>Once verification completes, you can close this window.</p>
             <p>
               If you ever want to remove your new token, go to{' '}
               <Link href="/account/tokens" className="underline">
