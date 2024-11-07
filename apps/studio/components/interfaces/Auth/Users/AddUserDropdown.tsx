@@ -18,7 +18,6 @@ import {
 import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
-
 const AddUserDropdown = () => {
   const inviteEnabled = IS_PLATFORM
 
