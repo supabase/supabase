@@ -11,12 +11,14 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionListProps {
   schema: string
@@ -35,6 +37,7 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
+  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
@@ -108,7 +111,10 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="left">
+                      <DropdownMenuContent
+                        side="left"
+                        className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+                      >
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
@@ -122,15 +128,17 @@ const FunctionList = ({
                           <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => {
-                            setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
-                          }}
-                        >
-                          <Edit size={14} />
-                          <p>Edit function with Assistant</p>
-                        </DropdownMenuItem>
+                        {enableAssistantV2 && (
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            onClick={() => {
+                              setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
+                            }}
+                          >
+                            <Edit size={14} />
+                            <p>Edit function with Assistant</p>
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
                           <Trash size={14} className="text-destructive" />
