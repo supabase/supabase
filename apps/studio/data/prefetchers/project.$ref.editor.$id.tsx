@@ -7,14 +7,11 @@ import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/
 import {
   formatFilterURLParams,
   formatSortURLParams,
-  getSupaTable,
+  parseSupaTable,
 } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  getTableLikeFromTableEditor,
-  prefetchTableEditor,
-} from 'data/table-editor/table-editor-query'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { prefetchTableRows } from 'data/table-rows/table-rows-query'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -43,16 +40,9 @@ export function usePrefetchEditorTablePage() {
         connectionString: project.connectionString,
         id,
       })
-        .then((tableData) => {
-          const entity = tableData.entity
-          const table = getTableLikeFromTableEditor(tableData)
-
-          if (entity && table) {
-            const supaTable = getSupaTable({
-              selectedTable: table,
-              encryptedColumns: tableData.encrypted_columns ?? undefined,
-              entityType: entity.type,
-            })
+        .then((entity) => {
+          if (entity) {
+            const supaTable = parseSupaTable(entity)
 
             const { sorts: localSorts = [], filters: localFilters = [] } =
               loadTableEditorSortsAndFiltersFromLocalStorage(
@@ -61,7 +51,7 @@ export function usePrefetchEditorTablePage() {
                 entity.schema
               ) ?? {}
 
-            return prefetchTableRows(queryClient, {
+            prefetchTableRows(queryClient, {
               queryKey: [supaTable.schema, supaTable.name],
               projectRef: project?.ref,
               connectionString: project?.connectionString,
