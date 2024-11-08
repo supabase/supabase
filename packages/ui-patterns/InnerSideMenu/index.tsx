@@ -79,10 +79,7 @@ const InnerSideMenuCollapsibleContent = forwardRef<
     <CollapsibleContent_Shadcn_
       ref={ref}
       {...props}
-      className={cn(
-        'w-full flex flex-col gap-0 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
-        props.className
-      )}
+      className={cn('w-full flex flex-col gap-0', props.className)}
     />
   )
 })
