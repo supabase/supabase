@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -15,7 +14,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
-import { Listbox } from 'ui'
+import { cn, Listbox } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
@@ -167,7 +166,7 @@ const Usage = () => {
               </Listbox>
 
               <div className="flex flex-col xl:flex-row xl:gap-3">
-                <p className={clsx('text-sm transition', isLoadingSubscription && 'opacity-50')}>
+                <p className={cn('text-sm transition', isLoadingSubscription && 'opacity-50')}>
                   Organization is on the {subscription.plan.name} plan
                 </p>
                 <p className="text-sm text-foreground-light">

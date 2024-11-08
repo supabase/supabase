@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.207.8
+  version: 1.219.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1725,6 +1725,7 @@ commands:
       - supabase-inspect-db-long-running-queries
       - supabase-inspect-db-outliers
       - supabase-inspect-db-replication-slots
+      - supabase-inspect-db-role-configs
       - supabase-inspect-db-role-connections
       - supabase-inspect-db-seq-scans
       - supabase-inspect-db-table-index-sizes
@@ -2045,6 +2046,28 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db role-connections
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
+  - id: supabase-inspect-db-role-configs
+    title: supabase inspect db role-configs
+    summary: |
+      Show configuration settings for database roles when they have been modified
+    tags: []
+    links: []
+    usage: supabase inspect db role-configs
     subcommands: []
     flags:
       - id: db-url

@@ -320,6 +320,7 @@ const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
+              className="mt-2"
               href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>
@@ -337,6 +338,7 @@ const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
+              className="mt-2"
               href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>

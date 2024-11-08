@@ -10,14 +10,21 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import InformationBox from 'components/ui/InformationBox'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
-import { Form, Input, Tabs } from 'ui'
+import {
+  Form,
+  Input,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import { SpamValidation } from './SpamValidation'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -157,6 +164,14 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                               </ReactMarkdown>
                             ) : null
                           }
+                          onChange={(e) => {
+                            if (projectRef) {
+                              debounceValidateSpam({
+                                projectRef,
+                                template: { subject: e.target.value, content: bodyValue },
+                              })
+                            }
+                          }}
                           disabled={!canUpdateConfig}
                         />
                       </div>
@@ -184,33 +199,41 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         }
                       />
                     </div>
-                    <Tabs defaultActiveId="source" type="underlined" size="tiny">
-                      <Tabs.Panel id="source" icon={<Code size={14} />} label="Source">
-                        <SpamValidation validationResult={validationResult} />
-                        <div className="relative h-96">
-                          <CodeEditor
-                            id="code-id"
-                            language="html"
-                            isReadOnly={!canUpdateConfig}
-                            className="!mb-0 h-96 overflow-hidden rounded border"
-                            onInputChange={(e: string | undefined) => {
-                              setBodyValue(e ?? '')
-                              if (bodyValue !== e) setHasUnsavedChanges(true)
+                    <Tabs_Shadcn_ defaultValue="source">
+                      <TabsList_Shadcn_ className="gap-3">
+                        <TabsTrigger_Shadcn_ value="source" className="gap-2">
+                          <Code size={14} />
+                          Source
+                        </TabsTrigger_Shadcn_>
+                        <TabsTrigger_Shadcn_ value="preview" className="gap-2">
+                          <Monitor size={14} />
+                          Preview
+                        </TabsTrigger_Shadcn_>
+                      </TabsList_Shadcn_>
+                      <TabsContent_Shadcn_ value="source" className="-space-y-px">
+                        <CodeEditor
+                          id="code-id"
+                          language="html"
+                          isReadOnly={!canUpdateConfig}
+                          className="!mb-0 relative h-96 overflow-hidden rounded border rounded-b-none"
+                          onInputChange={(e: string | undefined) => {
+                            setBodyValue(e ?? '')
+                            if (bodyValue !== e) setHasUnsavedChanges(true)
 
-                              if (projectRef) {
-                                const [subjectKey] = Object.keys(values)
-                                debounceValidateSpam({
-                                  projectRef,
-                                  template: { subject: values[subjectKey], content: e ?? '' },
-                                })
-                              }
-                            }}
-                            options={{ wordWrap: 'on', contextmenu: false }}
-                            value={bodyValue}
-                          />
-                        </div>
-                      </Tabs.Panel>
-                      <Tabs.Panel id="preview" icon={<Monitor size={14} />} label="Preview">
+                            if (projectRef) {
+                              const [subjectKey] = Object.keys(values)
+                              debounceValidateSpam({
+                                projectRef,
+                                template: { subject: values[subjectKey], content: e ?? '' },
+                              })
+                            }
+                          }}
+                          options={{ wordWrap: 'on', contextmenu: false }}
+                          value={bodyValue}
+                        />
+                        <SpamValidation validationResult={validationResult} />
+                      </TabsContent_Shadcn_>
+                      <TabsContent_Shadcn_ value="preview">
                         <Admonition
                           type="default"
                           title="The preview may differ slightly from the actual rendering in the email client"
@@ -220,8 +243,8 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                           title={id}
                           srcDoc={bodyValue}
                         />
-                      </Tabs.Panel>
-                    </Tabs>
+                      </TabsContent_Shadcn_>
+                    </Tabs_Shadcn_>
                   </>
                 )}
                 <div className="col-span-12 flex w-full">

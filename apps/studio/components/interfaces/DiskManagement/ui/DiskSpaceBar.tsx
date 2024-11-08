@@ -1,6 +1,15 @@
 import { AnimatePresence, motion } from 'framer-motion'
+import { Info } from 'lucide-react'
 import MotionNumber from 'motion-number'
+import { useTheme } from 'next-themes'
+import { UseFormReturn } from 'react-hook-form'
 
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
+import { useDatabaseSizeQuery } from 'data/database/database-size-query'
+import { GB } from 'lib/constants'
+import { formatBytes } from 'lib/helpers'
 import {
   badgeVariants,
   cn,
@@ -8,25 +17,32 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
-import { Info } from 'lucide-react'
-import { formatBytes } from 'lib/helpers'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
 
 interface DiskSpaceBarProps {
-  showNewBar: boolean
-  totalSize: number
-  usedSize: number
-  newTotalSize: number
+  form: UseFormReturn<DiskStorageSchemaType>
 }
 
-export default function DiskSpaceBar({
-  showNewBar,
-  totalSize,
-  usedSize,
-  newTotalSize,
-}: DiskSpaceBarProps) {
+export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
+  const { ref } = useParams()
+  const { resolvedTheme } = useTheme()
+  const { formState, watch } = form
+  const isDarkMode = resolvedTheme?.includes('dark')
+
+  const {
+    data: diskUtil,
+    // to do, error handling
+  } = useDiskUtilizationQuery({
+    projectRef: ref,
+  })
+
+  const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
+  const totalSize = formState.defaultValues?.totalSize || 0
+  const show = formState.dirtyFields.totalSize !== undefined && usedSize
+  const newTotalSize = watch('totalSize')
+
   const usedPercentage = (usedSize / totalSize) * 100
   const resizePercentage = AUTOSCALING_THRESHOLD * 100
 
@@ -38,13 +54,15 @@ export default function DiskSpaceBar({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const { remainingDuration } = useRemainingDurationForDiskAttributeUpdate({ projectRef: ref })
 
   const databaseSizeBytes = data?.result[0].db_size ?? 0
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)} GB used of{' '}
+          {usedSize.toFixed(2)}
+          <span>GB used of </span>
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber
               value={newTotalSize}
@@ -61,12 +79,12 @@ export default function DiskSpaceBar({
       <div className="relative">
         <div
           className={cn(
-            'h-[34px] relative border rounded-sm w-full transition',
-            showNewBar ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            'h-[35px] relative border rounded-sm w-full transition',
+            show ? 'bg-selection border border-brand-button' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
-            {!showNewBar ? (
+            {!show ? (
               <motion.div
                 key="currentBar"
                 initial={{ rotateY: 90, zIndex: 2 }}
@@ -78,16 +96,21 @@ export default function DiskSpaceBar({
               >
                 <div className="h-full flex">
                   <div
-                    className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{ width: `${usedPercentage}%` }}
+                    className={cn(
+                      usedPercentage >= 90 && remainingDuration > 0
+                        ? 'bg-destructive'
+                        : 'bg-foreground',
+                      'relative overflow-hidden transition-all duration-500 ease-in-out'
+                    )}
+                    style={{ width: `${usedPercentage >= 100 ? 100 : usedPercentage}%` }}
                   >
                     <div
                       className="absolute inset-0"
                       style={{
                         backgroundImage: `repeating-linear-gradient(
                             -45deg,
-                            rgba(255,255,255,0.1),
-                            rgba(255,255,255,0.1) 1px,
+                            ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
+                            ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
                             transparent 1px,
                             transparent 4px
                           )`,
@@ -96,7 +119,9 @@ export default function DiskSpaceBar({
                   </div>
                   <div
                     className="bg-transparent border-r transition-all duration-500 ease-in-out"
-                    style={{ width: `${resizePercentage - usedPercentage}%` }}
+                    style={{
+                      width: `${resizePercentage - usedPercentage <= 0 ? 0 : resizePercentage - usedPercentage}%`,
+                    }}
                   />
                 </div>
               </motion.div>
@@ -113,15 +138,15 @@ export default function DiskSpaceBar({
                 <div className="h-full flex">
                   <div
                     className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{ width: `${newUsedPercentage}%` }}
+                    style={{ width: `${newUsedPercentage >= 100 ? 100 : newUsedPercentage}%` }}
                   >
                     <div
                       className="absolute inset-0"
                       style={{
                         backgroundImage: `repeating-linear-gradient(
                             -45deg,
-                            rgba(255,255,255,0.1),
-                            rgba(255,255,255,0.1) 1px,
+                            ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
+                            ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
                             transparent 1px,
                             transparent 4px
                           )`,
@@ -133,15 +158,12 @@ export default function DiskSpaceBar({
             )}
           </AnimatePresence>
           <AnimatePresence>
-            {showNewBar && (
+            {show && (
               <motion.span
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 4 }}
-                transition={{
-                  duration: 0.12,
-                  delay: 0.12,
-                }}
+                transition={{ duration: 0.12, delay: 0.12 }}
                 className={cn(badgeVariants({ variant: 'success' }), 'absolute right-1 top-[5px]')}
               >
                 New disk size
@@ -149,8 +171,8 @@ export default function DiskSpaceBar({
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence mode="wait">
-          {!showNewBar && (
+        <AnimatePresence initial={true}>
+          {!show && (
             <motion.div
               key="currentSize"
               initial={{ opacity: 0, y: -10 }}
@@ -161,7 +183,7 @@ export default function DiskSpaceBar({
             >
               <div
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
-                style={{ left: `${showNewBar ? newResizePercentage : resizePercentage}%` }}
+                style={{ left: `${show ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
@@ -187,17 +209,19 @@ export default function DiskSpaceBar({
           )}
         </AnimatePresence>
       </div>
-      <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
-        <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
-          <span>Used Space</span>
+      {!show && (
+        <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
+            <span>Used Space</span>
+          </div>
+          <div className="flex items-center">
+            <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
+            <span>Available space</span>
+          </div>
         </div>
-        <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
-          <span>Available space</span>
-        </div>
-      </div>
-      <p className="text-xs text-foreground-lighter mt-4">
+      )}
+      <p className="text-xs text-foreground-lighter my-4">
         <span className="font-semibold">Note:</span> Disk Size refers to the total space your
         project occupies on disk, including the database itself (currently{' '}
         <span>{formatBytes(databaseSizeBytes, 2, 'GB')}</span>), additional files like the

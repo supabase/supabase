@@ -1,9 +1,10 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { Profile } from 'data/profile/types'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import type { ResponseError } from 'types'
 
 type SendIdentify = components['schemas']['TelemetryIdentifyBodyV2']
@@ -22,7 +23,7 @@ export async function sendIdentify({ body }: { body: SendIdentifyPayload }) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent) return undefined
+  if (!consent || !IS_PLATFORM) return undefined
 
   const headers = { Version: '2' }
   const { data, error } = await post(`/platform/telemetry/identify`, { body, headers })

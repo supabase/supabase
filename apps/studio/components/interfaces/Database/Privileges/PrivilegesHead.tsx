@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import SchemaSelector from 'components/ui/SchemaSelector'
 
 import {
@@ -15,7 +14,7 @@ export interface PrivilegesHeadProps {
   disabled: boolean
   selectedSchema: string
   selectedRole: string
-  selectedTable?: PostgresTable
+  selectedTable?: { name: string }
   tables: string[]
   roles: string[]
   onChangeSchema: (schema: string) => void
@@ -118,7 +117,9 @@ const TablesSelect = ({
   tables,
   onChangeTable,
 }: {
-  selectedTable?: PostgresTable
+  selectedTable?: {
+    name: string
+  }
   tables: string[]
   onChangeTable: (table: string) => void
 }) => {
