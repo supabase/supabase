@@ -15,7 +15,7 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import { DiskType, PLAN_DETAILS } from '../ui/DiskManagement.constants'
 import { DiskManagementDiskSizeReadReplicas } from '../ui/DiskManagementReadReplicas'
 import DiskSpaceBar from '../ui/DiskSpaceBar'
-import { DiskTypeReccomendationSection } from '../ui/DiskTypeRecommendationSection'
+import { DiskTypeRecommendationSection } from '../ui/DiskTypeRecommendationSection'
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 import { InputResetButton } from '../ui/InputResetButton'
@@ -149,7 +149,7 @@ export function DiskSizeField({
               subscription?.plan.id &&
               `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
           </span>
-          <DiskTypeReccomendationSection
+          <DiskTypeRecommendationSection
             form={form}
             actions={
               <Button

@@ -149,7 +149,8 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
-    const endpoint = settings.app_config?.endpoint
+    const protocol = settings?.app_config?.protocol ?? 'https'
+    const endpoint = settings?.app_config?.endpoint
     const { serviceKey } = getAPIKeys(settings)
 
     if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
@@ -157,7 +158,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
     updateUser({
       projectRef,
-      protocol: 'https',
+      protocol,
       endpoint,
       serviceApiKey: serviceKey.api_key,
       userId: user.id,
@@ -464,7 +465,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
     <div className="flex items-center gap-x-2 group">
       <p className="w-36 text-foreground-light text-sm">{property}</p>
@@ -498,7 +499,7 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,

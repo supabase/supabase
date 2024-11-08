@@ -1,8 +1,7 @@
-import clsx from 'clsx'
 import { AlertCircle, ArrowRight, ChevronDown, ChevronRight } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { Badge, Button, Collapsible, SidePanel } from 'ui'
+import { Badge, Button, cn, Collapsible, SidePanel } from 'ui'
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
@@ -63,7 +62,7 @@ const SpreadsheetImportPreview = ({
                 <ChevronDown
                   size={18}
                   strokeWidth={2}
-                  className={clsx('text-foreground-light', expandPreview && 'rotate-180')}
+                  className={cn('text-foreground-light', expandPreview && 'rotate-180')}
                 />
               }
               className="px-1"
