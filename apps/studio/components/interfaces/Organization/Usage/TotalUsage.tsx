@@ -1,18 +1,19 @@
-import type { OrgSubscription } from 'data/subscriptions/types'
-import SectionContent from './SectionContent'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
 import { useMemo } from 'react'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
-import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
-import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
-import clsx from 'clsx'
+
+import AlertError from 'components/ui/AlertError'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,
   PricingMetric,
 } from 'data/analytics/org-daily-stats-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import { useOrgUsageQuery } from 'data/usage/org-usage-query'
+import { cn } from 'ui'
+import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
+import BillingMetric from '../BillingSettings/BillingBreakdown/BillingMetric'
+import ComputeMetric from '../BillingSettings/BillingBreakdown/ComputeMetric'
+import SectionContent from './SectionContent'
 
 export interface ComputeProps {
   orgSlug: string
@@ -183,7 +184,7 @@ const TotalUsage = ({
               {sortedBillingMetrics.map((metric, i) => {
                 return (
                   <div
-                    className={clsx(
+                    className={cn(
                       'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
                       i % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
                       'border-b'
@@ -204,7 +205,7 @@ const TotalUsage = ({
 
               {computeMetrics.map((metric, i) => (
                 <div
-                  className={clsx(
+                  className={cn(
                     'col-span-12 md:col-span-6 space-y-4 py-4 border-overlay',
                     (i + sortedBillingMetrics.length) % 2 === 0 ? 'md:border-r md:pr-4' : 'md:pl-4',
                     'border-b'
