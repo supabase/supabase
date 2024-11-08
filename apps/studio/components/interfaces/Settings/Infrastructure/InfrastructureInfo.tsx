@@ -127,7 +127,7 @@ const InfrastructureInfo = () => {
                         <Input
                           readOnly
                           disabled
-                          value={currentPgVersion}
+                          value={currentPgVersion || serviceVersions?.['supabase-postgres'] || ''}
                           label="Postgres version"
                           actions={[
                             isOnNonGenerallyAvailableReleaseChannel && (
