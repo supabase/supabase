@@ -23,6 +23,8 @@ import {
 import { useCronSyntaxGenerateMutation } from '../../../../data/ai/cron-syntax-mutation'
 import { CreateCronJobForm } from './CreateCronJobSheet'
 import CronSyntaxChart from './CronSyntaxChart'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -31,12 +33,13 @@ interface CronJobScheduleSectionProps {
 const presets = [
   { name: 'Every minute', expression: '* * * * * *' },
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
-  { name: 'Every hour, at 30 minutes', expression: '30 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
+  { name: 'Every Monday at midnight', expression: '' },
   { name: 'Every night at midnight', expression: '0 0 0 * * *' },
 ] as const
 
 export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
+  const { project } = useProjectContext()
   let initialValue = presets[1].expression as string
 
   const [presetValue, setPresetValue] = useState<string>(initialValue)
@@ -47,6 +50,11 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 
   const { mutateAsync: generateCronSyntax, isLoading: isGeneratingCron } =
     useCronSyntaxGenerateMutation()
+
+  const { data: timezone } = useCronTimezoneQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   // generate the cron expression when the debounced value changes
   useEffect(() => {
@@ -132,8 +140,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                     <p className="text-sm text-foreground-light">Use natural language</p>
                   </div>
 
-                  <div className="mt-4">
-                    <p className="text-sm text-foreground-light">Use a preset</p>
+                  <div className="mt-2">
                     <ul className="flex gap-2 flex-wrap mt-2">
                       {presets.map((preset) => (
                         <li key={preset.name}>
@@ -166,7 +173,9 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 
               <FormMessage_Shadcn_ className="mt-4">
                 <div className="mt-2 bg-surface-100 p-4 rounded grid gap-4 border">
-                  <h4 className="text-sm text-foreground">Schedule</h4>
+                  <h4 className="text-sm text-foreground">
+                    Schedule {timezone ? `(${timezone})` : ''}
+                  </h4>
                   {scheduleString ? (
                     <span
                       className={cn(
