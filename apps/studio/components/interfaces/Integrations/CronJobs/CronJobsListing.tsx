@@ -105,8 +105,7 @@ export const CronJobsListing = () => {
       </div>
 
       <Sheet
-        open={true}
-        // open={!!createCronJobSheetShown}
+        open={!!createCronJobSheetShown}
         onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
       >
         <SheetContent size="default" tabIndex={undefined}>
