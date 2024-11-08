@@ -102,7 +102,7 @@ export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
   console.log('results:', results)
 
   return (
-    <div className="bg-background-muted -mx-5 border-t border-b overflow-hidden">
+    <div className="bg-background-muted -mx-5 my-5 border-t border-b overflow-hidden">
       <div className="flex items-center px-5 py-2 gap-2">
         <DatabaseIcon size={16} strokeWidth={1.5} />
         <h3 className="text-sm font-medium flex-1">{title}</h3>

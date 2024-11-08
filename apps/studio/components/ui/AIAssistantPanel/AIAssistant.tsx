@@ -1,7 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last, partition } from 'lodash'
-import { Box, Code, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import {
+  Box,
+  Code,
+  FileText,
+  MessageCircleMore,
+  Plus,
+  WandSparkles,
+  ChevronLeft,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -68,6 +76,13 @@ import { SchemasDropdownMenu } from './SchemasDropdownMenu'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 const ANIMATION_DURATION = 0.3
 
+type PanelType = 'assistant' | 'templates' | 'quickStart' | 'functions'
+
+interface Panel {
+  title: string
+  component: React.ReactNode
+}
+
 interface AIAssistantProps {
   id: string
   className?: string
@@ -75,8 +90,6 @@ interface AIAssistantProps {
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onResetConversation: () => void
 }
-
-// [Joshen] For some reason I'm having issues working with dropdown menu and scroll area
 
 export const AIAssistant = ({
   id,
@@ -92,6 +105,7 @@ export const AIAssistant = ({
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const [templates, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
+  const [activePanel, setActivePanel] = useState<PanelType>('assistant')
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel } = useAppStateSnapshot()
@@ -109,7 +123,6 @@ export const AIAssistant = ({
   const [contextHistory, setContextHistory] = useState<{
     [key: string]: { entity: string; schemas: string[]; tables: string[] }
   }>({})
-  // [Joshen] Mainly for error handling on useChat - cause last sent messages will be voided
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
@@ -173,8 +186,6 @@ export const AIAssistant = ({
     onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
 
-  console.log('messages:', chatMessages)
-
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
@@ -226,14 +237,12 @@ export const AIAssistant = ({
               </Button>
             </Admonition>
           )}
-          {isFirstUserMessage &&
-            includeSchemaMetadata &&
-            selectedSchemas.length === 0 && (
-              <Admonition
-                type="default"
-                title="We recommend including schemas for better answers from the Assistant"
-              />
-            )}
+          {isFirstUserMessage && includeSchemaMetadata && selectedSchemas.length === 0 && (
+            <Admonition
+              type="default"
+              title="We recommend including schemas for better answers from the Assistant"
+            />
+          )}
         </Message>
       )
     })
@@ -279,10 +288,10 @@ export const AIAssistant = ({
     }
   }
 
-  const onClickQuickPrompt = (type: SupportedAssistantQuickPromptTypes) => {
+  const onClickQuickPrompt = (type: SupportedAssistantQuickPromptTypes, entityId?: string) => {
     const prompt = generatePrompt({
       type,
-      context: selectedDatabaseEntity as any,
+      context: entityId || (selectedDatabaseEntity as any),
       schemas: selectedSchemas,
       tables: selectedTables,
     })
@@ -315,6 +324,171 @@ export const AIAssistant = ({
         },
       }
     )
+  }
+
+  const panels: Record<PanelType, Panel> = {
+    assistant: {
+      title: 'Assistant',
+      component: (
+        <div className="w-full px-content py-content flex flex-col">
+          <p className="text-base mb-2">
+            How can I help you
+            {!!entityContext ? (
+              <>
+                {' '}
+                with{' '}
+                <span className="text-foreground">
+                  {entityContext.id === 'rls-policies'
+                    ? entityContext.label
+                    : `Database ${entityContext.label}`}
+                </span>
+              </>
+            ) : (
+              ' today'
+            )}
+            ?
+          </p>
+          <p className="text-sm text-foreground-lighter mb-6">
+            I can help you get setup and even generate your entire database schema. Choose a
+            starting point or describe what you want to build.
+          </p>
+          {activePanel === 'assistant' && !selectedDatabaseEntity && !hasMessages && (
+            <div className="-mx-3 mb-4">
+              <Button
+                size="small"
+                icon={<WandSparkles strokeWidth={1.5} size={16} />}
+                type="text"
+                className="w-full justify-start py-1 h-auto"
+                onClick={() => setActivePanel('quickStart')}
+              >
+                Generate something new
+              </Button>
+              <Button
+                size="small"
+                icon={<Code strokeWidth={1.5} size={16} />}
+                type="text"
+                className="w-full justify-start py-1 h-auto"
+                onClick={() => setActivePanel('templates')}
+              >
+                Quick SQL snippets
+              </Button>
+            </div>
+          )}
+          {ASSISTANT_SUPPORT_ENTITIES.filter(
+            (e) => !selectedDatabaseEntity || e.id === selectedDatabaseEntity
+          ).map((entity) => (
+            <div key={entity.id} className="flex flex-col mb-4">
+              <h3 className="mb-2 flex flex-col space-y-2 uppercase font-mono text-sm text-foreground-lighter">
+                {entity.label}
+              </h3>
+              <div className="-mx-3">
+                <Button
+                  size="small"
+                  icon={<WandSparkles strokeWidth={1.5} size={16} />}
+                  type="text"
+                  className="w-full justify-start py-1 h-auto"
+                  onClick={() => onClickQuickPrompt('suggest', entity.id)}
+                >
+                  Suggest{' '}
+                  {entity.id === 'rls-policies'
+                    ? entity.label
+                    : `database ${entity.label.toLowerCase()}`}
+                </Button>
+
+                <Button
+                  size="small"
+                  icon={<FileText strokeWidth={1.5} size={16} />}
+                  type="text"
+                  className="w-full justify-start py-1 h-auto"
+                  onClick={() => onClickQuickPrompt('examples', entity.id)}
+                >
+                  Examples of{' '}
+                  {entity.id === 'rls-policies'
+                    ? entity.label
+                    : `database ${entity.label.toLowerCase()}`}
+                </Button>
+
+                <Button
+                  size="small"
+                  icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
+                  type="text"
+                  className="w-full justify-start py-1 h-auto"
+                  onClick={() => onClickQuickPrompt('ask', entity.id)}
+                >
+                  What are{' '}
+                  {entity.id === 'rls-policies'
+                    ? entity.label
+                    : `database ${entity.label.toLowerCase()}`}
+                  ?
+                </Button>
+                {/* <DocsButton href={retrieveDocsUrl(entity.id)} /> */}
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    templates: {
+      title: 'Templates',
+      component: (
+        <div className="w-full px-content py-content">
+          <div className="-mx-3">
+            {templates.map((template) => (
+              <Button
+                key={template.title}
+                size="small"
+                type={'text'}
+                className="w-full justify-start py-1 h-auto"
+                onClick={() =>
+                  setMessages([
+                    {
+                      id: crypto.randomUUID(),
+                      createdAt: new Date(Date.now() - 3000),
+                      role: 'user',
+                      content: `Help me to ${template.title}`,
+                    },
+                    {
+                      id: crypto.randomUUID(),
+                      role: 'assistant',
+                      createdAt: new Date(),
+                      content: [
+                        'Absolutely! Here is an example snippet. How would you like to customize it?:\n',
+                        '```sql',
+                        template.sql,
+                        '```',
+                      ].join('\n'),
+                    },
+                  ])
+                }
+              >
+                {template.title}
+              </Button>
+            ))}
+          </div>
+        </div>
+      ),
+    },
+    quickStart: {
+      title: 'Quick Start',
+      component: (
+        <div className="w-full px-content py-content">
+          <div className="-mx-3 space-y-2">
+            {quickStart.map((template) => (
+              <Button
+                key={template.title}
+                size="small"
+                icon={<Box strokeWidth={1.5} size={16} />}
+                type={'text'}
+                className="w-full py-1 h-auto justify-start text-left gap-4"
+              >
+                {template.title}
+                <p className="text-sm text-foreground-lighter">{template.description}</p>
+              </Button>
+            ))}
+          </div>
+        </div>
+      ),
+    },
   }
 
   useEffect(() => {
@@ -363,22 +537,25 @@ export const AIAssistant = ({
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div className="flex items-center justify-between gap-x-2 py-3 px-6 border-b ">
-          <div className="text-sm">Assistant</div>
-          <AnimatePresence>
+        <div className="flex items-center gap-x-3 py-3 px-6 border-b">
+          {activePanel !== 'assistant' && (
+            <Button
+              icon={<ChevronLeft strokeWidth={1.5} size={20} />}
+              type="default"
+              onClick={() => setActivePanel('assistant')}
+              className="w-7 h-7"
+            />
+          )}
+          <div className="text-sm flex-1">
+            {hasMessages ? 'New chat' : panels[activePanel].title}
+          </div>
+          <div className="flex gap-2">
             {hasMessages && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 100 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button type="default" disabled={isLoading} onClick={() => onResetConversation()}>
-                  Reset conversation
-                </Button>
-              </motion.div>
+              <Button type="default" disabled={isLoading} onClick={onResetConversation}>
+                Reset
+              </Button>
             )}
-          </AnimatePresence>
+          </div>
         </div>
 
         <div className={cn('flex-grow overflow-auto flex-col')}>
@@ -389,220 +566,20 @@ export const AIAssistant = ({
             </motion.div>
           )}
           {!hasMessages && (
-            <div
-              className={cn(
-                'w-full px-content py-content flex flex-col gap-y-4',
-                hasMessages ? 'sticky flex-0' : 'flex flex-col gap-y-4'
-              )}
-            >
-              <AnimatePresence>
-                {!hasMessages && (
-                  <motion.div
-                    exit={{ opacity: 0 }}
-                    initial={{ opacity: 100 }}
-                    transition={{ duration: ANIMATION_DURATION }}
-                  >
-                    <p className="text-base mb-4">
-                      How can I help you
-                      {!!entityContext ? (
-                        <>
-                          {' '}
-                          with{' '}
-                          <span className="text-foreground">
-                            {entityContext.id === 'rls-policies'
-                              ? entityContext.label
-                              : `Database ${entityContext.label}`}
-                          </span>
-                        </>
-                      ) : (
-                        ' today'
-                      )}
-                      ?
-                    </p>
-                    <div className="mb-4">
-                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
-                        Quick start
-                      </h3>
-                      <div className="-mx-3">
-                        {quickStart.map((template) => (
-                          <Button
-                            key={template.title}
-                            size="small"
-                            icon={<Box strokeWidth={1.5} size={16} />}
-                            type={'text'}
-                            className="w-full justify-start py-1 h-auto"
-                          >
-                            {template.title}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
-                        Templates
-                      </h3>
-                      <div className="-mx-3">
-                        {templates.map((template) => (
-                          <Button
-                            key={template.title}
-                            size="small"
-                            type={'text'}
-                            className="w-full justify-start py-1 h-auto"
-                            onClick={() =>
-                              setMessages([
-                                {
-                                  id: crypto.randomUUID(),
-                                  createdAt: new Date(Date.now() - 3000),
-                                  role: 'user',
-                                  content: `Help me to ${template.title}`,
-                                },
-                                {
-                                  id: crypto.randomUUID(),
-                                  role: 'assistant',
-                                  createdAt: new Date(),
-                                  content: [
-                                    'Absolutely! Here is an example snippet. How would you like to customize it?:\n',
-                                    '```sql',
-                                    template.sql,
-                                    '```',
-                                  ].join('\n'),
-                                },
-                              ])
-                            }
-                          >
-                            {template.title}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="mb-4">
-                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
-                        Functions
-                      </h3>
-                      <div className="-mx-3">
-                        <Button
-                          size="small"
-                          type={'text'}
-                          className="w-full justify-start py-1 h-auto"
-                        >
-                          Create a new function
-                        </Button>
-                        <Button
-                          size="small"
-                          type={'text'}
-                          className="w-full justify-start py-1 h-auto"
-                        >
-                          Suggest some functions to create
-                        </Button>
-                        <Button
-                          size="small"
-                          type={'text'}
-                          className="w-full justify-start py-1 h-auto"
-                        >
-                          View some examples
-                        </Button>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <div className="flex flex-col gap-y-2">
-                {disablePrompts && (
-                  <Admonition
-                    type="default"
-                    title="Assistant has been temporarily disabled"
-                    description="Give us a moment while we work on bringing the Assistant back online"
-                  />
-                )}
-                {!isApiKeySet && (
-                  <Admonition
-                    type="warning"
-                    title="OpenAI API key not set"
-                    description={
-                      <Markdown
-                        content={
-                          'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
-                        }
-                      />
-                    }
-                  />
-                )}
-
-                <AnimatePresence>
-                  {!hasMessages && (
-                    <motion.div
-                      exit={{ opacity: 0 }}
-                      initial={{ opacity: 100 }}
-                      transition={{ duration: ANIMATION_DURATION }}
-                      className={cn('w-full')}
-                    >
-                      <div
-                        className={cn(
-                          'flex items-center gap-x-2 transition',
-                          entityContext !== undefined ? 'opacity-100' : 'opacity-0'
-                        )}
-                      >
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <Button
-                              type="default"
-                              icon={<WandSparkles />}
-                              onClick={() => onClickQuickPrompt('suggest')}
-                            >
-                              Suggest
-                            </Button>
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom">
-                            Suggest some{' '}
-                            {entityContext?.id === 'rls-policies'
-                              ? entityContext.label
-                              : `database ${entityContext?.label.toLowerCase()}`}
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <Button
-                              type="default"
-                              icon={<FileText />}
-                              onClick={() => onClickQuickPrompt('examples')}
-                            >
-                              Examples
-                            </Button>
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom">
-                            Provide some examples of{' '}
-                            {entityContext?.id === 'rls-policies'
-                              ? entityContext.label
-                              : `database ${entityContext?.label.toLowerCase()}`}
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
-                        <Tooltip_Shadcn_>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <Button
-                              type="default"
-                              icon={<MessageCircleMore />}
-                              onClick={() => onClickQuickPrompt('ask')}
-                            >
-                              Ask
-                            </Button>
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom">
-                            What are{' '}
-                            {entityContext?.id === 'rls-policies'
-                              ? entityContext.label
-                              : `database ${entityContext?.label.toLowerCase()}`}
-                            ?
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
-                        {docsUrl !== undefined && <DocsButton href={docsUrl} />}
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activePanel}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: ANIMATION_DURATION }}
+              >
+                {panels[activePanel].component}
+              </motion.div>
+            </AnimatePresence>
           )}
         </div>
+
         <div className="w-full border rounded">
           <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
             <DropdownMenu>
