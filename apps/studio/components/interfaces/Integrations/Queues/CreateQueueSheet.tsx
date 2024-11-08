@@ -51,7 +51,11 @@ const unloggedQueueSchema = z.object({
 })
 
 const FormSchema = z.object({
-  name: z.string().trim().min(1, 'Please provide a name for your queue'),
+  name: z
+    .string()
+    .trim()
+    .min(1, 'Please provide a name for your queue')
+    .max(47, "The name can't be longer than 47 characters"),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,
     partitionedQueueSchema,
