@@ -185,6 +185,16 @@ export interface paths {
     /** Restore project with a physical backup */
     post: operations['BackupsController_restorePhysicalBackup']
   }
+  '/platform/database/{ref}/clone': {
+    /** List valid backups to clone from */
+    get: operations['CloneController_getValidBackups']
+    /** Clone the current project from a backup */
+    post: operations['CloneController_cloneCurrentProject']
+  }
+  '/platform/database/{ref}/clone/status': {
+    /** Retrieve the current status of an existing cloning process */
+    get: operations['CloneController_cloneProjectStatus']
+  }
   '/platform/database/{ref}/hook-enable': {
     /** Enables Database Webhooks on the project */
     post: operations['HooksController_enableHooks']
@@ -1225,6 +1235,14 @@ export interface paths {
     /** Removes project addon */
     delete: operations['AddonsController_removeAddon']
   }
+  '/system/projects/{ref}/config/email-restrictions': {
+    /** Gets the current email restrictions for a project. */
+    get: operations['ProjectEmailRestrictionsController_getEmailRestrictions']
+    /** Updates the current email restrictions for a project. */
+    put: operations['ProjectEmailRestrictionsController_updateEmailRestrictions']
+    /** Removes the current email restrictions for a project. */
+    delete: operations['ProjectEmailRestrictionsController_deleteEmailRestrictions']
+  }
   '/system/projects/{ref}/config/update-jwt/complete': {
     /** Handle update project jwt on completion */
     post: operations['ProjectUpdateJwtController_completeUpdateJwt']
@@ -1309,6 +1327,10 @@ export interface paths {
   '/system/projects/{ref}/wal-verification-reporting': {
     /** Processes a project's WAL verification report. */
     put: operations['WalVerificationReportingController_processWalVerification']
+  }
+  '/system/projects/email-abuse': {
+    /** Reports email abuse from a postmark */
+    post: operations['ProjectEmailAbuseController_reportEmailAbuseWebhookPostmark']
   }
   '/system/stripe/webhooks': {
     /** Processes Stripe event */
@@ -1403,6 +1425,16 @@ export interface paths {
   '/v0/database/{ref}/backups/restore-physical': {
     /** Restore project with a physical backup */
     post: operations['BackupsController_restorePhysicalBackup']
+  }
+  '/v0/database/{ref}/clone': {
+    /** List valid backups to clone from */
+    get: operations['CloneController_getValidBackups']
+    /** Clone the current project from a backup */
+    post: operations['CloneController_cloneCurrentProject']
+  }
+  '/v0/database/{ref}/clone/status': {
+    /** Retrieve the current status of an existing cloning process */
+    get: operations['CloneController_cloneProjectStatus']
   }
   '/v0/database/{ref}/hook-enable': {
     /** Enables Database Webhooks on the project */
@@ -2388,7 +2420,8 @@ export interface components {
       name: string
       prefix?: string | null
       secret_jwt_template?: components['schemas']['ApiKeySecretJWTTemplate'] | null
-      type?: unknown
+      /** @enum {string|null} */
+      type?: 'publishable' | 'secret' | 'legacy' | null
       updated_at?: string | null
     }
     ApiKeySecretJWTTemplate: {
@@ -2743,6 +2776,12 @@ export interface components {
       messages: Record<string, never>[]
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
+    }
+    CloneProjectDto: {
+      cloneBackupId: number
+      newDbPass: string
+      newProjectName: string
+      recoveryTimeTarget?: number
     }
     Column: {
       id: number
@@ -3432,6 +3471,14 @@ export interface components {
       download?: boolean
       downloadName?: string
       transform?: components['schemas']['StorageObjectTransformOptions']
+    }
+    EmailRestrictionsResponseBody: {
+      inserted_at?: string
+      is_restricted: boolean
+      project_id: number
+      project_ref: string
+      restricted_to_quota?: string
+      updated_at?: string
     }
     EventBody: {
       eventType: string
@@ -4779,6 +4826,16 @@ export interface components {
       db_schema: string
       endpoint: string
     }
+    ProjectClonedStatusResponse: {
+      inserted_at: string
+      project_id: number
+      source: components['schemas']['RefString']
+      /** @enum {string} */
+      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
+      target: components['schemas']['RefString']
+      target_project_id: number
+      updated_at: string
+    }
     ProjectCreationVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
       release_channel: components['schemas']['ReleaseChannel']
@@ -4919,6 +4976,8 @@ export interface components {
     }
     ProjectResourceWarningsResponse: {
       /** @enum {string|null} */
+      auth_email_offender: 'critical' | 'warning' | null
+      /** @enum {string|null} */
       auth_rate_limit_exhaustion: 'critical' | 'warning' | null
       /** @enum {string|null} */
       auth_restricted_email_sending: 'critical' | 'warning' | null
@@ -5056,6 +5115,9 @@ export interface components {
     }
     RealtimeHealthResponse: {
       connected_cluster: number
+    }
+    RefString: {
+      ref: string
     }
     Relationship: {
       constraint_name: string
@@ -5390,8 +5452,8 @@ export interface components {
       service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
     }
     ServiceVersions: {
-      gotrue: string
-      postgrest: string
+      gotrue?: string
+      postgrest?: string
       'supabase-postgres': string
     }
     SettingsResponse: {
@@ -6359,6 +6421,9 @@ export interface components {
       restriction_data?: components['schemas']['RestrictionData']
       /** @enum {string} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
+    }
+    UpdateRestrictionsRequestBody: {
+      restricted_to_quota: string
     }
     UpdateRestrictionsResponse: {
       message?: string
@@ -7757,6 +7822,69 @@ export interface operations {
         content: never
       }
       /** @description Failed to restore project with physical backup */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** List valid backups to clone from */
+  CloneController_getValidBackups: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['BackupsResponse']
+        }
+      }
+      /** @description Failed to list available valid backups */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Clone the current project from a backup */
+  CloneController_cloneCurrentProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CloneProjectDto']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to clone the current project */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Retrieve the current status of an existing cloning process */
+  CloneController_cloneProjectStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectClonedStatusResponse']
+        }
+      }
+      /** @description Failed to retrieve clone project status */
       500: {
         content: never
       }
@@ -13221,7 +13349,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['ServiceVersions']
         }
       }
     }
@@ -14669,6 +14797,71 @@ export interface operations {
       }
     }
   }
+  /** Gets the current email restrictions for a project. */
+  ProjectEmailRestrictionsController_getEmailRestrictions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['EmailRestrictionsResponseBody']
+        }
+      }
+      /** @description Failed to retrieve email restrictions. */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the current email restrictions for a project. */
+  ProjectEmailRestrictionsController_updateEmailRestrictions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRestrictionsRequestBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['EmailRestrictionsResponseBody']
+        }
+      }
+      /** @description Failed to update email restrictions. */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Removes the current email restrictions for a project. */
+  ProjectEmailRestrictionsController_deleteEmailRestrictions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['EmailRestrictionsResponseBody']
+        }
+      }
+      /** @description Failed to remove email restrictions. */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Handle update project jwt on completion */
   ProjectUpdateJwtController_completeUpdateJwt: {
     parameters: {
@@ -15129,6 +15322,18 @@ export interface operations {
         content: never
       }
       /** @description Failed to update health status. */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Reports email abuse from a postmark */
+  ProjectEmailAbuseController_reportEmailAbuseWebhookPostmark: {
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to report email abuse */
       500: {
         content: never
       }

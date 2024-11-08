@@ -41,6 +41,9 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Input_Shadcn_,
+  Alert_Shadcn_,
+  AlertTitle_Shadcn_,
+  AlertDescription_Shadcn_,
 } from 'ui'
 import { Admonition, TimestampInfo } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -48,6 +51,10 @@ import { z } from 'zod'
 import { debounce } from 'lodash'
 import generator from 'generate-password-browser'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
+import { PITRSelection } from 'components/interfaces/Database/Backups/PITR'
+import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
+import dayjs from 'dayjs'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -116,6 +123,7 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
+  const hasPITREnabled = backups?.pitr_enabled
 
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
@@ -290,24 +298,32 @@ const RestoreToNewProject = () => {
     )
   }
 
-  // if (cloneStatus?.status === 'IN_PROGRESS') {
-  //   return (
-  //     <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
-  //       <Loader2 className="animate-spin" />
-  //       <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
-  //       <AlertDescription_Shadcn_>
-  //         The new project is being created.
-  //         <br />
-  //         <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
-  //           Go to new project
-  //         </Link>
-  //       </AlertDescription_Shadcn_>
-  //     </Alert_Shadcn_>
-  //   )
-  // }
+  if (cloneStatus?.status === 'IN_PROGRESS') {
+    return (
+      <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
+        <Loader2 className="animate-spin" />
+        <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
+        <AlertDescription_Shadcn_>
+          The new project is being created.
+          <br />
+          <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
+            Go to new project
+          </Link>
+        </AlertDescription_Shadcn_>
+      </Alert_Shadcn_>
+    )
+  }
 
-  if (!isLoading && backups?.backups.length === 0) {
+  if (!isLoading && hasPITREnabled && !backups?.physicalBackupData.earliestPhysicalBackupDateUnix) {
     return <BackupsEmpty />
+  }
+
+  if (!isLoading && !hasPITREnabled && backups?.backups.length === 0) {
+    return (
+      <>
+        <BackupsEmpty />
+      </>
+    )
   }
 
   return (
@@ -452,30 +468,41 @@ const RestoreToNewProject = () => {
           </Form_Shadcn_>
         </DialogContent>
       </Dialog>
-
-      <Panel>
-        {data?.backups.length === 0 && <BackupsEmpty />}
-        <div className="divide-y">
-          {data?.backups.map((backup) => (
-            <div className="flex p-4 gap-4" key={backup.id}>
-              <div>
-                <TimestampInfo value={backup.inserted_at} />
+      {hasPITREnabled ? (
+        <PITRForm
+          onSubmit={() => {
+            setShowConfirmationDialog(true)
+          }}
+          earliestAvailableBackup={dayjs(
+            backups?.physicalBackupData.earliestPhysicalBackupDateUnix
+          )}
+          latestAvailableBackup={dayjs(backups?.physicalBackupData.latestPhysicalBackupDateUnix)}
+        />
+      ) : (
+        <Panel>
+          {data?.backups.length === 0 && <BackupsEmpty />}
+          <div className="divide-y">
+            {data?.backups.map((backup) => (
+              <div className="flex p-4 gap-4" key={backup.id}>
+                <div>
+                  <TimestampInfo value={backup.inserted_at} />
+                </div>
+                <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                <Button
+                  className="ml-auto"
+                  type="outline"
+                  onClick={() => {
+                    setSelectedBackupId(backup.id)
+                    setShowConfirmationDialog(true)
+                  }}
+                >
+                  Restore
+                </Button>
               </div>
-              <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-              <Button
-                className="ml-auto"
-                type="outline"
-                onClick={() => {
-                  setSelectedBackupId(backup.id)
-                  setShowConfirmationDialog(true)
-                }}
-              >
-                Restore
-              </Button>
-            </div>
-          ))}
-        </div>
-      </Panel>
+            ))}
+          </div>
+        </Panel>
+      )}
     </>
   )
 }
