@@ -55,6 +55,7 @@ import { Loader2 } from 'lucide-react'
 import { PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import dayjs from 'dayjs'
+import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -136,6 +137,24 @@ const RestoreToNewProject = () => {
 
   const isLoading = isPermissionsLoaded && cloneBackupsLoading && backupsLoading
 
+  /**
+   * New project will have the same compute size and disk size as the original project
+   */
+  function getNewProjectSpecs() {
+    const currentProjectComputeSize = project?.infra_compute_size
+    if (!currentProjectComputeSize) {
+      return null
+    }
+
+    if (currentProjectComputeSize === 'nano') {
+      return null
+    }
+
+    const additionalMonthlySpend = instanceSizeSpecs[currentProjectComputeSize]
+
+    return additionalMonthlySpend
+  }
+
   const { mutate: triggerClone } = useProjectCloneMutation({
     onError: (error) => {
       console.error('error', error)
@@ -181,6 +200,23 @@ const RestoreToNewProject = () => {
 
     form.setValue('password', password)
     delayedCheckPasswordStrength(password)
+  }
+
+  function AdditionalMonthlySpend() {
+    const newProjectSpecs = getNewProjectSpecs()
+    if (!newProjectSpecs) {
+      return null
+    }
+
+    return (
+      <div className="text-sm text-foreground-lighter border-t p-5">
+        <p>The new project will have the same compute size and disk size as this project.</p>
+        <div className="flex justify-between text-foreground mt-2">
+          <p>Additional monthly compute cost</p>
+          <p className="font-mono text-right text-brand">${newProjectSpecs.priceMonthly}</p>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {
@@ -371,6 +407,7 @@ const RestoreToNewProject = () => {
               </ul>
             </ul>
           </DialogSection>
+          <AdditionalMonthlySpend />
           <DialogFooter>
             <Button type="outline" onClick={() => setShowConfirmationDialog(false)}>
               Cancel
@@ -454,6 +491,7 @@ const RestoreToNewProject = () => {
                   )}
                 />
               </DialogSection>
+              <AdditionalMonthlySpend />
               <DialogFooter>
                 <Button
                   htmlType="reset"
