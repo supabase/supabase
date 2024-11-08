@@ -189,19 +189,23 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
             <div className="prose w-full max-w-3xl mx-auto pb-4 mb-8 border-b flex flex-col md:flex-row gap-4 md:gap-8 flex-wrap justify-center text-sm text-foreground-lighter">
               <div className="flex gap-2 items-center">
                 <span>Stage:</span>
-                <code>{feature.status?.stage}</code>
+                <Badge>{feature.status?.stage}</Badge>
               </div>
               <div className="flex gap-2 items-center">
                 <span>Available on self-hosted:</span>
                 {feature.status?.selfHostedTooling ? (
-                  <code className="flex gap-1.5 px-0">
+                  <Badge className="flex gap-1.5">
                     Requires
-                    <Link href={feature.status?.selfHostedTooling.link} target="_blank">
+                    <Link
+                      href={feature.status?.selfHostedTooling.link}
+                      target="_blank"
+                      className="translate-y-px hover:cursor-pointer"
+                    >
                       {feature.status?.selfHostedTooling?.label}
                     </Link>
-                  </code>
+                  </Badge>
                 ) : (
-                  <code>{feature.status?.availableOnSelfHosted ? 'Yes' : 'N/A'}</code>
+                  <Badge>{feature.status?.availableOnSelfHosted ? 'Yes' : 'N/A'}</Badge>
                 )}
               </div>
             </div>
