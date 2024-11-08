@@ -1,13 +1,14 @@
 import type OpenAI from 'openai'
 import { ContextLengthError } from '../errors'
 import { jsonrepair } from 'jsonrepair'
+import { codeBlock } from 'common-tags'
 
 // Responds to a natural language request for cron syntax.
-export async function chatCron(openai: OpenAI, prompt: string) {
+export async function generateCron(openai: OpenAI, prompt: string) {
   const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
     {
       role: 'system',
-      content: `
+      content: codeBlock`
         You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
         Rules for responses:
@@ -57,7 +58,7 @@ export async function chatCron(openai: OpenAI, prompt: string) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-2024-05-13',
+      model: 'gpt-4o-mini-2024-07-18',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,

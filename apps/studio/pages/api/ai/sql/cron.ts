@@ -1,5 +1,5 @@
 import { ContextLengthError } from 'ai-commands'
-import { chatCron } from 'ai-commands/edge'
+import { generateCron } from 'ai-commands/edge'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai'
@@ -31,7 +31,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   } = req
 
   try {
-    const result = await chatCron(openai, prompt)
+    const result = await generateCron(openai, prompt)
     return res.json(result)
   } catch (error) {
     if (error instanceof Error) {
