@@ -595,8 +595,6 @@ export const AIPolicyEditorPanel = memo(function ({
                         <LockedCreateQuerySection
                           schema={schema}
                           selectedPolicy={selectedPolicy}
-                          editorOneRef={editorOneRef}
-                          editorTwoRef={editorTwoRef}
                           formFields={{ name, table, behavior, command, roles }}
                         />
 

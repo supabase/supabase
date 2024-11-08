@@ -7,13 +7,13 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 import { CronJobsDisabledState } from '../../../../components/interfaces/Integrations/CronJobs/CronJobsDisabledState'
 
-import { Sheet, SheetContent } from 'ui'
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
+import { Sheet, SheetContent } from 'ui'
 
 const CronJobsPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -103,7 +103,7 @@ const CronJobsPage: NextPageWithLayout = () => {
 }
 
 CronJobsPage.getLayout = (page) => (
-  <ProjectIntegrationsLayout title="Integrations">{page}</ProjectIntegrationsLayout>
+  <ProjectIntegrationsLayout title="Cron Jobs">{page}</ProjectIntegrationsLayout>
 )
 
 export default CronJobsPage

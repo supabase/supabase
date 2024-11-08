@@ -48,8 +48,8 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     const LinkComponent = forwardRef<HTMLAnchorElement, ComponentPropsWithoutRef<typeof Link>>(
       function LinkComponent(props, ref) {
-        if (route.linkComponent && isValidElement(route.linkComponent)) {
-          return cloneElement<any>(route.linkComponent, { ...props, ref })
+        if (route.linkElement && isValidElement(route.linkElement)) {
+          return cloneElement<any>(route.linkElement, { ...props, ref })
         }
 
         return <Link ref={ref} {...props} />
