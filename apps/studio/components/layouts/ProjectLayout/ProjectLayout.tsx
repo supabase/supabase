@@ -31,6 +31,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
+import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -149,20 +150,23 @@ const ProjectLayout = ({
             />
             <ResizablePanel id="panel-right" className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                    <div className="w-full">
-                      <ProjectPausedState product={product} />
+              <div className="h-full w-full overflow-x-hidden flex items-stretch flex-1">
+                <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
+                  {showPausedState ? (
+                    <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                      <div className="w-full">
+                        <ProjectPausedState product={product} />
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                    <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
-                )}
-              </main>
+                  ) : (
+                    <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                      <ResourceExhaustionWarningBanner />
+                      {children}
+                    </ContentWrapper>
+                  )}
+                </main>
+                <AiAssistantPanel />
+              </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>

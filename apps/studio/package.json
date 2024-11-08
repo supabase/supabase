@@ -71,6 +71,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.436.0",
     "markdown-table": "^3.0.3",
+    "markdown-to-jsx": "^7.5.0",
     "memoize-one": "^5.0.1",
     "mime-db": "^1.53.0",
     "mobx": "^6.10.2",

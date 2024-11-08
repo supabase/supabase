@@ -17,6 +17,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -117,6 +118,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             <FeedbackDropdown />
             <NotificationsPopoverV2 />
             <HelpPopover />
+            <AssistantButton />
           </>
         )}
       </div>

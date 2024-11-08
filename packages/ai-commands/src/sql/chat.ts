@@ -25,6 +25,7 @@ export async function chatSql(
       - Always use semicolons
       - Output as markdown
       - Always include code snippets if available
+      - If a code snippet is SQL, and is a query for a chart, the first line of the snippet should always be -- props: {"isChart": "true", "xAxis": "columnName", "yAxis": "columnName"}
       - Use vector(384) data type for any embedding/vector related query
 
       When generating tables, do the following:

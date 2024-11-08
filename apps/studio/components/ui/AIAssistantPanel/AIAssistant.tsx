@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { last } from 'lodash'
-import { FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
+import { last, partition } from 'lodash'
+import { Box, Code, FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -48,6 +48,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Heading,
   SheetHeader,
   SheetSection,
   Tooltip_Shadcn_,
@@ -64,7 +65,7 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
-
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 const ANIMATION_DURATION = 0.3
 
 interface AIAssistantProps {
@@ -89,6 +90,8 @@ export const AIAssistant = ({
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
+
+  const [templates, quickStart] = partition(SQL_TEMPLATES, { type: 'template' })
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel } = useAppStateSnapshot()
@@ -139,14 +142,14 @@ export const AIAssistant = ({
 
   const tableDefinitions =
     selectedTables.length === 0
-      ? data?.map((def) => def.sql.trim()) ?? []
-      : data
+      ? (data?.map((def) => def.sql.trim()) ?? [])
+      : (data
           ?.filter((def) => {
             return selectedTables.some((table) => {
               return def.sql.startsWith(`CREATE  TABLE ${table.schema}.${table.name}`)
             })
           })
-          .map((def) => def.sql.trim()) ?? []
+          .map((def) => def.sql.trim()) ?? [])
   const entityDefinitions = includeSchemaMetadata ? tableDefinitions : undefined
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -162,12 +165,15 @@ export const AIAssistant = ({
     messages: chatMessages,
     isLoading: isChatLoading,
     append,
+    setMessages,
   } = useChat({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     body: { entityDefinitions, context: selectedDatabaseEntity, existingSql: existingDefinition },
     onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
+
+  console.log('messages:', chatMessages)
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
@@ -188,6 +194,50 @@ export const AIAssistant = ({
         a.role.localeCompare(b.role)
     )
   }, [chatMessages, debugThread, assistantError, lastSentMessage])
+
+  const renderedMessages = useMemo(() => {
+    return messages.map((m, index) => {
+      const isFirstUserMessage =
+        m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
+
+      return (
+        <Message
+          key={`message-${m.id}`}
+          name={m.name}
+          role={m.role}
+          content={m.content}
+          createdAt={new Date(m.createdAt || new Date()).getTime()}
+          isDebug={(m as MessageWithDebug).isDebug}
+          context={contextHistory[m.id]}
+          onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
+        >
+          {isFirstUserMessage && !includeSchemaMetadata && (
+            <Admonition
+              type="default"
+              title="Project metadata is not shared with the Assistant"
+              description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
+            >
+              <Button
+                type="default"
+                className="w-fit"
+                onClick={() => setIsConfirmOptInModalOpen(true)}
+              >
+                Update AI settings
+              </Button>
+            </Admonition>
+          )}
+          {isFirstUserMessage &&
+            includeSchemaMetadata &&
+            selectedSchemas.length === 0 && (
+              <Admonition
+                type="default"
+                title="We recommend including schemas for better answers from the Assistant"
+              />
+            )}
+        </Message>
+      )
+    })
+  }, [messages, contextHistory, includeSchemaMetadata, selectedSchemas.length, onDiff])
 
   const hasMessages = messages.length > 0
   const lastMessage = last(messages)
@@ -312,15 +362,9 @@ export const AIAssistant = ({
 
   return (
     <>
-      <div className={cn('flex flex-col', className)}>
-        <SheetHeader className="flex items-center justify-between py-3">
-          <div className="flex items-center gap-x-2">
-            <AiIconAnimation
-              allowHoverEffect
-              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
-            />
-            <p>Assistant</p>
-          </div>
+      <div className={cn('flex flex-col h-full', className)}>
+        <div className="flex items-center justify-between gap-x-2 py-3 px-6 border-b ">
+          <div className="text-sm">Assistant</div>
           <AnimatePresence>
             {hasMessages && (
               <motion.div
@@ -335,400 +379,407 @@ export const AIAssistant = ({
               </motion.div>
             )}
           </AnimatePresence>
-        </SheetHeader>
+        </div>
 
-        <SheetSection
-          className={cn(
-            'flex-grow flex flex-col items-center !p-0',
-            hasMessages ? 'justify-between h-[90%]' : 'justify-center h-full'
-          )}
-        >
+        <div className={cn('flex-grow overflow-auto flex-col')}>
           {hasMessages && (
-            <motion.div
-              initial={{ height: 0 }}
-              transition={{ duration: ANIMATION_DURATION }}
-              className="w-full overflow-auto flex-1"
-            >
-              {messages.map((m, index) => {
-                const isFirstUserMessage =
-                  m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
-
-                return (
-                  <Message
-                    key={`message-${m.id}`}
-                    name={m.name}
-                    role={m.role}
-                    content={m.content}
-                    createdAt={new Date(m.createdAt || new Date()).getTime()}
-                    isDebug={(m as MessageWithDebug).isDebug}
-                    context={contextHistory[m.id]}
-                    onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-                  >
-                    {isFirstUserMessage && !includeSchemaMetadata && (
-                      <Admonition
-                        type="default"
-                        title="Project metadata is not shared with the Assistant"
-                        description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
-                      >
-                        <Button
-                          type="default"
-                          className="w-fit"
-                          onClick={() => setIsConfirmOptInModalOpen(true)}
-                        >
-                          Update AI settings
-                        </Button>
-                      </Admonition>
-                    )}
-                    {isFirstUserMessage &&
-                      includeSchemaMetadata &&
-                      selectedSchemas.length === 0 && (
-                        <Admonition
-                          type="default"
-                          title="We recommend including schemas for better answers from the Assistant"
-                        />
-                      )}
-                  </Message>
-                )
-              })}
-              {assistantError !== undefined && (
-                <Message
-                  key="assistant-error"
-                  role="assistant"
-                  variant="warning"
-                  createdAt={new Date().getTime()}
-                  content={`Sorry! We ran into the following error while trying to respond to your message: ${assistantError}. Please try again shortly or reach out to us via support if the issue still persists!`}
-                >
-                  <Button asChild type="default" className="w-min">
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`/support/new?ref=${ref}&category=dashboard_bug&subject=Error%20with%20assistant%20response&message=Assistant%20error:%20${assistantError}`}
-                    >
-                      Contact support
-                    </Link>
-                  </Button>
-                </Message>
-              )}
-              {!isLoading && !pendingReply && assistantError === undefined && (
-                <p className="px-content text-xs text-right text-foreground-lighter pb-2">
-                  Please verify all responses as the Assistant can make mistakes
-                </p>
-              )}
-              {pendingChatReply && (
-                <Message key="thinking" role="assistant" content="Thinking..." />
-              )}
+            <motion.div className="w-full overflow-auto flex-1 p-5 flex flex-col gap-4">
+              {renderedMessages}
               <div ref={bottomRef} className="h-1" />
             </motion.div>
           )}
-
-          <div
-            className={cn(
-              'w-full px-content py-content',
-              hasMessages ? 'sticky flex-0 border-t' : 'flex flex-col gap-y-4'
-            )}
-          >
-            <AnimatePresence>
-              {!hasMessages && (
-                <motion.div
-                  exit={{ opacity: 0 }}
-                  initial={{ opacity: 100 }}
-                  transition={{ duration: ANIMATION_DURATION }}
-                >
-                  <p className="text-center text-base text-foreground-light">
-                    How can I help you
-                    {!!entityContext ? (
-                      <>
-                        {' '}
-                        with{' '}
-                        <span className="text-foreground">
-                          {entityContext.id === 'rls-policies'
-                            ? entityContext.label
-                            : `Database ${entityContext.label}`}
-                        </span>
-                      </>
-                    ) : (
-                      ' today'
-                    )}
-                    ?
-                  </p>
-                </motion.div>
+          {!hasMessages && (
+            <div
+              className={cn(
+                'w-full px-content py-content flex flex-col gap-y-4',
+                hasMessages ? 'sticky flex-0' : 'flex flex-col gap-y-4'
               )}
-            </AnimatePresence>
-            <div className="flex flex-col gap-y-2">
-              {disablePrompts && (
-                <Admonition
-                  type="default"
-                  title="Assistant has been temporarily disabled"
-                  description="Give us a moment while we work on bringing the Assistant back online"
-                />
-              )}
-              {!isApiKeySet && (
-                <Admonition
-                  type="warning"
-                  title="OpenAI API key not set"
-                  description={
-                    <Markdown
-                      content={
-                        'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
-                      }
-                    />
-                  }
-                />
-              )}
-              <div className="w-full border rounded">
-                <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<Plus />}
-                            className={cn(noContextAdded ? '' : 'px-1.5 !space-x-0')}
-                          >
-                            <span className={noContextAdded ? '' : 'sr-only'}>Add context</span>
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side={hasMessages ? 'top' : 'bottom'}>
-                          Add context for the assistant
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-[310px]">
-                      <DropdownMenuLabel>
-                        Improve the output quality of the assistant by giving it context about what
-                        you need help with
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {editor === null && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            <div className="flex flex-col gap-y-1">
-                              <p>Database Entity</p>
-                              <p className="text-foreground-lighter">
-                                Inform about what you're working with
-                              </p>
-                            </div>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioGroup
-                              value={selectedDatabaseEntity}
-                              onValueChange={(value) =>
-                                setSelectedDatabaseEntity(value as SupportedAssistantEntities)
-                              }
-                            >
-                              {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
-                                <DropdownMenuRadioItem key={x.id} value={x.id}>
-                                  {x.label}
-                                </DropdownMenuRadioItem>
-                              ))}
-                            </DropdownMenuRadioGroup>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                      {includeSchemaMetadata && (
-                        <>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="gap-x-2">
-                              <div className="flex flex-col gap-y-1">
-                                <p>Schemas</p>
-                                <p className="text-foreground-lighter">
-                                  Share table definitions in the selected schemas
-                                </p>
-                              </div>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent className="p-0 w-52">
-                              <SchemasDropdownMenu
-                                selectedSchemas={selectedSchemas}
-                                onToggleSchema={toggleSchema}
-                              />
-                            </DropdownMenuSubContent>
-                          </DropdownMenuSub>
-                          {selectedSchemas.length > 0 && (
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-x-2">
-                                <div className="flex flex-col gap-y-1">
-                                  <p>Tables</p>
-                                  <p className="text-foreground-lighter">
-                                    Select specific tables to share definitions for
-                                  </p>
-                                </div>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="p-0 w-52">
-                                <EntitiesDropdownMenu
-                                  selectedSchemas={selectedSchemas}
-                                  selectedEntities={selectedTables}
-                                  onToggleEntity={toggleEntity}
-                                />
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                          )}
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  {!!entityContext && (
-                    <ContextBadge
-                      label="Entity"
-                      value={entityContext.label}
-                      onRemove={editor === null ? () => setSelectedDatabaseEntity('') : undefined}
-                    />
-                  )}
-
-                  {selectedSchemas.length > 0 && (
-                    <ContextBadge
-                      label="Schemas"
-                      value={`${selectedSchemas.slice(0, 2).join(', ')}${selectedSchemas.length > 2 ? ` and ${selectedSchemas.length - 2} other${selectedSchemas.length > 3 ? 's' : ''}` : ''}`}
-                      onRemove={() => {
-                        setSelectedSchemas([])
-                        setSelectedTables([])
-                      }}
-                      tooltip={
-                        selectedSchemas.length > 2 ? (
-                          <>
-                            <p className="text-foreground-light">
-                              {selectedSchemas.length} schemas selected:
-                            </p>
-                            <ul className="list-disc pl-4">
-                              {selectedSchemas.map((x) => (
-                                <li key={x}>{x}</li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : undefined
-                      }
-                    />
-                  )}
-
-                  {selectedTables.length > 0 && (
-                    <ContextBadge
-                      label="Tables"
-                      value={`${selectedTables
-                        .slice(0, 2)
-                        .map((x) => x.name)
-                        .join(
-                          ', '
-                        )}${selectedTables.length > 2 ? ` and ${selectedTables.length - 2} other${selectedTables.length > 3 ? 's' : ''}` : ''}`}
-                      onRemove={() => setSelectedTables([])}
-                      tooltip={
-                        selectedTables.length > 2 ? (
-                          <>
-                            <p className="text-foreground-light">
-                              {selectedTables.length} tables selected:
-                            </p>
-                            <ul className="list-disc pl-4">
-                              {selectedTables.map((x) => (
-                                <li key={`${x.schema}.${x.name}`}>
-                                  {x.schema}.{x.name}
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : undefined
-                      }
-                    />
-                  )}
-                </div>
-
-                <AssistantChatForm
-                  textAreaRef={inputRef}
-                  className={cn(
-                    '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
-                  )}
-                  loading={isLoading}
-                  disabled={!isApiKeySet || disablePrompts || isLoading}
-                  placeholder={
-                    hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
-                  }
-                  value={value}
-                  onValueChange={(e) => setValue(e.target.value)}
-                  onSubmit={(event) => {
-                    event.preventDefault()
-                    sendMessageToAssistant(value)
-                  }}
-                />
-                {!hasMessages && IS_PLATFORM && (
-                  <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
-                    The Assistant is in Alpha and your prompts might be rate limited
-                  </div>
-                )}
-              </div>
-
+            >
               <AnimatePresence>
                 {!hasMessages && (
                   <motion.div
                     exit={{ opacity: 0 }}
                     initial={{ opacity: 100 }}
                     transition={{ duration: ANIMATION_DURATION }}
-                    className={cn('w-full')}
                   >
-                    <div
-                      className={cn(
-                        'flex items-center gap-x-2 transition',
-                        entityContext !== undefined ? 'opacity-100' : 'opacity-0'
+                    <p className="text-base mb-4">
+                      How can I help you
+                      {!!entityContext ? (
+                        <>
+                          {' '}
+                          with{' '}
+                          <span className="text-foreground">
+                            {entityContext.id === 'rls-policies'
+                              ? entityContext.label
+                              : `Database ${entityContext.label}`}
+                          </span>
+                        </>
+                      ) : (
+                        ' today'
                       )}
-                    >
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
+                      ?
+                    </p>
+                    <div className="mb-4">
+                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
+                        Quick start
+                      </h3>
+                      <div className="-mx-3">
+                        {quickStart.map((template) => (
                           <Button
-                            type="default"
-                            icon={<WandSparkles />}
-                            onClick={() => onClickQuickPrompt('suggest')}
+                            key={template.title}
+                            size="small"
+                            icon={<Box strokeWidth={1.5} size={16} />}
+                            type={'text'}
+                            className="w-full justify-start py-1 h-auto"
                           >
-                            Suggest
+                            {template.title}
                           </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Suggest some{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
+                        Templates
+                      </h3>
+                      <div className="-mx-3">
+                        {templates.map((template) => (
                           <Button
-                            type="default"
-                            icon={<FileText />}
-                            onClick={() => onClickQuickPrompt('examples')}
+                            key={template.title}
+                            size="small"
+                            type={'text'}
+                            className="w-full justify-start py-1 h-auto"
+                            onClick={() =>
+                              setMessages([
+                                {
+                                  id: crypto.randomUUID(),
+                                  createdAt: new Date(Date.now() - 3000),
+                                  role: 'user',
+                                  content: `Help me to ${template.title}`,
+                                },
+                                {
+                                  id: crypto.randomUUID(),
+                                  role: 'assistant',
+                                  createdAt: new Date(),
+                                  content: [
+                                    'Absolutely! Here is an example snippet. How would you like to customize it?:\n',
+                                    '```sql',
+                                    template.sql,
+                                    '```',
+                                  ].join('\n'),
+                                },
+                              ])
+                            }
                           >
-                            Examples
+                            {template.title}
                           </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Provide some examples of{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<MessageCircleMore />}
-                            onClick={() => onClickQuickPrompt('ask')}
-                          >
-                            Ask
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          What are{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                          ?
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      {docsUrl !== undefined && <DocsButton href={docsUrl} />}
+                        ))}
+                      </div>
+                    </div>
+                    <div className="mb-4">
+                      <h3 className="text-foreground-light font-mono text-sm uppercase w-full mb-2">
+                        Functions
+                      </h3>
+                      <div className="-mx-3">
+                        <Button
+                          size="small"
+                          type={'text'}
+                          className="w-full justify-start py-1 h-auto"
+                        >
+                          Create a new function
+                        </Button>
+                        <Button
+                          size="small"
+                          type={'text'}
+                          className="w-full justify-start py-1 h-auto"
+                        >
+                          Suggest some functions to create
+                        </Button>
+                        <Button
+                          size="small"
+                          type={'text'}
+                          className="w-full justify-start py-1 h-auto"
+                        >
+                          View some examples
+                        </Button>
+                      </div>
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
+              <div className="flex flex-col gap-y-2">
+                {disablePrompts && (
+                  <Admonition
+                    type="default"
+                    title="Assistant has been temporarily disabled"
+                    description="Give us a moment while we work on bringing the Assistant back online"
+                  />
+                )}
+                {!isApiKeySet && (
+                  <Admonition
+                    type="warning"
+                    title="OpenAI API key not set"
+                    description={
+                      <Markdown
+                        content={
+                          'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
+                        }
+                      />
+                    }
+                  />
+                )}
+
+                <AnimatePresence>
+                  {!hasMessages && (
+                    <motion.div
+                      exit={{ opacity: 0 }}
+                      initial={{ opacity: 100 }}
+                      transition={{ duration: ANIMATION_DURATION }}
+                      className={cn('w-full')}
+                    >
+                      <div
+                        className={cn(
+                          'flex items-center gap-x-2 transition',
+                          entityContext !== undefined ? 'opacity-100' : 'opacity-0'
+                        )}
+                      >
+                        <Tooltip_Shadcn_>
+                          <TooltipTrigger_Shadcn_ asChild>
+                            <Button
+                              type="default"
+                              icon={<WandSparkles />}
+                              onClick={() => onClickQuickPrompt('suggest')}
+                            >
+                              Suggest
+                            </Button>
+                          </TooltipTrigger_Shadcn_>
+                          <TooltipContent_Shadcn_ side="bottom">
+                            Suggest some{' '}
+                            {entityContext?.id === 'rls-policies'
+                              ? entityContext.label
+                              : `database ${entityContext?.label.toLowerCase()}`}
+                          </TooltipContent_Shadcn_>
+                        </Tooltip_Shadcn_>
+                        <Tooltip_Shadcn_>
+                          <TooltipTrigger_Shadcn_ asChild>
+                            <Button
+                              type="default"
+                              icon={<FileText />}
+                              onClick={() => onClickQuickPrompt('examples')}
+                            >
+                              Examples
+                            </Button>
+                          </TooltipTrigger_Shadcn_>
+                          <TooltipContent_Shadcn_ side="bottom">
+                            Provide some examples of{' '}
+                            {entityContext?.id === 'rls-policies'
+                              ? entityContext.label
+                              : `database ${entityContext?.label.toLowerCase()}`}
+                          </TooltipContent_Shadcn_>
+                        </Tooltip_Shadcn_>
+                        <Tooltip_Shadcn_>
+                          <TooltipTrigger_Shadcn_ asChild>
+                            <Button
+                              type="default"
+                              icon={<MessageCircleMore />}
+                              onClick={() => onClickQuickPrompt('ask')}
+                            >
+                              Ask
+                            </Button>
+                          </TooltipTrigger_Shadcn_>
+                          <TooltipContent_Shadcn_ side="bottom">
+                            What are{' '}
+                            {entityContext?.id === 'rls-policies'
+                              ? entityContext.label
+                              : `database ${entityContext?.label.toLowerCase()}`}
+                            ?
+                          </TooltipContent_Shadcn_>
+                        </Tooltip_Shadcn_>
+                        {docsUrl !== undefined && <DocsButton href={docsUrl} />}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
+          )}
+        </div>
+        <div className="w-full border rounded">
+          <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Button
+                      type="default"
+                      icon={<Plus />}
+                      className={cn(noContextAdded ? '' : 'px-1.5 !space-x-0')}
+                    >
+                      <span className={noContextAdded ? '' : 'sr-only'}>Add context</span>
+                    </Button>
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side={hasMessages ? 'top' : 'bottom'}>
+                    Add context for the assistant
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-[310px]">
+                <DropdownMenuLabel>
+                  Improve the output quality of the assistant by giving it context about what you
+                  need help with
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {editor === null && (
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger>
+                      <div className="flex flex-col gap-y-1">
+                        <p>Database Entity</p>
+                        <p className="text-foreground-lighter">
+                          Inform about what you're working with
+                        </p>
+                      </div>
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuRadioGroup
+                        value={selectedDatabaseEntity}
+                        onValueChange={(value) =>
+                          setSelectedDatabaseEntity(value as SupportedAssistantEntities)
+                        }
+                      >
+                        {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
+                          <DropdownMenuRadioItem key={x.id} value={x.id}>
+                            {x.label}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                )}
+                {includeSchemaMetadata && (
+                  <>
+                    <DropdownMenuSub>
+                      <DropdownMenuSubTrigger className="gap-x-2">
+                        <div className="flex flex-col gap-y-1">
+                          <p>Schemas</p>
+                          <p className="text-foreground-lighter">
+                            Share table definitions in the selected schemas
+                          </p>
+                        </div>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuSubContent className="p-0 w-52">
+                        <SchemasDropdownMenu
+                          selectedSchemas={selectedSchemas}
+                          onToggleSchema={toggleSchema}
+                        />
+                      </DropdownMenuSubContent>
+                    </DropdownMenuSub>
+                    {selectedSchemas.length > 0 && (
+                      <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="gap-x-2">
+                          <div className="flex flex-col gap-y-1">
+                            <p>Tables</p>
+                            <p className="text-foreground-lighter">
+                              Select specific tables to share definitions for
+                            </p>
+                          </div>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuSubContent className="p-0 w-52">
+                          <EntitiesDropdownMenu
+                            selectedSchemas={selectedSchemas}
+                            selectedEntities={selectedTables}
+                            onToggleEntity={toggleEntity}
+                          />
+                        </DropdownMenuSubContent>
+                      </DropdownMenuSub>
+                    )}
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {!!entityContext && (
+              <ContextBadge
+                label="Entity"
+                value={entityContext.label}
+                onRemove={editor === null ? () => setSelectedDatabaseEntity('') : undefined}
+              />
+            )}
+
+            {selectedSchemas.length > 0 && (
+              <ContextBadge
+                label="Schemas"
+                value={`${selectedSchemas.slice(0, 2).join(', ')}${selectedSchemas.length > 2 ? ` and ${selectedSchemas.length - 2} other${selectedSchemas.length > 3 ? 's' : ''}` : ''}`}
+                onRemove={() => {
+                  setSelectedSchemas([])
+                  setSelectedTables([])
+                }}
+                tooltip={
+                  selectedSchemas.length > 2 ? (
+                    <>
+                      <p className="text-foreground-light">
+                        {selectedSchemas.length} schemas selected:
+                      </p>
+                      <ul className="list-disc pl-4">
+                        {selectedSchemas.map((x) => (
+                          <li key={x}>{x}</li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : undefined
+                }
+              />
+            )}
+
+            {selectedTables.length > 0 && (
+              <ContextBadge
+                label="Tables"
+                value={`${selectedTables
+                  .slice(0, 2)
+                  .map((x) => x.name)
+                  .join(
+                    ', '
+                  )}${selectedTables.length > 2 ? ` and ${selectedTables.length - 2} other${selectedTables.length > 3 ? 's' : ''}` : ''}`}
+                onRemove={() => setSelectedTables([])}
+                tooltip={
+                  selectedTables.length > 2 ? (
+                    <>
+                      <p className="text-foreground-light">
+                        {selectedTables.length} tables selected:
+                      </p>
+                      <ul className="list-disc pl-4">
+                        {selectedTables.map((x) => (
+                          <li key={`${x.schema}.${x.name}`}>
+                            {x.schema}.{x.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  ) : undefined
+                }
+              />
+            )}
           </div>
-        </SheetSection>
+
+          <AssistantChatForm
+            textAreaRef={inputRef}
+            className={cn(
+              '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
+            )}
+            loading={isLoading}
+            disabled={!isApiKeySet || disablePrompts || isLoading}
+            placeholder={hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'}
+            value={value}
+            onValueChange={(e) => setValue(e.target.value)}
+            onSubmit={(event) => {
+              event.preventDefault()
+              sendMessageToAssistant(value)
+            }}
+          />
+          {!hasMessages && IS_PLATFORM && (
+            <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
+              The Assistant is in Alpha and your prompts might be rate limited
+            </div>
+          )}
+        </div>
       </div>
       <ConfirmationModal
         visible={isConfirmOptInModalOpen}

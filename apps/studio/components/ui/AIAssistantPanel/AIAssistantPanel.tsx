@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { uniqBy } from 'lodash'
-import { Command, CornerDownLeft, Loader2, X } from 'lucide-react'
+import { ChevronLeft, Command, CornerDownLeft, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -142,6 +142,10 @@ export const AiAssistantPanel = () => {
 
   const { mutateAsync: debugSql } = useSqlDebugMutation({ onError: () => {} })
 
+  const [view, setView] = useState<'assistant' | 'editor'>('assistant')
+
+  const isEditor = view === 'editor'
+
   const onExecuteSql = (skipValidation = false) => {
     setError(undefined)
     setShowWarning(false)
@@ -240,6 +244,7 @@ export const AiAssistantPanel = () => {
           },
         ])
       }
+      setView('editor')
     },
     [editorModel]
   )
@@ -297,165 +302,151 @@ export const AiAssistantPanel = () => {
     window.requestAnimationFrame(() => editorRef.current?.layout())
   }, [error, showWarning, isExecuting, numResults, showResults])
 
-  return (
-    <Sheet open={open} onOpenChange={() => onTogglePanel()}>
-      <SheetContent showClose={true} className={cn('flex gap-0 w-[1200px]')}>
-        {/* Assistant */}
-        <AIAssistant
-          id={chatId}
-          className="border-r w-1/2"
-          debugThread={debugThread}
-          onDiff={updateEditorWithCheckForDiff}
-          onResetConversation={() => setChatId(uuidv4())}
-        />
+  return !open ? null : (
+    <div className="w-[400px] shrink-0 border-l bg">
+      <AIAssistant
+        id={chatId}
+        className={cn('w-full h-full', isEditor && 'hidden')}
+        debugThread={debugThread}
+        onDiff={updateEditorWithCheckForDiff}
+        onResetConversation={() => setChatId(uuidv4())}
+      />
+      <div className={cn('flex-1 flex flex-col grow w-full h-full', !isEditor && 'hidden')}>
+        <div className="flex items-center  gap-4 p-4 border-b">
+          <Button
+            type="default"
+            icon={<ChevronLeft strokeWidth={1.5} size={16} />}
+            onClick={() => setView('assistant')}
+          />
 
-        {/* Editor */}
-        <div className={cn('flex flex-col grow w-1/2')}>
-          <SheetHeader className="flex items-center justify-between py-3 pr-12">
-            {title}
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="outline"
-                  icon={<SqlEditor />}
-                  className="h-[24px] w-[24px] px-1"
-                  onClick={() => {
-                    const content = editorRef.current?.getValue() ?? ''
-                    router.push(`/project/${ref}/sql/new?content=${encodeURIComponent(content)}`)
-                    setAiAssistantPanel({ open: false })
-                  }}
-                />
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">Open in SQL Editor</TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
-          </SheetHeader>
-          {editor === null && !isAcknowledged && (
-            <Admonition
-              showIcon={false}
-              type="default"
-              title="This is a quick access SQL editor to run queries on your database"
-              className="relative m-0 rounded-none border-x-0 border-t-0 [&>div]:m-0"
-            >
-              <span>
-                Queries written here will not be saved and results are limited up to only 100 rows
-              </span>
+          <span className="flex-1 text-sm">{title}</span>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
-                type="text"
-                icon={<X />}
-                className="px-1.5 absolute top-2 right-2"
-                onClick={() => setIsAcknowledged(true)}
-              />
-            </Admonition>
-          )}
-          <div className="flex flex-col h-full justify-between">
-            <div className="relative flex-grow block">
-              <CodeEditor
-                id="assistant-code-editor"
-                language="pgsql"
-                editorRef={editorRef}
-                placeholder={placeholder}
-                actions={{
-                  runQuery: { enabled: true, callback: () => onExecuteSql() },
-                  explainCode: { enabled: true, callback: onExplainSql },
-                  closeAssistant: { enabled: true, callback: () => onTogglePanel() },
+                type="outline"
+                icon={<SqlEditor />}
+                className="h-[24px] w-[24px] px-1"
+                onClick={() => {
+                  const content = editorRef.current?.getValue() ?? ''
+                  router.push(`/project/${ref}/sql/new?content=${encodeURIComponent(content)}`)
+                  setAiAssistantPanel({ open: false })
                 }}
               />
-            </div>
-            <div className="flex flex-col">
-              {error !== undefined && (
-                <Admonition
-                  type="warning"
-                  className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-                  title={errorHeader || 'Error running SQL query'}
-                  description={
-                    <>
-                      <div>
-                        {errorContent.length > 0 ? (
-                          errorContent.map((errorText: string, i: number) => (
-                            <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
-                              {errorText}
-                            </pre>
-                          ))
-                        ) : (
-                          <p className="font-mono text-xs">{error.error}</p>
-                        )}
-                      </div>
-                      <Button type="default" className="w-min" onClick={() => onFixWithAssistant()}>
-                        Fix with Assistant
-                      </Button>
-                    </>
-                  }
-                />
-              )}
-              {showWarning && (
-                <Admonition
-                  type="default"
-                  className="m-0 rounded-none border-x-0 border-b-0 [&>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
-                  title={`Your query doesn't seem to be relevant to ${
-                    entityContext?.id === 'rls-policies'
-                      ? entityContext?.label
-                      : `Database ${entityContext?.label}`
-                  }`}
-                  description={
-                    <>
-                      <p>Are you sure you want to run this query?</p>
-                      <Button type="default" className="w-min" onClick={() => onExecuteSql(true)}>
-                        Confirm run query
-                      </Button>
-                    </>
-                  }
-                />
-              )}
-              {results !== undefined && results.length > 0 && (
-                <>
-                  <div className={cn(showResults ? 'h-72 border-t' : 'h-0')}>
-                    <Results rows={results} />
-                  </div>
-                  <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
-                    <p className="text-xs text-foreground-light">
-                      {results.length} rows
-                      {results.length >= 100 && ` (Limited to only 100 rows)`}
-                    </p>
-                    <Button size="tiny" type="default" onClick={() => setShowResults(!showResults)}>
-                      {showResults ? 'Hide' : 'Show'} results
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">Open in SQL Editor</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+        </div>
+
+        {editor === null && !isAcknowledged && (
+          <Admonition
+            showIcon={false}
+            type="default"
+            title="This is a quick access SQL editor to run queries on your database"
+            className="relative m-0 rounded-none border-x-0 border-t-0 [&>div]:m-0"
+          >
+            <span>
+              Queries written here will not be saved and results are limited up to only 100 rows
+            </span>
+            <Button
+              type="text"
+              icon={<X />}
+              className="px-1.5 absolute top-2 right-2"
+              onClick={() => setIsAcknowledged(true)}
+            />
+          </Admonition>
+        )}
+
+        <div className="flex flex-col h-full justify-between">
+          <div className="relative flex-grow block">
+            <CodeEditor
+              id="assistant-code-editor"
+              language="pgsql"
+              editorRef={editorRef}
+              placeholder={placeholder}
+              actions={{
+                runQuery: { enabled: true, callback: () => onExecuteSql() },
+                explainCode: { enabled: true, callback: onExplainSql },
+                closeAssistant: { enabled: true, callback: () => onTogglePanel() },
+              }}
+            />
+          </div>
+          <div className="flex flex-col">
+            {error !== undefined && (
+              <Admonition
+                type="warning"
+                className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+                title={errorHeader || 'Error running SQL query'}
+                description={
+                  <>
+                    <div>
+                      {errorContent.length > 0 ? (
+                        errorContent.map((errorText: string, i: number) => (
+                          <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                            {errorText}
+                          </pre>
+                        ))
+                      ) : (
+                        <p className="font-mono text-xs">{error.error}</p>
+                      )}
+                    </div>
+                    <Button type="default" className="w-min" onClick={() => onFixWithAssistant()}>
+                      Fix with Assistant
                     </Button>
-                  </div>
-                </>
-              )}
-              {results !== undefined && results.length === 0 && (
-                <div className="flex items-center justify-between border-t bg-surface-100 h-[43px] pl-2 pr-5">
-                  <p className="text-xs text-foreground-light">Success. No rows returned.</p>
+                  </>
+                }
+              />
+            )}
+            {showWarning && (
+              <Admonition
+                type="default"
+                className="m-0 rounded-none border-x-0 border-b-0 [&>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+                title={`Your query doesn't seem to be relevant to ${
+                  entityContext?.id === 'rls-policies'
+                    ? entityContext?.label
+                    : `Database ${entityContext?.label}`
+                }`}
+                description={
+                  <>
+                    <p>Are you sure you want to run this query?</p>
+                    <Button type="default" className="w-min" onClick={() => onExecuteSql(true)}>
+                      Confirm run query
+                    </Button>
+                  </>
+                }
+              />
+            )}
+            {results !== undefined && results.length > 0 && (
+              <>
+                <div className={cn(showResults ? 'h-72 border-t' : 'h-0')}>
+                  <Results rows={results} />
                 </div>
-              )}
-              <SheetFooter className="bg-surface-100 flex items-center !justify-end px-5 py-4 w-full border-t">
-                <Button type="default" disabled={isExecuting} onClick={() => onTogglePanel()}>
-                  Cancel
-                </Button>
-                <Button
-                  loading={isExecuting}
-                  onClick={() => onExecuteSql()}
-                  iconRight={
-                    isExecuting ? (
-                      <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-                    ) : (
-                      <div className="flex items-center space-x-1">
-                        {os === 'macos' ? (
-                          <Command size={10} strokeWidth={1.5} />
-                        ) : (
-                          <p className="text-xs text-foreground-light">CTRL</p>
-                        )}
-                        <CornerDownLeft size={10} strokeWidth={1.5} />
-                      </div>
-                    )
-                  }
-                >
-                  {ctaText}
-                </Button>
-              </SheetFooter>
+                <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
+                  <p className="text-xs text-foreground-light">
+                    {results.length} rows
+                    {results.length >= 100 && ` (Limited to only 100 rows)`}
+                  </p>
+                  <Button size="tiny" type="default" onClick={() => setShowResults(!showResults)}>
+                    {showResults ? 'Hide' : 'Show'} results
+                  </Button>
+                </div>
+              </>
+            )}
+            {results !== undefined && results.length === 0 && (
+              <div className="flex items-center justify-between border-t bg-surface-100 h-[43px] pl-2 pr-5">
+                <p className="text-xs text-foreground-light">Success. No rows returned.</p>
+              </div>
+            )}
+            <div className="bg-surface-100 flex items-center !justify-end px-5 py-4 w-full border-t gap-2">
+              <Button type="default" disabled={isExecuting} onClick={() => onTogglePanel()}>
+                Cancel
+              </Button>
+              <Button loading={isExecuting} onClick={() => onExecuteSql()}>
+                {ctaText}
+              </Button>
             </div>
           </div>
         </div>
-      </SheetContent>
-    </Sheet>
+      </div>
+    </div>
   )
 }
