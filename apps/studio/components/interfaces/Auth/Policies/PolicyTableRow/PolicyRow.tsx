@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 import Panel from 'components/ui/Panel'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -11,6 +11,7 @@ import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,7 +21,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -46,8 +46,9 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
-        ' '
+      className={cn(
+        'flex border-overlay',
+        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
       )}
     >
       <div className="flex grow flex-col space-y-1">

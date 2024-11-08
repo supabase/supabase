@@ -1,8 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { useFlag } from 'hooks/ui/useFlag'
 import { put } from 'lib/common/fetch'
+import { IS_PLATFORM } from 'lib/constants'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
@@ -53,20 +54,13 @@ export const useUserUpdateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const userManagementV2 = useFlag('userManagementV2')
 
   return useMutation<UserUpdateData, ResponseError, UserUpdateVariables>(
     (vars) => updateUser(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-
-        if (userManagementV2) {
-          await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
-        } else {
-          await queryClient.invalidateQueries(authKeys.users(projectRef))
-        }
-
+        await queryClient.invalidateQueries(authKeys.usersInfinite(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

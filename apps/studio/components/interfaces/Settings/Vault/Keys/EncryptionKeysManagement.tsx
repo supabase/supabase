@@ -2,18 +2,19 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
-import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Key, Loader, Search, Trash, X } from 'lucide-react'
 import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
-import { Search, X, ExternalLink, Loader, Key, Trash } from 'lucide-react'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -135,44 +136,21 @@ const EncryptionKeysManagement = () => {
               </Listbox>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/vault"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Vault Documentation
-              </Link>
-            </Button>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="primary"
-                  disabled={!canManageKeys}
-                  onClick={() => setShowAddKeyModal(true)}
-                >
-                  Add new key
-                </Button>
-              </Tooltip.Trigger>
-              {!canManageKeys && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to add keys
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+          <div className="flex items-center gap-x-2">
+            <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+            <ButtonTooltip
+              type="primary"
+              disabled={!canManageKeys}
+              onClick={() => setShowAddKeyModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageKeys ? 'You need additional permissions to add keys' : undefined,
+                },
+              }}
+            >
+              Add new key
+            </ButtonTooltip>
           </div>
         </div>
 

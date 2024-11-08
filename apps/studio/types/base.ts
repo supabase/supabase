@@ -38,7 +38,6 @@ export interface Project extends ProjectBase {
   // available after projects.fetchDetail
   connectionString?: string
   dbVersion?: string
-  kpsVersion?: string
   restUrl?: string
   lastDatabaseResizeAt?: string | null
   maxDatabasePreprovisionGb?: string | null

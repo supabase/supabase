@@ -58,6 +58,7 @@ const nextConfig = {
   experimental: {
     outputFileTracingIncludes: {
       '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
   },
   webpack: (config, options) => {

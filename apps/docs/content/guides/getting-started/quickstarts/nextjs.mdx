@@ -8,7 +8,7 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    
+
     <StepHikeCompact.Details title="Create a Supabase project">
 
       Go to [database.new](https://database.new) and create a new Supabase project.
@@ -118,7 +118,7 @@ hideToc: true
         import { createClient } from '@/utils/supabase/server';
 
         export default async function Notes() {
-          const supabase = createClient();
+          const supabase = await createClient();
           const { data: notes } = await supabase.from("notes").select();
 
           return <pre>{JSON.stringify(notes, null, 2)}</pre>
@@ -129,8 +129,8 @@ hideToc: true
         import { createServerClient } from '@supabase/ssr'
         import { cookies } from 'next/headers'
 
-        export function createClient() {
-          const cookieStore = cookies()
+        export async function createClient() {
+          const cookieStore = await cookies()
 
           return createServerClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,

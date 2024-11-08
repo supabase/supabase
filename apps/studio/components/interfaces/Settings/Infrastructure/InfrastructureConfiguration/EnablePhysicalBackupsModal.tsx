@@ -23,6 +23,7 @@ import {
   DialogTrigger,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface EnablePhysicalBackupsModalProps {
   selectedRegion: string
@@ -123,15 +124,7 @@ export const EnablePhysicalBackupsModal = ({ selectedRegion }: EnablePhysicalBac
         </DialogSection>
         {!enabling && (
           <DialogFooter>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
-              >
-                Documentation
-              </a>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made" />
             <Button
               type="primary"
               loading={isEnabling}

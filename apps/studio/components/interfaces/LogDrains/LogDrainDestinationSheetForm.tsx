@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ExternalLink, TrashIcon } from 'lucide-react'
-import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -8,6 +7,7 @@ import { z } from 'zod'
 
 import { useParams } from 'common'
 import { LogDrainData, useLogDrainsQuery } from 'data/log-drains/log-drains-query'
+import { useFlag } from 'hooks/ui/useFlag'
 import {
   Button,
   Form_Shadcn_,
@@ -36,15 +36,16 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
 import { urlRegex } from '../Auth/Auth.constants'
+import { DATADOG_REGIONS, LOG_DRAIN_TYPES, LogDrainType } from './LogDrains.constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const FORM_ID = 'log-drain-destination-form'
 
 const formUnion = z.discriminatedUnion('type', [
   z.object({
     type: z.literal('webhook'),
-    url: z.string().regex(urlRegex, 'Endpoint URL is required and must be a valid URL'),
+    url: z.string().regex(urlRegex(), 'Endpoint URL is required and must be a valid URL'),
     http: z.enum(['http1', 'http2']),
     gzip: z.boolean(),
     headers: z.record(z.string(), z.string()).optional(),
@@ -62,6 +63,13 @@ const formUnion = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal('bigquery'),
+  }),
+  z.object({
+    type: z.literal('loki'),
+    url: z.string().min(1, { message: 'Loki URL is required' }),
+    headers: z.record(z.string(), z.string()),
+    username: z.string().optional(),
+    password: z.string().optional(),
   }),
 ])
 
@@ -128,6 +136,7 @@ export function LogDrainDestinationSheetForm({
   onSubmit: (values: z.infer<typeof formSchema>) => void
   mode: 'create' | 'update'
 }) {
+  const lokiLogDrainsEnabled = useFlag('lokilogdrains')
   const CREATE_DEFAULT_HEADERS = {
     'Content-Type': 'application/json',
   }
@@ -155,6 +164,8 @@ export function LogDrainDestinationSheetForm({
       url: defaultValues?.config?.url || '',
       api_key: defaultValues?.config?.api_key || '',
       region: defaultValues?.config?.region || '',
+      username: defaultValues?.config?.username || '',
+      password: defaultValues?.config?.password || '',
     },
   })
 
@@ -196,6 +207,16 @@ export function LogDrainDestinationSheetForm({
       form.reset()
     }
   }, [mode, open, form])
+
+  function getHeadersSectionDescription() {
+    if (type === 'webhook') {
+      return 'Set custom headers when draining logs to the Endpoint URL'
+    }
+    if (type === 'loki') {
+      return 'Set custom headers when draining logs to the Loki HTTP(S) endpoint'
+    }
+    return ''
+  }
 
   return (
     <Sheet
@@ -260,16 +281,18 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger_Shadcn_>
                       <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.map((type) => (
-                          <SelectItem_Shadcn_
-                            value={type.value}
-                            key={type.value}
-                            id={type.value}
-                            className="text-left"
-                          >
-                            {type.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        {LOG_DRAIN_TYPES.map((type) =>
+                          type.value === 'loki' && !lokiLogDrainsEnabled ? null : (
+                            <SelectItem_Shadcn_
+                              value={type.value}
+                              key={type.value}
+                              id={type.value}
+                              className="text-left"
+                            >
+                              {type.name}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
                   </FormItemLayout>
@@ -309,7 +332,6 @@ export function LogDrainDestinationSheetForm({
                                 </FormItem_Shadcn_>
                               </RadioGroupCard>
                             </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
                           </FormItemLayout>
                         )}
                       />
@@ -332,36 +354,6 @@ export function LogDrainDestinationSheetForm({
                         </FormItem_Shadcn_>
                       )}
                     />
-
-                    <div className="border-t">
-                      <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
-                        <FormLabel_Shadcn_>Custom Headers</FormLabel_Shadcn_>
-                        <p className="text-xs text-foreground-lighter">
-                          Set custom headers when draining logs to the Endpoint URL
-                        </p>
-                      </div>
-                      <div className="divide-y">
-                        {hasHeaders &&
-                          Object.keys(headers || {})?.map((headerKey) => (
-                            <div
-                              className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
-                              key={headerKey}
-                            >
-                              <div className="w-full">{headerKey}</div>
-                              <div className="w-full truncate" title={headers?.[headerKey]}>
-                                {headers?.[headerKey]}
-                              </div>
-                              <Button
-                                className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
-                                type="text"
-                                title="Remove"
-                                icon={<TrashIcon />}
-                                onClick={() => removeHeader(headerKey)}
-                              ></Button>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
                   </>
                 )}
                 {type === 'datadog' && (
@@ -429,45 +421,104 @@ export function LogDrainDestinationSheetForm({
                     />
                   </div>
                 )}
+                {type === 'loki' && (
+                  <div className="grid gap-4 px-content">
+                    <LogDrainFormItem
+                      type="url"
+                      value="url"
+                      placeholder="https://my-logs-endpoint.grafana.net/loki/api/v1/push"
+                      label="Loki URL"
+                      formControl={form.control}
+                      description="The Loki HTTP(S) endpoint to send events."
+                    />
+                    <LogDrainFormItem
+                      value="username"
+                      label="Username"
+                      placeholder="123456789"
+                      formControl={form.control}
+                    />
+                    <LogDrainFormItem
+                      type="password"
+                      value="password"
+                      label="Password"
+                      placeholder="glc_ABCD1234567890"
+                      formControl={form.control}
+                    />
+                  </div>
+                )}
+                <FormMessage_Shadcn_ />
               </div>
             </form>
           </Form_Shadcn_>
 
           {/* This form needs to be outside the <Form_Shadcn_> */}
-          {type === 'webhook' && (
-            <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                addHeader()
-              }}
-              className="flex border-t py-4 gap-4 items-center px-content"
-            >
-              <label className="sr-only" htmlFor="header-name">
-                Header name
-              </label>
-              <Input_Shadcn_
-                id="header-name"
-                type="text"
-                placeholder="x-header-name"
-                value={newCustomHeader.name}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
-              />
-              <label className="sr-only" htmlFor="header-value">
-                Header value
-              </label>
-              <Input_Shadcn_
-                id="header-value"
-                type="text"
-                placeholder="Header value"
-                value={newCustomHeader.value}
-                onChange={(e) => setNewCustomHeader({ ...newCustomHeader, value: e.target.value })}
-              />
+          {(type === 'webhook' || type === 'loki') && (
+            <>
+              <div className="border-t mt-4">
+                <div className="px-content pt-2 pb-3 border-b bg-background-alternative-200">
+                  <h2 className="text-sm text-foreground">Custom Headers</h2>
+                  <p className="text-xs text-foreground-lighter">
+                    {getHeadersSectionDescription()}
+                  </p>
+                </div>
+                <div className="divide-y">
+                  {hasHeaders &&
+                    Object.keys(headers || {})?.map((headerKey) => (
+                      <div
+                        className="flex text-sm px-content text-foreground items-center font-mono py-1.5 group"
+                        key={headerKey}
+                      >
+                        <div className="w-full">{headerKey}</div>
+                        <div className="w-full truncate" title={headers?.[headerKey]}>
+                          {headers?.[headerKey]}
+                        </div>
+                        <Button
+                          className="justify-self-end opacity-0 group-hover:opacity-100 w-7"
+                          type="text"
+                          title="Remove"
+                          icon={<TrashIcon />}
+                          onClick={() => removeHeader(headerKey)}
+                        ></Button>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  addHeader()
+                }}
+                className="flex border-t py-4 gap-4 items-center px-content"
+              >
+                <label className="sr-only" htmlFor="header-name">
+                  Header name
+                </label>
+                <Input_Shadcn_
+                  id="header-name"
+                  type="text"
+                  placeholder="x-header-name"
+                  value={newCustomHeader.name}
+                  onChange={(e) => setNewCustomHeader({ ...newCustomHeader, name: e.target.value })}
+                />
+                <label className="sr-only" htmlFor="header-value">
+                  Header value
+                </label>
+                <Input_Shadcn_
+                  id="header-value"
+                  type="text"
+                  placeholder="Header value"
+                  value={newCustomHeader.value}
+                  onChange={(e) =>
+                    setNewCustomHeader({ ...newCustomHeader, value: e.target.value })
+                  }
+                />
 
-              <Button htmlType="submit" type="outline">
-                Add
-              </Button>
-            </form>
+                <Button htmlType="submit" type="outline">
+                  Add
+                </Button>
+              </form>
+            </>
           )}
         </SheetSection>
 
@@ -477,18 +528,13 @@ export function LogDrainDestinationSheetForm({
               isReactForm={false}
               layout="horizontal"
               label={
-                <div className="text-foreground-light">
+                <div className="flex flex-col gap-y-2 text-foreground-light">
                   Additional drain cost
-                  <div className="text-foreground-lighter mt-2">
-                    <Link
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline flex gap-1 items-center"
-                      href="https://supabase.com/docs/guides/platform/log-drains"
-                    >
-                      Documentation <ExternalLink className="w-4 h-4" />
-                    </Link>
-                  </div>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href="https://supabase.com/docs/guides/platform/log-drains"
+                  />
                 </div>
               }
             >

@@ -5,6 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf node_modules",
     "tsdoc:dereference:functions:v1": "tsx ./tsdoc.ts --input ../../apps/docs/spec/enrichments/tsdoc_v1/functions.json --output ../../apps/docs/spec/enrichments/tsdoc_v1/functions_dereferenced.json",
     "tsdoc:dereference:gotrue:v1": "tsx ./tsdoc.ts --input ../../apps/docs/spec/enrichments/tsdoc_v1/gotrue.json --output ../../apps/docs/spec/enrichments/tsdoc_v1/gotrue_dereferenced.json",
     "tsdoc:dereference:postgrest:v1": "tsx ./tsdoc.ts --input ../../apps/docs/spec/enrichments/tsdoc_v1/postgrest.json --output ../../apps/docs/spec/enrichments/tsdoc_v1/postgrest_dereferenced.json",
