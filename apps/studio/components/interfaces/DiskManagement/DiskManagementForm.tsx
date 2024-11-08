@@ -316,7 +316,7 @@ export function DiskManagementForm() {
                 {usedPercentage >= 90 && isWithinCooldownWindow && (
                   <Admonition
                     type="destructive"
-                    title="Database is currently at 90% of disk size"
+                    title="Database size is currently over 90% of disk size"
                     description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
                   >
                     <DocsButton
