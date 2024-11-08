@@ -5,6 +5,7 @@ import {
   Download,
   Edit,
   Eye,
+  Files,
   Lock,
   MoreHorizontal,
   Table2,
@@ -48,6 +49,9 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useViewDefinitionQuery } from 'data/database/view-definition-query'
+import { useTableDefinitionQuery } from 'data/database/table-definition-query'
+import { format } from 'sql-formatter'
 
 export interface EntityListItemProps {
   id: number
@@ -205,6 +209,58 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
     } catch (error: any) {
       toast.error(`Failed to export table: ${error.message}`, { id: toastId })
+    }
+  }
+
+  const isView = entity.type === ENTITY_TYPE.VIEW || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW;
+  const isTable = entity.type === ENTITY_TYPE.TABLE;
+
+  const viewResult = useViewDefinitionQuery(
+    {
+      schema: entity?.schema,
+      name: entity?.name,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isView,
+    }
+  )
+
+  const tableResult = useTableDefinitionQuery(
+    {
+      schema: entity?.schema,
+      name: entity?.name,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: isTable,
+    }
+  )
+
+  const { data: definition, isLoading: isLoadingdefinition } = entity.type === ENTITY_TYPE.VIEW  || entity.type === ENTITY_TYPE.MATERIALIZED_VIEW ? viewResult : tableResult
+
+  
+  const copydefinition = async () => {
+    if(isLoadingdefinition) 
+      return toast.error("Loading definition, please wait");
+
+    const prepend = entity.type === ENTITY_TYPE.VIEW
+      ? `create view ${entity.schema}.${entity.name} as\n`
+      : entity.type === ENTITY_TYPE.MATERIALIZED_VIEW
+        ? `create materialized view ${entity.schema}.${entity.name} as\n`
+        : ''
+    
+    try {
+      const formattedDefinition = format(`${prepend}${definition}`, {
+        language: 'postgresql',
+        keywordCase: 'lower',
+      })
+      await navigator.clipboard.writeText(formattedDefinition);
+      toast.success("Definition copied to clipboard");
+    } catch (error) {
+      toast.error("Failed to copy definition") 
     }
   }
 
@@ -422,6 +478,18 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+
+            <DropdownMenuItem
+              key="copy-definition"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                copydefinition()
+              }}
+            >
+              <Files size={12} />
+              <span>Copy definition</span>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
             <DropdownMenuItem
