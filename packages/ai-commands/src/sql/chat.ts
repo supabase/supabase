@@ -89,10 +89,6 @@ export async function chatSql(
     initMessages.push(...messages)
   }
 
-  console.log('\n----- START: NEW MESSAGE -----')
-  console.log(initMessages.map((x) => x.content).join('\n\n'))
-  console.log('----- END: NEW MESSAGE -----\n')
-
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini-2024-07-18',

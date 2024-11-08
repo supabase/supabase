@@ -61,6 +61,7 @@ export const AiAssistantPanel = () => {
 
   const { open, editor, content, entity } = aiAssistantPanel
   const previousEditor = usePrevious(editor)
+  const previousEntity = usePrevious(entity)
 
   const [isAcknowledged, setIsAcknowledged] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED,
@@ -259,8 +260,8 @@ export const AiAssistantPanel = () => {
 
   useEffect(() => {
     if (open) {
-      // [Joshen] Only reset the assistant if the editor changed
-      if (previousEditor !== editor) {
+      // [Joshen] Only reset the assistant if the editor changed or if the provided entity has changed
+      if (previousEditor !== editor || previousEntity !== entity) {
         setChatId(uuidv4())
         setError(undefined)
         setShowWarning(false)

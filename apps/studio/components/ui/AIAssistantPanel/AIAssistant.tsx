@@ -455,19 +455,28 @@ export const AIAssistant = ({
                   transition={{ duration: ANIMATION_DURATION }}
                 >
                   <p className="text-center text-base text-foreground-light">
-                    How can I help you
-                    {!!entityContext ? (
+                    {entity !== undefined && !!entityContext ? (
                       <>
-                        {' '}
-                        with{' '}
-                        <span className="text-foreground">
-                          {entityContext.id === 'rls-policies'
-                            ? entityContext.label
-                            : `Database ${entityContext.label}`}
-                        </span>
+                        Need help with updating this{' '}
+                        <span className="text-foreground">{entityContext.name}</span>
                       </>
                     ) : (
-                      ' today'
+                      <>
+                        How can I help you
+                        {!!entityContext ? (
+                          <>
+                            {' '}
+                            with{' '}
+                            <span className="text-foreground">
+                              {entityContext.id === 'rls-policies'
+                                ? entityContext.label
+                                : `Database ${entityContext.label}`}
+                            </span>
+                          </>
+                        ) : (
+                          ' today'
+                        )}
+                      </>
                     )}
                     ?
                   </p>
