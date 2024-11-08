@@ -57,6 +57,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   })
 
+  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
   const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
@@ -367,7 +368,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             button={{
               icon: <Ban />,
               text: isBanned ? 'Unban user' : 'Ban user',
-              disabled: !canRemoveMFAFactors,
+              disabled: !canUpdateUser,
               onClick: () => {
                 if (isBanned) {
                   setIsUnbanModalOpen(true)
