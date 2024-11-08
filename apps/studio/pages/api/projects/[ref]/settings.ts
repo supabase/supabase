@@ -34,9 +34,8 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     cloud_provider: 'AWS',
     db_dns_name: '-',
     db_host: 'localhost',
-    dp_ip_addr_config: 'legacy' as const,
+    db_ip_addr_config: 'legacy' as const,
     db_name: 'postgres',
-    // @ts-expect-error API is typed wrongly
     db_port: 5432,
     db_user: 'postgres',
     inserted_at: '2021-08-02T06:40:40.646Z',
