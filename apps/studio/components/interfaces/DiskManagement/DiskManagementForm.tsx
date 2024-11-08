@@ -313,7 +313,7 @@ export function DiskManagementForm() {
             <>
               <div className="flex flex-col gap-y-3">
                 <DiskCountdownRadial />
-                {usedPercentage >= 90 && isWithinCooldownWindow && (
+                {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
                   <Admonition
                     type="destructive"
                     title="Database size is currently over 90% of disk size"
@@ -366,7 +366,12 @@ export function DiskManagementForm() {
                     strokeWidth={1}
                   />
                 </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <CollapsibleContent_Shadcn_
+                  className={cn(
+                    'flex flex-col gap-8 px-8 py-8 transition-all',
+                    'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  )}
+                >
                   <StorageTypeField form={form} disableInput={disableDiskInputs} />
                   <NoticeBar
                     type="default"
