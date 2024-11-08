@@ -32,6 +32,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   try {
     const result = await generateCron(openai, prompt)
+
     return res.json(result)
   } catch (error) {
     if (error instanceof Error) {

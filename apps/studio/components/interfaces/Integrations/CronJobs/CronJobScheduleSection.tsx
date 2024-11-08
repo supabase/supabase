@@ -20,11 +20,12 @@ import {
   SheetSection,
   Switch,
 } from 'ui'
-import { useCronSyntaxGenerateMutation } from '../../../../data/ai/cron-syntax-mutation'
-import { CreateCronJobForm } from './CreateCronJobSheet'
-import CronSyntaxChart from './CronSyntaxChart'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { useCompletion } from 'ai/react'
+import CronSyntaxChart from './CronSyntaxChart'
+import { CreateCronJobForm } from './CreateCronJobSheet'
+import { BASE_PATH } from 'lib/constants'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -48,37 +49,33 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
   const [scheduleString, setScheduleString] = useState('')
 
-  const { mutateAsync: generateCronSyntax, isLoading: isGeneratingCron } =
-    useCronSyntaxGenerateMutation()
+  const { complete: generateCronSyntax, isLoading: isGeneratingCron } = useCompletion({
+    api: `${BASE_PATH}/api/ai/sql/cron`,
+    onResponse: async (response) => {
+      if (response.ok) {
+        // remove quotes from the cron expression
+        const expression = (await response.text()).trim().replace(/^"|"$/g, '')
+        form.setValue('schedule', expression)
+        setPresetValue(expression)
+        setScheduleString(CronToString(expression))
+      }
+    },
+    onError: (error) => {
+      console.error('Error generating cron:', error)
+    },
+  })
 
   const { data: timezone } = useCronTimezoneQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  // generate the cron expression when the debounced value changes
   useEffect(() => {
-    if (!useNaturalLanguage) return
+    if (!useNaturalLanguage || !debouncedValue) return
 
-    if (debouncedValue) {
-      const handleGenerate = async (prompt: string) => {
-        try {
-          const expression = await generateCronSyntax({ prompt })
-
-          if (expression) {
-            form.setValue('schedule', expression)
-            setPresetValue(expression)
-            setScheduleString(CronToString(expression))
-          }
-        } catch (error) {
-          console.error('Error generating cron:', error)
-        }
-      }
-
-      handleGenerate(debouncedValue)
-    }
+    generateCronSyntax(debouncedValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue, form, generateCronSyntax])
+  }, [debouncedValue, useNaturalLanguage])
 
   useEffect(() => {
     if (!inputValue) return
