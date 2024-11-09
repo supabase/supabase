@@ -2,9 +2,8 @@ import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-import { useAtom } from 'jotai'
+import { useSnapshot } from 'valtio'
 import { motion } from 'framer-motion'
-
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
@@ -33,7 +32,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
-import { sidebarOpenAtom } from '../tabs/sidebar-state'
+import { sidebarState } from '../tabs/sidebar-state'
 import { useActionKey } from 'hooks/useActionKey'
 
 // [Joshen] This is temporary while we unblock users from managing their project
@@ -105,7 +104,7 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
-  const [isSidebarOpen, setIsSidebarOpen] = useAtom(sidebarOpenAtom)
+  const sidebar = useSnapshot(sidebarState)
   const actionKey = useActionKey()
 
   useEffect(() => {
@@ -113,12 +112,12 @@ const ProjectLayout = ({
       const isActionKeyPressed = e.key === actionKey?.[1]
       if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
         e.preventDefault()
-        setIsSidebarOpen((prev) => !prev)
+        sidebarState.isOpen = !sidebar.isOpen
       }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [actionKey, setIsSidebarOpen])
+  }, [actionKey, sidebarState])
 
   return (
     <AppLayout>
@@ -151,7 +150,7 @@ const ProjectLayout = ({
               <ResizablePanel
                 id="panel-left"
                 className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                  hidden: !showProductMenu || !productMenu || !isSidebarOpen,
+                  hidden: !showProductMenu || !productMenu || !sidebar.isOpen,
                 })}
                 defaultSize={0}
               >
@@ -164,7 +163,7 @@ const ProjectLayout = ({
                 </MenuBarWrapper>
               </ResizablePanel>
               <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu || !isSidebarOpen })}
+                className={cn({ hidden: !showProductMenu || !productMenu || !sidebar.isOpen })}
                 withHandle
                 disabled={resizableSidebar ? false : true}
               />
@@ -201,20 +200,19 @@ const MenuBarWrapper = ({
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const actionKey = useActionKey()
-  const [isSidebarOpen, setIsSidebarOpen] = useAtom(sidebarOpenAtom)
-  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+  const sidebar = useSnapshot(sidebarState)
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key.toLowerCase() === 'b' && (event.metaKey || event.ctrlKey)) {
         event.preventDefault()
-        setIsSidebarOpen((prev) => !prev)
+        sidebarState.isOpen = !sidebar.isOpen
       }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [setIsSidebarOpen])
+  }, [sidebarState])
 
   if (!isBlocking) {
     return children

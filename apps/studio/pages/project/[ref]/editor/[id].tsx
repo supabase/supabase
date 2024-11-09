@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { useAtom } from 'jotai'
-import { getTabsStore, addTab } from 'components/layouts/tabs/explorer-tabs.store'
+import { getTabsStore } from 'state/tabs'
 import { Table2 } from 'lucide-react'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
@@ -20,7 +19,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
-  const [_, setTabsState] = useAtom(getTabsStore('explorer'))
+  const store = getTabsStore('explorer')
 
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
@@ -31,19 +30,22 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (selectedTable) {
-      const tableTab = {
-        id: `table-${selectedTable.schema}-${selectedTable.name}`,
-        type: 'table' as const,
-        label: selectedTable.name,
-        icon: <Table2 size={15} />,
-        metadata: {
-          schema: selectedTable.schema,
-          name: selectedTable.name,
-          tableId: id,
-        },
-      }
+      const tabId = `table-${selectedTable.schema}-${selectedTable.name}`
 
-      addTab(setTabsState, tableTab)
+      if (!store.tabsMap[tabId]) {
+        store.openTabs = [...store.openTabs, tabId]
+        store.tabsMap[tabId] = {
+          id: tabId,
+          type: 'table',
+          label: selectedTable.name,
+          metadata: {
+            schema: selectedTable.schema,
+            name: selectedTable.name,
+            tableId: id,
+          },
+        }
+      }
+      store.activeTab = tabId
     }
   }, [selectedTable, id])
 

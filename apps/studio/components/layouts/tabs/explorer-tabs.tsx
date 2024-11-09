@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { useAtom } from 'jotai'
+import { useSnapshot } from 'valtio'
 import {
   FileJson2,
   Table2,
@@ -21,12 +21,12 @@ import {
   ScrollArea,
   ScrollBar,
 } from 'ui'
-import { getTabsStore, type Tab, type TabType } from './explorer-tabs.store'
+import { getTabsStore, type Tab, type TabType } from 'state/tabs'
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useRef, useEffect } from 'react'
-import { sidebarOpenAtom } from './sidebar-state'
+import { sidebarState } from './sidebar-state'
 import { useActionKey } from 'hooks/useActionKey'
 
 interface TabsProps {
@@ -117,90 +117,72 @@ const SortableTab = ({
 
 export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   const router = useRouter()
-  const [tabsState, setTabsState] = useAtom(getTabsStore(storeKey))
+  const store = getTabsStore(storeKey)
+  const tabs = useSnapshot(store)
+  const sidebar = useSnapshot(sidebarState)
   const sensors = useSensors(useSensor(PointerSensor))
-  const [isSidebarOpen, setIsSidebarOpen] = useAtom(sidebarOpenAtom)
   const actionKey = useActionKey()
 
-  const openTabs = tabsState.openTabs
-    .map((id) => tabsState.tabsMap[id])
+  const openTabs = tabs.openTabs
+    .map((id) => tabs.tabsMap[id])
     .filter((tab): tab is Tab => tab !== undefined)
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
 
-    setTabsState((prev) => {
-      const oldIndex = prev.openTabs.indexOf(active.id.toString())
-      const newIndex = prev.openTabs.indexOf(over.id.toString())
+    const oldIndex = tabs.openTabs.indexOf(active.id.toString())
+    const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
-      const newOpenTabs = [...prev.openTabs]
-      newOpenTabs.splice(oldIndex, 1)
-      newOpenTabs.splice(newIndex, 0, active.id.toString())
+    const newOpenTabs = [...tabs.openTabs]
+    newOpenTabs.splice(oldIndex, 1)
+    newOpenTabs.splice(newIndex, 0, active.id.toString())
 
-      return {
-        ...prev,
-        openTabs: newOpenTabs,
-        activeTab: active.id.toString(),
-      }
-    })
+    store.openTabs = newOpenTabs
+    store.activeTab = active.id.toString()
 
-    const tab = tabsState.tabsMap[active.id.toString()]
+    const tab = tabs.tabsMap[active.id.toString()]
     if (tab) {
       handleTabChange(active.id.toString())
     }
   }
 
   const handleClose = (id: string) => {
-    const currentTab = tabsState.tabsMap[id]
+    const currentTab = tabs.tabsMap[id]
+    const newTabs = tabs.openTabs.filter((tabId) => tabId !== id)
+    const nextTabId = newTabs[newTabs.length - 1]
+    const nextTab = nextTabId ? tabs.tabsMap[nextTabId] : null
 
-    setTabsState((prev) => {
-      const newTabs = prev.openTabs.filter((tabId) => tabId !== id)
-      const { [id]: _, ...newTabsMap } = prev.tabsMap
-
-      // Find the nearest tab to navigate to
-      const nextTabId = newTabs[newTabs.length - 1]
-      const nextTab = nextTabId ? prev.tabsMap[nextTabId] : null
-
-      if (nextTab) {
-        // Navigate based on the type of the next tab
-        switch (nextTab.type) {
-          case 'sql':
-            router.push(`/project/${router.query.ref}/sql/${nextTab.metadata?.sqlId}`)
-            break
-          case 'table':
-            router.push(
-              `/project/${router.query.ref}/editor/${nextTab.metadata?.tableId}?schema=${nextTab.metadata?.schema}`
-            )
-            break
-          case 'schema':
-            router.push(`/project/${router.query.ref}/explorer/schema/${nextTab.metadata?.schema}`)
-            break
-          // ... other cases
-        }
-      } else {
-        // No tabs left, redirect to explorer home
-        router.push(`/project/${router.query.ref}/explorer`)
+    if (nextTab) {
+      switch (nextTab.type) {
+        case 'sql':
+          router.push(`/project/${router.query.ref}/sql/${nextTab.metadata?.sqlId}`)
+          break
+        case 'table':
+          router.push(
+            `/project/${router.query.ref}/editor/${nextTab.metadata?.tableId}?schema=${nextTab.metadata?.schema}`
+          )
+          break
+        case 'schema':
+          router.push(`/project/${router.query.ref}/explorer/schema/${nextTab.metadata?.schema}`)
+          break
       }
+    } else {
+      router.push(`/project/${router.query.ref}/explorer`)
+    }
 
-      return {
-        openTabs: newTabs,
-        activeTab: nextTabId ?? null,
-        tabsMap: newTabsMap,
-      }
-    })
+    store.openTabs = newTabs
+    store.activeTab = nextTabId ?? null
+    delete store.tabsMap[id]
 
     onClose?.(id)
   }
 
   const handleTabChange = (id: string) => {
-    const tab = tabsState.tabsMap[id]
+    const tab = tabs.tabsMap[id]
     if (!tab) return
 
-    setTabsState((prev) => ({
-      ...prev,
-      activeTab: id,
-    }))
+    store.activeTab = id
 
     switch (tab.type) {
       case 'sql':
@@ -229,16 +211,16 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
 
   return (
     <Tabs_Shadcn_
-      value={tabsState.activeTab ?? undefined}
+      value={tabs.activeTab ?? undefined}
       onValueChange={handleTabChange}
       className="w-full"
     >
       <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center">
         <button
           className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-r"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          onClick={() => (sidebarState.isOpen = !sidebar.isOpen)}
         >
-          {isSidebarOpen ? (
+          {sidebar.isOpen ? (
             <PanelLeftClose
               size={16}
               strokeWidth={1.5}

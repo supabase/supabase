@@ -1,9 +1,9 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
-import { useAtom } from 'jotai'
-import { getTabsStore, addTab } from 'components/layouts/tabs/explorer-tabs.store'
-import { Code2 } from 'lucide-react'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import type { NextPageWithLayout } from 'types'
+import { ExplorerLayout } from 'components/layouts/explorer/layout'
 
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
@@ -20,9 +20,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { NextPageWithLayout } from 'types'
-import { ExplorerLayout } from 'components/layouts/explorer/layout'
+import { getTabsStore } from 'state/tabs'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -40,8 +38,6 @@ const SqlEditor: NextPageWithLayout = () => {
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-
-  const [_, setTabsState] = useAtom(getTabsStore('explorer'))
 
   useContentIdQuery(
     { projectRef: ref, id },
@@ -174,20 +170,21 @@ const SqlEditor: NextPageWithLayout = () => {
   useEffect(() => {
     if (!router.isReady || !id || id === 'new') return
 
-    const snippet = snippets?.find((s) => s.id === id)
-    if (snippet) {
-      const sqlTab = {
-        id: `sql-${id}`,
-        type: 'sql' as const,
-        label: snippet.name || 'Untitled Query',
-        icon: <Code2 size={15} />,
-        metadata: {
-          sqlId: id,
-        },
+    const store = getTabsStore('explorer')
+    const tabId = `sql-${id}`
+    const snippet = snippets.find((s) => s.id === id)
+
+    if (!store.tabsMap[tabId]) {
+      store.openTabs = [...store.openTabs, tabId]
+      store.tabsMap[tabId] = {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: { sqlId: id },
       }
-      addTab(setTabsState, sqlTab)
     }
-  }, [router.isReady, id])
+    store.activeTab = tabId
+  }, [router.isReady, id, snippets])
 
   return <SQLEditor />
 }

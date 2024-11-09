@@ -1,3 +1,9 @@
-import { atom } from 'jotai'
+import { proxy } from 'valtio'
 
-export const sidebarOpenAtom = atom(true)
+interface SidebarState {
+  isOpen: boolean
+}
+
+export const sidebarState = proxy<SidebarState>({
+  isOpen: true,
+})
