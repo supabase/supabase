@@ -49,6 +49,7 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { getTabsStore } from 'state/tabs'
 
 export interface EntityListItemProps {
   id: number | string
@@ -267,6 +268,11 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     return null
   }
 
+  const tabsStore = getTabsStore(projectRef)
+  const isOpened = Object.values(tabsStore.tabsMap).some(
+    (tab) => tab.metadata?.tableId === entity.id
+  )
+
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -274,7 +280,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
-      className={cn(TreeViewItemVariant({ isSelected: isActive }), 'px-4')}
+      className={cn(TreeViewItemVariant({ isSelected: isActive, isOpened }), 'px-4')}
     >
       <>
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}

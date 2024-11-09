@@ -25,6 +25,7 @@ interface SQLEditorTreeViewItemProps {
   level: number
   isBranch: boolean
   isSelected: boolean
+  isOpened?: boolean
   isExpanded: boolean
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
@@ -45,6 +46,7 @@ interface SQLEditorTreeViewItemProps {
 export const SQLEditorTreeViewItem = ({
   element,
   isBranch,
+  isOpened,
   isExpanded,
   level,
   status,
@@ -103,6 +105,7 @@ export const SQLEditorTreeViewItem = ({
       <ContextMenu_Shadcn_ modal={false}>
         <ContextMenuTrigger_Shadcn_ asChild>
           <TreeViewItem
+            isOpened={isOpened}
             level={level}
             xPadding={16}
             name={element.name}
