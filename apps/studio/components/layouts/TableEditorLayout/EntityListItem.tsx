@@ -5,6 +5,7 @@ import {
   Download,
   Edit,
   Eye,
+  Files,
   Lock,
   MoreHorizontal,
   Table2,
@@ -48,6 +49,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import useTableDefinition from 'hooks/misc/useTableDefinition'
 
 export interface EntityListItemProps {
   id: number
@@ -101,6 +103,16 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       ?.toLowerCase()
       ?.split('_')
       ?.join(' ')
+  }
+
+  const { formattedDefinition } = useTableDefinition(entity, project)
+  const copyDefinition = async () => {
+    try {
+      await navigator.clipboard.writeText(formattedDefinition!)
+      toast.success('Definition successfully copied to clipboard.')
+    } catch (error: any) {
+      toast.error('Failed to copy definition.')
+    }
   }
 
   const exportTableAsCSV = async () => {
@@ -422,6 +434,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
+            <DropdownMenuItem
+              key="copy-definition"
+              className="space-x-2"
+              onClick={(e) => {
+                e.stopPropagation()
+                copyDefinition()
+              }}
+            >
+              <Files size={12} />
+              <span>Copy Definition</span>
+            </DropdownMenuItem>
 
             <DropdownMenuSeparator />
             <DropdownMenuItem

@@ -3,7 +3,6 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useMemo, useRef } from 'react'
 import { format } from 'sql-formatter'
-
 import { useParams } from 'common'
 import Footer from 'components/grid/components/footer/Footer'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -19,6 +18,7 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { timeout } from 'lib/helpers'
 import { Button } from 'ui'
+import useTableDefinition from 'hooks/misc/useTableDefinition'
 
 export interface TableDefinitionProps {
   entity?: Entity
