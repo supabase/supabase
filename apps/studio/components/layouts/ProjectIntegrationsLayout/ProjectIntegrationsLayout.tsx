@@ -11,12 +11,13 @@ import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateProjectIntegrationsMenu } from './ProjectIntegrationsMenu.utils'
 
 export interface ProjectIntegrationsLayoutProps {
-  title?: string
+  title: string
 }
 
 const ProjectIntegrationsMenu = () => {
   // if running on self-hosted, cron UI should be always enabled
   const cronUiEnabled = useFlag('cronUi') || !IS_PLATFORM
+  const queuesUiEnabled = useFlag('queues')
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -29,6 +30,8 @@ const ProjectIntegrationsMenu = () => {
 
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const graphqlExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_graphql') !== undefined
+  // TODO: Change this to true for local development to work
+  const pgmqExtensionExists = (data ?? []).find((ext) => ext.name === 'pgmq') !== undefined
 
   return (
     <>
@@ -37,7 +40,9 @@ const ProjectIntegrationsMenu = () => {
         menu={generateProjectIntegrationsMenu(project, {
           pgNetExtensionExists,
           cronUiEnabled,
+          queuesUiEnabled,
           graphqlExtensionExists,
+          pgmqExtensionExists,
         })}
       />
     </>
@@ -46,9 +51,11 @@ const ProjectIntegrationsMenu = () => {
 
 const ProjectIntegrationsLayout = ({
   children,
+  title,
 }: PropsWithChildren<ProjectIntegrationsLayoutProps>) => {
   return (
     <ProjectLayout
+      title={title}
       product="Integrations"
       productMenu={<ProjectIntegrationsMenu />}
       isBlocking={false}
