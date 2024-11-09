@@ -189,11 +189,7 @@ const SqlEditor: NextPageWithLayout = () => {
     }
   }, [router.isReady, id])
 
-  return (
-    <div>
-      <SQLEditor />
-    </div>
-  )
+  return <SQLEditor />
 }
 
 SqlEditor.getLayout = (page) => (
