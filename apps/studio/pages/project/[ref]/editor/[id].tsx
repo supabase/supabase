@@ -1,15 +1,18 @@
-import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
-
+import { useEffect } from 'react'
+import { useAtom } from 'jotai'
+import { getTabsStore, addTab } from 'components/layouts/tabs/explorer-tabs.store'
+import { Table2 } from 'lucide-react'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { ExplorerLayout } from 'components/layouts/explorer/layout'
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
-import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useTheme } from 'next-themes'
+import { useRouter } from 'next/router'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -17,6 +20,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
+  const [_, setTabsState] = useAtom(getTabsStore('explorer'))
 
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
@@ -24,6 +28,24 @@ const TableEditorPage: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
     id,
   })
+
+  useEffect(() => {
+    if (selectedTable) {
+      const tableTab = {
+        id: `table-${selectedTable.schema}-${selectedTable.name}`,
+        type: 'table' as const,
+        label: selectedTable.name,
+        icon: <Table2 size={15} />,
+        metadata: {
+          schema: selectedTable.schema,
+          name: selectedTable.name,
+          tableId: id,
+        },
+      }
+
+      addTab(setTabsState, tableTab)
+    }
+  }, [selectedTable, id])
 
   return (
     <>
@@ -49,7 +71,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <TableEditorLayout>{page}</TableEditorLayout>
+    <ExplorerLayout>{page}</ExplorerLayout>
   </ProjectContextFromParamsProvider>
 )
 

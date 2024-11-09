@@ -20,11 +20,11 @@ import { TableNode } from './SchemaTableNode'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
-export const SchemaGraph = () => {
-  const { ref } = useParams()
+export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelection?: boolean }) => {
+  const { ref, schema: selectedSchema } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
+  // const [selectedSchema, setSelectedSchema] = useState<PostgresSchema['name']>(_schema || 'public')
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -105,37 +105,44 @@ export const SchemaGraph = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4 border-b border-muted">
-        {isLoadingSchemas && (
-          <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
-        )}
+      {!hideSchemaSelection ? (
+        <div className="flex items-center justify-between p-4 border-b border-muted">
+          {isLoadingSchemas && (
+            <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
+          )}
 
-        {isErrorSchemas && (
-          <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
-        )}
+          {isErrorSchemas && (
+            <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
+          )}
 
-        {isSuccessSchemas && (
-          <>
-            <SchemaSelector
-              className="w-[260px]"
-              size="small"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-            />
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button type="default" onClick={resetLayout}>
-                  Auto layout
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
-                Automatically arrange the layout of all nodes
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
-          </>
-        )}
-      </div>
+          {/* {isSuccessSchemas && (
+            <>
+              <SchemaSelector
+                className="w-[260px]"
+                size="small"
+                showError={false}
+                selectedSchemaName={selectedSchema}
+                onSelectSchema={setSelectedSchema}
+              />
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <Button type="default" onClick={resetLayout}>
+                    Auto layout
+                  </Button>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom">
+                  Automatically arrange the layout of all nodes
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+            </>
+          )} */}
+        </div>
+      ) : (
+        // <div className="h-10 bg-surface-100 px-3 flex items-center justify-between">
+        //   <span className="text-sm text-foreground-light">Some actions in here</span>
+        // </div>
+        <></>
+      )}
       {isLoadingTables && (
         <div className="w-full h-full flex items-center justify-center gap-x-2">
           <Loader2 className="animate-spin text-foreground-light" size={16} />
@@ -168,6 +175,7 @@ export const SchemaGraph = () => {
             proOptions={{ hideAttribution: true }}
             onNodeDragStop={() => saveNodePositions()}
           >
+            <SchemaGraphLegend />
             <Background
               gap={16}
               className="[&>*]:stroke-foreground-muted opacity-[25%]"
@@ -181,7 +189,6 @@ export const SchemaGraph = () => {
               maskColor={miniMapMaskColor}
               className="border rounded-md shadow-sm"
             />
-            <SchemaGraphLegend />
           </ReactFlow>
         </div>
       )}

@@ -1,20 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { PropsWithChildren, useMemo, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
+import { Button, Separator } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import { SQLEditorMenu } from '../SQLEditorLayout/SQLEditorMenu'
 import TableEditorMenu from './TableEditorMenu'
-import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
-import { Separator } from 'ui'
+import { SQLEditorMenu } from './SQLEditorMenu'
+import { ExplorerTabs } from '../tabs/explorer-tabs'
 
-const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+export interface ExplorerLayoutProps {
+  children: ReactNode
+  hideTabs?: boolean
+}
+
+export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutProps) => {
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
+
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
-  const tableEditorMenu = useMemo(() => {
-    return (
+  const productMenu = useMemo(
+    () => (
       <>
         <TableEditorMenu />
         <Separator />
@@ -22,9 +29,15 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
           key="sql-editor-menu"
           onViewOngoingQueries={() => setShowOngoingQueries(true)}
         />
+        <div className="p-4 border-t sticky bottom-0 bg-studio">
+          <Button block type="default" onClick={() => setShowOngoingQueries(true)}>
+            View running queries
+          </Button>
+        </div>
       </>
-    )
-  }, [])
+    ),
+    []
+  )
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -36,12 +49,15 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <ProjectLayoutWithAuth
-      product="Table Editor"
-      productMenu={tableEditorMenu}
+      product="SQL Editor"
+      productMenu={productMenu}
       isBlocking={false}
       resizableSidebar
     >
-      {children}
+      <div className="flex flex-col h-full">
+        {!hideTabs && <ExplorerTabs storeKey="explorer" />}
+        <div className="h-full">{children}</div>
+      </div>
       <OngoingQueriesPanel
         visible={showOngoingQueries}
         onClose={() => setShowOngoingQueries(false)}
@@ -49,5 +65,3 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     </ProjectLayoutWithAuth>
   )
 }
-
-export default TableEditorLayout

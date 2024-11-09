@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { Filter, Plus } from 'lucide-react'
+import { Edit2, Filter, Plus, Workflow } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -28,6 +28,10 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Skeleton,
+  TreeViewItemVariant,
+  TrewViewItemVariant,
+  cn,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -39,6 +43,8 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import Link from 'next/link'
+import { SchemaButton } from './schema-button'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -111,20 +117,39 @@ const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="h-[400px] flex flex-col flex-grow gap-5 pt-5">
-        <div className="flex flex-col gap-y-1.5">
-          <SchemaSelector
-            className="mx-4"
+      <div className="h-[400px] flex flex-col flex-grow gap-5 pt-2">
+        <div className="px-4 flex justify-between items-center">
+          <h2 className="text-sm">Postgres</h2>
+          <div className="flex items-center gap-1">
+            <SchemaSelector
+              className="w-fit"
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={(name: string) => {
+                setSearchText('')
+                setSelectedSchema(name)
+              }}
+              onSelectCreateSchema={() => snap.onAddSchema()}
+            />
+            <Button
+              type="default"
+              icon={<Edit2 />}
+              className="w-[26px]"
+              onClick={snap.onAddTable}
+            />
+          </div>
+        </div>
+        {/* <div className="flex flex-col gap-y-1.5 "> */}
+        {/* <SchemaSelector
+            className="mx-4 w-fit"
             selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
               setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
-          />
-
-          <div className="grid gap-3 mx-4">
-            {!isLocked ? (
+          /> */}
+        {/* <div className="grid gap-3 mx-4"> */}
+        {/* {!isLocked ? (
               <ButtonTooltip
                 block
                 title="Create a new table"
@@ -146,27 +171,24 @@ const TableEditorMenu = () => {
               >
                 New table
               </ButtonTooltip>
-            ) : (
-              <Alert_Shadcn_>
-                <AlertTitle_Shadcn_ className="text-sm">
-                  Viewing protected schema
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="text-xs">
-                  <p className="mb-2">
-                    This schema is managed by Supabase and is read-only through the table editor
-                  </p>
-                  <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
-                    Learn more
-                  </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-          </div>
-        </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <InnerSideBarFilters>
+            ) : ( */}
+        {/* <Alert_Shadcn_>
+              <AlertTitle_Shadcn_ className="text-sm">Viewing protected schema</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="text-xs">
+                <p className="mb-2">
+                  This schema is managed by Supabase and is read-only through the table editor
+                </p>
+                <Button type="default" size="tiny" onClick={() => setShowModal(true)}>
+                  Learn more
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_> */}
+        {/* )} */}
+        {/* </div> */}
+        {/* </div> */}
+        <div className="flex flex-auto flex-col gap-2 pb-4">
+          <InnerSideBarFilters className="px-4">
             <InnerSideBarFilterSearchInput
-              autoFocus
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
@@ -241,7 +263,31 @@ const TableEditorMenu = () => {
             </Popover_Shadcn_>
           </InnerSideBarFilters>
 
-          {isLoading && <InnerSideBarShimmeringLoaders />}
+          {isLoading && (
+            <div className="flex flex-col gap-y-1">
+              <div className="flex flex-row h-6 px-4 items-center gap-2">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-40 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-4 items-center gap-2">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-32 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-75">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-20 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-50">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-40 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-25">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-20 h-4" />
+              </div>
+            </div>
+          )}
+          {/* <InnerSideBarShimmeringLoaders />} */}
 
           {isError && (
             <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
@@ -264,7 +310,8 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-col flex-1" data-testid="tables-list">
+                  <SchemaButton schema={schema} />
                   <InfiniteList
                     items={entityTypes}
                     ItemComponent={EntityListItem}

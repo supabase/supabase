@@ -5,8 +5,24 @@ import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, use
 import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
+import { cva, VariantProps } from 'class-variance-authority'
 
 const TreeView = TreeViewPrimitive
+
+export type TreeViewItemVariantProps = VariantProps<typeof TreeViewItemVariant>
+export const TreeViewItemVariant = cva(
+  // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
+  // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
+  'group relative transition-colors h-[28px] flex items-center gap-3 text-sm cursor-pointer select-none text-foreground-light hover:bg-control aria-expanded:bg-control data-[state=open]:bg-control', // data-[state=open]:bg-control bg state for context menu open
+  {
+    variants: {
+      isSelected: {
+        true: 'text-foreground !bg-selection', // bg state for context menu open
+        false: '',
+      },
+    },
+  }
+)
 
 const TreeViewItem = forwardRef<
   HTMLDivElement,
@@ -92,20 +108,7 @@ const TreeViewItem = forwardRef<
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         {...props}
-        className={cn(
-          'group relative',
-          'transition-colors',
-          'h-[28px]',
-          'flex items-center gap-3',
-          'text-sm',
-          'cursor-pointer select-none',
-          'text-foreground-light',
-          'hover:bg-control',
-          'aria-expanded:bg-control',
-          isSelected ? 'text-foreground' : '', // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
-          isSelected ? '!bg-selection' : '', // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
-          'data-[state=open]:bg-control' // bg state for context menu open
-        )}
+        className={cn(TreeViewItemVariant({ isSelected }))}
         style={{
           paddingLeft:
             level === 1 && !isBranch
@@ -204,7 +207,7 @@ const TreeViewItem = forwardRef<
   }
 )
 
-const SQL_ICON = forwardRef<SVGSVGElement, LucideSVGProps>((props, ref) => (
+export const SQL_ICON = forwardRef<SVGSVGElement, LucideSVGProps>((props, ref) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g clipPath="url(#clip0_1018_49117)">
       <path d="M20.8457 14.4531V15.6348H17.8916V14.4531H20.8457ZM18.3311 8.52539V15.6348H16.9004V8.52539H18.3311Z" />
