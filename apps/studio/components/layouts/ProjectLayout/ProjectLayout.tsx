@@ -117,7 +117,7 @@ const ProjectLayout = ({
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [actionKey, sidebarState])
+  }, [actionKey, sidebar.isOpen])
 
   return (
     <AppLayout>
@@ -212,7 +212,7 @@ const MenuBarWrapper = ({
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [sidebarState])
+  }, [sidebar.isOpen])
 
   if (!isBlocking) {
     return children
