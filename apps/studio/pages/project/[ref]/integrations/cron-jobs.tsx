@@ -1,7 +1,7 @@
 import { CronJobsListing } from 'components/interfaces/Integrations/CronJobs/CronJobsListing'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
-import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const CronJobsPage: NextPageWithLayout = () => {
   // TODO: Change this to the correct permissions
@@ -24,7 +24,7 @@ const CronJobsPage: NextPageWithLayout = () => {
 }
 
 CronJobsPage.getLayout = (page) => (
-  <ProjectIntegrationsLayout title="Database">{page}</ProjectIntegrationsLayout>
+  <ProjectIntegrationsLayout title="Cron Jobs">{page}</ProjectIntegrationsLayout>
 )
 
 export default CronJobsPage

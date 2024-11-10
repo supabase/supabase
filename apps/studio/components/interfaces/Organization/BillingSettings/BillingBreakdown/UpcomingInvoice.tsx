@@ -1,15 +1,20 @@
-import clsx from 'clsx'
+import { ChevronRight, Info } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
 import { formatCurrency } from 'lib/helpers'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { Button, Collapsible } from 'ui'
+import {
+  Button,
+  cn,
+  Collapsible,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
-import { ChevronRight, Info } from 'lucide-react'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -170,7 +175,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             className="!px-1"
                             icon={
                               <ChevronRight
-                                className={clsx(
+                                className={cn(
                                   'transition',
                                   usageFeesExpanded.includes(fee.description) && 'rotate-90'
                                 )}
@@ -285,32 +290,29 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
 const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
   return (
-    <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_>
         <Info size={12} strokeWidth={2} />
-      </Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="bottom">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
-            <span className="text-xs text-foreground">
-              <p>
-                {text}{' '}
-                {linkRef && (
-                  <Link
-                    href={linkRef}
-                    target="_blank"
-                    className="transition text-brand hover:text-brand-600 underline"
-                  >
-                    Read more
-                  </Link>
-                )}
-              </p>
-            </span>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_
+        side="bottom"
+        className="min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto"
+      >
+        <p>
+          {text}{' '}
+          {linkRef && (
+            <Link
+              href={linkRef}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition text-brand hover:text-brand-600 underline"
+            >
+              Read more
+            </Link>
+          )}
+        </p>
+      </TooltipContent_Shadcn_>
+    </Tooltip_Shadcn_>
   )
 }
 

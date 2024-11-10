@@ -465,7 +465,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
     <div className="flex items-center gap-x-2 group">
       <p className="w-36 text-foreground-light text-sm">{property}</p>
@@ -499,7 +499,7 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,
