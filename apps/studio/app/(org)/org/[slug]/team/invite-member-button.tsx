@@ -23,7 +23,7 @@ import {
   doPermissionsCheck,
   useCheckPermissions,
   useGetPermissions,
-} from 'hooks/misc/useCheckPermissions'
+} from 'hooks/misc/useCheckPermissionsAppRouter'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {

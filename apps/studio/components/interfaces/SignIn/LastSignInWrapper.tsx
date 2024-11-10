@@ -16,7 +16,7 @@ export function LastSignInWrapper({
     <div className="flex items-center relative">
       {lastSignIn === type && (
         <Tooltip_Shadcn_>
-          <TooltipTrigger_Shadcn_ asChild className="absolute -right-8" asChild>
+          <TooltipTrigger_Shadcn_ asChild className="absolute -right-8">
             <button className="p-2 flex">
               <span className="w-2.5 h-2.5 bg-brand rounded-full animate-pulse" />
             </button>
