@@ -56,7 +56,7 @@ const DatabasePublications: NextPageWithLayout = () => {
             <div>
               <FormHeader
                 title="Tables"
-                description="Which tables would you like to broadcast the events on"
+                description="Select which tables to broadcast database events from"
               />
               <PublicationsTables selectedPublication={realtimePublication} />
             </div>
