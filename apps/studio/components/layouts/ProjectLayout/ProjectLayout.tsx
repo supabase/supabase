@@ -202,6 +202,8 @@ const MenuBarWrapper = ({
   const actionKey = useActionKey()
   const sidebar = useSnapshot(sidebarState)
 
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key.toLowerCase() === 'b' && (event.metaKey || event.ctrlKey)) {
