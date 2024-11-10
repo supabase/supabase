@@ -52,7 +52,7 @@ const AppHeader = () => {
         <div className="flex items-center gap-3">
           <FeedbackDropdown />
           <NotificationsPopoverV2 />
-          <HelpPopover />
+          {/* <HelpPopover /> */}
           <SettingsButton />
         </div>
         <div className="flex items-center gap-3">

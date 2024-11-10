@@ -1,7 +1,7 @@
 import { Sha256 } from '@aws-crypto/sha256-browser'
 import * as Sentry from '@sentry/nextjs'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
+import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useParams, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
@@ -24,14 +24,15 @@ const getAnonId = async (id: string) => {
 }
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
+  const pathname = usePathname()
   const user = useUser()
-  const router = useRouter()
+
   const { ref, slug } = useParams()
   const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
 
   const { consentValue, hasAcceptedConsent } = useConsent()
-  const previousPathname = usePrevious(router.pathname)
+  const previousPathname = usePrevious(pathname)
 
   const trackTelemetryPH = consentValue === 'true'
   const { mutate: sendPage } = useSendPageMutation()
@@ -48,26 +49,30 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     function handleRouteChange() {
-      if (snap.isOptedInTelemetry) handlePageTelemetry(window.location.href)
+      // Check telemetry consent and send page telemetry if opted in
+      if (snap.isOptedInTelemetry) {
+        handlePageTelemetry(window.location.href)
+      }
     }
 
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
+    // Send telemetry on route change or when query changes
+    handleRouteChange()
+
     return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
+      // No need for event cleanup here in App Router
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, snap.isOptedInTelemetry])
+  }, [pathname, snap.isOptedInTelemetry])
 
   useEffect(() => {
     // Send page telemetry on first page load
-    // Waiting for router ready before sending page_view
-    // if not the path will be dynamic route instead of the browser url
-    if (router.isReady && snap.isOptedInTelemetry) {
+    // Waiting for pathname to be available before sending page_view
+    // If not, the path might be a dynamic route instead of the browser URL
+    if (pathname && snap.isOptedInTelemetry) {
       handlePageTelemetry(window.location.href)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, snap.isOptedInTelemetry])
+  }, [pathname, snap.isOptedInTelemetry])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
@@ -89,19 +94,17 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   }, [user?.id])
 
   useEffect(() => {
-    const isLandingOnProjectRoute =
-      router.pathname.includes('[ref]') && previousPathname === router.pathname
+    const isLandingOnProjectRoute = pathname?.includes('[ref]') && previousPathname === pathname
     const isEnteringProjectRoute =
-      !(previousPathname ?? '').includes('[ref]') && router.pathname.includes('[ref]')
+      !(previousPathname ?? '').includes('[ref]') && pathname?.includes('[ref]')
     const isLeavingProjectRoute =
-      (previousPathname ?? '').includes('[ref]') && !router.pathname.includes('[ref]')
+      (previousPathname ?? '').includes('[ref]') && !pathname?.includes('[ref]')
 
-    const isLandingOnOrgRoute =
-      router.pathname.includes('[slug]') && previousPathname === router.pathname
+    const isLandingOnOrgRoute = pathname?.includes('[slug]') && previousPathname === pathname
     const isEnteringOrgRoute =
-      !(previousPathname ?? '').includes('[slug]') && router.pathname.includes('[slug]')
+      !(previousPathname ?? '').includes('[slug]') && pathname?.includes('[slug]')
     const isLeavingOrgRoute =
-      (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
+      (previousPathname ?? '').includes('[slug]') && !pathname?.includes('[slug]')
 
     if (trackTelemetryPH) {
       if (ref && (isLandingOnProjectRoute || isEnteringProjectRoute)) {
@@ -117,7 +120,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackTelemetryPH, slug, ref, router.pathname])
+  }, [trackTelemetryPH, slug, ref, pathname])
 
   useEffect(() => {
     const handleBeforeUnload = async () => {

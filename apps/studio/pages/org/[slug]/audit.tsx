@@ -1,9 +1,10 @@
 import { AuditLogs } from 'components/interfaces/Organization'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'app/(org)/layout'
 
 const OrgAuditLogs: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
@@ -14,5 +15,5 @@ const OrgAuditLogs: NextPageWithLayout = () => {
   )
 }
 
-OrgAuditLogs.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgAuditLogs.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 export default OrgAuditLogs

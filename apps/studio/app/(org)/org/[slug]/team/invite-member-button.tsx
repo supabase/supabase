@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import InformationBox from 'components/ui/InformationBox'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
@@ -23,7 +23,7 @@ import {
   doPermissionsCheck,
   useCheckPermissions,
   useGetPermissions,
-} from 'hooks/misc/useCheckPermissions'
+} from 'hooks/misc/useCheckPermissionsAppRouter'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -61,10 +61,11 @@ import {
   cn,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './team-settings.utils'
 
 export const InviteMemberButton = () => {
-  const { slug } = useParams()
+  const params = useParams()
+  const { slug } = params as { slug: string }
   const { profile } = useProfile()
   const organization = useSelectedOrganization()
   const { permissions: permissions } = useGetPermissions()
@@ -109,7 +110,7 @@ export const InviteMemberButton = () => {
         permissions,
         PermissionAction.CREATE,
         'user_invites',
-        { resource: { role_id } },
+        { resource: { role_id: role_id ?? 'not worked' } },
         organization?.slug
       )
     )

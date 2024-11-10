@@ -1,5 +1,5 @@
 import { InvoicesSettings } from 'components/interfaces/Organization'
-import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -20,5 +20,5 @@ const OrgInvoices: NextPageWithLayout = () => {
   )
 }
 
-OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgInvoices.getLayout = (page) => <OrganizationLayout pagesRouter>{page}</OrganizationLayout>
 export default OrgInvoices

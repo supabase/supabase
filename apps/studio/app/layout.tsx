@@ -1,3 +1,5 @@
+'use client'
+
 import 'react-data-grid/lib/styles.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
@@ -16,13 +18,14 @@ import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
+import './fonts.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
-import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
+// import { HydrationBoundary, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
@@ -31,29 +34,31 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useMemo, useState } from 'react'
+import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { toast } from 'sonner'
 
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import MetaFaviconsAppRouter from 'common/MetaFavicons/app-router-head'
 import { AppBannerWrapper, RouteValidationWrapper } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { StudioCommandMenu } from 'components/interfaces/App/CommandMenu'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
-import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-
+import { ConsentToast } from 'ui-patterns/ConsentToast'
+import { ReactQueryProvider } from './react-query-provider'
 import { NextIntlClientProvider } from 'next-intl'
 
 dayjs.extend(customParseFormat)
@@ -79,8 +84,11 @@ loader.config({
 // debugging way too difficult. Ideal scenario is we just have one AppLayout to control the height and scroll areas of
 // the dashboard, all other layout components should not be doing that
 
-function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
-  const queryClient = useRootQueryClient()
+function RootLayout({ children }: { children: React.ReactNode }) {
+  //   const [queryClient] = useState(() => new QueryClient())
+
+  const snap = useAppStateSnapshot()
+  const consentToastId = useRef<string | number>()
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -91,8 +99,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
         )
       : undefined
   )
-
-  const getLayout = Component.getLayout ?? ((page) => page)
 
   const AuthContainer = useMemo(
     // eslint-disable-next-line react/display-name
@@ -108,14 +114,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
-  const TelemetryContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? <PageTelemetry>{props.children}</PageTelemetry> : <>{props.children}</>
-    },
-    []
-  )
-
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
@@ -125,63 +123,94 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     console.error(error.stack)
   }
 
+  useEffect(() => {
+    // Check for telemetry consent
+    if (typeof window !== 'undefined') {
+      const onAcceptConsent = () => {
+        snap.setIsOptedInTelemetry(true)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const onOptOut = () => {
+        snap.setIsOptedInTelemetry(false)
+        if (consentToastId.current) toast.dismiss(consentToastId.current)
+      }
+
+      const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      if (IS_PLATFORM && hasAcknowledgedConsent === null) {
+        setTimeout(() => {
+          consentToastId.current = toast(
+            <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+            {
+              id: 'consent-toast',
+              position: 'bottom-right',
+              duration: Infinity,
+            }
+          )
+        }, 300)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
-            <FlagProvider>
-              <NextIntlClientProvider locale="en">
-                <ProfileProvider>
-                  <Head>
-                    <title>Supabase</title>
-                    <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                  </Head>
-                  <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                  <TelemetryContainer>
-                    <TooltipProvider>
-                      <RouteValidationWrapper>
-                        <ThemeProvider
-                          defaultTheme="system"
-                          themes={['dark', 'light', 'classic-dark']}
-                          enableSystem
-                          disableTransitionOnChange
-                        >
-                          <AppBannerContextProvider>
-                            <CommandProvider>
-                              <AppBannerWrapper>
-                                <FeaturePreviewContextProvider>
-                                  {getLayout(<Component {...pageProps} />)}
-                                  <StudioCommandMenu />
-                                  <GenerateSql />
-                                  <FeaturePreviewModal />
-                                  <AiAssistantPanel />
-                                </FeaturePreviewContextProvider>
-                              </AppBannerWrapper>
-                              <SonnerToaster position="top-right" />
-                            </CommandProvider>
-                          </AppBannerContextProvider>
-                        </ThemeProvider>
-                      </RouteValidationWrapper>
-                    </TooltipProvider>
-                  </TelemetryContainer>
+    <html lang="en">
+      <Head>
+        <title>Supabase</title>
+        <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+      </Head>
+      <body>
+        <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+          <ReactQueryProvider>
+            <AuthContainer>
+              <FlagProvider>
+                <NextIntlClientProvider locale="en">
+                  <ProfileProvider>
+                    <MetaFaviconsAppRouter applicationName="Supabase Studio" />
+                    <PageTelemetry>
+                      <TooltipProvider>
+                        <RouteValidationWrapper>
+                          <ThemeProvider
+                            defaultTheme="system"
+                            themes={['dark', 'light', 'classic-dark']}
+                            enableSystem
+                            disableTransitionOnChange
+                          >
+                            <AppBannerContextProvider>
+                              <CommandProvider>
+                                <AppBannerWrapper>
+                                  <FeaturePreviewContextProvider>
+                                    {children}
+                                    <StudioCommandMenu />
+                                    <GenerateSql />
+                                    <FeaturePreviewModal />
+                                  </FeaturePreviewContextProvider>
+                                </AppBannerWrapper>
+                                <SonnerToaster position="top-right" />
+                              </CommandProvider>
+                            </AppBannerContextProvider>
+                          </ThemeProvider>
+                        </RouteValidationWrapper>
+                      </TooltipProvider>
+                    </PageTelemetry>
 
-                  {!isTestEnv && <HCaptchaLoadedStore />}
-                  {!isTestEnv && (
-                    <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
-                  )}
-                </ProfileProvider>
-              </NextIntlClientProvider>
-            </FlagProvider>
-          </AuthContainer>
-        </Hydrate>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                    {!isTestEnv && <HCaptchaLoadedStore />}
+                    {!isTestEnv && (
+                      <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                    )}
+                  </ProfileProvider>
+                </NextIntlClientProvider>
+              </FlagProvider>
+            </AuthContainer>
+          </ReactQueryProvider>
+        </ErrorBoundary>
+      </body>
+    </html>
   )
 }
 
-export default CustomApp
+export default RootLayout

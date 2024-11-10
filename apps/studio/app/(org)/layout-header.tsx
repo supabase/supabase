@@ -13,10 +13,10 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge } from 'ui'
-import BreadcrumbsView from './BreadcrumbsView'
-import { FeedbackDropdown } from './FeedbackDropdown'
-import HelpPopover from './HelpPopover'
-import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import BreadcrumbsView from '../../components/layouts/ProjectLayout/LayoutHeader/BreadcrumbsView'
+import { FeedbackDropdown } from '../../components/layouts/ProjectLayout/LayoutHeader/FeedbackDropdown'
+import HelpPopover from '../../components/layouts/ProjectLayout/LayoutHeader/HelpPopover'
+import NotificationsPopoverV2 from '../../components/layouts/ProjectLayout/LayoutHeader/NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -116,7 +116,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
           <>
             <FeedbackDropdown />
             <NotificationsPopoverV2 />
-            <HelpPopover />
+            {/* <HelpPopover /> */}
           </>
         )}
       </div>

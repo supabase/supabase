@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { useLocale } from 'next-intl'
+import { usePathname } from 'next/navigation'
 import type { ResponseError } from 'types'
 
 type SendPage = components['schemas']['TelemetryPageBodyV2']
@@ -36,7 +37,8 @@ export const useSendPageMutation = ({
   onError,
   ...options
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
-  const router = useRouter()
+  const pathname = usePathname()
+  const locale = useLocale()
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -48,10 +50,10 @@ export const useSendPageMutation = ({
       const body: SendPage = {
         page_url: url,
         page_title: title,
-        pathname: router.pathname,
+        pathname: pathname,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
           user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,

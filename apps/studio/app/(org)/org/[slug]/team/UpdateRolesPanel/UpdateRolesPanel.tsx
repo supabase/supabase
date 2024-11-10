@@ -2,7 +2,7 @@ import { isEqual } from 'lodash'
 import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
@@ -42,7 +42,7 @@ import {
   WarningIcon,
   cn,
 } from 'ui'
-import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
+import { useGetRolesManagementPermissions } from '../team-settings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
   ProjectRoleConfiguration,
@@ -56,7 +56,9 @@ interface UpdateRolesPanelProps {
 }
 
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
-  const { slug } = useParams()
+  const params = useParams()
+  const { slug } = params as { slug: string }
+
   const organization = useSelectedOrganization()
   const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 

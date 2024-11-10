@@ -1,9 +1,11 @@
-import { useRouter } from 'next/router'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+// import AccountLayout from 'app/(org)/layout'
 import AlertError from 'components/ui/AlertError'
 import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -11,9 +13,9 @@ import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
+// import type { NextPageWithLayout } from 'types'
 
-const ProjectsPage: NextPageWithLayout = () => {
+const ProjectsPage = () => {
   const router = useRouter()
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState<string[]>([
@@ -61,47 +63,47 @@ const ProjectsPage: NextPageWithLayout = () => {
         </div>
       )}
 
-      {navLayoutV2 && (
+      {/* {navLayoutV2 && (
         <div className={`flex items-center justify-center h-full`}>
           <Loading />
         </div>
-      )}
-      {!navLayoutV2 && (
-        <div className="p-5">
-          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
-            <HomePageActions
-              search={search}
-              filterStatus={filterStatus}
-              setSearch={setSearch}
-              setFilterStatus={setFilterStatus}
-              organizations={organizations}
-            />
-          )}
-          <div className="my-6 space-y-8">
-            <ProjectList
-              search={search}
-              filterStatus={filterStatus}
-              resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
-            />
-          </div>
+      )} */}
+      {/* {!navLayoutV2 && ( */}
+      <div className="p-5">
+        {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+          <HomePageActions
+            search={search}
+            filterStatus={filterStatus}
+            setSearch={setSearch}
+            setFilterStatus={setFilterStatus}
+            organizations={organizations}
+          />
+        )}
+        <div className="my-6 space-y-8">
+          <ProjectList
+            search={search}
+            filterStatus={filterStatus}
+            resetFilterStatus={() => setFilterStatus(['ACTIVE_HEALTHY', 'INACTIVE'])}
+          />
         </div>
-      )}
+      </div>
+      {/* )} */}
     </>
   )
 }
 
-ProjectsPage.getLayout = (page) => (
-  <AccountLayout
-    title="Dashboard"
-    breadcrumbs={[
-      {
-        key: `supabase-projects`,
-        label: 'Projects',
-      },
-    ]}
-  >
-    {page}
-  </AccountLayout>
-)
+// ProjectsPage.getLayout = (page) => (
+//   <AccountLayout
+//     title="Dashboard"
+//     breadcrumbs={[
+//       {
+//         key: `supabase-projects`,
+//         label: 'Projects',
+//       },
+//     ]}
+//   >
+//     {page}
+//   </AccountLayout>
+// )
 
 export default ProjectsPage

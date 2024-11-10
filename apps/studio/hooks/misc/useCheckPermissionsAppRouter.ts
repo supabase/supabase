@@ -1,4 +1,5 @@
-import { useIsLoggedIn, useParams } from 'common'
+import { useIsLoggedIn } from 'common'
+import { useParams } from 'next/navigation'
 import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -158,7 +159,8 @@ export function usePermissionsLoaded() {
   const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
   const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
 
-  const { ref } = useParams()
+  const params = useParams()
+  const { ref } = params as { ref: string }
 
   const { isFetched: isProjectDetailFetched } = useProjectDetailQuery(
     { ref },

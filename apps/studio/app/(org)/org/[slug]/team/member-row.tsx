@@ -2,13 +2,12 @@ import { ArrowRight, Check, Minus, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { useState } from 'react'
 
-import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+// import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
@@ -20,8 +19,11 @@ import {
   cn,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
-import { MemberActions } from './MemberActions'
+import {
+  getUserDisplayName,
+  isInviteExpired,
+} from '../../../../../components/interfaces/Organization/Organization.utils'
+import { MemberActions } from './member-actions'
 import Link from 'next/link'
 
 interface MemberRowProps {

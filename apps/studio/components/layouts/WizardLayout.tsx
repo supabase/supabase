@@ -66,7 +66,7 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
           </div>
           <div className="flex">{/* The End */}</div>
           <div className="flex items-center space-x-2">
-            <HelpPopover />
+            {/* <HelpPopover /> */}
             <FeedbackDropdown />
           </div>
         </div>

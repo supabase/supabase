@@ -3,7 +3,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -11,30 +11,40 @@ import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissionsAppRouter'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { Form, Input, Toggle } from 'ui'
-import OptInToOpenAIToggle from './OptInToOpenAIToggle'
-import OrganizationDeletePanel from './OrganizationDeletePanel'
+import OptInToOpenAIToggle from '../../../../../components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
+import OrganizationDeletePanel from '../../../../../components/interfaces/Organization/GeneralSettings/OrganizationDeletePanel'
 
-const GeneralSettings = () => {
-  const { slug } = useParams()
+export function GeneralSettings() {
+  const params = useParams()
+  const { slug } = params as { slug: string }
+
   const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
-  const { name } = selectedOrganization ?? {}
+  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
+  const canUpdateOrganization = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations',
+    undefined,
+    slug
+  )
+  const canDeleteOrganization = useCheckPermissions(
+    PermissionAction.UPDATE,
+    'organizations',
+    undefined,
+    slug
+  )
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
+  const { name } = selectedOrganization ?? {}
   const formId = 'org-general-settings'
   const isOptedIntoAi = useOrgOptedIntoAi()
   const initialValues = { name: name ?? '', isOptedIntoAi }
-
-  const organizationDeletionEnabled = useIsFeatureEnabled('organizations:delete')
-
-  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const canDeleteOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
-  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
   const onUpdateOrganization = async (values: any, { resetForm }: any) => {
     if (!canUpdateOrganization) {
@@ -137,4 +147,4 @@ const GeneralSettings = () => {
   )
 }
 
-export default GeneralSettings
+// export default GeneralSettings

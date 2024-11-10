@@ -1,6 +1,8 @@
+'use client'
+
 import type { PropsWithChildren } from 'react'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
 import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
@@ -11,14 +13,23 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
-import AccountLayout from './AccountLayout/AccountLayout'
-import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
-import SettingsLayout from './SettingsLayout/SettingsLayout'
+import AccountLayout from '../layout'
+import {
+  ScaffoldContainer,
+  ScaffoldDivider,
+  ScaffoldHeader,
+  ScaffoldTitle,
+} from '../../../components/layouts/Scaffold'
+import SettingsLayout from '../../../components/layouts/SettingsLayout/SettingsLayout'
 
-const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
+const OrganizationLayout = ({
+  children,
+  pagesRouter,
+}: PropsWithChildren<{ pagesRouter?: boolean }>) => {
   const selectedOrganization = useSelectedOrganization()
   const currentPath = useCurrentPath()
-  const { slug } = useParams()
+  const params = useParams()
+  const slug = params?.slug as string
 
   const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
   const invoicesEnabled = invoicesEnabledOnProfileLevel
@@ -75,11 +86,8 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
 
-  return (
-    <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-    >
+  const content = (
+    <>
       <ScaffoldHeader className="pb-0">
         <ScaffoldContainer id="billing-page-top">
           <ScaffoldTitle className="pb-3">
@@ -114,8 +122,21 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       )}
 
       {children}
-    </AccountLayout>
+    </>
   )
+
+  if (pagesRouter) {
+    return (
+      <AccountLayout
+        title={selectedOrganization?.name ?? 'Supabase'}
+        breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
+      >
+        {content}
+      </AccountLayout>
+    )
+  } else {
+    return content
+  }
 }
 
 export default OrganizationLayout

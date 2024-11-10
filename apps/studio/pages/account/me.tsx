@@ -6,7 +6,7 @@ import {
 } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -14,6 +14,7 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'app/(org)/layout'
 
 const User: NextPageWithLayout = () => {
   return (

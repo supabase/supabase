@@ -3,7 +3,7 @@ import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useParams } from 'common'
+import { useParams } from 'next/navigation'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useOrganizationCreateInvitationMutation } from 'data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
@@ -18,7 +18,7 @@ import {
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissionsAppRouter'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useGetRolesManagementPermissions } from './team-settings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {
@@ -39,7 +39,9 @@ interface MemberActionsProps {
 }
 
 export const MemberActions = ({ member }: MemberActionsProps) => {
-  const { slug } = useParams()
+  const params = useParams()
+  const { slug } = params as { slug: string }
+
   const { profile } = useProfile()
   const [showAccessModal, setShowAccessModal] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)

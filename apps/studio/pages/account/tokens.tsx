@@ -6,12 +6,13 @@ import {
   NewAccessTokenButton,
   NewTokenBanner,
 } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import type { NextPageWithLayout } from 'types'
 import { Alert, Button } from 'ui'
 import { ExternalLink } from 'lucide-react'
+import AccountLayout from 'app/(org)/layout'
 
 const UserAccessTokens: NextPageWithLayout = () => {
   const [newToken, setNewToken] = useState<NewAccessToken | undefined>()

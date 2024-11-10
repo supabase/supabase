@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import { useRouter } from 'next/router'
+import { useLocale } from 'next-intl'
+import { usePathname } from 'next/navigation'
 import type { ResponseError } from 'types'
 
 type SendEvent = components['schemas']['TelemetryEventBodyV2']
@@ -42,7 +43,8 @@ export const useSendEventMutation = ({
   UseMutationOptions<SendEventData, ResponseError, SendEventVariables>,
   'mutationFn'
 > = {}) => {
-  const router = useRouter()
+  const pathName = usePathname()
+  const locale = useLocale()
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -55,10 +57,10 @@ export const useSendEventMutation = ({
         action,
         page_url: window.location.href,
         page_title: title,
-        pathname: router.pathname,
+        pathname: pathName,
         ph: {
           referrer,
-          language: router?.locale ?? 'en-US',
+          language: locale ?? 'en-US',
           user_agent: navigator.userAgent,
           search: window.location.search,
           viewport_height: isBrowser ? window.innerHeight : 0,

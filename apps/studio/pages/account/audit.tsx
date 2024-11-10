@@ -1,8 +1,9 @@
 import { AuditLogs } from 'components/interfaces/Account'
-import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
+import OrganizationLayout from 'app/(org)/org/layout'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import type { NextPageWithLayout } from 'types'
+import AccountLayout from 'app/(org)/layout'
 
 const User: NextPageWithLayout = () => {
   return (

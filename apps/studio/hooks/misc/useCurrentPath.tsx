@@ -1,13 +1,17 @@
-import { useRouter } from 'next/router'
+import { useRouter, usePathname } from 'next/navigation'
 
 export const useCurrentPath = () => {
   const router = useRouter()
+  const pathname = usePathname()
 
-  if (!router.isReady) {
-    return ''
-  }
+  // if (!router.isReady) {
+  //   return ''
+  // }
 
-  const pathWithQuery = router.asPath
+  return pathname
+
+  const pathWithQuery = pathname
+
   const currentPath = pathWithQuery.split('?')[0]
 
   return currentPath

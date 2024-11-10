@@ -1,14 +1,14 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import type { FallbackProps } from 'react-error-boundary'
 
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { WarningIcon } from 'ui'
 
 export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
-  const router = useRouter()
-  const message = `Path name: ${router.pathname}\n\n${error.stack}`
+  const pathname = usePathname()
+  const message = `Path name: ${pathname}\n\n${error.stack}`
   const isRemoveChildError = error.message.includes("Failed to execute 'removeChild' on 'Node'")
 
   return (
@@ -61,7 +61,10 @@ export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps)
             Return to dashboard
           </Button>
         ) : (
-          <Button type="outline" onClick={() => router.reload()}>
+          <Button
+            type="outline"
+            // onClick={() => router.reload()}
+          >
             Reload dashboard
           </Button>
         )}
