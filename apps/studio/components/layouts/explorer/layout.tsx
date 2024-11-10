@@ -57,17 +57,8 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
     >
       <div className="flex flex-col h-full">
         {!hideTabs && <ExplorerTabs storeKey="explorer" />}
-        <ResizablePanelGroup direction="vertical">
-          <ResizablePanel defaultSize={70}>
-            <div className="h-full">{children}</div>
-          </ResizablePanel>
-          <ResizableHandle />
-          <ResizablePanel defaultSize={30}>
-            <div className="bg-black h-full">
-              <SQLStatementsViewer />
-            </div>
-          </ResizablePanel>
-        </ResizablePanelGroup>
+
+        <div className="h-full">{children}</div>
       </div>
       <OngoingQueriesPanel
         visible={showOngoingQueries}

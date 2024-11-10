@@ -1,4 +1,5 @@
 import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useRouter } from 'next/router'
 
 import { handleError as handleErrorFetchers, post } from 'data/fetchers'
 import {
@@ -9,6 +10,7 @@ import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
 import { MB } from 'lib/constants'
 import sqlExecutionsStoreState, { type SqlExecution } from 'state/sql-executions'
+import { Router } from 'lucide-react'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -18,6 +20,7 @@ export type ExecuteSqlVariables = {
   handleError?: (error: ResponseError) => { result: any }
   isRoleImpersonationEnabled?: boolean
   autoLimit?: number
+  url?: string
 }
 
 export async function executeSql(
@@ -28,6 +31,7 @@ export async function executeSql(
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
+    url,
   }: Pick<
     ExecuteSqlVariables,
     | 'projectRef'
@@ -36,20 +40,22 @@ export async function executeSql(
     | 'queryKey'
     | 'handleError'
     | 'isRoleImpersonationEnabled'
+    | 'url'
   >,
   signal?: AbortSignal
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const execution: SqlExecution = {
+    queryKey,
     sql,
     startedAt: Date.now(),
     status: 'running',
+    url,
   }
-  const executionIndex = sqlExecutionsStoreState.addExecution(execution)
+  var executionIndex = sqlExecutionsStoreState.addExecution(execution)
 
   const sqlSize = new Blob([sql]).size
-  // [Joshen] I think the limit is around 1MB from testing, but its not exactly 1MB it seems
   if (sqlSize > 0.98 * MB) {
     throw new Error('Query is too large to be run via the SQL Editor')
   }
@@ -63,7 +69,6 @@ export async function executeSql(
       params: {
         header: { 'x-connection-encrypted': connectionString ?? '' },
         path: { ref: projectRef },
-        // @ts-ignore: This is just a client side thing to identify queries better
         query: {
           key:
             queryKey
@@ -73,17 +78,9 @@ export async function executeSql(
       },
       body: { query: sql },
       headers: Object.fromEntries(headers),
-    } as any) // Needed to fix generated api types for now
+    } as any)
 
     if (error) {
-      sqlExecutionsStoreState.updateExecution(executionIndex, {
-        ...execution,
-        completedAt: Date.now(),
-        duration: Date.now() - execution.startedAt,
-        status: 'error',
-        error,
-      })
-
       if (
         isRoleImpersonationEnabled &&
         typeof error === 'object' &&
@@ -117,6 +114,7 @@ export async function executeSql(
       else handleErrorFetchers(error)
     }
 
+    // Update execution status before any returns
     sqlExecutionsStoreState.updateExecution(executionIndex, {
       ...execution,
       completedAt: Date.now(),
@@ -134,13 +132,15 @@ export async function executeSql(
 
     return { result: data }
   } catch (error: any) {
+    // Update execution status before throwing
     sqlExecutionsStoreState.updateExecution(executionIndex, {
       ...execution,
       completedAt: Date.now(),
       duration: Date.now() - execution.startedAt,
       status: 'error',
-      error,
+      error: error?.message || 'Unknown error occurred',
     })
+
     throw error
   }
 }
@@ -158,13 +158,24 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     isRoleImpersonationEnabled,
   }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
-) =>
-  useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
+) => {
+  const router = useRouter()
+
+  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     ({ signal }) =>
       executeSql(
-        { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
+        {
+          projectRef,
+          connectionString,
+          sql,
+          queryKey,
+          handleError,
+          isRoleImpersonationEnabled,
+          url: router.asPath,
+        },
         signal
       ),
     { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
+}

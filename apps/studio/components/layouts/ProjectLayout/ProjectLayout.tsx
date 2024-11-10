@@ -34,6 +34,7 @@ import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { sidebarState } from '../tabs/sidebar-state'
 import { useActionKey } from 'hooks/useActionKey'
+import { SQLStatementsViewer } from '../explorer/sql-statements-viewer'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -139,37 +140,50 @@ const ProjectLayout = ({
         <div className="flex flex-col h-screen">
           {!hideHeader && <LayoutHeader />}
 
-          <div className="flex flex-1 overflow-hidden">
-            {!hideIconBar && <NavigationBar />}
+          <ResizablePanelGroup direction="vertical" autoSaveId="project-layout-vertical">
+            <ResizablePanel defaultSize={70} minSize={30} className="h-full">
+              <div className="flex flex-1 overflow-hidden h-full">
+                {!hideIconBar && <NavigationBar />}
 
-            <ResizablePanelGroup
-              className="flex flex-1"
-              direction="horizontal"
-              autoSaveId="project-layout"
-            >
-              <ResizablePanel
-                id="panel-left"
-                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                  hidden: !showProductMenu || !productMenu || !sidebar.isOpen,
-                })}
-                defaultSize={0}
-              >
-                <MenuBarWrapper
-                  isLoading={isLoading}
-                  isBlocking={isBlocking}
-                  productMenu={productMenu}
+                <ResizablePanelGroup
+                  className="flex flex-1"
+                  direction="horizontal"
+                  autoSaveId="project-layout-horizontal"
                 >
-                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                </MenuBarWrapper>
-              </ResizablePanel>
-              <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu || !sidebar.isOpen })}
-                withHandle
-                disabled={resizableSidebar ? false : true}
-              />
-              <ResizablePanel>{children}</ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
+                  <ResizablePanel
+                    id="panel-left"
+                    className={cn(
+                      resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
+                      {
+                        hidden: !showProductMenu || !productMenu || !sidebar.isOpen,
+                      }
+                    )}
+                    defaultSize={0}
+                  >
+                    <MenuBarWrapper
+                      isLoading={isLoading}
+                      isBlocking={isBlocking}
+                      productMenu={productMenu}
+                    >
+                      <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                    </MenuBarWrapper>
+                  </ResizablePanel>
+                  <ResizableHandle
+                    className={cn({ hidden: !showProductMenu || !productMenu || !sidebar.isOpen })}
+                    withHandle
+                    disabled={resizableSidebar ? false : true}
+                  />
+                  <ResizablePanel>{children}</ResizablePanel>
+                </ResizablePanelGroup>
+              </div>
+            </ResizablePanel>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={30}>
+              <div className="bg-black h-full">
+                <SQLStatementsViewer />
+              </div>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         <EnableBranchingModal />

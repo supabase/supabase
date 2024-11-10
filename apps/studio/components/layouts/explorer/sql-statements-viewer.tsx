@@ -1,50 +1,21 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useEffect, useState, useRef, useCallback, memo } from 'react'
 import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from 'ui'
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { Ban, ChevronDown, Loader2, Terminal, Trash2, XCircle } from 'lucide-react'
 import dayjs from 'dayjs'
 import hljs from 'highlight.js/lib/core'
 import sql from 'highlight.js/lib/languages/sql'
 import 'highlight.js/styles/atom-one-dark.css'
 import { format as sqlFormat } from 'sql-formatter'
+import sqlExecutionsState, { useSqlExecutions, type SqlExecution } from 'state/sql-executions'
+import clsx from 'clsx'
+import { Separator } from 'ui'
+import Link from 'next/link'
 
 hljs.registerLanguage('sql', sql)
-
-interface SQLStatement {
-  id: number
-  timestamp: number
-  sql: string
-  status: 'running' | 'completed' | 'error'
-  startedAt: number
-  completedAt?: number
-  duration?: number
-  error?: {
-    title: string
-    message: string
-  }
-}
-
-const sampleStatements = [
-  {
-    id: 1,
-    sql: `WITH RECURSIVE subordinates AS (SELECT employee_id, manager_id, full_name FROM employees WHERE employee_id = 2 UNION SELECT e.employee_id, e.manager_id, e.full_name FROM employees e INNER JOIN subordinates s ON s.employee_id = e.manager_id) SELECT * FROM subordinates;`,
-  },
-  {
-    id: 2,
-    sql: `SELECT DATE_TRUNC('month', order_date) AS month, product_category, SUM(total_amount) AS total_sales, COUNT(DISTINCT customer_id) AS unique_customers, AVG(total_amount) AS avg_order_value FROM orders JOIN order_items USING (order_id) JOIN products USING (product_id) WHERE order_date >= NOW() - INTERVAL '1 year' GROUP BY 1, 2 HAVING SUM(total_amount) > 10000 ORDER BY total_sales DESC LIMIT 10;`,
-  },
-  {
-    id: 3,
-    sql: `CREATE OR REPLACE FUNCTION update_stock() RETURNS TRIGGER AS $$ BEGIN UPDATE products SET stock_quantity = stock_quantity - NEW.quantity WHERE product_id = NEW.product_id; IF (SELECT stock_quantity FROM products WHERE product_id = NEW.product_id) < 0 THEN RAISE EXCEPTION 'Insufficient stock for product %', NEW.product_id; END IF; RETURN NEW; END; $$ LANGUAGE plpgsql; CREATE TRIGGER check_stock BEFORE INSERT ON order_items FOR EACH ROW EXECUTE FUNCTION update_stock();`,
-  },
-  {
-    id: 4,
-    sql: `SELECT u.user_id, u.username, COUNT(DISTINCT p.post_id) AS total_posts, COUNT(DISTINCT c.comment_id) AS total_comments, COALESCE(SUM(l.like_count), 0) AS total_likes_received FROM users u LEFT JOIN posts p ON u.user_id = p.user_id LEFT JOIN comments c ON u.user_id = c.user_id LEFT JOIN (SELECT post_id, COUNT(*) AS like_count FROM likes GROUP BY post_id) l ON p.post_id = l.post_id WHERE u.created_at >= NOW() - INTERVAL '30 days' GROUP BY u.user_id, u.username HAVING COUNT(DISTINCT p.post_id) > 0 OR COUNT(DISTINCT c.comment_id) > 0 ORDER BY total_likes_received DESC, total_posts DESC, total_comments DESC LIMIT 100;`,
-  },
-]
 
 const formatTime = (ms: number) => {
   const hours = Math.floor(ms / 3600000)
@@ -74,103 +45,159 @@ const highlightSQL = (sql: string) => {
   }
 }
 
-function SQLStatementItem({ statement }: { statement: SQLStatement }) {
-  return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{
-        type: 'spring',
-        stiffness: 500,
-        damping: 30,
-        mass: 1,
-      }}
-      className="mb-8"
-    >
-      <Tooltip_Shadcn_>
-        <TooltipTrigger_Shadcn_ asChild>
-          <div className="text-green-400 cursor-help mb-2">
-            -- {dayjs(statement.timestamp).format('YYYY-MM-DD HH:mm:ss.SSSS')}
-          </div>
-        </TooltipTrigger_Shadcn_>
-        <TooltipContent_Shadcn_ side="right" className="flex flex-col gap-1 font-mono">
-          <div>
-            <span className="text-zinc-400">Local: </span>
-            {dayjs(statement.timestamp).format('DD MMM YYYY, HH:mm:ss.SSS')}
-          </div>
-          <div>
-            <span className="text-zinc-400">UTC: </span>
-            {dayjs(statement.timestamp).format('DD MMM YYYY, HH:mm:ss.SSS [UTC]')}
-          </div>
-          <div>
-            <span className="text-zinc-400">Timestamp: </span>
-            {statement.timestamp}
-          </div>
-          <div>
-            <span className="text-zinc-400">Status: </span>
-            {statement.status}
-          </div>
-        </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+// Memoize the SQLStatementItem component
+const SQLStatementItem = memo(function SQLStatementItem({
+  statement,
+}: {
+  statement: SqlExecution
+}) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [isOverflowing, setIsOverflowing] = useState(false)
+  const sqlRef = useRef<HTMLDivElement>(null)
 
-      <motion.div
-        className="mt-1 relative overflow-hidden rounded-md bg-zinc-800"
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: 'auto' }}
-        transition={{ duration: 0.3, ease: 'easeInOut' }}
-      >
+  useEffect(() => {
+    if (sqlRef.current) {
+      setIsOverflowing(sqlRef.current.scrollHeight > 300)
+    }
+  }, [statement.sql])
+
+  return (
+    <div className="py-5 flex flex-col gap-5 px-5">
+      <div className="flex items-center gap-2">
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_>
+            <div className="text-foreground-muted text-left">
+              -- {dayjs(statement.timestamp).format('YYYY-MM-DD HH:mm:ss.SSS')}
+            </div>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="top" className="flex flex-col gap-1 font-mono">
+            <div>
+              <span className="text-zinc-400">Local: </span>
+              {dayjs(statement.timestamp).format('DD MMM YYYY, HH:mm:ss.SSS')}
+            </div>
+            <div>
+              <span className="text-zinc-400">UTC: </span>
+              {dayjs(statement.timestamp).format('DD MMM YYYY, HH:mm:ss.SSS [UTC]')}
+            </div>
+            <div>
+              <span className="text-zinc-400">Timestamp: </span>
+              {statement.timestamp}
+            </div>
+            <div>
+              <span className="text-zinc-400">Status: </span>
+              {statement.status}
+            </div>
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+
+        {statement.url && (
+          <Link
+            href={statement.url}
+            className="text-foreground-muted hover:text-foreground transition"
+          >
+            {statement.url}
+          </Link>
+        )}
+      </div>
+
+      <div className="relative flex flex-col gap-2">
         <div
-          className="hljs p-4 overflow-x-auto whitespace-pre-wrap relative z-0"
+          ref={sqlRef}
+          className={clsx(
+            'hljs overflow-x-auto whitespace-pre-wrap !bg-transparent text-xs',
+            !isExpanded && 'max-h-[300px] overflow-hidden'
+          )}
           dangerouslySetInnerHTML={highlightSQL(statement.sql)}
         />
-        <div className="mt-2 p-4 relative flex items-center gap-4 bg-zinc-900 rounded-b-md">
-          <div className="flex-1 flex items-center gap-2">
-            <RunningTimer statement={statement} />
-            <motion.div
-              className="absolute flex items-center gap-2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={
-                statement.status === 'completed' ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }
-              }
-              transition={{ duration: 0.2 }}
+
+        {isOverflowing && !isExpanded && (
+          <>
+            <div className="absolute bottom-0 inset-x-0 h-[150px] bg-gradient-to-t from-black from-20% via-black/50 to-transparent pointer-events-none" />
+            <div className="absolute bottom-8 left-0">
+              <Button
+                type="outline"
+                size="tiny"
+                onClick={() => setIsExpanded(true)}
+                className="rounded-full"
+              >
+                Show More
+              </Button>
+            </div>
+          </>
+        )}
+
+        {isOverflowing && isExpanded && (
+          <div>
+            <Button
+              type="outline"
+              size="tiny"
+              onClick={() => setIsExpanded(false)}
+              className="rounded-full"
             >
-              <div className="h-2 w-2 rounded-full bg-green-500" />
-              <span className="text-green-500">Completed</span>
-            </motion.div>
-            <motion.div
-              className="absolute flex items-center gap-2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={statement.status === 'error' ? { opacity: 1, x: 0 } : { opacity: 0, x: 20 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="h-2 w-2 rounded-full bg-red-500" />
-              <span className="text-red-500">Error</span>
-            </motion.div>
-          </div>
-          {statement.status !== 'running' && statement.duration && (
-            <span className="text-xs text-zinc-400 flex-shrink-0">
-              Completed in {formatTime(statement.duration)}
-            </span>
-          )}
-        </div>
-        {statement.status === 'error' && statement.error && (
-          <div className="mt-2 p-4 text-red-400 bg-red-400/10 rounded-md">
-            <div className="font-bold">{statement.error.title}</div>
-            <div>{statement.error.message}</div>
+              Show Less
+            </Button>
           </div>
         )}
-      </motion.div>
-    </motion.div>
-  )
-}
+      </div>
 
-export function SQLStatementsViewer() {
-  const [statements, setStatements] = useState<SQLStatement[]>([])
+      <div className="flex items-center gap-2">
+        <RunningTimer statement={statement} />
+        {statement.status === 'completed' && (
+          <motion.div
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <span className="text-foreground-muted">
+              Completed in {formatTime(statement.duration ?? 0)}
+            </span>
+          </motion.div>
+        )}
+        {statement.status === 'error' && (
+          <motion.div
+            className="flex items-center gap-2"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <div className="h-2 w-2 rounded-full bg-destructive-300" />
+            <span className="text-destructive">Error</span>
+          </motion.div>
+        )}
+      </div>
+
+      {statement.status === 'error' && statement.error && (
+        <div className="text-destructive bg-destructive-100 border border-destructive-300 rounded px-4 py-3 flex flex-col gap-2">
+          {statement.error.title && (
+            <span className="font-bold text-destructive-600">{statement.error.title}</span>
+          )}
+          <span className="text-destructive-600 text-xs">
+            {statement.error.message || statement.error}
+          </span>
+        </div>
+      )}
+    </div>
+  )
+})
+
+// Add memo to exports
+export const SQLStatementsViewer = memo(function SQLStatementsViewer() {
+  const { executions } = useSqlExecutions()
   const [showJumpButton, setShowJumpButton] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const isScrolledToBottomRef = useRef(true)
+
+  // This useEffect should run whenever executions change
+  useEffect(() => {
+    if (isScrolledToBottomRef.current && containerRef.current) {
+      requestAnimationFrame(() => {
+        if (containerRef.current) {
+          containerRef.current.scrollTop = containerRef.current.scrollHeight
+        }
+      })
+    }
+  }, [executions]) // Make sure we're watching executions
 
   const isScrolledToBottom = useCallback(() => {
     if (!containerRef.current) return true
@@ -191,70 +218,40 @@ export function SQLStatementsViewer() {
     setShowJumpButton(!atBottom)
   }, [isScrolledToBottom])
 
-  const simulateQueryExecution = useCallback((statement: SQLStatement) => {
-    const executionTime = Math.random() * 5000 + 500
-    setTimeout(() => {
-      setStatements((prev) =>
-        prev.map((s) => {
-          if (s.id === statement.id) {
-            const isError = Math.random() < 0.2
-            if (isError) {
-              return {
-                ...s,
-                status: 'error',
-                completedAt: Date.now(),
-                duration: Date.now() - s.startedAt,
-                error: {
-                  title: 'Query Execution Failed',
-                  message: 'An unexpected error occurred while executing the query.',
-                },
-              }
-            } else {
-              return {
-                ...s,
-                status: 'completed',
-                completedAt: Date.now(),
-                duration: Date.now() - s.startedAt,
-              }
-            }
-          }
-          return s
-        })
-      )
-    }, executionTime)
-  }, [])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newStatement = {
-        id: Date.now(),
-        timestamp: Date.now(),
-        sql: sampleStatements[Math.floor(Math.random() * sampleStatements.length)].sql,
-        status: 'running',
-        startedAt: Date.now(),
-      }
-      setStatements((prev) => [...prev, newStatement].slice(-100))
-      simulateQueryExecution(newStatement)
-      if (isScrolledToBottomRef.current) {
-        scrollToBottom()
-      }
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [simulateQueryExecution, scrollToBottom])
-
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full flex flex-col dark">
+      <div className="flex items-center justify-between h-8 border-b border-border/60 px-5 bg-black shadow-inner text-gray fill-gray">
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="lightgray"
+            className="size-5"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M2.25 6a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V6Zm3.97.97a.75.75 0 0 1 1.06 0l2.25 2.25a.75.75 0 0 1 0 1.06l-2.25 2.25a.75.75 0 0 1-1.06-1.06l1.72-1.72-1.72-1.72a.75.75 0 0 1 0-1.06Zm4.28 4.28a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5h-3Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <span className="text-xs font-mono text-white">Supabase Console</span>
+        </div>
+        <button onClick={() => sqlExecutionsState.clearExecutions()}>
+          <Ban size={12} />
+        </button>
+      </div>
       <div
         ref={containerRef}
-        className="w-full h-full text-white font-mono text-sm p-4 overflow-auto"
+        className="w-full h-full text-white font-mono text-sm overflow-auto scroll-smooth overflow-anchor-auto py-8"
         onScroll={handleScroll}
       >
-        <AnimatePresence initial={false}>
-          {statements.map((statement, index) => (
-            <SQLStatementItem key={statement.id} statement={statement} />
-          ))}
-        </AnimatePresence>
+        <div className="flex flex-col gap-2 divide-y divide-border/50">
+          <AnimatePresence initial={false}>
+            {executions.map((execution, index) => (
+              <SQLStatementItem key={index} statement={execution} />
+            ))}
+          </AnimatePresence>
+        </div>
       </div>
       {showJumpButton && (
         <Button
@@ -268,26 +265,28 @@ export function SQLStatementsViewer() {
       )}
     </div>
   )
-}
+})
 
-function RunningTimer({ statement }: { statement: SQLStatement }) {
+function RunningTimer({ statement }: { statement: SqlExecution }) {
   const [elapsedTime, setElapsedTime] = useState(0)
   const [showTimer, setShowTimer] = useState(false)
 
+  // Memoize the timer logic
   useEffect(() => {
-    if (statement.status === 'running') {
-      const timerInterval = setInterval(() => {
-        setElapsedTime(Date.now() - statement.startedAt)
-      }, 10)
+    if (statement.status !== 'running') return
 
-      const timerTimeout = setTimeout(() => {
-        setShowTimer(true)
-      }, 200)
+    const startTime = statement.startedAt
+    const timerInterval = setInterval(() => {
+      setElapsedTime(Date.now() - startTime)
+    }, 100) // Increased interval from 10ms to 100ms
 
-      return () => {
-        clearInterval(timerInterval)
-        clearTimeout(timerTimeout)
-      }
+    const timerTimeout = setTimeout(() => {
+      setShowTimer(true)
+    }, 200)
+
+    return () => {
+      clearInterval(timerInterval)
+      clearTimeout(timerTimeout)
     }
   }, [statement.status, statement.startedAt])
 
