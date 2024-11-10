@@ -3,11 +3,12 @@ import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQuer
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { ReactNode, useMemo, useState } from 'react'
-import { Button, Separator } from 'ui'
+import { Button, Separator, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 import { SQLEditorMenu } from './SQLEditorMenu'
 import { ExplorerTabs } from '../tabs/explorer-tabs'
+import { SQLStatementsViewer } from './sql-statements-viewer'
 
 export interface ExplorerLayoutProps {
   children: ReactNode
@@ -56,7 +57,17 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
     >
       <div className="flex flex-col h-full">
         {!hideTabs && <ExplorerTabs storeKey="explorer" />}
-        <div className="h-full">{children}</div>
+        <ResizablePanelGroup direction="vertical">
+          <ResizablePanel defaultSize={70}>
+            <div className="h-full">{children}</div>
+          </ResizablePanel>
+          <ResizableHandle />
+          <ResizablePanel defaultSize={30}>
+            <div className="bg-black h-full">
+              <SQLStatementsViewer />
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
       <OngoingQueriesPanel
         visible={showOngoingQueries}

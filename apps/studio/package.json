@@ -65,6 +65,7 @@
     "file-saver": "^2.0.5",
     "framer-motion": "^11.0.3",
     "generate-password-browser": "^1.1.0",
+    "highlight.js": "^11.10.0",
     "html-to-image": "^1.10.8",
     "icons": "*",
     "immutability-helper": "^3.1.1",
