@@ -50,7 +50,7 @@ const DatabasePublications: NextPageWithLayout = () => {
         <div className="col-span-12">
           <div className="space-y-10">
             <div>
-              <FormHeader title="Events" description="Which events would you like to broadcast" />
+              <FormHeader title="Events" description="Select which database events to be broadcasted" />
               <SinglePublicationView publicationName={'supabase_realtime'} />
             </div>
             <div>
