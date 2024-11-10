@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { ComponentProps, PropsWithChildren, useCallback } from 'react'
 
 import { prefetchProjectLogRequestsCount } from 'data/analytics/project-log-requests-count-query'
