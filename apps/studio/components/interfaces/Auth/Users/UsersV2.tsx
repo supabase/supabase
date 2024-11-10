@@ -308,7 +308,7 @@ export const UsersV2 = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button icon={sortOrder === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                Sorted by {sortColumn.replace('_', ' ')}
+                Sorted by {sortColumn.replaceAll('_', ' ')}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-44" align="start">
@@ -318,6 +318,17 @@ export const UsersV2 = () => {
                   <DropdownMenuSubContent>
                     <DropdownMenuRadioItem value="created_at:asc">Ascending</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="created_at:desc">
+                      Descending
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger>Sort by last sign in at</DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuRadioItem value="last_sign_in_at:asc">
+                      Ascending
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="last_sign_in_at:desc">
                       Descending
                     </DropdownMenuRadioItem>
                   </DropdownMenuSubContent>
@@ -352,7 +363,7 @@ export const UsersV2 = () => {
           >
             Refresh
           </Button>
-          <AddUserDropdown projectKpsVersion={project?.kpsVersion} />
+          <AddUserDropdown />
         </div>
       </div>
       <LoadingLine loading={isLoading || isRefetching || isFetchingNextPage} />

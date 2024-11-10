@@ -595,8 +595,6 @@ export const AIPolicyEditorPanel = memo(function ({
                         <LockedCreateQuerySection
                           schema={schema}
                           selectedPolicy={selectedPolicy}
-                          editorOneRef={editorOneRef}
-                          editorTwoRef={editorTwoRef}
                           formFields={{ name, table, behavior, command, roles }}
                         />
 
@@ -788,21 +786,25 @@ export const AIPolicyEditorPanel = memo(function ({
                           incomingChange !== undefined
                         }
                         onClick={() => {
-                          const sql = editorOneRef.current?.getValue().trim()
-                          if (!sql) return onSelectCancel()
-                          executeMutation({
-                            sql: sql,
-                            projectRef: selectedProject?.ref,
-                            connectionString: selectedProject?.connectionString,
-                            handleError: (error) => {
-                              throw error
-                            },
-                          })
+                          if (editView === 'conversation') {
+                            const sql = editorOneRef.current?.getValue().trim()
+                            if (!sql) return onSelectCancel()
+                            executeMutation({
+                              sql: sql,
+                              projectRef: selectedProject?.ref,
+                              connectionString: selectedProject?.connectionString,
+                              handleError: (error) => {
+                                throw error
+                              },
+                            })
+                          }
                         }}
                         tooltip={{
                           content: {
                             side: 'top',
-                            text: 'You need additional permissions to update policies',
+                            text: !canUpdatePolicies
+                              ? 'You need additional permissions to update policies'
+                              : undefined,
                           },
                         }}
                       >

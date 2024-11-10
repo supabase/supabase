@@ -107,7 +107,7 @@ const PreviewPane = () => {
   } = storageExplorerStore
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
-  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
 
   if (!file) {
     return null

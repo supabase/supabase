@@ -1,8 +1,8 @@
 import { Toggle } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const AnalyticsSettings = () => {
   const snap = useAppStateSnapshot()

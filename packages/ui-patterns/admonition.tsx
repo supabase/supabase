@@ -110,9 +110,10 @@ export const Admonition = forwardRef<
       >
         {/* {(showIcon && typeMapped === 'warning') || typeMapped === 'destructive' ? (
           <WarningIcon />
-        ) : (
+        ) : showIcon ? (
           <InfoIcon />
         )} */}
+        {/* ) : null} */}
         {label || title ? (
           <>
             <AlertTitle_Shadcn_
@@ -134,10 +135,7 @@ export const Admonition = forwardRef<
             {children && (
               <AlertDescription_Shadcn_
                 {...props.childProps?.description}
-                className={cn(
-                  'mt-3 [&_p]:mb-1.5 [&_p]:mt-0',
-                  props.childProps?.description?.className
-                )}
+                className={cn('[&_p]:mb-1.5 [&_p]:mt-0', props.childProps?.description?.className)}
               >
                 {children}
               </AlertDescription_Shadcn_>

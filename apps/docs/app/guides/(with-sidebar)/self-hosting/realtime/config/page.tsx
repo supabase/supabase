@@ -21,7 +21,7 @@ const RealtimeConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/realtime/config.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/realtime/config/page.tsx'
       )}
     >
       <MDXRemoteBase source={descriptionMdx} />

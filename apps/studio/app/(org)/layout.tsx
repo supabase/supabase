@@ -1,20 +1,19 @@
 'use client'
 
 import Head from 'next/head'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { PropsWithChildren, useEffect } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 // import SettingsLayout from '../../components/layouts/SettingsLayout/SettingsLayout'
 import type { SidebarSection } from 'app/(org)/layout.types'
 import WithSidebar from 'app/(org)/with-sidebar'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 export interface AccountLayoutProps {
   title: string
@@ -32,12 +31,11 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
   const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
-    if (enablePostHogTelemetry) await sendReset()
+    await sendReset()
     await signOut()
     await router.push('/sign-in')
   }

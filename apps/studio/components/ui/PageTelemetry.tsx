@@ -10,9 +10,9 @@ import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutatio
 import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
 const getAnonId = async (id: string) => {
   const hash = new Sha256()
@@ -26,32 +26,26 @@ const getAnonId = async (id: string) => {
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const pathname = usePathname()
   const user = useUser()
-  const router = useRouter()
+
   const { ref, slug } = useParams()
   const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
 
+  const { consentValue, hasAcceptedConsent } = useConsent()
   const previousPathname = usePrevious(pathname)
-  const enablePostHogTelemetry = useFlag('enablePosthogChanges')
-  const consent =
-    typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null
-  const trackTelemetryPH = enablePostHogTelemetry && consent === 'true'
 
+  const trackTelemetryPH = consentValue === 'true'
   const { mutate: sendPage } = useSendPageMutation()
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
   const { mutate: sendGroupsIdentify } = useSendGroupsIdentifyMutation()
   const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
 
   useEffect(() => {
-    const consent =
-      typeof window !== 'undefined'
-        ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-        : null
-    if (consent !== null) snap.setIsOptedInTelemetry(consent === 'true')
+    if (consentValue !== null) {
+      snap.setIsOptedInTelemetry(hasAcceptedConsent)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [consentValue])
 
   useEffect(() => {
     function handleRouteChange() {
@@ -130,7 +124,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const handleBeforeUnload = async () => {
-      if (enablePostHogTelemetry && snap.isOptedInTelemetry) await sendPageLeave()
+      if (snap.isOptedInTelemetry) await sendPageLeave()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
 

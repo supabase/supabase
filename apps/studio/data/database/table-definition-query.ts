@@ -7,6 +7,7 @@ type GetTableDefinition = {
   name?: string
 }
 
+// [Joshen] Eventually move this into entity-definition-query
 export const getTableDefinitionQuery = ({ schema = 'public', name }: GetTableDefinition) => {
   const sql = /* SQL */ `
     ${CREATE_PG_GET_TABLEDEF_SQL}

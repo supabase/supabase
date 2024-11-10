@@ -4,11 +4,11 @@ import { RefreshCw } from 'lucide-react'
 import { useParams } from 'common'
 import type { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
-import type { TableLike } from 'hooks/misc/useTable'
+import { Entity } from 'data/table-editor/table-editor-types'
 import { Button } from 'ui'
 
 export type RefreshButtonProps = {
-  table: TableLike | SupaTable
+  table: Entity | SupaTable
   isRefetching?: boolean
 }
 

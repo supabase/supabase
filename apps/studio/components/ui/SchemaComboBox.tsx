@@ -19,6 +19,7 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 interface SchemaComboBoxProps {
   className?: string
@@ -44,7 +45,7 @@ export const SchemaComboBox = ({
 }: SchemaComboBoxProps) => {
   const [open, setOpen] = useState(false)
 
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
   const {
     data,
     isLoading: isSchemasLoading,

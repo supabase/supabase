@@ -4,18 +4,29 @@ import Breadcrumbs from '~/components/Breadcrumbs'
 import { Feedback } from '~/components/Feedback'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { MDXRemoteBase } from './MdxBase'
-import { type ITroubleshootingEntry } from './Troubleshooting.utils'
+import { getTroubleshootingUpdatedDates, type ITroubleshootingEntry } from './Troubleshooting.utils'
 import Link from 'next/link'
 import { formatError, serializeTroubleshootingSearchParams } from './Troubleshooting.utils.shared'
 
-export default function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
+export default async function TroubleshootingPage({ entry }: { entry: ITroubleshootingEntry }) {
+  const dateUpdated = entry.data.database_id.startsWith('pseudo-')
+    ? new Date()
+    : (await getTroubleshootingUpdatedDates()).get(entry.data.database_id)
+
   return (
-    <SidebarSkeleton className="@container/troubleshooting-entry-layout w-full max-w-screen-lg mx-auto lg:py-8 lg:px-5">
+    <SidebarSkeleton
+      hideSideNav
+      className="@container/troubleshooting-entry-layout w-full max-w-screen-lg mx-auto lg:py-8 lg:px-5"
+    >
       <div className="px-5 py-8 lg:px-0 lg:py-0">
         <Breadcrumbs minLength={1} forceDisplayOnMobile />
         <article className="prose max-w-none mt-4">
           <h1>{entry.data.title}</h1>
-          {entry.data.updated_at && <p>Last edited: {entry.data.updated_at.toLocaleString()}</p>}
+          {dateUpdated && (
+            <p className="text-sm text-foreground-lighter">
+              Last edited: {dateUpdated.toLocaleDateString()}
+            </p>
+          )}
           <hr className="my-7" aria-hidden />
           <div className="grid gap-10 @3xl/troubleshooting-entry-layout:grid-cols-[1fr,250px]">
             <div>
