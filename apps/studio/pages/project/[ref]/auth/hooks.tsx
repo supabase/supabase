@@ -1,5 +1,3 @@
-'use client'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
