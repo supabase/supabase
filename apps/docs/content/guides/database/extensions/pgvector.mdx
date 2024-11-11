@@ -102,6 +102,19 @@ const { data, error } = await supabase.from('posts').insert({
 })
 ```
 
+## Specific usage cases
+
+### Queries with filtering
+
+If you use IVFFLAT or HNSW index and filter results from the query 
+E.g. 
+```
+SELECT * FROM items WHERE category_id = 123 ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
+```
+filters results of vector column embedding by another column ```category_id```.
+
+Then we advise to use [specific syntax for iterative search](https://github.com/pgvector/pgvector/?tab=readme-ov-file#iterative-index-scans) to get exact number of results as in the query.
+
 ## More pgvector and Supabase resources
 
 - [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
