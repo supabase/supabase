@@ -16,7 +16,7 @@ import TicketActions from './TicketActions'
 import TicketCopy from './TicketCopy'
 import TicketActions2 from './TicketActions2'
 import useLWShortcuts from '../useLWShortcuts'
-import MetalTicket from '~/components/LaunchWeek/13/CombinedMetalTicket'
+import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 import InteractiveGridParty from '~/components/LaunchWeek/13/InteractiveGridParty'
 import InteractiveGridSingle from '~/components/LaunchWeek/13/InteractiveGridSingle'
 
