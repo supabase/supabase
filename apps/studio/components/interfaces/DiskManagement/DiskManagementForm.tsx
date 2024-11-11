@@ -57,6 +57,8 @@ import {
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
+import { useRouter } from 'next/router'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export function DiskManagementForm() {
   const {
@@ -132,6 +134,19 @@ export function DiskManagementForm() {
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
+
+  /**
+   * redirect logic incase disk and compute feature is not live yet
+   *
+   * */
+  const router = useRouter()
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
+
+  useEffect(() => {
+    if (!diskAndComputeForm && diskAndComputeForm !== undefined && projectRef) {
+      router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
+    }
+  }, [diskAndComputeForm, projectRef, router])
 
   /**
    * Handle default values
