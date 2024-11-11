@@ -11,7 +11,8 @@ export const QUEUE_TYPES = [
     value: 'unlogged',
     icon: <Rows2 strokeWidth={1} />,
     label: 'Unlogged queue',
-    description: 'Creates an unlogged queue which loses all data on database restart.',
+    description:
+      'Creates an unlogged queue which loses all data on database restart. Can be useful when write throughput is more important than durability.',
   },
   {
     value: 'partitioned',

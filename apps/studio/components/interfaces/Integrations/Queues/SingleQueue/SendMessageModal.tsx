@@ -99,7 +99,7 @@ export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) =>
                   label="Delay"
                   layout="vertical"
                   className="gap-1"
-                  description="Time in seconds before the message becomes avalaible for reading."
+                  description="Time in seconds before the message becomes available for reading."
                 >
                   <FormControl_Shadcn_>
                     <Input
