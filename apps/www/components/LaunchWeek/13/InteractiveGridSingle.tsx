@@ -6,6 +6,7 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Dot } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
+import { INTERACTIVE_GRID_COLORS } from './InteractiveGridParty'
 
 const GRID_SIZE = 100
 const CELL_SIZE = 40
@@ -25,11 +26,7 @@ interface CursorPosition {
   y: number
 }
 
-interface Props {
-  isPartyMode?: boolean
-}
-
-export default function InteractiveGrid({ isPartyMode = false }: Props) {
+export default function InteractiveGridSingle() {
   const { supabase, userData } = useConfData()
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -55,7 +52,7 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
 
       // If userId already has a color, return it; otherwise, assign one
       if (!userColors[userId]) {
-        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF5733', '#57FF33', '#33FFFF']
+        const colors = [INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER]
         const color = colors[userId.charCodeAt(0) % colors.length]
         setUserColors((prev) => ({ ...prev, [userId]: color }))
         console.log(`Assigned color ${color} to user ${userId}`)
@@ -84,15 +81,6 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
           }
         }
 
-        // Broadcast hover state change to others
-        if (realtimeChannel) {
-          realtimeChannel.send({
-            type: 'broadcast',
-            event: 'hover',
-            payload: { cellKey: key, isHovered, color },
-          })
-        }
-
         return newState
       })
     },
@@ -103,7 +91,7 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
     (ctx: CanvasRenderingContext2D, currentTime: number) => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       ctx.lineWidth = 0.2
-      ctx.strokeStyle = isDarkTheme ? '#242424' : '#EDEDED'
+      ctx.strokeStyle = INTERACTIVE_GRID_COLORS(isDarkTheme).GRID_STROKE
 
       for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
@@ -136,7 +124,10 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
       }
 
       Object.entries(userCursors).forEach(([userId, cursor]) => {
-        ctx.fillStyle = userId === CURRENT_USER_ID ? 'blue' : getUserColor(userId)
+        ctx.fillStyle =
+          userId === CURRENT_USER_ID
+            ? INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
+            : getUserColor(userId)
         ctx.beginPath()
         ctx.arc(cursor.x, cursor.y, 5, 0, 2 * Math.PI)
         ctx.fill()
@@ -182,18 +173,6 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
             setCellHovered(key, false, userColor)
           }
         })
-
-        if (realtimeChannel) {
-          realtimeChannel.send({
-            type: 'broadcast',
-            event: 'cursor',
-            payload: {
-              x: e.nativeEvent.offsetX,
-              y: e.nativeEvent.offsetY,
-              userId: CURRENT_USER_ID,
-            },
-          })
-        }
       }
     },
     [hoveredCells, setCellHovered, realtimeChannel, getUserColor]
@@ -212,22 +191,6 @@ export default function InteractiveGrid({ isPartyMode = false }: Props) {
       })
 
       setRealtimeChannel(hoverChannel)
-
-      isPartyMode &&
-        hoverChannel
-          .on('broadcast', { event: 'hover' }, ({ payload }) => {
-            setCellHovered(payload.cellKey, payload.isHovered, payload.color)
-          })
-          .on('broadcast', { event: 'cursor' }, ({ payload }) => {
-            setUserCursors((prev) => ({
-              ...prev,
-              [payload.userId]: { x: payload.x, y: payload.y },
-            }))
-          })
-          .subscribe((status) => {
-            if (status !== 'SUBSCRIBED') return
-            hoverChannel.track({})
-          })
 
       hoverChannel.on('presence', { event: 'sync' }, () => {
         const newState = hoverChannel.presenceState()

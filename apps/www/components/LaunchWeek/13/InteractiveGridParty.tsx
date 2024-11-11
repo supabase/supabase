@@ -5,6 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Dot } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
+import { useTheme } from 'next-themes'
 
 const GRID_SIZE = 100
 const CELL_SIZE = 40
@@ -24,8 +25,15 @@ interface CursorPosition {
   y: number
 }
 
+export const INTERACTIVE_GRID_COLORS = (isDark: boolean) => ({
+  GRID_STROKE: isDark ? '#242424' : '#EDEDED',
+  CURRENT_USER_HOVER: isDark ? '#242424' : '#d3d3d3',
+})
+
 export default function InteractiveGrid() {
   const { supabase, userData } = useConfData()
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
@@ -95,8 +103,8 @@ export default function InteractiveGrid() {
   const drawGrid = useCallback(
     (ctx: CanvasRenderingContext2D, currentTime: number) => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-      ctx.lineWidth = 0.5
-      ctx.strokeStyle = '#242424'
+      ctx.lineWidth = 0.2
+      ctx.strokeStyle = INTERACTIVE_GRID_COLORS(isDarkTheme).GRID_STROKE
 
       for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
@@ -129,13 +137,16 @@ export default function InteractiveGrid() {
       }
 
       Object.entries(userCursors).forEach(([userId, cursor]) => {
-        ctx.fillStyle = userId === CURRENT_USER_ID ? 'blue' : getUserColor(userId)
+        ctx.fillStyle =
+          userId === CURRENT_USER_ID
+            ? INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
+            : getUserColor(userId)
         ctx.beginPath()
         ctx.arc(cursor.x, cursor.y, 5, 0, 2 * Math.PI)
         ctx.fill()
       })
     },
-    [hoveredCells, userCursors, getUserColor]
+    [hoveredCells, userCursors, getUserColor, isDarkTheme]
   )
 
   const animate = useCallback(() => {
@@ -235,7 +246,7 @@ export default function InteractiveGrid() {
   }, [supabase, realtimeChannel])
 
   return (
-    <div className="relative flex justify-center items-center max-h-screen bg-alternative overflow-hidden">
+    <div className="absolute inset-0 w-full h-full flex justify-center items-center max-h-screen overflow-hidden">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}

@@ -17,7 +17,8 @@ import TicketCopy from './TicketCopy'
 import TicketActions2 from './TicketActions2'
 import useLWShortcuts from '../useLWShortcuts'
 import MetalTicket from '~/components/LaunchWeek/13/CombinedMetalTicket'
-import InteractiveGrid from '~/components/LaunchWeek/13/CombinedInteractiveGrid'
+import InteractiveGridParty from '~/components/LaunchWeek/13/InteractiveGridParty'
+import InteractiveGridSingle from '~/components/LaunchWeek/13/InteractiveGridSingle'
 
 const TicketingFlow = () => {
   const { ticketState, userData, showCustomizationForm } = useConfData()
@@ -105,10 +106,10 @@ const TicketingFlow = () => {
                           size="small"
                           onClick={() => setIsPartyMode(true)}
                           type="default"
-                          className="pl-1 pointer-events-auto"
+                          className="sm:pl-1 pointer-events-auto"
                         >
                           <div className="flex items-center">
-                            <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase flex items-center justify-center">
+                            <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
                               P
                             </div>
                             Party Mode: {isPartyMode ? 'On' : 'Off'}
@@ -117,7 +118,7 @@ const TicketingFlow = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="h-full mx-auto max-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-spacing-3 border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-md">
+                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-spacing-3 border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-md">
                     <TicketForm />
                   </div>
                 </m.div>
@@ -194,7 +195,7 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      <InteractiveGrid isPartyMode={isPartyMode} />
+      {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
       {hasTicket && <div className="absolute inset-8">HAS_TICKET</div>}
     </>
   )

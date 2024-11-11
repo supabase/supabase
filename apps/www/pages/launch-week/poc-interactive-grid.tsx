@@ -7,7 +7,7 @@ import supabase from '~/lib/supabase'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import InteractiveGrid from '~/components/LaunchWeek/13/InteractiveGrid'
+import InteractiveGrid from '~/components/LaunchWeek/13/InteractiveGridPOC'
 
 export default function LaunchWeekIndex() {
   const { query } = useRouter()

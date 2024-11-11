@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 const useLWShortcuts = (disabled?: boolean) => {
-  const [isPartyMode, setIsPartyMode] = useState<boolean>(false)
+  const [isPartyMode, setIsPartyMode] = useState<boolean>(true)
 
   function onKeyDown(event: KeyboardEvent) {
     if (disabled) return
@@ -10,14 +10,11 @@ const useLWShortcuts = (disabled?: boolean) => {
       setIsPartyMode(false)
     }
 
-    if (event.key === 'Escape') {
-      setIsPartyMode(false)
-    }
-
     const newKey = event.key.toLocaleLowerCase()
 
     if (!(event.metaKey || event.ctrlKey) && newKey === 'p') {
-      if (!isPartyMode) setIsPartyMode(true)
+      console.log('P!')
+      setIsPartyMode(true)
     }
   }
 
