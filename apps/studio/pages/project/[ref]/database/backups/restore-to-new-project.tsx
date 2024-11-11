@@ -153,13 +153,14 @@ const RestoreToNewProject = () => {
     return additionalMonthlySpend
   }
 
-  const { mutate: triggerClone } = useProjectCloneMutation({
+  const { mutate: triggerClone, isLoading: cloneMutationLoading } = useProjectCloneMutation({
     onError: (error) => {
       console.error('error', error)
       toast.error('Failed to restore to new project')
     },
     onSuccess: () => {
       toast.success('Restoration process started')
+      setShowConfirmationDialog(false)
     },
   })
 
@@ -444,10 +445,15 @@ const RestoreToNewProject = () => {
               id={'create-new-project-form'}
               onSubmit={form.handleSubmit((data) => {
                 if (!selectedBackupId) return
+                if (!project?.ref) {
+                  toast.error('Project ref is required')
+                  return
+                }
                 triggerClone({
+                  projectRef: project?.ref,
                   cloneBackupId: selectedBackupId,
-                  name: data.name,
-                  password: data.password,
+                  newProjectName: data.name,
+                  newDbPass: data.password,
                 })
               })}
             >
@@ -507,7 +513,9 @@ const RestoreToNewProject = () => {
                 >
                   Cancel
                 </Button>
-                <Button htmlType="submit">Restore to new project</Button>
+                <Button htmlType="submit" loading={cloneMutationLoading}>
+                  Restore to new project
+                </Button>
               </DialogFooter>
             </form>
           </Form_Shadcn_>
