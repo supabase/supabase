@@ -7,6 +7,7 @@ import PurgeQueue from 'components/interfaces/Integrations/Queues/SingleQueue/Pu
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
 import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
+import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
 import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
@@ -33,6 +34,7 @@ const QueueMessagesPage: NextPageWithLayout = () => {
 
   const { name: queueName } = useParams()
   const { project } = useProjectContext()
+  const [sendMessageModalShown, setSendMessageModalShown] = useState(false)
   const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
@@ -72,6 +74,9 @@ const QueueMessagesPage: NextPageWithLayout = () => {
           </Breadcrumb_Shadcn_>
         </div>
         <div className="flex items-center gap-x-2">
+          <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
+            Add a message
+          </Button>
           <Button type="warning" onClick={() => setDeleteQueueModalShown(true)}>
             Purge the queue
           </Button>
@@ -87,7 +92,12 @@ const QueueMessagesPage: NextPageWithLayout = () => {
       <QueueMessagesDataGrid
         messages={messages || []}
         isLoading={isLoading}
+        showMessageModal={() => setSendMessageModalShown(true)}
         fetchNextPage={fetchNextPage}
+      />
+      <SendMessageModal
+        visible={sendMessageModalShown}
+        onClose={() => setSendMessageModalShown(false)}
       />
       <DeleteQueue
         queueName={queueName!}
