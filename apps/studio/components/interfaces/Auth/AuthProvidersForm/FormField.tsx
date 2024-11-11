@@ -3,6 +3,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 
+import { Markdown } from 'components/interfaces/Markdown'
 import { DatePicker } from 'components/ui/DatePicker'
 import { BASE_PATH } from 'lib/constants'
 import { Button, Input, InputNumber, Listbox, Toggle } from 'ui'
@@ -109,16 +110,15 @@ const FormField = ({
           label={properties.title}
           labelOptional={
             properties.descriptionOptional ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.descriptionOptional}
-              </ReactMarkdown>
+              <Markdown
+                content={properties.descriptionOptional}
+                className="text-foreground-lighter"
+              />
             ) : null
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -140,6 +140,7 @@ const FormField = ({
           }
         />
       )
+
     case 'multiline-string':
       return (
         <Input.TextArea
@@ -159,9 +160,7 @@ const FormField = ({
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
@@ -183,6 +182,7 @@ const FormField = ({
           }
         />
       )
+
     case 'number':
       return (
         <InputNumber
@@ -201,9 +201,7 @@ const FormField = ({
           }
           descriptionText={
             properties.description ? (
-              <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                {properties.description}
-              </ReactMarkdown>
+              <Markdown content={properties.description} className="text-foreground-lighter" />
             ) : null
           }
           actions={
