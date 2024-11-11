@@ -3,6 +3,8 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { ReactNode, useMemo, useState } from 'react'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { SQLEditorMenu } from './SQLEditorMenu'
+import TableEditorMenu from '../TableEditorLayout/TableEditorMenu'
+import { Separator } from 'ui'
 
 export interface SQLEditorLayoutProps {
   title: string
@@ -13,10 +15,14 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
   const productMenu = useMemo(
     () => (
-      <SQLEditorMenu
-        key="sql-editor-menu"
-        onViewOngoingQueries={() => setShowOngoingQueries(true)}
-      />
+      <>
+        <TableEditorMenu />
+        <Separator />
+        <SQLEditorMenu
+          key="sql-editor-menu"
+          onViewOngoingQueries={() => setShowOngoingQueries(true)}
+        />
+      </>
     ),
     []
   )

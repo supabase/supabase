@@ -1,6 +1,9 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import type { NextPageWithLayout } from 'types'
+import { ExplorerLayout } from 'components/layouts/explorer/layout'
 
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
@@ -17,8 +20,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { NextPageWithLayout } from 'types'
+import { getTabsStore } from 'state/tabs'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -164,13 +166,33 @@ const SqlEditor: NextPageWithLayout = () => {
     }
   }, [isPgInfoReady])
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <SQLEditor />
-    </div>
-  )
+  // Watch for route changes
+  useEffect(() => {
+    if (!router.isReady || !id || id === 'new') return
+
+    const store = getTabsStore('explorer')
+    const tabId = `sql-${id}`
+    const snippet = snippets.find((s) => s.id === id)
+
+    if (!store.tabsMap[tabId]) {
+      store.openTabs = [...store.openTabs, tabId]
+      store.tabsMap[tabId] = {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: { sqlId: id },
+      }
+    }
+    store.activeTab = tabId
+  }, [router.isReady, id, snippets])
+
+  return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <ExplorerLayout title="SQL" hideTabs={false}>
+    {page}
+  </ExplorerLayout>
+)
 
 export default SqlEditor

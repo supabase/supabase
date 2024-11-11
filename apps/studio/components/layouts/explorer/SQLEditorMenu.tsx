@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilePlus, FolderPlus, Plus } from 'lucide-react'
+import { Edit2, FilePlus, FolderPlus, Plus } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -79,8 +79,26 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   }
 
   return (
-    <div className="h-full flex flex-col justify-between">
+    <div className="h-[400px] flex flex-col">
       <div className="mt-4 mb-2 flex flex-col gap-y-4">
+        <div className="px-4 flex justify-between items-center">
+          <h2 className="text-sm">Workbook</h2>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="default" icon={<Edit2 />} className="w-[26px]" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="bottom" className="w-48">
+              <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
+                <FilePlus size={14} />
+                Create a new snippet
+              </DropdownMenuItem>
+              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
+                <FolderPlus size={14} />
+                Create a new folder
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <div className="mx-4 flex items-center justify-between gap-x-2">
           <InnerSideBarFilters className="w-full p-0 gap-0">
             <InnerSideBarFilterSearchInput
@@ -103,28 +121,9 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                icon={<Plus className="text-foreground" />}
-                className="w-[26px]"
-              />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" side="bottom" className="w-48">
-              <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
-                <FilePlus size={14} />
-                Create a new snippet
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
-                Create a new folder
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
-        <div className="px-2">
+        {/* <div className="px-2">
           <InnerSideMenuItem
             title="Templates"
             isActive={router.asPath === `/project/${ref}/sql/templates`}
@@ -139,16 +138,16 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           >
             Quickstarts
           </InnerSideMenuItem>
-        </div>
+        </div> */}
 
         <SQLEditorNavV2 searchText={searchText} />
       </div>
 
-      <div className="p-4 border-t sticky bottom-0 bg-studio">
+      {/* <div className="p-4 border-t sticky bottom-0 bg-studio">
         <Button block type="default" onClick={onViewOngoingQueries}>
           View running queries
         </Button>
-      </div>
+      </div> */}
     </div>
   )
 }

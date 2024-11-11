@@ -92,35 +92,34 @@ function InfiniteList<T, P>({
   const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
 
   return (
-    <div className="relative flex flex-col flex-grow">
-      <div className="flex-grow">
-        <AutoSizer>
-          {({ height, width }: { height: number; width: number }) => (
-            <InfiniteLoader
-              itemCount={itemCount}
-              isItemLoaded={isItemLoaded}
-              loadMoreItems={loadMoreItems}
-            >
-              {({ onItemsRendered, ref }) => (
-                <VariableSizeList
-                  ref={(refy) => {
-                    ref(refy)
-                    listRef.current = refy
-                  }}
-                  height={height ?? 0}
-                  width={width ?? 0}
-                  itemCount={itemCount}
-                  itemData={itemData}
-                  itemSize={getItemSize}
-                  onItemsRendered={onItemsRendered}
-                >
-                  {Item}
-                </VariableSizeList>
-              )}
-            </InfiniteLoader>
-          )}
-        </AutoSizer>
-      </div>
+    <>
+      <AutoSizer>
+        {({ height, width }: { height: number; width: number }) => (
+          <InfiniteLoader
+            itemCount={itemCount}
+            isItemLoaded={isItemLoaded}
+            loadMoreItems={loadMoreItems}
+          >
+            {({ onItemsRendered, ref }) => (
+              <VariableSizeList
+                ref={(refy) => {
+                  ref(refy)
+                  listRef.current = refy
+                }}
+                height={height ?? 0}
+                width={width ?? 0}
+                itemCount={itemCount}
+                itemData={itemData}
+                itemSize={getItemSize}
+                onItemsRendered={onItemsRendered}
+              >
+                {Item}
+              </VariableSizeList>
+            )}
+          </InfiniteLoader>
+        )}
+      </AutoSizer>
+
       <div
         style={{
           position: 'absolute',
@@ -131,7 +130,7 @@ function InfiniteList<T, P>({
           pointerEvents: 'none', //https://github.com/bvaughn/react-window/issues/455
         }}
       />
-    </div>
+    </>
   )
 }
 

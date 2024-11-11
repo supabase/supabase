@@ -2,7 +2,8 @@ import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-
+import { useSnapshot } from 'valtio'
+import { motion } from 'framer-motion'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
@@ -31,6 +32,9 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
+import { sidebarState } from '../tabs/sidebar-state'
+import { useActionKey } from 'hooks/useActionKey'
+import { SQLStatementsViewer } from '../explorer/sql-statements-viewer'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -101,6 +105,21 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
+  const sidebar = useSnapshot(sidebarState)
+  const actionKey = useActionKey()
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isActionKeyPressed = e.key === actionKey?.[1]
+      if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
+        e.preventDefault()
+        sidebarState.isOpen = !sidebar.isOpen
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [actionKey, sidebar.isOpen])
+
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -118,51 +137,51 @@ const ProjectLayout = ({
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex h-full">
-          {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
-          {/* Product menu bar */}
-          <ResizablePanelGroup
-            className="flex h-full"
-            direction="horizontal"
-            autoSaveId="project-layout"
-          >
-            <ResizablePanel
-              id="panel-left"
-              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                hidden: !showProductMenu || !productMenu,
-              })}
-              defaultSize={0} // forces panel to smallest width possible, at w-64
-            >
-              <MenuBarWrapper
-                isLoading={isLoading}
-                isBlocking={isBlocking}
-                productMenu={productMenu}
-              >
-                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-              </MenuBarWrapper>
+        <div className="flex flex-col h-screen">
+          {!hideHeader && <LayoutHeader />}
+
+          <ResizablePanelGroup direction="vertical" autoSaveId="project-layout-vertical">
+            <ResizablePanel defaultSize={70} minSize={30} className="h-full">
+              <div className="flex flex-1 overflow-hidden h-full">
+                {!hideIconBar && <NavigationBar />}
+
+                <ResizablePanelGroup
+                  className="flex flex-1"
+                  direction="horizontal"
+                  autoSaveId="project-layout-horizontal"
+                >
+                  <ResizablePanel
+                    id="panel-left"
+                    className={cn(
+                      resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
+                      {
+                        hidden: !showProductMenu || !productMenu || !sidebar.isOpen,
+                      }
+                    )}
+                    defaultSize={0}
+                  >
+                    <MenuBarWrapper
+                      isLoading={isLoading}
+                      isBlocking={isBlocking}
+                      productMenu={productMenu}
+                    >
+                      <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                    </MenuBarWrapper>
+                  </ResizablePanel>
+                  <ResizableHandle
+                    className={cn({ hidden: !showProductMenu || !productMenu || !sidebar.isOpen })}
+                    withHandle
+                    disabled={resizableSidebar ? false : true}
+                  />
+                  <ResizablePanel>{children}</ResizablePanel>
+                </ResizablePanelGroup>
+              </div>
             </ResizablePanel>
-            <ResizableHandle
-              className={cn({ hidden: !showProductMenu || !productMenu })}
-              withHandle
-              disabled={resizableSidebar ? false : true}
-            />
-            <ResizablePanel id="panel-right" className="h-full flex flex-col">
-              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                    <div className="w-full">
-                      <ProjectPausedState product={product} />
-                    </div>
-                  </div>
-                ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                    <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
-                )}
-              </main>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={30}>
+              <div className="bg-black h-full">
+                <SQLStatementsViewer />
+              </div>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
@@ -194,7 +213,22 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
+  const actionKey = useActionKey()
+  const sidebar = useSnapshot(sidebarState)
+
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key.toLowerCase() === 'b' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault()
+        sidebarState.isOpen = !sidebar.isOpen
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [sidebar.isOpen])
 
   if (!isBlocking) {
     return children

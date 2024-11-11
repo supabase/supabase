@@ -1,4 +1,4 @@
-import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
+import { Blocks, FileText, Lightbulb, List, PackageSearch, Settings } from 'lucide-react'
 
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
@@ -23,19 +23,19 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
   return [
     {
       key: 'editor',
-      label: 'Table Editor',
-      icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      label: 'Explorer',
+      icon: <PackageSearch size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
       linkElement: <EditorIndexPageLink projectRef={ref} />,
     },
-    {
-      key: 'sql',
-      label: 'SQL Editor',
-      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: !IS_PLATFORM
-        ? `/project/${ref}/sql/1`
-        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
-    },
+    // {
+    //   key: 'sql',
+    //   label: 'SQL Editor',
+    //   icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    //   link: !IS_PLATFORM
+    //     ? `/project/${ref}/sql/1`
+    //     : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
+    // },
   ]
 }
 export const generateProductRoutes = (

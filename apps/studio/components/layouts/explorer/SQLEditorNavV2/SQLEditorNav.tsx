@@ -42,6 +42,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { getTabsStore } from 'state/tabs'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -333,7 +334,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   return (
     <>
-      <InnerSideMenuSeparator />
       {((numProjectSnippets === 0 && searchText.length === 0) || numProjectSnippets > 0) && (
         <>
           <InnerSideMenuCollapsible
@@ -347,7 +347,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
             <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
               {numProjectSnippets === 0 ? (
                 <InnerSideBarEmptyPanel
-                  className="mx-2"
+                  className="mx-3"
                   title="No shared queries"
                   description="Share queries with your team by right-clicking on the query."
                 />
@@ -355,34 +355,41 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                 <TreeView
                   data={projectSnippetsTreeState}
                   aria-label="project-level-snippets"
-                  nodeRenderer={({ element, ...props }) => (
-                    <SQLEditorTreeViewItem
-                      {...props}
-                      element={element}
-                      onSelectDelete={() => {
-                        setShowDeleteModal(true)
-                        setSelectedSnippets([element.metadata as unknown as Snippet])
-                      }}
-                      onSelectRename={() => {
-                        setShowRenameModal(true)
-                        setSelectedSnippetToRename(element.metadata as Snippet)
-                      }}
-                      onSelectDownload={() => {
-                        setSelectedSnippetToDownload(element.metadata as Snippet)
-                      }}
-                      onSelectCopyPersonal={() => {
-                        onSelectCopyPersonal(element.metadata as Snippet)
-                      }}
-                      onSelectUnshare={() => {
-                        setSelectedSnippetToUnshare(element.metadata as Snippet)
-                      }}
-                    />
-                  )}
+                  nodeRenderer={({ element, ...props }) => {
+                    const tabsStore = getTabsStore(projectRef as string)
+                    const isOpened = Object.values(tabsStore.tabsMap).some(
+                      (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
+                    )
+
+                    return (
+                      <SQLEditorTreeViewItem
+                        {...props}
+                        element={element}
+                        isOpened={isExpanded}
+                        onSelectDelete={() => {
+                          setShowDeleteModal(true)
+                          setSelectedSnippets([element.metadata as unknown as Snippet])
+                        }}
+                        onSelectRename={() => {
+                          setShowRenameModal(true)
+                          setSelectedSnippetToRename(element.metadata as Snippet)
+                        }}
+                        onSelectDownload={() => {
+                          setSelectedSnippetToDownload(element.metadata as Snippet)
+                        }}
+                        onSelectCopyPersonal={() => {
+                          onSelectCopyPersonal(element.metadata as Snippet)
+                        }}
+                        onSelectUnshare={() => {
+                          setSelectedSnippetToUnshare(element.metadata as Snippet)
+                        }}
+                      />
+                    )
+                  }}
                 />
               )}
             </InnerSideMenuCollapsibleContent>
           </InnerSideMenuCollapsible>
-          <InnerSideMenuSeparator />
         </>
       )}
 
@@ -400,7 +407,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               {numFavoriteSnippets === 0 ? (
                 <InnerSideBarEmptyPanel
                   title="No favorite queries"
-                  className="mx-2"
+                  className="mx-3"
                   description={
                     <>
                       Save a query to favorites for easy accessbility by clicking the{' '}
@@ -413,35 +420,42 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                 <TreeView
                   data={favoritesTreeState}
                   aria-label="favorite-snippets"
-                  nodeRenderer={({ element, ...props }) => (
-                    <SQLEditorTreeViewItem
-                      {...props}
-                      element={element}
-                      onSelectDelete={() => {
-                        setShowDeleteModal(true)
-                        setSelectedSnippets([element.metadata as unknown as Snippet])
-                      }}
-                      onSelectRename={() => {
-                        setShowRenameModal(true)
-                        setSelectedSnippetToRename(element.metadata as Snippet)
-                      }}
-                      onSelectDownload={() => {
-                        setSelectedSnippetToDownload(element.metadata as Snippet)
-                      }}
-                      onSelectCopyPersonal={() => {
-                        onSelectCopyPersonal(element.metadata as Snippet)
-                      }}
-                      onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
-                      onSelectUnshare={() => {
-                        setSelectedSnippetToUnshare(element.metadata as Snippet)
-                      }}
-                    />
-                  )}
+                  nodeRenderer={({ element, ...props }) => {
+                    const tabsStore = getTabsStore(projectRef as string)
+                    const isOpened = Object.values(tabsStore.tabsMap).some(
+                      (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
+                    )
+
+                    return (
+                      <SQLEditorTreeViewItem
+                        {...props}
+                        element={element}
+                        isOpened={isOpened}
+                        onSelectDelete={() => {
+                          setShowDeleteModal(true)
+                          setSelectedSnippets([element.metadata as unknown as Snippet])
+                        }}
+                        onSelectRename={() => {
+                          setShowRenameModal(true)
+                          setSelectedSnippetToRename(element.metadata as Snippet)
+                        }}
+                        onSelectDownload={() => {
+                          setSelectedSnippetToDownload(element.metadata as Snippet)
+                        }}
+                        onSelectCopyPersonal={() => {
+                          onSelectCopyPersonal(element.metadata as Snippet)
+                        }}
+                        onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
+                        onSelectUnshare={() => {
+                          setSelectedSnippetToUnshare(element.metadata as Snippet)
+                        }}
+                      />
+                    )
+                  }}
                 />
               )}
             </InnerSideMenuCollapsibleContent>
           </InnerSideMenuCollapsible>
-          <InnerSideMenuSeparator />
         </>
       )}
 
@@ -493,63 +507,73 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               selectedIds={selectedSnippets.map((x) => x.id)}
               aria-label="private-snippets"
               expandedIds={defaultExpandedFolderIds}
-              nodeRenderer={({ element, ...props }) => (
-                <SQLEditorTreeViewItem
-                  {...props}
-                  element={element}
-                  isMultiSelected={selectedSnippets.length > 1}
-                  status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
-                  onMultiSelect={onMultiSelect}
-                  onSelectCreate={() => {
-                    if (profile && project) {
-                      const snippet = createSqlSnippetSkeletonV2({
-                        id: uuidv4(),
-                        name: untitledSnippetTitle,
-                        owner_id: profile?.id,
-                        project_id: project?.id,
-                        folder_id: element.id as string,
-                        sql: '',
-                      })
-                      snapV2.addSnippet({ projectRef: project.ref, snippet })
-                      router.push(`/project/${projectRef}/sql/${snippet.id}`)
-                    }
-                  }}
-                  onSelectDelete={() => {
-                    if (props.isBranch) {
-                      setSelectedFolderToDelete(element.metadata as SnippetFolder)
-                    } else {
-                      setShowDeleteModal(true)
-                      if (selectedSnippets.length === 0) {
-                        setSelectedSnippets([element.metadata as unknown as Snippet])
+              nodeRenderer={({ element, ...props }) => {
+                const tabsStore = getTabsStore(projectRef as string)
+                const isOpened = Object.values(tabsStore.tabsMap).some(
+                  (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
+                )
+
+                return (
+                  <SQLEditorTreeViewItem
+                    {...props}
+                    isOpened={isOpened}
+                    element={element}
+                    isMultiSelected={selectedSnippets.length > 1}
+                    status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
+                    onMultiSelect={onMultiSelect}
+                    onSelectCreate={() => {
+                      if (profile && project) {
+                        const snippet = createSqlSnippetSkeletonV2({
+                          id: uuidv4(),
+                          name: untitledSnippetTitle,
+                          owner_id: profile?.id,
+                          project_id: project?.id,
+                          folder_id: element.id as string,
+                          sql: '',
+                        })
+                        snapV2.addSnippet({ projectRef: project.ref, snippet })
+                        router.push(`/project/${projectRef}/sql/${snippet.id}`)
                       }
+                    }}
+                    onSelectDelete={() => {
+                      if (props.isBranch) {
+                        setSelectedFolderToDelete(element.metadata as SnippetFolder)
+                      } else {
+                        setShowDeleteModal(true)
+                        if (selectedSnippets.length === 0) {
+                          setSelectedSnippets([element.metadata as unknown as Snippet])
+                        }
+                      }
+                    }}
+                    onSelectRename={() => {
+                      if (props.isBranch) {
+                        snapV2.editFolder(element.id as string)
+                      } else {
+                        setShowRenameModal(true)
+                        setSelectedSnippetToRename(element.metadata as Snippet)
+                      }
+                    }}
+                    onSelectMove={() => {
+                      setShowMoveModal(true)
+                      if (selectedSnippets.length === 0) {
+                        setSelectedSnippets([element.metadata as Snippet])
+                      }
+                    }}
+                    onSelectDownload={() =>
+                      setSelectedSnippetToDownload(element.metadata as Snippet)
                     }
-                  }}
-                  onSelectRename={() => {
-                    if (props.isBranch) {
-                      snapV2.editFolder(element.id as string)
-                    } else {
-                      setShowRenameModal(true)
-                      setSelectedSnippetToRename(element.metadata as Snippet)
-                    }
-                  }}
-                  onSelectMove={() => {
-                    setShowMoveModal(true)
-                    if (selectedSnippets.length === 0) {
-                      setSelectedSnippets([element.metadata as Snippet])
-                    }
-                  }}
-                  onSelectDownload={() => setSelectedSnippetToDownload(element.metadata as Snippet)}
-                  onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
-                  onEditSave={(name: string) => {
-                    // [Joshen] Inline editing only for folders for now
-                    if (name.length === 0 && element.id === 'new-folder') {
-                      snapV2.removeFolder(element.id as string)
-                    } else if (name.length > 0) {
-                      snapV2.saveFolder({ id: element.id as string, name })
-                    }
-                  }}
-                />
-              )}
+                    onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
+                    onEditSave={(name: string) => {
+                      // [Joshen] Inline editing only for folders for now
+                      if (name.length === 0 && element.id === 'new-folder') {
+                        snapV2.removeFolder(element.id as string)
+                      } else if (name.length > 0) {
+                        snapV2.saveFolder({ id: element.id as string, name })
+                      }
+                    }}
+                  />
+                )
+              }}
             />
           )}
         </InnerSideMenuCollapsibleContent>
