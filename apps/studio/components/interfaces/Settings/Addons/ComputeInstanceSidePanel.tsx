@@ -45,19 +45,22 @@ const ComputeInstanceSidePanel = () => {
   const { ref: projectRef } = useParams()
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
-
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
-
   const canUpdateCompute = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
   )
-
   const isProjectActive = useIsProjectActive()
-
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
+
   const visible = panel === 'computeInstance'
+  if (visible) {
+    if (diskAndComputeForm) {
+      router.push(`/project/${projectRef}/settings/compute-and-disk`)
+    }
+  }
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
