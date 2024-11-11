@@ -46,10 +46,11 @@
     "@tanstack/react-query": "4.35.7",
     "@tanstack/react-query-devtools": "4.35.7",
     "@uidotdev/usehooks": "^2.4.1",
+    "@use-gesture/react": "^10.3.1",
     "@vercel/flags": "^2.6.0",
     "@vitejs/plugin-react": "^4.2.1",
     "@zip.js/zip.js": "^2.7.29",
-    "ai": "^2.2.31",
+    "ai": "^3.4.33",
     "ai-commands": "*",
     "awesome-debounce-promise": "^2.1.0",
     "clsx": "^1.2.1",
@@ -103,6 +104,7 @@
     "react-inlinesvg": "^4.0.4",
     "react-intersection-observer": "^9.5.3",
     "react-markdown": "^8.0.3",
+    "react-rnd": "^10.4.13",
     "react-simple-maps": "4.0.0-beta.6",
     "react-tracked": "^1.7.11",
     "react-use": "^17.5.0",
@@ -127,6 +129,7 @@
     "yup": "^1.4.0",
     "yup-password": "^0.3.0",
     "zod": "^3.22.4",
+    "zustand": "^5.0.1",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

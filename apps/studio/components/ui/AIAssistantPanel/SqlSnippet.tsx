@@ -7,11 +7,19 @@ import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
-import { Database } from 'icons'
+import { Rnd } from 'react-rnd'
+import { Admonition } from 'ui-patterns'
+import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 
-interface SqlSnippetProps {
+interface SqlSnippetWrapperProps {
   sql: string
   isLoading?: boolean
+}
+
+interface ParsedSqlProps {
+  sql: string
+  props: any
+  title: string
 }
 
 const isReadOnlySelect = (query: string): boolean => {
@@ -36,32 +44,78 @@ const isReadOnlySelect = (query: string): boolean => {
     'with',
 
     // Function patterns
-    '(',
     'function',
     'procedure',
   ]
 
-  // Check if query contains any disallowed patterns
-  return !disallowedPatterns.some((pattern) => normalizedQuery.includes(pattern))
+  const allowedPatterns = ['inserted']
+
+  // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
+  return !disallowedPatterns.some((pattern) => {
+    // Check if the found disallowed pattern is actually part of an allowed pattern
+    const isPartOfAllowedPattern = allowedPatterns.some(
+      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(pattern)
+    )
+
+    if (isPartOfAllowedPattern) {
+      return false
+    }
+
+    return normalizedQuery.includes(pattern)
+  })
 }
 
-export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
+const SqlSnippetWrapper = ({ sql, isLoading }: SqlSnippetWrapperProps) => {
   let formatted = (sql || [''])[0]
+  const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
+  const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
+  const title = props.title || 'SQL Query'
+  formatted = formatted.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  console.log('props:', propsMatch, title, propsMatch)
 
-  const [showCode, setShowCode] = useState(!isReadOnlySelect(formatted))
+  const handleDragStart = useCallback(
+    (e: React.DragEvent) => {
+      e.dataTransfer.setData(
+        'text/plain',
+        JSON.stringify({
+          props: {
+            id: `sql-snippet-${Math.random().toString(36).substr(2, 9)}`,
+            title,
+            sql: formatted,
+            isChart: props.isChart,
+            xAxis: props.xAxis,
+            yAxis: props.yAxis,
+          },
+        })
+      )
+    },
+    [title, formatted, props.isChart, props.xAxis, props.yAxis]
+  )
+
+  return (
+    <div
+      draggable
+      onDragStart={handleDragStart}
+      className="-mx-5 my-3 bg-background-muted border-t border-b overflow-hidden"
+    >
+      <SqlCard
+        sql={formatted}
+        isChart={props.isChart}
+        xAxis={props.xAxis}
+        yAxis={props.yAxis}
+        title={title}
+      />
+    </div>
+  )
+}
+
+export const SqlCard = ({ sql, isChart, xAxis, yAxis, title }: ParsedSqlProps) => {
+  const [showCode, setShowCode] = useState(!isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const project = useSelectedProject()
-
-  const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
-  console.log('formatted:', formatted, propsMatch)
-
-  const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
-  const title = props.title || 'SQL Query'
-
-  console.log('props:', props)
-
-  formatted = formatted.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
+  const [error, setError] = useState<QueryResponseError>()
+  const { newQuery } = useNewQuery()
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (res) => {
@@ -70,39 +124,43 @@ export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
       setResults(res.result)
     },
     onError: (error) => {
-      console.error('SQL execution failed:', error)
-      setResults(undefined)
+      setError(error)
+      setResults([])
     },
   })
 
   const handleExecute = useCallback(() => {
-    if (!project?.ref || !formatted) return
+    if (!project?.ref || !sql) return
+    setError(undefined)
 
     executeSql({
-      sql: suffixWithLimit(formatted, 100),
+      sql: suffixWithLimit(sql, 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       handleError: (error) => {
-        console.log('error:', error)
-        throw error
+        setError(error)
+        setResults([])
       },
     })
-  }, [project?.ref, project?.connectionString, formatted, executeSql])
+  }, [project?.ref, project?.connectionString, sql, executeSql])
 
   useEffect(() => {
-    if (isReadOnlySelect(formatted)) {
+    if (isReadOnlySelect(sql) && !results) {
       handleExecute()
     }
-  }, [formatted, handleExecute])
+  }, [sql, handleExecute])
 
   const handleEdit = () => {
-    alert('saved')
+    newQuery(sql, title)
   }
+
+  const [errorHeader, ...errorContent] =
+    (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   console.log('results:', results)
 
   return (
-    <div className="bg-background-muted -mx-5 my-5 border-t border-b overflow-hidden">
+    <div className="overflow-hidden">
       <div className="flex items-center px-5 py-2 gap-2">
         <DatabaseIcon size={16} strokeWidth={1.5} />
         <h3 className="text-sm font-medium flex-1">{title}</h3>
@@ -120,27 +178,27 @@ export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
             type="text"
             size="tiny"
             className="w-7 h-7"
-            icon={<Play size={14} />}
-            loading={isExecuting}
-            onClick={handleExecute}
+            icon={<Edit size={14} />}
+            onClick={handleEdit}
           ></Button>
 
           <Button
             type="text"
             size="tiny"
             className="w-7 h-7"
-            icon={<Edit size={14} />}
-            onClick={handleEdit}
+            icon={<Play size={14} />}
+            loading={isExecuting}
+            onClick={handleExecute}
           ></Button>
         </div>
       </div>
 
       {showCode && (
         <CodeBlock
-          value={formatted}
+          value={sql}
           language="sql"
           className={cn(
-            '!bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none',
+            'max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
             // change the look of the code block. The flex hack is so that the code is wrapping since
             // every word is a separate span
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
@@ -150,11 +208,7 @@ export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
       )}
 
       {/* Results Section */}
-      {results !== undefined &&
-      results.length > 0 &&
-      props.isChart &&
-      props.xAxis &&
-      props.yAxis ? (
+      {results !== undefined && results.length > 0 && isChart && xAxis && yAxis ? (
         <div className="p-5 border-t">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
@@ -166,38 +220,64 @@ export const SqlSnippet = ({ sql, isLoading }: SqlSnippetProps) => {
             >
               <CartesianGrid vertical={false} />
               <XAxis
-                dataKey={props.xAxis}
+                dataKey={xAxis}
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
                 minTickGap={32}
               />
               <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-              <Bar dataKey={props.yAxis} fill="hsl(var(--chart-2))" />
+              <Bar dataKey={yAxis} fill="hsl(var(--chart-2))" />
             </BarChart>
           </ChartContainer>
         </div>
       ) : (
-        results !== undefined &&
-        results.length > 0 && (
-          <>
-            <div className={cn(showResults ? 'h-auto max-h-64 overflow-auto border-t' : 'h-0')}>
-              <Results rows={results} />
-            </div>
-            <div className="flex items-center justify-between border-t bg-surface-100 py-2 pl-2 pr-5">
-              <p className="text-xs text-foreground-light">
-                {results.length} rows
-                {results.length >= 100 && ` (Limited to only 100 rows)`}
-              </p>
-            </div>
-          </>
-        )
-      )}
-      {results !== undefined && results.length === 0 && (
-        <div className="flex items-center justify-between border-t bg-surface-100 h-[43px] pl-2 pr-5">
-          <p className="text-xs text-foreground-light">Success. No rows returned.</p>
+        <div>
+          {error !== undefined ? (
+            <Admonition
+              type="warning"
+              className="m-0 rounded-none border-x-0 border-b-0 [&>div>div>pre]:text-sm [&>div]:flex [&>div]:flex-col [&>div]:gap-y-2"
+              title={errorHeader || 'Error running SQL query'}
+              description={
+                <>
+                  <div>
+                    {errorContent.length > 0 ? (
+                      errorContent.map((errorText: string, i: number) => (
+                        <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                          {errorText}
+                        </pre>
+                      ))
+                    ) : (
+                      <p className="font-mono text-xs">{error.error}</p>
+                    )}
+                  </div>
+                </>
+              }
+            />
+          ) : results !== undefined && results.length > 0 ? (
+            <>
+              <div className={cn(showResults ? 'h-auto max-h-64 overflow-auto border-t' : 'h-0')}>
+                <Results rows={results} />
+              </div>
+              <div className="flex items-center justify-between border-t bg-background-muted py-2 pl-2 pr-5">
+                <p className="text-xs text-foreground-light">
+                  {results.length} rows
+                  {results.length >= 100 && ` (Limited to only 100 rows)`}
+                </p>
+              </div>
+            </>
+          ) : (
+            results !== undefined &&
+            results.length === 0 && (
+              <div className="flex items-center justify-between border-t bg-surface-100 h-[43px] pl-2 pr-5">
+                <p className="text-xs text-foreground-light">Success. No rows returned.</p>
+              </div>
+            )
+          )}
         </div>
       )}
     </div>
   )
 }
+
+export { SqlSnippetWrapper as SqlSnippet }

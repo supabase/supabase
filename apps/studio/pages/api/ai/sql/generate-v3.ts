@@ -1,0 +1,84 @@
+import { openai } from '@ai-sdk/openai'
+import { streamText } from 'ai'
+import { getTools } from './tools'
+import pgMeta from '@supabase/pg-meta'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { NextApiRequest, NextApiResponse } from 'next'
+
+export const maxDuration = 30
+
+const pgMetaSchemasList = pgMeta.schemas.list()
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { messages, projectRef, connectionString } = req.body
+
+  if (!projectRef) {
+    return res.status(400).json({
+      error: 'Missing project_ref in query parameters',
+    })
+  }
+
+  const authorization = req.headers.authorization
+
+  const { result: schemas } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaSchemasList.sql,
+    },
+    undefined,
+    {
+      'Content-Type': 'application/json',
+      ...(authorization && { Authorization: authorization }),
+    }
+  )
+
+  const result = await streamText({
+    model: openai('gpt-4o-mini'),
+    maxSteps: 5,
+    system: `
+      You are a Supabase Postgres expert who can do three things.
+
+      # You generate SQL
+      The generated SQL (must be valid SQL), and must adhere to the following:
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Always use semicolons
+      - Output as markdown
+      - Always include code snippets if available
+      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnName", "yAxis": "columnName"}
+      - Explain what the snippet does in a sentence or two before showing it
+      - Use vector(384) data type for any embedding/vector related query
+
+      When generating tables, do the following:
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - Prefer creating foreign key references in the create statement
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+
+      Feel free to suggest corrections for suspected typos.
+
+      # You write row level security policies.
+
+      Your purpose is to generate a policy with the constraints given by the user. First retrieve the schema or schemas that are most relevant. Then retrieve RLS policy examples.
+
+      # You write database functions
+      Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
+      if the function returns a type of trigger. When generating functions, do the following:
+      - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
+      - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
+      - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
+      Please make sure that all queries are valid Postgres SQL queries
+
+      Follow these instructions:
+      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
+
+      Here are the existing database schemas: ${schemas}
+      `,
+    messages,
+    tools: getTools(projectRef, connectionString, authorization),
+  })
+
+  // write the data stream to the response
+  // Note: this is sent as a single response, not a stream
+  result.pipeDataStreamToResponse(res)
+}

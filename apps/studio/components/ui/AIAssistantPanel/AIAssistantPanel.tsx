@@ -303,7 +303,7 @@ export const AiAssistantPanel = () => {
   }, [error, showWarning, isExecuting, numResults, showResults])
 
   return !open ? null : (
-    <div className="w-[400px] shrink-0 border-l bg">
+    <div className="w-[400px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0 shrink-0 border-l bg">
       <AIAssistant
         id={chatId}
         className={cn('w-full h-full', isEditor && 'hidden')}

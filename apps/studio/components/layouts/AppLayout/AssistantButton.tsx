@@ -8,13 +8,14 @@ const AssistantButton = () => {
 
   return (
     <Button
+      type="text"
       id="assistant-trigger"
+      className="w-6 h-6"
       onClick={() => {
         setAiAssistantPanel({ open: !aiAssistantPanel.open })
       }}
-    >
-      <Wand size={18} strokeWidth={1.5} className="text-foreground-light" />
-    </Button>
+      icon={<Wand size={18} strokeWidth={1.5} className="text-foreground-light" />}
+    />
   )
 }
 

@@ -11,7 +11,7 @@ import {
   ChevronLeft,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, memo } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
@@ -33,6 +33,8 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { constructHeaders } from 'data/fetchers'
 import {
   BASE_PATH,
   IS_PLATFORM,
@@ -75,6 +77,50 @@ import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 const ANIMATION_DURATION = 0.3
+import { Loading } from 'ui'
+
+const MemoizedMessage = memo(
+  ({ message, isFirstUserMessage, includeSchemaMetadata }) => {
+    return (
+      <Message
+        key={message.id}
+        name={message.name}
+        role={message.role}
+        content={message.content}
+        createdAt={new Date(message.createdAt || new Date()).getTime()}
+        isDebug={message.isDebug}
+      >
+        {isFirstUserMessage && !includeSchemaMetadata && (
+          <Admonition
+            type="default"
+            title="Project metadata is not shared with the Assistant"
+            description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
+            className="mb-4"
+          >
+            <Button
+              type="default"
+              className="w-fit"
+              onClick={() => setIsConfirmOptInModalOpen(true)}
+            >
+              Update AI settings
+            </Button>
+          </Admonition>
+        )}
+      </Message>
+    )
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function to determine if the component should re-render
+    return (
+      prevProps.message.id === nextProps.message.id &&
+      prevProps.message.content === nextProps.message.content &&
+      prevProps.contextHistory[prevProps.message.id] ===
+        nextProps.contextHistory[nextProps.message.id] &&
+      prevProps.includeSchemaMetadata === nextProps.includeSchemaMetadata &&
+      prevProps.selectedSchemas.length === nextProps.selectedSchemas.length
+    )
+  }
+)
 
 type PanelType = 'assistant' | 'templates' | 'quickStart' | 'functions'
 
@@ -126,6 +172,7 @@ export const AIAssistant = ({
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [headers, setHeaders] = useState<Record<string, string>>({})
 
   const docsUrl = retrieveDocsUrl(selectedDatabaseEntity as SupportedAssistantEntities)
   const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
@@ -136,6 +183,18 @@ export const AIAssistant = ({
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
+  const {
+    data: tables,
+    isLoading: isLoadingTables,
+    isSuccess: isSuccessTables,
+    isError: isErrorTables,
+    error: errorTables,
+  } = useTablesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: 'public',
+  })
 
   const { data: existingDefinition } = useEntityDefinitionQuery({
     id: entity?.id,
@@ -181,9 +240,20 @@ export const AIAssistant = ({
     setMessages,
   } = useChat({
     id,
-    api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions, context: selectedDatabaseEntity, existingSql: existingDefinition },
-    onError: (error) => setAssistantError(JSON.parse(error.message).error),
+    api: `${BASE_PATH}/api/ai/sql/generate-v3`,
+    headers: headers,
+    maxSteps: 5,
+    body: {
+      entityDefinitions,
+      context: selectedDatabaseEntity,
+      existingSql: existingDefinition,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    onError: (error) => {
+      console.log('error:', JSON.stringify(error))
+      // setAssistantError(JSON.parse(error.message).error)
+    },
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
@@ -206,47 +276,26 @@ export const AIAssistant = ({
     )
   }, [chatMessages, debugThread, assistantError, lastSentMessage])
 
-  const renderedMessages = useMemo(() => {
-    return messages.map((m, index) => {
-      const isFirstUserMessage =
-        m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
+  const renderedMessages = useMemo(
+    () =>
+      messages.map((message, index) => {
+        const isFirstUserMessage =
+          message.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
 
-      return (
-        <Message
-          key={`message-${m.id}`}
-          name={m.name}
-          role={m.role}
-          content={m.content}
-          createdAt={new Date(m.createdAt || new Date()).getTime()}
-          isDebug={(m as MessageWithDebug).isDebug}
-          context={contextHistory[m.id]}
-          onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-        >
-          {isFirstUserMessage && !includeSchemaMetadata && (
-            <Admonition
-              type="default"
-              title="Project metadata is not shared with the Assistant"
-              description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
-            >
-              <Button
-                type="default"
-                className="w-fit"
-                onClick={() => setIsConfirmOptInModalOpen(true)}
-              >
-                Update AI settings
-              </Button>
-            </Admonition>
-          )}
-          {isFirstUserMessage && includeSchemaMetadata && selectedSchemas.length === 0 && (
-            <Admonition
-              type="default"
-              title="We recommend including schemas for better answers from the Assistant"
-            />
-          )}
-        </Message>
-      )
-    })
-  }, [messages, contextHistory, includeSchemaMetadata, selectedSchemas.length, onDiff])
+        return (
+          <MemoizedMessage
+            key={message.id}
+            message={message}
+            isFirstUserMessage={isFirstUserMessage}
+            includeSchemaMetadata={includeSchemaMetadata}
+            selectedSchemas={selectedSchemas}
+            contextHistory={contextHistory}
+            onDiff={onDiff}
+          />
+        )
+      }),
+    [messages, contextHistory, includeSchemaMetadata, selectedSchemas]
+  )
 
   const hasMessages = messages.length > 0
   const lastMessage = last(messages)
@@ -259,7 +308,12 @@ export const AIAssistant = ({
 
   const sendMessageToAssistant = (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
-    append(payload)
+    console.log('sending:', headers)
+    append(payload, {
+      headers: {
+        Authorization: headers.get('Authorization'),
+      },
+    })
     setAssistantError(undefined)
     setLastSentMessage(payload)
     sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
@@ -331,100 +385,147 @@ export const AIAssistant = ({
       title: 'Assistant',
       component: (
         <div className="w-full px-content py-content flex flex-col">
-          <p className="text-base mb-2">
-            How can I help you
-            {!!entityContext ? (
-              <>
-                {' '}
-                with{' '}
-                <span className="text-foreground">
-                  {entityContext.id === 'rls-policies'
-                    ? entityContext.label
-                    : `Database ${entityContext.label}`}
-                </span>
-              </>
-            ) : (
-              ' today'
-            )}
-            ?
-          </p>
-          <p className="text-sm text-foreground-lighter mb-6">
-            I can help you get setup and even generate your entire database schema. Choose a
-            starting point or describe what you want to build.
-          </p>
-          {activePanel === 'assistant' && !selectedDatabaseEntity && !hasMessages && (
-            <div className="-mx-3 mb-4">
-              <Button
-                size="small"
-                icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                type="text"
-                className="w-full justify-start py-1 h-auto"
-                onClick={() => setActivePanel('quickStart')}
-              >
-                Generate something new
-              </Button>
-              <Button
-                size="small"
-                icon={<Code strokeWidth={1.5} size={16} />}
-                type="text"
-                className="w-full justify-start py-1 h-auto"
-                onClick={() => setActivePanel('templates')}
-              >
-                Quick SQL snippets
-              </Button>
-            </div>
-          )}
-          {ASSISTANT_SUPPORT_ENTITIES.filter(
-            (e) => !selectedDatabaseEntity || e.id === selectedDatabaseEntity
-          ).map((entity) => (
-            <div key={entity.id} className="flex flex-col mb-4">
-              <h3 className="mb-2 flex flex-col space-y-2 uppercase font-mono text-sm text-foreground-lighter">
-                {entity.label}
-              </h3>
-              <div className="-mx-3">
-                <Button
-                  size="small"
-                  icon={<WandSparkles strokeWidth={1.5} size={16} />}
-                  type="text"
-                  className="w-full justify-start py-1 h-auto"
-                  onClick={() => onClickQuickPrompt('suggest', entity.id)}
-                >
-                  Suggest{' '}
-                  {entity.id === 'rls-policies'
-                    ? entity.label
-                    : `database ${entity.label.toLowerCase()}`}
-                </Button>
-
-                <Button
-                  size="small"
-                  icon={<FileText strokeWidth={1.5} size={16} />}
-                  type="text"
-                  className="w-full justify-start py-1 h-auto"
-                  onClick={() => onClickQuickPrompt('examples', entity.id)}
-                >
-                  Examples of{' '}
-                  {entity.id === 'rls-policies'
-                    ? entity.label
-                    : `database ${entity.label.toLowerCase()}`}
-                </Button>
-
-                <Button
-                  size="small"
-                  icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
-                  type="text"
-                  className="w-full justify-start py-1 h-auto"
-                  onClick={() => onClickQuickPrompt('ask', entity.id)}
-                >
-                  What are{' '}
-                  {entity.id === 'rls-policies'
-                    ? entity.label
-                    : `database ${entity.label.toLowerCase()}`}
-                  ?
-                </Button>
-                {/* <DocsButton href={retrieveDocsUrl(entity.id)} /> */}
+          {!tables || tables.length === 0 ? (
+            <>
+              <p className="text-base mb-2">Welcome to Supabase!</p>
+              <p className="text-sm text-foreground-lighter mb-6">
+                I can help you get setup and even generate your entire database schema. Choose a
+                starting point or describe what you want to build.
+              </p>
+              <div className="-mx-3 space-y-2">
+                {quickStart.map((template) => (
+                  <Button
+                    key={template.title}
+                    size="small"
+                    onClick={() =>
+                      setMessages([
+                        {
+                          id: crypto.randomUUID(),
+                          createdAt: new Date(Date.now() - 3000),
+                          role: 'user',
+                          content: `Help me to ${template.title}. ${template.description}`,
+                        },
+                        {
+                          id: crypto.randomUUID(),
+                          role: 'assistant',
+                          createdAt: new Date(),
+                          content: [
+                            'Absolutely! Here is a starting point. How would you like to customize it?:\n',
+                            '```sql',
+                            template.sql,
+                            '```',
+                          ].join('\n'),
+                        },
+                      ])
+                    }
+                    icon={<Box strokeWidth={1.5} size={16} />}
+                    type={'text'}
+                    className="w-full py-1 h-auto justify-start text-left gap-3"
+                  >
+                    {template.title}
+                    <p className="text-sm text-foreground-lighter">{template.description}</p>
+                  </Button>
+                ))}
               </div>
-            </div>
-          ))}
+            </>
+          ) : (
+            <>
+              <p className="text-base mb-2">
+                How can I help you
+                {!!entityContext ? (
+                  <>
+                    {' '}
+                    with{' '}
+                    <span className="text-foreground">
+                      {entityContext.id === 'rls-policies'
+                        ? entityContext.label
+                        : `Database ${entityContext.label}`}
+                    </span>
+                  </>
+                ) : (
+                  ' today'
+                )}
+                ?
+              </p>
+              <p className="text-sm text-foreground-lighter mb-6">
+                I can help you get setup and even generate your entire database schema. Choose a
+                starting point or describe what you want to build.
+              </p>
+              {activePanel === 'assistant' && !selectedDatabaseEntity && !hasMessages && (
+                <div className="-mx-3 mb-4">
+                  <Button
+                    size="small"
+                    icon={<WandSparkles strokeWidth={1.5} size={16} />}
+                    type="text"
+                    className="w-full justify-start py-1 h-auto"
+                    onClick={() => setActivePanel('quickStart')}
+                  >
+                    Generate something new
+                  </Button>
+                  <Button
+                    size="small"
+                    icon={<Code strokeWidth={1.5} size={16} />}
+                    type="text"
+                    className="w-full justify-start py-1 h-auto"
+                    onClick={() => setActivePanel('templates')}
+                  >
+                    Quick SQL snippets
+                  </Button>
+                </div>
+              )}
+              {ASSISTANT_SUPPORT_ENTITIES.filter(
+                (e) => !selectedDatabaseEntity || e.id === selectedDatabaseEntity
+              ).map((entity) => (
+                <div key={entity.id} className="flex flex-col mb-4">
+                  <h3 className="mb-2 flex flex-col space-y-2 uppercase font-mono text-sm text-foreground-lighter">
+                    {entity.label}
+                  </h3>
+                  <div className="-mx-3">
+                    <Button
+                      size="small"
+                      icon={<WandSparkles strokeWidth={1.5} size={16} />}
+                      type="text"
+                      className="w-full justify-start py-1 h-auto"
+                      onClick={() => onClickQuickPrompt('suggest', entity.id)}
+                    >
+                      Suggest{' '}
+                      {entity.id === 'rls-policies'
+                        ? entity.label
+                        : `database ${entity.label.toLowerCase()}`}
+                    </Button>
+
+                    <Button
+                      size="small"
+                      icon={<FileText strokeWidth={1.5} size={16} />}
+                      type="text"
+                      className="w-full justify-start py-1 h-auto"
+                      onClick={() => onClickQuickPrompt('examples', entity.id)}
+                    >
+                      Examples of{' '}
+                      {entity.id === 'rls-policies'
+                        ? entity.label
+                        : `database ${entity.label.toLowerCase()}`}
+                    </Button>
+
+                    <Button
+                      size="small"
+                      icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
+                      type="text"
+                      className="w-full justify-start py-1 h-auto"
+                      onClick={() => onClickQuickPrompt('ask', entity.id)}
+                    >
+                      What are{' '}
+                      {entity.id === 'rls-policies'
+                        ? entity.label
+                        : `database ${entity.label.toLowerCase()}`}
+                      ?
+                    </Button>
+                    {/* <DocsButton href={retrieveDocsUrl(entity.id)} /> */}
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       ),
     },
@@ -432,13 +533,14 @@ export const AIAssistant = ({
       title: 'Templates',
       component: (
         <div className="w-full px-content py-content">
-          <div className="-mx-3">
+          <div className="-mx-3 space-y-2">
             {templates.map((template) => (
               <Button
                 key={template.title}
                 size="small"
                 type={'text'}
-                className="w-full justify-start py-1 h-auto"
+                icon={<Code strokeWidth={1.5} size={16} />}
+                className="w-full py-1 h-auto justify-start text-left gap-3"
                 onClick={() =>
                   setMessages([
                     {
@@ -462,6 +564,7 @@ export const AIAssistant = ({
                 }
               >
                 {template.title}
+                <p className="text-sm text-foreground-lighter">{template.description}</p>
               </Button>
             ))}
           </div>
@@ -477,9 +580,30 @@ export const AIAssistant = ({
               <Button
                 key={template.title}
                 size="small"
+                onClick={() =>
+                  setMessages([
+                    {
+                      id: crypto.randomUUID(),
+                      createdAt: new Date(Date.now() - 3000),
+                      role: 'user',
+                      content: `Help me to ${template.title}. ${template.description}`,
+                    },
+                    {
+                      id: crypto.randomUUID(),
+                      role: 'assistant',
+                      createdAt: new Date(),
+                      content: [
+                        'Absolutely! Here is a starting point. How would you like to customize it?:\n',
+                        '```sql',
+                        template.sql,
+                        '```',
+                      ].join('\n'),
+                    },
+                  ])
+                }
                 icon={<Box strokeWidth={1.5} size={16} />}
                 type={'text'}
-                className="w-full py-1 h-auto justify-start text-left gap-4"
+                className="w-full py-1 h-auto justify-start text-left gap-3"
               >
                 {template.title}
                 <p className="text-sm text-foreground-lighter">{template.description}</p>
@@ -497,6 +621,15 @@ export const AIAssistant = ({
       if (mode) setSelectedDatabaseEntity(mode.id)
     }
   }, [editor])
+
+  useEffect(() => {
+    const loadHeaders = async () => {
+      const headerData = await constructHeaders()
+      setHeaders(headerData)
+      console.log('auth:', headerData.get('Authorization'))
+    }
+    loadHeaders()
+  }, [])
 
   useEffect(() => {
     if (!isLoading) {
@@ -531,13 +664,24 @@ export const AIAssistant = ({
         },
       })
     }
+    if (messages.length > 0) {
+      setActivePanel('assistant')
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length])
+
+  if (isLoadingTables) {
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <Loading active />
+      </div>
+    )
+  }
 
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div className="flex items-center gap-x-3 py-3 px-6 border-b">
+        <div className="flex items-center gap-x-3 py-3 px-5 border-b">
           {activePanel !== 'assistant' && (
             <Button
               icon={<ChevronLeft strokeWidth={1.5} size={20} />}
@@ -560,7 +704,7 @@ export const AIAssistant = ({
 
         <div className={cn('flex-grow overflow-auto flex-col')}>
           {hasMessages && (
-            <motion.div className="w-full overflow-auto flex-1 p-5 flex flex-col gap-4">
+            <motion.div className="w-full overflow-auto flex-1 p-5 flex flex-col">
               {renderedMessages}
               <div ref={bottomRef} className="h-1" />
             </motion.div>
@@ -751,11 +895,6 @@ export const AIAssistant = ({
               sendMessageToAssistant(value)
             }}
           />
-          {!hasMessages && IS_PLATFORM && (
-            <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
-              The Assistant is in Alpha and your prompts might be rate limited
-            </div>
-          )}
         </div>
       </div>
       <ConfirmationModal
