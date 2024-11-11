@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Book, Github, Loader2, Settings } from 'lucide-react'
+import { Book, Github, Loader2, Settings, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -9,9 +9,11 @@ import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/da
 import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { extensions } from 'shared-data'
-import { Button, cn, Switch } from 'ui'
+import { Button, cn, Switch, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
+import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
+import { Alert } from '@ui/components/shadcn/ui/alert'
 
 interface ExtensionCardProps {
   extension: DatabaseExtension
@@ -166,9 +168,19 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         onCancel={() => setIsDisableModalOpen(false)}
         onConfirm={() => onConfirmDisable()}
       >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to turn OFF the "{extension.name}" extension?
-        </p>
+        <div className="grid gap-3">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to turn OFF the "{extension.name}" extension?
+          </p>
+          {EXTENSION_DISABLE_WARNINGS[extension.name] && (
+            <Alert_Shadcn_ variant="default" className="mb-2">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                {EXTENSION_DISABLE_WARNINGS[extension.name]}
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </div>
       </ConfirmationModal>
     </>
   )

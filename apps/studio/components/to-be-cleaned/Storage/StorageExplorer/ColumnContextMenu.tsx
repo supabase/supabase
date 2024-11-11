@@ -2,6 +2,8 @@ import { compact, uniqBy } from 'lodash'
 import { Item, Menu, Separator, Submenu } from 'react-contexify'
 import 'react-contexify/dist/ReactContexify.css'
 
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { ChevronRight, ChevronsDown, ChevronsUp, Clipboard, Eye, FolderPlus } from 'lucide-react'
 import {
@@ -16,6 +18,7 @@ interface ColumnContextMenuProps {
 }
 
 const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
+  const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
   const storageExplorerStore = useStorageStore()
   const {
     columns,
@@ -57,11 +60,13 @@ const ColumnContextMenu = ({ id = '' }: ColumnContextMenuProps) => {
 
   return (
     <Menu id={id} animation="fade">
-      <Item onClick={({ props }) => onSelectCreateFolder(props.index)}>
-        <FolderPlus size="14" strokeWidth={1} />
-        <span className="ml-2 text-xs">New folder</span>
-      </Item>
-      <Separator />
+      {canUpdateFiles && [
+        <Item key="create-folder" onClick={({ props }) => onSelectCreateFolder(props.index)}>
+          <FolderPlus size="14" strokeWidth={1} />
+          <span className="ml-2 text-xs">New folder</span>
+        </Item>,
+        <Separator key="create-folder-separator" />,
+      ]}
       <Item onClick={({ props }) => onSelectAllItemsInColumn(props.index)}>
         <Clipboard size="14" strokeWidth={1} />
         <span className="ml-2 text-xs">Select all items</span>

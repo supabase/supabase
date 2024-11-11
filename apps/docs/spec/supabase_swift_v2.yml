@@ -3041,7 +3041,7 @@ functions:
                   )
                 """
               )
-              .order("name", ascending: false, foreignTable: "cities")
+              .order("name", ascending: false, referencedTable: "cities")
               .execute()
             ```
         data:
@@ -3152,7 +3152,7 @@ functions:
               )
               """
             )
-            .limit(1, foreignTable: "cities")
+            .limit(1, referencedTable: "cities")
             .execute()
           ```
         data:

@@ -1,11 +1,9 @@
 import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
-import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SparkBar from 'components/ui/SparkBar'
 import { createDatabaseColumn } from 'data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from 'data/database-columns/database-column-delete-mutation'
@@ -17,13 +15,12 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
-import { getTable } from 'data/tables/table-query'
 import { updateTable as updateTableMutation } from 'data/tables/table-update-mutation'
 import { getTables } from 'data/tables/tables-query'
-import { getViews } from 'data/views/views-query'
 import { timeout, tryParseJson } from 'lib/helpers'
 import {
   generateCreateColumnPayload,
@@ -36,67 +33,6 @@ import type { ImportContent } from './TableEditor/TableEditor.types'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
-
-export interface UseEncryptedColumnsArgs {
-  schemaName?: string
-  tableName?: string
-}
-const listEncryptedColumns = async (
-  projectRef: string,
-  connectionString: string | undefined = undefined,
-  schema: string,
-  table: string
-) => {
-  if (!table) return []
-
-  const views = await getViews({ projectRef, connectionString, schema })
-  const decryptedView = views.find((view) => view.name === `decrypted_${table}`)
-  if (!decryptedView) return []
-
-  try {
-    const encryptedColumns = await executeSql({
-      projectRef,
-      connectionString,
-      sql: `SELECT column_name as name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'decrypted_${table}' and column_name like 'decrypted_%'`,
-    })
-    return encryptedColumns.result.map((column: any) => column.name.split('decrypted_')[1])
-  } catch (error) {
-    console.error('Error fetching encrypted columns', error)
-    return []
-  }
-}
-
-export function useEncryptedColumns({ schemaName, tableName }: UseEncryptedColumnsArgs) {
-  const { project } = useProjectContext()
-  const [encryptedColumns, setEncryptedColumns] = useState<string[]>([])
-
-  useEffect(() => {
-    let isMounted = true
-
-    const getEncryptedColumns = async () => {
-      if (schemaName !== undefined && tableName !== undefined) {
-        const columns = await listEncryptedColumns(
-          project?.ref!,
-          project?.connectionString,
-          schemaName,
-          tableName
-        )
-
-        if (isMounted) {
-          setEncryptedColumns(columns)
-        }
-      }
-    }
-
-    getEncryptedColumns()
-
-    return () => {
-      isMounted = false
-    }
-  }, [schemaName, tableName])
-
-  return encryptedColumns
-}
 
 /**
  * The functions below are basically just queries but may be supported directly
@@ -561,8 +497,8 @@ export const createTable = async ({
 
     // Then add the primary key constraints here to support composite keys
     const primaryKeyColumns = columns
-      .filter((column: ColumnField) => column.isPrimaryKey)
-      .map((column: ColumnField) => column.name)
+      .filter((column) => column.isPrimaryKey)
+      .map((column) => column.name)
     if (primaryKeyColumns.length > 0) {
       await addPrimaryKey(projectRef, connectionString, table.schema, table.name, primaryKeyColumns)
     }
@@ -585,7 +521,7 @@ export const createTable = async ({
           projectRef,
           connectionString,
           importContent.file,
-          table as PostgresTable,
+          table,
           importContent.selectedHeaders,
           (progress: number) => {
             toast.loading(
@@ -628,7 +564,7 @@ export const createTable = async ({
         await insertTableRows(
           projectRef,
           connectionString,
-          table as PostgresTable,
+          table,
           importContent.rows,
           importContent.selectedHeaders,
           (progress: number) => {
@@ -752,16 +688,12 @@ export const updateTable = async ({
         projectRef: projectRef,
         connectionString: connectionString,
         payload: columnPayload,
-        selectedTable: updatedTable as PostgresTable,
+        selectedTable: updatedTable,
       })
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
       if (originalColumn) {
-        const columnPayload = generateUpdateColumnPayload(
-          originalColumn,
-          updatedTable as PostgresTable,
-          column
-        )
+        const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
           const skipPKCreation = true
@@ -771,7 +703,7 @@ export const updateTable = async ({
             connectionString: connectionString,
             id: column.id,
             payload: columnPayload,
-            selectedTable: updatedTable as PostgresTable,
+            selectedTable: updatedTable,
             skipPKCreation,
             skipSuccessMessage,
           })
@@ -818,7 +750,7 @@ export const updateTable = async ({
   ])
 
   return {
-    table: await getTable({
+    table: await getTableEditor({
       projectRef,
       connectionString,
       id: table.id,

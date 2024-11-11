@@ -540,7 +540,7 @@ const EXTERNAL_PROVIDER_AZURE = {
       then: (schema) => schema.required('Secret Value is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_AZURE_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_AZURE_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'microsoft-icon',
@@ -782,7 +782,7 @@ const EXTERNAL_PROVIDER_GITLAB = {
       then: (schema) => schema.required('Client Secret is required'),
       otherwise: (schema) => schema,
     }),
-    EXTERNAL_GITLAB_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    EXTERNAL_GITLAB_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
   }),
   misc: {
     iconKey: 'gitlab-icon',
@@ -934,8 +934,8 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
     EXTERNAL_KEYCLOAK_URL: string().when('EXTERNAL_KEYCLOAK_ENABLED', {
       is: true,
       then: (schema) =>
-        schema.matches(urlRegex, 'Must be a valid URL').required('Realm URL is required'),
-      otherwise: (schema) => schema.matches(urlRegex, 'Must be a valid URL'),
+        schema.matches(urlRegex(), 'Must be a valid URL').required('Realm URL is required'),
+      otherwise: (schema) => schema.matches(urlRegex(), 'Must be a valid URL'),
     }),
   }),
   misc: {
@@ -1244,7 +1244,7 @@ const EXTERNAL_PROVIDER_WORKOS = {
   validationSchema: object().shape({
     EXTERNAL_WORKOS_ENABLED: boolean().required(),
     EXTERNAL_WORKOS_URL: string()
-      .matches(urlRegex, 'Must be a valid URL')
+      .matches(urlRegex(), 'Must be a valid URL')
       .when('EXTERNAL_WORKOS_ENABLED', {
         is: true,
         then: (schema) => schema.required('WorkOS URL is required'),
@@ -1335,7 +1335,7 @@ const PROVIDER_SAML = {
   },
   validationSchema: object().shape({
     SAML_ENABLED: boolean().required(),
-    SAML_EXTERNAL_URL: string().matches(urlRegex, 'Must be a valid URL').optional(),
+    SAML_EXTERNAL_URL: string().matches(urlRegex(), 'Must be a valid URL').optional(),
     SAML_ALLOW_ENCRYPTED_ASSERTIONS: boolean().optional(),
   }),
   misc: {

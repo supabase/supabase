@@ -1,15 +1,20 @@
-import clsx from 'clsx'
+import { ChevronRight, Info } from 'lucide-react'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrgUpcomingInvoiceQuery } from 'data/invoices/org-invoice-upcoming-query'
 import { formatCurrency } from 'lib/helpers'
-import Link from 'next/link'
-import { useMemo, useState } from 'react'
-import { Button, Collapsible } from 'ui'
+import {
+  Button,
+  cn,
+  Collapsible,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { billingMetricUnit, formatUsage } from '../helpers'
-import { ChevronRight, Info } from 'lucide-react'
 
 export interface UpcomingInvoiceProps {
   slug?: string
@@ -113,7 +118,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <th className="py-2 font-medium text-right text-sm text-foreground-light pr-4">
                   Usage
                 </th>
-                <th className="py-2 font-medium text-left text-sm text-foreground-light">
+                <th className="py-2 pr-2 font-medium text-left text-sm text-foreground-light max-w-[200px]">
                   Unit price
                 </th>
                 <th className="py-2 font-medium text-right text-sm text-foreground-light">Cost</th>
@@ -124,6 +129,9 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                 <tr key={item.description} className="border-b">
                   <td className="py-2 text-sm max-w-[200px]" colSpan={item.proration ? 3 : 1}>
                     {item.description ?? 'Unknown'}
+                    {item.usage_metric &&
+                      billingMetricUnit(item.usage_metric) &&
+                      ` (${billingMetricUnit(item.usage_metric)})`}
                   </td>
                   {!item.proration && (
                     <td className="py-2 text-sm text-right pr-4">
@@ -131,12 +139,12 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                     </td>
                   )}
                   {!item.proration && (
-                    <td className="py-2 text-sm">
+                    <td className="py-2 pr-2 text-sm max-w-[200px]">
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
                           ? formatCurrency(item.unit_price)
-                          : null}
+                          : `${item.unit_price_desc}`}
                     </td>
                   )}
                   <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
@@ -167,7 +175,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             className="!px-1"
                             icon={
                               <ChevronRight
-                                className={clsx(
+                                className={cn(
                                   'transition',
                                   usageFeesExpanded.includes(fee.description) && 'rotate-90'
                                 )}
@@ -282,32 +290,29 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
 
 const InvoiceTooltip = ({ text, linkRef }: { text: string; linkRef?: string }) => {
   return (
-    <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_>
         <Info size={12} strokeWidth={2} />
-      </Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="bottom">
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto">
-            <span className="text-xs text-foreground">
-              <p>
-                {text}{' '}
-                {linkRef && (
-                  <Link
-                    href={linkRef}
-                    target="_blank"
-                    className="transition text-brand hover:text-brand-600 underline"
-                  >
-                    Read more
-                  </Link>
-                )}
-              </p>
-            </span>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_
+        side="bottom"
+        className="min-w-[300px] max-w-[450px] max-h-[300px] overflow-y-auto"
+      >
+        <p>
+          {text}{' '}
+          {linkRef && (
+            <Link
+              href={linkRef}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition text-brand hover:text-brand-600 underline"
+            >
+              Read more
+            </Link>
+          )}
+        </p>
+      </TooltipContent_Shadcn_>
+    </Tooltip_Shadcn_>
   )
 }
 

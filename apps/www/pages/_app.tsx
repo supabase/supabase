@@ -89,21 +89,20 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.isReady, consentValue])
 
   useEffect(() => {
-    if (blockEvents) return
-
     const handleBeforeUnload = async () => {
-      await post(`${API_URL}/telemetry/page-leave`, {
-        page_url: window.location.href,
-        page_title: title,
-        pathname: router.pathname,
-      })
+      if (!blockEvents) {
+        await post(`${API_URL}/telemetry/page-leave`, {
+          page_url: window.location.href,
+          page_title: title,
+          pathname: router.pathname,
+        })
+      }
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
-
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
-  }, [])
+  }, [blockEvents, router.pathname, title])
 
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath } = useRouter()

@@ -3,7 +3,13 @@ import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/exec
 import { CREATE_PG_GET_TABLEDEF_SQL } from './database-query-constants'
 import { databaseKeys } from './keys'
 
-export const getEntityDefinitionsQuery = (schemas: string[], limit = 100) => {
+export const getEntityDefinitionsQuery = ({
+  schemas,
+  limit = 100,
+}: {
+  schemas: string[]
+  limit?: number
+}) => {
   const sql = /* SQL */ `
 ${CREATE_PG_GET_TABLEDEF_SQL}
 
@@ -26,13 +32,7 @@ with records as (
         'create materialized view ', concat(nc.nspname, '.', c.relname), ' as',
         pg_get_viewdef(concat(nc.nspname, '.', c.relname), true)
       )
-      when 'f' then pg_temp.pg_get_tabledef(
-        concat(nc.nspname),
-        concat(c.relname),
-        false,
-        'FKEYS_INTERNAL',
-        'NO_TRIGGERS'
-      )
+      when 'f' then concat('create foreign table ', nc.nspname, '.', c.relname, ' ( ... )')
       when 'p' then pg_temp.pg_get_tabledef(
         concat(nc.nspname),
         concat(c.relname),
@@ -99,7 +99,7 @@ export const useEntityDefinitionsQuery = <
     {
       projectRef,
       connectionString,
-      sql: getEntityDefinitionsQuery(schemas, limit),
+      sql: getEntityDefinitionsQuery({ schemas, limit }),
       queryKey: databaseKeys.entityDefinitions(projectRef, schemas),
     },
     {
