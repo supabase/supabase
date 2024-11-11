@@ -135,7 +135,7 @@ const RestoreToNewProject = () => {
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
 
-  const isLoading = isPermissionsLoaded && cloneBackupsLoading && backupsLoading
+  const isLoading = !isPermissionsLoaded || cloneBackupsLoading || backupsLoading
 
   /**
    * New project will have the same compute size and disk size as the original project
@@ -351,7 +351,11 @@ const RestoreToNewProject = () => {
   }
 
   if (!isLoading && hasPITREnabled && !backups?.physicalBackupData.earliestPhysicalBackupDateUnix) {
-    return <BackupsEmpty />
+    return (
+      <>
+        <BackupsEmpty />
+      </>
+    )
   }
 
   if (!isLoading && !hasPITREnabled && backups?.backups.length === 0) {
@@ -423,7 +427,6 @@ const RestoreToNewProject = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
       <Dialog open={showNewProjectDialog} onOpenChange={setShowNewProjectDialog}>
         <DialogContent>
           <DialogHeader className="border-b">
@@ -518,27 +521,30 @@ const RestoreToNewProject = () => {
         />
       ) : (
         <Panel>
-          {data?.backups.length === 0 && <BackupsEmpty />}
-          <div className="divide-y">
-            {data?.backups.map((backup) => (
-              <div className="flex p-4 gap-4" key={backup.id}>
-                <div>
-                  <TimestampInfo value={backup.inserted_at} />
+          {data?.backups.length === 0 ? (
+            <BackupsEmpty />
+          ) : (
+            <div className="divide-y">
+              {data?.backups.map((backup) => (
+                <div className="flex p-4 gap-4" key={backup.id}>
+                  <div>
+                    <TimestampInfo value={backup.inserted_at} />
+                  </div>
+                  <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                  <Button
+                    className="ml-auto"
+                    type="outline"
+                    onClick={() => {
+                      setSelectedBackupId(backup.id)
+                      setShowConfirmationDialog(true)
+                    }}
+                  >
+                    Restore
+                  </Button>
                 </div>
-                <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                <Button
-                  className="ml-auto"
-                  type="outline"
-                  onClick={() => {
-                    setSelectedBackupId(backup.id)
-                    setShowConfirmationDialog(true)
-                  }}
-                >
-                  Restore
-                </Button>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </Panel>
       )}
     </>
