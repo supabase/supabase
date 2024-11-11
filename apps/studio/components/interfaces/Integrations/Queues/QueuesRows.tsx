@@ -4,16 +4,19 @@ import { ChevronRight } from 'lucide-react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
+import { PostgresQueueMetric } from 'data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
 import { DATETIME_FORMAT } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { DATE_FORMAT } from './SingleQueue/MessageDetailsPanel'
 
 interface QueuesRowsProps {
   queues: PostgresQueue[]
+  metrics: PostgresQueueMetric[] | undefined
   filterString: string
 }
 
-export const QueuesRows = ({ queues: fetchedQueues, filterString }: QueuesRowsProps) => {
+export const QueuesRows = ({ queues: fetchedQueues, metrics, filterString }: QueuesRowsProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
 
@@ -40,6 +43,7 @@ export const QueuesRows = ({ queues: fetchedQueues, filterString }: QueuesRowsPr
       {queues.map((q) => {
         const type = q.is_partitioned ? 'Partitioned' : q.is_unlogged ? 'Unlogged' : 'Basic'
 
+        const metric = metrics?.find((m) => m.queue_name === q.queue_name)
 
         return (
           <Table.tr
@@ -60,8 +64,39 @@ export const QueuesRows = ({ queues: fetchedQueues, filterString }: QueuesRowsPr
             <Table.td className="table-cell">
               <p title={q.created_at}>{dayjs(q.created_at).format(DATETIME_FORMAT)}</p>
             </Table.td>
-            <Table.td className="flex items-center justify-end">
-              <ChevronRight />
+            <Table.td className="table-cell">
+              <p>{metric?.queue_length}</p>
+            </Table.td>
+            <Table.td className="table-cell">
+              {metric?.newest_msg_age_sec ? (
+                <p
+                  title={dayjs().subtract(metric.newest_msg_age_sec, 'seconds').format(DATE_FORMAT)}
+                >
+                  {dayjs()
+                    .subtract(metric?.newest_msg_age_sec, 'seconds')
+                    .fromNow()}
+                </p>
+              ) : (
+                'Never'
+              )}
+            </Table.td>
+            <Table.td className="table-cell">
+              {metric?.oldest_msg_age_sec ? (
+                <p
+                  title={dayjs().subtract(metric.oldest_msg_age_sec, 'seconds').format(DATE_FORMAT)}
+                >
+                  {dayjs()
+                    .subtract(metric?.oldest_msg_age_sec, 'seconds')
+                    .fromNow()}
+                </p>
+              ) : (
+                'Never'
+              )}
+            </Table.td>
+            <Table.td>
+              <div className="flex items-center justify-end">
+                <ChevronRight size="18" />
+              </div>
             </Table.td>
           </Table.tr>
         )

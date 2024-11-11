@@ -7,6 +7,7 @@ import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
 import { useQueuesQuery } from 'data/database-queues/database-queues-query'
 import { Search } from 'lucide-react'
 import { useQueryState } from 'nuqs'
@@ -34,6 +35,16 @@ export const QueuesListing = () => {
     connectionString: project?.connectionString,
   })
 
+  const { data: metrics, refetch: refetchMetrics } = useQueuesMetricsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      staleTime: 30 * 1000, // 60 seconds, talk with Oli whether this is ok to call every minute
+    }
+  )
+
   const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -47,6 +58,7 @@ export const QueuesListing = () => {
     // refetch the queues after the pgmq extension has been installed
     if (pgmqExtensionInstalled && isError) {
       refetch()
+      refetchMetrics()
     }
   }, [isError, pgmqExtensionInstalled, refetch])
 
@@ -101,10 +113,21 @@ export const QueuesListing = () => {
                   <Table.th key="created_at" className="table-cell">
                     Created at
                   </Table.th>
+                  <Table.th key="created_at" className="table-cell">
+                    Current queue size
+                  </Table.th>
+                  <Table.th key="created_at" className="table-cell">
+                    Oldest message enqueued at
+                  </Table.th>
+                  <Table.th key="created_at" className="table-cell">
+                    Newest message enqueued at
+                  </Table.th>
                   <Table.th key="buttons" className="table-cell"></Table.th>
                 </>
               }
-              body={<QueuesRows queues={queues} filterString={searchQuery || ''} />}
+              body={
+                <QueuesRows queues={queues} metrics={metrics} filterString={searchQuery || ''} />
+              }
             />
           </div>
         )}
