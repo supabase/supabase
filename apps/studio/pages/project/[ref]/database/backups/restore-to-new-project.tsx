@@ -104,7 +104,6 @@ const RestoreToNewProject = () => {
     error,
     isLoading: cloneBackupsLoading,
     isError,
-    isSuccess,
   } = useCloneBackupsQuery(
     {
       projectRef: project?.ref,
@@ -119,7 +118,6 @@ const RestoreToNewProject = () => {
 
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadPhysicalBackups = useCheckPermissions(PermissionAction.READ, 'physical_backups')
-  const hasBackups = !!data?.backups.length
   const canTriggerPhysicalBackups = useCheckPermissions(
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
@@ -131,6 +129,7 @@ const RestoreToNewProject = () => {
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
   const { data: cloneStatus } = useCloneStatusQuery({ projectRef: project?.ref })
+  const lastClone = cloneStatus?.cloned?.[cloneStatus?.cloned?.length - 1]
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
@@ -140,7 +139,7 @@ const RestoreToNewProject = () => {
   /**
    * New project will have the same compute size and disk size as the original project
    */
-  function getNewProjectSpecs() {
+  function getAdditionalMonthlySpend() {
     const currentProjectComputeSize = project?.infra_compute_size
     if (!currentProjectComputeSize) {
       return null
@@ -203,17 +202,23 @@ const RestoreToNewProject = () => {
   }
 
   function AdditionalMonthlySpend() {
-    const newProjectSpecs = getNewProjectSpecs()
-    if (!newProjectSpecs) {
+    const additionalMonthlySpend = getAdditionalMonthlySpend()
+    if (!additionalMonthlySpend) {
       return null
     }
 
     return (
       <div className="text-sm text-foreground-lighter border-t p-5">
-        <p>The new project will have the same compute size and disk size as this project.</p>
+        <p>
+          The new project will have the same compute size and disk size as this project. You will be
+          able to update the compute size and disk size after the new project is created in{' '}
+          <span className="font-mono text-xs tracking-tighter text-foreground-light">
+            Project Settings &gt; Compute and Disk
+          </span>
+        </p>
         <div className="flex justify-between text-foreground mt-2">
-          <p>Additional monthly compute cost</p>
-          <p className="font-mono text-right text-brand">${newProjectSpecs.priceMonthly}</p>
+          <p>Additional Monthly Compute + Disk Cost</p>
+          <p className="font-mono text-right text-brand">${additionalMonthlySpend.priceMonthly}</p>
         </div>
       </div>
     )
@@ -525,6 +530,7 @@ const RestoreToNewProject = () => {
             <BackupsEmpty />
           ) : (
             <div className="divide-y">
+              <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre>
               {data?.backups.map((backup) => (
                 <div className="flex p-4 gap-4" key={backup.id}>
                   <div>
