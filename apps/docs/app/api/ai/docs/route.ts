@@ -10,7 +10,8 @@ export const runtime = 'edge'
   Reference for Vercel regions: https://vercel.com/docs/edge-network/regions#region-list
   Reference for OpenAI regions: https://help.openai.com/en/articles/5347006-openai-api-supported-countries-and-territories
   */
-export const preferredRegion = [ 'arn1',
+export const preferredRegion = [
+  'arn1',
   'bom1',
   'cdg1',
   'cle1',
