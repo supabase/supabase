@@ -4857,7 +4857,7 @@ export interface components {
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
-      cloned: components['schemas']['TargetCloneStatus']
+      cloned: components['schemas']['TargetCloneStatus'][]
       id: number
       ref: string
     }
@@ -5762,14 +5762,17 @@ export interface components {
         | 'REFERENCES'
         | 'TRIGGER'
     }
+    TargetClonedProject: {
+      ref: string
+    }
     TargetCloneStatus: {
-      inserted_at: string
+      inserted_at: string | null
       project_id: number
       /** @enum {string} */
       status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
+      target_project: components['schemas']['TargetClonedProject']
       target_project_id: number
-      target_project_ref: string
-      updated_at: string
+      updated_at: string | null
     }
     TaxId: {
       country: string

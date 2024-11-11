@@ -52,7 +52,6 @@ import { debounce } from 'lodash'
 import generator from 'generate-password-browser'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
-import { PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import dayjs from 'dayjs'
 import { instanceSizeSpecs } from 'data/projects/new-project.constants'
@@ -129,7 +128,7 @@ const RestoreToNewProject = () => {
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
   const { data: cloneStatus } = useCloneStatusQuery({ projectRef: project?.ref })
-  const lastClone = cloneStatus?.cloned?.[cloneStatus?.cloned?.length - 1]
+  const lastClone = cloneStatus?.cloned[cloneStatus?.cloned.length - 1]
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
@@ -303,7 +302,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (cloneStatus?.status === 'FAILED') {
+  if (lastClone?.status === 'FAILED') {
     return (
       <Admonition
         type="destructive"
@@ -321,7 +320,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (cloneStatus?.status === 'COMPLETED') {
+  if (lastClone?.status === 'COMPLETED') {
     return (
       <Admonition
         type="default"
@@ -330,7 +329,7 @@ const RestoreToNewProject = () => {
           <>
             The new project has been created.
             <br />
-            <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
+            <Link className="underline" href={`/project/${lastClone?.target_project.ref}`}>
               Go to new project
             </Link>
           </>
@@ -339,7 +338,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (cloneStatus?.status === 'IN_PROGRESS') {
+  if (lastClone?.status === 'IN_PROGRESS') {
     return (
       <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
         <Loader2 className="animate-spin" />
@@ -347,7 +346,7 @@ const RestoreToNewProject = () => {
         <AlertDescription_Shadcn_>
           The new project is being created.
           <br />
-          <Link className="underline" href={`/project/${cloneStatus?.target.ref}`}>
+          <Link className="underline" href={`/project/${lastClone?.target_project.ref}`}>
             Go to new project
           </Link>
         </AlertDescription_Shadcn_>
@@ -525,33 +524,35 @@ const RestoreToNewProject = () => {
           latestAvailableBackup={dayjs(backups?.physicalBackupData.latestPhysicalBackupDateUnix)}
         />
       ) : (
-        <Panel>
-          {data?.backups.length === 0 ? (
-            <BackupsEmpty />
-          ) : (
-            <div className="divide-y">
-              <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre>
-              {data?.backups.map((backup) => (
-                <div className="flex p-4 gap-4" key={backup.id}>
-                  <div>
-                    <TimestampInfo value={backup.inserted_at} />
+        <>
+          <Panel>
+            {data?.backups.length === 0 ? (
+              <BackupsEmpty />
+            ) : (
+              <div className="divide-y">
+                {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
+                {data?.backups.map((backup) => (
+                  <div className="flex p-4 gap-4" key={backup.id}>
+                    <div>
+                      <TimestampInfo value={backup.inserted_at} />
+                    </div>
+                    <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                    <Button
+                      className="ml-auto"
+                      type="outline"
+                      onClick={() => {
+                        setSelectedBackupId(backup.id)
+                        setShowConfirmationDialog(true)
+                      }}
+                    >
+                      Restore
+                    </Button>
                   </div>
-                  <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                  <Button
-                    className="ml-auto"
-                    type="outline"
-                    onClick={() => {
-                      setSelectedBackupId(backup.id)
-                      setShowConfirmationDialog(true)
-                    }}
-                  >
-                    Restore
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
-        </Panel>
+                ))}
+              </div>
+            )}
+          </Panel>
+        </>
       )}
     </>
   )
