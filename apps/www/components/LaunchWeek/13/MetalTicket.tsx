@@ -11,6 +11,7 @@ import { useParams } from 'common'
 const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco Sansalvadore' }) => {
   const params = useParams()
   const canvasRef = useRef<HTMLDivElement>(null)
+  const ticketRef = useRef<THREE.Mesh | null>(null)
   const orbitRef = useRef<THREE.Object3D | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
@@ -21,7 +22,8 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
     if (!canvasRef.current) return
 
     const isDesktop = () => window.innerWidth > 768
-    const canvasWidth = isDesktop() ? window.innerWidth : window.innerWidth
+    const desktopWidth = () => (window.innerWidth / 2) * 3
+    const canvasWidth = isDesktop() ? desktopWidth() : window.innerWidth
     const canvasHeight = window.innerHeight
 
     // Initialize scene, camera, and renderer
@@ -63,6 +65,7 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
     })
 
     let ticket3DImport: THREE.Mesh
+    const ticketGroup = new THREE.Group()
 
     loader.load('/images/launchweek/13/ticket/3D-ticket-cutout-no-holes.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
@@ -76,7 +79,9 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
         }
       })
 
-      scene.add(ticket3DImport)
+      ticketGroup.add(ticket3DImport)
+      scene.add(ticketGroup)
+      ticketRef.current = ticket3DImport
       camera.lookAt(ticket3DImport.position)
 
       // Load font and add text geometry
@@ -100,7 +105,8 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
           textMesh.updateMatrix()
           textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
           textMesh.castShadow = true
-          scene.add(textMesh)
+          // scene.add(textMesh)
+          ticketGroup.add(textMesh)
         })
 
         const footerContent = [
@@ -126,12 +132,25 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
           textMesh.updateMatrix()
           textMesh.position.set(line.position.x, line.position.y, line.position.z)
           textMesh.castShadow = true
-          scene.add(textMesh)
+          ticketGroup.add(textMesh)
         })
       })
     })
 
     camera.position.z = 30
+
+    const getTicketScreenPosition = () => {
+      if (!ticketRef.current) return null
+
+      const vector = new THREE.Vector3()
+      ticketRef.current.getWorldPosition(vector)
+      vector.project(camera)
+
+      const x = (vector.x * 0.5 + 0.5) * canvasWidth
+      const y = -(vector.y * 0.5 - 0.5) * canvasHeight
+
+      return { x, y }
+    }
 
     // Animation function with smooth transitions
     const animate = () => {
@@ -162,9 +181,14 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
       const centerX = canvasRect.left + canvasRect.width / 2
       const centerY = canvasRect.top + canvasRect.height / 2
 
+      const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
+      // if (!ticketPosition) return
+
       // Calculate distance from cursor to center
-      const deltaX = e.clientX - centerX
-      const deltaY = e.clientY - centerY
+      // const deltaX = e.clientX - centerX
+      // const deltaY = e.clientY - centerY
+      const deltaX = e.clientX - (canvasRect.left + ticketPosition.x)
+      const deltaY = e.clientY - (canvasRect.top + ticketPosition.y)
       const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
       // Maximum distance for sensitivity calculation (diagonal of the canvas)
@@ -183,15 +207,13 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
     // Reset handler with smooth transition
     const resetRotation = () => {
       targetRotation.current = { x: 0, y: 0 }
-      console.log('out')
     }
 
     // Handle window resize
     const handleResize = () => {
-      const newWidth = isDesktop() ? window.innerWidth : window.innerWidth
+      const newWidth = isDesktop() ? desktopWidth() : window.innerWidth
       camera.aspect = newWidth / window.innerHeight
       camera.updateProjectionMatrix()
-      ticket3DImport.position.x = isDesktop() ? 10 : 0
       renderer.setSize(newWidth, window.innerHeight)
     }
 
@@ -215,7 +237,7 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
   }, [params])
 
   return (
-    <div className="relative flex justify-end items-center max-h-screen bg-alternative overflow-hidden">
+    <div className="w-screen relative flex justify-end items-center max-h-screen bg-alternative overflow-hidden">
       <div ref={canvasRef} className="w-full h-full" />
     </div>
   )
