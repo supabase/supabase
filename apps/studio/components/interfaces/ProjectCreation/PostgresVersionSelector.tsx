@@ -17,6 +17,8 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Admonition } from 'ui-patterns'
+import { DocsButton } from 'components/ui/DocsButton'
 
 type ReleaseChannel = components['schemas']['ReleaseChannel']
 type PostgresEngine = components['schemas']['PostgresEngine']
@@ -60,6 +62,9 @@ export const PostgresVersionSelector = ({
     organizationSlug,
   })
 
+  // [Joshen TODO Oriole] Hook this up properly
+  const isOrioleDbSelected = true
+
   useEffect(() => {
     const defaultValue = data?.available_versions?.[0]
       ? formatValue(data.available_versions[0])
@@ -97,6 +102,17 @@ export const PostgresVersionSelector = ({
           </SelectGroup_Shadcn_>
         </SelectContent_Shadcn_>
       </Select_Shadcn_>
+      {isOrioleDbSelected && (
+        <Admonition
+          type="warning"
+          className="mt-2"
+          title="OrioleDB is not production ready"
+          description="Postgres with OrioleDB is currently in preview. We do not recommend using it for production."
+        >
+          {/* [Joshen TODO Oriole] Proper docs URL */}
+          <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+        </Admonition>
+      )}
     </FormItemLayout>
   )
 }

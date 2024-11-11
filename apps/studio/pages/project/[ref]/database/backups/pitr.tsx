@@ -6,6 +6,7 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -14,10 +15,12 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { AlertCircle } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -47,6 +50,8 @@ DatabasePhysicalBackups.getLayout = (page) => (
 const PITR = () => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+  const isOrioleDb = useIsOrioleDb()
+
   const {
     data: backups,
     error,
@@ -68,6 +73,18 @@ const PITR = () => {
 
   if (isPermissionsLoaded && !canReadPhysicalBackups) {
     return <NoPermission resourceText="view PITR backups" />
+  }
+
+  if (isOrioleDb) {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for OrioleDB"
+        description="OrioleDB is currently in preview and projects created are strictly ephemeral with no database backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+      </Admonition>
+    )
   }
 
   return (
