@@ -423,7 +423,8 @@ Each connection is assigned a unique `sso_provider_id`, which is included in the
 This setup allows you to implement multi-tenant SSO for multiple clients or organizations within a single application. For example, if you have an app with multiple clients using different Azure Active Directories, you can create separate SAML connections for each and use the `sso_provider_id` to manage access and apply appropriate security policies.
 
 ### Is multi-subdomain SSO with SAML supported?
-Yes, also referred to as [cross-origin authentication within the same site](https://web.dev/articles/same-site-same-origin). To redirect to a URL other than the [Site URL](https://supabase.com/docs/guides/auth/redirect-urls), following the SAML response from the IdP, the  `redirectTo` option can be added to [`signInWithSSO`](https://supabase.com/docs/reference/javascript/auth-signinwithsso). 
+
+Yes, also referred to as [cross-origin authentication within the same site](https://web.dev/articles/same-site-same-origin). To redirect to a URL other than the [Site URL](https://supabase.com/docs/guides/auth/redirect-urls), following the SAML response from the IdP, the `redirectTo` option can be added to [`signInWithSSO`](https://supabase.com/docs/reference/javascript/auth-signinwithsso).
 
 ```ts
   const { data, error } = await supabase.auth.signInWithSSO({
@@ -441,25 +442,24 @@ When redirecting to a URL other than the Site URL, a `/callback` endpoint is nec
 <TabPanel id="sveltekit" label="SvelteKit">
 
 ```ts
-import { error, redirect } from "@sveltejs/kit";
-import type { RequestHandler } from "./$types";
+import { error, redirect } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-    const code = url.searchParams.get("code");
+  const code = url.searchParams.get('code')
 
-    if (!code) {
-        error(400, "No authorization code provided");
-    }
+  if (!code) {
+    error(400, 'No authorization code provided')
+  }
 
-    const { error: tokenExchangeError } = await locals.supabase.auth
-        .exchangeCodeForSession(code);
+  const { error: tokenExchangeError } = await locals.supabase.auth.exchangeCodeForSession(code)
 
-    if (tokenExchangeError) {
-        error(400, "Failed to exchange authorization code for session");
-    }
+  if (tokenExchangeError) {
+    error(400, 'Failed to exchange authorization code for session')
+  }
 
-    redirect(303, "/");
-};
+  redirect(303, '/')
+}
 ```
 
 </TabPanel>
