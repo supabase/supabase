@@ -917,6 +917,12 @@ export interface paths {
     /** Modify database disk */
     post: operations['DiskController_modifyDisk']
   }
+  '/platform/projects/{ref}/disk/custom-config': {
+    /** Gets disk autoscale config */
+    get: operations['DiskController_getDiskAutoscaleConfig']
+    /** Updates disk autoscale config */
+    post: operations['DiskController_updateDiskAutoscaleConfig']
+  }
   '/platform/projects/{ref}/disk/util': {
     /** Get disk utilization */
     get: operations['DiskController_getDiskUtilization']
@@ -1256,6 +1262,12 @@ export interface paths {
     get: operations['SystemProjectDiskController_getDisk']
     /** Modify database disk */
     post: operations['SystemProjectDiskController_modifyDisk']
+  }
+  '/system/projects/{ref}/disk/custom-config': {
+    /** Gets disk autoscale config */
+    get: operations['SystemProjectDiskController_getDiskAutoscaleConfig']
+    /** Updates disk autoscale config */
+    post: operations['SystemProjectDiskController_updateDiskAutoscaleConfig']
   }
   '/system/projects/{ref}/disk/util': {
     /** Get disk utilization */
@@ -1869,6 +1881,12 @@ export interface paths {
     get: operations['DiskController_getDisk']
     /** Modify database disk */
     post: operations['DiskController_modifyDisk']
+  }
+  '/v0/projects/{ref}/disk/custom-config': {
+    /** Gets disk autoscale config */
+    get: operations['DiskController_getDiskAutoscaleConfig']
+    /** Updates disk autoscale config */
+    post: operations['DiskController_updateDiskAutoscaleConfig']
   }
   '/v0/projects/{ref}/disk/util': {
     /** Get disk utilization */
@@ -3392,6 +3410,14 @@ export interface components {
     DetachPaymentMethodBody: {
       card_id: string
     }
+    DiskAutoscaleConfig: {
+      /** @description Growth percentage for disk autoscaling */
+      growth_percent?: number | null
+      /** @description Maximum limit the disk size will grow to in GB */
+      max_size_gb?: number | null
+      /** @description Minimum increment size for disk autoscaling in GB */
+      min_increment_gb?: number | null
+    }
     DiskRequestAttributesGP3: {
       iops: number
       size_gb: number
@@ -4826,15 +4852,14 @@ export interface components {
       db_schema: string
       endpoint: string
     }
+    ProjectClonedResponse: {
+      source_project_ref: string
+      target_project_ref: string
+    }
     ProjectClonedStatusResponse: {
-      inserted_at: string
-      project_id: number
-      source: components['schemas']['RefString']
-      /** @enum {string} */
-      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
-      target: components['schemas']['RefString']
-      target_project_id: number
-      updated_at: string
+      cloned: components['schemas']['TargetCloneStatus']
+      id: number
+      ref: string
     }
     ProjectCreationVersionInfo: {
       postgres_engine: components['schemas']['PostgresEngine']
@@ -4864,7 +4889,6 @@ export interface components {
       inserted_at: string
       is_branch_enabled: boolean
       is_physical_backups_enabled: boolean
-      kpsVersion?: string
       lastDatabaseResizeAt?: string
       maxDatabasePreprovisionGb?: number
       name: string
@@ -4873,7 +4897,6 @@ export interface components {
       ref: string
       region: string
       restUrl: string
-      serviceVersions?: components['schemas']['ServiceVersions']
       /** @enum {string} */
       status:
         | 'ACTIVE_HEALTHY'
@@ -5115,9 +5138,6 @@ export interface components {
     }
     RealtimeHealthResponse: {
       connected_cluster: number
-    }
-    RefString: {
-      ref: string
     }
     Relationship: {
       constraint_name: string
@@ -5742,6 +5762,15 @@ export interface components {
         | 'REFERENCES'
         | 'TRIGGER'
     }
+    TargetCloneStatus: {
+      inserted_at: string
+      project_id: number
+      /** @enum {string} */
+      status: 'COMPLETED' | 'IN_PROGRESS' | 'FAILED' | 'REMOVED'
+      target_project_id: number
+      target_project_ref: string
+      updated_at: string
+    }
     TaxId: {
       country: string
       type: string
@@ -6089,6 +6118,23 @@ export interface components {
         | '3_challenge_verified'
         | '4_origin_setup_completed'
         | '5_services_reconfigured'
+    }
+    UpdateDiskAutoscaleConfig: {
+      /**
+       * @description Growth percentage for disk autoscaling
+       * @default 50
+       */
+      growth_percent?: number | null
+      /**
+       * @description Maximum limit the disk size will grow to in GB
+       * @default 61440
+       */
+      max_size_gb?: number | null
+      /**
+       * @description Minimum increment size for disk autoscaling in GB
+       * @default 4
+       */
+      min_increment_gb?: number | null
     }
     UpdateFunctionBody: {
       args?: string[]
@@ -7862,7 +7908,9 @@ export interface operations {
     }
     responses: {
       201: {
-        content: never
+        content: {
+          'application/json': components['schemas']['ProjectClonedResponse']
+        }
       }
       /** @description Failed to clone the current project */
       500: {
@@ -13040,6 +13088,57 @@ export interface operations {
       }
     }
   }
+  /** Gets disk autoscale config */
+  DiskController_getDiskAutoscaleConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskAutoscaleConfig']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project disk autoscale config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates disk autoscale config */
+  DiskController_updateDiskAutoscaleConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDiskAutoscaleConfig']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['DiskAutoscaleConfig']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project disk autoscale config */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Get disk utilization */
   DiskController_getDiskUtilization: {
     parameters: {
@@ -14945,6 +15044,57 @@ export interface operations {
         content: never
       }
       /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets disk autoscale config */
+  SystemProjectDiskController_getDiskAutoscaleConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskAutoscaleConfig']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project disk autoscale config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates disk autoscale config */
+  SystemProjectDiskController_updateDiskAutoscaleConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDiskAutoscaleConfig']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['DiskAutoscaleConfig']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project disk autoscale config */
       500: {
         content: never
       }
