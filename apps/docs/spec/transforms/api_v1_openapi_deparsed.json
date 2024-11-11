@@ -4488,6 +4488,9 @@
               }
             }
           },
+          "403": {
+            "description": ""
+          },
           "500": {
             "description": "Failed to retrieve project's service health status"
           }
@@ -4720,6 +4723,9 @@
                     "statement_timeout": {
                       "type": "string"
                     },
+                    "track_commit_timestamp": {
+                      "type": "boolean"
+                    },
                     "wal_keep_size": {
                       "type": "string"
                     },
@@ -4835,6 +4841,9 @@
                   "statement_timeout": {
                     "type": "string"
                   },
+                  "track_commit_timestamp": {
+                    "type": "boolean"
+                  },
                   "wal_keep_size": {
                     "type": "string"
                   },
@@ -4926,6 +4935,9 @@
                     },
                     "statement_timeout": {
                       "type": "string"
+                    },
+                    "track_commit_timestamp": {
+                      "type": "boolean"
                     },
                     "wal_keep_size": {
                       "type": "string"
@@ -11882,6 +11894,9 @@
           "statement_timeout": {
             "type": "string"
           },
+          "track_commit_timestamp": {
+            "type": "boolean"
+          },
           "wal_keep_size": {
             "type": "string"
           },
@@ -11962,6 +11977,9 @@
           },
           "statement_timeout": {
             "type": "string"
+          },
+          "track_commit_timestamp": {
+            "type": "boolean"
           },
           "wal_keep_size": {
             "type": "string"

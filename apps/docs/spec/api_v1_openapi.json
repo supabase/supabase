@@ -1540,6 +1540,7 @@
               }
             }
           },
+          "403": { "description": "" },
           "500": { "description": "Failed to retrieve project's service health status" }
         },
         "tags": ["Projects"],
@@ -3461,6 +3462,7 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
           "statement_timeout": { "type": "string" },
+          "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
           "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
@@ -3487,6 +3489,7 @@
           "max_worker_processes": { "type": "integer", "minimum": 0, "maximum": 262143 },
           "shared_buffers": { "type": "string" },
           "statement_timeout": { "type": "string" },
+          "track_commit_timestamp": { "type": "boolean" },
           "wal_keep_size": { "type": "string" },
           "wal_sender_timeout": { "type": "string" },
           "work_mem": { "type": "string" },
