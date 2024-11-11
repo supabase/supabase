@@ -8,16 +8,15 @@ export const QUEUE_TYPES = [
     description: 'Create a basic queue.',
   },
   {
-    value: 'partitioned',
-    icon: <Rows3 strokeWidth={1} />,
-    label: 'Partitioned queue',
-    description: 'Create a partitioned queue which is optimized for large amount of messages',
-  },
-
-  {
     value: 'unlogged',
     icon: <Rows2 strokeWidth={1} />,
     label: 'Unlogged queue',
     description: 'Creates an unlogged queue which loses all data on database restart.',
+  },
+  {
+    value: 'partitioned',
+    icon: <Rows3 strokeWidth={1} />,
+    label: 'Partitioned queue',
+    description: 'Create a partitioned queue which is optimized for large amount of messages',
   },
 ] as const
