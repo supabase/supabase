@@ -197,7 +197,7 @@ export const MessageDetailsPanel = ({
                       deleteMessage({
                         projectRef: project!.ref,
                         connectionString: project?.connectionString,
-                        queryName: queueName!,
+                        queueName: queueName!,
                         messageId: selectedMessage.msg_id,
                       })
                     },

@@ -1,16 +1,26 @@
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import DeleteQueue from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
+import PurgeQueue from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
 import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueDataGrid'
 import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
 import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
 import type { NextPageWithLayout } from 'types'
-import { Button, LoadingLine } from 'ui'
+import {
+  Breadcrumb_Shadcn_,
+  BreadcrumbItem_Shadcn_,
+  BreadcrumbLink_Shadcn_,
+  BreadcrumbList_Shadcn_,
+  BreadcrumbPage_Shadcn_,
+  BreadcrumbSeparator_Shadcn_,
+  Button,
+  LoadingLine,
+} from 'ui'
 
 const QueueMessagesPage: NextPageWithLayout = () => {
   // TODO: Change this to the correct permissions
@@ -23,6 +33,7 @@ const QueueMessagesPage: NextPageWithLayout = () => {
 
   const { name: queueName } = useParams()
   const { project } = useProjectContext()
+  const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)
   const [deleteQueueModalShown, setDeleteQueueModalShown] = useState(false)
   const [selectedTypes, setSelectedTypes] = useState<QUEUE_MESSAGE_TYPE[]>([])
 
@@ -38,21 +49,38 @@ const QueueMessagesPage: NextPageWithLayout = () => {
   )
   const messages = useMemo(() => data?.pages.flatMap((p) => p), [data?.pages])
 
-  if (isLoading && isError) {
+  if (isError) {
     return null
   }
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
-        className="py-4 px-6 !mb-0"
-        title={`Queue ${queueName}`}
-        actions={
+      <div className="flex items-center justify-between gap-x-4 py-4 px-6 mb-0">
+        <div className="space-y-1 flex-shrink">
+          <Breadcrumb_Shadcn_>
+            <BreadcrumbList_Shadcn_>
+              <BreadcrumbItem_Shadcn_>
+                <BreadcrumbLink_Shadcn_ asChild className="text-xl">
+                  <Link href={`/project/${project?.ref}/integrations/queues`}>Queues</Link>
+                </BreadcrumbLink_Shadcn_>
+              </BreadcrumbItem_Shadcn_>
+              <BreadcrumbSeparator_Shadcn_ />
+              <BreadcrumbItem_Shadcn_>
+                <BreadcrumbPage_Shadcn_ className="text-xl">{queueName}</BreadcrumbPage_Shadcn_>
+              </BreadcrumbItem_Shadcn_>
+            </BreadcrumbList_Shadcn_>
+          </Breadcrumb_Shadcn_>
+        </div>
+        <div className="flex items-center gap-x-2">
+          <Button type="warning" onClick={() => setDeleteQueueModalShown(true)}>
+            Purge the queue
+          </Button>
           <Button type="danger" onClick={() => setDeleteQueueModalShown(true)}>
             Delete the queue
           </Button>
-        }
-      />
+          {/* <DocsButton href={docsUrl} />} */}
+        </div>
+      </div>
 
       <QueueFilters selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes} />
       <LoadingLine loading={isFetching} />
@@ -65,6 +93,11 @@ const QueueMessagesPage: NextPageWithLayout = () => {
         queueName={queueName!}
         visible={deleteQueueModalShown}
         onClose={() => setDeleteQueueModalShown(false)}
+      />
+      <PurgeQueue
+        queueName={queueName!}
+        visible={purgeQueueModalShown}
+        onClose={() => setPurgeQueueModalShown(false)}
       />
     </div>
   )

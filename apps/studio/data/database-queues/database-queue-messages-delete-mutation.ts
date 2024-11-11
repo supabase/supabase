@@ -8,20 +8,20 @@ import { databaseQueuesKeys } from './keys'
 export type DatabaseQueueMessageDeleteVariables = {
   projectRef: string
   connectionString?: string
-  queryName: string
+  queueName: string
   messageId: number
 }
 
 export async function deleteDatabaseQueueMessage({
   projectRef,
   connectionString,
-  queryName,
+  queueName,
   messageId,
 }: DatabaseQueueMessageDeleteVariables) {
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.delete('${queryName}', ${messageId})`,
+    sql: `SELECT * FROM pgmq.delete('${queueName}', ${messageId})`,
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -50,9 +50,9 @@ export const useDatabaseQueueMessageDeleteMutation = ({
     DatabaseQueueMessageDeleteVariables
   >((vars) => deleteDatabaseQueueMessage(vars), {
     async onSuccess(data, variables, context) {
-      const { projectRef, queryName } = variables
+      const { projectRef, queueName } = variables
       await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
+        databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
       )
       await onSuccess?.(data, variables, context)
     },
