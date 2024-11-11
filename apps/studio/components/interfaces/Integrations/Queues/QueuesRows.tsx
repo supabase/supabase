@@ -38,7 +38,8 @@ export const QueuesRows = ({ queues: fetchedQueues, filterString }: QueuesRowsPr
   return (
     <>
       {queues.map((q) => {
-        const type = q.is_partitioned ? 'Partitioned' : q.is_unlogged ? 'Unlogged' : 'Regular'
+        const type = q.is_partitioned ? 'Partitioned' : q.is_unlogged ? 'Unlogged' : 'Basic'
+
 
         return (
           <Table.tr
