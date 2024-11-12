@@ -17,7 +17,9 @@ import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
+  FormLabel_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -43,6 +45,7 @@ import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
+import { InfoIcon } from 'lucide-react'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -229,10 +232,14 @@ export const CreateCronJobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
+
+                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs flex items-center gap-x-1 absolute top-0 right-0 ">
+                        * cannot be changed after creation
+                      </FormLabel_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
