@@ -3,11 +3,11 @@ import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQuer
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { ReactNode, useMemo, useState } from 'react'
-import { Button, Separator } from 'ui'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, Separator } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
-import TableEditorMenu from './TableEditorMenu'
-import { SQLEditorMenu } from './SQLEditorMenu'
 import { ExplorerTabs } from '../tabs/explorer-tabs'
+import { SQLEditorMenu } from './SQLEditorMenu'
+import TableEditorMenu from './TableEditorMenu'
 
 export interface ExplorerLayoutProps {
   children: ReactNode
@@ -22,19 +22,25 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
 
   const productMenu = useMemo(
     () => (
-      <>
-        <TableEditorMenu />
-        <Separator />
-        <SQLEditorMenu
-          key="sql-editor-menu"
-          onViewOngoingQueries={() => setShowOngoingQueries(true)}
-        />
+      <ResizablePanelGroup direction="vertical">
+        <ResizablePanel defaultSize={40}>
+          <TableEditorMenu />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={40}>
+          <SQLEditorMenu
+            key="sql-editor-menu"
+            onViewOngoingQueries={() => setShowOngoingQueries(true)}
+          />
+        </ResizablePanel>
+        <ResizableHandle />
+
         <div className="p-4 border-t sticky bottom-0 bg-studio">
           <Button block type="default" onClick={() => setShowOngoingQueries(true)}>
             View running queries
           </Button>
         </div>
-      </>
+      </ResizablePanelGroup>
     ),
     []
   )

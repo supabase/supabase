@@ -117,7 +117,7 @@ const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="h-[400px] flex flex-col flex-grow gap-5 pt-2">
+      <div className="h-full flex flex-col flex-grow gap-5 py-2">
         <div className="px-4 flex justify-between items-center">
           <h2 className="text-sm">Postgres</h2>
           <div className="flex items-center gap-1">
@@ -186,7 +186,7 @@ const TableEditorMenu = () => {
         {/* )} */}
         {/* </div> */}
         {/* </div> */}
-        <div className="flex flex-auto flex-col gap-2 pb-4">
+        <div className="flex flex-auto flex-col gap-2">
           <InnerSideBarFilters className="px-4">
             <InnerSideBarFilterSearchInput
               name="search-tables"
@@ -297,7 +297,7 @@ const TableEditorMenu = () => {
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
-                  className="mx-2"
+                  className="mx-4"
                   title="No entities available"
                   description="This schema has no entities available yet"
                 />
