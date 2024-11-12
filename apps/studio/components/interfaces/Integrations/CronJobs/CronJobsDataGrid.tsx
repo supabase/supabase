@@ -23,6 +23,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
 import DeleteCronJob from './DeleteCronJob'
 import { Jobs } from 'openai/resources/fine-tuning/jobs'
+import { DocsButton } from 'components/ui/DocsButton'
+import { CronJobsFormHeader } from './CronJobsFormHeader'
 
 interface CronJobsDataGridProps {
   jobState: { jobId: string; selectedJob: CronJob | null }
@@ -171,7 +173,7 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
         autoSaveId="cron-jobs-layout"
       >
         <div className="h-full flex flex-col w-full">
-          <FormHeader className="py-4 px-6 !mb-0" title="Cron Jobs" />
+          <CronJobsFormHeader />
           {/* turn this into tabs  */}
           <div className="flex items-center gap-2 px-6">
             Jobs

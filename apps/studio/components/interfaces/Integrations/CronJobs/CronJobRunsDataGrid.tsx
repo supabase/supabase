@@ -1,5 +1,5 @@
 import { ChevronRight, Eye, Timer } from 'lucide-react'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -16,10 +16,13 @@ import {
   HoverCard_Shadcn_,
   HoverCardTrigger_Shadcn_,
   HoverCardContent_Shadcn_,
+  Separator,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { calculateDuration } from './CronJobs.utils'
 import { formatDate } from './CronJobs.utils'
+import { DocsButton } from 'components/ui/DocsButton'
+import { CronJobsFormHeader } from './CronJobsFormHeader'
 
 type CronJobRun = {
   jobid: number
@@ -42,6 +45,9 @@ interface CronJobsDataGridProps {
 
 const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGridProps) => {
   const { project } = useProjectContext()
+  const router = useRouter()
+
+  const gridRef = useRef<DataGridHandle>(null)
 
   const { data: cronJobs, isLoading } = useCronJobRunsQuery({
     projectRef: project?.ref,
@@ -49,8 +55,9 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
     jobId,
   })
 
-  const gridRef = useRef<DataGridHandle>(null)
-  const router = useRouter()
+  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
+    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
+  >()
 
   const cronJobColumns = [
     {
@@ -153,9 +160,9 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
         autoSaveId="cron-jobs-layout"
       >
         <div className="h-full flex flex-col w-full">
-          <FormHeader className="py-4 px-6 !mb-0" title="Cron Jobs" />
+          <CronJobsFormHeader />
           {/* turn this into some kind of proper tabs?  */}
-          <div className="flex items-end px-6 justify-between">
+          <div className="flex items-center px-6">
             <div className="flex items-center gap-2">
               <button onClick={() => updateJobState('', null)}>Jobs</button>
               {jobState.selectedJob && (
@@ -168,15 +175,21 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
                 </>
               )}
             </div>
-            <div className="flex items-center gap-6">
-              <div className="grid gap-1">
-                <span className="uppercase text-xs text-foreground-lighter">Command</span>
-
-                <HoverCard_Shadcn_>
+            <Separator orientation="vertical" className="ml-6 h-6" />
+            <div className="flex items-center gap-6 ml-6">
+              <div className="flex items-center gap-1">
+                <span className="text-foreground-light text-sm">
+                  {jobState.selectedJob?.schedule}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <HoverCard_Shadcn_ openDelay={200}>
                   <HoverCardTrigger_Shadcn_ asChild className="cursor-pointer">
-                    <span className="font-mono p-2 bg-200 rounded-md text-sm flex items-center gap-2">
+                    <span className="font-mono p-1 bg-200 rounded-md text-sm flex items-center gap-2">
                       <Eye size={12} className="text-foreground-lighter" />
-                      <span className="truncate max-w-36">{jobState.selectedJob?.command}</span>
+                      <span className="text-foreground-light text-sm truncate max-w-36">
+                        {jobState.selectedJob?.command}
+                      </span>
                     </span>
                   </HoverCardTrigger_Shadcn_>
                   <HoverCardContent_Shadcn_>
@@ -185,12 +198,6 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
                     </span>
                   </HoverCardContent_Shadcn_>
                 </HoverCard_Shadcn_>
-              </div>
-              <div className="grid gap-1">
-                <span className="uppercase text-xs text-foreground-lighter">Schedule</span>
-                <span className="text-lg text-foreground-light">
-                  {jobState.selectedJob?.schedule}
-                </span>
               </div>
             </div>
           </div>
