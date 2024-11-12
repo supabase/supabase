@@ -15,6 +15,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
@@ -265,7 +266,7 @@ const SidePanelEditor = ({
       ])
 
       await queryClient.invalidateQueries(
-        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
       )
 
       setIsEdited(false)
@@ -473,7 +474,7 @@ const SidePanelEditor = ({
           await Promise.all([
             queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, table.id)),
             queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
+              tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
             ),
             queryClient.invalidateQueries(
               databaseKeys.tableDefinition(project?.ref, selectedTable.id)
@@ -557,7 +558,7 @@ const SidePanelEditor = ({
 
     await Promise.all([
       queryClient.invalidateQueries(
-        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
       ),
     ])
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {

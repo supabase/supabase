@@ -15,7 +15,7 @@ export type RefreshButtonProps = {
 const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = tableRowKeys.tableRows(ref, { table: { id: table.id } })
+  const queryKey = tableRowKeys.tableRowsAndCount(ref, table.id)
 
   async function onClick() {
     await queryClient.invalidateQueries(queryKey)

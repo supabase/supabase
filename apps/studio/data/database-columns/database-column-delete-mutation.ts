@@ -6,6 +6,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 
@@ -63,9 +64,7 @@ export const useDatabaseColumnDeleteMutation = ({
           ...(table !== undefined
             ? [
                 queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
-                queryClient.invalidateQueries(
-                  sqlKeys.query(projectRef, [table.schema, table.name])
-                ),
+                queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id)),
                 queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
                 // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
                 // which has a view dependent on it

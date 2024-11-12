@@ -61,7 +61,7 @@ const TableGridEditor = ({
     async onMutate({ projectRef, table, configuration, payload }) {
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
-      const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+      const queryKey = tableRowKeys.tableRowsAndCount(projectRef, table.id)
 
       await queryClient.cancelQueries(queryKey)
 

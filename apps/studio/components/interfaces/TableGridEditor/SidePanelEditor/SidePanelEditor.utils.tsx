@@ -17,6 +17,7 @@ import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
 import { deleteTable as deleteTableMutation } from 'data/tables/table-delete-mutation'
@@ -741,9 +742,7 @@ export const updateTable = async ({
 
   await Promise.all([
     queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
-    // invalidate list of tables, as well as visible individual tables
-    queryClient.invalidateQueries(['projects', projectRef, 'tables']),
-    queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name])),
+    queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id)),
     queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
   ])
