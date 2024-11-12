@@ -47,30 +47,28 @@ const CronJobsPage: NextPageWithLayout = () => {
       <ScaffoldSection className="h-full">
         <div className="col-span-12 h-full pb-8">
           {pgCronExtensionInstalled && (
-            <div className="w-full space-y-4">
-              <FormHeader
-                title="Cron jobs"
-                description="Schedule and automate tasks like running queries or maintenance routines at specified intervals"
-                actions={
-                  <>
-                    <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
-                    <Button
-                      type="primary"
-                      onClick={() =>
-                        setCreateCronJobSheetShown({
-                          jobname: '',
-                          schedule: '',
-                          command: '',
-                          active: true,
-                        })
-                      }
-                    >
-                      Create a new cron job
-                    </Button>
-                  </>
-                }
-              />
-            </div>
+            <FormHeader
+              title="Cron jobs"
+              description="Schedule and automate tasks like running queries or maintenance routines at specified intervals"
+              actions={
+                <>
+                  <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
+                  <Button
+                    type="primary"
+                    onClick={() =>
+                      setCreateCronJobSheetShown({
+                        jobname: '',
+                        schedule: '',
+                        command: '',
+                        active: true,
+                      })
+                    }
+                  >
+                    Create a new cron job
+                  </Button>
+                </>
+              }
+            />
           )}
           {isLoadingExtensions ? (
             <GenericSkeletonLoader />
