@@ -117,6 +117,7 @@ export const CreateCronJobSheet = ({
   onClose,
 }: CreateCronJobSheetProps) => {
   const isEditing = !!selectedCronJob?.jobname
+
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 

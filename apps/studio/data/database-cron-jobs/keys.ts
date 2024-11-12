@@ -3,4 +3,6 @@ export const databaseCronJobsKeys = {
   delete: () => ['cron-jobs', 'delete'] as const,
   alter: () => ['cronjobs', 'alter'] as const,
   list: (projectRef: string | undefined) => ['projects', projectRef, 'cron-jobs'] as const,
+  runs: (projectRef: string | undefined, jobId: number) =>
+    ['projects', projectRef, 'cron-jobs', jobId] as const,
 }

@@ -120,6 +120,7 @@ export const CronJobsListing = () => {
           />
         </SheetContent>
       </Sheet>
+
       <DeleteCronJob
         visible={!!cronJobForDeletion}
         onClose={() => setCronJobForDeletion(undefined)}

@@ -1,25 +1,54 @@
+import CronJobRunsDataGrid from 'components/interfaces/Integrations/CronJobs/CronJobRunsDataGrid'
+import CronJobsDataGrid from 'components/interfaces/Integrations/CronJobs/CronJobsDataGrid'
 import { CronJobsListing } from 'components/interfaces/Integrations/CronJobs/CronJobsListing'
 import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
+import { useQueryState } from 'nuqs'
+import { useState, useEffect } from 'react'
+import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { ChevronRight } from 'lucide-react'
 
 const CronJobsPage: NextPageWithLayout = () => {
-  // TODO: Change this to the correct permissions
-  // const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
-  // const isPermissionsLoaded = usePermissionsLoaded()
+  const [jobState, setJobState] = useState<{ jobId: string; selectedJob: CronJob | null }>({
+    jobId: '',
+    selectedJob: null,
+  })
 
-  // if (isPermissionsLoaded && !canReadFunctions) {
-  //   return <NoPermission isFullPage resourceText="manage database cron jobs" />
-  // }
+  // store the jobId in the url
+  const [urlCronJob, setUrlCronJob] = useQueryState('jobid', { defaultValue: '' })
+
+  // Sync the jobId from useQueryState with the combined state
+  useEffect(() => {
+    setJobState((prevState) => ({ ...prevState, jobId: urlCronJob }))
+  }, [urlCronJob])
+
+  // Update both jobId and selectedJob
+  function updateJobState(jobId: string, job: CronJob | null) {
+    setJobState({ jobId, selectedJob: job })
+    setUrlCronJob(jobId)
+  }
 
   return (
-    <ScaffoldContainer className="h-full">
-      <ScaffoldSection className="h-full">
-        <div className="col-span-12 h-full pb-8">
-          <CronJobsListing />
-        </div>
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    <>
+      {urlCronJob === '' ? (
+        <CronJobsDataGrid jobState={jobState} updateJobState={updateJobState} />
+      ) : (
+        <CronJobRunsDataGrid
+          jobId={Number(urlCronJob)}
+          jobState={jobState}
+          updateJobState={updateJobState}
+        />
+      )}
+    </>
+
+    // <ScaffoldContainer className="h-full">
+    //   <ScaffoldSection className="h-full">
+    //     <div className="col-span-12 h-full pb-8">
+    //       <CronJobsDataGrid />
+    //     </div>
+    //   </ScaffoldSection>
+    // </ScaffoldContainer>
   )
 }
 
