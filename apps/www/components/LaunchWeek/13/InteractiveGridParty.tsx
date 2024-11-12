@@ -51,7 +51,7 @@ export default function InteractiveGrid() {
     (userId: string | undefined) => {
       if (!userId) {
         console.log('userId is undefined, returning black as fallback.')
-        return '#ffffff' // fallback color
+        return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER // fallback color
       }
 
       // If userId already has a color, return it; otherwise, assign one
@@ -256,16 +256,6 @@ export default function InteractiveGrid() {
         className="border border-gray-300 shadow-lg"
       />
       <div className="absolute top-4 right-4 text-foreground w-40 h-full flex flex-col gap-2 pointer-events-none">
-        <div className="bg-default w-full h-full p-4 rounded-lg border shadow-lg max-h-60 overflow-hidden pointer-events-auto">
-          <h3 className="">Hovered Cells:</h3>
-          <ul className="mt-2 h-full overflow-hidden overflow-y-scroll">
-            {Array.from(hoveredCells.entries()).map(([cell, state]) => (
-              <li key={cell}>
-                {cell} - {state.isHovered ? 'Hovered' : 'Fading'}
-              </li>
-            ))}
-          </ul>
-        </div>
         <div className="text-foreground-lighter text-xs flex items-center transition-opacity">
           <Dot className="text-brand animate-pulse -ml-2" />
           {onlineUsers.length} user{isSingular ? '' : 's'} online

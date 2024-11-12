@@ -1,28 +1,27 @@
 import React, { useState } from 'react'
-import dynamic from 'next/dynamic'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
-import { Badge, Button, cn } from 'ui'
+import { Button, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
-import useWinningChances from '../../hooks/useWinningChances'
 
+import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import TicketForm from './TicketForm'
-import CountdownComponent from '../Countdown'
-import TicketPresence from './TicketPresence'
-import TicketActions from './TicketActions'
-// import LW13Background from '../LW13Background'
-import TicketCopy from './TicketCopy'
-import TicketActions2 from './TicketActions2'
-import useLWShortcuts from '../useLWShortcuts'
+import CountdownComponent from '~/components/LaunchWeek/13/Countdown'
+import useLWPartyMode from '~/components/LaunchWeek/13/useLWPartyMode'
 import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 import InteractiveGridParty from '~/components/LaunchWeek/13/InteractiveGridParty'
 import InteractiveGridSingle from '~/components/LaunchWeek/13/InteractiveGridSingle'
 
+import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
+import TicketPresence from '~/components/LaunchWeek/13/Ticket/TicketPresence'
+import TicketActions from '~/components/LaunchWeek/13/Ticket/TicketActions'
+import TicketCopy from '~/components/LaunchWeek/13/Ticket/TicketCopy'
+import TicketActions2 from '~/components/LaunchWeek/13/Ticket/TicketActions2'
+
 const TicketingFlow = () => {
   const { ticketState, userData, showCustomizationForm } = useConfData()
-  const { isPartyMode, setIsPartyMode } = useLWShortcuts()
+  const { isPartyMode, setIsPartyMode } = useLWPartyMode()
 
   const isLoading = ticketState === 'loading'
   const isRegistering = ticketState === 'registration'
@@ -42,8 +41,8 @@ const TicketingFlow = () => {
 
   return (
     <>
-      <SectionContainer className="relative h-full flex-1 pointer-events-none">
-        <div className="relative z-10 flex h-full">
+      <SectionContainer className="relative h-full min-h-[calc(100dvh-65px)] flex-1 pointer-events-none">
+        <div className="relative z-10 flex items-center h-full">
           <h1 className="sr-only">Supabase Launch Week 13 | {LW13_DATE}</h1>
 
           <LazyMotion features={domAnimation}>
@@ -54,7 +53,7 @@ const TicketingFlow = () => {
                   initial={exit}
                   animate={animate}
                   exit={exit}
-                  className="relative w-full min-h-[400px] mx-auto py-16 md:py-24 flex flex-col items-center gap-6 text-foreground"
+                  className="relative w-full min-h-[400px] max-h-[400px] mx-auto py-16 md:py-24 flex flex-col items-center gap-6 text-foreground"
                 >
                   <div className="hidden">
                     <TicketForm />
@@ -82,23 +81,23 @@ const TicketingFlow = () => {
                   animate={animate}
                   exit={exit}
                   className={cn(
-                    'w-full min-h-[400px] text-left grid md:grid-cols-2 justify-center gap-6 lg:gap-8 opacity-0 invisible',
+                    'w-full min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
                     !hasTicket && 'opacity-100 visible'
                   )}
                 >
-                  <div className="h-full max-w-sm flex flex-col justify-center gap-6">
+                  <div className="h-full max-w-sm flex flex-col justify-center gap-2 md:gap-6">
                     <CountdownComponent
                       date={LW13_LAUNCH_DATE}
                       showCard={false}
                       className="[&_*]:leading-4 text-foreground-lighter"
                       size="large"
                     />
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-2 md:gap-6">
                       <div className="flex flex-col flex-wrap uppercase text-2xl tracking-wider">
                         <h2 className="text-foreground">Launch Week 13</h2>
                         <p className="text-foreground-lighter text-base">{LW13_DATE}</p>
                       </div>
-                      <p className="text-foreground-lighter text-lg ">
+                      <p className="text-foreground-lighter text-sm md:text-lg">
                         Join us for a week of new features and level up your development
                       </p>
                       <div>
@@ -195,7 +194,8 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
+      {/* {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />} */}
+      <InteractiveGridParty />
       {hasTicket && <div className="absolute inset-8">HAS_TICKET</div>}
     </>
   )

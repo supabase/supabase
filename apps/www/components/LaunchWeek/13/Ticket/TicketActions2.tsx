@@ -15,7 +15,7 @@ export default function TicketActions2() {
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
   const downloadLink = useRef<HTMLAnchorElement>()
-  const link = `${LW_URL}/tickets/${username}?lw=12${
+  const link = `${LW_URL}/tickets/${username}?lw=13${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
@@ -23,7 +23,7 @@ export default function TicketActions2() {
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
-  const downloadUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw12-og?username=${encodeURIComponent(
+  const downloadUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/lw13-og?username=${encodeURIComponent(
     username ?? ''
   )}`
   const params = useParams()
@@ -57,7 +57,7 @@ export default function TicketActions2() {
             shared_on_twitter: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
-          .eq('launch_week', 'lw12')
+          .eq('launch_week', 'lw13')
           .eq('username', username)
       } else if (social === 'linkedin') {
         await supabase
@@ -66,7 +66,7 @@ export default function TicketActions2() {
             shared_on_linkedin: 'now',
             metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
           })
-          .eq('launch_week', 'lw12')
+          .eq('launch_week', 'lw13')
           .eq('username', username)
       }
 
