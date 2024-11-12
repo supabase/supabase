@@ -23,6 +23,7 @@ import {
   SheetSection,
   Switch,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
 import CronSyntaxChart from './CronSyntaxChart'
 
@@ -40,7 +41,8 @@ const presets = [
 
 export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
-  let initialValue = presets[1].expression as string
+  const initialValue = form.getValues('schedule')
+  const { schedule } = form.watch()
 
   const [presetValue, setPresetValue] = useState<string>(initialValue)
   const [inputValue, setInputValue] = useState(initialValue)
@@ -71,7 +73,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 
   useEffect(() => {
     if (!useNaturalLanguage || !debouncedValue) return
-
     generateCronSyntax(debouncedValue)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedValue, useNaturalLanguage])
@@ -82,21 +83,24 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
     // update the cronstrue string when the input value changes
     try {
       setScheduleString(CronToString(inputValue))
+      console.log(inputValue)
       form.setValue('schedule', inputValue)
     } catch {}
+  }, [form, inputValue])
 
-    // Update preset value
+  useEffect(() => {
     if (!useNaturalLanguage) {
-      setPresetValue(inputValue)
+      setPresetValue(schedule)
+      setScheduleString(CronToString(schedule))
     }
-  }, [inputValue, useNaturalLanguage])
+  }, [schedule])
 
   return (
     <SheetSection>
       <FormField_Shadcn_
         control={form.control}
         name="schedule"
-        render={() => {
+        render={({ field }) => {
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
               <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
@@ -104,21 +108,26 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                 {useNaturalLanguage ? 'Describe your schedule in words' : 'Enter a cron expression'}
               </FormLabel_Shadcn_>
               <FormControl_Shadcn_>
-                <div className="flex flex-col gap-2">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
+                <div className="flex flex-col gap-y-2">
+                  {useNaturalLanguage ? (
+                    <Input
                       value={inputValue}
-                      placeholder={useNaturalLanguage ? 'E.g. every 5 minutes' : '* * * * *'}
-                      onChange={(e) => {
-                        setInputValue(e.target.value)
-                      }}
+                      placeholder="E.g. every 5 minutes"
+                      className={cn(!useNaturalLanguage && 'hidden')}
+                      onChange={(e) => setInputValue(e.target.value)}
+                    />
+                  ) : (
+                    <Input_Shadcn_
+                      {...field}
+                      autoComplete="off"
+                      placeholder="* * * * *"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
                         }
                       }}
                     />
-                  </FormControl_Shadcn_>
+                  )}
 
                   <div className="flex items-center gap-2 mt-2">
                     <Switch
@@ -140,9 +149,9 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                           <Button
                             type="outline"
                             onClick={() => {
-                              setPresetValue(preset.expression)
-                              setInputValue(preset.expression)
                               setUseNaturalLanguage(false)
+                              form.setValue('schedule', preset.expression)
+                              setPresetValue(preset.expression)
                             }}
                           >
                             {preset.name}
@@ -182,7 +191,11 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                     {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
                   </span>
                 )}
-                {scheduleString ? (
+                {!inputValue && !isGeneratingCron && !scheduleString ? (
+                  <span className="text-sm text-foreground-light">
+                    Describe your schedule above
+                  </span>
+                ) : scheduleString ? (
                   <span className="text-sm text-foreground-light flex items-center gap-2">
                     The cron will be run {/* lowercase the first letter */}
                     {isGeneratingCron ? (
@@ -211,9 +224,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                     )}
                   </span>
                 ) : null}
-                {!isGeneratingCron && !scheduleString && (
-                  <span className="text-foreground-light">Describe your schedule above</span>
-                )}
               </div>
             </FormItem_Shadcn_>
           )
