@@ -14,7 +14,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     case 'PATCH':
       return handlePatch(req, res)
     default:
-      res.setHeader('Allow', ['GET', 'DELETE'])
+      res.setHeader('Allow', ['PATCH'])
       res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
