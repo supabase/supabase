@@ -221,13 +221,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
-              (x) => x.title.toLowerCase() === provider.name
+              (x) =>
+                x.title.toLowerCase() ===
+                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
-              provider.name === 'email' ? 'email' : providerMeta?.title ?? provider.name
+              provider.name === 'email'
+                ? 'email'
+                : provider.name === 'linkedin'
+                  ? 'LinkedIn'
+                  : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -241,7 +247,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   />
                 )}
                 <div className="flex-grow mt-0.5">
-                  <p className="capitalize">{provider.name}</p>
+                  <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
@@ -465,7 +471,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
     <div className="flex items-center gap-x-2 group">
       <p className="w-36 text-foreground-light text-sm">{property}</p>
@@ -499,7 +505,7 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,

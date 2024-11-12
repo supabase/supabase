@@ -26,6 +26,7 @@ type AiAssistantPanelType = {
   content?: string
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
+  tables: { schema: string; name: string }[]
 }
 
 export const appState = proxy({
@@ -112,9 +113,11 @@ export const appState = proxy({
     editor: null,
     content: '',
     entity: undefined,
+    tables: [],
   } as AiAssistantPanelType,
-  setAiAssistantPanel: (value: AiAssistantPanelType) => {
+  setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,

@@ -6,7 +6,7 @@ import { useParams } from 'common'
 import DeleteHookModal from 'components/interfaces/Database/Hooks/DeleteHookModal'
 import EditHookPanel from 'components/interfaces/Database/Hooks/EditHookPanel'
 import HooksList from 'components/interfaces/Database/Hooks/HooksList/HooksList'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -16,7 +16,6 @@ import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 
 const HooksPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -126,7 +125,7 @@ const HooksPage: NextPageWithLayout = () => {
 }
 
 HooksPage.getLayout = (page) => (
-  <ProjectIntegrationsLayout title="Hooks">{page}</ProjectIntegrationsLayout>
+  <ProjectIntegrationsLayout title="Webhooks">{page}</ProjectIntegrationsLayout>
 )
 
 export default HooksPage
