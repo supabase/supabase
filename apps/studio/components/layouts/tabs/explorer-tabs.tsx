@@ -6,7 +6,6 @@ import {
   Database,
   Code2,
   Eye,
-  Function as FunctionIcon,
   X,
   Workflow,
   PanelLeftClose,
@@ -42,8 +41,8 @@ const getTabIcon = (type: TabType) => {
       return <Table2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
     case 'view':
       return <Eye size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-    case 'function':
-      return <FunctionIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+    // case 'function':
+    //   return <FunctionIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
     case 'sql':
       return (
         <SQL_ICON
@@ -84,6 +83,17 @@ const SortableTab = ({
     zIndex: isDragging ? 1 : 0,
   }
 
+  // Add logic to check for multiple schemas
+  const hasMultipleSchemas = openTabs
+    .filter((t) => t.type === 'table')
+    .some((t) => t.metadata?.schema !== openTabs[0]?.metadata?.schema)
+
+  // Generate the display label
+  const displayLabel =
+    tab.type === 'table' && hasMultipleSchemas && tab.metadata?.schema
+      ? `${tab.metadata.schema}.${tab.label}`
+      : tab.label
+
   return (
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
       <TabsTrigger_Shadcn_
@@ -92,7 +102,7 @@ const SortableTab = ({
         {...listeners}
       >
         {getTabIcon(tab.type)}
-        {tab.label}
+        {displayLabel}
         <span
           role="button"
           onClick={(e) => {
@@ -125,7 +135,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
 
   const openTabs = tabs.openTabs
     .map((id) => tabs.tabsMap[id])
-    .filter((tab): tab is Tab => tab !== undefined)
+    .filter((tab) => tab !== undefined) as Tab[]
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
