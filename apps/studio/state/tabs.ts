@@ -11,7 +11,7 @@ interface TableMetadata {
 export interface Tab {
   id: string
   type: TabType
-  label: string
+  label?: string
   icon?: ReactNode
   metadata?: {
     schema?: string
@@ -23,7 +23,7 @@ export interface Tab {
 
 interface TabsState {
   openTabs: string[]
-  activeTab: string | null
+  activeTab: string
   tabsMap: Record<string, Tab>
 }
 

@@ -1,38 +1,26 @@
-import { useRouter } from 'next/router'
-import { useSnapshot } from 'valtio'
-import {
-  FileJson2,
-  Table2,
-  Database,
-  Code2,
-  Eye,
-  X,
-  Workflow,
-  PanelLeftClose,
-  PanelLeftOpen,
-} from 'lucide-react'
-import {
-  cn,
-  SQL_ICON,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  ScrollArea,
-  ScrollBar,
-} from 'ui'
-import { getTabsStore, type Tab, type TabType } from 'state/tabs'
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { SortableContext, horizontalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
+import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { useRef, useEffect } from 'react'
-import { sidebarState } from './sidebar-state'
 import { useActionKey } from 'hooks/useActionKey'
+import { Eye, FileJson2, PanelLeftClose, PanelLeftOpen, Table2, Workflow, X } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useMemo } from 'react'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { getTabsStore, type Tab, type TabType } from 'state/tabs'
+import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { useSnapshot } from 'valtio'
+import { sidebarState } from './sidebar-state'
+import { motion, AnimatePresence } from 'framer-motion'
 
 interface TabsProps {
   storeKey: string
   onClose?: (id: string) => void
 }
 
+/**
+ * Returns the appropriate icon component for each tab type
+ * Icons are consistently styled with the same size and color
+ */
 const getTabIcon = (type: TabType) => {
   switch (type) {
     case 'schema':
@@ -61,7 +49,14 @@ const getTabIcon = (type: TabType) => {
   }
 }
 
-// Sortable Tab component
+/**
+ * Individual draggable tab component that handles:
+ * - Drag
+ * - Drop functionality
+ * - Dynamic schema name display
+ * - Tab label animations
+ * - Close button interactions
+ */
 const SortableTab = ({
   tab,
   index,
@@ -73,6 +68,9 @@ const SortableTab = ({
   openTabs: Tab[]
   onClose: (id: string) => void
 }) => {
+  const router = useRouter()
+  const currentSchema = router.query.schema as string
+
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
   })
@@ -83,16 +81,32 @@ const SortableTab = ({
     zIndex: isDragging ? 1 : 0,
   }
 
-  // Add logic to check for multiple schemas
+  const snapV2 = useSqlEditorV2StateSnapshot()
+
+  // For SQL tabs, get the snippet from the SQL editor state
+  // This ensures tab labels stay in sync with snippet names
+  const sqlSnippet =
+    tab.type === 'sql' && tab.metadata?.sqlId ? snapV2.snippets[tab.metadata.sqlId]?.snippet : null
+
+  // Check if we have tables from multiple schemas
+  // Used to determine if we need to show schema names in table labels
   const hasMultipleSchemas = openTabs
     .filter((t) => t.type === 'table')
     .some((t) => t.metadata?.schema !== openTabs[0]?.metadata?.schema)
 
-  // Generate the display label
-  const displayLabel =
-    tab.type === 'table' && hasMultipleSchemas && tab.metadata?.schema
-      ? `${tab.metadata.schema}.${tab.label}`
-      : tab.label
+  // Update schema visibility check to include URL param comparison
+  const shouldShowSchema = useMemo(() => {
+    const schemaInParamsDifferent =
+      currentSchema &&
+      tab.type === 'table' && // Only check for table tabs
+      tab.metadata?.schema &&
+      currentSchema !== tab.metadata.schema
+
+    return hasMultipleSchemas || schemaInParamsDifferent
+  }, [openTabs, currentSchema, tab.metadata?.schema, tab.type])
+
+  // Create a motion version of TabsTrigger while preserving all functionality
+  const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
@@ -102,7 +116,22 @@ const SortableTab = ({
         {...listeners}
       >
         {getTabIcon(tab.type)}
-        {displayLabel}
+        <div className="flex items-center gap-0">
+          <AnimatePresence mode="popLayout">
+            {shouldShowSchema && (
+              <motion.span
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.15 }}
+                className="text-foreground-muted group-data-[state=active]:text-foreground-lighter"
+              >
+                {tab.metadata.schema}.
+              </motion.span>
+            )}
+          </AnimatePresence>
+          <span>{tab.label || 'Untitled'}</span>
+        </div>
         <span
           role="button"
           onClick={(e) => {

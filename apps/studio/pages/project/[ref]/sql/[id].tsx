@@ -172,19 +172,17 @@ const SqlEditor: NextPageWithLayout = () => {
 
     const store = getTabsStore('explorer')
     const tabId = `sql-${id}`
-    const snippet = snippets.find((s) => s.id === id)
 
     if (!store.tabsMap[tabId]) {
       store.openTabs = [...store.openTabs, tabId]
       store.tabsMap[tabId] = {
         id: tabId,
         type: 'sql',
-        label: snippet?.name || 'Untitled Query',
         metadata: { sqlId: id },
       }
     }
     store.activeTab = tabId
-  }, [router.isReady, id, snippets])
+  }, [router.isReady, id])
 
   return <SQLEditor />
 }
