@@ -72,7 +72,7 @@ const SortableTab = ({
   storeKey: string
 }) => {
   const router = useRouter()
-  const currentSchema = router.query.schema as string
+  const currentSchema = (router.query.schema as string) || 'public'
   const store = getTabsStore(storeKey)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -100,15 +100,18 @@ const SortableTab = ({
 
   // Update schema visibility check to include URL param comparison
   const shouldShowSchema = useMemo(() => {
-    const schemaInParamsDifferent =
-      currentSchema &&
-      tab.type === 'table' && // Only check for table tabs
-      tab.metadata?.schema &&
-      currentSchema !== tab.metadata.schema
+    // For both table and schema tabs, show schema if:
+    // Any tab has a different schema than the current schema parameter
+    if (tab.type === 'table' || tab.type === 'schema') {
+      const anyTabHasDifferentSchema = openTabs
+        .filter((t) => t.type === 'table' || t.type === 'schema')
+        .some((t) => t.metadata?.schema !== currentSchema)
 
-    // Only show schema for table tabs
-    return (hasMultipleSchemas || schemaInParamsDifferent) && tab.type === 'table'
-  }, [openTabs, currentSchema, tab.metadata?.schema, tab.type])
+      return anyTabHasDifferentSchema
+    }
+
+    return false
+  }, [openTabs, currentSchema, tab.type])
 
   // Create a motion version of TabsTrigger while preserving all functionality
   const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
@@ -143,7 +146,7 @@ const SortableTab = ({
               </motion.span>
             )}
           </AnimatePresence>
-          <span>{tab.label || 'Untitled'}</span>
+          <span>{tab.type === 'schema' ? 'schema' : tab.label || 'Untitled'}</span>
         </div>
         <span
           role="button"
@@ -247,7 +250,10 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
 
     switch (tab.type) {
       case 'sql':
-        router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}`)
+        // We use the schema query param from the URL to set the schema for the SQL tab
+        // this can be improved later
+        const schema = (router.query.schema as string) || 'public'
+        router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
         break
       case 'table':
         router.push(

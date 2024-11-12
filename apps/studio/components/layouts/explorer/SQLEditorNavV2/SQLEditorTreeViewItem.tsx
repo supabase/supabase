@@ -121,11 +121,13 @@ export const SQLEditorTreeViewItem = ({
             onClick={(e) => {
               if (!isBranch) {
                 if (!e.shiftKey) {
-                  router.push(`/project/${ref}/sql/${element.id}`)
+                  const schema = (router.query.schema as string) || 'public'
+                  router.push(`/project/${ref}/sql/${element.id}?schema=${schema}`)
                 } else if (id !== 'new') {
                   onMultiSelect?.(element.id)
                 } else {
-                  router.push(`/project/${ref}/sql/${element.id}`)
+                  const schema = (router.query.schema as string) || 'public'
+                  router.push(`/project/${ref}/sql/${element.id}?schema=${schema}`)
                 }
               } else {
                 // Prevent expanding folder while editing text
