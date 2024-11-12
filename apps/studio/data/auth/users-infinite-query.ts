@@ -2,6 +2,8 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 
 import type { components } from 'data/api'
 import { executeSql, ExecuteSqlError } from 'data/sql/execute-sql-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import { authKeys } from './keys'
 
 export type Filter = 'verified' | 'unverified' | 'anonymous'
@@ -82,8 +84,11 @@ export type UsersError = ExecuteSqlError
 export const useUsersInfiniteQuery = <TData = UsersData>(
   { projectRef, connectionString, keywords, filter, providers, sort, order }: UsersVariables,
   { enabled = true, ...options }: UseInfiniteQueryOptions<UsersData, UsersError, TData> = {}
-) =>
-  useInfiniteQuery<UsersData, UsersError, TData>(
+) => {
+  const project = useSelectedProject()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useInfiniteQuery<UsersData, UsersError, TData>(
     authKeys.usersInfinite(projectRef, { keywords, filter, providers, sort, order }),
     ({ signal, pageParam }) => {
       return executeSql(
@@ -105,7 +110,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
     },
     {
       staleTime: 0,
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
 
       getNextPageParam(lastPage, pages) {
         const page = pages.length
@@ -116,3 +121,4 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
       ...options,
     }
   )
+}
