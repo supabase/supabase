@@ -422,12 +422,17 @@ export const actions: Actions = {
 ```
 
 ```svelte src/routes/auth/+layout.svelte
+<script>
+	let { children } = $props();
+</script>
+
 <header>
 	<nav>
 		<a href="/">Home</a>
 	</nav>
 </header>
-<slot />
+
+{@render children()}
 ```
 
 ```svelte src/routes/auth/error/+page.svelte
