@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { useDebounce } from 'use-debounce'
 
+import { useCompletion } from 'ai/react'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
+import { BASE_PATH } from 'lib/constants'
 import {
   Accordion_Shadcn_,
   AccordionContent_Shadcn_,
@@ -15,17 +19,12 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Input_Shadcn_,
   SheetSection,
   Switch,
 } from 'ui'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCronTimezoneQuery } from 'data/database-cron-jobs/database-cron-timezone-query'
-import { useCompletion } from 'ai/react'
-import CronSyntaxChart from './CronSyntaxChart'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { BASE_PATH } from 'lib/constants'
+import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -101,28 +100,24 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
               <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
+              <FormLabel_Shadcn_ className="text-foreground-lighter">
+                {useNaturalLanguage ? 'Describe your schedule in words' : 'Enter a cron expression'}
+              </FormLabel_Shadcn_>
               <FormControl_Shadcn_>
                 <div className="flex flex-col gap-2">
                   <FormControl_Shadcn_>
-                    <>
-                      <FormLabel_Shadcn_ className="text-foreground-lighter">
-                        {useNaturalLanguage
-                          ? 'Describe your schedule in words'
-                          : 'Enter a cron expression'}
-                      </FormLabel_Shadcn_>
-                      <Input_Shadcn_
-                        value={inputValue}
-                        placeholder={useNaturalLanguage ? 'E.g. every 5 minutes' : '* * * * *'}
-                        onChange={(e) => {
-                          setInputValue(e.target.value)
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                          }
-                        }}
-                      />
-                    </>
+                    <Input_Shadcn_
+                      value={inputValue}
+                      placeholder={useNaturalLanguage ? 'E.g. every 5 minutes' : '* * * * *'}
+                      onChange={(e) => {
+                        setInputValue(e.target.value)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                        }
+                      }}
+                    />
                   </FormControl_Shadcn_>
 
                   <div className="flex items-center gap-2 mt-2">
