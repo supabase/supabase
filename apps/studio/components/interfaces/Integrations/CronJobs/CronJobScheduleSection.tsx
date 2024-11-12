@@ -83,7 +83,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
     // update the cronstrue string when the input value changes
     try {
       setScheduleString(CronToString(inputValue))
-      console.log(inputValue)
       form.setValue('schedule', inputValue)
     } catch {}
   }, [form, inputValue])
