@@ -13,7 +13,6 @@ import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useBackupsQuery } from 'data/database/backups-query'
 import { useProjectCloneMutation } from 'data/projects/clone-mutation'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
@@ -358,7 +357,16 @@ const RestoreToNewProject = () => {
   ) {
     return (
       <>
-        <BackupsEmpty />
+        <Admonition
+          type="default"
+          title="No backups found"
+          description={
+            <>
+              PITR is enabled, but no backups were found. Check again in a few minutes.
+              {/* <pre>{JSON.stringify(cloneBackups, null, 2)}</pre> */}
+            </>
+          }
+        />
       </>
     )
   }
@@ -366,6 +374,7 @@ const RestoreToNewProject = () => {
   if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
     return (
       <>
+        t2
         <BackupsEmpty />
       </>
     )
@@ -537,7 +546,10 @@ const RestoreToNewProject = () => {
         <>
           <Panel>
             {cloneBackups?.backups.length === 0 ? (
-              <BackupsEmpty />
+              <>
+                t3
+                <BackupsEmpty />
+              </>
             ) : (
               <div className="divide-y">
                 {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
