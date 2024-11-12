@@ -15,21 +15,19 @@ const corsHeaders = {
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
 
-const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12`
+const STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw13`
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
 const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-// const BUCKET_FOLDER_VERSION = 'v1'
 
 const LW_TABLE = 'tickets'
 const LW_MATERIALIZED_VIEW = 'tickets_view'
 
 export async function GET(req: Request, res: Response) {
   const url = new URL(req.url)
-  console.log(process.env.NEXT_PUBLIC_SUPABASE_URL)
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
   const assumePlatinum = url.searchParams.get('platinum') ?? url.searchParams.get('amp;platinum')
   const userAgent = req.headers.get('user-agent')
@@ -47,14 +45,14 @@ export async function GET(req: Request, res: Response) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_twitter: 'now' })
-        .eq('launch_week', 'lw12')
+        .eq('launch_week', 'lw13')
         .eq('username', username)
         .is('shared_on_twitter', null)
     } else if (userAgent?.toLocaleLowerCase().includes('linkedin')) {
       await supabaseAdminClient
         .from(LW_TABLE)
         .update({ shared_on_linkedin: 'now' })
-        .eq('launch_week', 'lw12')
+        .eq('launch_week', 'lw13')
         .eq('username', username)
         .is('shared_on_linkedin', null)
     }
@@ -65,7 +63,7 @@ export async function GET(req: Request, res: Response) {
       .select(
         'id, name, ticket_number, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
       )
-      .eq('launch_week', 'lw12')
+      .eq('launch_week', 'lw13')
       .eq('username', username)
       .maybeSingle()
 
@@ -80,8 +78,6 @@ export async function GET(req: Request, res: Response) {
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
     } = user
-
-    console.log(user)
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum)
@@ -546,7 +542,7 @@ export async function GET(req: Request, res: Response) {
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`launch-week/lw12/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+      .upload(`launch-week/lw13/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
         contentType: 'image/png',
         // cacheControl: `${60 * 60 * 24 * 7}`,
         cacheControl: `0`,

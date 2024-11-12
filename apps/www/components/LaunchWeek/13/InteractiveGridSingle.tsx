@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import { Dot } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
 import { INTERACTIVE_GRID_COLORS } from './InteractiveGridParty'
@@ -205,7 +204,7 @@ export default function InteractiveGridSingle() {
   }, [supabase, realtimeChannel])
 
   return (
-    <div className="absolute inset-0 w-full h-full flex justify-center items-center max-h-screen overflow-hidden">
+    <div className="absolute inset-0 w-full h-full flex justify-center items-center lg:max-h-screen overflow-hidden">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
@@ -214,12 +213,6 @@ export default function InteractiveGridSingle() {
         onMouseLeave={handleMouseLeave}
         className="border border-gray-300 shadow-lg"
       />
-      <div className="absolute top-4 right-4 text-foreground w-40 h-full flex flex-col gap-2 pointer-events-none">
-        <div className="text-foreground-lighter text-xs flex items-center transition-opacity">
-          <Dot className="text-brand animate-pulse -ml-2" />
-          {onlineUsers.length} user{isSingular ? '' : 's'} online
-        </div>
-      </div>
     </div>
   )
 }

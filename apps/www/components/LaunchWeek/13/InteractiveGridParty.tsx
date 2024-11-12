@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import { Dot } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
 
@@ -28,6 +27,10 @@ interface CursorPosition {
 export const INTERACTIVE_GRID_COLORS = (isDark: boolean) => ({
   GRID_STROKE: isDark ? '#242424' : '#EDEDED',
   CURRENT_USER_HOVER: isDark ? '#242424' : '#d3d3d3',
+  // HOVER_COLORS: isDark ? ['#242424'] : ['#D3D3D3'],
+  HOVER_COLORS: isDark
+    ? ['#822A17', '#1F7A2F', '#172A82', '#520F57']
+    : ['#FF8166', '#5CD671', '#6E86F7', '#F999FF'],
 })
 
 export default function InteractiveGrid() {
@@ -40,10 +43,9 @@ export default function InteractiveGrid() {
   > | null>(null)
   const [hoveredCells, setHoveredCells] = useState<Map<string, CellState>>(new Map())
   const [userCursors, setUserCursors] = useState<Record<string, CursorPosition>>({})
-  const [onlineUsers, setOnlineUsers] = useState<any[]>([])
+  const [_onlineUsers, setOnlineUsers] = useState<any[]>([])
   const [userColors, setUserColors] = useState<Record<string, string>>({})
   const animationFrameRef = useRef<number>()
-  const isSingular = (onlineUsers?.length ?? 0) === 1
 
   const currentUserIdRef = useRef(userData?.id || uuidv4())
   const CURRENT_USER_ID = currentUserIdRef.current
@@ -58,7 +60,7 @@ export default function InteractiveGrid() {
         return userColors[userId]
       }
 
-      const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF5733', '#57FF33', '#33FFFF']
+      const colors = INTERACTIVE_GRID_COLORS(isDarkTheme).HOVER_COLORS
       const color = colors[userId.charCodeAt(0) % colors.length]
 
       setUserColors((prev) => ({ ...prev, [userId]: color }))
@@ -199,7 +201,7 @@ export default function InteractiveGrid() {
         }
       }
     },
-    [hoveredCells, setCellHovered, realtimeChannel, getUserColor]
+    [hoveredCells, setCellHovered, realtimeChannel, getUserColor, isDarkTheme]
   )
 
   const handleMouseLeave = useCallback(() => {
@@ -245,21 +247,15 @@ export default function InteractiveGrid() {
   }, [supabase, realtimeChannel])
 
   return (
-    <div className="absolute inset-0 w-full h-full flex justify-center items-center max-h-screen overflow-hidden">
+    <div className="absolute inset-0 w-full h-full flex justify-center items-center max-h-full lg:max-h-screen">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
         height={CANVAS_HEIGHT}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="border border-gray-300 shadow-lg"
+        className="shadow-lg"
       />
-      <div className="absolute top-4 right-4 text-foreground w-40 h-full flex flex-col gap-2 pointer-events-none">
-        <div className="text-foreground-lighter text-xs flex items-center transition-opacity">
-          <Dot className="text-brand animate-pulse -ml-2" />
-          {onlineUsers?.length} user{isSingular ? '' : 's'} online
-        </div>
-      </div>
     </div>
   )
 }

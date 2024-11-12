@@ -5,6 +5,7 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import { Button } from 'ui'
 import { useKey } from 'react-use'
 
+import { useCommandMenuOpen } from 'ui-patterns'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 type FormState = 'default' | 'loading' | 'error'
@@ -107,7 +108,8 @@ export default function TicketForm() {
     }
   }, [session])
 
-  useKey('t', () => handleGithubSignIn())
+  const isCommandMenuOpen = useCommandMenuOpen()
+  useKey('t', () => !isCommandMenuOpen && handleGithubSignIn(), {}, [isCommandMenuOpen])
 
   async function handleGithubSignIn() {
     if (formState !== 'default') {

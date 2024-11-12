@@ -14,7 +14,7 @@ export default function LaunchWeekIndex() {
 
   const TITLE = `${LW13_TITLE} | ${LW13_DATE}`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/13/lw13-og.png?lw=12`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/13/lw13-og.png`
 
   const ticketNumber = query.ticketNumber?.toString()
   const [session, setSession] = useState<Session | null>(null)
@@ -82,7 +82,7 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="md:h-[calc(100dvh-65px)] min-h-[calc(100dvh-65px)]">
+        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100dvh-65px)] overflow-hidden">
           <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>

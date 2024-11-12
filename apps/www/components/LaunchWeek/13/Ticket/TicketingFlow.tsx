@@ -1,26 +1,23 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { Button, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
 
-import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
-import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import CountdownComponent from '~/components/LaunchWeek/13/Countdown'
-import useLWPartyMode from '~/components/LaunchWeek/13/useLWPartyMode'
-import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 import InteractiveGridParty from '~/components/LaunchWeek/13/InteractiveGridParty'
 import InteractiveGridSingle from '~/components/LaunchWeek/13/InteractiveGridSingle'
+import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import useLWPartyMode from '~/components/LaunchWeek/13/useLWPartyMode'
+import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
 
 import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
-import TicketPresence from '~/components/LaunchWeek/13/Ticket/TicketPresence'
-import TicketActions from '~/components/LaunchWeek/13/Ticket/TicketActions'
-import TicketCopy from '~/components/LaunchWeek/13/Ticket/TicketCopy'
-import TicketActions2 from '~/components/LaunchWeek/13/Ticket/TicketActions2'
+import TicketSwagCtaBox from '~/components/LaunchWeek/13/Ticket/TicketSwagCtaBox'
 
 const TicketingFlow = () => {
-  const { ticketState, userData, showCustomizationForm } = useConfData()
+  const { ticketState, userData } = useConfData()
   const { isPartyMode, setIsPartyMode } = useLWPartyMode()
 
   const isLoading = ticketState === 'loading'
@@ -39,9 +36,25 @@ const TicketingFlow = () => {
   const DISPLAY_NAME = userData?.name || userData?.username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
 
+  const PartyModeButton = () => (
+    <Button
+      size="small"
+      onClick={() => setIsPartyMode(!isPartyMode)}
+      type="default"
+      className="sm:pl-1 pointer-events-auto"
+    >
+      <div className="flex items-center">
+        <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
+          P
+        </div>
+        Party Mode: {isPartyMode ? 'On' : 'Off'}
+      </div>
+    </Button>
+  )
+
   return (
     <>
-      <SectionContainer className="relative h-full min-h-[calc(100dvh-65px)] flex-1 pointer-events-none">
+      <SectionContainer className="relative h-full lg:min-h-[calc(100dvh-65px)] flex-1 pointer-events-none">
         <div className="relative z-10 flex items-center h-full">
           <h1 className="sr-only">Supabase Launch Week 13 | {LW13_DATE}</h1>
 
@@ -53,7 +66,7 @@ const TicketingFlow = () => {
                   initial={exit}
                   animate={animate}
                   exit={exit}
-                  className="relative w-full min-h-[400px] max-h-[400px] mx-auto py-16 md:py-24 flex flex-col items-center gap-6 text-foreground"
+                  className="relative w-full lg:min-h-[400px] max-h-[400px] mx-auto py-16 md:py-24 flex flex-col items-center gap-6 text-foreground"
                 >
                   <div className="hidden">
                     <TicketForm />
@@ -81,11 +94,11 @@ const TicketingFlow = () => {
                   animate={animate}
                   exit={exit}
                   className={cn(
-                    'w-full min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
+                    'w-full lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
                     !hasTicket && 'opacity-100 visible'
                   )}
                 >
-                  <div className="h-full max-w-sm flex flex-col justify-center gap-2 md:gap-6">
+                  <div className="h-full max-w-xs flex flex-col justify-center gap-2 md:gap-6">
                     <CountdownComponent
                       date={LW13_LAUNCH_DATE}
                       showCard={false}
@@ -98,26 +111,14 @@ const TicketingFlow = () => {
                         <p className="text-foreground-lighter text-base">{LW13_DATE}</p>
                       </div>
                       <p className="text-foreground-lighter text-sm md:text-lg">
-                        Join us for a week of new features and level up your development
+                        Join us for a week of new features and level up your development.
                       </p>
                       <div>
-                        <Button
-                          size="small"
-                          onClick={() => setIsPartyMode(true)}
-                          type="default"
-                          className="sm:pl-1 pointer-events-auto"
-                        >
-                          <div className="flex items-center">
-                            <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
-                              P
-                            </div>
-                            Party Mode: {isPartyMode ? 'On' : 'Off'}
-                          </div>
-                        </Button>
+                        <PartyModeButton />
                       </div>
                     </div>
                   </div>
-                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-spacing-3 border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-md">
+                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-md">
                     <TicketForm />
                   </div>
                 </m.div>
@@ -128,27 +129,16 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full flex-1 min-h-[400px] h-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-32 text-foreground text-center md:text-left"
+                  className="w-full flex-1 lg:min-h-[400px] h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
-                  <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
-                    {/* <TicketContainer /> */}
-                    <MetalTicket username="Francesco Sansalvadore" />
-                    {/* {!hasPlatinumTicket && <TicketPresence />} */}
-                    {/* // not sure why this was only non platinum */}
-                    <TicketPresence />
-                    <TicketCopy />
-                  </div>
-                  <div className="order-first xl:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
+                  <div className="order-first lg:h-full w-full max-w-md xl:max-w-xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
                     {hasPlatinumTicket ? (
                       <div>
                         {hasSecretTicket ? (
-                          <p className="text-2xl mb-1">Share the secret ticket to beat the odds</p>
+                          <p className="text-2xl mb-1">Got the secret ticket, {FIRST_NAME}!</p>
                         ) : (
-                          <p className="text-2xl mb-1">Thanks for sharing</p>
+                          <p className="text-2xl mb-1">Thanks for sharing, {FIRST_NAME}!</p>
                         )}
-                        <p className="text-2xl text-foreground-light">
-                          Follow Launch Week 13 announcements to find out if you're a lucky winner.
-                        </p>
                       </div>
                     ) : winningChances !== 2 ? (
                       <div>
@@ -156,46 +146,38 @@ const TicketingFlow = () => {
                           <p className="text-2xl mb-1">You found a secret ticket</p>
                         )}
                         {!hasSecretTicket && (
-                          <p className="text-2xl mb-1">You're in {FIRST_NAME}!</p>
+                          <p className="text-2xl mb-1">You're in, {FIRST_NAME}!</p>
                         )}
-                        <p className="text-2xl text-foreground-light">
-                          Share your ticket to win limited swag.
-                        </p>
                       </div>
                     ) : (
                       <div>
-                        <p className="text-2xl mb-1">Almost there {FIRST_NAME}!</p>
-                        <p className="text-2xl text-foreground-light">
-                          Share on {!userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
-                          increase your chances of winning limited swag.
-                        </p>
+                        <p className="text-2xl mb-1">Almost there, {FIRST_NAME}!</p>
                       </div>
                     )}
-                    <TicketActions2 />
-                    <div className="w-full my-3">
-                      <TicketActions />
+                    <TicketSwagCtaBox
+                      hasSecretTicket={hasSecretTicket!}
+                      hasPlatinumTicket={hasPlatinumTicket!}
+                      userData={userData}
+                      firstName={FIRST_NAME!}
+                      className="w-full"
+                    />
+                    <div className="flex gap-4 items-center">
+                      <PartyModeButton />
                     </div>
-                    <CountdownComponent date={LW13_LAUNCH_DATE} showCard={false} />
                   </div>
                 </m.div>
               )}
-              {/* {!showCustomizationForm && isPartyMode && (
-                <m.div
-                  key="ticket"
-                  initial={initial}
-                  animate={animate}
-                  exit={exit}
-                  className="w-full flex justify-center text-foreground !h-[500px]"
-                >
-                  <LWGame setisPartyMode={setisPartyMode} />
-                </m.div>
-              )} */}
             </AnimatePresence>
           </LazyMotion>
         </div>
       </SectionContainer>
       {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
-      {hasTicket && <div className="absolute inset-8">HAS_TICKET</div>}
+      {hasTicket && (
+        <MetalTicket
+          username="Francesco Sansalvadore"
+          className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
+        />
+      )}
     </>
   )
 }

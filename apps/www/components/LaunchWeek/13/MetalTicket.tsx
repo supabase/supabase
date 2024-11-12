@@ -7,8 +7,12 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { useParams } from 'common'
+import { cn } from 'ui'
 
-const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco Sansalvadore' }) => {
+const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
+  username = 'Francesco Sansalvadore',
+  className,
+}) => {
   const params = useParams()
   const canvasRef = useRef<HTMLDivElement>(null)
   const ticketRef = useRef<THREE.Mesh | null>(null)
@@ -21,10 +25,10 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
   useEffect(() => {
     if (!canvasRef.current) return
 
-    const isDesktop = () => window.innerWidth > 768
-    const desktopWidth = () => (window.innerWidth / 2) * 3
+    const isDesktop = () => window.innerWidth > 1024
+    const desktopWidth = () => (window.innerWidth / 2) * 3 - 140
     const canvasWidth = isDesktop() ? desktopWidth() : window.innerWidth
-    const canvasHeight = window.innerHeight
+    const canvasHeight = window.innerHeight - 65
 
     // Initialize scene, camera, and renderer
     const scene = new THREE.Scene()
@@ -181,7 +185,6 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
       const centerY = canvasRect.top + canvasRect.height / 2
 
       const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
-      // if (!ticketPosition) return
 
       // Calculate distance from cursor to center of ticket
       const deltaX = e.clientX - (canvasRect.left + ticketPosition.x)
@@ -209,9 +212,9 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
     // Handle window resize
     const handleResize = () => {
       const newWidth = isDesktop() ? desktopWidth() : window.innerWidth
-      camera.aspect = newWidth / window.innerHeight
+      camera.aspect = newWidth / (window.innerHeight - 65)
       camera.updateProjectionMatrix()
-      renderer.setSize(newWidth, window.innerHeight)
+      renderer.setSize(newWidth, window.innerHeight - 65)
     }
 
     // Event listeners
@@ -234,8 +237,13 @@ const ThreeCanvas: React.FC<{ username: string }> = ({ username = 'Francesco San
   }, [params])
 
   return (
-    <div className="w-screen absolute inset-0 h-full flex justify-end items-center max-h-screen overflow-hidden pointer-events-none">
-      <div ref={canvasRef} className="w-full h-full" />
+    <div
+      className={cn(
+        'w-screen absolute inset-0 lg:h-full flex justify-end items-center overflow-hidden pointer-events-none',
+        className
+      )}
+    >
+      <div ref={canvasRef} className="w-full lg:h-full" />
     </div>
   )
 }
