@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
-
       - uses: actions/checkout@v4
         with:
           sparse-checkout: apps
+          ref: ${{ github.head_ref }}
 
       - uses: actions/setup-node@v4
         with:
@@ -39,7 +39,7 @@ jobs:
           git config --global user.email 'github-tidy-bot@supabase.com'
           if [[ `git status --porcelain` ]]; then
             echo "[bot] Changes detected, committing."
-       
+
             echo "[bot] Running in non-squash mode."
             git commit -am "ci: Autofix updates from GitHub workflow"
             git push
