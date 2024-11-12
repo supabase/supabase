@@ -6,6 +6,6 @@ export const databaseQueuesKeys = {
     ['projects', projectRef, 'queues', queueName, options].filter(Boolean),
   list: (projectRef: string | undefined) => ['projects', projectRef, 'queues'] as const,
   // invalidating queues.list will also invalidate queues.metrics
-  metrics: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'queues', 'metrics'] as const,
+  metrics: (projectRef: string | undefined, queueName: string) =>
+    ['projects', projectRef, 'queues', 'metrics', queueName] as const,
 }
