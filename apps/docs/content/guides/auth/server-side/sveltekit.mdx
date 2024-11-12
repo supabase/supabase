@@ -279,8 +279,8 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 
-	export let data;
-	$: ({ session, supabase } = data);
+	let { data, children } = $props();
+	let { session, supabase } = $derived(data);
 
 	onMount(() => {
 		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
@@ -293,7 +293,7 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 	});
 </script>
 
-<slot />
+{@render children()}
 ```
 
 </StepHikeCompact.Code>
@@ -327,8 +327,8 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 ```svelte src/routes/+page.svelte
 <script>
-	export let data;
-	$: ({ countries } = data);
+	let { data } = $props();
+	let { countries } = $derived(data);
 </script>
 
 <h1>Welcome to Supabase!</h1>
@@ -512,10 +512,10 @@ To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.serv
 
 ```svelte src/routes/private/+layout.svelte
 <script>
-	export let data;
-	$: ({ supabase } = data);
+	let { data, children } = $props();
+	let { supabase } = $derived(data);
 
-	$: logout = async () => {
+	const logout = async () => {
 		const { error } = await supabase.auth.signOut();
 		if (error) {
 			console.error(error);
@@ -527,10 +527,10 @@ To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.serv
 	<nav>
 		<a href="/">Home</a>
 	</nav>
-	<button on:click={logout}>Logout</button>
+	<button onclick={logout}>Logout</button>
 </header>
 <main>
-	<slot />
+	{@render children()}
 </main>
 ```
 
@@ -577,11 +577,10 @@ export const load: PageServerLoad = async ({ depends, locals: { supabase } }) =>
 
 	import type { PageData } from './$types';
 
-	export let data: PageData;
-	$: ({ notes, supabase, user } = data);
+	let { data } = $props();
+	let { notes, supabase, user } = $derived(data);
 
-	let handleSubmit: EventHandler<SubmitEvent, HTMLFormElement>;
-	$: handleSubmit = async (evt) => {
+	const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (evt) => {
 		evt.preventDefault();
 		if (!evt.target) return;
 
@@ -605,7 +604,7 @@ export const load: PageServerLoad = async ({ depends, locals: { supabase } }) =>
 		<li>{note.note}</li>
 	{/each}
 </ul>
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
 	<label>
 		Add a note
 		<input name="note" type="text" />
