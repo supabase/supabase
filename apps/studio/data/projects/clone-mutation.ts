@@ -44,7 +44,9 @@ export const useProjectCloneMutation = ({
     (vars) => triggerClone(vars),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(projectKeys.listCloneBackups(variables.projectRef))
+        await queryClient.invalidateQueries({
+          queryKey: projectKeys.listCloneBackups(variables.projectRef),
+        })
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

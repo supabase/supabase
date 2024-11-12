@@ -88,18 +88,7 @@ const RestoreToNewProject = () => {
   const isFreePlan = subscription?.plan?.id === 'free'
 
   const {
-    data: backups,
-    isLoading: backupsLoading,
-    isSuccess: backupsSuccess,
-  } = useBackupsQuery(
-    { projectRef: project?.ref },
-    {
-      enabled: !isFreePlan,
-    }
-  )
-
-  const {
-    data,
+    data: cloneBackups,
     error,
     isLoading: cloneBackupsLoading,
     isError,
@@ -108,7 +97,7 @@ const RestoreToNewProject = () => {
       projectRef: project?.ref,
     },
     {
-      enabled: backupsSuccess && !isFreePlan,
+      enabled: !isFreePlan,
     }
   )
 
@@ -121,19 +110,25 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
-  const hasPITREnabled = backups?.pitr_enabled
+  const hasPITREnabled = cloneBackups?.pitr_enabled
 
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
-  const { data: cloneStatus } = useCloneStatusQuery({ projectRef: project?.ref })
+  const {
+    data: cloneStatus,
+    refetch: refetchCloneStatus,
+    isLoading: cloneStatusLoading,
+  } = useCloneStatusQuery({
+    projectRef: project?.ref,
+  })
   const lastClone = cloneStatus?.cloned[cloneStatus?.cloned.length - 1]
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
 
-  const isLoading = !isPermissionsLoaded || cloneBackupsLoading || backupsLoading
+  const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
   /**
    * New project will have the same compute size and disk size as the original project
@@ -160,7 +155,8 @@ const RestoreToNewProject = () => {
     },
     onSuccess: () => {
       toast.success('Restoration process started')
-      setShowConfirmationDialog(false)
+      refetchCloneStatus()
+      setShowNewProjectDialog(false)
     },
   })
 
@@ -355,7 +351,11 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && hasPITREnabled && !backups?.physicalBackupData.earliestPhysicalBackupDateUnix) {
+  if (
+    !isLoading &&
+    hasPITREnabled &&
+    !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
+  ) {
     return (
       <>
         <BackupsEmpty />
@@ -363,7 +363,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && !hasPITREnabled && backups?.backups.length === 0) {
+  if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
     return (
       <>
         <BackupsEmpty />
@@ -527,19 +527,21 @@ const RestoreToNewProject = () => {
             setShowConfirmationDialog(true)
           }}
           earliestAvailableBackup={dayjs(
-            backups?.physicalBackupData.earliestPhysicalBackupDateUnix
+            cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
           )}
-          latestAvailableBackup={dayjs(backups?.physicalBackupData.latestPhysicalBackupDateUnix)}
+          latestAvailableBackup={dayjs(
+            cloneBackups?.physicalBackupData.latestPhysicalBackupDateUnix
+          )}
         />
       ) : (
         <>
           <Panel>
-            {data?.backups.length === 0 ? (
+            {cloneBackups?.backups.length === 0 ? (
               <BackupsEmpty />
             ) : (
               <div className="divide-y">
                 {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
-                {data?.backups.map((backup) => {
+                {cloneBackups?.backups.map((backup) => {
                   if (!backup.isPhysicalBackup) return null
                   return (
                     <div className="flex p-4 gap-4" key={backup.id}>
