@@ -156,12 +156,12 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                       ))}
                     </ul>
                   </div>
-                  <Accordion_Shadcn_ type="single" collapsible className="mt-2">
+                  <Accordion_Shadcn_ type="single" collapsible className="mt-2 pb-2">
                     <AccordionItem_Shadcn_ value="item-1" className="border-none">
                       <AccordionTrigger_Shadcn_ className="text-xs text-foreground-light font-normal gap-2 justify-start py-1 ">
                         View syntax chart
                       </AccordionTrigger_Shadcn_>
-                      <AccordionContent_Shadcn_>
+                      <AccordionContent_Shadcn_ asChild className="!pb-0">
                         <CronSyntaxChart />
                       </AccordionContent_Shadcn_>
                     </AccordionItem_Shadcn_>
@@ -169,61 +169,57 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                 </div>
               </FormControl_Shadcn_>
 
-              <FormMessage_Shadcn_ className="mt-4">
-                <div className="mt-2 bg-surface-100 p-4 rounded grid gap-4 border">
-                  <h4 className="text-sm text-foreground">
-                    Schedule {timezone ? `(${timezone})` : ''}
-                  </h4>
-                  {scheduleString ? (
-                    <span
-                      className={cn(
-                        'text-xl font-mono',
-                        isGeneratingCron
-                          ? 'animate-pulse text-foreground-lighter'
-                          : 'text-foreground'
-                      )}
-                    >
-                      {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
-                    </span>
-                  ) : (
-                    <span className="text-xl font-mono text-foreground-lighter">
-                      {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
-                    </span>
-                  )}
-                  {scheduleString ? (
-                    <span className="text-foreground-light flex items-center gap-2">
-                      The cron will be run {/* lowercase the first letter */}
-                      {isGeneratingCron ? (
-                        <span className="inline-flex items-center">
-                          {[0, 1, 2].map((i) => (
-                            <motion.span
-                              key={i}
-                              initial={{ opacity: 0 }}
-                              animate={{ opacity: 1 }}
-                              transition={{
-                                duration: 0.5,
-                                repeat: Infinity,
-                                repeatType: 'reverse',
-                                delay: i * 0.2,
-                              }}
-                            >
-                              .
-                            </motion.span>
-                          ))}
-                        </span>
-                      ) : (
-                        scheduleString
-                          .split(' ')
-                          .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                          .join(' ') + '.'
-                      )}
-                    </span>
-                  ) : null}
-                  {!isGeneratingCron && !scheduleString && (
-                    <span className="text-foreground-light">Describe your schedule above</span>
-                  )}
-                </div>
-              </FormMessage_Shadcn_>
+              <div className="bg-surface-100 p-4 rounded grid gap-y-4 border">
+                <h4 className="text-sm text-foreground">
+                  Schedule {timezone ? `(${timezone})` : ''}
+                </h4>
+                {scheduleString ? (
+                  <span
+                    className={cn(
+                      'text-xl font-mono',
+                      isGeneratingCron ? 'animate-pulse text-foreground-lighter' : 'text-foreground'
+                    )}
+                  >
+                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
+                  </span>
+                ) : (
+                  <span className="text-xl font-mono text-foreground-lighter">
+                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
+                  </span>
+                )}
+                {scheduleString ? (
+                  <span className="text-sm text-foreground-light flex items-center gap-2">
+                    The cron will be run {/* lowercase the first letter */}
+                    {isGeneratingCron ? (
+                      <span className="inline-flex items-center">
+                        {[0, 1, 2].map((i) => (
+                          <motion.span
+                            key={i}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                              duration: 0.5,
+                              repeat: Infinity,
+                              repeatType: 'reverse',
+                              delay: i * 0.2,
+                            }}
+                          >
+                            .
+                          </motion.span>
+                        ))}
+                      </span>
+                    ) : (
+                      scheduleString
+                        .split(' ')
+                        .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
+                        .join(' ') + '.'
+                    )}
+                  </span>
+                ) : null}
+                {!isGeneratingCron && !scheduleString && (
+                  <span className="text-foreground-light">Describe your schedule above</span>
+                )}
+              </div>
             </FormItem_Shadcn_>
           )
         }}
