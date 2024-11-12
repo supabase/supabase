@@ -35,7 +35,7 @@ export const getUsersSQL = ({
   keywords?: string
   providers?: string[]
   sort: string
-  order: string
+  order: 'asc' | 'desc'
 }) => {
   const offset = page * USERS_PAGE_LIMIT
   const hasValidKeywords = keywords && keywords !== ''
@@ -75,7 +75,7 @@ export const getUsersSQL = ({
   const sortOn = sort ?? 'created_at'
   const sortOrder = order ?? 'desc'
 
-  return `${baseQueryUsers}${conditions.length > 0 ? ` where ${combinedConditions}` : ''} order by "${sortOn}" ${sortOrder} limit ${USERS_PAGE_LIMIT} offset ${offset};`
+  return `${baseQueryUsers}${conditions.length > 0 ? ` where ${combinedConditions}` : ''} order by "${sortOn}" ${sortOrder} nulls last limit ${USERS_PAGE_LIMIT} offset ${offset};`
 }
 
 export type UsersData = { result: User[] }
