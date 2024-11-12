@@ -9,13 +9,13 @@ import { SupabaseGrid } from 'components/grid/SupabaseGrid'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { DocsButton } from 'components/ui/DocsButton'
-import { sqlKeys } from 'data/sql/keys'
 import {
   Entity,
   isMaterializedView,
   isTableLike,
   isView,
 } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
@@ -61,11 +61,7 @@ const TableGridEditor = ({
     async onMutate({ projectRef, table, configuration, payload }) {
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
-      const queryKey = sqlKeys.query(projectRef, [
-        table.schema,
-        table.name,
-        { table: { name: table.name, schema: table.schema } },
-      ])
+      const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
       await queryClient.cancelQueries(queryKey)
 

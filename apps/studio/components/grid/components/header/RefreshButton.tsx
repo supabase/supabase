@@ -3,8 +3,8 @@ import { RefreshCw } from 'lucide-react'
 
 import { useParams } from 'common'
 import type { SupaTable } from 'components/grid/types'
-import { sqlKeys } from 'data/sql/keys'
 import { Entity } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { Button } from 'ui'
 
 export type RefreshButtonProps = {
@@ -15,7 +15,7 @@ export type RefreshButtonProps = {
 const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = sqlKeys.query(ref, [table.schema, table.name])
+  const queryKey = tableRowKeys.tableRows(ref, { table: { id: table.id } })
 
   async function onClick() {
     await queryClient.invalidateQueries(queryKey)

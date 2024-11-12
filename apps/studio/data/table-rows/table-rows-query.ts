@@ -1,4 +1,4 @@
-import type { QueryClient, QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, type QueryClient, type UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { Query } from 'components/grid/query/Query'
@@ -7,28 +7,20 @@ import {
   JSON_TYPES,
   TEXT_TYPES,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { sqlKeys } from 'data/sql/keys'
 import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
-import {
-  isRoleImpersonationEnabled,
-  useIsRoleImpersonationEnabled,
-} from 'state/role-impersonation-state'
-import {
-  ExecuteSqlData,
-  ExecuteSqlError,
-  executeSql,
-  useExecuteSqlQuery,
-} from '../sql/execute-sql-query'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
+import { tableRowKeys } from './keys'
 import { THRESHOLD_COUNT } from './table-rows-count-query'
 import { formatFilterValue } from './utils'
 
-type GetTableRowsArgs = {
+export interface GetTableRowsArgs {
   table?: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
@@ -135,7 +127,7 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
-export const getTableRowsSqlQuery = ({
+export const getTableRowsSql = ({
   table,
   filters = [],
   sorts = [],
@@ -202,79 +194,69 @@ export type TableRows = { rows: SupaRow[] }
 export type TableRowsVariables = GetTableRowsArgs & {
   projectRef?: string
   connectionString?: string
-  queryKey?: QueryKey
 }
 
 export type TableRowsData = TableRows
 export type TableRowsError = ExecuteSqlError
 
-function getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }: TableRowsVariables) {
-  return [
-    ...(queryKey ?? []),
+export async function getTableRows(
+  {
+    projectRef,
+    connectionString,
+    table,
+    impersonatedRole,
+    filters,
+    sorts,
+    limit,
+    page,
+  }: TableRowsVariables,
+  signal?: AbortSignal
+) {
+  const sql = wrapWithRoleImpersonation(
+    getTableRowsSql({ table, filters, sorts, limit, page, impersonatedRole }),
     {
-      table: {
-        name: table?.name,
-        schema: table?.schema,
-        columns: table?.columns.map((c) => c.name),
-      },
-      impersonatedRole,
-      ...args,
-    },
-  ]
-}
-
-export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
-  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
-  options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
-) => {
-  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
-
-  return useExecuteSqlQuery(
+      projectRef: projectRef ?? 'ref',
+      role: impersonatedRole,
+    }
+  )
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
-        projectRef: projectRef ?? 'ref',
-        role: impersonatedRole,
-      }),
-      queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
-      isRoleImpersonationEnabled,
+      sql,
+      queryKey: ['table-rows', table?.id],
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
     },
-    {
-      select(data: { result: Record<string, any>[] }) {
-        const rows = data.result.map((x, index) => {
-          return { idx: index, ...x } as SupaRow
-        })
+    signal
+  )
 
-        return {
-          rows,
-        } as TData
-      },
-      enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
+  const rows = result.map((x: any, index: number) => {
+    return { idx: index, ...x }
+  }) as SupaRow[]
+
+  return {
+    rows,
+  }
+}
+
+export const useTableRowsQuery = <TData = TableRowsData>(
+  { projectRef, connectionString, table, ...args }: TableRowsVariables,
+  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+) =>
+  useQuery<TableRowsData, TableRowsError, TData>(
+    tableRowKeys.tableRows(projectRef, { table, ...args }),
+    ({ signal }) => getTableRows({ projectRef, connectionString, table, ...args }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof table !== 'undefined',
       ...options,
     }
   )
-}
 
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables
+  { projectRef, connectionString, table, impersonatedRole, ...args }: TableRowsVariables
 ) {
-  return client.fetchQuery(
-    sqlKeys.query(projectRef, getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args })),
-    ({ signal }) =>
-      executeSql(
-        {
-          projectRef,
-          connectionString,
-          sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
-            projectRef: projectRef ?? 'ref',
-            role: impersonatedRole,
-          }),
-          queryKey: getTableRowsQueryKey({ queryKey, table, impersonatedRole, ...args }),
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
-        },
-        signal
-      )
+  return client.fetchQuery(tableRowKeys.tableRows(projectRef, { table, ...args }), ({ signal }) =>
+    getTableRows({ projectRef, connectionString, table, ...args }, signal)
   )
 }

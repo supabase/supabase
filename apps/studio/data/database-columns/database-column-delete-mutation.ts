@@ -1,6 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { sqlKeys } from 'data/sql/keys'
@@ -65,9 +66,7 @@ export const useDatabaseColumnDeleteMutation = ({
                 queryClient.invalidateQueries(
                   sqlKeys.query(projectRef, [table.schema, table.name])
                 ),
-                queryClient.invalidateQueries(
-                  sqlKeys.query(projectRef, ['table-definition', table.schema, table.name])
-                ),
+                queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
                 // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
                 // which has a view dependent on it
                 queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, table.schema)),

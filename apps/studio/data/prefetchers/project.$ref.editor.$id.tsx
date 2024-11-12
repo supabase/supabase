@@ -52,7 +52,6 @@ export function usePrefetchEditorTablePage() {
               ) ?? {}
 
             prefetchTableRows(queryClient, {
-              queryKey: [supaTable.schema, supaTable.name],
               projectRef: project?.ref,
               connectionString: project?.connectionString,
               table: supaTable,

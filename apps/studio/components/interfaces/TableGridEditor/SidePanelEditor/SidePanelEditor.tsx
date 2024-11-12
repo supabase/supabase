@@ -10,6 +10,7 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
@@ -258,11 +259,7 @@ const SidePanelEditor = ({
         queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, selectedTable?.id)),
         queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [
-            'table-definition',
-            selectedTable!.schema,
-            selectedTable!.name,
-          ])
+          databaseKeys.tableDefinition(project?.ref, selectedTable?.id)
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
@@ -479,11 +476,7 @@ const SidePanelEditor = ({
               sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
             ),
             queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [
-                'table-definition',
-                selectedTable.schema,
-                selectedTable.name,
-              ])
+              databaseKeys.tableDefinition(project?.ref, selectedTable.id)
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
           ])

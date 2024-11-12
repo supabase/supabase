@@ -59,7 +59,6 @@ const ForeignRowSelector = ({
 
   const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [schemaName, tableName],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table: supaTable,

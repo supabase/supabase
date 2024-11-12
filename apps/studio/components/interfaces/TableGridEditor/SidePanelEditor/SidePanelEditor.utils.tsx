@@ -11,6 +11,7 @@ import { updateDatabaseColumn } from 'data/database-columns/database-column-upda
 import type { Constraint } from 'data/database/constraints-query'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -743,9 +744,7 @@ export const updateTable = async ({
     // invalidate list of tables, as well as visible individual tables
     queryClient.invalidateQueries(['projects', projectRef, 'tables']),
     queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name])),
-    queryClient.invalidateQueries(
-      sqlKeys.query(projectRef, ['table-definition', table.schema, table.name])
-    ),
+    queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
   ])
 

@@ -60,7 +60,6 @@ const Pagination = () => {
 
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table,

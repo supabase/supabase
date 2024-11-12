@@ -149,7 +149,6 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const { project } = useProjectContext()
   const { data, error, isSuccess, isError, isLoading, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [props.table.schema, props.table.name],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table: props.table,

@@ -11,7 +11,7 @@ import type { ResponseError } from 'types'
 export type TableRowUpdateVariables = {
   projectRef: string
   connectionString?: string
-  table: { name: string; schema?: string }
+  table: { id: number; name: string; schema?: string }
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]

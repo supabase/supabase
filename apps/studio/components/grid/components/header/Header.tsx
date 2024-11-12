@@ -239,7 +239,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
-    queryKey: [table.schema, table.name],
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     table,
@@ -252,7 +251,6 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       table,
