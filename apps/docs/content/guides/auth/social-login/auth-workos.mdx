@@ -4,9 +4,21 @@ title: 'SSO and Social Login with WorkOS'
 description: 'Add WorkOS AuthKit to your Supabase project'
 ---
 
-[WorkOS AuthKit](https://authkit.com) provides email/password authentication and social login by default. Once AuthKit is installed, you can enable SSO through a dashboard toggle.
+## Choose which authentication method is right for you
 
-## Step 1. Create a WorkOS organization
+There are two ways to add authentication to your Supabase using WorkOS: 
+
+### [Option 1](#option-1-using-workos-as-a-provider-via-supabase-auth): Using WorkOS as a provider via Supabase auth 
+
+This method uses WorkOS as a provider you configure in your Supabase dashboard. You then use Supabase's auth code to connect to WorkOS. 
+
+### [Option 2](#option-2-using-authkit): Using AuthKit
+
+[WorkOS AuthKit](https://authkit.com) is the world's best login box. AuthKit provides email/password authentication and social login by default. Once AuthKit is installed, you can configure and deploy additional SSO providers via the WorkOS dashboard.
+
+## Option 1: Using WorkOS as a provider via Supabase auth 
+
+### Step 1. Create a WorkOS organization
 
 Log in to the WorkOS dashboard and visit the Organizations tab to create an organization
 ![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
@@ -17,7 +29,7 @@ Log in to the WorkOS dashboard and visit the Organizations tab to create an orga
 
 Visit the getting started page of the WorkOS dashboard, at [https://dashboard.workos.com/get-started](https://dashboard.workos.com/get-started), to obtain the following values from the Quickstart panel:
 * `WORKOS_CLIENT_ID`
-* `WORKOS_API_KEY`A
+* `WORKOS_API_KEY`
 
 ## Step 3. Add your WorkOS credentials to your Supabase project
 
@@ -33,6 +45,12 @@ Visit the getting started page of the WorkOS dashboard, at [https://dashboard.wo
 1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy
 1. Click Save
 
+**Note:** In order to successfully test locally, you must add the localhost equivalent redirect for your app. For example: 
+
+`http://localhost:3000/auth/v1/callback`
+
+Ensure this redirect URL exactly matches the route exposed by your application code.
+
 ## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
 
 Visit the WorkOS dashboard and click the redirects button in the left navigation panel.
@@ -41,271 +59,69 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 ![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-## Step 5. Connect a WorkOS supported identity provider
+## Step 5. Add login code to your client app 
 
-With AuthKit, you get email-based authentication and social logins for free, but you can configure OAuth providers in the WorkOS dashboard on the Authentication tab:
+When a user signs in, call signInWithOAuth with workos as the provider. 
 
-![Configure SSO or OAuth providers at your leisure](/docs/img/guides/auth-workos/workos-auth-config-dashboard.png)
-
-## Install and configure AuthKit
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-
-<TabPanel id="nextjs" label="Next.js">
-
-## Install dependencies
-For a Next.js integration, use the authkit-nextjs library. Start by installing it in your Next.js project via npm.
-
-`npm install @workos-inc/authkit-nextjs`
-
-## Set secrets
-
-To make calls to WorkOS, provide the API key and the client ID. Store these values as managed secrets and pass them to the SDKs either as environment variables or directly in your app’s configuration depending on your preferences.
-
-```bash
-WORKOS_API_KEY='sk_test_x0K3p7n2B9q4M5v8R1w6T0y3F4h7J9l2S5d8Q6b3N0m4C7v9X2p5L8n1W4t7K'
-WORKOS_CLIENT_ID='project_02FHKBFC8H6N99F94NG00K896G'
-WORKOS_COOKIE_PASSWORD="<your password>" # generate a secure password here
-```
-
-The SDK requires you to set a strong password to encrypt cookies. This password must be at least 32 characters long. You can generate a secure password by using the
-[1Password generator](https://1password.com/password-generator) or the openssl library via the command line:
-
-```bash
-openssl rand -base64 24
-```
-
-## Add AuthKit to your app
-
-### Provider
-The AuthKitProvider component adds protections for auth edge cases and is required to wrap your app layout.
-
-```typescript layout.tsx
-import { AuthKitProvider } from '@workos-inc/authkit-nextjs';
-
-export default function RootLayout({ children }) {
-  return (
-    <html lang="en">
-      <body>
-        <AuthKitProvider>{children}</AuthKitProvider>
-      </body>
-    </html>
-  );
-}
-```
-
-### Middleware
-[Next.js middleware](https://nextjs.org/docs/app/building-your-application/routing/middleware)
-
-```typescript middleware.ts
-import { authkitMiddleware } from '@workos-inc/authkit-nextjs';
-
-export default authkitMiddleware();
-
-// Match against pages that require authentication
-// Leave this out if you want authentication on every page in your application
-export const config = { matcher: ['/'] };
-```
-
-### Callback route
-When a user has authenticated via AuthKit, they will be redirected to your app’s callback route. Make sure this route matches the WORKOS_REDIRECT_URI environment variable and the configured redirect URI in your WorkOS dashboard.
-
-```typescript /app/callback/route.ts
-import { handleAuth } from '@workos-inc/authkit-nextjs';
-
-// Redirect the user to `/` after successful sign in
-// The redirect can be customized: `handleAuth({ returnPathname: '/foo' })`
-export const GET = handleAuth();
-```
-### Access authentication data in your Next.js application
-We’ll need to direct users to sign in (or sign up) using AuthKit before redirecting them back to your application. We’ll do this by generating an AuthKit authorization URL server side and redirecting the user to it.
-
-The `withAuth` method is used to retrieve the current logged in user and their details.
-
-```javascript page.jsx
-import Link from 'next/link';
-import {
-  getSignInUrl,
-  getSignUpUrl,
-  withAuth,
-} from '@workos-inc/authkit-nextjs';
-
-export default async function HomePage() {
-  // Retrieves the user from the session or returns `null` if no user is signed in
-  const { user } = await withAuth();
-
-  // Get the URL to redirect the user to AuthKit to sign in
-  const signInUrl = await getSignInUrl();
-
-  // Get the URL to redirect the user to AuthKit to sign up
-  const signUpUrl = await getSignUpUrl();
-
-  /**
-   * If a signed-in user is mandatory, you can use the `ensureSignedIn`
-   * configuration option. If logged out, the below will immediately redirect
-   * the user to AuthKit. After signing in, the user will automatically
-   * be redirected back to this page.
-   * */
-  // const { user } = await withAuth({ ensureSignedIn: true });
-
-  if (!user) {
-    return (
-      <>
-        <Link href={signInUrl}>Sign in</Link>;
-        <Link href={signUpUrl}>Sign up</Link>;
-      </>
-    );
-  }
-
-  return (
-    <>
-      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
-    </>
-  );
-}
-```
-
-### Protected routes
-For routes where a signed in user is mandatory, you can use the `ensureSignedIn` option when using `withAuth`.
-
-```typescript app/protected/page.tsx
-import { withAuth } from '@workos-inc/authkit-nextjs';
-
-export default async function ProtectedPage() {
-  // If the user isn't signed in, they will be automatically redirected to AuthKit
-  const { user } = await withAuth({ ensureSignedIn: true });
-
-  return (
-    <>
-      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
-    </>
-  );
-}
-```
-If you prefer a “secure by default” approach where every route is automatically protected, look into implementing [middleware auth mode](https://github.com/workos/authkit-nextjs?tab=readme-ov-file#middleware-auth)  in the authkit-nextjs library.
-
-### Ending the session
-Finally, ensure the user can end their session by redirecting them to the logout URL. After successfully signing out, the user will be redirected to your app’s homepage, which is configured in the WorkOS dashboard.
-
-```javascript authkit-nextjs logout example
-import Link from 'next/link';
-import {
-  getSignInUrl,
-  getSignUpUrl,
-  withAuth,
-  signOut,
-} from '@workos-inc/authkit-nextjs';
-
-export default async function HomePage() {
-  // Retrieves the user from the session or returns `null` if no user is signed in
-  const { user } = await withAuth();
-
-  // Get the URL to redirect the user to AuthKit to sign in
-  const signInUrl = await getSignInUrl();
-
-  // Get the URL to redirect the user to AuthKit to sign up
-  const signUpUrl = await getSignUpUrl();
-
-  if (!user) {
-    return (
-      <>
-        <Link href={signInUrl}>Sign in</Link>;
-        <Link href={signUpUrl}>Sign up</Link>;
-      </>
-    );
-  }
-
-  return (
-    <form
-      action={async () => {
-        'use server';
-        await signOut();
-      }}
-    >
-      <p>Welcome back{user.firstName && `, ${user.firstName}`}</p>
-      <button type="submit">Sign out</button>
-    </form>
-  );
-}
-```
-
-
-</TabPanel>
-
-<TabPanel id="js" label="Original">
-
-When your user signs in, call [`getAuthorizationUrl()`](https://workos.com/docs/reference/sso/get-authorization-url)
-
-```js
-import { WorkOS } from '@workos-inc/node';
-import { NextResponse } from 'next/server';
-
-// Fail fast if required environment variables are not set
-const apiKey = process.env.WORKOS_API_KEY;
-const clientId = process.env.WORKOS_CLIENT_ID;
-// Optionally, set a fallback Redirect URI
-const redirectUri = process.env.REDIRECT_URI || 'http://localhost:3000/auth/callback';
-
-if (!apiKey) {
-  throw new Error('WORKOS_API_KEY is not set in the environment variables.');
-}
-
-if (!clientId) {
-  throw new Error('WORKOS_CLIENT_ID is not set in the environment variables.');
-}
-
-const workos = new WorkOS(apiKey);
-
-export async function GET() {
-  // Use your Organization ID from the WorkOS dashboard: https://dashboard.workos.com
-  const organization = 'org_XXXXXX';
-
-  const authorizationUrl = workos.sso.getAuthorizationUrl({
-    organization,
-    redirectUri,
-    clientId,
+```javascript page.tsx
+async function signInWithWorkOS() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'workos',
+    options: {
+      redirectTo: 'http://example.com/auth/v1/callback',
+      queryParams: {
+        connection: '<connection_id>', 
+      },
+    },
   });
 
-  return NextResponse.json({ url: authorizationUrl });
+  if (data.url) {
+    redirect(data.url) // use the redirect API for your server or framework
+  } 
 }
 ```
+**Note**: In the above code, you can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
 
-When your user successfully signs in via social logins, magic link email or a configured SSO provider, you then exchange the code returned by WorkOS for an authenticated user profile:
+Within your specified callback URL, you'll exchange the code for a logged in user profile: 
 
-```js
-import { WorkOS } from '@workos-inc/node';
+```javascript auth/v1/callback/route.ts
+import { NextResponse } from 'next/server'
+import { createClient } from '@/utils/supabase/server'
 
-const apiKey = process.env.WORKOS_API_KEY;
-const clientId = process.env.WORKOS_CLIENT_ID;
+export async function GET(request: Request) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  // if "next" is in param, use it as the redirect URL
+  const next = searchParams.get('next') ?? '/'
 
-if (!apiKey) {
-  throw new Error('WORKOS_API_KEY is not set in the environment variables.');
+  if (code) {
+    const supabase = await createClient()
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    if (!error) {
+      const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
+      const isLocalEnv = process.env.NODE_ENV === 'development'
+      if (isLocalEnv) {
+        // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
+        return NextResponse.redirect(`${origin}${next}`)
+      } else if (forwardedHost) {
+        return NextResponse.redirect(`https://${forwardedHost}${next}`)
+      } else {
+        return NextResponse.redirect(`${origin}${next}`)
+      }
+    }
+  }
+
+  // return the user to an error page with instructions
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`)
 }
 
-if (!clientId) {
-  throw new Error('WORKOS_CLIENT_ID is not set in the environment variables.');
-}
-
-const workos = new WorkOS(apiKey);
-
-const { access_token, profile } = await workos.sso.getProfileAndToken({
-  // Read the code query param from the Redirect URL that WorkOS returns after successful auth
-  // This static code is provided by way of example:
-  code: '01DMEK0J53CVMC32CK5SE0KZ8Q',
-  clientId: clientId,
-});
 ```
 
-Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+## Option 2: Using AuthKit
 
-</TabPanel>
-</Tabs>
+### Step 1. Install and configure AuthKit
+
+Visit [https://authkit.com](https://authkit.com) to get up and running with AuthKit, the world's best login box. 
 
 ## Resources
 
