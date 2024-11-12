@@ -194,8 +194,7 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      {/* {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />} */}
-      <InteractiveGridParty />
+      {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
       {hasTicket && <div className="absolute inset-8">HAS_TICKET</div>}
     </>
   )

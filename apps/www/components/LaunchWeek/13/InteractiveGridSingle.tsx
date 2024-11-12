@@ -39,27 +39,26 @@ export default function InteractiveGridSingle() {
   const [onlineUsers, setOnlineUsers] = useState<any[]>([])
   const [userColors, setUserColors] = useState<Record<string, string>>({})
   const animationFrameRef = useRef<number>()
-  const isSingular = onlineUsers.length === 1
+  const isSingular = (onlineUsers?.length ?? 0) === 1
 
-  const CURRENT_USER_ID = userData?.id || useRef(uuidv4()).current
+  const currentUserIdRef = useRef(userData?.id || uuidv4())
+  const CURRENT_USER_ID = currentUserIdRef.current
 
   const getUserColor = useCallback(
     (userId: string | undefined) => {
       if (!userId) {
-        console.log('userId is undefined, returning black as fallback.')
         return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER // fallback color
       }
 
-      // If userId already has a color, return it; otherwise, assign one
-      if (!userColors[userId]) {
-        const colors = [INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER]
-        const color = colors[userId.charCodeAt(0) % colors.length]
-        setUserColors((prev) => ({ ...prev, [userId]: color }))
-        console.log(`Assigned color ${color} to user ${userId}`)
-        return color
+      if (userColors[userId]) {
+        return userColors[userId]
       }
 
-      return userColors[userId]
+      const colors = [INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER]
+      const color = colors[userId.charCodeAt(0) % colors.length]
+
+      setUserColors((prev) => ({ ...prev, [userId]: color }))
+      return color
     },
     [userColors]
   )

@@ -43,29 +43,28 @@ export default function InteractiveGrid() {
   const [onlineUsers, setOnlineUsers] = useState<any[]>([])
   const [userColors, setUserColors] = useState<Record<string, string>>({})
   const animationFrameRef = useRef<number>()
-  const isSingular = onlineUsers.length === 1
+  const isSingular = (onlineUsers?.length ?? 0) === 1
 
-  const CURRENT_USER_ID = userData?.id || useRef(uuidv4()).current
+  const currentUserIdRef = useRef(userData?.id || uuidv4())
+  const CURRENT_USER_ID = currentUserIdRef.current
 
   const getUserColor = useCallback(
     (userId: string | undefined) => {
       if (!userId) {
-        console.log('userId is undefined, returning black as fallback.')
-        return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER // fallback color
+        return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
       }
 
-      // If userId already has a color, return it; otherwise, assign one
-      if (!userColors[userId]) {
-        const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF5733', '#57FF33', '#33FFFF']
-        const color = colors[userId.charCodeAt(0) % colors.length]
-        setUserColors((prev) => ({ ...prev, [userId]: color }))
-        console.log(`Assigned color ${color} to user ${userId}`)
-        return color
+      if (userColors[userId]) {
+        return userColors[userId]
       }
 
-      return userColors[userId]
+      const colors = ['#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FF5733', '#57FF33', '#33FFFF']
+      const color = colors[userId.charCodeAt(0) % colors.length]
+
+      setUserColors((prev) => ({ ...prev, [userId]: color }))
+      return color
     },
-    [userColors]
+    [userColors, isDarkTheme]
   )
 
   const setCellHovered = useCallback(
@@ -258,7 +257,7 @@ export default function InteractiveGrid() {
       <div className="absolute top-4 right-4 text-foreground w-40 h-full flex flex-col gap-2 pointer-events-none">
         <div className="text-foreground-lighter text-xs flex items-center transition-opacity">
           <Dot className="text-brand animate-pulse -ml-2" />
-          {onlineUsers.length} user{isSingular ? '' : 's'} online
+          {onlineUsers?.length} user{isSingular ? '' : 's'} online
         </div>
       </div>
     </div>
