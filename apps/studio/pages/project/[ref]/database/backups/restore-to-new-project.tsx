@@ -539,24 +539,27 @@ const RestoreToNewProject = () => {
             ) : (
               <div className="divide-y">
                 {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
-                {data?.backups.map((backup) => (
-                  <div className="flex p-4 gap-4" key={backup.id}>
-                    <div>
-                      <TimestampInfo value={backup.inserted_at} />
+                {data?.backups.map((backup) => {
+                  if (!backup.isPhysicalBackup) return null
+                  return (
+                    <div className="flex p-4 gap-4" key={backup.id}>
+                      <div>
+                        <TimestampInfo value={backup.inserted_at} />
+                      </div>
+                      <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                      <Button
+                        className="ml-auto"
+                        type="outline"
+                        onClick={() => {
+                          setSelectedBackupId(backup.id)
+                          setShowConfirmationDialog(true)
+                        }}
+                      >
+                        Restore
+                      </Button>
                     </div>
-                    <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                    <Button
-                      className="ml-auto"
-                      type="outline"
-                      onClick={() => {
-                        setSelectedBackupId(backup.id)
-                        setShowConfirmationDialog(true)
-                      }}
-                    >
-                      Restore
-                    </Button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </Panel>
