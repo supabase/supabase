@@ -35,7 +35,7 @@ const presets = [
   { name: 'Every minute', expression: '* * * * * *' },
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
-  { name: 'Every Monday at midnight', expression: '' },
+  { name: 'Every Monday at midnight', expression: '0 0 * * 1' },
   { name: 'Every night at midnight', expression: '0 0 0 * * *' },
 ] as const
 
