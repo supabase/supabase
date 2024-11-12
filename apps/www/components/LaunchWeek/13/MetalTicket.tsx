@@ -71,7 +71,7 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
     let ticket3DImport: THREE.Mesh
     const ticketGroup = new THREE.Group()
 
-    loader.load('/images/launchweek/13/ticket/3D-ticket-cutout-no-holes.glb', (gltf) => {
+    loader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
       ticket3DImport.rotation.x = Math.PI * 0.5
 
@@ -99,15 +99,18 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
 
         ticket3DImport.updateMatrix()
 
+        const PADDING_LEFT = -6.4
+
         textLines.map((text, index) => {
           const textGeometry = new TextGeometry(text, {
             font,
-            size: 0.95,
+            size: 1.0,
             height: 0.4,
           })
           const textMesh = new THREE.Mesh(textGeometry, textMaterial)
           textMesh.updateMatrix()
-          textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
+          // textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
+          textMesh.position.set(PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
           textMesh.castShadow = true
           ticketGroup.add(textMesh)
         })
@@ -115,12 +118,12 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
         const footerContent = [
           {
             text: 'LAUNCH WEEK 13',
-            position: { x: -5.8, y: -6.8, z: -0.2 },
+            position: { x: PADDING_LEFT, y: -6.8, z: -0.2 },
             size: 0.59,
           },
           {
             text: '2-6 DEC 2024',
-            position: { x: -5.8, y: -7.7, z: -0.2 },
+            position: { x: PADDING_LEFT, y: -7.7, z: -0.2 },
             size: 0.55,
           },
         ]
@@ -141,6 +144,7 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
     })
 
     camera.position.z = 30
+    ticketGroup.scale.set(1.1, 1.1, 1.1)
 
     const getTicketScreenPosition = () => {
       if (!ticketRef.current) return null
