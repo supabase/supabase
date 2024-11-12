@@ -237,7 +237,7 @@ export const CreateCronJobSheet = ({
                         <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
 
-                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs flex items-center gap-x-1 absolute top-0 right-0 ">
+                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs absolute top-0 right-0 ">
                         * cannot be changed after creation
                       </FormLabel_Shadcn_>
                     </FormItemLayout>
