@@ -30,6 +30,7 @@ import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
+import { makeActiveTabPermanent } from 'state/tabs'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -213,7 +214,12 @@ const TableGridEditor = ({
    */
 
   return (
-    <>
+    <div
+      onClick={() => {
+        makeActiveTabPermanent('explorer')
+      }}
+      className="h-full"
+    >
       <SupabaseGrid
         key={gridKey}
         theme={theme}
@@ -260,7 +266,7 @@ const TableGridEditor = ({
         selectedTable={isTableLike(selectedTable) ? selectedTable : undefined}
         onTableCreated={onTableCreated}
       />
-    </>
+    </div>
   )
 }
 

@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
-import { getTabsStore } from 'state/tabs'
-import { Table2 } from 'lucide-react'
+import { addTab, getTabsStore } from 'state/tabs'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
@@ -28,13 +27,18 @@ const TableEditorPage: NextPageWithLayout = () => {
     id,
   })
 
+  /**
+   * Effect: Creates or updates tab when table is loaded
+   * Runs when:
+   * - selectedTable changes (when a new table is loaded)
+   * - id changes (when URL parameter changes)
+   */
   useEffect(() => {
-    if (selectedTable) {
+    if (selectedTable && projectRef) {
       const tabId = `table-${selectedTable.schema}-${selectedTable.name}`
 
       if (!store.tabsMap[tabId]) {
-        store.openTabs = [...store.openTabs, tabId]
-        store.tabsMap[tabId] = {
+        addTab(projectRef, {
           id: tabId,
           type: 'table',
           label: selectedTable.name,
@@ -43,11 +47,13 @@ const TableEditorPage: NextPageWithLayout = () => {
             name: selectedTable.name,
             tableId: id,
           },
-        }
+        })
+      } else {
+        // If tab already exists, just make it active
+        store.activeTab = tabId
       }
-      store.activeTab = tabId
     }
-  }, [selectedTable, id])
+  }, [selectedTable, id, projectRef])
 
   return (
     <>

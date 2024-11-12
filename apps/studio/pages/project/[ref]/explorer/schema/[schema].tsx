@@ -3,7 +3,7 @@ import { SchemaGraph } from 'components/interfaces/Database/Schemas/SchemaGraph'
 import { ExplorerLayout } from 'components/layouts/explorer/layout'
 import { ReactFlowProvider } from 'reactflow'
 import type { NextPageWithLayout } from 'types'
-import { getTabsStore } from 'state/tabs'
+import { getTabsStore, addTab } from 'state/tabs'
 import { useEffect } from 'react'
 import { FileJson2 } from 'lucide-react'
 
@@ -17,17 +17,17 @@ const SchemasPage: NextPageWithLayout = () => {
       const tabId = `schema-${schema}`
 
       if (!store.tabsMap[tabId]) {
-        store.openTabs = [...store.openTabs, tabId]
-        store.tabsMap[tabId] = {
+        addTab('explorer', {
           id: tabId,
           type: 'schema',
           label: `Schema: ${schema}`,
           metadata: {
             schema,
           },
-        }
+        })
+      } else {
+        store.activeTab = tabId
       }
-      store.activeTab = tabId
     }
   }, [schema])
 

@@ -20,7 +20,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { getTabsStore } from 'state/tabs'
+import { addTab, getTabsStore } from 'state/tabs'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -170,19 +170,19 @@ const SqlEditor: NextPageWithLayout = () => {
   useEffect(() => {
     if (!router.isReady || !id || id === 'new') return
 
-    const store = getTabsStore('explorer')
     const tabId = `sql-${id}`
+    const snippet = snippets.find((s) => s.id === id)
 
-    if (!store.tabsMap[tabId]) {
-      store.openTabs = [...store.openTabs, tabId]
-      store.tabsMap[tabId] = {
-        id: tabId,
-        type: 'sql',
-        metadata: { sqlId: id },
-      }
-    }
-    store.activeTab = tabId
-  }, [router.isReady, id])
+    addTab('explorer', {
+      id: tabId,
+      type: 'sql',
+      label: snippet?.name || 'Untitled Query',
+      metadata: {
+        sqlId: id,
+        name: snippet?.name,
+      },
+    })
+  }, [router.isReady, id, snippets])
 
   return <SQLEditor />
 }

@@ -22,7 +22,7 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
 
   const productMenu = useMemo(
     () => (
-      <ResizablePanelGroup direction="vertical">
+      <ResizablePanelGroup direction="vertical" autoSaveId="explorer-side-panel">
         <ResizablePanel defaultSize={40}>
           <TableEditorMenu />
         </ResizablePanel>

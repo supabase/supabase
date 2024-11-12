@@ -78,6 +78,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { makeActiveTabPermanent } from 'state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -672,6 +673,7 @@ const SQLEditor = () => {
         className="flex h-full"
         direction="horizontal"
         autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_PANEL_SPLIT_SIZE}
+        onClick={() => makeActiveTabPermanent('explorer')}
       >
         <ResizablePanel minSize={30}>
           <ResizablePanelGroup

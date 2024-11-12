@@ -6,11 +6,12 @@ import { Eye, FileJson2, PanelLeftClose, PanelLeftOpen, Table2, Workflow, X } fr
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { getTabsStore, type Tab, type TabType } from 'state/tabs'
+import { getTabsStore, makeTabPermanent, tabsHelpers, type Tab, type TabType } from 'state/tabs'
 import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
 import { sidebarState } from './sidebar-state'
 import { motion, AnimatePresence } from 'framer-motion'
+import { nanoid } from 'nanoid'
 
 interface TabsProps {
   storeKey: string
@@ -62,14 +63,17 @@ const SortableTab = ({
   index,
   openTabs,
   onClose,
+  storeKey,
 }: {
   tab: Tab
   index: number
   openTabs: Tab[]
   onClose: (id: string) => void
+  storeKey: string
 }) => {
   const router = useRouter()
   const currentSchema = router.query.schema as string
+  const store = getTabsStore(storeKey)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
@@ -102,7 +106,8 @@ const SortableTab = ({
       tab.metadata?.schema &&
       currentSchema !== tab.metadata.schema
 
-    return hasMultipleSchemas || schemaInParamsDifferent
+    // Only show schema for table tabs
+    return (hasMultipleSchemas || schemaInParamsDifferent) && tab.type === 'table'
   }, [openTabs, currentSchema, tab.metadata?.schema, tab.type])
 
   // Create a motion version of TabsTrigger while preserving all functionality
@@ -112,12 +117,20 @@ const SortableTab = ({
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
       <TabsTrigger_Shadcn_
         value={tab.id}
-        className="flex items-center gap-2 px-3 text-xs bg-dash-sidebar/50 dark:bg-surface-100/50 data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100 relative group h-full border-t-2 !border-b-0 hover:bg-surface-300 dark:hover:bg-surface-100"
+        onDoubleClick={() => makeTabPermanent(storeKey, tab.id)}
+        className={cn(
+          'flex items-center gap-2 px-3 text-xs',
+          'bg-dash-sidebar/50 dark:bg-surface-100/50',
+          'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+          'relative group h-full border-t-2 !border-b-0',
+          'hover:bg-surface-300 dark:hover:bg-surface-100',
+          tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
+        )}
         {...listeners}
       >
         {getTabIcon(tab.type)}
         <div className="flex items-center gap-0">
-          <AnimatePresence mode="popLayout">
+          <AnimatePresence mode="popLayout" initial>
             {shouldShowSchema && (
               <motion.span
                 initial={{ opacity: 0, width: 0 }}
@@ -126,7 +139,7 @@ const SortableTab = ({
                 transition={{ duration: 0.15 }}
                 className="text-foreground-muted group-data-[state=active]:text-foreground-lighter"
               >
-                {tab.metadata.schema}.
+                {tab?.metadata?.schema}.
               </motion.span>
             )}
           </AnimatePresence>
@@ -173,16 +186,25 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     const oldIndex = tabs.openTabs.indexOf(active.id.toString())
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
-    const newOpenTabs = [...tabs.openTabs]
-    newOpenTabs.splice(oldIndex, 1)
-    newOpenTabs.splice(newIndex, 0, active.id.toString())
+    // Only make permanent if the tab actually moved position
+    if (oldIndex !== newIndex) {
+      const draggedTab = tabs.tabsMap[active.id.toString()]
+      if (draggedTab?.isPreview) {
+        makeTabPermanent(storeKey, active.id.toString())
+      }
 
-    store.openTabs = newOpenTabs
-    store.activeTab = active.id.toString()
+      // Then reorder the tabs
+      const newOpenTabs = [...tabs.openTabs]
+      newOpenTabs.splice(oldIndex, 1)
+      newOpenTabs.splice(newIndex, 0, active.id.toString())
 
-    const tab = tabs.tabsMap[active.id.toString()]
-    if (tab) {
-      handleTabChange(active.id.toString())
+      store.openTabs = newOpenTabs
+      store.activeTab = active.id.toString()
+
+      const tab = tabs.tabsMap[active.id.toString()]
+      if (tab) {
+        handleTabChange(active.id.toString())
+      }
     }
   }
 
@@ -248,6 +270,34 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     }
   }
 
+  const handleItemClick = (
+    event: React.MouseEvent,
+    item: { name: string; schema: string; type: TabType }
+  ) => {
+    const store = getTabsStore(storeKey)
+
+    // If double-clicked or modifier key, open as permanent tab
+    if (event.detail === 2 || event.metaKey || event.ctrlKey) {
+      const id = nanoid()
+      store.tabsMap[id] = {
+        id,
+        type: item.type,
+        label: item.name,
+        metadata: { schema: item.schema },
+        isPreview: false,
+      }
+      store.openTabs.push(id)
+      store.activeTab = id
+    } else {
+      // Open as preview tab
+      tabsHelpers.openInPreview(store, {
+        type: item.type,
+        label: item.name,
+        metadata: { schema: item.schema },
+      })
+    }
+  }
+
   return (
     <Tabs_Shadcn_
       value={tabs.activeTab ?? undefined}
@@ -286,6 +336,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
                 index={index}
                 openTabs={openTabs}
                 onClose={handleClose}
+                storeKey={storeKey}
               />
             ))}
           </SortableContext>

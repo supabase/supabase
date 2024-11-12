@@ -50,6 +50,7 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { getTabsStore } from 'state/tabs'
+import { useSnapshot } from 'valtio'
 
 export interface EntityListItemProps {
   id: number | string
@@ -269,9 +270,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   const tabsStore = getTabsStore(projectRef)
-  const isOpened = Object.values(tabsStore.tabsMap).some(
-    (tab) => tab.metadata?.tableId === entity.id
-  )
+  const tabs = useSnapshot(tabsStore)
+
+  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
 
   return (
     <EditorTablePageLink

@@ -1,12 +1,8 @@
 import { proxy } from 'valtio'
 import { ReactNode } from 'react'
+import { nanoid } from 'nanoid'
 
-export type TabType = 'schema' | 'sql' | 'table' | 'view' | 'function'
-
-interface TableMetadata {
-  schema: string
-  tableId: number
-}
+export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function'
 
 export interface Tab {
   id: string
@@ -19,12 +15,14 @@ export interface Tab {
     tableId?: number
     sqlId?: string
   }
+  isPreview?: boolean
 }
 
 interface TabsState {
+  activeTab: string | null
   openTabs: string[]
-  activeTab: string
-  tabsMap: Record<string, Tab>
+  tabsMap: { [key: string]: Tab }
+  previewTabId?: string
 }
 
 type TabStore = ReturnType<typeof proxy<TabsState>>
@@ -46,10 +44,36 @@ export const getTabsStore = (key: string): TabStore => {
 
 export const addTab = (storeKey: string, tab: Tab) => {
   const store = getTabsStore(storeKey)
-  if (!store.tabsMap[tab.id]) {
+
+  // If tab exists and is active, don't do anything
+  if (store.tabsMap[tab.id] && store.activeTab === tab.id) {
+    return
+  }
+
+  // If tab exists but isn't active, just make it active
+  if (store.tabsMap[tab.id]) {
+    store.activeTab = tab.id
+    return
+  }
+
+  // If this tab should be permanent, add it normally
+  if (tab.isPreview === false) {
     store.openTabs = [...store.openTabs, tab.id]
     store.tabsMap[tab.id] = tab
+    store.activeTab = tab.id
+    return
   }
+
+  // Remove any existing preview tab
+  if (store.previewTabId) {
+    store.openTabs = store.openTabs.filter((id) => id !== store.previewTabId)
+    delete store.tabsMap[store.previewTabId]
+  }
+
+  // Add new preview tab
+  store.tabsMap[tab.id] = { ...tab, isPreview: true }
+  store.openTabs = [...store.openTabs, tab.id]
+  store.previewTabId = tab.id
   store.activeTab = tab.id
 }
 
@@ -69,4 +93,23 @@ export const reorderTabs = (storeKey: string, oldIndex: number, newIndex: number
   const [removedTab] = newOpenTabs.splice(oldIndex, 1)
   newOpenTabs.splice(newIndex, 0, removedTab)
   getTabsStore(storeKey).openTabs = newOpenTabs
+}
+
+export const makeTabPermanent = (storeKey: string, tabId: string) => {
+  const store = getTabsStore(storeKey)
+  const tab = store.tabsMap[tabId]
+
+  if (tab?.isPreview) {
+    tab.isPreview = false
+    store.previewTabId = undefined
+  }
+}
+
+export const makeActiveTabPermanent = (storeKey: string) => {
+  const store = getTabsStore(storeKey)
+  if (store.activeTab && store.tabsMap[store.activeTab]?.isPreview) {
+    makeTabPermanent(storeKey, store.activeTab)
+    return true
+  }
+  return false
 }
