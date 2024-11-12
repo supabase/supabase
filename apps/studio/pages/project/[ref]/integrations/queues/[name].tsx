@@ -75,13 +75,13 @@ const QueueMessagesPage: NextPageWithLayout = () => {
         </div>
         <div className="flex items-center gap-x-2">
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
-            Add a message
+            Add message
           </Button>
           <Button type="warning" onClick={() => setDeleteQueueModalShown(true)}>
-            Purge the queue
+            Purge messages
           </Button>
           <Button type="danger" onClick={() => setDeleteQueueModalShown(true)}>
-            Delete the queue
+            Delete queue
           </Button>
           {/* <DocsButton href={docsUrl} />} */}
         </div>
