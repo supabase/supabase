@@ -21,10 +21,14 @@ import { TableNode } from './SchemaTableNode'
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
 export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelection?: boolean }) => {
-  const { ref, schema: selectedSchema } = useParams()
+  const { ref, schema: selectedSchemaParam } = useParams()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
-  // const [selectedSchema, setSelectedSchema] = useState<PostgresSchema['name']>(_schema || 'public')
+  const [selectedSchema, setSelectedSchema] = useState<PostgresSchema['name']>(
+    selectedSchemaParam || 'public'
+  )
+
+  const targetSchema = selectedSchemaParam || selectedSchema
 
   const miniMapNodeColor = '#111318'
   const miniMapMaskColor = resolvedTheme?.includes('dark')
@@ -59,11 +63,11 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedSchema,
+    schema: targetSchema,
     includeColumns: true,
   })
 
-  const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
+  const schema = (schemas ?? []).find((s) => s.name === targetSchema)
   const [_, setStoredPositions] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SCHEMA_VISUALIZER_POSITIONS(ref as string, schema?.id ?? 0),
     {}
@@ -94,7 +98,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
 
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
-      const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
+      const schema = schemas.find((s) => s.name === targetSchema) as PostgresSchema
       getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
         reactFlowInstance.setNodes(nodes)
         reactFlowInstance.setEdges(edges)
@@ -115,13 +119,13 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
             <AlertError error={errorSchemas as any} subject="Failed to retrieve schemas" />
           )}
 
-          {/* {isSuccessSchemas && (
+          {isSuccessSchemas && (
             <>
               <SchemaSelector
                 className="w-[260px]"
                 size="small"
                 showError={false}
-                selectedSchemaName={selectedSchema}
+                selectedSchemaName={targetSchema}
                 onSelectSchema={setSelectedSchema}
               />
               <Tooltip_Shadcn_>
@@ -135,7 +139,7 @@ export const SchemaGraph = ({ hideSchemaSelection = false }: { hideSchemaSelecti
                 </TooltipContent_Shadcn_>
               </Tooltip_Shadcn_>
             </>
-          )} */}
+          )}
         </div>
       ) : (
         // <div className="h-10 bg-surface-100 px-3 flex items-center justify-between">
