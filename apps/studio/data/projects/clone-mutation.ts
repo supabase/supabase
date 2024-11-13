@@ -7,21 +7,23 @@ import { projectKeys } from './keys'
 
 export type ProjectCloneVariables = {
   projectRef: string
-  cloneBackupId: number
   newProjectName: string
   newDbPass: string
+  cloneBackupId?: number
+  recoveryTimeTarget?: number
 }
 
 export async function triggerClone({
   projectRef,
-  cloneBackupId,
   newProjectName,
+  cloneBackupId,
   newDbPass,
+  recoveryTimeTarget,
 }: ProjectCloneVariables) {
   if (!projectRef) throw new Error('Project ref is required')
   const { data, error } = await post('/platform/database/{ref}/clone', {
     params: { path: { ref: projectRef } },
-    body: { cloneBackupId, newProjectName, newDbPass },
+    body: { cloneBackupId, newProjectName, newDbPass, recoveryTimeTarget },
   })
 
   if (error) handleError(error)

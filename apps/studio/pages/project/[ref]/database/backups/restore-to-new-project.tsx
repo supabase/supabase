@@ -126,6 +126,7 @@ const RestoreToNewProject = () => {
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
+  const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
 
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
@@ -453,17 +454,31 @@ const RestoreToNewProject = () => {
             <form
               id={'create-new-project-form'}
               onSubmit={form.handleSubmit((data) => {
-                if (!selectedBackupId) return
                 if (!project?.ref) {
                   toast.error('Project ref is required')
                   return
                 }
-                triggerClone({
-                  projectRef: project?.ref,
-                  cloneBackupId: selectedBackupId,
-                  newProjectName: data.name,
-                  newDbPass: data.password,
-                })
+
+                if (hasPITREnabled && recoveryTimeTarget) {
+                  triggerClone({
+                    projectRef: project?.ref,
+                    newProjectName: data.name,
+                    newDbPass: data.password,
+                    recoveryTimeTarget: recoveryTimeTarget,
+                    cloneBackupId: undefined,
+                  })
+                } else if (selectedBackupId) {
+                  triggerClone({
+                    projectRef: project?.ref,
+                    cloneBackupId: selectedBackupId,
+                    newProjectName: data.name,
+                    newDbPass: data.password,
+                    recoveryTimeTarget: undefined,
+                  })
+                } else {
+                  toast.error('No backup or point in time selected')
+                  return
+                }
               })}
             >
               <DialogSection className="pb-6 space-y-4 text-sm">
@@ -532,10 +547,10 @@ const RestoreToNewProject = () => {
       </Dialog>
       {hasPITREnabled ? (
         <>
-          <pre>{JSON.stringify(cloneBackups?.physicalBackupData, null, 2)}</pre>
           <PITRForm
-            onSubmit={() => {
+            onSubmit={(v) => {
               setShowConfirmationDialog(true)
+              setRecoveryTimeTarget(v.recoveryTimeTargetUnix)
             }}
             earliestAvailableBackupUnix={
               cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix || 0

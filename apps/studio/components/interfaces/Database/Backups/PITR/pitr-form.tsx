@@ -74,7 +74,6 @@ export function PITRForm({
     () => !!selectedDate && isBeforeLatest && isAfterEarliest,
     [selectedDate, isBeforeLatest, isAfterEarliest]
   )
-  console.log({ isWithinRange, isBeforeLatest, isAfterEarliest, selectedDate })
 
   const onUpdateDate = (date: Date) => {
     setSelectedDateRaw(
