@@ -23,13 +23,17 @@ This method uses WorkOS as a provider you configure in your Supabase dashboard. 
 Log in to the WorkOS dashboard and visit the Organizations tab to create an organization
 ![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
 
-## Step 2. Obtain your `WORKOS_CLIENT_ID` and `WORKOS_API_KEY` values
+Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create)
+
+## Step 2. Obtain your `Client ID` and `WORKOS_API_KEY` values
 
 ![Get your Environment's Client ID and Secret](/docs/img/guides/auth-workos/workos-dashboard-get-client-id-and-key.png)
 
 Visit the getting started page of the WorkOS dashboard, at [https://dashboard.workos.com/get-started](https://dashboard.workos.com/get-started), to obtain the following values from the Quickstart panel:
 * `WORKOS_CLIENT_ID`
 * `WORKOS_API_KEY`
+
+**Note**: You must be signed in to see these values.
 
 ## Step 3. Add your WorkOS credentials to your Supabase project
 
@@ -63,7 +67,7 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 When a user signs in, call signInWithOAuth with workos as the provider. 
 
-```javascript page.tsx
+```javascript
 async function signInWithWorkOS() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'workos',
@@ -121,7 +125,7 @@ export async function GET(request: Request) {
 
 ### Step 1. Install and configure AuthKit
 
-Visit [https://authkit.com](https://authkit.com) to get up and running with AuthKit, the world's best login box. 
+Visit [the WorkOS AuthKit Quickstart Guide](https://workos.com/docs/user-management/nextjs) to get up and running with AuthKit, the world's best login box. 
 
 ## Resources
 
