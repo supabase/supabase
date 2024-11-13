@@ -16,6 +16,7 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
+import { tableEditorKeys } from 'data/table-editor/keys'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
@@ -213,6 +214,8 @@ export const createColumn = async ({
   selectedTable,
   primaryKey,
   foreignKeyRelations = [],
+  skipSuccessMessage = false,
+  toastId: _toastId,
 }: {
   projectRef: string
   connectionString: string | undefined
@@ -220,8 +223,10 @@ export const createColumn = async ({
   selectedTable: PostgresTable
   primaryKey?: Constraint
   foreignKeyRelations?: ForeignKey[]
+  skipSuccessMessage?: boolean
+  toastId?: string | number
 }) => {
-  const toastId = toast.loading(`Creating column "${payload.name}"...`)
+  const toastId = _toastId ?? toast.loading(`Creating column "${payload.name}"...`)
   try {
     // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
@@ -267,7 +272,9 @@ export const createColumn = async ({
       })
     }
 
-    toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+    if (!skipSuccessMessage) {
+      toast.success(`Successfully created column "${column.name}"`, { id: toastId })
+    }
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })
     return { error }
@@ -691,6 +698,8 @@ export const updateTable = async ({
         connectionString: connectionString,
         payload: columnPayload,
         selectedTable: updatedTable,
+        skipSuccessMessage: true,
+        toastId,
       })
     } else {
       const originalColumn = find(originalColumns, { id: column.id })
@@ -698,16 +707,15 @@ export const updateTable = async ({
         const columnPayload = generateUpdateColumnPayload(originalColumn, updatedTable, column)
         if (!isEmpty(columnPayload)) {
           toast.loading(`Updating column ${column.name} from ${updatedTable.name}`, { id: toastId })
-          const skipPKCreation = true
-          const skipSuccessMessage = true
+
           const res = await updateColumn({
             projectRef: projectRef,
             connectionString: connectionString,
             id: column.id,
             payload: columnPayload,
             selectedTable: updatedTable,
-            skipPKCreation,
-            skipSuccessMessage,
+            skipPKCreation: true,
+            skipSuccessMessage: true,
           })
           if (res?.error) {
             hasError = true
@@ -741,11 +749,15 @@ export const updateTable = async ({
   const queryClient = getQueryClient()
 
   await Promise.all([
+    queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
     queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
-    queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id)),
     queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
   ])
+
+  // We need to invalidate tableRowsAndCount after tableEditor
+  // to ensure the query sent is correct
+  await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
 
   return {
     table: await getTableEditor({
