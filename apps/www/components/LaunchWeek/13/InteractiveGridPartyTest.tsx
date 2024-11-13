@@ -10,24 +10,27 @@ const GRID_SIZE = 100
 const CELL_SIZE = 40
 const CANVAS_WIDTH = 1800
 const CANVAS_HEIGHT = 1600
-const HOVER_DURATION = 100
-const FADE_DURATION = 300
+const HOVER_DURATION = 500
+const FADE_DURATION = 400
 
 interface CellState {
   isHovered: boolean
   fadeStartTime: number | null
   color: string
+  userId: string
 }
 
 interface CursorPosition {
   x: number
   y: number
+  cellX: number
+  cellY: number
+  lastCell: string | null
 }
 
 export const INTERACTIVE_GRID_COLORS = (isDark: boolean) => ({
   GRID_STROKE: isDark ? '#242424' : '#EDEDED',
   CURRENT_USER_HOVER: isDark ? '#242424' : '#d3d3d3',
-  // HOVER_COLORS: isDark ? ['#242424'] : ['#D3D3D3'],
   HOVER_COLORS: isDark
     ? ['#822A17', '#1F7A2F', '#172A82', '#520F57']
     : ['#FF8166', '#5CD671', '#6E86F7', '#F999FF'],
@@ -69,36 +72,53 @@ export default function InteractiveGrid() {
     [userColors, isDarkTheme]
   )
 
-  const setCellHovered = useCallback(
-    (key: string, isHovered: boolean, color: string) => {
+  const startCellFade = useCallback((cellKey: string) => {
+    setHoveredCells((prev) => {
+      const newState = new Map(prev)
+      const cell = newState.get(cellKey)
+      if (cell) {
+        newState.set(cellKey, {
+          ...cell,
+          isHovered: false,
+          fadeStartTime: Date.now(),
+        })
+      }
+      return newState
+    })
+  }, [])
+
+  const handleCursorMove = useCallback(
+    (userId: string, position: CursorPosition) => {
+      const currentCell = `${position.cellX},${position.cellY}`
+      const prevCell = userCursors[userId]?.lastCell
+
+      // Set new cell as hovered
       setHoveredCells((prev) => {
         const newState = new Map(prev)
-        if (isHovered) {
-          newState.set(key, { isHovered: true, fadeStartTime: null, color })
-        } else {
-          const existingCell = newState.get(key)
-          if (existingCell && existingCell.isHovered) {
-            newState.set(key, {
-              isHovered: false,
-              fadeStartTime: Date.now() + HOVER_DURATION,
-              color,
-            })
-          }
-        }
-
-        // Broadcast hover state change to others
-        if (realtimeChannel) {
-          realtimeChannel.send({
-            type: 'broadcast',
-            event: 'hover',
-            payload: { cellKey: key, isHovered, color },
-          })
-        }
-
+        newState.set(currentCell, {
+          isHovered: true,
+          fadeStartTime: null,
+          color: getUserColor(userId),
+          userId,
+        })
         return newState
       })
+
+      // Start fade on previous cell if it exists
+      if (prevCell && prevCell !== currentCell) {
+        startCellFade(prevCell)
+      }
+
+      // Update cursor position
+      setUserCursors((prev) => ({
+        ...prev,
+        [userId]: {
+          ...position,
+          lastCell: currentCell,
+        },
+      }))
     },
-    [realtimeChannel]
+    [userCursors, getUserColor, startCellFade]
   )
 
   const drawGrid = useCallback(
@@ -107,36 +127,43 @@ export default function InteractiveGrid() {
       ctx.lineWidth = 0.2
       ctx.strokeStyle = INTERACTIVE_GRID_COLORS(isDarkTheme).GRID_STROKE
 
+      // Draw grid cells
       for (let x = 0; x < GRID_SIZE; x++) {
         for (let y = 0; y < GRID_SIZE; y++) {
           const cellX = x * CELL_SIZE
           const cellY = y * CELL_SIZE
-
           ctx.strokeRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
 
           const cellKey = `${x},${y}`
           const cellState = hoveredCells.get(cellKey)
+
           if (cellState) {
             let opacity = 0.5
+
             if (!cellState.isHovered && cellState.fadeStartTime) {
               const fadeElapsed = currentTime - cellState.fadeStartTime
-              if (fadeElapsed >= 0) {
-                opacity = Math.max(0, 0.5 * (1 - fadeElapsed / FADE_DURATION))
-                if (opacity === 0) {
-                  setHoveredCells((prev) => {
-                    const newState = new Map(prev)
-                    newState.delete(cellKey)
-                    return newState
-                  })
-                }
+              opacity = Math.max(0, 0.5 * (1 - fadeElapsed / FADE_DURATION))
+
+              if (opacity <= 0) {
+                setHoveredCells((prev) => {
+                  const newState = new Map(prev)
+                  newState.delete(cellKey)
+                  return newState
+                })
+                continue
               }
             }
-            ctx.fillStyle = `rgba(${parseInt(cellState.color.slice(1, 3), 16)}, ${parseInt(cellState.color.slice(3, 5), 16)}, ${parseInt(cellState.color.slice(5, 7), 16)}, ${opacity})`
+
+            ctx.fillStyle = `rgba(${parseInt(cellState.color.slice(1, 3), 16)}, ${parseInt(
+              cellState.color.slice(3, 5),
+              16
+            )}, ${parseInt(cellState.color.slice(5, 7), 16)}, ${opacity})`
             ctx.fillRect(cellX, cellY, CELL_SIZE, CELL_SIZE)
           }
         }
       }
 
+      // Draw cursors
       Object.entries(userCursors).forEach(([userId, cursor]) => {
         ctx.fillStyle =
           userId === CURRENT_USER_ID
@@ -174,77 +201,72 @@ export default function InteractiveGrid() {
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement>) => {
-      const x = Math.floor(e.nativeEvent.offsetX / CELL_SIZE)
-      const y = Math.floor(e.nativeEvent.offsetY / CELL_SIZE)
-      const cellKey = `${x},${y}`
-      const userColor = getUserColor(CURRENT_USER_ID)
+      const x = e.nativeEvent.offsetX
+      const y = e.nativeEvent.offsetY
+      const cellX = Math.floor(x / CELL_SIZE)
+      const cellY = Math.floor(y / CELL_SIZE)
 
-      if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
-        setCellHovered(cellKey, true, userColor)
+      if (cellX >= 0 && cellX < GRID_SIZE && cellY >= 0 && cellY < GRID_SIZE) {
+        const position = {
+          x,
+          y,
+          cellX,
+          cellY,
+          lastCell: userCursors[CURRENT_USER_ID]?.lastCell || null,
+        }
 
-        hoveredCells.forEach((_, key) => {
-          if (key !== cellKey) {
-            setCellHovered(key, false, userColor)
-          }
-        })
+        // Update local state
+        handleCursorMove(CURRENT_USER_ID, position)
 
+        // Broadcast position
         if (realtimeChannel) {
           realtimeChannel.send({
             type: 'broadcast',
             event: 'cursor',
             payload: {
-              x: e.nativeEvent.offsetX,
-              y: e.nativeEvent.offsetY,
               userId: CURRENT_USER_ID,
+              position,
             },
           })
         }
       }
     },
-    [hoveredCells, setCellHovered, realtimeChannel, getUserColor, isDarkTheme]
+    [realtimeChannel, handleCursorMove, userCursors]
   )
 
   const handleMouseLeave = useCallback(() => {
-    hoveredCells.forEach((_, key) => {
-      setCellHovered(key, false, getUserColor(CURRENT_USER_ID))
+    const cursor = userCursors[CURRENT_USER_ID]
+    if (cursor?.lastCell) {
+      startCellFade(cursor.lastCell)
+    }
+
+    setUserCursors((prev) => {
+      const newCursors = { ...prev }
+      delete newCursors[CURRENT_USER_ID]
+      return newCursors
     })
-  }, [hoveredCells, setCellHovered, getUserColor, userData])
+  }, [userCursors, startCellFade])
 
   useEffect(() => {
     if (!realtimeChannel && supabase) {
-      const hoverChannel = supabase.channel('hover_presence', {
+      const channel = supabase.channel('cursor_tracking', {
         config: { broadcast: { ack: true } },
       })
 
-      setRealtimeChannel(hoverChannel)
-
-      hoverChannel
-        .on('broadcast', { event: 'hover' }, ({ payload }) => {
-          setCellHovered(payload.cellKey, payload.isHovered, payload.color)
-        })
+      channel
         .on('broadcast', { event: 'cursor' }, ({ payload }) => {
-          setUserCursors((prev) => ({
-            ...prev,
-            [payload.userId]: { x: payload.x, y: payload.y },
-          }))
+          // Handle cursor updates from other users
+          handleCursorMove(payload.userId, payload.position)
         })
-        .subscribe((status) => {
-          if (status !== 'SUBSCRIBED') return
-          hoverChannel.track({})
-        })
+        .subscribe()
 
-      hoverChannel.on('presence', { event: 'sync' }, () => {
-        const newState = hoverChannel.presenceState()
-        setOnlineUsers(
-          [...Object.entries(newState).map(([_, value]) => value[0])].filter(onlyUnique)
-        )
-      })
-    }
+      setRealtimeChannel(channel)
 
-    return () => {
-      realtimeChannel?.unsubscribe()
+      return () => {
+        channel.unsubscribe()
+      }
     }
-  }, [supabase, realtimeChannel])
+  }, [supabase, handleCursorMove])
 
   return (
     <div className="absolute inset-0 w-full h-full flex justify-center items-center max-h-full lg:max-h-screen">
