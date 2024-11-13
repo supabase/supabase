@@ -68,9 +68,8 @@ export const EmptyStatePanel = ({
           )}
           {aiButtonText && (
             <Button
-              type="default"
-              icon={<Sparkles className="w-4 h-4 text-white" />}
-              className="!bg-[#6366f1] hover:!bg-[#6366f1]/90 text-white border border-[#6366f1]"
+              type="primary"
+              icon={<Sparkles className="w-4 h-4" />}
               onClick={onAiButtonClick}
             >
               {aiButtonText}

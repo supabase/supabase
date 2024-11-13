@@ -22,10 +22,10 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
 
   return [
     {
-      key: 'editor',
+      key: 'explorer',
       label: 'Explorer',
       icon: <PackageSearch size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
       linkElement: <EditorIndexPageLink projectRef={ref} />,
     },
     // {
