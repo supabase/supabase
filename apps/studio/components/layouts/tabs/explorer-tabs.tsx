@@ -1,17 +1,35 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useActionKey } from 'hooks/useActionKey'
-import { Eye, FileJson2, PanelLeftClose, PanelLeftOpen, Table2, Workflow, X } from 'lucide-react'
+import {
+  CirclePlus,
+  Eye,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Plus,
+  Table2,
+  Workflow,
+  X,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { getTabsStore, makeTabPermanent, tabsHelpers, type Tab, type TabType } from 'state/tabs'
+import {
+  getTabsStore,
+  makeTabPermanent,
+  openNewContentTab,
+  removeTab,
+  type Tab,
+  type TabType,
+  handleTabNavigation,
+  handleTabClose,
+  handleTabDragEnd,
+} from 'state/tabs'
 import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
 import { sidebarState } from './sidebar-state'
-import { motion, AnimatePresence } from 'framer-motion'
-import { nanoid } from 'nanoid'
 
 interface TabsProps {
   storeKey: string
@@ -46,7 +64,7 @@ const getTabIcon = (type: TabType) => {
         />
       )
     default:
-      return <FileJson2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+      return <CirclePlus size={14} strokeWidth={1.5} className="text-foreground-lighter" />
   }
 }
 
@@ -182,6 +200,10 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
 
+  // Separate new tab from regular tabs
+  const regularTabs = openTabs.filter((tab) => tab.type !== 'new')
+  const newTab = openTabs.find((tab) => tab.type === 'new')
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     if (!over || active.id === over.id) return
@@ -189,120 +211,26 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     const oldIndex = tabs.openTabs.indexOf(active.id.toString())
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
-    // Only make permanent if the tab actually moved position
     if (oldIndex !== newIndex) {
-      const draggedTab = tabs.tabsMap[active.id.toString()]
-      if (draggedTab?.isPreview) {
-        makeTabPermanent(storeKey, active.id.toString())
-      }
-
-      // Then reorder the tabs
-      const newOpenTabs = [...tabs.openTabs]
-      newOpenTabs.splice(oldIndex, 1)
-      newOpenTabs.splice(newIndex, 0, active.id.toString())
-
-      store.openTabs = newOpenTabs
-      store.activeTab = active.id.toString()
-
-      const tab = tabs.tabsMap[active.id.toString()]
-      if (tab) {
-        handleTabChange(active.id.toString())
-      }
+      handleTabDragEnd(storeKey, oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
   const handleClose = (id: string) => {
-    const currentTab = tabs.tabsMap[id]
-    const newTabs = tabs.openTabs.filter((tabId) => tabId !== id)
-    const nextTabId = newTabs[newTabs.length - 1]
-    const nextTab = nextTabId ? tabs.tabsMap[nextTabId] : null
-
-    if (nextTab) {
-      switch (nextTab.type) {
-        case 'sql':
-          router.push(`/project/${router.query.ref}/sql/${nextTab.metadata?.sqlId}`)
-          break
-        case 'table':
-          router.push(
-            `/project/${router.query.ref}/editor/${nextTab.metadata?.tableId}?schema=${nextTab.metadata?.schema}`
-          )
-          break
-        case 'schema':
-          router.push(`/project/${router.query.ref}/explorer/schema/${nextTab.metadata?.schema}`)
-          break
-      }
-    } else {
-      router.push(`/project/${router.query.ref}/explorer`)
-    }
-
-    store.openTabs = newTabs
-    store.activeTab = nextTabId ?? null
-    delete store.tabsMap[id]
-
-    onClose?.(id)
+    handleTabClose(storeKey, id, router, onClose)
   }
 
   const handleTabChange = (id: string) => {
-    const tab = tabs.tabsMap[id]
-    if (!tab) return
-
-    store.activeTab = id
-
-    switch (tab.type) {
-      case 'sql':
-        // We use the schema query param from the URL to set the schema for the SQL tab
-        // this can be improved later
-        const schema = (router.query.schema as string) || 'public'
-        router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
-        break
-      case 'table':
-        router.push(
-          `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
-        )
-        break
-      case 'schema':
-        router.push(`/project/${router.query.ref}/explorer/schema/${tab.metadata?.schema}`)
-        break
-      case 'view':
-        router.push(
-          `/project/${router.query.ref}/explorer/views/${tab.metadata?.schema}/${tab.metadata?.name}`
-        )
-        break
-      case 'function':
-        router.push(
-          `/project/${router.query.ref}/explorer/functions/${tab.metadata?.schema}/${tab.metadata?.name}`
-        )
-        break
-    }
+    handleTabNavigation(storeKey, id, router)
   }
 
-  const handleItemClick = (
-    event: React.MouseEvent,
-    item: { name: string; schema: string; type: TabType }
-  ) => {
-    const store = getTabsStore(storeKey)
-
-    // If double-clicked or modifier key, open as permanent tab
-    if (event.detail === 2 || event.metaKey || event.ctrlKey) {
-      const id = nanoid()
-      store.tabsMap[id] = {
-        id,
-        type: item.type,
-        label: item.name,
-        metadata: { schema: item.schema },
-        isPreview: false,
-      }
-      store.openTabs.push(id)
-      store.activeTab = id
-    } else {
-      // Open as preview tab
-      tabsHelpers.openInPreview(store, {
-        type: item.type,
-        label: item.name,
-        metadata: { schema: item.schema },
-      })
-    }
+  const handleNewClick = () => {
+    openNewContentTab(storeKey)
+    router.push(`/project/${router.query.ref}/explorer/new`)
   }
+
+  const hasNewTab = Object.values(tabs.tabsMap).some((tab) => tab.type === 'new')
+  const isOnNewPage = router.pathname.endsWith('/explorer/new')
 
   return (
     <Tabs_Shadcn_
@@ -330,12 +258,13 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
           )}
         </button>
 
+        {/* Draggable regular tabs */}
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <SortableContext
-            items={openTabs.map((tab) => tab.id)}
+            items={regularTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
           >
-            {openTabs.map((tab, index) => (
+            {regularTabs.map((tab, index) => (
               <SortableTab
                 key={tab.id}
                 tab={tab}
@@ -347,6 +276,54 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
             ))}
           </SortableContext>
         </DndContext>
+
+        {/* Non-draggable new tab */}
+        {newTab && (
+          <>
+            <TabsTrigger_Shadcn_
+              value={newTab.id}
+              className={cn(
+                'flex items-center gap-2 px-3 text-xs',
+                'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                'relative group h-full border-t-2 !border-b-0',
+                'hover:bg-surface-300 dark:hover:bg-surface-100'
+              )}
+            >
+              {getTabIcon(newTab.type)}
+              <div className="flex items-center gap-0">
+                <span>{newTab.type === 'schema' ? 'schema' : newTab.label || 'Untitled'}</span>
+              </div>
+              <span
+                role="button"
+                onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  handleClose(newTab.id)
+                }}
+                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                onMouseDown={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+              >
+                <X size={12} className="text-foreground-light" />
+              </span>{' '}
+              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+            </TabsTrigger_Shadcn_>
+          </>
+        )}
+
+        {!isOnNewPage && !hasNewTab && (
+          <button
+            className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-l"
+            onClick={handleNewClick}
+          >
+            <Plus
+              size={16}
+              strokeWidth={1.5}
+              className="text-foreground-lighter hover:text-foreground-light"
+            />
+          </button>
+        )}
       </TabsList_Shadcn_>
     </Tabs_Shadcn_>
   )

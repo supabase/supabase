@@ -26,7 +26,7 @@ interface SQLEditorTreeViewItemProps {
   isBranch: boolean
   isSelected: boolean
   isOpened?: boolean
-  isExpanded: boolean
+  isExpanded?: boolean
   isMultiSelected?: boolean
   status?: 'editing' | 'saving' | 'idle'
   getNodeProps: () => any

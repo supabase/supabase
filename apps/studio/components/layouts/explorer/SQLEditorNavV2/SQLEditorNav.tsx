@@ -365,7 +365,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                       <SQLEditorTreeViewItem
                         {...props}
                         element={element}
-                        isOpened={isExpanded}
+                        isOpened={isOpened}
                         onSelectDelete={() => {
                           setShowDeleteModal(true)
                           setSelectedSnippets([element.metadata as unknown as Snippet])

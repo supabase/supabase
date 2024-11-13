@@ -1,8 +1,9 @@
 import { proxy } from 'valtio'
 import { ReactNode } from 'react'
 import { nanoid } from 'nanoid'
+import { useRouter } from 'next/router'
 
-export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function'
+export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function' | 'new'
 
 export interface Tab {
   id: string
@@ -112,4 +113,114 @@ export const makeActiveTabPermanent = (storeKey: string) => {
     return true
   }
   return false
+}
+
+export const openNewContentTab = (storeKey: string) => {
+  const tab: Tab = {
+    id: `new-${nanoid()}`,
+    type: 'new',
+    label: 'New',
+    metadata: {},
+    isPreview: false,
+  }
+
+  addTab(storeKey, tab)
+}
+
+export const removeNewTab = (storeKey: string) => {
+  const store = getTabsStore(storeKey)
+  const newTab = Object.values(store.tabsMap).find((tab) => tab.type === 'new')
+  if (newTab) {
+    removeTab(storeKey, newTab.id)
+  }
+}
+
+export const handleTabNavigation = (storeKey: string, id: string, router: any) => {
+  const store = getTabsStore(storeKey)
+  const tab = store.tabsMap[id]
+  if (!tab) return
+
+  store.activeTab = id
+
+  switch (tab.type) {
+    case 'sql':
+      const schema = (router.query.schema as string) || 'public'
+      router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
+      break
+    case 'table':
+      router.push(
+        `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
+      )
+      break
+    case 'schema':
+      router.push(`/project/${router.query.ref}/explorer/schema/${tab.metadata?.schema}`)
+      break
+    case 'view':
+      router.push(
+        `/project/${router.query.ref}/explorer/views/${tab.metadata?.schema}/${tab.metadata?.name}`
+      )
+      break
+    case 'function':
+      router.push(
+        `/project/${router.query.ref}/explorer/functions/${tab.metadata?.schema}/${tab.metadata?.name}`
+      )
+      break
+    case 'new':
+      router.push(`/project/${router.query.ref}/explorer/new`)
+      break
+  }
+}
+
+export const handleTabClose = (
+  storeKey: string,
+  id: string,
+  router: any,
+  onClose?: (id: string) => void
+) => {
+  const store = getTabsStore(storeKey)
+  const currentTab = store.tabsMap[id]
+  const newTabs = store.openTabs.filter((tabId) => tabId !== id)
+  const nextTabId = newTabs[newTabs.length - 1]
+  const nextTab = nextTabId ? store.tabsMap[nextTabId] : null
+
+  // Update store first
+  store.openTabs = newTabs
+  store.activeTab = nextTabId ?? null
+  delete store.tabsMap[id]
+
+  // Then handle navigation based on next tab
+  if (nextTab) {
+    handleTabNavigation(storeKey, nextTab.id, router)
+  } else {
+    router.push(`/project/${router.query.ref}/explorer`)
+  }
+
+  onClose?.(id)
+}
+
+export const handleTabDragEnd = (
+  storeKey: string,
+  oldIndex: number,
+  newIndex: number,
+  tabId: string,
+  router: any
+) => {
+  const store = getTabsStore(storeKey)
+
+  // Make permanent if needed
+  const draggedTab = store.tabsMap[tabId]
+  if (draggedTab?.isPreview) {
+    makeTabPermanent(storeKey, tabId)
+  }
+
+  // Reorder tabs
+  const newOpenTabs = [...store.openTabs]
+  newOpenTabs.splice(oldIndex, 1)
+  newOpenTabs.splice(newIndex, 0, tabId)
+
+  store.openTabs = newOpenTabs
+  store.activeTab = tabId
+
+  // Handle navigation
+  handleTabNavigation(storeKey, tabId, router)
 }

@@ -330,7 +330,7 @@ const ExplorerPage: NextPageWithLayout = () => {
 
 ExplorerPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <ExplorerLayout hideTabs>{page}</ExplorerLayout>
+    <ExplorerLayout>{page}</ExplorerLayout>
   </ProjectContextFromParamsProvider>
 )
 
