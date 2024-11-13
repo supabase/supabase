@@ -107,7 +107,7 @@ const { data, error } = await supabase.from('posts').insert({
 ### Queries with filtering
 
 If you use an IVFFlat or HNSW index and naively filter the results based on the value of another column, you may get fewer rows returned than requested.
-E.g. 
+For example
 For example, the following query may return fewer than 5 rows, even if 5 corresponding rows exist in the database. This is because the embedding index may not return 5 rows matching the filter.
 
 ```
