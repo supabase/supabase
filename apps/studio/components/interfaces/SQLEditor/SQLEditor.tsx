@@ -54,7 +54,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
-import { AiAssistantPanel } from './AiAssistantPanel'
 import { DiffActionBar } from './DiffActionBar'
 import {
   ROWS_PER_PAGE_OPTIONS,
@@ -863,26 +862,6 @@ const SQLEditor = () => {
               )}
             </ResizablePanel>
           </ResizablePanelGroup>
-        </ResizablePanel>
-
-        <ResizableHandle withHandle />
-
-        <ResizablePanel
-          ref={aiPanelRef}
-          collapsible
-          collapsedSize={0}
-          minSize={31}
-          maxSize={40}
-          onCollapse={() => setIsAiOpen(false)}
-          onExpand={() => setIsAiOpen(true)}
-        >
-          <AiAssistantPanel
-            selectedMessage={selectedMessage}
-            existingSql={editorRef.current?.getValue() || ''}
-            includeSchemaMetadata={includeSchemaMetadata}
-            onDiff={updateEditorWithCheckForDiff}
-            onClose={() => aiPanelRef.current?.collapse()}
-          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </>
