@@ -257,7 +257,7 @@ const RestoreToNewProject = () => {
         title="Restore to new project requires physical backups"
         description={
           <>
-            Enable physical backups to restore to a new project.
+            Physical backups must be enabled to restore your database to a new project.
             <br /> Find out more about how backups work at supabase{' '}
             <Link
               target="_blank"
