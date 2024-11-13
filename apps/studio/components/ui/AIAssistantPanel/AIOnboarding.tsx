@@ -13,8 +13,8 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
   }
 
   return (
-    <div className="w-full px-content py-content flex flex-col flex-1 h-full">
-      <div className="shrink-0 h-64 w-auto overflow-hidden -mx-8 -mt-8 relative">
+    <div className="w-full px-8 py-content flex flex-col flex-1 h-full">
+      <div className="shrink-0 h-64 mb-5 w-auto overflow-hidden -mx-8 -mt-8 relative">
         <motion.div
           initial={{ height: '800%', bottom: 0 }}
           animate={{ height: '100%', bottom: 0, transition: { duration: 8 } }}
@@ -55,11 +55,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0 }}
       >
-        <p className="text-base mb-2">How can I help you today?</p>
-        <p className="text-sm text-foreground-lighter mb-6">
-          I can help you get setup and even generate your entire database schema. Describe what you
-          want to build.
-        </p>
+        <p className="text-base mb-8">How can I help you today?</p>
       </motion.div>
       <motion.div className="space-y-6 pb-16">
         <motion.section
