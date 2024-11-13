@@ -17,6 +17,7 @@ import {
 } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
+import { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useUrlState } from 'hooks/ui/useUrlState'
@@ -30,7 +31,6 @@ import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
-import { TableRowsData } from 'data/table-rows/table-rows-query'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */

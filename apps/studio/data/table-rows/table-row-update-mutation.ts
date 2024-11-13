@@ -59,6 +59,7 @@ export async function updateTableRow({
     connectionString,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    queryKey: ['table-row-update', table.id],
   })
 
   return result
@@ -81,7 +82,9 @@ export const useTableRowUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+        await queryClient.invalidateQueries(
+          tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
