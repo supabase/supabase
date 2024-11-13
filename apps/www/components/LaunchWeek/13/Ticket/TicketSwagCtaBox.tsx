@@ -40,7 +40,7 @@ export default function TicketSwagCtaBox({
             className="object-top mx-auto bg-foreground bg-center inset-x-0 w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
           /> */}
         </div>
-        <div className="flex flex-col gap-2 pl-4 md:pl-6 pr-12 text-left text-foreground-light text-sm">
+        <div className="flex flex-col gap-2 pl-4 md:pl-6 pr-12 text-left text-foreground-light text-sm xl:text-base">
           {hasPlatinumTicket ? (
             <div>
               {hasSecretTicket ? (
