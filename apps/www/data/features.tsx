@@ -43,6 +43,7 @@ export enum PRODUCT_STAGES {
   PRIVATE_ALPHA = 'Private Alpha',
   PUBLIC_ALPHA = 'Public Alpha',
   BETA = 'Beta',
+  PUBLIC_BETA = 'Public Beta',
   GA = 'General Availability',
 }
 
@@ -630,7 +631,7 @@ This feature is particularly valuable for teams looking to optimize their databa
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -1568,7 +1569,7 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     slug: 'role-based-access-control',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   // Analytics
@@ -1645,7 +1646,7 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     slug: 'soc-2-compliance',
     status: {
       stage: PRODUCT_STAGES.GA,
-      availableOnSelfHosted: true,
+      availableOnSelfHosted: false,
     },
   },
   // Studio
@@ -1671,7 +1672,7 @@ This feature is especially beneficial for teams looking to improve their databas
       'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
     slug: 'ai-query-assistance',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
@@ -1801,7 +1802,7 @@ This feature is essential for organizations aiming to maintain high security sta
     docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
     slug: 'security-and-performance-advisor',
     status: {
-      stage: PRODUCT_STAGES.GA,
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: true,
     },
   },
