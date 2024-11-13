@@ -22,6 +22,7 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
+    "@ai-sdk/openai": "^0.0.72",
     "@aws-crypto/sha256-browser": "^3.0.0",
     "@dagrejs/dagre": "^1.0.4",
     "@graphiql/react": "^0.19.4",
