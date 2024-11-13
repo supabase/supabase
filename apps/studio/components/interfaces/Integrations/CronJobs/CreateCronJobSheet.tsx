@@ -42,6 +42,7 @@ import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -131,7 +132,7 @@ export const CreateCronJobSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '',
+      schedule: selectedCronJob?.schedule || '* * * * * *',
       values: cronJobValues,
     },
   })
