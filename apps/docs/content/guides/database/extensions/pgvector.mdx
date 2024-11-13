@@ -113,8 +113,7 @@ SELECT * FROM items WHERE category_id = 123 ORDER BY embedding <-> '[3,1,2]' LIM
 ```
 filters results of vector column embedding by another column ```category_id```.
 
-Then you can use [specific syntax for iterative search](https://github.com/pgvector/pgvector/?tab=readme-ov-file#iterative-index-scans) to get exact number of results as in the query.
-
+To get the exact number of requested rows, use [iterative search](https://github.com/pgvector/pgvector/?tab=readme-ov-file#iterative-index-scans) to continue scanning the index until enough results are found.
 ## More pgvector and Supabase resources
 
 - [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
