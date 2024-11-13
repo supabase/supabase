@@ -374,7 +374,6 @@ const RestoreToNewProject = () => {
   if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
     return (
       <>
-        t2
         <BackupsEmpty />
       </>
     )
@@ -551,7 +550,6 @@ const RestoreToNewProject = () => {
           <Panel>
             {cloneBackups?.backups.length === 0 ? (
               <>
-                t3
                 <BackupsEmpty />
               </>
             ) : (
