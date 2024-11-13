@@ -33,7 +33,7 @@ Most major browsers support WebAuthn. Check the [caniuse specification](https://
 
 ## Types of Authenticators
 
-An authenticator is a component that securely generates and stores cryptographic keys associated with a particular relying \***\*party (web page origin) and a credential \*\***ID (a unique identifier for the key). The authenticator uses these keys to authenticate the user to the relying party without directly storing user-specific data like the user ID.
+An authenticator is a component that securely generates and stores cryptographic keys associated with a particular relying party (web page origin) and a credential ID (a unique identifier for the key). The authenticator uses these keys to authenticate the user to the relying party without directly storing user-specific data like the user ID.
 
 There are two main types of authenticators:
 
@@ -91,10 +91,7 @@ You can enroll a WebAuthn factor with a single step:
 import { browserSupportsWebAuthn } from '@supabase/supabase-js'
 if (supabase.auth.browserSupportsWebAuthn()) {
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn'})
-}) else {
-   // Use another MFA method, such as MFA (Phone)
-   // const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'phone', phone: '<your-phone-number>' })
-};
+})
 ```
 
 Or in multiple-steps by setting the `useMultiStepEnroll` parameter to true.
@@ -123,17 +120,78 @@ const credential = await navigator.credentials.create(data)
 const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
 ```
 
+Verification is often done on a page with a single button.
+
+```ts
+export default function MFAWebAuthn() {
+  const [error, setError] = useState(null)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    startAuthentication()
+  }, [])
+
+  const startAuthentication = async () => {
+    setIsAuthenticating(true)
+    setError(null)
+
+    try {
+      const { data, error: authError } = await supabase.auth.mfa.verify({
+        factorType: 'webauthn'
+      })
+
+      if (authError) throw authError
+
+      console.log('Authentication successful', data)
+      // Handle successful authentication here
+      // For example, navigate to protected route:
+      // navigate('/dashboard')
+
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsAuthenticating(false)
+    }
+  }
+
+  return (
+    <div>
+      <h2>Security Verification Required</h2>
+      <p>Please verify your identity using your security key.</p>
+
+      {error && (
+        <div>
+          <p>Error: {error}</p>
+        </div>
+      )}
+
+      <button
+        onClick={startAuthentication}
+        disabled={isAuthenticating}
+      >
+        {isAuthenticating ? 'Verifying...' : 'Verify Identity'}
+      </button>
+
+      <button onClick={() => navigate('/mfa-selection')}>
+        Use Different Method
+      </button>
+    </div>
+  )
+}
+```
+
 `useMultiStep` informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application
 
-When using multi-step enroll there are a substantial number of fields to deal with. The fields are highlighted below:
+When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
 
-| Field Type   | Field Name                | Configurability  | Description                                                           |
-| ------------ | ------------------------- | ---------------- | --------------------------------------------------------------------- |
-| Configurable | `attestation`             | Developer choice | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
-| Configurable | `authenticatorAttachment` | Developer choice | Preferred authenticator type ('platform' or 'cross-platform')         |
-| Configurable | `requireResidentKey`      | Developer choice | Whether a resident key is required (true or false)                    |
-| Configurable | `userVerification`        | Developer choice | User verification preference ('required', 'preferred', 'discouraged') |
-| Configurable | `rp.name`                 | Developer choice | Human-readable name for the Relying Party                             |
+| Field Name                | Configurability  | Description                                                           |
+| ------------------------- | ---------------- | --------------------------------------------------------------------- |
+| `attestation`             | Developer choice | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
+| `authenticatorAttachment` | Developer choice | Preferred authenticator type ('platform' or 'cross-platform')         |
+| `requireResidentKey`      | Developer choice | Whether a resident key is required (true or false)                    |
+| `userVerification`        | Developer choice | User verification preference ('required', 'preferred', 'discouraged') |
+| `rp.name`                 | Developer choice | Human-readable name for the Relying Party                             |
 
 While configurable fields can be set by developers, it's important to choose appropriate values based on your security requirements and user experience considerations.
 
@@ -271,18 +329,18 @@ function MFASelectionPage() {
 export default MFASelectionPage
 ```
 
-Let the user pick their preferred authentication method. Redirect the user to choose between factors or complete verification.
+Let the user pick their preferred authentication method and redirect the user to choose between factors or complete verification.
 
 ## Factor Management
 
 As WebAuthn encompasses Platform and Roaming Authenticators, developers may wish to view the differing types of authenticators. Use the WebAuthn AAGUID to identify the type of authenticator used (e.g. Chrome Profile on Mac, Yubikey). There is a [community sourced JSON](https://github.com/passkeydeveloper/passkey-authenticator-aaguids) mapping from AAGUID to passkey name.
 
 ```ts
-import aaguids from './aaguids.json' with { type: 'json' };
+import aaguids from './aaguids.json' with { type: 'json' }
 
 const { data, error } = await supabase.auth.mfa.listFactors()
 
-const provider_name = aaguids[data.webauthn.webauthn_aaguid]?.name || 'Unknown';
+const provider_name = aaguids[data.webauthn.webauthn_aaguid]?.name || 'Unknown'
 ```
 
 You can confirm that the mapping is accurate by using the helper site [on this page](https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/?combined)
@@ -305,4 +363,8 @@ verify_enabled = true
 
 ### Is WebAuthn only for 2FA?
 
-For the moment, we do not support WebAuthn as a Sign In or Sign Up method. Please check back in the future
+For the moment, we do not support WebAuthn as a Sign In or Sign Up method. Please check back in the future.
+
+### Is WebAuthn Multi-Factor Authentication supported on the Supabase Dashboard?
+
+At the moment, support is limited to use on Supabase Projects. We do not support MFA for WebAuthn on the Suapbase dashboard.
