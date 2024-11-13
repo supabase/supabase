@@ -401,7 +401,8 @@ const RestoreToNewProject = () => {
               <li>
                 A project can only be restored to another project once. <br />
                 <span className="text-foreground-lighter text-xs">
-                  This is a temporary limitation. Please contact us if you need to restore a project to multiple other projects.
+                  This is a temporary limitation. Please contact us if you need to restore a project
+                  to multiple other projects.
                 </span>
               </li>
             </ul>
@@ -531,17 +532,20 @@ const RestoreToNewProject = () => {
         </DialogContent>
       </Dialog>
       {hasPITREnabled ? (
-        <PITRForm
-          onSubmit={() => {
-            setShowConfirmationDialog(true)
-          }}
-          earliestAvailableBackup={dayjs(
-            cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
-          )}
-          latestAvailableBackup={dayjs(
-            cloneBackups?.physicalBackupData.latestPhysicalBackupDateUnix
-          )}
-        />
+        <>
+          <pre>{JSON.stringify(cloneBackups?.physicalBackupData, null, 2)}</pre>
+          <PITRForm
+            onSubmit={() => {
+              setShowConfirmationDialog(true)
+            }}
+            earliestAvailableBackupUnix={
+              cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix || 0
+            }
+            latestAvailableBackupUnix={
+              cloneBackups?.physicalBackupData.latestPhysicalBackupDateUnix || 0
+            }
+          />
+        </>
       ) : (
         <>
           <Panel>

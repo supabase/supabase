@@ -14,7 +14,7 @@ import {
 import { TimezoneSelection } from './TimezoneSelection'
 import TimeInput from './TimeInput'
 import { Timezone } from './PITR.types'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 type Props = {
   onSubmit: (data: {
@@ -22,12 +22,23 @@ type Props = {
     recoveryTimeString: string
     recoveryTimeStringUtc: string
   }) => void
-  earliestAvailableBackup: dayjs.Dayjs
-  latestAvailableBackup: dayjs.Dayjs
+  earliestAvailableBackupUnix: number
+  latestAvailableBackupUnix: number
 }
 
-export function PITRForm({ onSubmit, earliestAvailableBackup, latestAvailableBackup }: Props) {
+export function PITRForm({
+  onSubmit,
+  earliestAvailableBackupUnix,
+  latestAvailableBackupUnix,
+}: Props) {
   const [selectedTimezone, setSelectedTimezone] = useState<Timezone>(getClientTimezone())
+  const earliestAvailableBackup = dayjs
+    .unix(earliestAvailableBackupUnix ?? 0)
+    .tz(selectedTimezone.utc[0])
+  const latestAvailableBackup = dayjs
+    .unix(latestAvailableBackupUnix ?? 0)
+    .tz(selectedTimezone.utc[0])
+
   const [selectedDateRaw, setSelectedDateRaw] = useState<Date>(latestAvailableBackup.toDate())
 
   const selectedDate = dayjs(selectedDateRaw).tz(selectedTimezone.utc[0], true)
@@ -57,9 +68,13 @@ export function PITRForm({ onSubmit, earliestAvailableBackup, latestAvailableBac
   const recoveryTimeString = selectedDate.format('DD MMM YYYY HH:mm:ss')
   const recoveryTimeStringUtc = selectedDate.utc().format('DD MMM YYYY HH:mm:ss')
 
-  const isSelectedOutOfRange =
-    selectedDate &&
-    (selectedDate.isBefore(earliestAvailableBackup) || selectedDate.isAfter(latestAvailableBackup))
+  const isBeforeLatest = selectedDate.isBefore(latestAvailableBackup)
+  const isAfterEarliest = selectedDate.isAfter(earliestAvailableBackup)
+  const isWithinRange = useMemo(
+    () => !!selectedDate && isBeforeLatest && isAfterEarliest,
+    [selectedDate, isBeforeLatest, isAfterEarliest]
+  )
+  console.log({ isWithinRange, isBeforeLatest, isAfterEarliest, selectedDate })
 
   const onUpdateDate = (date: Date) => {
     setSelectedDateRaw(
@@ -86,13 +101,14 @@ export function PITRForm({ onSubmit, earliestAvailableBackup, latestAvailableBac
         footer={
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
-              type="warning"
-              disabled={isSelectedOutOfRange || !selectedDate}
+              type="default"
+              disabled={!selectedDate || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
                 content: {
+                  hidden: !isWithinRange,
                   side: 'bottom',
-                  text: isSelectedOutOfRange
+                  text: !isWithinRange
                     ? 'Selected date is out of range where backups are available'
                     : null,
                 },
