@@ -1,4 +1,4 @@
-import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { Eye, EyeOffIcon, Heart, Pointer, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,7 +31,7 @@ import {
   useSnippets,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { Separator, Skeleton, TreeView } from 'ui'
+import { Separator, Skeleton, TreeView, TreeViewItem } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -495,9 +495,31 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-3 px-4"
-              title="No queries created yet"
+              title="No prviate queries created yet"
               description="Queries will be automatically saved once you start writing in the editor"
-            />
+            >
+              <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed w-60 bg-dash-sidebar h-content -mb-4 mt-3 pointer-events-none">
+                <div className="relative h-content">
+                  <div className="absolute inset-0 pointer-events-none z-10">
+                    <div className="absolute inset-0 bg-gradient-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
+                  </div>
+                  <div className="absolute left-[150px] bottom-[21px] text-foreground-muted z-10 pointer-events-none">
+                    <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />
+                  </div>
+                  {[...Array(4)].map((_, i) => (
+                    <div className="border-l pointer-events-none">
+                      <TreeViewItem
+                        isSelected={i === 2}
+                        key={-(i + 1)}
+                        id={-(i + 1)}
+                        name={`example_query_${i + 1}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </InnerSideBarEmptyPanel>
           ) : (
             <TreeView
               multiSelect
