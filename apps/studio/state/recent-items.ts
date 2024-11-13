@@ -2,7 +2,7 @@ import { proxy, subscribe } from 'valtio'
 import { Tab, TabType } from './tabs'
 
 const RECENT_ITEMS_KEY = 'supabase_recent_items'
-const MAX_RECENT_ITEMS = 15
+const MAX_RECENT_ITEMS = 8
 
 export interface RecentItem {
   id: string

@@ -1,12 +1,13 @@
 import { TabIcon } from 'components/explorer/tabs/TabIcon'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { usePostgresInUse } from 'data/database/postgres-in-use-query'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, LayoutGroup, motion, Variants } from 'framer-motion'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import { BarChart2, Box, Search, Table2, X } from 'lucide-react'
+import { BarChart2, Box, Search, Table2, X, Upload, BaggageClaim, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -15,11 +16,12 @@ import type { RecentItem } from 'state/recent-items'
 import { recentItemsStore } from 'state/recent-items'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { removeNewTab } from 'state/tabs'
-import { Badge, Card, cn, Separator, SQL_ICON } from 'ui'
+import { Badge, Button, Card, cn, Separator, Skeleton, SQL_ICON } from 'ui'
 import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
+
 dayjs.extend(relativeTime)
 
 const itemVariants: Variants = {
@@ -166,6 +168,7 @@ export function NewTab() {
   const { profile } = useProfile()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { isInUse: isPostgresInUse, isLoading: isLoadingCheckingPostgres } = usePostgresInUse()
   const { ref } = router.query
 
   const [isLoading, setIsLoading] = useState(true)
@@ -208,39 +211,87 @@ export function NewTab() {
           <div className="bg-surface-100 p-6 h-full overflow-y-auto py-12">
             <div className="mx-auto max-w-2xl space-y-6">
               {/* Action Cards */}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  {
-                    icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-                    title: 'New Table',
-                    description: 'Create Postgres tables',
-                    bgColor: 'bg-blue-500',
-                    isBeta: false,
-                  },
-                  {
-                    icon: (
-                      <SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />
-                    ),
-                    title: 'New Query',
-                    description: 'Write and execute SQL queries',
-                    bgColor: 'bg-violet-500',
-                    isBeta: false,
-                    onClick: handleNewQuery,
-                  },
-                  {
-                    icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
-                    title: 'New Report',
-                    description: 'Create data visualizations',
-                    bgColor: 'bg-orange-500',
-                    isBeta: true,
-                  },
-                ].map((item, i) => (
+              <div className="flex flex-wrap gap-5">
+                {(!isPostgresInUse
+                  ? [
+                      {
+                        icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                        title: 'Create your first table',
+                        description: 'Design and create a new database table',
+                        bgColor: 'bg-blue-500',
+                        isBeta: false,
+                      },
+                      {
+                        icon: (
+                          <SQL_ICON
+                            className={cn('fill-foreground', 'w-4 h-4')}
+                            strokeWidth={1.5}
+                          />
+                        ),
+                        title: 'Write SQL',
+                        description: 'Create tables and load data with SQL',
+                        bgColor: 'bg-alternative',
+                        isBeta: false,
+                        onClick: handleNewQuery,
+                      },
+                      {
+                        icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                        title: 'Upload CSV',
+                        description: 'Import data from CSV files',
+                        bgColor: 'bg-green-500',
+                        isBeta: false,
+                        onClick: handleNewQuery,
+                      },
+                      {
+                        icon: (
+                          <SQL_ICON
+                            className={cn('fill-foreground', 'w-4 h-4')}
+                            strokeWidth={1.5}
+                          />
+                        ),
+                        title: 'Write SQL',
+                        description: 'Create tables and load data with SQL',
+                        bgColor: 'bg-alternative',
+                        isBeta: false,
+                        onClick: handleNewQuery,
+                      },
+                    ]
+                  : [
+                      {
+                        icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                        title: 'New Table',
+                        description: 'Create Postgres tables',
+                        bgColor: 'bg-blue-500',
+                        isBeta: false,
+                      },
+                      {
+                        icon: (
+                          <SQL_ICON
+                            className={cn('fill-foreground', 'w-4 h-4')}
+                            strokeWidth={1.5}
+                          />
+                        ),
+                        title: 'New Query',
+                        description: 'Execute SQL queries',
+                        bgColor: 'bg-violet-500',
+                        isBeta: false,
+                        onClick: handleNewQuery,
+                      },
+                      {
+                        icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
+                        title: 'New Report',
+                        description: 'Create data visualizations',
+                        bgColor: 'bg-orange-500',
+                        isBeta: true,
+                      },
+                    ]
+                ).map((item, i) => (
                   <Card
                     key={`recent-item-${i}`}
-                    className="bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
+                    className="grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
                     onClick={item.onClick}
                   >
-                    <div className={`relative flex items-center gap-3 text-center`}>
+                    <div className={`relative flex items-center gap-3`}>
                       {item.isBeta && (
                         <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
                           Coming soon
@@ -253,27 +304,71 @@ export function NewTab() {
                       </div>
                       <div className="flex flex-col gap-0">
                         <h3 className="text-sm text-foreground mb-0">{item.title}</h3>
-                        {/* <p className="text-sm text-foreground-light">{item.description}</p> */}
+                        <p className="text-xs text-foreground-light">{item.description}</p>
                       </div>
                     </div>
                   </Card>
                 ))}
               </div>
 
-              {/* Search Bar */}
-              <div className="relative">
-                <Input
-                  placeholder="Search all files"
-                  icon={<Search size={14} className="text-foreground-light" />}
-                />
-              </div>
+              {isLoadingCheckingPostgres ? (
+                <motion.div className="w-full" variants={itemVariants}>
+                  <Skeleton className="w-full h-[160px] rounded-lg" />
+                </motion.div>
+              ) : (
+                !isPostgresInUse && (
+                  <motion.div
+                    className="w-full rounded-lg overflow-hidden relative border border-muted"
+                    variants={itemVariants}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-background-surface-200 via-background-surface-200 to-transparent"></div>
+                    <div className="relative z-10 px-5 py-4 h-full flex gap-5 items-center justify-between">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex gap-4">
+                          <div className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-surface-300 border">
+                            <BaggageClaim
+                              size={14}
+                              className="text-foreground-light"
+                              strokeWidth={1.5}
+                            />
+                          </div>
+                          <div className="flex flex-col gap-1">
+                            <h2 className="text-base text-foreground">
+                              Migrate your Database to Postgres
+                            </h2>
+                            <p className="text-xs text-foreground-light max-w-md">
+                              Already have a database? Migrate any database to Supabase to access
+                              backups, RESTful auto APIs, Authentication and more.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Button type="default" className="rounded-full" iconRight={<BookOpen />}>
+                        Migrate to Postgres
+                      </Button>
+                    </div>
+                  </motion.div>
+                )
+              )}
 
-              {/* Recent Files */}
-              <div className="space-y-4">
-                <h2 className="text-sm text-foreground">Recent files</h2>
+              {isPostgresInUse && (
+                <>
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Input
+                      placeholder="Search all files"
+                      icon={<Search size={14} className="text-foreground-light" />}
+                    />
+                  </div>
 
-                <RecentItems />
-              </div>
+                  {/* Recent Files */}
+                  <div className="space-y-4">
+                    <h2 className="text-sm text-foreground">Recent files</h2>
+
+                    <RecentItems />
+                  </div>
+                </>
+              )}
 
               <Separator />
 
