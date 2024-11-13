@@ -578,16 +578,18 @@ const RestoreToNewProject = () => {
                         <TimestampInfo value={backup.inserted_at} />
                       </div>
                       <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                      <Button
-                        className="ml-auto"
-                        type="outline"
-                        onClick={() => {
-                          setSelectedBackupId(backup.id)
-                          setShowConfirmationDialog(true)
-                        }}
-                      >
-                        Restore
-                      </Button>
+                      {(backup.status as any) === 'COMPLETED' && (
+                        <Button
+                          className="ml-auto"
+                          type="outline"
+                          onClick={() => {
+                            setSelectedBackupId(backup.id)
+                            setShowConfirmationDialog(true)
+                          }}
+                        >
+                          Restore
+                        </Button>
+                      )}
                     </div>
                   )
                 })}
