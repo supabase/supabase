@@ -399,7 +399,7 @@ const RestoreToNewProject = () => {
                 Project region will stay the same: <code>{project?.region || ''}</code>
               </li>
               <li>
-                Each project can only be restored to a new one once. <br />
+                A project can only be restored to another project once. <br />
                 <span className="text-foreground-lighter text-xs">
                   This is a temporary limitation, contact us if you need to restore more than once.
                 </span>
