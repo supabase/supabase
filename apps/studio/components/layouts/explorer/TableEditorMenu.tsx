@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { Edit2, Filter, Plus, Workflow } from 'lucide-react'
+import { Edit2, Filter, Plus, Pointer, Workflow } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
@@ -297,14 +297,43 @@ const TableEditorMenu = () => {
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
-                  className="mx-4"
-                  title="No entities available"
-                  description="This schema has no entities available yet"
-                />
+                  className="mx-4 relative overflow-hidden"
+                  title="No tables or views"
+                  description="Any tables or views you create will be listed here."
+                >
+                  <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed w-60 bg-dash-sidebar h-content -mb-4 mt-3 pointer-events-none">
+                    <div className="relative h-content">
+                      <div className="absolute inset-0 pointer-events-none z-10">
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
+                      </div>
+                      <div className="absolute left-[150px] bottom-[21px] text-foreground-muted z-10 pointer-events-none">
+                        <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />
+                      </div>
+                      {[...Array(4)].map((_, i) => (
+                        <div className="border-l pointer-events-none">
+                          <EntityListItem
+                            isActive={i === 2}
+                            key={-(i + 1)}
+                            item={{
+                              rls_enabled: false,
+                              id: -(i + 1),
+                              name: `example_table_${i + 1}`,
+                              type: i % 2 === 0 ? ENTITY_TYPE.TABLE : ENTITY_TYPE.VIEW,
+                              comment: null,
+                              schema: selectedSchema,
+                            }}
+                            id={-(i + 1)}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </InnerSideBarEmptyPanel>
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
-                  className="mx-2"
+                  className="mx-4"
                   title="No results found"
                   description={`Your search for "${searchText}" did not return any results`}
                 />

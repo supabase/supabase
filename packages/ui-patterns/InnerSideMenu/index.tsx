@@ -233,7 +233,7 @@ const InnerSideBarEmptyPanel = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
+        'border border-muted bg-surface-100 dark:bg-surface-75 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
         props.className
       )}
     >
@@ -244,6 +244,7 @@ const InnerSideBarEmptyPanel = forwardRef<
           <p className="text-xs text-foreground-lighter text-center">{description}</p>
         )}
         {actions && <div className="mt-2">{actions}</div>}
+        {props.children}
       </div>
     </div>
   )

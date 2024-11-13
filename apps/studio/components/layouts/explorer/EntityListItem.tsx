@@ -56,6 +56,7 @@ export interface EntityListItemProps {
   id: number | string
   projectRef: string
   isLocked: boolean
+  isActive?: boolean
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -63,12 +64,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   projectRef,
   item: entity,
   isLocked,
+  isActive: _isActive,
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  const isActive = Number(id) === entity.id
+  const isActive = _isActive ?? Number(id) === entity.id
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
