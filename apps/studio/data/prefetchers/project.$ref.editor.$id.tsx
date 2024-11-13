@@ -54,7 +54,7 @@ export function usePrefetchEditorTablePage() {
             prefetchTableRows(queryClient, {
               projectRef: project?.ref,
               connectionString: project?.connectionString,
-              table: supaTable,
+              tableId: id,
               sorts: sorts ?? formatSortURLParams(supaTable.name, localSorts),
               filters: filters ?? formatFilterURLParams(localFilters),
               page: 1,

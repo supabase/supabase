@@ -2,13 +2,11 @@ import { useQueryClient } from '@tanstack/react-query'
 import { RefreshCw } from 'lucide-react'
 
 import { useParams } from 'common'
-import type { SupaTable } from 'components/grid/types'
-import { Entity } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { Button } from 'ui'
 
 export type RefreshButtonProps = {
-  table: Entity | SupaTable
+  table: { id: number }
   isRefetching?: boolean
 }
 

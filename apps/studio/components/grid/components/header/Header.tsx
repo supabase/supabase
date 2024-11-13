@@ -241,7 +241,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const { data } = useTableRowsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    table,
+    tableId: table.id,
     sorts,
     filters,
     page: snap.page,
@@ -253,7 +253,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,

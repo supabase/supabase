@@ -1,6 +1,6 @@
 import type { GetTableRowsArgs } from './table-rows-query'
 
-type TableRowKeyArgs = Omit<GetTableRowsArgs, 'table'> & { table?: { id: number } }
+type TableRowKeyArgs = Omit<GetTableRowsArgs, 'table'> & { table?: { id?: number } }
 
 export const tableRowKeys = {
   tableRows: (projectRef?: string, { table, ...args }: TableRowKeyArgs = {}) =>

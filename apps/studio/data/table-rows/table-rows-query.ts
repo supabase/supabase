@@ -1,12 +1,19 @@
-import { useQuery, type QueryClient, type UseQueryOptions } from '@tanstack/react-query'
+import {
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+  type UseQueryOptions,
+} from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { Query } from 'components/grid/query/Query'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import {
   JSON_TYPES,
   TEXT_TYPES,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
@@ -191,9 +198,11 @@ export const getTableRowsSql = ({
 
 export type TableRows = { rows: SupaRow[] }
 
-export type TableRowsVariables = GetTableRowsArgs & {
+export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
+  queryClient: QueryClient
   projectRef?: string
   connectionString?: string
+  tableId?: number
 }
 
 export type TableRowsData = TableRows
@@ -201,9 +210,10 @@ export type TableRowsError = ExecuteSqlError
 
 export async function getTableRows(
   {
+    queryClient,
     projectRef,
     connectionString,
-    table,
+    tableId,
     impersonatedRole,
     filters,
     sorts,
@@ -212,6 +222,17 @@ export async function getTableRows(
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
+  const entity = await prefetchTableEditor(queryClient, {
+    projectRef,
+    connectionString,
+    id: tableId,
+  })
+  if (!entity) {
+    throw new Error('Table not found')
+  }
+
+  const table = parseSupaTable(entity)
+
   const sql = wrapWithRoleImpersonation(
     getTableRowsSql({ table, filters, sorts, limit, page, impersonatedRole }),
     {
@@ -240,23 +261,34 @@ export async function getTableRows(
 }
 
 export const useTableRowsQuery = <TData = TableRowsData>(
-  { projectRef, connectionString, table, ...args }: TableRowsVariables,
+  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
   { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
-) =>
-  useQuery<TableRowsData, TableRowsError, TData>(
-    tableRowKeys.tableRows(projectRef, { table, ...args }),
-    ({ signal }) => getTableRows({ projectRef, connectionString, table, ...args }, signal),
+) => {
+  const queryClient = useQueryClient()
+  return useQuery<TableRowsData, TableRowsError, TData>(
+    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    ({ signal }) =>
+      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined' && typeof table !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
       ...options,
     }
   )
+}
 
 export function prefetchTableRows(
   client: QueryClient,
-  { projectRef, connectionString, table, impersonatedRole, ...args }: TableRowsVariables
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    impersonatedRole,
+    ...args
+  }: Omit<TableRowsVariables, 'queryClient'>
 ) {
-  return client.fetchQuery(tableRowKeys.tableRows(projectRef, { table, ...args }), ({ signal }) =>
-    getTableRows({ projectRef, connectionString, table, ...args }, signal)
+  return client.fetchQuery(
+    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
   )
 }

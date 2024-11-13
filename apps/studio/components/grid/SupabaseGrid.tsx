@@ -151,7 +151,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: props.table,
+      tableId: props.table.id,
       sorts,
       filters,
       page: snap.page,

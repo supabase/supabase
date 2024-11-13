@@ -64,7 +64,6 @@ export const useDatabaseColumnDeleteMutation = ({
           ...(table !== undefined
             ? [
                 queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
-                queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id)),
                 queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
                 // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
                 // which has a view dependent on it
@@ -72,6 +71,13 @@ export const useDatabaseColumnDeleteMutation = ({
               ]
             : []),
         ])
+
+        if (table !== undefined) {
+          // We need to invalidate tableRowsAndCount after tableEditor
+          // to ensure the query sent is correct
+          await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
+        }
+
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

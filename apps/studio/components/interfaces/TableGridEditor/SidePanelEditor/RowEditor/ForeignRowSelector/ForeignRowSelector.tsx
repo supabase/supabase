@@ -61,7 +61,7 @@ const ForeignRowSelector = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: supaTable,
+      tableId: table?.id,
       sorts,
       filters,
       page,

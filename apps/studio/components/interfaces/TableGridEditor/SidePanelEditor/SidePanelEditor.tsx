@@ -265,6 +265,8 @@ const SidePanelEditor = ({
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
 
+      // We need to invalidate tableRowsAndCount after tableEditor
+      // to ensure the query sent is correct
       await queryClient.invalidateQueries(
         tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
       )
@@ -474,13 +476,16 @@ const SidePanelEditor = ({
           await Promise.all([
             queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, table.id)),
             queryClient.invalidateQueries(
-              tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-            ),
-            queryClient.invalidateQueries(
               databaseKeys.tableDefinition(project?.ref, selectedTable.id)
             ),
             queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
           ])
+
+          // We need to invalidate tableRowsAndCount after tableEditor
+          // to ensure the query sent is correct
+          await queryClient.invalidateQueries(
+            tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
+          )
 
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
@@ -556,11 +561,9 @@ const SidePanelEditor = ({
       }
     }
 
-    await Promise.all([
-      queryClient.invalidateQueries(
-        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-      ),
-    ])
+    await queryClient.invalidateQueries(
+      tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
+    )
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
     })

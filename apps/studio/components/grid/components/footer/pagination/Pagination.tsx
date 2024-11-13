@@ -44,7 +44,6 @@ const Pagination = () => {
   const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
   const filters = formatFilterURLParams(filter as string[])
   const page = snap.page
-  const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
@@ -62,7 +61,7 @@ const Pagination = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
