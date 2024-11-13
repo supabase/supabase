@@ -106,7 +106,7 @@ const { data, error } = await supabase.from('posts').insert({
 
 ### Queries with filtering
 
-If you use IVFFlat or HNSW index and filter results from the query 
+If you use an IVFFlat or HNSW index and naively filter the results based on the value of another column, you may get fewer rows returned than requested.
 E.g. 
 ```
 SELECT * FROM items WHERE category_id = 123 ORDER BY embedding <-> '[3,1,2]' LIMIT 5;
