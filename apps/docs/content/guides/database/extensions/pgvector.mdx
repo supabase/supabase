@@ -1,7 +1,7 @@
 ---
-id: 'pgvector'
-title: 'pgvector: Embeddings and vector similarity'
-description: 'pgvector: a PostgreSQL extension for storing embeddings and performing vector similarity search.'
+id: "pgvector"
+title: "pgvector: Embeddings and vector similarity"
+description: "pgvector: a PostgreSQL extension for storing embeddings and performing vector similarity search."
 ---
 
 [pgvector](https://github.com/pgvector/pgvector/) is a PostgreSQL extension for vector similarity search. It can also be used for storing [embeddings](https://supabase.com/blog/openai-embeddings-postgres-vector).
@@ -79,27 +79,30 @@ create table posts (
 In this example we'll generate a vector using Transformer.js, then store it in the database using the Supabase client.
 
 ```js
-import { pipeline } from '@xenova/transformers'
-const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
+import { pipeline } from "@xenova/transformers";
+const generateEmbedding = await pipeline(
+  "feature-extraction",
+  "Supabase/gte-small",
+);
 
-const title = 'First post!'
-const body = 'Hello world!'
+const title = "First post!";
+const body = "Hello world!";
 
 // Generate a vector using Transformers.js
 const output = await generateEmbedding(body, {
-  pooling: 'mean',
+  pooling: "mean",
   normalize: true,
-})
+});
 
 // Extract the embedding output
-const embedding = Array.from(output.data)
+const embedding = Array.from(output.data);
 
 // Store the vector in Postgres
-const { data, error } = await supabase.from('posts').insert({
+const { data, error } = await supabase.from("posts").insert({
   title,
   body,
   embedding,
-})
+});
 ```
 
 ## Specific usage cases
@@ -115,6 +118,7 @@ SELECT * FROM items WHERE category_id = 123 ORDER BY embedding <-> '[3,1,2]' LIM
 ```
 
 To get the exact number of requested rows, use [iterative search](https://github.com/pgvector/pgvector/?tab=readme-ov-file#iterative-index-scans) to continue scanning the index until enough results are found.
+
 ## More pgvector and Supabase resources
 
 - [Supabase Clippy: ChatGPT for Supabase Docs](https://supabase.com/blog/chatgpt-supabase-docs)
