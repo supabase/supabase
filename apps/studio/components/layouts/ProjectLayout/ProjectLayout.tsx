@@ -32,6 +32,7 @@ import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { useAppStateSnapshot } from 'state/app-state'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -88,6 +89,7 @@ const ProjectLayout = ({
   const selectedProject = useSelectedProject()
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
+  const { aiAssistantPanel } = useAppStateSnapshot()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
@@ -150,23 +152,44 @@ const ProjectLayout = ({
             />
             <ResizablePanel id="panel-right" className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <div className="h-full w-full overflow-x-hidden flex items-stretch flex-1">
-                <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                  {showPausedState ? (
-                    <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                      <div className="w-full">
-                        <ProjectPausedState product={product} />
+              <ResizablePanelGroup
+                className="h-full w-full overflow-x-hidden flex-1"
+                direction="horizontal"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel
+                  defaultSize={100}
+                  id="panel-content"
+                  className="w-full min-w-[800px]"
+                >
+                  <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                      <ResourceExhaustionWarningBanner />
-                      {children}
-                    </ContentWrapper>
-                  )}
-                </main>
-                <AiAssistantPanel />
-              </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {aiAssistantPanel.open && (
+                  <>
+                    <ResizableHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      className="max-w-[400px] min-w-[400px] bg xl:max-w-none xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                      defaultSize={0}
+                    >
+                      <AiAssistantPanel />
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>

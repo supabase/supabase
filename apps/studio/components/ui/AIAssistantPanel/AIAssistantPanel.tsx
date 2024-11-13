@@ -13,15 +13,13 @@ export const AiAssistantPanel = () => {
   const [chatId, setChatId] = useState(() => uuidv4())
 
   return !open ? null : (
-    <div className="w-[400px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0 shrink-0 border-l bg">
-      <AIAssistant
-        id={chatId}
-        initialMessages={initialMessages}
-        sqlSnippets={sqlSnippets}
-        initialInput={initialInput}
-        className={cn('w-full h-full')}
-        onResetConversation={() => setChatId(uuidv4())}
-      />
-    </div>
+    <AIAssistant
+      id={chatId}
+      initialMessages={initialMessages}
+      sqlSnippets={sqlSnippets}
+      initialInput={initialInput}
+      className={cn('w-full h-full')}
+      onResetConversation={() => setChatId(uuidv4())}
+    />
   )
 }
