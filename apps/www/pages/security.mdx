@@ -44,6 +44,44 @@ export const Section = ({ children, icon, img }) => (
 
 <div className="container mx-auto px-8 sm:px-16 xl:px-20 mb-16">
 
+<h2>Enterprise-grade</h2>
+
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 lg:gap-16 bg-surface-100 border rounded-lg gap-4 transition-colors p-10 mb-20">
+
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### SOC 2
+
+<div className="w-32">
+  <img src="/images/security/soc2-type2.svg" />
+</div>
+
+Supabase is SOC2 Type 2 compliant. This is an important security policy when handling sensitive customer data.
+
+</Section>
+
+<Section icon={<Activity strokeWidth={1}/>}>
+
+### HIPAA
+
+<div className="w-32">
+  <img src="/images/security/HIPAA.svg" />
+</div>
+
+Supabase is HIPAA compliant. You can store Protected Health Information (PHI) on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
+
+</Section>
+
+<Section className="mt-50">
+
+SOC2 Type 2 and HIPAA are available to Enterprise and Team customers. Request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
+
+</Section>
+
+</div>
+
+<h2>Protection for everyone</h2>
+
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
 
 <Section icon={<Lock strokeWidth={1}/>}>
@@ -55,33 +93,6 @@ MFA adds an additional layer of security to your user account, by requiring a se
 
 </Section>
 
-<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
-
-### SOC 2
-
-Supabase is SOC2 Type 2 compliant. This is an important security policy when handling sensitive customer data.
-
-Enterprise and Team customers can access our SOC2 report [on the dashboard](/dashboard/org/_/documents).
-
-<div className="w-32">
-  <img src="/images/security/soc2-type2.svg" />
-</div>
-
-</Section>
-
-<Section icon={<Activity strokeWidth={1}/>}>
-
-### HIPAA
-
-Supabase is HIPAA compliant. You can store Protected Health Information (PHI) on our hosted platform once you enter into a Business Associate Agreement (BAA) with us and fulfill your HIPAA obligations under our [shared responsibility model](/docs/guides/platform/shared-responsibility-model#managing-healthcare-data).
-
-Enterprise and Team customers can request to sign our BAA [on the dashboard](/dashboard/org/_/documents).
-
-<div className="w-32">
-  <img src="/images/security/HIPAA.svg" />
-</div>
-
-</Section>
 <Section icon={<KeyIcon strokeWidth={1}/>}>
 
 ### Data Encryption
