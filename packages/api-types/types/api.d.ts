@@ -2796,9 +2796,11 @@ export interface components {
       success: boolean
     }
     CloneProjectDto: {
-      cloneBackupId: number
+      /** @default 0 */
+      cloneBackupId?: number
       newDbPass: string
       newProjectName: string
+      /** @default 0 */
       recoveryTimeTarget?: number
     }
     Column: {
