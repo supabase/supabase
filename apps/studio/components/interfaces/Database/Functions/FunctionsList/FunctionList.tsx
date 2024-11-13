@@ -125,7 +125,11 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
-                            setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
+                            setAiAssistantPanel({
+                              open: true,
+                              initialInput: 'Help me update this function to do...',
+                              sqlSnippets: [x.complete_statement],
+                            })
                           }}
                         >
                           <Edit size={14} />

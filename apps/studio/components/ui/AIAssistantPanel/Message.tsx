@@ -9,18 +9,18 @@ import { SqlSnippet } from './SqlSnippet'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useProfile } from 'lib/profile'
 import { MessagePre } from './MessagePre'
+import { motion } from 'framer-motion'
+import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 
 interface MessageProps {
   name?: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
   createdAt?: number
-  isDebug?: boolean
   isSelected?: boolean
   isLoading?: boolean
+  readOnly?: boolean
   action?: React.ReactNode
-  context?: { entity: string; schemas: string[]; tables: string[] }
-  onDiff?: (type: DiffType, s: string) => void
   variant?: 'default' | 'warning'
 }
 
@@ -29,43 +29,35 @@ export const Message = function Message({
   role,
   content,
   createdAt,
-  isDebug,
   isLoading,
+  readOnly,
   isSelected = false,
-  context,
   children,
   action = null,
   variant = 'default',
-  onDiff = noop,
 }: PropsWithChildren<MessageProps>) {
   const { profile } = useProfile()
   const isUser = role === 'user'
 
-  const formattedContext =
-    context !== undefined
-      ? Object.entries(context)
-          .filter(([_, value]) => value.length > 0)
-          .map(([key, value]) => {
-            return `${key.charAt(0).toUpperCase() + key.slice(1)}: ${Array.isArray(value) ? value.join(', ') : value}`
-          })
-          .join(' • ')
-      : undefined
-
   if (!content) return null
 
   return (
-    <div className="w-full flex flex-col">
+    <motion.div
+      layout="position"
+      initial={{ y: 5, opacity: 0, scale: 0.99 }}
+      animate={{ y: 0, opacity: 1, scale: 1 }}
+      className="w-full flex flex-col"
+    >
       {children}
       <div
         className={cn(
-          'text-foreground-light text-sm mb max-w-full mb-3',
+          'text-foreground-light text-sm mb max-w-full mb-6',
           variant === 'warning' && 'bg-warning-200',
-          isUser ? 'px-4 py-2 rounded-lg bg-background-muted w-fit self-end' : 'mb-6'
+          isUser ? 'px-5 py-3 rounded-lg bg-background-muted w-fit self-end' : 'mb-6'
         )}
       >
         {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
 
-        {isDebug && <Badge variant="warning">Debug request</Badge>}
         {action}
 
         <ReactMarkdown
@@ -74,7 +66,21 @@ export const Message = function Message({
           components={{
             ...markdownComponents,
             pre: (props: any) => {
-              return <SqlSnippet isLoading={isLoading} sql={props.children[0].props.children} />
+              return readOnly ? (
+                <div className="mb-1 -mt-2">
+                  <CollapsibleCodeBlock
+                    value={props.children[0].props.children[0]}
+                    language="sql"
+                    hideLineNumbers
+                  />
+                </div>
+              ) : (
+                <SqlSnippet
+                  readOnly={readOnly}
+                  isLoading={isLoading}
+                  sql={props.children[0].props.children}
+                />
+              )
             },
             ol: (props: any) => {
               return <ol className="flex flex-col gap-y-4">{props.children}</ol>
@@ -92,10 +98,7 @@ export const Message = function Message({
         >
           {content}
         </ReactMarkdown>
-        {/* {role === 'user' && context !== undefined && (
-        <span className="text-xs text-foreground-lighter">{formattedContext}</span>
-      )} */}
       </div>
-    </div>
+    </motion.div>
   )
 }

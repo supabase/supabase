@@ -21,6 +21,7 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Button, Input } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
+import { useAppStateSnapshot } from 'state/app-state'
 
 /**
  * Filter tables by table name and policy name
@@ -64,6 +65,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
+  const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -148,8 +150,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            setShowPolicyAiEditor(true)
-            setSelectedTable(table)
+            setAiAssistantPanel({
+              open: true,
+              initialInput: `Help me create an RLS policy for the table ${table} on the ${schema} schema`,
+            })
           }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)

@@ -181,7 +181,7 @@ const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
-          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
+          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
 
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
@@ -237,7 +237,7 @@ const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql)
         : selectedValue || editorRef.current?.getValue()
       formatQuery(
         {
@@ -277,7 +277,7 @@ const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql)
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -406,26 +406,11 @@ const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-
-      const { solution, sql } = await debugSql({
-        sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-        errorMessage: result.error.message,
-        entityDefinitions,
+      appSnap.setAiAssistantPanel({
+        open: true,
+        sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
-
-      const formattedSql =
-        sqlAiDisclaimerComment +
-        '\n\n' +
-        format(sql, {
-          language: 'postgresql',
-          keywordCase: 'lower',
-        })
-      setDebugSolution(solution)
-      setSourceSqlDiff({
-        original: snippet.snippet.content.sql,
-        modified: formattedSql,
-      })
-      setSelectedDiffType(DiffType.Modification)
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -719,7 +704,27 @@ const SQLEditor = () => {
                   <motion.button
                     layoutId="ask-ai-input-icon"
                     transition={{ duration: 0.1 }}
-                    onClick={() => aiPanelRef.current?.expand()}
+                    onClick={() => {
+                      const state = getSqlEditorV2StateSnapshot()
+                      const snippet = state.snippets[id]
+                      const editor = editorRef.current
+                      const selection = editor.getSelection()
+                      const selectedValue = selection
+                        ? editor.getModel()?.getValueInRange(selection)
+                        : undefined
+                      const sql = snippet
+                        ? ((selectedValue || editorRef.current?.getValue()) ??
+                          snippet.snippet.content.sql)
+                        : selectedValue || editorRef.current?.getValue()
+
+                      appSnap.setAiAssistantPanel({
+                        open: true,
+                        sqlSnippets: sql ? [sql] : [],
+                        initialInput: sql
+                          ? `Help me make a change to the attached sql snippet`
+                          : '',
+                      })
+                    }}
                     className={cn(
                       'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
                     )}

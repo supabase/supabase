@@ -4,12 +4,12 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { getEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { stripIndent } from 'common-tags'
-type DatabasePoliciesData = components['schemas']['PostgresPolicy']
+import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
 
 export const getTools = (projectRef: string, connectionString: string, authorization?: string) => {
   return {
     getSchema: tool({
-      description: 'Get the schema definition for a given schema',
+      description: 'Get more information about one or more schemas',
       parameters: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
       }),
@@ -38,8 +38,9 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
         }
       },
     }),
-    getRlsExamples: tool({
-      description: 'Get examples and instructions on how to write RLS policies',
+    getRlsKnowledge: tool({
+      description:
+        'Get existing policies and examples and instructions on how to write RLS policies',
       parameters: z.object({
         schemas: z.array(z.string()).describe('The schema names to get the policies for'),
       }),
@@ -55,7 +56,6 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
             ...(authorization && { Authorization: authorization }),
           }
         )
-        console.log('rls:', data)
         const formattedPolicies = data
           .map(
             (policy: DatabasePoliciesData) => `
@@ -71,8 +71,7 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
 
         return stripIndent`
           You're a Supabase Postgres expert in writing row level security policies. Your purpose is to
-          generate a policy with the constraints given by the user. You will be provided a schema
-          on which the policy should be applied.
+          generate a policy with the constraints given by the user. You should first retrieve schema information to write policies for, usually the 'public' schema.
 
           The output should use the following instructions:
           - The generated SQL must be valid SQL.

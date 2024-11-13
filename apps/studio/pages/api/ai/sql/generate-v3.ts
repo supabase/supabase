@@ -59,7 +59,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       # You write row level security policies.
 
-      Your purpose is to generate a policy with the constraints given by the user. First retrieve the schema or schemas that are most relevant. Then retrieve RLS policy examples.
+      Your purpose is to generate a policy with the constraints given by the user.
+      - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+      - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
+      - Then write new policies or update existing policies based on the prompt
+      - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
 
       # You write database functions
       Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
@@ -72,7 +76,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
 
-      Here are the existing database schemas: ${schemas}
+      Here are the existing database schema names you can retrieve: ${schemas}
       `,
     messages,
     tools: getTools(projectRef, connectionString, authorization),

@@ -3,6 +3,7 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import type { Message as MessageType } from 'ai/react'
 
 const EMPTY_DASHBOARD_HISTORY: {
   sql?: string
@@ -21,6 +22,9 @@ export type CommonDatabaseEntity = {
 
 type AiAssistantPanelType = {
   open: boolean
+  initialMessages?: MessageType[]
+  initialInput?: string
+  sqlSnippets?: string[]
   editor?: SupportedAssistantEntities | null
   // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
   content?: string
@@ -109,6 +113,9 @@ export const appState = proxy({
 
   aiAssistantPanel: {
     open: false,
+    initialMessages: [],
+    sqlSnippets: [],
+    initialInput: '',
     editor: null,
     content: '',
     entity: undefined,

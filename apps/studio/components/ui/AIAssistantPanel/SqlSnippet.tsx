@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Code, Play, Edit, DatabaseIcon } from 'lucide-react'
+import { Code, Play, Edit, DatabaseIcon, FileWarning } from 'lucide-react'
 import { Button, CodeBlock, cn } from 'ui'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -14,12 +14,14 @@ import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 interface SqlSnippetWrapperProps {
   sql: string
   isLoading?: boolean
+  readOnly?: boolean
 }
 
 interface ParsedSqlProps {
   sql: string
   props: any
   title: string
+  readOnly?: boolean
 }
 
 const isReadOnlySelect = (query: string): boolean => {
@@ -65,7 +67,7 @@ const isReadOnlySelect = (query: string): boolean => {
   })
 }
 
-const SqlSnippetWrapper = ({ sql, isLoading }: SqlSnippetWrapperProps) => {
+const SqlSnippetWrapper = ({ sql, isLoading, readOnly = false }: SqlSnippetWrapperProps) => {
   let formatted = (sql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
   const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
@@ -96,7 +98,7 @@ const SqlSnippetWrapper = ({ sql, isLoading }: SqlSnippetWrapperProps) => {
     <div
       draggable
       onDragStart={handleDragStart}
-      className="-mx-5 my-3 bg-background-muted border-t border-b overflow-hidden"
+      className="-mx-5 my-3 mt-2 border-b overflow-hidden"
     >
       <SqlCard
         sql={formatted}
@@ -104,17 +106,26 @@ const SqlSnippetWrapper = ({ sql, isLoading }: SqlSnippetWrapperProps) => {
         xAxis={props.xAxis}
         yAxis={props.yAxis}
         title={title}
+        readOnly={readOnly}
       />
     </div>
   )
 }
 
-export const SqlCard = ({ sql, isChart, xAxis, yAxis, title }: ParsedSqlProps) => {
-  const [showCode, setShowCode] = useState(!isReadOnlySelect(sql))
+export const SqlCard = ({
+  sql,
+  isChart,
+  xAxis,
+  yAxis,
+  title,
+  readOnly = false,
+}: ParsedSqlProps) => {
+  const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const project = useSelectedProject()
   const [error, setError] = useState<QueryResponseError>()
+  const [showWarning, setShowWarning] = useState(false)
   const { newQuery } = useNewQuery()
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
@@ -122,17 +133,25 @@ export const SqlCard = ({ sql, isChart, xAxis, yAxis, title }: ParsedSqlProps) =
       console.log('SQL executed successfully:', res)
       setShowResults(true)
       setResults(res.result)
+      setShowWarning(false)
     },
     onError: (error) => {
       setError(error)
       setResults([])
+      setShowWarning(false)
     },
   })
 
   const handleExecute = useCallback(() => {
-    if (!project?.ref || !sql) return
-    setError(undefined)
+    if (!project?.ref || !sql || readOnly) return
 
+    if (!isReadOnlySelect(sql)) {
+      setShowCode(true)
+      setShowWarning(true)
+      return
+    }
+
+    setError(undefined)
     executeSql({
       sql: suffixWithLimit(sql, 100),
       projectRef: project?.ref,
@@ -142,55 +161,97 @@ export const SqlCard = ({ sql, isChart, xAxis, yAxis, title }: ParsedSqlProps) =
         setResults([])
       },
     })
-  }, [project?.ref, project?.connectionString, sql, executeSql])
+  }, [project?.ref, project?.connectionString, sql, executeSql, readOnly])
 
   useEffect(() => {
-    if (isReadOnlySelect(sql) && !results) {
+    if (isReadOnlySelect(sql) && !results && !readOnly) {
       handleExecute()
     }
-  }, [sql, handleExecute])
+  }, [sql, handleExecute, readOnly])
 
   const handleEdit = () => {
-    newQuery(sql, title)
+    if (!readOnly) {
+      newQuery(sql, title)
+    }
   }
 
   const [errorHeader, ...errorContent] =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
-  console.log('results:', results)
-
   return (
     <div className="overflow-hidden">
       <div className="flex items-center px-5 py-2 gap-2">
-        <DatabaseIcon size={16} strokeWidth={1.5} />
-        <h3 className="text-sm font-medium flex-1">{title}</h3>
+        {showWarning ? (
+          <div className="py-2">
+            <FileWarning strokeWidth={1.5} size={20} className="text-warning-600 mb-3" />
+            <h3 className="text-sm font-medium flex-1">
+              This query contains write operations. Are you sure you want to execute it?
+            </h3>
+            <div className="flex justify-stretch mt-2 gap-2">
+              <Button
+                type="outline"
+                size="tiny"
+                className="w-full flex-1"
+                onClick={() => setShowWarning(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="outline"
+                size="tiny"
+                className="w-full flex-1"
+                onClick={() => {
+                  setShowWarning(false)
+                  executeSql({
+                    sql: suffixWithLimit(sql, 100),
+                    projectRef: project?.ref,
+                    connectionString: project?.connectionString,
+                    handleError: (error) => {
+                      setError(error)
+                      setResults([])
+                    },
+                  })
+                }}
+              >
+                Run
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <DatabaseIcon size={16} strokeWidth={1.5} />
+            <h3 className="text-sm font-medium flex-1">{title}</h3>
 
-        <div className="flex">
-          <Button
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Code size={14} />}
-            onClick={() => setShowCode(!showCode)}
-          ></Button>
+            {!readOnly && (
+              <div className="flex">
+                <Button
+                  type="text"
+                  size="tiny"
+                  className="w-7 h-7"
+                  icon={<Code size={14} />}
+                  onClick={() => setShowCode(!showCode)}
+                ></Button>
 
-          <Button
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Edit size={14} />}
-            onClick={handleEdit}
-          ></Button>
+                <Button
+                  type="text"
+                  size="tiny"
+                  className="w-7 h-7"
+                  icon={<Edit size={14} />}
+                  onClick={handleEdit}
+                ></Button>
 
-          <Button
-            type="text"
-            size="tiny"
-            className="w-7 h-7"
-            icon={<Play size={14} />}
-            loading={isExecuting}
-            onClick={handleExecute}
-          ></Button>
-        </div>
+                <Button
+                  type="text"
+                  size="tiny"
+                  className="w-7 h-7"
+                  icon={<Play size={14} />}
+                  loading={isExecuting}
+                  onClick={handleExecute}
+                ></Button>
+              </div>
+            )}
+          </>
+        )}
       </div>
 
       {showCode && (
@@ -199,8 +260,6 @@ export const SqlCard = ({ sql, isChart, xAxis, yAxis, title }: ParsedSqlProps) =
           language="sql"
           className={cn(
             'max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
-            // change the look of the code block. The flex hack is so that the code is wrapping since
-            // every word is a separate span
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
           hideLineNumbers
