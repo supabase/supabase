@@ -24,15 +24,23 @@ Let's start building the Vue 3 app from scratch.
 We can use [`nuxi init`](https://nuxt.com/docs/getting-started/installation) to create an app called `nuxt-user-management`:
 
 ```bash
-npx nuxi init nuxt-user-management
+npx nuxi@latest init nuxt-user-management
 
 cd nuxt-user-management
 ```
 
-Then let's install the only additional dependency: [NuxtSupabase](https://supabase.nuxtjs.org/). We only need to import NuxtSupabase as a dev dependency.
+Then let's install the only additional dependency: [NuxtSupabase](https://supabase.nuxtjs.org/). We can use `nuxi` to install the Supabase module.
 
 ```bash
-npm install @nuxtjs/supabase --save-dev
+npx nuxi@latest module add supabase
+```
+
+This will install the required dev dependencies and add it to the modules in the `nuxt.config.ts` file.
+
+```ts nuxt.config.ts
+export default defineNuxtConfig({
+  modules: ['@nuxtjs/supabase'],
+})
 ```
 
 And finally we want to save the environment variables in a `.env`.
