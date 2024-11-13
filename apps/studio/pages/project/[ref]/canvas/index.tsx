@@ -1,9 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { useGesture } from '@use-gesture/react'
+import React, { useEffect, useCallback, useRef } from 'react'
+import { useRouter } from 'next/router'
 import { create } from 'zustand'
 import { Rnd } from 'react-rnd'
-import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { Minus, Plus, ZoomIn, ZoomOut } from 'lucide-react'
+import { Button } from 'ui'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { SqlCard } from 'components/ui/AIAssistantPanel/SqlSnippet'
 import type { NextPageWithLayout } from 'types'
@@ -15,6 +14,7 @@ const CanvasPage: NextPageWithLayout = () => {
 CanvasPage.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
 
 export default CanvasPage
+
 interface DraggedItem {
   id: number
   x: number
@@ -29,6 +29,7 @@ interface CanvasStore {
   addItem: (item: DraggedItem) => void
   updateItemPosition: (id: number, x: number, y: number) => void
   updateItemSize: (id: number, width: number, height: number) => void
+  setItems: (items: DraggedItem[]) => void
 }
 
 const useCanvasStore = create<CanvasStore>((set) => ({
@@ -42,6 +43,7 @@ const useCanvasStore = create<CanvasStore>((set) => ({
     set((state) => ({
       items: state.items.map((item) => (item.props.id === id ? { ...item, width, height } : item)),
     })),
+  setItems: (items) => set({ items }),
 }))
 
 const DraggableItem: React.FC<{ id: number; props: Record<string, any> }> = ({ id, props }) => {
@@ -51,16 +53,67 @@ const DraggableItem: React.FC<{ id: number; props: Record<string, any> }> = ({ i
 
   return (
     <div draggable onDragStart={handleDragStart} className="cursor-move">
-      <Button variant="outline">Drag Me (ID: {id})</Button>
+      <Button type="outline">Drag Me (ID: {id})</Button>
     </div>
   )
 }
 
 const Canvas: React.FC = () => {
+  const router = useRouter()
   const items = useCanvasStore((state) => state.items)
   const addItem = useCanvasStore((state) => state.addItem)
   const updateItemPosition = useCanvasStore((state) => state.updateItemPosition)
   const updateItemSize = useCanvasStore((state) => state.updateItemSize)
+  const setItems = useCanvasStore((state) => state.setItems)
+
+  const debounceTimer = useRef<NodeJS.Timeout>()
+
+  useEffect(() => {
+    const queryItems = router.query.items
+    if (queryItems && typeof queryItems === 'string') {
+      try {
+        const parsedItems = JSON.parse(decodeURIComponent(queryItems))
+        setItems(parsedItems)
+      } catch (error) {
+        console.error('Failed to parse items from URL:', error)
+      }
+    }
+  }, [router.query.items, setItems])
+
+  useEffect(() => {
+    if (items.length > 0) {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+      }
+
+      debounceTimer.current = setTimeout(() => {
+        const queryString = encodeURIComponent(
+          JSON.stringify(
+            items.map((item) => ({
+              id: item.id,
+              x: item.x,
+              y: item.y,
+              width: item.width,
+              height: item.height,
+            }))
+          )
+        )
+        router.replace(
+          {
+            query: { ...router.query, items: queryString },
+          },
+          undefined,
+          { shallow: true }
+        )
+      }, 500) // 500ms debounce delay
+
+      return () => {
+        if (debounceTimer.current) {
+          clearTimeout(debounceTimer.current)
+        }
+      }
+    }
+  }, [items, router])
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
@@ -74,8 +127,6 @@ const Canvas: React.FC = () => {
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
   }
-
-  console.log('drag items:', items)
 
   return (
     <div

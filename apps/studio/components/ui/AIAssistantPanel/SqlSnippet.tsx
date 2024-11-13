@@ -98,7 +98,7 @@ const SqlSnippetWrapper = ({ sql, isLoading, readOnly = false }: SqlSnippetWrapp
     <div
       draggable
       onDragStart={handleDragStart}
-      className="-mx-5 my-3 mt-2 border-b overflow-hidden"
+      className="-mx-8 my-3 mt-2 border-b overflow-hidden"
     >
       <SqlCard
         sql={formatted}
