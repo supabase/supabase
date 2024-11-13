@@ -12,18 +12,18 @@ A background task can run until the Edge Function instance hits its [wall-clock 
 Here's an example of defining a background task using a custom event.
 
 ```ts
-// define a custom event
+// Define a custom event type for the background task.
 class MyBackgroundTaskEvent extends Event {
-  readonly taskPromise: Promise<string>
+  readonly taskPromise: Promise<Response>
 
-  constructor(taskPromise) {
+  constructor(taskPromise: Promise<Response>) {
     super('myBackgroundTask')
     this.taskPromise = taskPromise
   }
 }
 
-globalThis.addEventListener('myBackgroundTask', async (event: MyBackgroundTaskEvent) => {
-  const res = await event.taskPromise
+globalThis.addEventListener('myBackgroundTask', async (event) => {
+  const res = await (event as MyBackgroundTaskEvent).taskPromise
   console.log(await res.json())
 })
 
