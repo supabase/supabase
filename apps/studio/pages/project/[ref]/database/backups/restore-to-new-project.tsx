@@ -293,7 +293,7 @@ const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restore to new project is not available while project is offline"
-        description={<>Your project needs to be online to restore your database to a new project</>}
+        description="Your project needs to be online to restore your database to a new project"
       />
     )
   }
@@ -401,7 +401,7 @@ const RestoreToNewProject = () => {
               <li>
                 A project can only be restored to another project once. <br />
                 <span className="text-foreground-lighter text-xs">
-                  This is a temporary limitation, contact us if you need to restore more than once.
+                  This is a temporary limitation. Please contact us if you need to restore a project to multiple other projects.
                 </span>
               </li>
             </ul>
