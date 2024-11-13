@@ -1,7 +1,7 @@
 import { proxy } from 'valtio'
 import { ReactNode } from 'react'
 import { nanoid } from 'nanoid'
-import { useRouter } from 'next/router'
+import { addRecentItem } from './recent-items'
 
 export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function' | 'new'
 
@@ -54,6 +54,10 @@ export const addTab = (storeKey: string, tab: Tab) => {
   // If tab exists but isn't active, just make it active
   if (store.tabsMap[tab.id]) {
     store.activeTab = tab.id
+    // Add to recent items when switching to existing tab
+    if (!tab.isPreview && tab.type !== 'new') {
+      addRecentItem(tab)
+    }
     return
   }
 
@@ -62,6 +66,10 @@ export const addTab = (storeKey: string, tab: Tab) => {
     store.openTabs = [...store.openTabs, tab.id]
     store.tabsMap[tab.id] = tab
     store.activeTab = tab.id
+    // Add to recent items when creating permanent tab
+    if (tab.type !== 'new') {
+      addRecentItem(tab)
+    }
     return
   }
 
@@ -103,6 +111,10 @@ export const makeTabPermanent = (storeKey: string, tabId: string) => {
   if (tab?.isPreview) {
     tab.isPreview = false
     store.previewTabId = undefined
+    // Add to recent items when preview tab becomes permanent
+    if (tab.type !== 'new') {
+      addRecentItem(tab)
+    }
   }
 }
 
@@ -141,6 +153,11 @@ export const handleTabNavigation = (storeKey: string, id: string, router: any) =
   if (!tab) return
 
   store.activeTab = id
+
+  // Add to recent items when navigating to a non-preview, non-new tab
+  if (!tab.isPreview && tab.type !== 'new') {
+    addRecentItem(tab)
+  }
 
   switch (tab.type) {
     case 'sql':

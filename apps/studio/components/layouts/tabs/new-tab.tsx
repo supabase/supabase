@@ -1,0 +1,399 @@
+import { TabIcon } from 'components/explorer/tabs/TabIcon'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { AnimatePresence, LayoutGroup, motion, Variants } from 'framer-motion'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useProfile } from 'lib/profile'
+import { BarChart2, Box, Search, Table2, X } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import type { RecentItem } from 'state/recent-items'
+import { recentItemsStore } from 'state/recent-items'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { removeNewTab } from 'state/tabs'
+import { Badge, Card, cn, Separator, SQL_ICON } from 'ui'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat'
+import { Input } from 'ui-patterns/DataInputs/Input'
+import { v4 as uuidv4 } from 'uuid'
+import { useSnapshot } from 'valtio'
+dayjs.extend(relativeTime)
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.96, y: 15 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 600,
+      damping: 50,
+      staggerChildren: 0.08,
+      delayChildren: 0.03,
+    },
+  },
+}
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      stiffness: 600,
+      damping: 50,
+      staggerChildren: 0.08,
+      delayChildren: 0.03,
+    },
+  },
+}
+
+interface AssistantChatDemoProps {
+  value: string
+  setValueState: (value: string) => void
+  onSubmit: () => void
+}
+
+function AssistantChatDemo({ value, setValueState, onSubmit }: AssistantChatDemoProps) {
+  const [loading, setLoading] = useState(false)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }, [value])
+
+  return (
+    <AssistantChatForm
+      textAreaRef={inputRef}
+      placeholder="Ask me anything..."
+      icon={<Box strokeWidth={1.5} size={24} className="text-foreground-muted" />}
+      value={value}
+      loading={loading}
+      disabled={loading}
+      onValueChange={(e) => setValueState(e.target.value)}
+      onSubmit={async (event) => {
+        event.preventDefault()
+        setLoading(true)
+        setTimeout(() => {
+          setLoading(false)
+          onSubmit()
+        }, 1500)
+      }}
+    />
+  )
+}
+
+function RecentItems() {
+  const recentItemsSnap = useSnapshot(recentItemsStore)
+  const router = useRouter()
+  const { ref } = router.query
+
+  if (!recentItemsSnap?.items || !ref) return null
+
+  return (
+    <div className="flex flex-col gap-0">
+      {recentItemsSnap.items.length === 0 ? (
+        <motion.div
+          layout
+          initial={false}
+          className="flex flex-col items-center justify-center p-8 text-center"
+        >
+          <TabIcon
+            type="table"
+            size={21}
+            strokeWidth={2}
+            className="text-foreground-lighter mb-2"
+          />
+          <p className="text-sm text-foreground-lighter">No recent items yet</p>
+          <p className="text-xs text-foreground-light">
+            Items will appear here as you browse through your project
+          </p>
+        </motion.div>
+      ) : (
+        <AnimatePresence>
+          <div className="grid grid-cols-1 gap-12 gap-y-0">
+            {recentItemsSnap.items.map((item: RecentItem, index: number) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ delay: index * 0.05 }}
+              >
+                <Link
+                  href={`/project/${ref}/${
+                    item.type === 'sql'
+                      ? `sql/${item.metadata?.sqlId}`
+                      : item.type === 'table'
+                        ? `editor/${item.metadata?.tableId}?schema=${item.metadata?.schema}`
+                        : `explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
+                  }`}
+                  className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
+                >
+                  <div className="flex h-6 w-6 items-center justify-center rounded bg-surface-100 border">
+                    <TabIcon type={item.type} />
+                  </div>
+                  <div className="flex flex-1 gap-5 items-center">
+                    <span className="text-sm text-foreground">
+                      <span className="text-foreground-lighter">{item.metadata?.schema}</span>
+                      {item.metadata?.schema && <span className="text-foreground-light">.</span>}
+                      <span className="text-foreground">{item.label || 'Untitled'}</span>
+                    </span>
+                    <div className="bg-border-muted flex grow h-px"></div>
+                    <span className="text-xs text-foreground-lighter">
+                      {dayjs(item.timestamp).fromNow()}
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </AnimatePresence>
+      )}
+    </div>
+  )
+}
+
+export function NewTab() {
+  const router = useRouter()
+  const { profile } = useProfile()
+  const project = useSelectedProject()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { ref } = router.query
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [input, setInput] = useState('')
+  const [showRightPanel, setShowRightPanel] = useState(false)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  //   const showRightPanel = false
+
+  const handleNewQuery = async () => {
+    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
+
+    try {
+      const snippet = createSqlSnippetSkeletonV2({
+        id: uuidv4(),
+        name: untitledSnippetTitle,
+        owner_id: profile.id,
+        project_id: project.id,
+        sql: '',
+      })
+      snapV2.addSnippet({ projectRef: ref as string, snippet })
+      removeNewTab('explorer')
+      router.push(`/project/${ref}/sql/${snippet.id}`)
+    } catch (error: any) {
+      toast.error(`Failed to create new query: ${error.message}`)
+    }
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
+
+  return (
+    <LayoutGroup>
+      <div className="flex h-full w-full">
+        <motion.div className="flex-1" initial="hidden" animate="show" variants={containerVariants}>
+          <div className="bg-surface-100 p-6 h-full overflow-y-auto py-12">
+            <div className="mx-auto max-w-2xl space-y-6">
+              {/* Action Cards */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  {
+                    icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                    title: 'New Table',
+                    description: 'Create Postgres tables',
+                    bgColor: 'bg-blue-500',
+                    isBeta: false,
+                  },
+                  {
+                    icon: (
+                      <SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />
+                    ),
+                    title: 'New Query',
+                    description: 'Write and execute SQL queries',
+                    bgColor: 'bg-violet-500',
+                    isBeta: false,
+                    onClick: handleNewQuery,
+                  },
+                  {
+                    icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
+                    title: 'New Report',
+                    description: 'Create data visualizations',
+                    bgColor: 'bg-orange-500',
+                    isBeta: true,
+                  },
+                ].map((item, i) => (
+                  <Card
+                    key={`recent-item-${i}`}
+                    className="bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
+                    onClick={item.onClick}
+                  >
+                    <div className={`relative flex items-center gap-3 text-center`}>
+                      {item.isBeta && (
+                        <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
+                          Coming soon
+                        </Badge>
+                      )}
+                      <div
+                        className={`rounded-full ${item.bgColor} w-8 h-8 flex items-center justify-center`}
+                      >
+                        {item.icon}
+                      </div>
+                      <div className="flex flex-col gap-0">
+                        <h3 className="text-sm text-foreground mb-0">{item.title}</h3>
+                        {/* <p className="text-sm text-foreground-light">{item.description}</p> */}
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Search Bar */}
+              <div className="relative">
+                <Input
+                  placeholder="Search all files"
+                  icon={<Search size={14} className="text-foreground-light" />}
+                />
+              </div>
+
+              {/* Recent Files */}
+              <div className="space-y-4">
+                <h2 className="text-sm text-foreground">Recent files</h2>
+
+                <RecentItems />
+              </div>
+
+              <Separator />
+
+              {/* Example Prompts */}
+              <AnimatePresence>
+                {!showRightPanel && (
+                  <motion.div
+                    variants={itemVariants}
+                    className="w-full"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <motion.div className="flex flex-col gap-3">
+                      <motion.p
+                        className="text-sm text-foreground-light"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: showRightPanel ? 0 : 1 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        Try these example prompts:
+                      </motion.p>
+                      {isLoading ? (
+                        <>
+                          {[...Array(4)].map((_, i) => (
+                            <motion.div
+                              key={i}
+                              className="h-6 bg-foreground/10 rounded animate-pulse"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.2 * i }}
+                            />
+                          ))}
+                        </>
+                      ) : (
+                        [
+                          'Create a table to store user profiles with basic information',
+                          'Help me write a query to find the most active users in the last 30 days',
+                          'Show me how to implement row level security for a multi-tenant application',
+                          'Generate a function to calculate the distance between two geographic points',
+                        ].map((prompt, i) => (
+                          <motion.div
+                            key={prompt}
+                            className="text-sm text-foreground-light hover:text-foreground cursor-pointer"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{
+                              opacity: showRightPanel ? 0 : 1,
+                              x: showRightPanel ? -20 : 0,
+                            }}
+                            transition={{
+                              delay: showRightPanel ? 0 : 0.4 + i * 0.1,
+                              duration: 0.2,
+                            }}
+                            onClick={() => {
+                              setInput(prompt)
+                              inputRef.current?.focus()
+                            }}
+                          >
+                            "{prompt}"
+                          </motion.div>
+                        ))
+                      )}
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Chat Input */}
+              <motion.div
+                variants={itemVariants}
+                className="w-full"
+                layout
+                layoutId="chat-input"
+                key="chat-input"
+              >
+                <AssistantChatDemo
+                  value={input}
+                  setValueState={setInput}
+                  onSubmit={() => setShowRightPanel(true)}
+                />
+              </motion.div>
+            </div>
+          </div>
+        </motion.div>
+        {showRightPanel && (
+          <motion.div
+            className="w-[400px] border-l border-muted h-full bg-black flex flex-col"
+            initial={{ x: 400, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: 400, opacity: 0 }}
+          >
+            <div className="flex justify-between items-center p-4 border-b border-muted">
+              <h3 className="text-sm font-medium">AI Assistant</h3>
+              <button
+                onClick={() => {
+                  setShowRightPanel(false)
+                  setInput('')
+                }}
+                className="p-1 hover:bg-surface-200 rounded-md"
+              >
+                <X size={16} className="text-foreground-light" />
+              </button>
+            </div>
+
+            <div className="flex-1">{/* Chat content will go here */}</div>
+
+            <motion.div
+              layout
+              layoutId="chat-input"
+              key="chat-input"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="p-4 border-t border-muted"
+            >
+              <AssistantChatDemo value={input} setValueState={setInput} onSubmit={() => {}} />
+            </motion.div>
+          </motion.div>
+        )}
+      </div>
+    </LayoutGroup>
+  )
+}

@@ -30,42 +30,11 @@ import {
 import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
 import { sidebarState } from './sidebar-state'
+import { TabIcon } from 'components/explorer/tabs/TabIcon'
 
 interface TabsProps {
   storeKey: string
   onClose?: (id: string) => void
-}
-
-/**
- * Returns the appropriate icon component for each tab type
- * Icons are consistently styled with the same size and color
- */
-const getTabIcon = (type: TabType) => {
-  switch (type) {
-    case 'schema':
-      return <Workflow size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-    case 'table':
-      return <Table2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-    case 'view':
-      return <Eye size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-    // case 'function':
-    //   return <FunctionIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-    case 'sql':
-      return (
-        <SQL_ICON
-          className={cn(
-            'transition-colors',
-            'fill-foreground-muted',
-            'group-aria-selected:fill-foreground',
-            'w-4 h-4 shrink-0',
-            '-ml-0.5'
-          )}
-          strokeWidth={1.5}
-        />
-      )
-    default:
-      return <CirclePlus size={14} strokeWidth={1.5} className="text-foreground-lighter" />
-  }
 }
 
 /**
@@ -149,7 +118,7 @@ const SortableTab = ({
         )}
         {...listeners}
       >
-        {getTabIcon(tab.type)}
+        <TabIcon type={tab.type} />
         <div className="flex items-center gap-0">
           <AnimatePresence mode="popLayout" initial>
             {shouldShowSchema && (
@@ -290,7 +259,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
-              {getTabIcon(newTab.type)}
+              <TabIcon type={newTab.type} />
               <div className="flex items-center gap-0">
                 <span>{newTab.type === 'schema' ? 'schema' : newTab.label || 'Untitled'}</span>
               </div>

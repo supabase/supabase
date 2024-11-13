@@ -58,11 +58,7 @@ export const EmptyStatePanel = ({
       {(buttonText || aiButtonText) && (
         <div className="flex gap-3">
           {buttonText && (
-            <Button
-              type="default"
-              className="bg-[#6366f1] hover:bg-[#6366f1]/90 text-white"
-              onClick={onButtonClick}
-            >
+            <Button type="default" onClick={onButtonClick}>
               {buttonText}
             </Button>
           )}
