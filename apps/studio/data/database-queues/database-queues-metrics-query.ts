@@ -60,15 +60,13 @@ export async function getDatabaseQueuesMetrics({
         connectionString,
         sql: estimateMetricsSqlQuery(queueName),
       })
-      console.log('2', result)
       return {
         queue_name: queueName,
         queue_length: result[0].estimated_rows,
         method: 'estimated',
       } as PostgresQueueMetric
-    } else {
-      handleError(error)
     }
+    return handleError(error)
   }
 }
 
