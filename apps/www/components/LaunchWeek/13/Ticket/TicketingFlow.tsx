@@ -174,7 +174,7 @@ const TicketingFlow = () => {
       {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
       {hasTicket && (
         <MetalTicket
-          username="Francesco Sansalvadore"
+          username={DISPLAY_NAME ?? ''}
           className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
         />
       )}
