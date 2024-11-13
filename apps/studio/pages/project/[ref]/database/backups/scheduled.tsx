@@ -1,34 +1,27 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Info } from 'lucide-react'
 
+import { useParams } from 'common'
 import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import type { NextPageWithLayout } from 'types'
 import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from 'types'
 import { Admonition } from 'ui-patterns'
-import { DocsButton } from 'components/ui/DocsButton'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref || 'default'
+  const { ref: projectRef } = useParams()
 
-  const {
-    data: backups,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useBackupsQuery({ projectRef: ref })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const isOrioleDb = useIsOrioleDb()
   const isPitrEnabled = backups?.pitr_enabled
@@ -43,7 +36,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           <div className="space-y-6">
             <FormHeader className="!mb-0" title="Database Backups" />
 
-            <DatabaseBackupsNav active="scheduled" projRef={ref} />
+            <DatabaseBackupsNav active="scheduled" />
 
             {isOrioleDb ? (
               <Admonition
