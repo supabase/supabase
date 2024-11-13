@@ -112,7 +112,6 @@ export async function getEntityDefinition(
   }
 }
 
-// type EntityDefinition = { id: number; sql: string }
 export type EntityDefinitionData = string
 export type EntityDefinitionError = ExecuteSqlError
 

@@ -30,6 +30,7 @@ import { TableGridSkeletonLoader } from './LoadingState'
 import NotFoundState from './NotFoundState'
 import SidePanelEditor from './SidePanelEditor/SidePanelEditor'
 import TableDefinition from './TableDefinition'
+import { TableRowsData } from 'data/table-rows/table-rows-query'
 
 export interface TableGridEditorProps {
   /** Theme for the editor */
@@ -61,16 +62,16 @@ const TableGridEditor = ({
     async onMutate({ projectRef, table, configuration, payload }) {
       const primaryKeyColumns = new Set(Object.keys(configuration.identifiers))
 
-      const queryKey = tableRowKeys.tableRowsAndCount(projectRef, table.id)
+      const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
 
       await queryClient.cancelQueries(queryKey)
 
-      const previousRowsQueries = queryClient.getQueriesData<{ result: any[] }>(queryKey)
+      const previousRowsQueries = queryClient.getQueriesData<TableRowsData>(queryKey)
 
-      queryClient.setQueriesData<{ result: any[] }>(queryKey, (old) => {
+      queryClient.setQueriesData<TableRowsData>(queryKey, (old) => {
         return {
-          result:
-            old?.result.map((row) => {
+          rows:
+            old?.rows.map((row) => {
               // match primary keys
               if (
                 Object.entries(row)
