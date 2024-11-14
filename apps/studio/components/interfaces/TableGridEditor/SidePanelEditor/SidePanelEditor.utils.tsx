@@ -13,11 +13,12 @@ import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constan
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
-import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
 import { tableKeys } from 'data/tables/keys'
 import { createTable as createTableMutation } from 'data/tables/table-create-mutation'
@@ -463,6 +464,8 @@ export const createTable = async ({
   isRLSEnabled: boolean
   importContent?: ImportContent
 }) => {
+  const queryClient = getQueryClient()
+
   // Create the table first. Error may be thrown.
   const table = await createTableMutation({
     projectRef: projectRef,
@@ -606,6 +609,13 @@ export const createTable = async ({
         }
       }
     }
+
+    await prefetchEditorTablePage({
+      queryClient,
+      projectRef,
+      connectionString,
+      id: table.id,
+    })
 
     // Finally, return the created table
     return table
@@ -760,7 +770,7 @@ export const updateTable = async ({
   await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
 
   return {
-    table: await getTableEditor({
+    table: await prefetchTableEditor(queryClient, {
       projectRef,
       connectionString,
       id: table.id,

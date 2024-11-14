@@ -472,21 +472,6 @@ const SidePanelEditor = ({
         if (hasError) {
           toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
         } else {
-          queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
-          await Promise.all([
-            queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, table.id)),
-            queryClient.invalidateQueries(
-              databaseKeys.tableDefinition(project?.ref, selectedTable.id)
-            ),
-            queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
-          ])
-
-          // We need to invalidate tableRowsAndCount after tableEditor
-          // to ensure the query sent is correct
-          await queryClient.invalidateQueries(
-            tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
-          )
-
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }
