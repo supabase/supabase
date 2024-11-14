@@ -70,10 +70,13 @@ const BillingBreakdown = () => {
 
             {invoiceFeatureEnabled && (
               <>
-                <Markdown
-                  content={`The table shows your upcoming invoice, excluding credits. This invoice will
-                  continue updating until the end of your billing period on ${billingCycleEnd.format('MMMM DD')}. See [usage page](/org/${orgSlug}/usage) for a more detailed usage breakdown.`}
-                />
+                <p className="prose text-sm">
+                  The table shows your upcoming invoice, excluding credits. This invoice will
+                  continue updating until the end of your billing period on{' '}
+                  {billingCycleEnd.format('MMMM DD')}. See{' '}
+                  <Link href={`/org/${orgSlug}/usage`}>usage page</Link> for a more
+                  detailed usage breakdown.
+                </p>
 
                 <UpcomingInvoice slug={orgSlug} />
               </>
