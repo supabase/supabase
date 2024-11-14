@@ -114,6 +114,9 @@ export async function executeSql(
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = ResponseError
 
+/**
+ * @deprecated Use the regular useQuery with a function that calls executeSql() instead
+ */
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
     projectRef,
