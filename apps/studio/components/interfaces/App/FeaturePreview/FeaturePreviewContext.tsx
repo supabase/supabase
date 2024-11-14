@@ -10,7 +10,7 @@ import { FunctionsAssistantPreview } from './FunctionsAssistantPreview'
 export const FEATURE_PREVIEWS = [
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT,
-    name: 'Database Functions Assistant',
+    name: 'Supabase AI Assistant V2',
     content: <FunctionsAssistantPreview />,
     discussionsUrl: undefined,
     isNew: true,

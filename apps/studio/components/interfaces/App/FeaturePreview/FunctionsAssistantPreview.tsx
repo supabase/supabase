@@ -11,6 +11,7 @@ export const FunctionsAssistantPreview = () => {
 
   return (
     <div className="flex flex-col gap-y-2">
+      <p>This needs to be updated</p>
       <p className="text-foreground-light text-sm mb-4">
         We're providing an additional alternative UX to creating database functions through the
         dashboard with the integration of our AI Assistant that you might have seen in the Auth

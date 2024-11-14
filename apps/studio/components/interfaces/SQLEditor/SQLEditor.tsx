@@ -77,6 +77,7 @@ import {
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { useIsDatabaseFunctionsAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import { AiAssistantPanel } from './AiAssistantPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -86,8 +87,8 @@ const DiffEditor = dynamic(
 )
 
 const SQLEditor = () => {
-  const { ref, id: urlId } = useParams()
   const router = useRouter()
+  const { ref, id: urlId } = useParams()
 
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -119,6 +120,7 @@ const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const aiPanelRef = useRef<ImperativePanelHandle>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -601,8 +603,6 @@ const SQLEditor = () => {
     }
   }, [selectedDiffType, sourceSqlDiff])
 
-  const aiPanelRef = useRef<ImperativePanelHandle>(null)
-
   return (
     <>
       <ConfirmationModal
@@ -706,34 +706,36 @@ const SQLEditor = () => {
             )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAssistantV2Enabled && !open && (
+                {!isAssistantV2Enabled && !isAiOpen && (
                   <motion.button
                     layoutId="ask-ai-input-icon"
                     transition={{ duration: 0.1 }}
+                    className="group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out"
                     onClick={() => {
-                      const state = getSqlEditorV2StateSnapshot()
-                      const snippet = state.snippets[id]
-                      const editor = editorRef.current
-                      const selection = editor?.getSelection()
-                      const selectedValue = selection
-                        ? editor?.getModel()?.getValueInRange(selection)
-                        : undefined
-                      const sql = snippet
-                        ? (selectedValue || editorRef.current?.getValue()) ??
-                          snippet.snippet.content.sql
-                        : selectedValue || editorRef.current?.getValue()
+                      if (isAssistantV2Enabled) {
+                        const state = getSqlEditorV2StateSnapshot()
+                        const snippet = state.snippets[id]
+                        const editor = editorRef.current
+                        const selection = editor?.getSelection()
+                        const selectedValue = selection
+                          ? editor?.getModel()?.getValueInRange(selection)
+                          : undefined
+                        const sql = snippet
+                          ? (selectedValue || editorRef.current?.getValue()) ??
+                            snippet.snippet.content.sql
+                          : selectedValue || editorRef.current?.getValue()
 
-                      appSnap.setAiAssistantPanel({
-                        open: true,
-                        sqlSnippets: sql ? [sql] : [],
-                        initialInput: sql
-                          ? `Help me make a change to the attached sql snippet`
-                          : '',
-                      })
+                        appSnap.setAiAssistantPanel({
+                          open: true,
+                          sqlSnippets: sql ? [sql] : [],
+                          initialInput: sql
+                            ? `Help me make a change to the attached sql snippet`
+                            : '',
+                        })
+                      } else {
+                        aiPanelRef.current?.expand()
+                      }
                     }}
-                    className={cn(
-                      'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
-                    )}
                   >
                     <AiIconAnimation loading={false} allowHoverEffect />
                   </motion.button>
@@ -870,6 +872,28 @@ const SQLEditor = () => {
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
+
+        {!isAssistantV2Enabled && (
+          <>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              ref={aiPanelRef}
+              collapsible
+              collapsedSize={0}
+              minSize={31}
+              maxSize={40}
+              onCollapse={() => setIsAiOpen(false)}
+              onExpand={() => setIsAiOpen(true)}
+            >
+              <AiAssistantPanel
+                existingSql={editorRef.current?.getValue() || ''}
+                includeSchemaMetadata={includeSchemaMetadata}
+                onDiff={updateEditorWithCheckForDiff}
+                onClose={() => aiPanelRef.current?.collapse()}
+              />
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
     </>
   )
