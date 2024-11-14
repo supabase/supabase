@@ -21,12 +21,15 @@ export async function getSchemas(
   { projectRef, connectionString }: SchemasVariables,
   signal?: AbortSignal
 ) {
-  const { result } = await executeSql({
-    projectRef,
-    connectionString,
-    sql: pgMetaSchemasList.sql,
-    queryKey: ['schemas'],
-  })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaSchemasList.sql,
+      queryKey: ['schemas'],
+    },
+    signal
+  )
 
   return result
 }
