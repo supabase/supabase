@@ -98,7 +98,10 @@ export const convertKVStringArrayToJson = (values: string[]) => {
   return Object.fromEntries(values.map((value) => value.split('=')))
 }
 
-export function wrapperMetaComparator(wrapperMeta: WrapperMeta, wrapper: FDW | undefined) {
+export function wrapperMetaComparator(
+  wrapperMeta: Pick<WrapperMeta, 'handlerName' | 'server'>,
+  wrapper: FDW | undefined
+) {
   if (wrapperMeta.handlerName === 'wasm_fdw_handler') {
     const serverOptions = convertKVStringArrayToJson(wrapper?.server_options ?? [])
     return (
