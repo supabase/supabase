@@ -7,7 +7,6 @@ import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
-import { Rnd } from 'react-rnd'
 import { Admonition } from 'ui-patterns'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 
@@ -75,31 +74,8 @@ const SqlSnippetWrapper = ({ sql, isLoading, readOnly = false }: SqlSnippetWrapp
   formatted = formatted.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
   console.log('props:', propsMatch, title, propsMatch)
 
-  const handleDragStart = useCallback(
-    (e: React.DragEvent) => {
-      e.dataTransfer.setData(
-        'text/plain',
-        JSON.stringify({
-          props: {
-            id: `sql-snippet-${Math.random().toString(36).substr(2, 9)}`,
-            title,
-            sql: formatted,
-            isChart: props.isChart,
-            xAxis: props.xAxis,
-            yAxis: props.yAxis,
-          },
-        })
-      )
-    },
-    [title, formatted, props.isChart, props.xAxis, props.yAxis]
-  )
-
   return (
-    <div
-      draggable
-      onDragStart={handleDragStart}
-      className="-mx-8 my-3 mt-2 border-b overflow-hidden"
-    >
+    <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
         sql={formatted}
         isChart={props.isChart}
