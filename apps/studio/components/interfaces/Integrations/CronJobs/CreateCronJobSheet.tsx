@@ -238,7 +238,7 @@ export const CreateCronJobSheet = ({
                       </FormControl_Shadcn_>
 
                       <FormLabel_Shadcn_ className="text-foreground-lighter text-xs absolute top-0 right-0 ">
-                        * cannot be changed after creation
+                        Cron jobs cannot be renamed once created
                       </FormLabel_Shadcn_>
                     </FormItemLayout>
                   )}
