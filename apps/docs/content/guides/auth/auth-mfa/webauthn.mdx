@@ -94,7 +94,7 @@ if (supabase.auth.browserSupportsWebAuthn()) {
 })
 ```
 
-Or in multiple-steps by setting the `useMultiStepEnroll` parameter to true.
+Or in multiple-steps by setting the `useMultiStep` parameter to true.
 
 ```ts
 const { data: { factorId }, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
@@ -181,7 +181,7 @@ export default function MFAWebAuthn() {
 }
 ```
 
-`useMultiStep` informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application
+Setting `useMultiStep` to false informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application
 
 When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
 
