@@ -35,6 +35,7 @@ import {
   SelectValue_Shadcn_,
   Separator,
   TextArea_Shadcn_,
+  Toggle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -52,6 +53,8 @@ import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { detectBrowser } from 'lib/helpers'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -75,6 +78,19 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   const [docsResults, setDocsResults] = useState<Page[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
+
+  const [supportAccess, setSupportAccess] = useState(false)
+
+  const snap = useAppStateSnapshot()
+  const { mutate: sendReset } = useSendResetMutation()
+
+  const onToggleOptIn = () => {
+    const value = !snap.isOptedInTelemetry ? 'true' : 'false'
+    snap.setIsOptedInTelemetry(value === 'true')
+    if (value === 'false') sendReset()
+    setSupportAccess(value === 'true')
+    form.setValue('allowSupportAccess', value === 'true')
+  }
 
   const FormSchema = z
     .object({
@@ -632,30 +648,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               )}
             />
 
-            {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
-              <FormField_Shadcn_
-                name="allowSupportAccess"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex"
-                    className={cn(CONTAINER_CLASSES)}
-                    label="Allow Supabase Support to access your project temporarily"
-                    description="In some cases, we may require temporary access to your project to complete troubleshooting, or to answer questions related specifically to your project"
-                  >
-                    <FormControl_Shadcn_>
-                      <Checkbox_Shadcn_
-                        {...field}
-                        value={String(field.value)}
-                        checked={field.value}
-                        onCheckedChange={(value) => field.onChange(value)}
-                      />
-                    </FormControl_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            )}
-
             <div className={cn(CONTAINER_CLASSES)}>
               <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-foreground-light">Attachments</p>
@@ -707,14 +699,32 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
             </div>
 
             <div className={cn(CONTAINER_CLASSES)}>
-              <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                <p className="text-foreground-light">We will contact you at</p>
-                <p className="text-foreground font-medium">{respondToEmail}</p>
-              </div>
-              <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-2">
-                <p className="text-foreground-light">
-                  Please ensure you haven't blocked Hubspot in your emails
-                </p>
+              <div className="flex items-center space-x-1 justify-end block text-sm mb-2">
+                {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+                  <FormField_Shadcn_
+                    name="allowSupportAccess"
+                    control={form.control}
+                    render={({ field }) => (
+                      <div className="flex items-center ">
+                        <Toggle
+                          id=""
+                          label="Allow Support Access"
+                          checked={field.value}
+                          onChange={() => {
+                            const newValue = !field.value
+                            field.onChange(newValue)
+                            setSupportAccess(newValue)
+                            snap.setIsOptedInTelemetry(newValue)
+                            if (!newValue) sendReset()
+                          }}
+                          className="flex-row-reverse"
+                          size="tiny"
+                        />
+                        <FormControl_Shadcn_></FormControl_Shadcn_>
+                      </div>
+                    )}
+                  />
+                )}
               </div>
               <div className="flex justify-end">
                 <Button
@@ -726,6 +736,15 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 >
                   Send support request
                 </Button>
+              </div>
+              <div className="flex items-center space-x-1 justify-end block text-sm mt-4 mb-2">
+                <p className="text-foreground-light">We will contact you at</p>
+                <p className="text-foreground font-medium">{respondToEmail}</p>
+              </div>
+              <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-0">
+                <p className="text-foreground-light">
+                  Please ensure you haven't blocked Hubspot in your emails
+                </p>
               </div>
             </div>
           </>
