@@ -90,7 +90,7 @@ export const useFDWsQuery = <TData = FDWsData>(
   { enabled = true, ...options }: UseQueryOptions<FDWsData, FDWsError, TData> = {}
 ) =>
   useQuery<FDWsData, FDWsError, TData>(
-    fdwKeys.fdws(projectRef),
+    fdwKeys.list(projectRef),
     ({ signal }) => getFDWs({ projectRef, connectionString }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',

@@ -8,7 +8,6 @@ import {
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
@@ -164,9 +163,9 @@ export const useFDWCreateMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(fdwKeys.fdws(projectRef), { refetchType: 'all' }),
+        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),
+        queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
       ])
 
       await onSuccess?.(data, variables, context)
