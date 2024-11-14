@@ -12,6 +12,7 @@ import type { ResponseError } from 'types'
 import { getCreateFDWSql } from './fdw-create-mutation'
 import { getDeleteFDWSql } from './fdw-delete-mutation'
 import { FDW } from './fdws-query'
+import { fdwKeys } from './keys'
 
 export type FDWUpdateVariables = {
   projectRef?: string
@@ -73,7 +74,7 @@ export const useFDWUpdateMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        queryClient.invalidateQueries(fdwKeys.fdws(projectRef)),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),
       ])

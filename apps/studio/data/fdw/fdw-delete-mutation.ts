@@ -10,6 +10,7 @@ import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
 import type { ResponseError } from 'types'
 import { FDW } from './fdws-query'
+import { fdwKeys } from './keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
@@ -74,7 +75,7 @@ export const useFDWDeleteMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
+        queryClient.invalidateQueries(fdwKeys.fdws(projectRef)),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),
       ])
