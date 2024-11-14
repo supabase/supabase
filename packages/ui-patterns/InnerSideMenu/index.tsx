@@ -39,7 +39,13 @@ const InnerSideMenuCollapsible = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_>
 >(({ ...props }, ref) => {
-  return <Collapsible_Shadcn_ ref={ref} {...props} className={cn('w-full px-2', props.className)} />
+  return (
+    <Collapsible_Shadcn_
+      ref={ref}
+      {...props}
+      className={cn('w-full px-2 group', props.className)}
+    />
+  )
 })
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
@@ -73,10 +79,7 @@ const InnerSideMenuCollapsibleContent = forwardRef<
     <CollapsibleContent_Shadcn_
       ref={ref}
       {...props}
-      className={cn(
-        'w-full flex flex-col gap-0 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down',
-        props.className
-      )}
+      className={cn('w-full flex flex-col gap-0', props.className)}
     />
   )
 })
@@ -220,7 +223,7 @@ const InnerSideBarEmptyPanel = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<'div'> & {
     title: string
-    description?: string
+    description?: string | React.ReactNode
     illustration?: React.ReactNode
     actions?: React.ReactNode
   }

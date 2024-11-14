@@ -33,8 +33,7 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
 
   const viewResult = useViewDefinitionQuery(
     {
-      schema: entity?.schema,
-      name: entity?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
@@ -45,8 +44,7 @@ const TableDefinition = ({ entity }: TableDefinitionProps) => {
 
   const tableResult = useTableDefinitionQuery(
     {
-      schema: entity?.schema,
-      name: entity?.name,
+      id: entity?.id,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },

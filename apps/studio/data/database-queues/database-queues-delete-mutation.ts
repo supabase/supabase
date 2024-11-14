@@ -20,7 +20,7 @@ export async function deleteDatabaseQueue({
     projectRef,
     connectionString,
     sql: `select * from pgmq.drop_queue('${queueName}');`,
-    queryKey: databaseQueuesKeys.delete(),
+    queryKey: databaseQueuesKeys.delete(queueName),
   })
 
   return result
