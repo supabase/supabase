@@ -1,5 +1,5 @@
 import { ChevronRight, Pencil, Trash, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -25,6 +25,7 @@ import DeleteCronJob from './DeleteCronJob'
 import { Jobs } from 'openai/resources/fine-tuning/jobs'
 import { DocsButton } from 'components/ui/DocsButton'
 import { CronJobsFormHeader } from './CronJobsFormHeader'
+import { computeNextRunFromCurrentTime } from './CronJobs.utils'
 
 interface CronJobsDataGridProps {
   jobState: { jobId: string; selectedJob: CronJob | null }
@@ -62,6 +63,16 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
   const { mutate: toggleDatabaseCronJob, isLoading: isTogglingCronJob } =
     useDatabaseCronJobToggleMutation()
 
+  const [currentTime, setCurrentTime] = useState(new Date())
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 30000) // Update every 30 seconds
+
+    return () => clearInterval(interval)
+  }, [])
+
   const cronJobColumns = [
     {
       id: 'name',
@@ -78,6 +89,14 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
       name: 'Schedule',
       minWidth: 150,
       value: (row: CronJob) => <div className="text-xs">{row.schedule}</div>,
+    },
+    {
+      id: 'next_run',
+      name: 'Next Run',
+      minWidth: 150,
+      value: (row: CronJob) => (
+        <div className="text-xs">{computeNextRunFromCurrentTime(row.schedule, currentTime)}</div>
+      ),
     },
 
     {

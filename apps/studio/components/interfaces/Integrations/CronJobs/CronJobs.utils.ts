@@ -1,5 +1,10 @@
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader, HTTPParameter } from './CronJobs.constants'
+import parser from 'cron-parser'
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 
 export const buildCronQuery = (name: string, schedule: string, command: string) => {
   return `select cron.schedule('${name}','${schedule}',${command});`
@@ -134,4 +139,17 @@ export function formatDate(dateString: string): string {
     timeZoneName: 'short', // Optional: to include timezone
   }
   return date.toLocaleString(undefined, options)
+}
+
+export function computeNextRunFromCurrentTime(schedule: string, currentTime: Date): string {
+  try {
+    const interval = parser.parseExpression(schedule, { currentDate: currentTime })
+    const nextRun = interval.next().toDate()
+
+    // Format the date using dayjs
+    return dayjs(nextRun).utc().format('YYYY-MM-DD HH:mm:ss [UTC]')
+  } catch (err) {
+    console.error('Error parsing cron schedule:', err)
+    return 'Invalid cron schedule'
+  }
 }
