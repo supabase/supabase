@@ -4,6 +4,11 @@ export const databaseKeys = {
     ['projects', projectRef, 'indexes', schema] as const,
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
+  tableColumns: (
+    projectRef: string | undefined,
+    schema: string | undefined,
+    table: string | undefined
+  ) => ['projects', projectRef, 'table-columns', schema, table] as const,
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>

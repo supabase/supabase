@@ -96,7 +96,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     setSearchTerm(value)
   }
 
-  const columns = tableColumns?.result[0]?.columns ?? []
+  const columns = tableColumns?.[0]?.columns ?? []
   const columnOptions: MultiSelectOption[] = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
