@@ -1,13 +1,11 @@
+import { FunctionComponent } from 'react'
 import {
-  Apple,
   Activity,
   BarChart,
   Braces,
   Brain,
-  BrainIcon,
   ChartScatter,
   Cloud,
-  Code,
   Database,
   DatabaseBackup,
   DatabaseZap,
@@ -34,6 +32,7 @@ import {
   UserX,
   Zap,
 } from 'lucide-react'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
@@ -72,7 +71,7 @@ export type FeatureType = {
   /**
    * icon will be displayed in the feature card
    */
-  icon: string | LucideIcon
+  icon: string | LucideIcon | FunctionComponent
   /**
    * Each feature belongs to one or more products
    */
@@ -1952,7 +1951,7 @@ Key benefits:
 
 This feature is particularly valuable for developers looking to build dynamic web applications that leverage the power of Supabase as a backend service.
 `,
-    icon: Code,
+    icon: JsIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/javascript/start',
@@ -1977,7 +1976,7 @@ Key benefits:
 
 This feature is particularly useful for Flutter developers aiming to create responsive mobile applications backed by a powerful database solution.
 `,
-    icon: Smartphone,
+    icon: FlutterIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/dart/start',
@@ -2002,7 +2001,7 @@ Key benefits:
 
 This feature is particularly valuable for iOS developers looking to leverage the capabilities of Supabase in their mobile applications.
 `,
-    icon: Apple,
+    icon: SwiftIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
@@ -2027,7 +2026,7 @@ Key benefits:
 
 This feature is especially beneficial for Python developers looking to build robust applications powered by a scalable backend service like Supabase.
 `,
-    icon: BrainIcon,
+    icon: PythonIcon,
     products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
