@@ -60,35 +60,42 @@ const DatabaseSelector = ({
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         <div className="flex items-center space-x-2 cursor-pointer">
-          <Button
-            type="default"
-            className={cn(
-              'pr-2',
-              variant === 'connected-on-right' && 'rounded-r-none',
-              variant === 'connected-on-left' && 'rounded-l-none border-l-0',
-              variant === 'connected-on-both' && 'rounded-none border-x-0'
-            )}
-            icon={isLoading && <Loader2 className="animate-spin" />}
-            iconRight={<ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />}
-          >
-            <span className="text-foreground-muted mr-1">source</span>
-            {selectedAdditionalOption ? (
-              <span>{selectedAdditionalOption.name}</span>
-            ) : (
-              <>
-                <span className="capitalize">
-                  {isLoading || selectedDatabase?.identifier === projectRef
-                    ? 'Primary database'
-                    : 'Read replica'}
-                </span>{' '}
-                {isSuccess && selectedDatabase?.identifier !== projectRef && (
-                  <span>
-                    ({selectedDatabaseRegion} - {formattedDatabaseId})
-                  </span>
-                )}
-              </>
-            )}
-          </Button>
+          <div className="flex">
+            <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+              Source
+            </span>
+            <Button
+              type="default"
+              size="small"
+              className={cn(
+                'pr-2 rounded-l-none',
+                variant === 'connected-on-right' && 'rounded-r-none',
+                variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+                variant === 'connected-on-both' && 'rounded-none border-x-0'
+              )}
+              icon={isLoading && <Loader2 className="animate-spin" />}
+              iconRight={
+                <ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
+              }
+            >
+              {selectedAdditionalOption ? (
+                <span>{selectedAdditionalOption.name}</span>
+              ) : (
+                <>
+                  <span className="capitalize">
+                    {isLoading || selectedDatabase?.identifier === projectRef
+                      ? 'Primary database'
+                      : 'Read replica'}
+                  </span>{' '}
+                  {isSuccess && selectedDatabase?.identifier !== projectRef && (
+                    <span>
+                      ({selectedDatabaseRegion} - {formattedDatabaseId})
+                    </span>
+                  )}
+                </>
+              )}
+            </Button>
+          </div>
         </div>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="end">

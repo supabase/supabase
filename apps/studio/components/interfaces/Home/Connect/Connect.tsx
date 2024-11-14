@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
 import { useState } from 'react'
 
-import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -29,6 +29,7 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
+import { PoolingModesDialog } from 'components/interfaces/Connect/PoolingModesDialog'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
@@ -256,14 +257,14 @@ const Connect = () => {
             <TabsContent_Shadcn_
               key="direct"
               value="direct"
-              className={cn(DIALOG_PADDING_X_SMALL, DIALOG_PADDING_Y, '!mt-0')}
+              className={cn('!mt-0', 'p-0', 'flex flex-col gap-6', DIALOG_PADDING_Y)}
             >
-              <DatabaseConnectionString appearance="minimal" />
+              <DatabaseConnectionString />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
         </DialogContent>
       </Dialog>
-      <PoolingModesModal />
+      <PoolingModesDialog />
     </>
   )
 }
