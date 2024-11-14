@@ -194,7 +194,7 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
               <Alert
                 withIcon
                 variant="warning"
-                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm.`}
+                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
               >
                 This is due to changes in compute instances from the downgrade. Affected projects
                 include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
@@ -204,6 +204,10 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
         </Modal.Content>
 
         <div className="flex items-center justify-between border-t px-4 py-4">
+          <p className="text-xs text-foreground-lighter">
+            The unused amount for the remaining time of your billing cycle will be refunded as credits
+          </p>
+
           <div className="flex items-center space-x-2">
             <Button type="default" onClick={() => onClose()}>
               Cancel
