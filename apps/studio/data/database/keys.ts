@@ -2,6 +2,7 @@ export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
   indexes: (projectRef: string | undefined, schema: string | undefined) =>
     ['projects', projectRef, 'indexes', schema] as const,
+  keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>
