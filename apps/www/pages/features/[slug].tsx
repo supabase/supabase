@@ -103,12 +103,25 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               "
             >
               <div className="relative h-full flex flex-col items-start gap-2 w-full max-w-2xl mx-auto">
-                <div className="flex gap-1 flex-wrap mb-2">
+                <div className="flex flex-wrap items-center space-x-1 mb-2">
+                  <Link href="/features" passHref>
+                    <Badge
+                      className="p-0 h-[22px] w-[22px] rounded-full flex items-center justify-center text-foreground-lighter hover:text-foreground hover:border-foreground-lighter"
+                      size="small"
+                    >
+                      <ChevronLeft className="w-3.5 h-3.5" />
+                    </Badge>
+                  </Link>
                   {feature.products.map((product) => (
-                    <Link href={`/features?products=${product}`} passHref>
+                    <Link
+                      key={`product-${product}`}
+                      href={`/features?products=${product}`}
+                      className="inline-flex"
+                      passHref
+                    >
                       <Badge
                         key={product}
-                        className="capitalize hover:border-foreground-lighter"
+                        className="capitalize hover:border-foreground-lighter hover:text-foreground"
                         size="small"
                       >
                         {product}

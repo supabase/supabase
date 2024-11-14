@@ -1,40 +1,45 @@
 import {
-  ChartScatter,
-  Database,
-  FileCode2,
-  Lock,
-  Cloud,
-  UploadCloud,
-  Image,
-  MessageCircle,
-  ShieldCheck,
-  Package,
-  Users,
-  Folders,
-  RectangleEllipsis,
-  Braces,
-  Globe,
-  UserX,
-  GitBranch,
-  DatabaseZap,
-  Mail,
-  Smartphone,
-  Server,
+  Apple,
   Activity,
   BarChart,
+  Braces,
   Brain,
-  Puzzle,
+  BrainIcon,
+  ChartScatter,
+  Cloud,
+  Code,
+  Database,
   DatabaseBackup,
+  DatabaseZap,
+  Eye,
+  FileCode2,
+  Folders,
+  GitBranch,
+  Globe,
+  Image,
+  Lock,
+  Mail,
+  MessageCircle,
+  Package,
+  Puzzle,
+  RectangleEllipsis,
+  Server,
+  Shield,
+  ShieldCheck,
   ShieldPlus,
+  Smartphone,
   Terminal,
+  UploadCloud,
+  Users,
+  UserX,
   Zap,
 } from 'lucide-react'
 import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM = 'platform management',
-  STUDIO = 'studio',
+  PLATFORM_MANAGEMENT = 'Platform Management',
+  STUDIO = 'Studio',
 }
 
 export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
@@ -601,7 +606,7 @@ Vault is a Postgres extension and accompanying Supabase UI that simplifies the s
 This feature is particularly useful for teams looking to enhance their security posture by managing sensitive data directly within their database environment.
 `,
     icon: Lock,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
@@ -626,7 +631,7 @@ Supavisor is a cloud-native connection pooler designed for Postgres, built to ha
 This feature is particularly valuable for teams looking to optimize their database interactions and ensure robust performance as their applications scale.
 `,
     icon: Zap,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
@@ -637,7 +642,7 @@ This feature is particularly valuable for teams looking to optimize their databa
   },
   // Realtime
   {
-    title: 'Realtime Postgres changes',
+    title: 'Realtime - Postgres changes',
     subtitle: 'Receive your database changes through websockets.',
     description: `
 Supabase's Realtime Postgres Changes feature allows you to listen to database changes in real-time using the Realtime system. This capability enables you to build responsive, live-updating applications that reflect database changes instantly.
@@ -675,7 +680,7 @@ Supabase's Realtime Postgres Changes feature provides a powerful tool for creati
     },
   },
   {
-    title: 'Realtime Broadcast',
+    title: 'Realtime - Broadcast',
     subtitle: 'Send messages between connected users through websockets.',
     description: `
 Supabase's Realtime Broadcast feature enables real-time communication between connected clients using the Realtime system. This functionality allows you to build interactive, collaborative applications where users can instantly share messages or data in real-time.
@@ -716,7 +721,7 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     },
   },
   {
-    title: 'Realtime Presence',
+    title: 'Realtime - Presence',
     subtitle: 'Synchronize shared state between users through websockets.',
     description: `
 Supabase's Realtime Presence feature allows you to track and synchronize shared state between connected users in real-time. This capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
@@ -752,6 +757,55 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
     slug: 'realtime-presence',
     status: {
       stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Broadcast Authorization',
+    subtitle: 'Control access to broadcast channels in real-time.',
+    description: `
+The Realtime Broadcast Authorization feature allows you to manage access permissions for broadcast channels in your application. This functionality ensures that only authorized users can listen to specific channels, enhancing security and control over real-time data streams.
+
+Key benefits:
+1. Secure Access Control: Implement fine-grained access control over who can receive broadcast messages in real-time.
+2. Customizable Permissions: Define specific authorization rules based on user roles or attributes.
+3. Enhanced User Experience: Ensure that users only receive relevant updates based on their permissions.
+4. Easy Integration with Existing Systems: Seamlessly integrate broadcast authorization into your current application architecture.
+5. Comprehensive Documentation Available: Access detailed guides on how to implement broadcast authorization effectively.
+
+This feature is particularly valuable for applications that require controlled access to live data streams, such as chat applications or collaborative tools.
+`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#broadcast',
+    slug: 'realtime-broadcast-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Presence Authorization',
+    subtitle: 'Manage presence information securely in real-time.',
+    description: ` 
+The Realtime Presence Authorization feature enables you to control access permissions related to presence information in your application. This allows you to manage who can see the online status of other users in real-time, enhancing privacy and security within collaborative environments.
+
+Key benefits:
+1. Controlled Visibility of Presence Data: Ensure that only authorized users can view the online status of others, protecting user privacy.
+2. Customizable Presence Rules: Define specific rules based on user roles or attributes for who can see presence information.
+3. Improved User Experience: Enhance collaboration by providing relevant presence information while maintaining security protocols.
+4. Seamless Integration: Easily incorporate presence authorization into existing systems without significant overhead.
+5. Detailed Implementation Guides: Access comprehensive documentation on how to implement presence authorization effectively.
+
+This feature is particularly useful for collaborative applications where knowing the online status of team members is crucial while ensuring privacy and security are maintained.`,
+    icon: Eye,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#presence',
+    slug: 'realtime-presence-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
       availableOnSelfHosted: true,
     },
   },
@@ -1490,7 +1544,7 @@ Supabase's Command Line Interface (CLI) tool provides developers with a powerful
 By leveraging the Supabase CLI, you can significantly improve your development workflow, ensuring consistency between local and production environments, streamlining deployments, and making it easier to manage complex Supabase projects. This tool empowers developers to work more efficiently with Supabase, whether they're building small prototypes or large-scale applications.
 `,
     icon: Terminal,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
@@ -1526,7 +1580,7 @@ Supabase's Management API provides a powerful interface for programmatically man
 By utilizing the Supabase Management API, you can create more efficient, scalable, and automated workflows for managing your Supabase projects. This feature is especially powerful for organizations dealing with multiple projects or environments, enabling them to maintain consistency, reduce manual errors, and quickly respond to changing project requirements.
 `,
     icon: FileCode2,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/project-management/api',
@@ -1562,7 +1616,7 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
@@ -1598,7 +1652,7 @@ Supabase Reports provide comprehensive insights into your project's performance,
 By leveraging Supabase Reports, you gain a understanding of your project's performance and usage patterns. This feature empowers you to make informed decisions about scaling, optimization, and resource allocation, ensuring that your application runs efficiently and cost-effectively. Whether you're troubleshooting issues, planning for growth, or optimizing costs, Supabase Reports provides the insights you need to manage your project effectively.
 `,
     icon: BarChart,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '/images/features/reports-and-metrics.png',
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
@@ -1640,7 +1694,7 @@ Leveraging Supabase's SOC 2 Compliance involves:
 By building on Supabase's SOC 2 compliant platform, you gain a significant advantage in terms of security and trust. This compliance demonstrates to your users, partners, and regulators that you take data protection seriously and have chosen a backend platform that adheres to rigorous security standards. Whether you're a startup looking to win enterprise clients or an established company aiming to enhance your security posture, Supabase's SOC 2 compliance provides a solid foundation for building secure, trustworthy applications.
 `,
     icon: ShieldCheck,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/compliance',
     slug: 'soc-2-compliance',
@@ -1692,7 +1746,7 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
     icon: Activity,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
@@ -1880,6 +1934,106 @@ This feature is particularly useful for teams seeking to enhance their observabi
     slug: 'log-drains',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - JavaScript',
+    subtitle: 'Easily integrate Supabase with your JavaScript applications.',
+    description: `
+The Supabase JavaScript Client Library provides a straightforward way to interact with your Supabase database and services directly from your JavaScript applications. This library simplifies the process of making API calls, managing authentication, and handling real-time updates, making it an essential tool for developers working with Supabase.
+
+Key benefits:
+1. Simplified API Interaction: Easily connect to your Supabase backend with minimal setup.
+2. Built-in Authentication: Manage user authentication seamlessly within your JavaScript applications.
+3. Real-Time Capabilities: Subscribe to changes in your database and receive updates in real-time.
+4. Comprehensive Documentation: Access detailed guides and examples to help you get started quickly.
+5. Community Support: Join a growing community of developers using the JavaScript Client Library for various projects.
+
+This feature is particularly valuable for developers looking to build dynamic web applications that leverage the power of Supabase as a backend service.
+`,
+    icon: Code,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    slug: 'client-library-javascript',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Flutter',
+    subtitle: 'Integrate Supabase into your Flutter applications effortlessly.',
+    description: `
+The Supabase Flutter Client Library allows developers to easily integrate Supabase into their Flutter applications. This library provides a comprehensive set of tools for managing database interactions, user authentication, and real-time data updates, all tailored for the Flutter framework.
+
+Key benefits:
+1. Seamless Integration: Connect your Flutter app to Supabase with minimal configuration.
+2. User Authentication: Manage user sign-ups, logins, and sessions directly within your Flutter application.
+3. Real-Time Updates: Receive live updates from your database, enhancing user experience.
+4. Detailed Documentation: Access extensive resources and examples to facilitate development.
+5. Active Community: Engage with other Flutter developers leveraging Supabase for their projects.
+
+This feature is particularly useful for Flutter developers aiming to create responsive mobile applications backed by a powerful database solution.
+`,
+    icon: Smartphone,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    slug: 'client-library-flutter',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Swift',
+    subtitle: 'Effortlessly connect your Swift applications to Supabase.',
+    description: `
+The Supabase Swift Client Library provides an easy way for developers to integrate their iOS applications with Supabase services. This library simplifies database access, user authentication, and real-time data handling, making it an essential tool for Swift developers.
+
+Key benefits:
+1. Easy Integration: Quickly connect your Swift app to Supabase with straightforward setup instructions.
+2. Authentication Management: Handle user authentication seamlessly within your iOS applications.
+3. Real-Time Data Handling: Subscribe to changes in your database and receive updates instantly.
+4. Comprehensive Guides: Utilize detailed documentation and examples to streamline development.
+5. Supportive Community: Join a community of Swift developers using Supabase for their app development needs.
+
+This feature is particularly valuable for iOS developers looking to leverage the capabilities of Supabase in their mobile applications.
+`,
+    icon: Apple,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    slug: 'client-library-swift',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Python',
+    subtitle: 'Integrate Supabase easily into your Python applications.',
+    description: `
+The Supabase Python Client Library enables developers to connect their Python applications with Supabase effortlessly. This library provides tools for interacting with the database, managing user authentication, and handling real-time updates, tailored specifically for Python developers.
+
+Key benefits:
+1. Simple Connection Setup: Easily connect your Python application to Supabase with minimal configuration.
+2. User Authentication Support: Manage user accounts and sessions directly within your Python code.
+3. Real-Time Data Updates: Subscribe to changes in your database and receive live updates as they occur.
+4. In-Depth Documentation: Access comprehensive guides and examples to assist in development.
+5. Engaged Community Support: Connect with other Python developers utilizing Supabase in their projects.
+
+This feature is especially beneficial for Python developers looking to build robust applications powered by a scalable backend service like Supabase.
+`,
+    icon: BrainIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/python/start',
+    slug: 'client-library-python',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: true,
     },
   },
