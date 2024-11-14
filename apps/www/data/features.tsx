@@ -37,8 +37,8 @@ import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM_MANAGEMENT = 'Platform Management',
-  STUDIO = 'Studio',
+  PLATFORM = 'platform',
+  STUDIO = 'studio',
 }
 
 export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
@@ -605,7 +605,7 @@ Vault is a Postgres extension and accompanying Supabase UI that simplifies the s
 This feature is particularly useful for teams looking to enhance their security posture by managing sensitive data directly within their database environment.
 `,
     icon: Lock,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
@@ -630,7 +630,7 @@ Supavisor is a cloud-native connection pooler designed for Postgres, built to ha
 This feature is particularly valuable for teams looking to optimize their database interactions and ensure robust performance as their applications scale.
 `,
     icon: Zap,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
@@ -1543,7 +1543,7 @@ Supabase's Command Line Interface (CLI) tool provides developers with a powerful
 By leveraging the Supabase CLI, you can significantly improve your development workflow, ensuring consistency between local and production environments, streamlining deployments, and making it easier to manage complex Supabase projects. This tool empowers developers to work more efficiently with Supabase, whether they're building small prototypes or large-scale applications.
 `,
     icon: Terminal,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/vyHyYpvjaks',
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
@@ -1579,7 +1579,7 @@ Supabase's Management API provides a powerful interface for programmatically man
 By utilizing the Supabase Management API, you can create more efficient, scalable, and automated workflows for managing your Supabase projects. This feature is especially powerful for organizations dealing with multiple projects or environments, enabling them to maintain consistency, reduce manual errors, and quickly respond to changing project requirements.
 `,
     icon: FileCode2,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/management-api.png',
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/project-management/api',
@@ -1615,7 +1615,7 @@ Supabase's Role-Based Access Control (RBAC) feature provides a powerful and flex
 
 By leveraging Role-Based Access Control, you can create a secure, scalable, and easily manageable access control system for your application. This feature allows you to implement complex permission structures with ease, ensuring that users only have access to the resources and functionalities appropriate for their role within the system.
 `,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/kwoKmi6inAw',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
@@ -1651,7 +1651,7 @@ Supabase Reports provide comprehensive insights into your project's performance,
 By leveraging Supabase Reports, you gain a understanding of your project's performance and usage patterns. This feature empowers you to make informed decisions about scaling, optimization, and resource allocation, ensuring that your application runs efficiently and cost-effectively. Whether you're troubleshooting issues, planning for growth, or optimizing costs, Supabase Reports provides the insights you need to manage your project effectively.
 `,
     icon: BarChart,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/reports-and-metrics.png',
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
@@ -1693,7 +1693,7 @@ Leveraging Supabase's SOC 2 Compliance involves:
 By building on Supabase's SOC 2 compliant platform, you gain a significant advantage in terms of security and trust. This compliance demonstrates to your users, partners, and regulators that you take data protection seriously and have chosen a backend platform that adheres to rigorous security standards. Whether you're a startup looking to win enterprise clients or an established company aiming to enhance your security posture, Supabase's SOC 2 compliance provides a solid foundation for building secure, trustworthy applications.
 `,
     icon: ShieldCheck,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/compliance',
     slug: 'soc-2-compliance',
@@ -1745,7 +1745,7 @@ The Logs & Analytics feature in Supabase provides users with comprehensive loggi
 This feature is particularly valuable for teams looking to enhance their application's reliability and performance by gaining deeper insights into usage patterns and potential issues.
 `,
     icon: Activity,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '/images/features/logs-analytics.png',
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
@@ -1952,7 +1952,7 @@ Key benefits:
 This feature is particularly valuable for developers looking to build dynamic web applications that leverage the power of Supabase as a backend service.
 `,
     icon: JsIcon,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/javascript/start',
     slug: 'client-library-javascript',
@@ -1977,7 +1977,7 @@ Key benefits:
 This feature is particularly useful for Flutter developers aiming to create responsive mobile applications backed by a powerful database solution.
 `,
     icon: FlutterIcon,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/dart/start',
     slug: 'client-library-flutter',
@@ -2002,7 +2002,7 @@ Key benefits:
 This feature is particularly valuable for iOS developers looking to leverage the capabilities of Supabase in their mobile applications.
 `,
     icon: SwiftIcon,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/swift/start',
     slug: 'client-library-swift',
@@ -2027,7 +2027,7 @@ Key benefits:
 This feature is especially beneficial for Python developers looking to build robust applications powered by a scalable backend service like Supabase.
 `,
     icon: PythonIcon,
-    products: [ADDITIONAL_PRODUCTS.PLATFORM_MANAGEMENT],
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
     slug: 'client-library-python',
