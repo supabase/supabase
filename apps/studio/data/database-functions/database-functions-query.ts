@@ -1,7 +1,6 @@
 import pgMeta from '@supabase/pg-meta'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { databaseKeys } from 'data/database/keys'
-import type { ExecuteSqlError } from 'data/sql/execute-sql-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { z } from 'zod'
@@ -40,9 +39,9 @@ export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DatabaseFunctionsData, ExecuteSqlError, TData> = {}
+  }: UseQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
 ) =>
-  useQuery<DatabaseFunctionsData, ExecuteSqlError, TData>(
+  useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>(
     databaseKeys.databaseFunctions(projectRef),
     ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
     {
