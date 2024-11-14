@@ -1,12 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useState } from 'react'
 
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Button } from 'ui'
@@ -65,15 +64,7 @@ export const QueuesDisabledState = () => {
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
-            <Button asChild type="text" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/extensions/pgmq"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/database/extensions/pgmq" />
           </div>
         </ProductEmptyState>
       </div>
