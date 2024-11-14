@@ -8,7 +8,6 @@ import { analyticsKeys } from './keys'
 
 export type ProjectDailyStatsAttribute =
   operations['DailyStatsController_getDailyStats']['parameters']['query']['attribute']
-
 export type ProjectDailyStatsInterval = '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
 
 export type ProjectDailyStatsVariables = {

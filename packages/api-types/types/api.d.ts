@@ -959,6 +959,10 @@ export interface paths {
     /** Run project lints */
     get: operations['ProjectRunLintsController_runProjectLints']
   }
+  '/platform/projects/{ref}/service-versions': {
+    /** Gets service versions for a specific project */
+    get: operations['ProjectServiceVersionsController_getServiceVersions']
+  }
   '/platform/projects/{ref}/settings': {
     /** Gets project's settings */
     get: operations['SettingsController_getProjectApi']
@@ -1205,6 +1209,10 @@ export interface paths {
     /** Creates a partner organization */
     post: operations['AwsPartnerOrganizationsSystemController_createPartnerOrganization']
   }
+  '/system/partner-organizations/{slug}': {
+    /** Converts an organization into a partner organization */
+    put: operations['AwsPartnerOrganizationsSystemController_convertToPartnerOrganization']
+  }
   '/system/projects': {
     /** Create a project */
     post: operations['SystemProjectsController_createProject']
@@ -1224,6 +1232,20 @@ export interface paths {
   '/system/projects/{ref}/credentials/aws': {
     /** Allows a project to obtain temporary credentials. */
     post: operations['AwsCredentialsController_getTemporaryCredentials']
+  }
+  '/system/projects/{ref}/disk': {
+    /** Get database disk attributes */
+    get: operations['SystemProjectDiskController_getDisk']
+    /** Modify database disk */
+    post: operations['SystemProjectDiskController_modifyDisk']
+  }
+  '/system/projects/{ref}/disk/util': {
+    /** Get disk utilization */
+    get: operations['SystemProjectDiskController_getDiskUtilization']
+  }
+  '/system/projects/{ref}/disk/volume_info': {
+    /** Get AWS disk volume information */
+    get: operations['SystemProjectDiskController_getAwsDiskInfo']
   }
   '/system/projects/{ref}/functions': {
     /**
@@ -2570,9 +2592,8 @@ export interface components {
       uri_allow_list: string | null
     }
     AuthHealthResponse: {
-      description: string
-      name: string
-      version: string
+      /** @enum {string} */
+      name: 'GoTrue'
     }
     AutoApiService: {
       app: {
@@ -2694,10 +2715,12 @@ export interface components {
       git_branch?: string
       id: string
       is_default: boolean
+      /** Format: int64 */
       latest_check_run_id?: number
       name: string
       parent_project_ref: string
       persistent: boolean
+      /** Format: int32 */
       pr_number?: number
       project_ref: string
       reset_on_push: boolean
@@ -2734,6 +2757,9 @@ export interface components {
       is_grantable: boolean
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
+    }
+    ConvertIntoAwsPartnerOrganizationBody: {
+      partner_billing: components['schemas']['AwsPartnerBillingBody']
     }
     CopyObjectBody: {
       from: string
@@ -3263,7 +3289,7 @@ export interface components {
         | '8_attached_volume_to_upgraded_instance'
         | '9_completed_upgrade'
         | '10_completed_post_physical_backup'
-      /** @enum {number} */
+      /** @enum {integer} */
       status: 0 | 1 | 2
       target_version: number
     }
@@ -3466,6 +3492,7 @@ export interface components {
       query: string
     }
     FunctionResponse: {
+      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -3475,11 +3502,13 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
     }
     FunctionSlugResponse: {
+      /** Format: int64 */
       created_at: number
       entrypoint_path?: string
       id: string
@@ -3489,6 +3518,7 @@ export interface components {
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
+      /** Format: int64 */
       updated_at: number
       verify_jwt?: boolean
       version: number
@@ -4212,6 +4242,7 @@ export interface components {
     }
     OAuthTokenResponse: {
       access_token: string
+      /** Format: int64 */
       expires_in: number
       refresh_token: string
       /** @enum {string} */
@@ -4490,6 +4521,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
       work_mem?: string
@@ -4803,10 +4835,6 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
-      v2MaintenanceWindow: {
-        end?: string
-        start?: string
-      }
       volumeSizeGb?: number
     }
     ProjectInfo: {
@@ -4934,10 +4962,9 @@ export interface components {
       cloud_provider: string
       db_dns_name: string
       db_host: string
-      /** @enum {string|null} */
-      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
+      db_ip_addr_config: string
       db_name: string
-      db_port: string
+      db_port: number
       db_user: string
       inserted_at: string
       jwt_secret?: string
@@ -5029,8 +5056,6 @@ export interface components {
     }
     RealtimeHealthResponse: {
       connected_cluster: number
-      db_connected: boolean
-      healthy: boolean
     }
     Relationship: {
       constraint_name: string
@@ -5365,8 +5390,8 @@ export interface components {
       service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
     }
     ServiceVersions: {
-      gotrue: string
-      postgrest: string
+      gotrue?: string
+      postgrest?: string
       'supabase-postgres': string
     }
     SettingsResponse: {
@@ -5448,6 +5473,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     SnippetProject: {
+      /** Format: int64 */
       id: number
       name: string
     }
@@ -5467,6 +5493,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     SnippetUser: {
+      /** Format: int64 */
       id: number
       username: string
     }
@@ -5495,6 +5522,7 @@ export interface components {
     }
     StorageConfigResponse: {
       features: components['schemas']['StorageFeatures']
+      /** Format: int64 */
       fileSizeLimit: number
     }
     StorageFeatureImageTransformation: {
@@ -6285,6 +6313,7 @@ export interface components {
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
       statement_timeout?: string
+      track_commit_timestamp?: boolean
       wal_keep_size?: string
       wal_sender_timeout?: string
       work_mem?: string
@@ -6370,6 +6399,7 @@ export interface components {
     }
     UpdateStorageConfigBody: {
       features?: components['schemas']['StorageFeatures']
+      /** Format: int64 */
       fileSizeLimit?: number
     }
     UpdateSubscriptionBody: {
@@ -6709,7 +6739,9 @@ export interface components {
       pool_mode?: 'transaction' | 'session' | 'statement'
     }
     V1PhysicalBackup: {
+      /** Format: int64 */
       earliest_physical_backup_date_unix?: number
+      /** Format: int64 */
       latest_physical_backup_date_unix?: number
     }
     V1PostgrestConfigResponse: {
@@ -6720,6 +6752,7 @@ export interface components {
       max_rows: number
     }
     V1ProjectRefResponse: {
+      /** Format: int64 */
       id: number
       name: string
       ref: string
@@ -6761,6 +6794,7 @@ export interface components {
         | 'RESIZING'
     }
     V1RestorePitrBody: {
+      /** Format: int64 */
       recovery_time_target_unix: number
     }
     V1RunQueryBody: {
@@ -7559,6 +7593,9 @@ export interface operations {
   /** Retrieve CLI login session */
   CliLoginController_getCliLoginSession: {
     parameters: {
+      query?: {
+        device_code?: string
+      }
       path: {
         session_id: string
       }
@@ -13173,6 +13210,22 @@ export interface operations {
       }
     }
   }
+  /** Gets service versions for a specific project */
+  ProjectServiceVersionsController_getServiceVersions: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ServiceVersions']
+        }
+      }
+    }
+  }
   /** Gets project's settings */
   SettingsController_getProjectApi: {
     parameters: {
@@ -14536,6 +14589,29 @@ export interface operations {
       }
     }
   }
+  /** Converts an organization into a partner organization */
+  AwsPartnerOrganizationsSystemController_convertToPartnerOrganization: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ConvertIntoAwsPartnerOrganizationBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Unexpected error while converting organization into a partner organization */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Create a project */
   SystemProjectsController_createProject: {
     requestBody: {
@@ -14628,6 +14704,92 @@ export interface operations {
       }
       /** @description Failed to obtain temporary credentials. */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Get database disk attributes */
+  SystemProjectDiskController_getDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get database disk attributes */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Modify database disk */
+  SystemProjectDiskController_modifyDisk: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DiskRequestBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to modify database disk */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get disk utilization */
+  SystemProjectDiskController_getDiskUtilization: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['DiskUtilMetricsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get disk utilization */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get AWS disk volume information */
+  SystemProjectDiskController_getAwsDiskInfo: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
         content: never
       }
     }
@@ -16037,6 +16199,9 @@ export interface operations {
         content: {
           'application/json': components['schemas']['V1ServiceHealthResponse'][]
         }
+      }
+      403: {
+        content: never
       }
       /** @description Failed to retrieve project's service health status */
       500: {

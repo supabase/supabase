@@ -7,7 +7,8 @@ import {
 } from 'lib/role-impersonation'
 import type { ResponseError } from 'types'
 import { sqlKeys } from './keys'
-import { MB } from 'lib/constants'
+import { MB, PROJECT_STATUS } from 'lib/constants'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export type ExecuteSqlVariables = {
   projectRef?: string
@@ -55,7 +56,11 @@ export async function executeSql(
       header: { 'x-connection-encrypted': connectionString ?? '' },
       path: { ref: projectRef },
       // @ts-ignore: This is just a client side thing to identify queries better
-      query: { key: queryKey?.filter((seg) => typeof seg === 'string').join('-') ?? '' },
+      query: {
+        key:
+          queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
+          '',
+      },
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
@@ -119,13 +124,17 @@ export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
     isRoleImpersonationEnabled,
   }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
-) =>
-  useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
+) => {
+  const project = useSelectedProject()
+  const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+
+  return useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
     sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     ({ signal }) =>
       executeSql(
         { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
         signal
       ),
-    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined' && isActive, staleTime: 0, ...options }
   )
+}

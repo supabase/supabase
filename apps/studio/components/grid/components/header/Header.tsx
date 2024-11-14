@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Papa from 'papaparse'
@@ -196,7 +195,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                                 className="-translate-x-[2px]"
                               />
                               <ArrowUp
-                                className={clsx(
+                                className={cn(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                                   'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
                                 )}
@@ -240,10 +239,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
-    queryKey: [table.schema, table.name],
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    table,
+    tableId: table.id,
     sorts,
     filters,
     page: snap.page,
@@ -253,10 +251,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
@@ -379,59 +376,57 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   return (
     <div className="flex items-center gap-x-2">
       {editable && (
-        <>
-          <ButtonTooltip
+        <ButtonTooltip
+          type="default"
+          size="tiny"
+          icon={<Trash />}
+          onClick={onRowsDelete}
+          disabled={allRowsSelected && isImpersonatingRole}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text:
+                allRowsSelected && isImpersonatingRole
+                  ? 'Table truncation is not supported when impersonating a role'
+                  : undefined,
+            },
+          }}
+        >
+          {allRowsSelected
+            ? `Delete all rows in table`
+            : selectedRows.size > 1
+              ? `Delete ${selectedRows.size} rows`
+              : `Delete ${selectedRows.size} row`}
+        </ButtonTooltip>
+      )}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
             type="default"
             size="tiny"
-            icon={<Trash />}
-            onClick={onRowsDelete}
-            disabled={allRowsSelected && isImpersonatingRole}
-            tooltip={{
-              content: {
-                side: 'bottom',
-                text:
-                  allRowsSelected && isImpersonatingRole
-                    ? 'Table truncation is not supported when impersonating a role'
-                    : undefined,
-              },
-            }}
+            iconRight={<ChevronDown />}
+            loading={isExporting}
+            disabled={isExporting}
           >
-            {allRowsSelected
-              ? `Delete all rows in table`
-              : selectedRows.size > 1
-                ? `Delete ${selectedRows.size} rows`
-                : `Delete ${selectedRows.size} row`}
-          </ButtonTooltip>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="default"
-                size="tiny"
-                iconRight={<ChevronDown />}
-                loading={isExporting}
-                disabled={isExporting}
-              >
-                Export
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-40">
-              <DropdownMenuItem onClick={onRowsExportCSV}>
-                <span className="text-foreground-light">Export to CSV</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            Export
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-40">
+          <DropdownMenuItem onClick={onRowsExportCSV}>
+            <span className="text-foreground-light">Export to CSV</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onRowsExportSQL}>Export to SQL</DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-          {!allRowsSelected && totalRows > allRows.length && (
-            <>
-              <div className="h-6 ml-0.5">
-                <Separator orientation="vertical" />
-              </div>
-              <Button type="text" onClick={() => onSelectAllRows()}>
-                Select all rows in table
-              </Button>
-            </>
-          )}
+      {!allRowsSelected && totalRows > allRows.length && (
+        <>
+          <div className="h-6 ml-0.5">
+            <Separator orientation="vertical" />
+          </div>
+          <Button type="text" onClick={() => onSelectAllRows()}>
+            Select all rows in table
+          </Button>
         </>
       )}
     </div>

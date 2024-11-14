@@ -6,17 +6,17 @@ import type { SupaRow } from 'components/grid/types'
 import { Markdown } from 'components/interfaces/Markdown'
 import { DocsButton } from 'components/ui/DocsButton'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
-import type { Table } from 'data/tables/get-table'
+import { Entity } from 'data/table-editor/table-editor-types'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 import { getPrimaryKeys } from './utils'
 
 export type TableRowDeleteVariables = {
   projectRef: string
   connectionString?: string
-  table: Table
+  table: Entity
   rows: SupaRow[]
   impersonatedRole?: ImpersonationRole
 }
@@ -29,7 +29,7 @@ export function getTableRowDeleteSql({
   if (error) throw error
 
   let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-  primaryKeys!.forEach((key) => {
+  primaryKeys?.forEach((key) => {
     const primaryKeyValues = rows.map((x) => x[key])
     queryChains = queryChains.filter(key, 'in', primaryKeyValues)
   })
@@ -76,7 +76,7 @@ export const useTableRowDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(tableRowKeys.tableRowsAndCount(projectRef, table.id))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

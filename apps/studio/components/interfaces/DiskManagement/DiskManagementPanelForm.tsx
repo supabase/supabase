@@ -55,7 +55,6 @@ import {
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { getDiskStorageSchema } from './DiskManagementPanelSchema'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
@@ -169,7 +168,6 @@ export function DiskManagementPanelForm() {
     totalSize: size_gb,
     computeSize: undefined,
   }
-  const DiskStorageSchema = getDiskStorageSchema(size_gb)
   const form = useForm<DiskStorageSchemaType>({
     resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
     defaultValues,
