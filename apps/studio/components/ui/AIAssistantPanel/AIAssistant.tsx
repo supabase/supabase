@@ -374,7 +374,7 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
-          ) : !tables?.length > 0 ? (
+          ) : tables?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
             <div className="w-full flex flex-col justify-end flex-1 h-full p-8">
