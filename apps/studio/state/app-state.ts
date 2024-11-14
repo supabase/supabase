@@ -20,16 +20,33 @@ export type CommonDatabaseEntity = {
   [key: string]: any
 }
 
+export type SuggestionsType = {
+  title: string
+  prompts: string[]
+}
+
 type AiAssistantPanelType = {
   open: boolean
   initialMessages?: MessageType[]
   initialInput?: string
   sqlSnippets?: string[]
+  suggestions?: SuggestionsType
   editor?: SupportedAssistantEntities | null
   // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
   content?: string
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
+}
+
+const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
+  open: false,
+  initialMessages: [],
+  sqlSnippets: undefined,
+  initialInput: '',
+  suggestions: undefined,
+  editor: null,
+  content: '',
+  entity: undefined,
 }
 
 export const appState = proxy({
@@ -111,15 +128,14 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  aiAssistantPanel: {
-    open: false,
-    initialMessages: [],
-    sqlSnippets: [],
-    initialInput: '',
-    editor: null,
-    content: '',
-    entity: undefined,
-  } as AiAssistantPanelType,
+  resetAiAssistantPanel: () => {
+    appState.aiAssistantPanel = {
+      ...INITIAL_AI_ASSISTANT,
+      open: appState.aiAssistantPanel.open,
+    }
+  },
+
+  aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
   setAiAssistantPanel: (value: AiAssistantPanelType) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
     appState.aiAssistantPanel = {

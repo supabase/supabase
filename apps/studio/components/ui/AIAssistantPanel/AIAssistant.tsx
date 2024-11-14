@@ -4,7 +4,7 @@ import { last, partition } from 'lodash'
 import { Box, Code, FileText, MessageCircleMore, WandSparkles, ChevronLeft } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, memo } from 'react'
 import { toast } from 'sonner'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useAppStateSnapshot, SuggestionsType } from 'state/app-state'
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
@@ -60,22 +60,22 @@ interface AIAssistantProps {
   initialMessages?: MessageType[]
   sqlSnippets?: string[]
   initialInput?: string
+  suggestions?: SuggestionsType
 }
 
 export const AIAssistant = ({
   id,
   className,
   onResetConversation,
-  sqlSnippets: initialSqlSnippets = [],
+  sqlSnippets,
   initialMessages = [],
+  suggestions,
   initialInput = '',
 }: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
-
-  const [sqlSnippets, setSqlSnippets] = useState(initialSqlSnippets)
 
   const disablePrompts = useFlag('disableAssistantPrompts')
 
@@ -90,7 +90,7 @@ export const AIAssistant = ({
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
-  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const { resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
 
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -162,7 +162,7 @@ export const AIAssistant = ({
         Authorization: headerData.get('Authorization'),
       },
     })
-    setSqlSnippets([])
+    setAiAssistantPanel({ sqlSnippets: undefined })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
@@ -194,22 +194,16 @@ export const AIAssistant = ({
   }
 
   useEffect(() => {
-    return () => {
-      setAiAssistantPanel({
-        initialInput: '',
-        sqlSnippets: [],
-      })
-    }
+    return resetAiAssistantPanel
   }, [])
 
   useEffect(() => {
     setValue(initialInput)
-    setSqlSnippets(initialSqlSnippets)
     if (inputRef.current) {
       inputRef.current.focus()
       inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
     }
-  }, [initialInput, initialSqlSnippets])
+  }, [initialInput])
 
   useEffect(() => {
     if (!isLoading) {
@@ -239,14 +233,14 @@ export const AIAssistant = ({
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div className={cn('flex-grow overflow-auto flex-col')}>
+        <div className={cn('flex-grow overflow-auto flex flex-col')}>
           <div className="z-50 bg-background/80 backdrop-blur-md sticky top-0">
             <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
               <AiIconAnimation loading={false} allowHoverEffect />
 
               <div className="text-sm flex-1">{hasMessages ? 'New chat' : 'Assistant'}</div>
               <div className="flex gap-2">
-                {hasMessages && (
+                {(hasMessages || suggestions || sqlSnippets) && (
                   <Button type="default" disabled={isLoading} onClick={onResetConversation}>
                     Reset
                   </Button>
@@ -309,6 +303,32 @@ export const AIAssistant = ({
               )}
               <div ref={bottomRef} className="h-1" />
             </motion.div>
+          ) : suggestions ? (
+            <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
+              <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
+                Suggestions
+              </h3>
+              {suggestions.title && <p>{suggestions.title}</p>}
+              <div className="-mx-3 mt-4 mb-12">
+                {suggestions?.prompts.map((prompt) => (
+                  <Button
+                    size="small"
+                    icon={<FileText strokeWidth={1.5} size={16} />}
+                    type="text"
+                    className="w-full justify-start py-1 h-auto"
+                    onClick={() => {
+                      setValue(prompt)
+                      if (inputRef.current) {
+                        inputRef.current.focus()
+                        inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
+                      }
+                    }}
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </div>
+            </div>
           ) : tables?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
@@ -337,7 +357,7 @@ export const AIAssistant = ({
                   onRemove={() => {
                     const newSnippets = [...sqlSnippets]
                     newSnippets.splice(index, 1)
-                    setSqlSnippets(newSnippets)
+                    setAiAssistantPanel({ sqlSnippets: newSnippets })
                   }}
                   className="text-xs"
                 />
@@ -363,9 +383,8 @@ export const AIAssistant = ({
             onValueChange={(e) => setValue(e.target.value)}
             onSubmit={(event) => {
               event.preventDefault()
-              const sqlSnippetsString = sqlSnippets
-                .map((snippet) => '```sql\n' + snippet + '\n```')
-                .join('\n')
+              const sqlSnippetsString =
+                sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
               const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
               sendMessageToAssistant(valueWithSnippets)
             }}

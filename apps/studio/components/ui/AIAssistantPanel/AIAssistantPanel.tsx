@@ -6,20 +6,26 @@ import { cn } from 'ui'
 import { AIAssistant } from './AIAssistant'
 
 export const AiAssistantPanel = () => {
-  const { aiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, resetAiAssistantPanel } = useAppStateSnapshot()
 
-  const { open, initialMessages, initialInput, sqlSnippets } = aiAssistantPanel
+  const { open, initialMessages, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const [chatId, setChatId] = useState(() => uuidv4())
+
+  const handleReset = () => {
+    setChatId(uuidv4())
+    resetAiAssistantPanel()
+  }
 
   return !open ? null : (
     <AIAssistant
       id={chatId}
+      suggestions={suggestions}
       initialMessages={initialMessages}
       sqlSnippets={sqlSnippets}
       initialInput={initialInput}
       className={cn('w-full h-full')}
-      onResetConversation={() => setChatId(uuidv4())}
+      onResetConversation={handleReset}
     />
   )
 }

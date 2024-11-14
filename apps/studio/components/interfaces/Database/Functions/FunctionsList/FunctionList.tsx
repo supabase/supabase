@@ -128,6 +128,15 @@ const FunctionList = ({
                             setAiAssistantPanel({
                               open: true,
                               initialInput: 'Help me update this function to do...',
+                              suggestions: {
+                                title:
+                                  'I can help you make a change to this function, here are a few example prompts to get you started:',
+                                prompts: [
+                                  'Rename this function to...',
+                                  'Modify this function so that it...',
+                                  'Add a trigger for this function that calls it when...',
+                                ],
+                              },
                               sqlSnippets: [x.complete_statement],
                             })
                           }}
