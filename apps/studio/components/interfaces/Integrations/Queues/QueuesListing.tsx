@@ -102,7 +102,7 @@ export const QueuesListing = () => {
                     Created at
                   </Table.th>
                   <Table.th key="queue_size" className="table-cell">
-                    Current queue size
+                    <div className="flex justify-center">Size</div>
                   </Table.th>
                   <Table.th key="buttons" className="table-cell"></Table.th>
                 </>

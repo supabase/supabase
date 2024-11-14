@@ -1,5 +1,6 @@
+import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { isNil, noop } from 'lodash'
-import { Archive, X } from 'lucide-react'
+import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -49,6 +50,8 @@ export const MessageDetailsPanel = ({
   const { id: _id } = useParams()
   const { name: queueName } = useParams()
   const project = useSelectedProject()
+
+  useEscapeKeydown(() => setSelectedMessage(null))
 
   const {
     mutate: archiveMessage,
@@ -137,7 +140,7 @@ export const MessageDetailsPanel = ({
                   title="Postpone message"
                   description="The message will be postponed and won't show up in reads for 60 seconds."
                   button={{
-                    icon: <Archive />,
+                    icon: <Clock12 />,
                     text: 'Postpone',
                     isLoading: isLoadingRead,
                     onClick: () => {
@@ -161,7 +164,7 @@ export const MessageDetailsPanel = ({
                 />
                 <RowAction
                   title="Archive message"
-                  description="The message will be marked as archived and hidden from future reads by consumers. You can still access the message afterwards."
+                  description="The message will be marked as archived and hidden from future reads by consumers. You can still access the message later."
                   button={{
                     icon: <Archive />,
                     text: 'Archive',
@@ -189,7 +192,7 @@ export const MessageDetailsPanel = ({
                   title="Delete message"
                   description="The message cannot be recovered afterwards."
                   button={{
-                    icon: <Archive />,
+                    icon: <Trash2 />,
                     text: 'Delete',
                     type: 'danger',
                     isLoading: isLoadingDelete,

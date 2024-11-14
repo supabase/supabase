@@ -51,15 +51,15 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
         <p title={queue.created_at}>{dayjs(queue.created_at).format(DATETIME_FORMAT)}</p>
       </Table.td>
       <Table.td className="table-cell">
-        {isLoading ? (
-          <div className="flex justify-center">
+        <div className="flex justify-center">
+          {isLoading ? (
             <Loader2 className="animate-spin" size={16} />
-          </div>
-        ) : (
-          <p>
-            {metrics?.queue_length} {metrics?.method === 'estimated' ? '(Approximate)' : null}
-          </p>
-        )}
+          ) : (
+            <p>
+              {metrics?.queue_length} {metrics?.method === 'estimated' ? '(Approximate)' : null}
+            </p>
+          )}
+        </div>
       </Table.td>
       <Table.td>
         <div className="flex items-center justify-end">

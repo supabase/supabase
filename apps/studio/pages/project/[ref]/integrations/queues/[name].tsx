@@ -1,3 +1,4 @@
+import { Paintbrush, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 
@@ -21,6 +22,7 @@ import {
   BreadcrumbSeparator_Shadcn_,
   Button,
   LoadingLine,
+  Separator,
 } from 'ui'
 
 const QueueMessagesPage: NextPageWithLayout = () => {
@@ -73,16 +75,24 @@ const QueueMessagesPage: NextPageWithLayout = () => {
             </BreadcrumbList_Shadcn_>
           </Breadcrumb_Shadcn_>
         </div>
-        <div className="flex items-center gap-x-2">
+        <div className="flex gap-x-2">
+          <Button
+            type="text"
+            onClick={() => setPurgeQueueModalShown(true)}
+            icon={<Paintbrush />}
+            title="Purge messages"
+          />
+          <Button
+            type="text"
+            onClick={() => setDeleteQueueModalShown(true)}
+            icon={<Trash2 />}
+            title="Delete queue"
+          />
+          <Separator orientation="vertical" className="h-[26px]" />
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
             Add message
           </Button>
-          <Button type="warning" onClick={() => setDeleteQueueModalShown(true)}>
-            Purge messages
-          </Button>
-          <Button type="danger" onClick={() => setDeleteQueueModalShown(true)}>
-            Delete queue
-          </Button>
+
           {/* <DocsButton href={docsUrl} />} */}
         </div>
       </div>
