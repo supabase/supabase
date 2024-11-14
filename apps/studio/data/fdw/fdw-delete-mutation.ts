@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import type { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { entityTypeKeys } from 'data/entity-types/keys'
+import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
@@ -73,8 +74,9 @@ export const useFDWDeleteMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(fdwKeys.list(projectRef), { refetchType: 'all' }),
         queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
-        queryClient.invalidateQueries(fdwKeys.list(projectRef)),
+        queryClient.invalidateQueries(foreignTableKeys.list(projectRef)),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
         queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
       ])
