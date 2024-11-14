@@ -1,4 +1,4 @@
-import { ChevronRight, Pencil, Trash, X } from 'lucide-react'
+import { ChevronRight, Pencil, Trash, X, Eye } from 'lucide-react'
 import { useRef, useState, useEffect } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
@@ -17,6 +17,9 @@ import {
   Sheet,
   SheetContent,
   cn,
+  HoverCard_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -26,6 +29,8 @@ import { Jobs } from 'openai/resources/fine-tuning/jobs'
 import { DocsButton } from 'components/ui/DocsButton'
 import { CronJobsFormHeader } from './CronJobsFormHeader'
 import { computeNextRunFromCurrentTime } from './CronJobs.utils'
+import CronJobsEmptyState from './CronJobsEmptyState'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 interface CronJobsDataGridProps {
   jobState: { jobId: string; selectedJob: CronJob | null }
@@ -103,7 +108,25 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
       id: 'command',
       name: 'Command',
       minWidth: 150,
-      value: (row: CronJob) => <div className="text-xs">{row.command}</div>,
+      value: (row: CronJob) => (
+        <HoverCard_Shadcn_ openDelay={200}>
+          <HoverCardTrigger_Shadcn_ asChild className="cursor-pointer">
+            <span className="font-mono px-2 py-1 bg-alternative-200 rounded-md text-sm flex items-center gap-2">
+              <Eye size={12} className="text-foreground-lighter" />
+              <span className="text-foreground-light text-sm truncate max-w-36">{row.command}</span>
+            </span>
+          </HoverCardTrigger_Shadcn_>
+          <HoverCardContent_Shadcn_>
+            <SimpleCodeBlock
+              showCopy={false}
+              className="sql"
+              parentClassName="!p-0 [&>div>span]:text-xs"
+            >
+              {row.command}
+            </SimpleCodeBlock>
+          </HoverCardContent_Shadcn_>
+        </HoverCard_Shadcn_>
+      ),
     },
     {
       id: 'status',
@@ -191,9 +214,7 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
         className="relative flex flex-grow bg-alternative min-h-0"
         autoSaveId="cron-jobs-layout"
       >
-        <div className="h-full flex flex-col w-full">
-          <CronJobsFormHeader />
-          {/* turn this into tabs  */}
+        <div className="h-full flex flex-col w-full bg-200 pt-8">
           <div className="flex items-center gap-2 px-6">
             Jobs
             {jobState.jobId && (
@@ -243,8 +264,8 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
                       <GenericSkeletonLoader />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      No cron jobs found
+                    <div className="flex items-center justify-center w-full col-span-5">
+                      <CronJobsEmptyState context="jobs" />
                     </div>
                   ),
                 }}

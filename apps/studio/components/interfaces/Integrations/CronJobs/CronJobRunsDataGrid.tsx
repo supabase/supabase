@@ -1,28 +1,25 @@
-import { ChevronRight, Eye, Timer } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { ChevronRight, Eye, InfoIcon, Timer } from 'lucide-react'
+import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useCronJobRunsQuery } from 'data/database-cron-jobs/database-cron-jobs-runs-query'
-import { useRouter } from 'next/router'
 import {
   Badge,
-  Button,
-  ResizablePanel,
-  ResizablePanelGroup,
   cn,
   HoverCard_Shadcn_,
-  HoverCardTrigger_Shadcn_,
   HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  ResizablePanel,
+  ResizablePanelGroup,
   Separator,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { calculateDuration } from './CronJobs.utils'
-import { formatDate } from './CronJobs.utils'
-import { DocsButton } from 'components/ui/DocsButton'
-import { CronJobsFormHeader } from './CronJobsFormHeader'
+import { calculateDuration, formatDate } from './CronJobs.utils'
+import CronJobsEmptyState from './CronJobsEmptyState'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import { toString as CronToString } from 'cronstrue'
 
 type CronJobRun = {
   jobid: number
@@ -45,7 +42,6 @@ interface CronJobsDataGridProps {
 
 const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGridProps) => {
   const { project } = useProjectContext()
-  const router = useRouter()
 
   const gridRef = useRef<DataGridHandle>(null)
 
@@ -54,10 +50,6 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
     connectionString: project?.connectionString,
     jobId,
   })
-
-  const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
-    Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
-  >()
 
   const cronJobColumns = [
     {
@@ -146,12 +138,6 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
     return result
   })
 
-  function handleSidepanelClose() {
-    //setSelectedJob(null)
-    const { id, ...otherParams } = router.query
-    router.push({ query: otherParams })
-  }
-
   return (
     <>
       <ResizablePanelGroup
@@ -159,10 +145,9 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
         className="relative flex flex-grow bg-alternative min-h-0"
         autoSaveId="cron-jobs-layout"
       >
-        <div className="h-full flex flex-col w-full">
-          <CronJobsFormHeader />
+        <div className="h-full flex flex-col w-full bg-200 pt-8">
           {/* turn this into some kind of proper tabs?  */}
-          <div className="flex items-center px-6">
+          <div className="flex items-center px-6 justify-between">
             <div className="flex items-center gap-2">
               <button onClick={() => updateJobState('', null)}>Jobs</button>
               {jobState.selectedJob && (
@@ -175,27 +160,52 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
                 </>
               )}
             </div>
-            <Separator orientation="vertical" className="ml-6 h-6" />
-            <div className="flex items-center gap-6 ml-6">
-              <div className="flex items-center gap-1">
-                <span className="text-foreground-light text-sm">
-                  {jobState.selectedJob?.schedule}
+
+            <div className="flex items-center gap-12">
+              <div className="relative">
+                <span className="text-foreground-lighter text-xs absolute -top-5 left-0 uppercase">
+                  Schedule
                 </span>
-              </div>
-              <div className="flex items-center gap-1">
                 <HoverCard_Shadcn_ openDelay={200}>
                   <HoverCardTrigger_Shadcn_ asChild className="cursor-pointer">
-                    <span className="font-mono p-1 bg-200 rounded-md text-sm flex items-center gap-2">
-                      <Eye size={12} className="text-foreground-lighter" />
+                    <span className="font-mono px-2 py-1 bg-alternative-200 rounded-md text-sm flex items-center gap-2">
+                      <InfoIcon size={12} className="text-foreground-lighter" />
+                      <span className="text-foreground-light text-sm truncate max-w-36">
+                        {jobState.selectedJob?.schedule}
+                      </span>
+                    </span>
+                  </HoverCardTrigger_Shadcn_>
+                  <HoverCardContent_Shadcn_>
+                    <span className="text-foreground-light text-sm inline-block py-1">
+                      The cron will be run{' '}
+                      {jobState.selectedJob?.schedule
+                        ? CronToString(String(jobState.selectedJob.schedule).toLocaleLowerCase())
+                        : ''}
+                    </span>
+                  </HoverCardContent_Shadcn_>
+                </HoverCard_Shadcn_>
+              </div>
+              <div className=" relative">
+                <span className="text-foreground-lighter text-xs absolute -top-5 left-0 uppercase">
+                  Command
+                </span>
+                <HoverCard_Shadcn_ openDelay={200}>
+                  <HoverCardTrigger_Shadcn_ asChild className="cursor-pointer">
+                    <span className="font-mono px-2 py-1 bg-alternative-200 rounded-md text-sm flex items-center gap-2">
+                      <InfoIcon size={12} className="text-foreground-lighter" />
                       <span className="text-foreground-light text-sm truncate max-w-36">
                         {jobState.selectedJob?.command}
                       </span>
                     </span>
                   </HoverCardTrigger_Shadcn_>
                   <HoverCardContent_Shadcn_>
-                    <span className="text-sm font-mono text-foreground-light">
+                    <SimpleCodeBlock
+                      showCopy={false}
+                      className="sql"
+                      parentClassName="!p-0 [&>div>span]:text-xs"
+                    >
                       {jobState.selectedJob?.command}
-                    </span>
+                    </SimpleCodeBlock>
                   </HoverCardContent_Shadcn_>
                 </HoverCard_Shadcn_>
               </div>
@@ -212,10 +222,9 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
                 columns={columns}
                 rows={cronJobs ?? []}
                 rowClass={(job) => {
-                  ///const isSelected = job.jobid === selectedJob?.jobid
                   const isSelected = false
                   return [
-                    `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+                    `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'}  `,
                     `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
                     '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
                     '[&>.rdg-cell:first-child>div]:ml-4',
@@ -223,27 +232,15 @@ const CronJobRunsDataGrid = ({ jobId, jobState, updateJobState }: CronJobsDataGr
                 }}
                 renderers={{
                   renderRow(idx, props) {
-                    return (
-                      <Row
-                        key={props.row.id}
-                        {...props}
-                        // onClick={() => {
-                        //   if (typeof idx === 'number' && idx >= 0) {
-                        //     //setSelectedJob(props.row)
-                        //     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                        //     //router.push({ ...router, query: { ...router.query, id: props.row.id } })
-                        //   }
-                        // }}
-                      />
-                    )
+                    return <Row key={props.row.id} {...props} />
                   },
                   noRowsFallback: isLoading ? (
                     <div className="absolute top-14 px-6 w-full">
                       <GenericSkeletonLoader />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-full">
-                      No cron job runs found
+                    <div className="flex items-center justify-center w-full col-span-6">
+                      <CronJobsEmptyState context="runs" />
                     </div>
                   ),
                 }}

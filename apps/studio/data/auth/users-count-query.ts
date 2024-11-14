@@ -1,8 +1,8 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 
 import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
-import { Filter } from './users-infinite-query'
 import { authKeys } from './keys'
+import { Filter } from './users-infinite-query'
 
 type UsersCountVariables = {
   projectRef?: string
@@ -65,8 +65,8 @@ export type UsersCountError = ExecuteSqlError
 export const useUsersCountQuery = <TData extends UsersCountData = UsersCountData>(
   { projectRef, connectionString, keywords, filter, providers }: UsersCountVariables,
   options: UseQueryOptions<ExecuteSqlData, UsersCountError, TData> = {}
-) =>
-  useExecuteSqlQuery(
+) => {
+  return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
@@ -75,3 +75,4 @@ export const useUsersCountQuery = <TData extends UsersCountData = UsersCountData
     },
     options
   )
+}

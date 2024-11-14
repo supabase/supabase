@@ -5,4 +5,5 @@ export const databaseCronJobsKeys = {
   list: (projectRef: string | undefined) => ['projects', projectRef, 'cron-jobs'] as const,
   runs: (projectRef: string | undefined, jobId: number) =>
     ['projects', projectRef, 'cron-jobs', jobId] as const,
+  timezone: (projectRef: string | undefined) => ['database-cron-timezone', projectRef] as const,
 }

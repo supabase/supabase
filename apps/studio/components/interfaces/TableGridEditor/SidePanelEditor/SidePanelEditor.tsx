@@ -10,10 +10,12 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
+import { tableRowKeys } from 'data/table-rows/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
@@ -258,17 +260,15 @@ const SidePanelEditor = ({
         queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, selectedTable?.id)),
         queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
         queryClient.invalidateQueries(
-          sqlKeys.query(project?.ref, [
-            'table-definition',
-            selectedTable!.schema,
-            selectedTable!.name,
-          ])
+          databaseKeys.tableDefinition(project?.ref, selectedTable?.id)
         ),
         queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
       ])
 
+      // We need to invalidate tableRowsAndCount after tableEditor
+      // to ensure the query sent is correct
       await queryClient.invalidateQueries(
-        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
+        tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
       )
 
       setIsEdited(false)
@@ -472,22 +472,6 @@ const SidePanelEditor = ({
         if (hasError) {
           toast(`Table ${table.name} has been updated, but there were some errors`, { id: toastId })
         } else {
-          queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints']))
-          await Promise.all([
-            queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, table.id)),
-            queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [selectedTable.schema, selectedTable.name])
-            ),
-            queryClient.invalidateQueries(
-              sqlKeys.query(project?.ref, [
-                'table-definition',
-                selectedTable.schema,
-                selectedTable.name,
-              ])
-            ),
-            queryClient.invalidateQueries(entityTypeKeys.list(project?.ref)),
-          ])
-
           toast.success(`Successfully updated ${table.name}!`, { id: toastId })
         }
       }
@@ -562,11 +546,9 @@ const SidePanelEditor = ({
       }
     }
 
-    await Promise.all([
-      queryClient.invalidateQueries(
-        sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
-      ),
-    ])
+    await queryClient.invalidateQueries(
+      tableRowKeys.tableRowsAndCount(project?.ref, selectedTable?.id)
+    )
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
     })
