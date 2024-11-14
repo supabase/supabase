@@ -948,7 +948,6 @@ const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'LinkedIn (OIDC)',
-  value: 'linkedin_oidc',
   link: 'https://supabase.com/docs/guides/auth/social-login/auth-linkedin',
   properties: {
     EXTERNAL_LINKEDIN_OIDC_ENABLED: {
@@ -1144,7 +1143,6 @@ const EXTERNAL_PROVIDER_SLACK_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'Slack (OIDC)',
-  value: 'slack_oidc',
   link: 'https://supabase.com/docs/guides/auth/social-login/auth-slack',
   properties: {
     EXTERNAL_SLACK_OIDC_ENABLED: {
