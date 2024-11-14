@@ -1,7 +1,7 @@
-import { UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
 
 const generatePolicyDefinition = (policy: {
@@ -21,14 +21,19 @@ CREATE POLICY "${policy.name}" on "${policy.schema}"."${policy.table}" AS ${poli
 }
 
 // [Joshen] Eventually should support table definition and view definition as well if possible
-export const getEntityDefinitionQuery = ({
+export const getEntityDefinitionSql = ({
   id,
   type,
 }: {
   id?: number
   type?: SupportedAssistantEntities | 'table' | 'view' | null
 }) => {
-  if (!id || !type) return ''
+  if (!id) {
+    throw new Error('id is required')
+  }
+  if (!type) {
+    throw new Error('type is required')
+  }
 
   switch (type) {
     case 'functions':
@@ -79,32 +84,54 @@ export type EntityDefinitionVariables = {
   connectionString?: string
 }
 
-export type EntityDefinitionData = string
-export type EntityDefinitionError = ExecuteSqlError
+export async function getEntityDefinition(
+  { projectRef, connectionString, id, type }: EntityDefinitionVariables,
+  signal?: AbortSignal
+) {
+  if (!id) {
+    throw new Error('id is required')
+  }
 
-export const useEntityDefinitionQuery = <TData extends EntityDefinitionData = EntityDefinitionData>(
-  { id, type, projectRef, connectionString }: EntityDefinitionVariables,
-  { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, EntityDefinitionError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  const sql = getEntityDefinitionSql({ id, type })
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: getEntityDefinitionQuery({ id, type }),
-      queryKey: databaseKeys.entityDefinition(projectRef, id),
+      sql,
+      queryKey: ['entity-definition', id],
     },
+    signal
+  )
+
+  if (type === 'functions') {
+    return result[0].pg_get_functiondef
+  } else if (type === 'rls-policies') {
+    return generatePolicyDefinition(result[0])
+  } else {
+    return result[0]
+  }
+}
+
+export type EntityDefinitionData = string
+export type EntityDefinitionError = ExecuteSqlError
+
+export const useEntityDefinitionQuery = <TData = EntityDefinitionData>(
+  { projectRef, connectionString, id, type }: EntityDefinitionVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<EntityDefinitionData, EntityDefinitionError, TData> = {}
+) =>
+  useQuery<EntityDefinitionData, EntityDefinitionError, TData>(
+    databaseKeys.entityDefinition(projectRef, id),
+    ({ signal }) => getEntityDefinition({ projectRef, connectionString, id, type }, signal),
     {
-      select(data) {
-        if (type === 'functions') {
-          return data.result[0].pg_get_functiondef
-        } else if (type === 'rls-policies') {
-          return generatePolicyDefinition(data.result[0])
-        } else {
-          return data.result[0]
-        }
-      },
-      enabled: enabled && typeof id !== 'undefined' && typeof type !== 'undefined',
+      enabled:
+        enabled &&
+        typeof projectRef !== 'undefined' &&
+        typeof id !== 'undefined' &&
+        !isNaN(id) &&
+        typeof type !== 'undefined',
       ...options,
     }
   )
-}

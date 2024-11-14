@@ -56,7 +56,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
 
 export function prefetchTableEditor(
   client: QueryClient,
-  { projectRef, connectionString, id }: Required<TableEditorVariables>
+  { projectRef, connectionString, id }: TableEditorVariables
 ) {
   return client.fetchQuery(tableEditorKeys.tableEditor(projectRef, id), ({ signal }) =>
     getTableEditor(
