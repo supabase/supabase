@@ -16,10 +16,10 @@ import { PRODUCT_SHORTNAMES } from 'shared-data/products'
 import gaEvents from '~/lib/gaEvents'
 import Telemetry from '~/lib/telemetry'
 
-import type { SolutionsType } from '~/data/Solutions'
+import type { ProductType } from '~/data/MainProducts'
 
 interface Props {
-  products: SolutionsType
+  products: ProductType
 }
 
 const Products: React.FC<Props> = (props) => {

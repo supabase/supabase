@@ -1,7 +1,7 @@
 import { products } from 'shared-data'
 import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 
-export type SolutionsType = {
+export type ProductType = {
   [key: string]: {
     name: string
     icon: string
@@ -12,7 +12,7 @@ export type SolutionsType = {
   }
 }
 
-const solutions: SolutionsType = {
+const MainProducts: ProductType = {
   [PRODUCT_SHORTNAMES.DATABASE]: {
     name: PRODUCT_NAMES.DATABASE,
     icon: products.database.icon[24],
@@ -89,4 +89,4 @@ const solutions: SolutionsType = {
   },
 }
 
-export default solutions
+export default MainProducts
