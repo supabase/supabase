@@ -16,7 +16,6 @@ import { entityTypeKeys } from 'data/entity-types/keys'
 import { prefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from 'data/query-client'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -760,7 +759,7 @@ export const updateTable = async ({
 
   await Promise.all([
     queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, table.id)),
-    queryClient.invalidateQueries(sqlKeys.query(projectRef, ['foreign-key-constraints'])),
+    queryClient.invalidateQueries(databaseKeys.foreignKeyConstraints(projectRef, table.schema)),
     queryClient.invalidateQueries(databaseKeys.tableDefinition(projectRef, table.id)),
     queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
   ])
