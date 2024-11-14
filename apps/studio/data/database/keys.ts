@@ -19,4 +19,6 @@ export const databaseKeys = {
     ['projects', projectRef, 'table-constraints', id] as const,
   foreignKeyConstraints: (projectRef: string | undefined, schema?: string) =>
     ['projects', projectRef, 'foreign-key-constraints', schema] as const,
+  databaseSize: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database-size'] as const,
 }
