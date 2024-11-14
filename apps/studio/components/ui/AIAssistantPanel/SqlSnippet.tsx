@@ -1,83 +1,56 @@
-import { useState, useEffect, useCallback } from 'react'
-import { Code, Play, Edit, DatabaseIcon, FileWarning } from 'lucide-react'
-import { Button, CodeBlock, cn } from 'ui'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Code, DatabaseIcon, Edit, FileWarning, Play } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
+import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
+
+import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
-import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import {
+  Button,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  CodeBlock,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  cn,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
-import useNewQuery from 'components/interfaces/SQLEditor/hooks'
+import { ButtonTooltip } from '../ButtonTooltip'
+import { isReadOnlySelect } from './AIAssistant.utils'
 
 interface SqlSnippetWrapperProps {
   sql: string
-  isLoading?: boolean
   readOnly?: boolean
 }
 
 interface ParsedSqlProps {
   sql: string
-  props: any
   title: string
   readOnly?: boolean
+  isChart: boolean
+  xAxis: string
+  yAxis: string
 }
 
-const isReadOnlySelect = (query: string): boolean => {
-  const normalizedQuery = query.trim().toLowerCase()
-
-  // Check if it starts with SELECT
-  if (!normalizedQuery.startsWith('select')) {
-    return false
-  }
-
-  // List of keywords that indicate write operations or function calls
-  const disallowedPatterns = [
-    // Write operations
-    'insert',
-    'update',
-    'delete',
-    'alter',
-    'drop',
-    'create',
-    'truncate',
-    'replace',
-    'with',
-
-    // Function patterns
-    'function',
-    'procedure',
-  ]
-
-  const allowedPatterns = ['inserted']
-
-  // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
-  return !disallowedPatterns.some((pattern) => {
-    // Check if the found disallowed pattern is actually part of an allowed pattern
-    const isPartOfAllowedPattern = allowedPatterns.some(
-      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(pattern)
-    )
-
-    if (isPartOfAllowedPattern) {
-      return false
-    }
-
-    return normalizedQuery.includes(pattern)
-  })
-}
-
-const SqlSnippetWrapper = ({ sql, isLoading, readOnly = false }: SqlSnippetWrapperProps) => {
-  let formatted = (sql || [''])[0]
+const SqlSnippetWrapper = ({ sql, readOnly = false }: SqlSnippetWrapperProps) => {
+  const formatted = (sql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
   const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
   const title = props.title || 'SQL Query'
-  formatted = formatted.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
-  console.log('props:', propsMatch, title, propsMatch)
+  const updatedFormatted = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
   return (
     <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
-        sql={formatted}
+        sql={updatedFormatted}
         isChart={props.isChart}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
@@ -96,13 +69,18 @@ export const SqlCard = ({
   title,
   readOnly = false,
 }: ParsedSqlProps) => {
+  const router = useRouter()
+  const project = useSelectedProject()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { newQuery } = useNewQuery()
+
+  const isInSQLEditor = router.pathname.includes('/sql')
+  const isInNewSnippet = router.pathname.endsWith('/sql')
   const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
-  const project = useSelectedProject()
   const [error, setError] = useState<QueryResponseError>()
   const [showWarning, setShowWarning] = useState(false)
-  const { newQuery } = useNewQuery()
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (res) => {
@@ -132,9 +110,10 @@ export const SqlCard = ({
       sql: suffixWithLimit(sql, 100),
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      handleError: (error) => {
+      handleError: (error: any) => {
         setError(error)
         setResults([])
+        return { result: [] }
       },
     })
   }, [project?.ref, project?.connectionString, sql, executeSql, readOnly])
@@ -143,10 +122,13 @@ export const SqlCard = ({
     if (isReadOnlySelect(sql) && !results && !readOnly) {
       handleExecute()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sql, handleExecute, readOnly])
 
-  const handleEdit = () => {
-    if (!readOnly) {
+  const handleEditInSQLEditor = () => {
+    if (isInSQLEditor) {
+      snapV2.setDiffContent(sql, DiffType.Addition)
+    } else {
       newQuery(sql, title)
     }
   }
@@ -182,9 +164,10 @@ export const SqlCard = ({
                     sql: suffixWithLimit(sql, 100),
                     projectRef: project?.ref,
                     connectionString: project?.connectionString,
-                    handleError: (error) => {
+                    handleError: (error: any) => {
                       setError(error)
                       setResults([])
+                      return { result: [] }
                     },
                   })
                 }}
@@ -200,30 +183,64 @@ export const SqlCard = ({
 
             {!readOnly && (
               <div className="flex">
-                <Button
+                <ButtonTooltip
                   type="text"
                   size="tiny"
                   className="w-7 h-7"
                   icon={<Code size={14} />}
                   onClick={() => setShowCode(!showCode)}
-                ></Button>
+                  tooltip={{ content: { side: 'bottom', text: 'Show query' } }}
+                />
 
-                <Button
-                  type="text"
-                  size="tiny"
-                  className="w-7 h-7"
-                  icon={<Edit size={14} />}
-                  onClick={handleEdit}
-                ></Button>
+                {!isInSQLEditor || isInNewSnippet ? (
+                  <ButtonTooltip
+                    type="text"
+                    size="tiny"
+                    className="w-7 h-7"
+                    icon={<Edit size={14} />}
+                    onClick={handleEditInSQLEditor}
+                    tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
+                  />
+                ) : (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <ButtonTooltip
+                        type="text"
+                        size="tiny"
+                        className="w-7 h-7"
+                        icon={<Edit size={14} />}
+                        tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-36">
+                      <DropdownMenuItem
+                        onClick={() => snapV2.setDiffContent(sql, DiffType.Addition)}
+                      >
+                        Insert code
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => snapV2.setDiffContent(sql, DiffType.Modification)}
+                      >
+                        Replace code
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => snapV2.setDiffContent(sql, DiffType.NewSnippet)}
+                      >
+                        Create new snippet
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
 
-                <Button
+                <ButtonTooltip
                   type="text"
                   size="tiny"
                   className="w-7 h-7"
                   icon={<Play size={14} />}
                   loading={isExecuting}
                   onClick={handleExecute}
-                ></Button>
+                  tooltip={{ content: { side: 'bottom', text: 'Run query' } }}
+                />
               </div>
             )}
           </>

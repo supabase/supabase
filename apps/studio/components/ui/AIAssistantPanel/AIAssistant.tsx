@@ -1,23 +1,24 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { last, partition } from 'lodash'
-import { Box, Code, FileText, MessageCircleMore, WandSparkles, ChevronLeft } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, memo } from 'react'
+import { motion } from 'framer-motion'
+import { last } from 'lodash'
+import { FileText } from 'lucide-react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { useAppStateSnapshot, SuggestionsType } from 'state/app-state'
+
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { constructHeaders } from 'data/fetchers'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { constructHeaders } from 'data/fetchers'
 import {
   BASE_PATH,
   IS_PLATFORM,
@@ -26,7 +27,10 @@ import {
   TELEMETRY_CATEGORIES,
   TELEMETRY_LABELS,
 } from 'lib/constants'
+import uuidv4 from 'lib/uuid'
+import { SuggestionsType, useAppStateSnapshot } from 'state/app-state'
 import {
+  AiIconAnimation,
   Button,
   cn,
   Tooltip_Shadcn_,
@@ -34,21 +38,13 @@ import {
   TooltipProvider_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-
-import { Admonition, AssistantChatForm } from 'ui-patterns'
+import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
-import { Message } from './Message'
-const ANIMATION_DURATION = 0.3
-import { Loading } from 'ui'
-import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import AIOnboarding from './AIOnboarding'
-import { AiIconAnimation } from 'ui'
+import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { Message } from './Message'
 
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
-import uuidv4 from 'lib/uuid'
-
-const MemoizedMessage = memo(({ message }) => {
+const MemoizedMessage = memo(({ message }: { message: MessageType }) => {
   return (
     <Message
       key={message.id}
@@ -158,7 +154,7 @@ export const AIAssistant = ({
 
   const renderedMessages = useMemo(
     () =>
-      messages.map((message, index) => {
+      messages.map((message) => {
         return <MemoizedMessage key={message.id} message={message} />
       }),
     [messages]
@@ -170,11 +166,10 @@ export const AIAssistant = ({
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
     const headerData = await constructHeaders()
     append(payload, {
-      headers: {
-        Authorization: headerData.get('Authorization'),
-      },
+      headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
-    setAiAssistantPanel({ sqlSnippets: undefined })
+
+    setAiAssistantPanel({ open: true, sqlSnippets: undefined })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
@@ -266,7 +261,8 @@ export const AIAssistant = ({
   if (isLoadingTables) {
     return (
       <div className="h-full w-full flex justify-center items-center">
-        <Loading active />
+        {/* [Joshen] We could try play around with a custom loader for the assistant here */}
+        <GenericSkeletonLoader className="w-4/5" />
       </div>
     )
   }
@@ -374,7 +370,7 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
-          ) : tables?.length > 0 ? (
+          ) : (tables ?? [])?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
             <div className="w-full flex flex-col justify-end flex-1 h-full p-8">
@@ -479,7 +475,7 @@ export const AIAssistant = ({
                   onRemove={() => {
                     const newSnippets = [...sqlSnippets]
                     newSnippets.splice(index, 1)
-                    setAiAssistantPanel({ sqlSnippets: newSnippets })
+                    setAiAssistantPanel({ open: true, sqlSnippets: newSnippets })
                   }}
                   className="text-xs"
                 />
@@ -497,7 +493,7 @@ export const AIAssistant = ({
             placeholder={
               hasMessages
                 ? 'Reply to the assistant...'
-                : sqlSnippets?.length > 0
+                : (sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
                   : 'How can we help you today?'
             }

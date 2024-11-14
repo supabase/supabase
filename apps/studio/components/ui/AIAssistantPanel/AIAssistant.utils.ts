@@ -154,3 +154,46 @@ export const generatePrompt = ({
     return basePrompt
   }
 }
+
+export const isReadOnlySelect = (query: string): boolean => {
+  const normalizedQuery = query.trim().toLowerCase()
+
+  // Check if it starts with SELECT
+  if (!normalizedQuery.startsWith('select')) {
+    return false
+  }
+
+  // List of keywords that indicate write operations or function calls
+  const disallowedPatterns = [
+    // Write operations
+    'insert',
+    'update',
+    'delete',
+    'alter',
+    'drop',
+    'create',
+    'truncate',
+    'replace',
+    'with',
+
+    // Function patterns
+    'function',
+    'procedure',
+  ]
+
+  const allowedPatterns = ['inserted']
+
+  // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
+  return !disallowedPatterns.some((pattern) => {
+    // Check if the found disallowed pattern is actually part of an allowed pattern
+    const isPartOfAllowedPattern = allowedPatterns.some(
+      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(pattern)
+    )
+
+    if (isPartOfAllowedPattern) {
+      return false
+    }
+
+    return normalizedQuery.includes(pattern)
+  })
+}

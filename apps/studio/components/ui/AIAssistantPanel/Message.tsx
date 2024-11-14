@@ -1,16 +1,11 @@
-import dayjs from 'dayjs'
-import { noop } from 'lodash'
-import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Badge, cn, markdownComponents, WarningIcon } from 'ui'
-import { SqlSnippet } from './SqlSnippet'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { useProfile } from 'lib/profile'
-import { MessagePre } from './MessagePre'
-import { motion } from 'framer-motion'
+
+import { cn, markdownComponents, WarningIcon } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
+import { SqlSnippet } from './SqlSnippet'
 
 interface MessageProps {
   name?: string
@@ -36,7 +31,6 @@ export const Message = function Message({
   action = null,
   variant = 'default',
 }: PropsWithChildren<MessageProps>) {
-  const { profile } = useProfile()
   const isUser = role === 'user'
 
   if (!content) return null

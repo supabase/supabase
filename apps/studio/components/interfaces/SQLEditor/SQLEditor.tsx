@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { format } from 'sql-formatter'
 
 import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams } from 'common'
@@ -77,6 +76,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { useIsDatabaseFunctionsAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -104,11 +104,13 @@ const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
+  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
+  const { open } = appSnap.aiAssistantPanel
+
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const [selectedMessage, setSelectedMessage] = useState<string>()
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
@@ -126,7 +128,9 @@ const SQLEditor = () => {
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
+  // [Joshen] This eventually needs to be in the app state
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
+  const isAssistantOpen = (!isAssistantV2Enabled && isAiOpen) || (isAssistantV2Enabled && open)
 
   const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
@@ -180,7 +184,7 @@ const SQLEditor = () => {
           const editor = editorRef.current
           const monaco = monacoRef.current
 
-          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
+          const startLineNumber = hasSelection ? editor?.getSelection()?.startLineNumber ?? 0 : 0
 
           const formattedError = error.formattedError ?? ''
           const lineError = formattedError.slice(formattedError.indexOf('LINE'))
@@ -236,7 +240,7 @@ const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql)
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
         : selectedValue || editorRef.current?.getValue()
       formatQuery(
         {
@@ -276,7 +280,7 @@ const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? ((selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql)
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -375,7 +379,7 @@ const SQLEditor = () => {
   )
 
   const updateEditorWithCheckForDiff = useCallback(
-    ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => {
+    ({ diffType, sql }: { diffType: DiffType; sql: string }) => {
       const editorModel = editorRef.current?.getModel()
       if (!editorModel) return
 
@@ -391,7 +395,6 @@ const SQLEditor = () => {
           },
         ])
       } else {
-        setSelectedMessage(id)
         const currentSql = editorRef.current?.getValue()
         const diff = { original: currentSql || '', modified: sql }
         setSourceSqlDiff(diff)
@@ -466,7 +469,6 @@ const SQLEditor = () => {
         label: debugSolution ? 'debug_snippet' : 'edit_snippet',
       })
 
-      setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSourceSqlDiff(undefined)
@@ -493,7 +495,6 @@ const SQLEditor = () => {
       label: debugSolution ? 'debug_snippet' : 'edit_snippet',
     })
 
-    setSelectedMessage(undefined)
     setDebugSolution(undefined)
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
@@ -571,6 +572,12 @@ const SQLEditor = () => {
       databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
     }
   }, [isSuccessReadReplicas, databases, ref])
+
+  useEffect(() => {
+    if (snapV2.diffContent !== undefined) {
+      updateEditorWithCheckForDiff(snapV2.diffContent)
+    }
+  }, [snapV2.diffContent])
 
   const defaultSqlDiff = useMemo(() => {
     if (!sourceSqlDiff) {
@@ -663,7 +670,7 @@ const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
+            {(isAssistantOpen || isDiffOpen) && !hasHipaaAddon && (
               <AISchemaSuggestionPopover
                 onClickSettings={() => {
                   appSnap.setShowAiSettingsModal(true)
@@ -699,7 +706,7 @@ const SQLEditor = () => {
             )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAiOpen && (
+                {!isAssistantV2Enabled && !open && (
                   <motion.button
                     layoutId="ask-ai-input-icon"
                     transition={{ duration: 0.1 }}
@@ -707,13 +714,13 @@ const SQLEditor = () => {
                       const state = getSqlEditorV2StateSnapshot()
                       const snippet = state.snippets[id]
                       const editor = editorRef.current
-                      const selection = editor.getSelection()
+                      const selection = editor?.getSelection()
                       const selectedValue = selection
-                        ? editor.getModel()?.getValueInRange(selection)
+                        ? editor?.getModel()?.getValueInRange(selection)
                         : undefined
                       const sql = snippet
-                        ? ((selectedValue || editorRef.current?.getValue()) ??
-                          snippet.snippet.content.sql)
+                        ? (selectedValue || editorRef.current?.getValue()) ??
+                          snippet.snippet.content.sql
                         : selectedValue || editorRef.current?.getValue()
 
                       appSnap.setAiAssistantPanel({
