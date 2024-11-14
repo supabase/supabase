@@ -15,7 +15,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import UpcomingInvoice from './UpcomingInvoice'
-import { Markdown } from 'components/interfaces/Markdown'
 
 const BillingBreakdown = () => {
   const { slug: orgSlug } = useParams()
