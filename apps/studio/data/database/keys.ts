@@ -1,5 +1,7 @@
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
+  indexes: (projectRef: string | undefined, schema: string | undefined) =>
+    ['projects', projectRef, 'indexes', schema] as const,
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>
@@ -8,9 +10,10 @@ export const databaseKeys = {
     ['projects', projectRef, 'table-definition', id] as const,
   viewDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'view-definition', id] as const,
-  backups: (projectRef: string | undefined) => [projectRef, 'database', 'backups'] as const,
+  backups: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'database', 'backups'] as const,
   poolingConfiguration: (projectRef: string | undefined) =>
-    [projectRef, 'database', 'pooling-configuration'] as const,
+    ['projects', projectRef, 'database', 'pooling-configuration'] as const,
   indexesFromQuery: (projectRef: string | undefined, query: string) =>
     ['projects', projectRef, 'indexes', { query }] as const,
   indexAdvisorFromQuery: (projectRef: string | undefined, query: string) =>
