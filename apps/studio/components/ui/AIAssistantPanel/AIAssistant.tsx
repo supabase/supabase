@@ -26,7 +26,14 @@ import {
   TELEMETRY_CATEGORIES,
   TELEMETRY_LABELS,
 } from 'lib/constants'
-import { Button, cn } from 'ui'
+import {
+  Button,
+  cn,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipProvider_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 
 import { Admonition, AssistantChatForm } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -37,6 +44,9 @@ import { Loading } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import AIOnboarding from './AIOnboarding'
 import { AiIconAnimation } from 'ui'
+
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import uuidv4 from 'lib/uuid'
 
 const MemoizedMessage = memo(({ message }) => {
   return (
@@ -81,11 +91,13 @@ export const AIAssistant = ({
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
   const [value, setValue] = useState<string>(initialInput)
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
@@ -193,6 +205,34 @@ export const AIAssistant = ({
     )
   }
 
+  const handleScroll = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      const scrollPercentage =
+        (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100
+      const isScrollable = container.scrollHeight > container.clientHeight
+      const isAtBottom = scrollPercentage >= 100
+
+      setShowFade(isScrollable && !isAtBottom)
+    }
+  }
+
+  // Add useEffect to set up scroll listener
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      // Initial check
+      handleScroll()
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [])
+
   useEffect(() => {
     return resetAiAssistantPanel
   }, [])
@@ -220,6 +260,7 @@ export const AIAssistant = ({
 
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+    handleScroll()
   }, [messages])
 
   if (isLoadingTables) {
@@ -233,7 +274,11 @@ export const AIAssistant = ({
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div className={cn('flex-grow overflow-auto flex flex-col')}>
+        <div
+          ref={scrollContainerRef}
+          className={cn('flex-grow overflow-auto flex flex-col')}
+          onScroll={handleScroll}
+        >
           <div className="z-50 bg-background/80 backdrop-blur-md sticky top-0">
             <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
               <AiIconAnimation loading={false} allowHoverEffect />
@@ -265,7 +310,7 @@ export const AIAssistant = ({
             )}
           </div>
           {hasMessages ? (
-            <motion.div className="w-full overflow-auto flex-1 p-8 flex flex-col">
+            <motion.div className="w-full p-8 flex flex-col">
               <div className="text-xs text-foreground-lighter text-center mb-5">
                 {new Date(messages[0].createdAt || new Date()).toLocaleDateString('en-US', {
                   month: 'long',
@@ -329,23 +374,100 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
-          ) : tables?.length > 0 ? (
+          ) : !tables?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
-            <div className="w-full px-content py-content flex flex-col justify-end flex-1 h-full">
-              <p className="text-base mb-2">Welcome to Supabase!</p>
+            <div className="w-full flex flex-col justify-end flex-1 h-full p-8">
+              <div className="flex-1">
+                <div className="shrink-0 h-64 mb-5 w-auto overflow-hidden -mx-8 -mt-8 relative">
+                  <motion.div
+                    initial={{ height: '800%', bottom: 0 }}
+                    animate={{ height: '100%', bottom: 0, transition: { duration: 8 } }}
+                    className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-b from-transparent to-background"
+                  />
+                  <div className="h-full w-full relative">
+                    <motion.div
+                      initial={{ x: 350, rotate: -45 }}
+                      animate={{
+                        x: 400,
+                        rotate: -45,
+                        transition: { duration: 5, ease: 'easeInOut' },
+                      }}
+                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
+                    />
+                    <motion.div
+                      initial={{ x: 380, rotate: -45 }}
+                      animate={{
+                        x: 500,
+                        rotate: -45,
+                        transition: { duration: 5, ease: 'easeInOut' },
+                      }}
+                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
+                    />
+                    <motion.div
+                      initial={{ x: 410, rotate: -45 }}
+                      animate={{
+                        x: 600,
+                        rotate: -45,
+                        transition: { duration: 5, ease: 'easeInOut' },
+                      }}
+                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
+                    />
+                  </div>
+                </div>
+              </div>
+              <h2 className="text-base mb-2">Welcome to Supabase!</h2>
               <p className="text-sm text-foreground-lighter mb-6">
-                This is the Supabase assistant which can help you create, debug and modify tables,
+                This is the Supabase assistant which will help you create, debug and modify tables,
                 policies, functions and more. You can even use it to query your data using just your
                 words. It looks like we have a blank canvas though, so what are you looking to
-                build?
+                build? Here are some ideas.
               </p>
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={() => setValue('Generate a database schema for ...')}>
+                  Generate a ...
+                </Button>
+                {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
+                  <TooltipProvider_Shadcn_>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="outline"
+                          onClick={() => {
+                            setMessages([
+                              {
+                                id: uuidv4(),
+                                role: 'user',
+                                createdAt: new Date(Date.now() - 3000),
+                                content: qs.description,
+                              },
+                              {
+                                id: uuidv4(),
+                                role: 'assistant',
+                                createdAt: new Date(),
+                                content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
+                              },
+                            ])
+                          }}
+                        >
+                          {qs.title}
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_>
+                        <p>{qs.description}</p>
+                      </TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                  </TooltipProvider_Shadcn_>
+                ))}
+              </div>
             </div>
           )}
         </div>
-        <div className="pointer-events-none z-10 -mt-24">
-          <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent"></div>
-        </div>
+        {showFade && (
+          <div className="pointer-events-none z-10 -mt-24">
+            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent"></div>
+          </div>
+        )}
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
             <div className="mb-2">
