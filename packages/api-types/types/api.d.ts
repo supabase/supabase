@@ -1263,15 +1263,12 @@ export interface paths {
     /** Modify database disk */
     post: operations['SystemProjectDiskController_modifyDisk']
   }
-<<<<<<< HEAD
   '/system/projects/{ref}/disk/custom-config': {
     /** Gets disk autoscale config */
     get: operations['SystemProjectDiskController_getDiskAutoscaleConfig']
     /** Updates disk autoscale config */
     post: operations['SystemProjectDiskController_updateDiskAutoscaleConfig']
   }
-=======
->>>>>>> e36be4e10258052c1c55937ecb3c34c6af149720
   '/system/projects/{ref}/disk/util': {
     /** Get disk utilization */
     get: operations['SystemProjectDiskController_getDiskUtilization']
@@ -3577,6 +3574,7 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
+      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -3593,6 +3591,7 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
+      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -6770,6 +6769,7 @@ export interface components {
     V1CreateFunctionBody: {
       body: string
       name: string
+      resource_multiplier?: string
       slug: string
       verify_jwt?: boolean
     }
@@ -6941,6 +6941,7 @@ export interface components {
     V1UpdateFunctionBody: {
       body?: string
       name?: string
+      resource_multiplier?: string
       verify_jwt?: boolean
     }
     ValidateQueryBody: {
@@ -15057,7 +15058,6 @@ export interface operations {
       }
     }
   }
-<<<<<<< HEAD
   /** Gets disk autoscale config */
   SystemProjectDiskController_getDiskAutoscaleConfig: {
     parameters: {
@@ -15109,8 +15109,6 @@ export interface operations {
       }
     }
   }
-=======
->>>>>>> e36be4e10258052c1c55937ecb3c34c6af149720
   /** Get disk utilization */
   SystemProjectDiskController_getDiskUtilization: {
     parameters: {
@@ -15187,6 +15185,7 @@ export interface operations {
         import_map?: boolean
         entrypoint_path?: string
         import_map_path?: string
+        resource_multiplier?: string
       }
       path: {
         /** @description Project ref */
@@ -15267,6 +15266,7 @@ export interface operations {
         import_map?: boolean
         entrypoint_path?: string
         import_map_path?: string
+        resource_multiplier?: string
       }
       path: {
         /** @description Project ref */
