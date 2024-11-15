@@ -12,12 +12,7 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Switch,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Switch, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 const ComplianceConfig = () => {
   const { ref } = useParams()
@@ -25,8 +20,8 @@ const ComplianceConfig = () => {
 
   const { data: settings, isLoading, isSuccess } = useProjectSettingsV2Query({ projectRef: ref })
 
-  const { mutate: updateComplianceConfig, isLoading: isSubmitting } = useComplianceConfigUpdateMutation(
-    {
+  const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
+    useComplianceConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully updated project compliance configuration')
       },
@@ -34,8 +29,7 @@ const ComplianceConfig = () => {
         setIsSensitive(initialIsSensitive)
         toast.error(`Failed to update project compliance configuration: ${error.message}`)
       },
-    }
-  )
+    })
 
   const { project } = useProjectContext()
   const canUpdateComplianceConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -53,7 +47,7 @@ const ComplianceConfig = () => {
 
   const toggleIsSensitive = async () => {
     if (!ref) return console.error('Project ref is required')
-      setIsSensitive(!isSensitive)
+    setIsSensitive(!isSensitive)
     updateComplianceConfig({ projectRef: ref, isSensitive: !isSensitive })
   }
 
@@ -96,18 +90,15 @@ const ComplianceConfig = () => {
                       <Switch
                         size="large"
                         checked={isSensitive}
-                        disabled={
-                          isLoading ||
-                          isSubmitting ||
-                          !canUpdateComplianceConfig
-                        }
+                        disabled={isLoading || isSubmitting || !canUpdateComplianceConfig}
                         onCheckedChange={toggleIsSensitive}
                       />
                     </div>
                   </TooltipTrigger_Shadcn_>
-                  {(!canUpdateComplianceConfig) && (
+                  {!canUpdateComplianceConfig && (
                     <TooltipContent_Shadcn_ side="bottom" className="w-64 text-center">
-                      You need additional permissions to update the compliance configuration for your project
+                      You need additional permissions to update the compliance configuration for
+                      your project
                     </TooltipContent_Shadcn_>
                   )}
                 </Tooltip_Shadcn_>
