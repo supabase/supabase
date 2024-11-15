@@ -127,7 +127,7 @@ const RestoreToNewProject = () => {
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
-  const IS_CLONED_PROJECT = cloneStatus?.cloned_from !== undefined
+  const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
 
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
@@ -289,7 +289,7 @@ const RestoreToNewProject = () => {
       <Admonition type="default" title={`This project cannot be restored to a new project`}>
         <Markdown
           content={`This project was originally restored from another project. This is a temporary limitation. Please [contact us](/support/new?ref=${project?.ref}) if you need to restore a project to multiple other projects.  
-            [Go to original project](/project/${(cloneStatus.cloned_from.source_project as any).ref})`}
+            [Go to original project](/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref})`}
         />
       </Admonition>
     )
