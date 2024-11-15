@@ -1,5 +1,8 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { Wand } from 'lucide-react'
+import { Button } from 'ui'
 import { useAppStateSnapshot } from 'state/app-state'
-import { AiIconAnimation, Button } from 'ui'
+import { AiIconAnimation } from 'ui'
 
 const AssistantButton = () => {
   const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()

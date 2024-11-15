@@ -49,6 +49,14 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   entity: undefined,
 }
 
+type InlineEditorType = {
+  open: boolean
+}
+
+const INITIAL_INLINE_EDITOR: InlineEditorType = {
+  open: false,
+}
+
 export const appState = proxy({
   // [Joshen] Last visited "entity" for any page that we wanna track
   dashboardHistory: EMPTY_DASHBOARD_HISTORY,
@@ -126,6 +134,14 @@ export const appState = proxy({
   },
   setNavigationPanelJustClosed: (value: boolean) => {
     appState.navigationPanelJustClosed = value
+  },
+
+  inlineEditorPanel: INITIAL_INLINE_EDITOR as InlineEditorType,
+  setInlineEditorPanel: (value: Partial<InlineEditorType>) => {
+    appState.inlineEditorPanel = {
+      ...appState.inlineEditorPanel,
+      ...value,
+    }
   },
 
   resetAiAssistantPanel: () => {

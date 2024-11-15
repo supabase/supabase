@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -33,6 +33,7 @@ import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { useAppStateSnapshot } from 'state/app-state'
+import { InlineEditor } from 'components/interfaces/SQLEditor/InlineEditor'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -89,7 +90,10 @@ const ProjectLayout = ({
   const selectedProject = useSelectedProject()
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
-  const { aiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, inlineEditorPanel } = useAppStateSnapshot()
+
+  const assistantPanelRef = useRef<HTMLDivElement>(null)
+  const [inlineEditorRight, setInlineEditorRight] = useState(0)
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
@@ -103,6 +107,14 @@ const ProjectLayout = ({
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
+
+  const handleAssistantResize = () => {
+    if (assistantPanelRef.current) {
+      const panelWidth = assistantPanelRef.current.getBoundingClientRect().width
+      console.log('width:', panelWidth)
+      setInlineEditorRight(aiAssistantPanel.open ? panelWidth : 0)
+    }
+  }
 
   return (
     <AppLayout>
@@ -173,14 +185,31 @@ const ProjectLayout = ({
                     )}
                   </main>
                 </ResizablePanel>
+                {inlineEditorPanel.open && (
+                  <>
+                    {!aiAssistantPanel.open && <ResizableHandle />}
+                    <ResizablePanel
+                      id="panel-inline-editor"
+                      className={cn('min-w-[400px] max-w-[400px] bg-surface-100', {
+                        'absolute z-50 top-[48px] bottom-0 border-l': aiAssistantPanel.open,
+                      })}
+                      style={{ right: 400 }}
+                    >
+                      <InlineEditor />
+                    </ResizablePanel>
+                  </>
+                )}
                 {aiAssistantPanel.open && (
                   <>
                     <ResizableHandle />
                     <ResizablePanel
                       id="panel-assistant"
-                      className="min-w-[400px] max-w-[500px] bg xl:max-w-none xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                      className="min-w-[400px] max-w-[400px] w-[400px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                      // onResize={handleAssistantResize}
                     >
-                      <AiAssistantPanel />
+                      <div ref={assistantPanelRef} className="w-full h-full">
+                        <AiAssistantPanel />
+                      </div>
                     </ResizablePanel>
                   </>
                 )}
