@@ -10,10 +10,10 @@ import {
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
-import { getColor } from './Multiplayer/randomColor'
-import { Coordinates, Payload, User } from './Multiplayer/types'
+import { getColor } from './randomColor'
+import { Coordinates, Payload, User } from './types'
 import { cloneDeep, throttle } from 'lodash'
-import Cursor from './Multiplayer/Cursor'
+import Cursor from './Cursor'
 
 /**
  * [x] multiplayer cursors

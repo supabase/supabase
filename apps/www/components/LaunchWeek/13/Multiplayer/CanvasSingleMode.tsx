@@ -4,10 +4,10 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
-import { INTERACTIVE_GRID_COLORS } from './InteractiveGridParty'
-import Cursor from './Multiplayer/Cursor'
-import { getColor } from './Multiplayer/randomColor'
-import { Coordinates } from './Multiplayer/types'
+import { INTERACTIVE_GRID_COLORS } from './CanvasPartyMode'
+import Cursor from './Cursor'
+import { getColor } from './randomColor'
+import { Coordinates } from './types'
 
 const GRID_SIZE = 100
 const CELL_SIZE = 40

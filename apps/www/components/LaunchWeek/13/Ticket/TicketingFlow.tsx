@@ -5,8 +5,8 @@ import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animatio
 import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
 
 import CountdownComponent from '~/components/LaunchWeek/13/Countdown'
-import InteractiveGridParty from '~/components/LaunchWeek/13/InteractiveGridParty'
-import InteractiveGridSingle from '~/components/LaunchWeek/13/InteractiveGridSingle'
+import CanvasPartyMode from '~/components/LaunchWeek/13/Multiplayer/CanvasPartyMode'
+import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
 import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -171,7 +171,7 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      {isPartyMode ? <InteractiveGridParty /> : <InteractiveGridSingle />}
+      {isPartyMode ? <CanvasPartyMode /> : <CanvasSingleMode />}
       {hasTicket && (
         <MetalTicket
           username={DISPLAY_NAME ?? ''}
