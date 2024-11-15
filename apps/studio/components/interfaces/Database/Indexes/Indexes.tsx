@@ -53,12 +53,12 @@ const Indexes = () => {
   })
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      refetchIndexes()
+    onSuccess: async () => {
+      await refetchIndexes()
       setSelectedIndexToDelete(undefined)
       toast.success('Successfully deleted index')
     },
-    onError(error) {
+    onError: (error) => {
       toast.error(`Failed to delete index: ${error.message}`)
     },
   })
