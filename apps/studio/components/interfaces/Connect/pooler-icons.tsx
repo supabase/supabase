@@ -4,6 +4,11 @@ import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from 'ui'
 
+// Add these to your existing constants section
+const LINE_WIDTH = 2 // SVG container width
+const LINE_STROKE_WIDTH = 1 // Width of the actual line
+const LINE_OFFSET = 1 // For centering the line in container
+
 const FlowingLine = ({
   x,
   y1,
@@ -19,18 +24,18 @@ const FlowingLine = ({
     <AnimatePresence>
       {isActive && (
         <svg
-          width="4"
+          width={LINE_WIDTH}
           height={y2 - y1 + 6}
-          viewBox={`0 0 4 ${y2 - y1 + 6}`}
-          style={{ position: 'absolute', left: x - 2, top: y1 - 3 }}
+          viewBox={`0 0 ${LINE_WIDTH} ${y2 - y1 + 6}`}
+          style={{ position: 'absolute', left: x - LINE_OFFSET, top: y1 - 3 }}
         >
           <motion.line
-            x1="2"
+            x1="1"
             y1="3"
-            x2="2"
+            x2="1"
             y2={y2 - y1 + 3}
             stroke="hsl(var(--foreground-default) / 0.6)"
-            strokeWidth="3"
+            strokeWidth={LINE_STROKE_WIDTH}
             strokeLinecap="round"
             initial={{ pathLength: 0, opacity: 0 }}
             animate={{ pathLength: 1, opacity: 1 }}
@@ -67,7 +72,7 @@ const FlowingLine = ({
             x2="2"
             y2={y2 - y1 + 3}
             stroke={`url(#lineGradient-${x}-${y1}-${y2})`}
-            strokeWidth="3"
+            strokeWidth={LINE_STROKE_WIDTH}
             strokeLinecap="round"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -82,9 +87,11 @@ const FlowingLine = ({
 
 const TopRect = ({ isActive }: { isActive: boolean }) => (
   <motion.rect
+    width={RECT_WIDTH}
+    height={3}
     className={cn(
-      `fill-indigo-500 stroke-indigo-700 stroke-[1] w-[${RECT_WIDTH}px] h-[3px]`,
-      isActive && 'stroke-indigo-900'
+      'fill-background-surface-200 stroke-border-stronger stroke-[1]',
+      isActive && 'stroke-foreground/40'
     )}
     x={RECT_X}
     y={TOP_RECT_Y}
@@ -98,8 +105,10 @@ const TopRect = ({ isActive }: { isActive: boolean }) => (
 
 const BottomRect = ({ isActive }: { isActive: boolean }) => (
   <motion.rect
+    width={RECT_WIDTH}
+    height={8}
     className={cn(
-      `stroke-brand-500 fill-brand-300 stroke-[1] w-[${RECT_WIDTH}px] h-[8px] transition-all`,
+      'stroke-brand-500 fill-brand-300 stroke-[1] transition-all',
       isActive && 'fill-brand-400 stroke-brand'
     )}
     x={RECT_X}
@@ -115,22 +124,22 @@ const BottomRect = ({ isActive }: { isActive: boolean }) => (
 )
 
 // Common y-coordinates for both icons
-const TOP_LINE_START = 24 // Start below dots
-const TOP_LINE_END = 36 // End above top rect
-const BOTTOM_LINE_START = 50 // Start below top rect
-const BOTTOM_LINE_END = 56 // End above bottom rect
+const TOP_LINE_START = 14 // Start below dots
+const TOP_LINE_END = 24 // End above top rect
+const BOTTOM_LINE_START = 36 // Start below top rect
+const BOTTOM_LINE_END = 41 // End above bottom rect
 
 // Common rect positions and dimensions
-const TOP_RECT_Y = 42
-const BOTTOM_RECT_Y = 60
+const TOP_RECT_Y = 29
+const BOTTOM_RECT_Y = 45
 const RECT_X = 8
-const RECT_WIDTH = 48
+const RECT_WIDTH = 32
 
 // Add to existing constants
-const CIRCLE_Y = 12
-const CIRCLE_SPACING = 16
-const CIRCLE_START_X = 16
-const CIRCLE_RADIUS = 4
+const CIRCLE_Y = 9
+const CIRCLE_SPACING = 12
+const CIRCLE_START_X = 12
+const CIRCLE_RADIUS = 1.8
 
 // Static circle for SessionIcon
 const ConnectionDot = ({ index, isActive }: { index: number; isActive: boolean }) => (
@@ -148,57 +157,73 @@ export const TransactionIcon = () => {
   const [bottomLineActive, setBottomLineActive] = useState(false)
 
   useEffect(() => {
+    // Watch lines state and update bottomLineActive accordingly
+    setBottomLineActive(lines.some(Boolean))
+  }, [lines])
+
+  useEffect(() => {
     const animateDot = (index: number) => {
-      // Start with dot inactive during animation in
+      // Clear previous state
       setDots((prev) => {
-        const newDots = [...prev]
-        newDots[index] = false
-        return newDots
+        const newState = [...prev]
+        newState[index] = false
+        return newState
+      })
+      setLines((prev) => {
+        const newState = [...prev]
+        newState[index] = false
+        return newState
       })
 
-      // After animation in completes, set dot to active
+      // Step 1: Animate dot in
       setTimeout(() => {
         setDots((prev) => {
-          const newDots = [...prev]
-          newDots[index] = true
-          return newDots
+          const newState = [...prev]
+          newState[index] = true
+          return newState
         })
-        setLines((prev) => {
-          const newLines = [...prev]
-          newLines[index] = true
-          return newLines
-        })
-        setBottomLineActive(true)
-      }, 200)
+      }, 0)
 
-      // Start exit animation, set dot inactive first
+      // Step 2: After dot is in, wait, then show line
+      setTimeout(() => {
+        setLines((prev) => {
+          const newState = [...prev]
+          newState[index] = true
+          return newState
+        })
+      }, 400) // Wait 400ms after dot appears before showing line
+
+      // Step 3: Clear everything
       setTimeout(() => {
         setDots((prev) => {
-          const newDots = [...prev]
-          newDots[index] = false
-          return newDots
+          const newState = [...prev]
+          newState[index] = false
+          return newState
         })
         setLines((prev) => {
-          const newLines = [...prev]
-          newLines[index] = false
-          if (!newLines.some(Boolean)) {
-            setBottomLineActive(false)
-          }
-          return newLines
+          const newState = [...prev]
+          newState[index] = false
+          return newState
         })
-      }, 700)
+      }, 1000) // Total animation duration
     }
 
+    // Initial staggered animation
+    setTimeout(() => animateDot(0), 0)
+    setTimeout(() => animateDot(1), 200)
+    setTimeout(() => animateDot(2), 400)
+
+    // Set up intervals for continuous animation
     const intervals = [0, 1, 2].map((index) =>
-      setInterval(() => animateDot(index), Math.random() * 2000 + 1500)
+      setInterval(() => animateDot(index), 3000 + index * 200)
     )
 
     return () => intervals.forEach(clearInterval)
   }, [])
 
   return (
-    <div style={{ position: 'relative', width: 64, height: 72 }}>
-      <svg width="64" height="72" viewBox="0 0 64 72">
+    <div style={{ position: 'relative', width: 48, height: 35 }}>
+      <svg width="48" height="35" viewBox="0 0 48 35">
         {[0, 1, 2].map((index) => (
           <React.Fragment key={index}>
             <AnimatePresence>
@@ -234,7 +259,7 @@ export const TransactionIcon = () => {
           </React.Fragment>
         ))}
         <TopRect isActive={bottomLineActive} />
-        <BottomRect isActive={bottomLineActive} />
+        {/* <BottomRect isActive={bottomLineActive} /> */}
       </svg>
       {[0, 1, 2].map((index) => (
         <FlowingLine
@@ -245,12 +270,12 @@ export const TransactionIcon = () => {
           isActive={lines[index]}
         />
       ))}
-      <FlowingLine
+      {/* <FlowingLine
         x={CIRCLE_START_X + 1 * CIRCLE_SPACING}
         y1={BOTTOM_LINE_START}
         y2={BOTTOM_LINE_END}
         isActive={bottomLineActive}
-      />
+      /> */}
     </div>
   )
 }
@@ -304,15 +329,15 @@ export const SessionIcon = () => {
   }, [])
 
   return (
-    <div style={{ position: 'relative', width: 64, height: 72 }}>
-      <svg width="64" height="72" viewBox="0 0 64 72">
+    <div style={{ position: 'relative', width: 48, height: 35 }}>
+      <svg width="48" height="35" viewBox="0 0 48 35">
         {[0, 1, 2].map((index) => (
           <g key={index}>
             <ConnectionDot index={index} isActive={topLineStates[index]} />
           </g>
         ))}
         <TopRect isActive={topLineStates.some((state) => state)} />
-        <BottomRect isActive={bottomLineStates.some((state) => state)} />
+        {/* <BottomRect isActive={bottomLineStates.some((state) => state)} /> */}
       </svg>
       {[0, 1, 2].map((index) => (
         <React.Fragment key={index}>
@@ -322,12 +347,12 @@ export const SessionIcon = () => {
             y2={TOP_LINE_END}
             isActive={topLineStates[index]}
           />
-          <FlowingLine
+          {/* <FlowingLine
             x={CIRCLE_START_X + index * CIRCLE_SPACING}
             y1={BOTTOM_LINE_START}
             y2={BOTTOM_LINE_END}
             isActive={bottomLineStates[index]}
-          />
+          /> */}
         </React.Fragment>
       ))}
     </div>

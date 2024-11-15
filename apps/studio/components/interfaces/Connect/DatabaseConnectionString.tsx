@@ -45,6 +45,7 @@ import {
 } from './DatabaseSettings.utils'
 import { UsePoolerCheckbox } from './UsePoolerCheckbox'
 import { SessionIcon, TransactionIcon } from './pooler-icons'
+import { ConnectionPanel } from './ConnectionPanel'
 
 const CONNECTION_TYPES = [
   { id: 'uri', label: 'URI' },
@@ -166,11 +167,7 @@ export const DatabaseConnectionString = () => {
   }, [poolingConfiguration?.pool_mode])
 
   return (
-    <>
-      <div className="m-7 p-3 border rounded flex items-center gap-10">
-        <TransactionIcon />
-        <SessionIcon />
-      </div>
+    <div className="flex flex-col">
       <div className={cn('flex items-center gap-2', DIALOG_PADDING_X)}>
         <div className="flex">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
@@ -193,67 +190,56 @@ export const DatabaseConnectionString = () => {
           </Select_Shadcn_>
         </div>
         <DatabaseSelector />
-        {/* <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres" /> */}
       </div>
-      <div className={cn(DIALOG_PADDING_X)}>
-        {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}
-        {isErrorReadReplicas && (
-          <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
-        )}
-        {isSuccessReadReplicas && (
-          <>
-            <div className="flex flex-col gap-y-4 pt-2">
-              <h1>Direct Connection</h1>
-              <Input
-                copy
-                readOnly
-                disabled
-                className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-                value={connectionStrings['direct'][selectedTab]}
-                onCopy={() => handleCopy(selectedTab)}
-              />
-            </div>
-            <DatabaseSettings />
-          </>
-        )}
-      </div>
-      <Separator />
-      <div className={cn(DIALOG_PADDING_X)}>
-        {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}
-        {isErrorReadReplicas && (
-          <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
-        )}
-        {isSuccessReadReplicas && (
-          <>
-            <div className="flex flex-row gap-x-4">
-              <div className="flex flex-col gap-y-4 pt-2">
-                <h1>Transaction Pooler</h1>
-                <Input
-                  copy
-                  readOnly
-                  disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-                  value={connectionStrings['pooler'][selectedTab]}
-                  onCopy={() => handleCopy(selectedTab)}
-                />
-                <DatabaseSettings />
-              </div>
-              <div className="flex flex-col gap-y-4 pt-2">
-                <h1>Session Pooler</h1>
-                <Input
-                  copy
-                  readOnly
-                  disabled
-                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-                  value={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
-                  onCopy={() => handleCopy(selectedTab)}
-                />
-                <DatabaseSettings />
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+
+      {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}
+      {isErrorReadReplicas && (
+        <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
+      )}
+      {isSuccessReadReplicas && (
+        <div className="flex flex-col divide-y divide-border">
+          <ConnectionPanel
+            type="direct"
+            title="Direct connection"
+            description="Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers."
+            connectionString={connectionStrings['direct'][selectedTab]}
+            onCopy={() => handleCopy(selectedTab)}
+            ipv4Status={{
+              type: 'error',
+              title: 'Does not accept IPv4',
+              link: { text: 'Purchase IPv4 support', url: '#' },
+            }}
+          />
+
+          <ConnectionPanel
+            type="transaction"
+            title="Transaction Pooler"
+            description="Ideal for stateless applications like serverless functions where each interaction with the database is brief and isolated."
+            connectionString={connectionStrings['pooler'][selectedTab]}
+            onCopy={() => handleCopy(selectedTab)}
+            ipv4Status={{
+              type: 'success',
+              title: 'Suitable for IPv4',
+              description: 'Transaction pooler connections are IPv4 proxied for free.',
+            }}
+            notice="Transaction pooler does not support prepared statements"
+          />
+
+          <ConnectionPanel
+            type="session"
+            title="Session Pooler"
+            description="Better suited for applications with longer-running sessions that need persistent state or session-based features."
+            connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
+            onCopy={() => handleCopy(selectedTab)}
+            ipv4Status={{
+              type: 'success',
+              title: 'Suitable for IPv4',
+              description: 'Session pooler connections are IPv4 proxied for free.',
+            }}
+          />
+        </div>
+      )}
+
       {poolerConnStringSyntax.length > 0 && (
         <>
           <Separator />
@@ -339,6 +325,6 @@ export const DatabaseConnectionString = () => {
           </div>
         </>
       )}
-    </>
+    </div>
   )
 }

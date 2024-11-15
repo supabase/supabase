@@ -152,7 +152,7 @@ const Connect = () => {
           </Button>
         </DialogTrigger>
         <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-          <DialogHeader className="pb-3">
+          <DialogHeader className={DIALOG_PADDING_X}>
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
               Get the connection strings and environment variables for your app
@@ -163,7 +163,7 @@ const Connect = () => {
             defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
-            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_SMALL)}>
+            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X)}>
               <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
                 Connection String
               </TabsTrigger_Shadcn_>
