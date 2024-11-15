@@ -38,7 +38,7 @@ const FunctionsList = ({
   const { search } = useParams()
   const { project } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const enableFunctionsAssistant = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -144,7 +144,7 @@ const FunctionsList = ({
                   >
                     Create a new function
                   </ButtonTooltip>
-                  {enableFunctionsAssistant && (
+                  {isAssistantV2Enabled && (
                     <ButtonTooltip
                       type="default"
                       disabled={!canCreateFunctions}

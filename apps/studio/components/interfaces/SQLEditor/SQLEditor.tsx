@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { format } from 'sql-formatter'
 
 import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams } from 'common'
@@ -51,7 +52,9 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useIsDatabaseFunctionsAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
+import { AiAssistantPanel } from './AiAssistantPanel'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { DiffActionBar } from './DiffActionBar'
 import {
@@ -76,8 +79,6 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { useIsDatabaseFunctionsAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import { AiAssistantPanel } from './AiAssistantPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -410,11 +411,33 @@ const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-      appSnap.setAiAssistantPanel({
-        open: true,
-        sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
-        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
-      })
+      if (isAssistantV2Enabled) {
+        appSnap.setAiAssistantPanel({
+          open: true,
+          sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+          initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
+        })
+      } else {
+        const { solution, sql } = await debugSql({
+          sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+          errorMessage: result.error.message,
+          entityDefinitions,
+        })
+
+        const formattedSql =
+          sqlAiDisclaimerComment +
+          '\n\n' +
+          format(sql, {
+            language: 'postgresql',
+            keywordCase: 'lower',
+          })
+        setDebugSolution(solution)
+        setSourceSqlDiff({
+          original: snippet.snippet.content.sql,
+          modified: formattedSql,
+        })
+        setSelectedDiffType(DiffType.Modification)
+      }
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
