@@ -22,7 +22,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion, passwordStrength } from 'lib/helpers'
 import Link from 'next/link'
-import { useState, useRef } from 'react'
+import { useState, useRef, version } from 'react'
 import { useForm } from 'react-hook-form'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -52,8 +52,8 @@ import generator from 'generate-password-browser'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
-import dayjs from 'dayjs'
 import { instanceSizeSpecs } from 'data/projects/new-project.constants'
+import { Markdown } from 'components/interfaces/Markdown'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -65,7 +65,7 @@ const RestoreToNewProjectPage: NextPageWithLayout = () => {
         <div className="col-span-12">
           <div className="space-y-6">
             <FormHeader className="!mb-0" title="Database Backups" />
-            <DatabaseBackupsNav active="rtnp" projRef={ref} />
+            <DatabaseBackupsNav active="rtnp" />
             <div className="space-y-8">
               <RestoreToNewProject />
             </div>
@@ -237,17 +237,15 @@ const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="Restore to new project is not available for this database version"
-        description={
-          <>
-            Restore to new project is only available for Postgres 15 and above.
-            <br /> Go to{' '}
-            <Link className="underline" href={`/project/${project?.ref}/settings/infrastructure`}>
-              infrastructure settings
-            </Link>{' '}
+      >
+        <Markdown
+          content={`
+            Restore to new project is only available for Postgres 15 and above.  
+            Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
             to upgrade your database version.
-          </>
-        }
-      />
+          `}
+        />
+      </Admonition>
     )
   }
 
@@ -301,37 +299,28 @@ const RestoreToNewProject = () => {
 
   if (lastClone?.status === 'FAILED') {
     return (
-      <Admonition
-        type="destructive"
-        title="Failed to restore to new project"
-        description={
-          <>
+      <Admonition type="destructive" title="Failed to restore to new project">
+        <Markdown
+          content="
             The new project failed to be created.
             <br />
-            <Link className="underline" href={`/support/new?category=dashboard_bug`}>
-              Contact support
-            </Link>
-          </>
-        }
-      />
+            [Contact support](/support/new?category=dashboard_bug)
+          `}"
+        />
+      </Admonition>
     )
   }
 
   if (lastClone?.status === 'COMPLETED') {
     return (
-      <Admonition
-        type="default"
-        title="Restoration completed"
-        description={
-          <>
-            The new project has been created.
-            <br />
-            <Link className="underline" href={`/project/${lastClone?.target_project.ref}`}>
-              Go to new project
-            </Link>
-          </>
-        }
-      />
+      <Admonition type="default" title="Restoration completed">
+        <Markdown
+          content={`
+            The new project has been created. A project can only be restored to another project once.
+            [Go to new project](/project/${lastClone?.target_project.ref})
+          `}
+        />
+      </Admonition>
     )
   }
 
@@ -361,12 +350,7 @@ const RestoreToNewProject = () => {
         <Admonition
           type="default"
           title="No backups found"
-          description={
-            <>
-              PITR is enabled, but no backups were found. Check again in a few minutes.
-              {/* <pre>{JSON.stringify(cloneBackups, null, 2)}</pre> */}
-            </>
-          }
+          description={'PITR is enabled, but no backups were found. Check again in a few minutes.'}
         />
       </>
     )
