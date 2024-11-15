@@ -781,6 +781,16 @@ export const database: NavMenuConstant = {
       ],
     },
     {
+      name: 'OrioleDB',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/orioledb',
+        },
+      ],
+    },
+    {
       name: 'Access and security',
       url: undefined,
       items: [
