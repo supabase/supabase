@@ -8,11 +8,14 @@ import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
+import { useParams } from 'common'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { constructHeaders } from 'data/fetchers'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -30,6 +33,7 @@ import {
 } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
@@ -44,8 +48,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useParams } from 'common'
 
 const MemoizedMessage = memo(({ message }: { message: MessageType }) => {
   return (
@@ -72,6 +74,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const router = useRouter()
   const project = useSelectedProject()
   const { id: snippetId } = useParams()
+
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
@@ -98,6 +101,9 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const snippet = snippets[snippetId ?? '']
   const snippetContent = snippet?.snippet?.content?.sql
 
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -122,8 +128,10 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
+    // [Joshen] Not currently used atm, but initialMessages will be for...
     initialMessages: initialMessages as unknown as MessageType[],
     body: {
+      includeSchemaMetadata,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
@@ -297,16 +305,22 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               <Admonition
                 type="default"
                 title="Project metadata is not shared"
-                description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
+                description={
+                  hasHipaaAddon
+                    ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
+                    : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
+                }
                 className="border-0 border-b rounded-none"
               >
-                <Button
-                  type="default"
-                  className="w-fit mt-4"
-                  onClick={() => setIsConfirmOptInModalOpen(true)}
-                >
-                  Update AI settings
-                </Button>
+                {!hasHipaaAddon && (
+                  <Button
+                    type="default"
+                    className="w-fit mt-4"
+                    onClick={() => setIsConfirmOptInModalOpen(true)}
+                  >
+                    Update AI settings
+                  </Button>
+                )}
               </Admonition>
             )}
           </div>
@@ -468,11 +482,13 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
             </div>
           )}
         </div>
+
         {showFade && (
           <div className="pointer-events-none z-10 -mt-24">
-            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent"></div>
+            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
           </div>
         )}
+
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
             <div className="mb-2">
@@ -510,14 +526,19 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
             onValueChange={(e) => setValue(e.target.value)}
             onSubmit={(event) => {
               event.preventDefault()
-              const sqlSnippetsString =
-                sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
-              const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
-              sendMessageToAssistant(valueWithSnippets)
+              if (includeSchemaMetadata) {
+                const sqlSnippetsString =
+                  sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
+                const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+                sendMessageToAssistant(valueWithSnippets)
+              } else {
+                sendMessageToAssistant(value)
+              }
             }}
           />
         </div>
       </div>
+
       <ConfirmationModal
         visible={isConfirmOptInModalOpen}
         size="large"

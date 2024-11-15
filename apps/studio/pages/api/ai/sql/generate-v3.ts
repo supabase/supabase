@@ -10,7 +10,7 @@ export const maxDuration = 30
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { messages, projectRef, connectionString } = req.body
+  const { messages, projectRef, connectionString, includeSchemaMetadata } = req.body
 
   if (!projectRef) {
     return res.status(400).json({
@@ -20,18 +20,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   const authorization = req.headers.authorization
 
-  const { result: schemas } = await executeSql(
-    {
-      projectRef,
-      connectionString,
-      sql: pgMetaSchemasList.sql,
-    },
-    undefined,
-    {
-      'Content-Type': 'application/json',
-      ...(authorization && { Authorization: authorization }),
-    }
-  )
+  const { result: schemas } = includeSchemaMetadata
+    ? await executeSql(
+        {
+          projectRef,
+          connectionString,
+          sql: pgMetaSchemasList.sql,
+        },
+        undefined,
+        {
+          'Content-Type': 'application/json',
+          ...(authorization && { Authorization: authorization }),
+        }
+      )
+    : { result: [] }
 
   const result = await streamText({
     model: openai('gpt-4o-mini'),
@@ -80,7 +82,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       Here are the existing database schema names you can retrieve: ${schemas}
       `,
     messages,
-    tools: getTools(projectRef, connectionString, authorization),
+    tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
   })
 
   // write the data stream to the response

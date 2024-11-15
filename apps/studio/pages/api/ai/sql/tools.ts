@@ -1,12 +1,22 @@
-import { z } from 'zod'
 import { tool } from 'ai'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { getEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { stripIndent } from 'common-tags'
-import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
+import { z } from 'zod'
 
-export const getTools = (projectRef: string, connectionString: string, authorization?: string) => {
+import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
+import { getEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+
+export const getTools = ({
+  projectRef,
+  connectionString,
+  authorization,
+  includeSchemaMetadata,
+}: {
+  projectRef: string
+  connectionString: string
+  authorization?: string
+  includeSchemaMetadata: boolean
+}) => {
   return {
     getSchema: tool({
       description: 'Get more information about one or more schemas',
@@ -14,22 +24,24 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
       }),
       execute: async ({ schemas }) => {
-        // retrieve schema
         console.log('schema:', schemas)
 
         try {
-          const result = await executeSql(
-            {
-              projectRef,
-              connectionString,
-              sql: getEntityDefinitionsQuery({ schemas }),
-            },
-            undefined,
-            {
-              'Content-Type': 'application/json',
-              ...(authorization && { Authorization: authorization }),
-            }
-          )
+          const result = includeSchemaMetadata
+            ? await executeSql(
+                {
+                  projectRef,
+                  connectionString,
+                  sql: getEntityDefinitionsQuery({ schemas }),
+                },
+                undefined,
+                {
+                  'Content-Type': 'application/json',
+                  ...(authorization && { Authorization: authorization }),
+                }
+              )
+            : { result: [] }
+
           console.log('response2:', result)
           return result
         } catch (error) {
@@ -45,20 +57,23 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
         schemas: z.array(z.string()).describe('The schema names to get the policies for'),
       }),
       execute: async ({ schemas }) => {
-        const data = await getDatabasePolicies(
-          {
-            projectRef,
-            connectionString,
-          },
-          undefined,
-          {
-            'Content-Type': 'application/json',
-            ...(authorization && { Authorization: authorization }),
-          }
-        )
+        const data = includeSchemaMetadata
+          ? await getDatabasePolicies(
+              {
+                projectRef,
+                connectionString,
+              },
+              undefined,
+              {
+                'Content-Type': 'application/json',
+                ...(authorization && { Authorization: authorization }),
+              }
+            )
+          : []
+
         const formattedPolicies = data
           .map(
-            (policy: DatabasePoliciesData) => `
+            (policy) => `
           Policy Name: "${policy.name}"
           Action: ${policy.action}
           Roles: ${policy.roles.join(', ')}
@@ -306,7 +321,7 @@ export const getTools = (projectRef: string, connectionString: string, authoriza
 
           This prevents the policy \`( (select auth.uid()) = user_id )\` from running for any \`anon\` users, since the execution stops at the \`to authenticated\` step.
 
-          Here are my existing policies: ${formattedPolicies}
+          ${data.length > 0 ? `Here are my existing policies: ${formattedPolicies}` : ''}
         `
       },
     }),
