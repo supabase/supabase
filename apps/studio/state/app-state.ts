@@ -28,7 +28,7 @@ export type SuggestionsType = {
 type AiAssistantPanelType = {
   open: boolean
   initialMessages?: MessageType[]
-  initialInput?: string
+  initialInput: string
   sqlSnippets?: string[]
   suggestions?: SuggestionsType
   editor?: SupportedAssistantEntities | null
@@ -136,7 +136,7 @@ export const appState = proxy({
   },
 
   aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
-  setAiAssistantPanel: (value: AiAssistantPanelType) => {
+  setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,

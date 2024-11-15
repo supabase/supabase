@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { motion } from 'framer-motion'
 import { last } from 'lodash'
 import { FileText } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -28,7 +29,7 @@ import {
   TELEMETRY_LABELS,
 } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
-import { SuggestionsType, useAppStateSnapshot } from 'state/app-state'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
   Button,
@@ -43,6 +44,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
+import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useParams } from 'common'
 
 const MemoizedMessage = memo(({ message }: { message: MessageType }) => {
   return (
@@ -63,27 +66,20 @@ interface AIAssistantProps {
   id: string
   className?: string
   onResetConversation: () => void
-  initialMessages?: MessageType[]
-  sqlSnippets?: string[]
-  initialInput?: string
-  suggestions?: SuggestionsType
 }
 
-export const AIAssistant = ({
-  id,
-  className,
-  onResetConversation,
-  sqlSnippets,
-  initialMessages = [],
-  suggestions,
-  initialInput = '',
-}: AIAssistantProps) => {
+export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
+  const router = useRouter()
   const project = useSelectedProject()
+  const { id: snippetId } = useParams()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const { snippets } = useSqlEditorV2StateSnapshot()
+  const { aiAssistantPanel, resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open, initialInput, initialMessages, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -98,7 +94,9 @@ export const AIAssistant = ({
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
-  const { resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const snippet = snippets[snippetId ?? '']
+  const snippetContent = snippet?.snippet?.content?.sql
 
   const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -124,7 +122,7 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    initialMessages,
+    initialMessages: initialMessages as unknown as MessageType[],
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -231,6 +229,13 @@ export const AIAssistant = ({
   useEffect(() => {
     return resetAiAssistantPanel
   }, [])
+
+  useEffect(() => {
+    if (open && isInSQLEditor && !!snippetContent) {
+      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isInSQLEditor, snippetContent])
 
   useEffect(() => {
     setValue(initialInput)
@@ -479,7 +484,7 @@ export const AIAssistant = ({
                   onRemove={() => {
                     const newSnippets = [...sqlSnippets]
                     newSnippets.splice(index, 1)
-                    setAiAssistantPanel({ open: true, sqlSnippets: newSnippets })
+                    setAiAssistantPanel({ sqlSnippets: newSnippets })
                   }}
                   className="text-xs"
                 />
