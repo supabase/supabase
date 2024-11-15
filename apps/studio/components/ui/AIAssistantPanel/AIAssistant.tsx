@@ -47,18 +47,20 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 
-const MemoizedMessage = memo(({ message }: { message: MessageType }) => {
-  return (
-    <Message
-      key={message.id}
-      name={message.name}
-      role={message.role}
-      content={message.content}
-      createdAt={new Date(message.createdAt || new Date()).getTime()}
-      readOnly={message.role === 'user'}
-    />
-  )
-})
+const MemoizedMessage = memo(
+  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+    return (
+      <Message
+        key={message.id}
+        id={message.id}
+        role={message.role}
+        content={message.content}
+        readOnly={message.role === 'user'}
+        isLoading={isLoading}
+      />
+    )
+  }
+)
 
 MemoizedMessage.displayName = 'MemoizedMessage'
 
@@ -133,8 +135,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  const isLoading = isChatLoading
-
   const messages = useMemo(() => {
     const merged = [
       ...chatMessages,
@@ -151,9 +151,9 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const renderedMessages = useMemo(
     () =>
       messages.map((message) => {
-        return <MemoizedMessage key={message.id} message={message} />
+        return <MemoizedMessage key={message.id} message={message} isLoading={isChatLoading} />
       }),
-    [messages]
+    [messages, isChatLoading]
   )
 
   const hasMessages = messages.length > 0
@@ -237,7 +237,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   }, [initialInput])
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isChatLoading) {
       if (inputRef.current) inputRef.current.focus()
     }
 
@@ -245,9 +245,9 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       () => {
         if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
       },
-      isLoading ? 100 : 500
+      isChatLoading ? 100 : 500
     )
-  }, [isLoading])
+  }, [isChatLoading])
 
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -278,7 +278,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               <div className="text-sm flex-1">{hasMessages ? 'New chat' : 'Assistant'}</div>
               <div className="flex gap-2">
                 {(hasMessages || suggestions || sqlSnippets) && (
-                  <Button type="default" disabled={isLoading} onClick={onResetConversation}>
+                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
                     Reset
                   </Button>
                 )}
@@ -516,8 +516,8 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
             className={cn(
               'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
-            loading={isLoading}
-            disabled={!isApiKeySet || disablePrompts || isLoading}
+            loading={isChatLoading}
+            disabled={!isApiKeySet || disablePrompts || isChatLoading}
             placeholder={
               hasMessages
                 ? 'Reply to the assistant...'

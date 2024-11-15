@@ -27,20 +27,13 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { isReadOnlySelect } from './AIAssistant.utils'
 
 interface SqlSnippetWrapperProps {
+  id: string
   sql: string
+  isLoading: boolean
   readOnly?: boolean
 }
 
-interface ParsedSqlProps {
-  sql: string
-  title: string
-  readOnly?: boolean
-  isChart: boolean
-  xAxis: string
-  yAxis: string
-}
-
-const SqlSnippetWrapper = ({ sql, readOnly = false }: SqlSnippetWrapperProps) => {
+const SqlSnippetWrapper = ({ id, sql, isLoading, readOnly = false }: SqlSnippetWrapperProps) => {
   const formatted = (sql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
   const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
@@ -50,24 +43,39 @@ const SqlSnippetWrapper = ({ sql, readOnly = false }: SqlSnippetWrapperProps) =>
   return (
     <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
+        id={id}
         sql={updatedFormatted}
         isChart={props.isChart}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
         title={title}
         readOnly={readOnly}
+        isLoading={isLoading}
       />
     </div>
   )
 }
 
+interface ParsedSqlProps {
+  id: string
+  sql: string
+  title: string
+  isLoading: boolean
+  readOnly?: boolean
+  isChart: boolean
+  xAxis: string
+  yAxis: string
+}
+
 export const SqlCard = ({
+  id,
   sql,
   isChart,
   xAxis,
   yAxis,
   title,
   readOnly = false,
+  isLoading,
 }: ParsedSqlProps) => {
   const router = useRouter()
   const project = useSelectedProject()
@@ -76,6 +84,7 @@ export const SqlCard = ({
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
+
   const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
@@ -84,7 +93,6 @@ export const SqlCard = ({
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: (res) => {
-      console.log('SQL executed successfully:', res)
       setShowResults(true)
       setResults(res.result)
       setShowWarning(false)
@@ -118,13 +126,6 @@ export const SqlCard = ({
     })
   }, [project?.ref, project?.connectionString, sql, executeSql, readOnly])
 
-  useEffect(() => {
-    if (isReadOnlySelect(sql) && !results && !readOnly) {
-      handleExecute()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, handleExecute, readOnly])
-
   const handleEditInSQLEditor = () => {
     if (isInSQLEditor) {
       snapV2.setDiffContent(sql, DiffType.Addition)
@@ -135,6 +136,13 @@ export const SqlCard = ({
 
   const [errorHeader, ...errorContent] =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
+
+  useEffect(() => {
+    if (isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
+      handleExecute()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sql, readOnly, isLoading])
 
   return (
     <div className="overflow-hidden">
