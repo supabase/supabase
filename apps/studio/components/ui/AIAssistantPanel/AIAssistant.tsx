@@ -2,13 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { motion } from 'framer-motion'
 import { last } from 'lodash'
 import { FileText } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
-import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
@@ -33,7 +31,6 @@ import {
 } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
@@ -71,18 +68,14 @@ interface AIAssistantProps {
 }
 
 export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
-  const router = useRouter()
   const project = useSelectedProject()
-  const { id: snippetId } = useParams()
-
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const { snippets } = useSqlEditorV2StateSnapshot()
   const { aiAssistantPanel, resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { open, initialInput, initialMessages, sqlSnippets, suggestions } = aiAssistantPanel
+  const { initialInput, initialMessages, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -96,10 +89,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
-
-  const isInSQLEditor = router.pathname.includes('/sql/[id]')
-  const snippet = snippets[snippetId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
@@ -237,13 +226,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   useEffect(() => {
     return resetAiAssistantPanel
   }, [])
-
-  useEffect(() => {
-    if (open && isInSQLEditor && !!snippetContent) {
-      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isInSQLEditor, snippetContent])
 
   useEffect(() => {
     setValue(initialInput)
