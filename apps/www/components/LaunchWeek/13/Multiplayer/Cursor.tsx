@@ -1,4 +1,5 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   x?: number
@@ -75,29 +76,47 @@ const Cursor: FC<Props> = ({
       {!_isLocalClient && (
         <svg
           width="18"
-          height="24"
-          viewBox="0 0 18 24"
+          height="21"
+          viewBox="0 0 18 21"
           fill="none"
           className="absolute top-0 left-0 transform transition pointer-events-none"
           style={{ color, transform: `translateX(${x}px) translateY(${y}px)` }}
           xmlns="http://www.w3.org/2000/svg"
         >
           <path
-            d="M2.717 2.22918L15.9831 15.8743C16.5994 16.5083 16.1503 17.5714 15.2661 17.5714H9.35976C8.59988 17.5714 7.86831 17.8598 7.3128 18.3783L2.68232 22.7C2.0431 23.2966 1 22.8434 1 21.969V2.92626C1 2.02855 2.09122 1.58553 2.717 2.22918Z"
-            fill={color}
-            stroke={hue}
-            strokeWidth="2"
+            d="M4.19777 1.00263C3.10663 0.0999637 1.45741 0.876037 1.45741 2.29215V18.767C1.45741 20.368 3.48943 21.0551 4.4611 19.7827L8.48462 14.5138C8.59593 14.368 8.76885 14.2825 8.95226 14.2825H15.6018C17.1701 14.2825 17.877 12.3191 16.6686 11.3194L4.19777 1.00263Z"
+            fill={hue}
+            stroke={color}
+            strokeWidth="1"
+            strokeLinejoin="round"
           />
         </svg>
+
+        // <svg
+        //   width="18"
+        //   height="24"
+        //   viewBox="0 0 18 24"
+        //   fill="none"
+        //   className="absolute top-0 left-0 transform transition pointer-events-none"
+        //   style={{ color, transform: `translateX(${x}px) translateY(${y}px)` }}
+        //   xmlns="http://www.w3.org/2000/svg"
+        // >
+        //   <path
+        //     d="M2.717 2.22918L15.9831 15.8743C16.5994 16.5083 16.1503 17.5714 15.2661 17.5714H9.35976C8.59988 17.5714 7.86831 17.8598 7.3128 18.3783L2.68232 22.7C2.0431 23.2966 1 22.8434 1 21.969V2.92626C1 2.02855 2.09122 1.58553 2.717 2.22918Z"
+        //     fill={color}
+        //     stroke={hue}
+        //     strokeWidth="2"
+        //   />
+        // </svg>
       )}
       <div
         ref={chatBubbleRef}
-        className={[
+        className={cn(
           'transition-all absolute top-0 left-0 py-2 rounded-full shadow-md',
           'flex items-center justify-between px-4 space-x-2 pointer-events-none',
           `${showMessageBubble ? 'opacity-100' : 'opacity-0'}`,
-          `${_isLocalClient && !hideInput ? 'w-[280px]' : 'max-w-[280px] overflow-hidden'}`,
-        ].join(' ')}
+          `${_isLocalClient && !hideInput ? 'w-[280px]' : 'max-w-[280px] overflow-hidden'}`
+        )}
         style={{
           backgroundColor: color,
           transform: `translateX(${

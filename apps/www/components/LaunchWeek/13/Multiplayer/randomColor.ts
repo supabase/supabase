@@ -1,41 +1,13 @@
 import { sampleSize } from 'lodash'
 
 const colors = {
-  tomato: {
-    bg: 'var(--colors-tomato9)',
-    hue: 'var(--colors-tomato7)',
+  brand: {
+    bg: 'hsl(var(--brand-default))',
+    hue: 'hsl(var(--brand-500))',
   },
-  crimson: {
-    bg: 'var(--colors-crimson9)',
-    hue: 'var(--colors-crimson7)',
-  },
-  pink: {
-    bg: 'var(--colors-pink9)',
-    hue: 'var(--colors-pink7)',
-  },
-  plum: {
-    bg: 'var(--colors-plum9)',
-    hue: 'var(--colors-plum7)',
-  },
-  indigo: {
-    bg: 'var(--colors-indigo9)',
-    hue: 'var(--colors-indigo7)',
-  },
-  blue: {
-    bg: 'var(--colors-blue9)',
-    hue: 'var(--colors-blue7)',
-  },
-  cyan: {
-    bg: 'var(--colors-cyan9)',
-    hue: 'var(--colors-cyan7)',
-  },
-  green: {
-    bg: 'var(--colors-green9)',
-    hue: 'var(--colors-green7)',
-  },
-  orange: {
-    bg: 'var(--colors-orange9)',
-    hue: 'var(--colors-orange7)',
+  gray: {
+    bg: 'hsl(var(--foreground-muted))',
+    hue: 'hsl(var(--background-surface-100))',
   },
 }
 
@@ -53,4 +25,8 @@ export const getRandomColors = (qty: number) => {
 
 export const getRandomColor = () => {
   return Object.values(colors)[Math.floor(Math.random() * Object.values(colors).length)]
+}
+
+export const getColor = (color: 'brand' | 'gray') => {
+  return colors[color]
 }

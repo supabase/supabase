@@ -16,12 +16,26 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
-import { getRandomColor, getRandomColors, getRandomUniqueColor } from './Multiplayer/randomColor'
+import {
+  getColor,
+  // getRandomColor,
+  // getRandomColors,
+  // getRandomUniqueColor,
+} from './Multiplayer/randomColor'
 import { Coordinates, Message, Payload, User } from './Multiplayer/types'
 import { cloneDeep, throttle } from 'lodash'
 import { Badge } from 'ui'
 import Cursor from './Multiplayer/Cursor'
 import Chatbox from './Multiplayer/Chatbox'
+
+/**
+ * [x] multiplayer cursors
+ * [x] show own trail
+ * [ ] share color between cursor and trails
+ * [ ] show own cursor
+ * [ ] abstract reusable setHoverTrail function
+ * [ ] show other users cursors
+ */
 
 const GRID_SIZE = 100
 const CELL_SIZE = 40
@@ -35,7 +49,7 @@ const MAX_ROOM_USERS = 50
 const MAX_DISPLAY_MESSAGES = 50
 const MAX_EVENTS_PER_SECOND = 10
 const X_THRESHOLD = 25
-const Y_THRESHOLD = 35
+const Y_THRESHOLD = 65
 
 interface CellState {
   isHovered: boolean
@@ -79,7 +93,7 @@ export default function InteractiveGrid() {
 
   const router = useRouter()
 
-  const localColorBackup = getRandomColor()
+  const localColorBackup = getColor('gray')
 
   const chatboxRef = useRef<any>()
   // [Joshen] Super hacky fix for a really weird bug for onKeyDown
@@ -111,15 +125,15 @@ export default function InteractiveGrid() {
   const [roomId, setRoomId] = useState<undefined | string>(undefined)
   const [users, setUsers] = useState<{ [key: string]: User }>({})
 
-  const setIsTyping = (value: boolean) => {
-    isTypingRef.current = value
-    _setIsTyping(value)
-  }
+  // const setIsTyping = (value: boolean) => {
+  //   isTypingRef.current = value
+  //   _setIsTyping(value)
+  // }
 
-  const setIsCancelled = (value: boolean) => {
-    isCancelledRef.current = value
-    _setIsCancelled(value)
-  }
+  // const setIsCancelled = (value: boolean) => {
+  //   isCancelledRef.current = value
+  //   _setIsCancelled(value)
+  // }
 
   const setMessage = (value: string) => {
     messageRef.current = value
@@ -131,10 +145,10 @@ export default function InteractiveGrid() {
     _setMousePosition(coordinates)
   }
 
-  const setMessagesInTransit = (messages: string[]) => {
-    messagesInTransitRef.current = messages
-    _setMessagesInTransit(messages)
-  }
+  // const setMessagesInTransit = (messages: string[]) => {
+  //   messagesInTransitRef.current = messages
+  //   _setMessagesInTransit(messages)
+  // }
 
   const mapInitialUsers = (userChannel: RealtimeChannel, roomId: string) => {
     const state = userChannel.presenceState()
@@ -143,21 +157,21 @@ export default function InteractiveGrid() {
     if (!_users) return
 
     // Deconflict duplicate colours at the beginning of the browser session
-    const colors = Object.keys(usersRef.current).length === 0 ? getRandomColors(_users.length) : []
+    // const colors = Object.keys(usersRef.current).length === 0 ? getRandomColors(_users.length) : []
 
     if (_users) {
       setUsers((existingUsers) => {
         const updatedUsers = _users.reduce(
           (acc: { [key: string]: User }, { user_id: userId }: any, index: number) => {
-            const userColors = Object.values(usersRef.current).map((user: any) => user.color)
+            // const userColors = Object.values(usersRef.current).map((user: any) => user.color)
             // Deconflict duplicate colors for incoming clients during the browser session
-            const color = colors.length > 0 ? colors[index] : getRandomUniqueColor(userColors)
+            // const color = colors.length > 0 ? colors[index] : getRandomUniqueColor(userColors)
 
             acc[userId] = existingUsers[userId] || {
               x: 0,
               y: 0,
-              color: color.bg,
-              hue: color.hue,
+              // color: color.bg,
+              // hue: color.hue,
             }
             return acc
           },
@@ -272,101 +286,102 @@ export default function InteractiveGrid() {
   useEffect(() => {
     if (!roomId || !isInitialStateSynced) return
 
-    let pingIntervalId: ReturnType<typeof setInterval> | undefined
-    let messageChannel: RealtimeChannel, pingChannel: RealtimeChannel
-    let setMouseEvent: (e: MouseEvent) => void = () => {},
-      onKeyDown: (e: KeyboardEvent) => void = () => {}
+    // let pingIntervalId: ReturnType<typeof setInterval> | undefined
+    let messageChannel: RealtimeChannel
+    // , pingChannel: RealtimeChannel
+    let setMouseEvent: (e: MouseEvent) => void = () => {}
+    // onKeyDown: (e: KeyboardEvent) => void = () => {}
 
     // Ping channel is used to calculate roundtrip time from client to server to client
-    pingChannel = supabase?.channel(`ping:${userId}`, {
-      config: { broadcast: { ack: true } },
-    })!
-    pingChannel.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
-      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
-        pingIntervalId = setInterval(async () => {
-          const start = performance.now()
-          const resp = await pingChannel.send({
-            type: 'broadcast',
-            event: 'PING',
-            payload: {},
-          })
+    // pingChannel = supabase?.channel(`ping:${userId}`, {
+    //   config: { broadcast: { ack: true } },
+    // })!
+    // pingChannel.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
+    //   if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
+    //     pingIntervalId = setInterval(async () => {
+    //       const start = performance.now()
+    //       const resp = await pingChannel.send({
+    //         type: 'broadcast',
+    //         event: 'PING',
+    //         payload: {},
+    //       })
 
-          if (resp !== 'ok') {
-            console.log('pingChannel broadcast error')
-            setLatency(-1)
-          } else {
-            const end = performance.now()
-            const newLatency = end - start
+    //       if (resp !== 'ok') {
+    //         console.log('pingChannel broadcast error')
+    //         setLatency(-1)
+    //       } else {
+    //         const end = performance.now()
+    //         const newLatency = end - start
 
-            // if (newLatency >= LATENCY_THRESHOLD) {
-            //   sendLog(
-            //     `Roundtrip Latency for User ${userId} surpassed ${LATENCY_THRESHOLD} ms at ${newLatency.toFixed(
-            //       1
-            //     )} ms`
-            //   )
-            // }
+    //         // if (newLatency >= LATENCY_THRESHOLD) {
+    //         //   sendLog(
+    //         //     `Roundtrip Latency for User ${userId} surpassed ${LATENCY_THRESHOLD} ms at ${newLatency.toFixed(
+    //         //       1
+    //         //     )} ms`
+    //         //   )
+    //         // }
 
-            setLatency(newLatency)
-          }
-        }, 1000)
-      }
-    })
+    //         setLatency(newLatency)
+    //       }
+    //     }, 1000)
+    //   }
+    // })
 
     messageChannel = supabase?.channel(`chat_messages:${roomId}`)!
 
-    // Listen for messages inserted into the database
-    messageChannel.on(
-      REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
-      {
-        event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
-        schema: 'public',
-        table: 'messages',
-        filter: `room_id=eq.${roomId}`,
-      },
-      (
-        payload: RealtimePostgresInsertPayload<{
-          id: number
-          created_at: string
-          message: string
-          user_id: string
-          room_id: string
-        }>
-      ) => {
-        // if (payload.new.user_id === userId && insertMsgTimestampRef.current) {
-        //   sendLog(
-        //     `Message Latency for User ${userId} from insert to receive was ${(
-        //       performance.now() - insertMsgTimestampRef.current
-        //     ).toFixed(1)} ms`
-        //   )
-        //   insertMsgTimestampRef.current = undefined
-        // }
+    // // Listen for messages inserted into the database
+    // messageChannel.on(
+    //   REALTIME_LISTEN_TYPES.POSTGRES_CHANGES,
+    //   {
+    //     event: REALTIME_POSTGRES_CHANGES_LISTEN_EVENT.INSERT,
+    //     schema: 'public',
+    //     table: 'messages',
+    //     filter: `room_id=eq.${roomId}`,
+    //   },
+    //   (
+    //     payload: RealtimePostgresInsertPayload<{
+    //       id: number
+    //       created_at: string
+    //       message: string
+    //       user_id: string
+    //       room_id: string
+    //     }>
+    //   ) => {
+    //     // if (payload.new.user_id === userId && insertMsgTimestampRef.current) {
+    //     //   sendLog(
+    //     //     `Message Latency for User ${userId} from insert to receive was ${(
+    //     //       performance.now() - insertMsgTimestampRef.current
+    //     //     ).toFixed(1)} ms`
+    //     //   )
+    //     //   insertMsgTimestampRef.current = undefined
+    //     // }
 
-        setMessages((prevMsgs: Message[]) => {
-          const messages = prevMsgs.slice(-MAX_DISPLAY_MESSAGES + 1)
-          const msg = (({ id, message, room_id, user_id }) => ({
-            id,
-            message,
-            room_id,
-            user_id,
-          }))(payload.new)
-          messages.push(msg)
+    //     setMessages((prevMsgs: Message[]) => {
+    //       const messages = prevMsgs.slice(-MAX_DISPLAY_MESSAGES + 1)
+    //       const msg = (({ id, message, room_id, user_id }) => ({
+    //         id,
+    //         message,
+    //         room_id,
+    //         user_id,
+    //       }))(payload.new)
+    //       messages.push(msg)
 
-          if (msg.user_id === userId) {
-            const updatedMessagesInTransit = removeFirst(
-              messagesInTransitRef?.current ?? [],
-              msg.message
-            )
-            setMessagesInTransit(updatedMessagesInTransit)
-          }
+    //       if (msg.user_id === userId) {
+    //         const updatedMessagesInTransit = removeFirst(
+    //           messagesInTransitRef?.current ?? [],
+    //           msg.message
+    //         )
+    //         setMessagesInTransit(updatedMessagesInTransit)
+    //       }
 
-          return messages
-        })
+    //       return messages
+    //     })
 
-        if (chatboxRef.current) {
-          chatboxRef.current.scrollIntoView({ behavior: 'smooth' })
-        }
-      }
-    )
+    //     if (chatboxRef.current) {
+    //       chatboxRef.current.scrollIntoView({ behavior: 'smooth' })
+    //     }
+    //   }
+    // )
 
     // Listen for cursor positions from other users in the room
     messageChannel.on(
@@ -385,7 +400,7 @@ export default function InteractiveGrid() {
             const y =
               (payload?.payload?.y ?? 0 - Y_THRESHOLD) > window.innerHeight
                 ? window.innerHeight - Y_THRESHOLD
-                : payload?.payload?.y
+                : payload?.payload?.y! - Y_THRESHOLD
 
             users[userId] = { ...existingUser, ...{ x, y } }
             users = cloneDeep(users)
@@ -397,26 +412,26 @@ export default function InteractiveGrid() {
     )
 
     // Listen for messages sent by other users directly via Broadcast
-    messageChannel.on(
-      REALTIME_LISTEN_TYPES.BROADCAST,
-      { event: 'MESSAGE' },
-      (payload: Payload<{ user_id: string; isTyping: boolean; message: string }>) => {
-        setUsers((users) => {
-          const userId = payload!.payload!.user_id
-          const existingUser = users[userId]
+    // messageChannel.on(
+    //   REALTIME_LISTEN_TYPES.BROADCAST,
+    //   { event: 'MESSAGE' },
+    //   (payload: Payload<{ user_id: string; isTyping: boolean; message: string }>) => {
+    //     setUsers((users) => {
+    //       const userId = payload!.payload!.user_id
+    //       const existingUser = users[userId]
 
-          if (existingUser) {
-            users[userId] = {
-              ...existingUser,
-              ...{ isTyping: payload?.payload?.isTyping, message: payload?.payload?.message },
-            }
-            users = cloneDeep(users)
-          }
+    //       if (existingUser) {
+    //         users[userId] = {
+    //           ...existingUser,
+    //           ...{ isTyping: payload?.payload?.isTyping, message: payload?.payload?.message },
+    //         }
+    //         users = cloneDeep(users)
+    //       }
 
-          return users
-        })
-      }
-    )
+    //       return users
+    //     })
+    //   }
+    // )
     messageChannel.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
       if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
         // Lodash throttle will be removed once realtime-js client throttles on the channel level
@@ -436,108 +451,108 @@ export default function InteractiveGrid() {
           setMousePosition({ x, y })
         }
 
-        onKeyDown = async (e: KeyboardEvent) => {
-          if (document.activeElement?.id === 'email') return
+        // onKeyDown = async (e: KeyboardEvent) => {
+        //   if (document.activeElement?.id === 'email') return
 
-          // Start typing session
-          if (e.code === 'Enter' || (e.key.length === 1 && !e.metaKey)) {
-            if (!isTypingRef.current) {
-              setIsTyping(true)
-              setIsCancelled(false)
+        //   // Start typing session
+        //   if (e.code === 'Enter' || (e.key.length === 1 && !e.metaKey)) {
+        //     if (!isTypingRef.current) {
+        //       setIsTyping(true)
+        //       setIsCancelled(false)
 
-              if (chatInputFix.current) {
-                setMessage('')
-                chatInputFix.current = false
-              } else {
-                setMessage(e.key.length === 1 ? e.key : '')
-              }
-              messageChannel
-                .send({
-                  type: 'broadcast',
-                  event: 'MESSAGE',
-                  payload: { user_id: userId, isTyping: true, message: '' },
-                })
-                .catch(() => {})
-            } else if (e.code === 'Enter') {
-              // End typing session and send message
-              setIsTyping(false)
-              messageChannel
-                .send({
-                  type: 'broadcast',
-                  event: 'MESSAGE',
-                  payload: { user_id: userId, isTyping: false, message: messageRef.current },
-                })
-                .catch(() => {})
-              if (messageRef.current) {
-                const updatedMessagesInTransit = (messagesInTransitRef?.current ?? []).concat([
-                  messageRef.current,
-                ])
-                setMessagesInTransit(updatedMessagesInTransit)
-                if (chatboxRef.current) chatboxRef.current.scrollIntoView({ behavior: 'smooth' })
-                insertMsgTimestampRef.current = performance.now()
-                await supabase?.from('messages').insert([
-                  {
-                    user_id: userId,
-                    room_id: roomId,
-                    message: messageRef.current,
-                  },
-                ])
-              }
-            }
-          }
+        //       if (chatInputFix.current) {
+        //         setMessage('')
+        //         chatInputFix.current = false
+        //       } else {
+        //         setMessage(e.key.length === 1 ? e.key : '')
+        //       }
+        //       messageChannel
+        //         .send({
+        //           type: 'broadcast',
+        //           event: 'MESSAGE',
+        //           payload: { user_id: userId, isTyping: true, message: '' },
+        //         })
+        //         .catch(() => {})
+        //     } else if (e.code === 'Enter') {
+        //       // End typing session and send message
+        //       setIsTyping(false)
+        //       messageChannel
+        //         .send({
+        //           type: 'broadcast',
+        //           event: 'MESSAGE',
+        //           payload: { user_id: userId, isTyping: false, message: messageRef.current },
+        //         })
+        //         .catch(() => {})
+        //       if (messageRef.current) {
+        //         const updatedMessagesInTransit = (messagesInTransitRef?.current ?? []).concat([
+        //           messageRef.current,
+        //         ])
+        //         setMessagesInTransit(updatedMessagesInTransit)
+        //         if (chatboxRef.current) chatboxRef.current.scrollIntoView({ behavior: 'smooth' })
+        //         insertMsgTimestampRef.current = performance.now()
+        //         await supabase?.from('messages').insert([
+        //           {
+        //             user_id: userId,
+        //             room_id: roomId,
+        //             message: messageRef.current,
+        //           },
+        //         ])
+        //       }
+        //     }
+        //   }
 
-          // End typing session without sending
-          if (e.code === 'Escape' && isTypingRef.current) {
-            setIsTyping(false)
-            setIsCancelled(true)
-            chatInputFix.current = true
+        //   // End typing session without sending
+        //   if (e.code === 'Escape' && isTypingRef.current) {
+        //     setIsTyping(false)
+        //     setIsCancelled(true)
+        //     chatInputFix.current = true
 
-            messageChannel
-              .send({
-                type: 'broadcast',
-                event: 'MESSAGE',
-                payload: { user_id: userId, isTyping: false, message: '' },
-              })
-              .catch(() => {})
-          }
-        }
+        //     messageChannel
+        //       .send({
+        //         type: 'broadcast',
+        //         event: 'MESSAGE',
+        //         payload: { user_id: userId, isTyping: false, message: '' },
+        //       })
+        //       .catch(() => {})
+        //   }
+        // }
 
         window.addEventListener('mousemove', setMouseEvent)
-        window.addEventListener('keydown', onKeyDown)
+        // window.addEventListener('keydown', onKeyDown)
       }
     })
 
     return () => {
-      pingIntervalId && clearInterval(pingIntervalId)
+      // pingIntervalId && clearInterval(pingIntervalId)
 
       window.removeEventListener('mousemove', setMouseEvent)
-      window.removeEventListener('keydown', onKeyDown)
+      // window.removeEventListener('keydown', onKeyDown)
 
-      pingChannel && supabase?.removeChannel(pingChannel)
+      // pingChannel && supabase?.removeChannel(pingChannel)
       messageChannel && supabase?.removeChannel(messageChannel)
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, isInitialStateSynced])
 
-  const getUserColor = useCallback(
-    (userId: string | undefined) => {
-      if (!userId) {
-        return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
-      }
+  // const getUserColor = useCallback(
+  //   (userId: string | undefined) => {
+  //     if (!userId) {
+  //       return INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
+  //     }
 
-      if (userColors[userId]) {
-        return userColors[userId]
-      }
+  //     if (userColors[userId]) {
+  //       return userColors[userId]
+  //     }
 
-      const colors = INTERACTIVE_GRID_COLORS(isDarkTheme).HOVER_COLORS
-      const color = colors[userId.charCodeAt(0) % colors.length]
+  //     const colors = INTERACTIVE_GRID_COLORS(isDarkTheme).HOVER_COLORS
+  //     const color = colors[userId.charCodeAt(0) % colors.length]
 
-      setUserColors((prev) => ({ ...prev, [userId]: color }))
-      return color
-    },
-    [userColors, isDarkTheme]
-  )
+  //     setUserColors((prev) => ({ ...prev, [userId]: color }))
+  //     return color
+  //   },
+  //   [userColors, isDarkTheme]
+  // )
 
   const setCellHovered = useCallback(
     (key: string, isHovered: boolean, color: string) => {
@@ -617,7 +632,7 @@ export default function InteractiveGrid() {
       //   ctx.fill()
       // })
     },
-    [hoveredCells, userCursors, getUserColor, isDarkTheme]
+    [hoveredCells, userCursors, isDarkTheme]
   )
 
   const animate = useCallback(() => {
@@ -647,7 +662,8 @@ export default function InteractiveGrid() {
       const x = Math.floor(e.nativeEvent.offsetX / CELL_SIZE)
       const y = Math.floor(e.nativeEvent.offsetY / CELL_SIZE)
       const cellKey = `${x},${y}`
-      const userColor = getUserColor(CURRENT_USER_ID)
+      // const userColor = getUserColor(CURRENT_USER_ID)
+      const userColor = INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
 
       if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
         setCellHovered(cellKey, true, userColor)
@@ -671,14 +687,14 @@ export default function InteractiveGrid() {
         // }
       }
     },
-    [hoveredCells, setCellHovered, realtimeChannel, getUserColor, isDarkTheme]
+    [hoveredCells, setCellHovered, realtimeChannel, isDarkTheme]
   )
 
   const handleMouseLeave = useCallback(() => {
     hoveredCells.forEach((_, key) => {
-      setCellHovered(key, false, getUserColor(CURRENT_USER_ID))
+      setCellHovered(key, false, INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER)
     })
-  }, [hoveredCells, setCellHovered, getUserColor, userData])
+  }, [hoveredCells, setCellHovered, userData])
 
   // useEffect(() => {
   //   if (!realtimeChannel && supabase) {
@@ -751,8 +767,10 @@ export default function InteractiveGrid() {
                 key={userId}
                 x={x}
                 y={y}
-                color={color}
-                hue={hue}
+                // color={color}
+                // hue={hue}
+                color={getColor('gray').bg}
+                hue={getColor('gray').hue}
                 message={message || ''}
                 isTyping={isTyping || false}
               />
