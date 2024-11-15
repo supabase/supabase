@@ -5104,6 +5104,8 @@ export interface components {
       region: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
       ssl_enforced: boolean
+      is_sensitive?: boolean
+      has_compliance_addon?: boolean
       status: string
     }
     /** @enum {string} */
