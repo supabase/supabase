@@ -2,6 +2,7 @@ import { AlertCircle, Globe, Globe2, X } from 'lucide-react'
 import { cn, DIALOG_PADDING_X } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TransactionIcon, SessionIcon } from './pooler-icons'
+import { ConnectionParameters } from './ConnectionParameters'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -16,6 +17,11 @@ interface ConnectionPanelProps {
     link?: { text: string; url: string }
   }
   notice?: string
+  parameters?: Array<{
+    key: string
+    value: string
+    description?: string
+  }>
 }
 
 const IPv4StatusIcon = ({ className, active }: { className?: string; active: boolean }) => {
@@ -71,6 +77,7 @@ export const ConnectionPanel = ({
   onCopy,
   ipv4Status,
   notice,
+  parameters = [],
 }: ConnectionPanelProps) => {
   return (
     <div className={cn('py-8', DIALOG_PADDING_X)}>
@@ -78,19 +85,21 @@ export const ConnectionPanel = ({
         <div className="flex flex-col">
           <h1 className="text-sm">{title}</h1>
           <p className="text-xs text-foreground-light mb-4">{description}</p>
-          <Input
-            copy
-            readOnly
-            disabled
-            className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100"
-            value={connectionString}
-            onCopy={onCopy}
-          />
+          <div className="flex flex-col -space-y-px">
+            <Input
+              copy
+              readOnly
+              className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
+              value={connectionString}
+              onCopy={onCopy}
+            />
+            {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
+          </div>
         </div>
         <div className="flex flex-col items-end">
           <div className="flex flex-col -space-y-px w-full">
             {type !== 'direct' && (
-              <div className="border px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b">
+              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b">
                 <div className="flex items-center gap-2 -ml-2">
                   {type === 'transaction' ? <TransactionIcon /> : <SessionIcon />}
                 </div>
@@ -109,7 +118,7 @@ export const ConnectionPanel = ({
               </div>
             )}
 
-            <div className="border px-5 flex gap-7 py-3 first:rounded-t last:rounded-b">
+            <div className="border border-muted px-5 flex gap-7 py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
               </div>

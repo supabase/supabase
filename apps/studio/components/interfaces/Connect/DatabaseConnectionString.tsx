@@ -60,6 +60,29 @@ const CONNECTION_TYPES = [
 
 type ConnectionType = 'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
 
+const CONNECTION_PARAMETERS = {
+  host: {
+    key: 'host',
+    description: 'The hostname of your database',
+  },
+  port: {
+    key: 'port',
+    description: 'Port number for the connection',
+  },
+  database: {
+    key: 'database',
+    description: 'Default database name',
+  },
+  user: {
+    key: 'user',
+    description: 'Database user',
+  },
+  pool_mode: {
+    key: 'pool_mode',
+    description: 'Connection pooling behavior',
+  },
+} as const
+
 export const DatabaseConnectionString = () => {
   const project = useSelectedProject()
   const { ref: projectRef, connectionString } = useParams()
@@ -209,6 +232,16 @@ export const DatabaseConnectionString = () => {
               title: 'Does not accept IPv4',
               link: { text: 'Purchase IPv4 support', url: '#' },
             }}
+            parameters={[
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+            ]}
           />
 
           <ConnectionPanel
@@ -223,6 +256,18 @@ export const DatabaseConnectionString = () => {
               description: 'Transaction pooler connections are IPv4 proxied for free.',
             }}
             notice="Transaction pooler does not support prepared statements"
+            parameters={[
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.port, value: poolingConfiguration?.db_port.toString() ?? '6543', description: 'Port number for transaction pooler' },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
+            ]}
           />
 
           <ConnectionPanel
@@ -236,6 +281,18 @@ export const DatabaseConnectionString = () => {
               title: 'Suitable for IPv4',
               description: 'Session pooler connections are IPv4 proxied for free.',
             }}
+            parameters={[
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.port, value: '5432', description: 'Port number for session pooler' },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+              // prettier-ignore
+              { ...CONNECTION_PARAMETERS.pool_mode, value: 'session', description: 'Connection is reserved for the entire session' },
+            ]}
           />
         </div>
       )}
