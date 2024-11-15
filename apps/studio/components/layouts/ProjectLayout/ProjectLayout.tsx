@@ -157,11 +157,7 @@ const ProjectLayout = ({
                 direction="horizontal"
                 autoSaveId="project-layout-content"
               >
-                <ResizablePanel
-                  defaultSize={100}
-                  id="panel-content"
-                  className="w-full min-w-[800px]"
-                >
+                <ResizablePanel id="panel-content" className=" w-full min-w-[600px]">
                   <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
                     {showPausedState ? (
                       <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
@@ -182,8 +178,7 @@ const ProjectLayout = ({
                     <ResizableHandle />
                     <ResizablePanel
                       id="panel-assistant"
-                      className="max-w-[400px] min-w-[400px] bg xl:max-w-none xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
-                      defaultSize={0}
+                      className="min-w-[400px] max-w-[500px] bg xl:max-w-none xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
                     >
                       <AiAssistantPanel />
                     </ResizablePanel>
