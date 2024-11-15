@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -24,8 +25,10 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { GB, PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
@@ -56,7 +59,6 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 
 export function DiskManagementForm() {
   const {
@@ -67,6 +69,8 @@ export function DiskManagementForm() {
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
 
   const { data: resourceWarnings } = useResourceWarningsQuery()
   const projectResourceWarnings = (resourceWarnings ?? [])?.find(
@@ -186,14 +190,6 @@ export function DiskManagementForm() {
     isFlyArchitecture
 
   const disableComputeInputs = isPlanUpgradeRequired
-
-  useEffect(() => {
-    // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
-      form.reset(defaultValues, {})
-    }
-  }, [isSuccess])
-
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
@@ -261,6 +257,20 @@ export function DiskManagementForm() {
       })
     }
   }
+
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded, preserving any user changes
+    if (isSuccess) {
+      form.reset(defaultValues, {})
+    }
+  }, [isSuccess])
+
+  // Redirect logic incase disk and compute feature is not live yet
+  useEffect(() => {
+    if (diskAndComputeForm !== undefined && !diskAndComputeForm && projectRef) {
+      router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
+    }
+  }, [diskAndComputeForm, projectRef, router])
 
   return (
     <Form_Shadcn_ {...form}>
