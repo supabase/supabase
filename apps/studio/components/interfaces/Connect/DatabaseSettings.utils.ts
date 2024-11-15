@@ -50,11 +50,27 @@ export const getConnectionStrings = (
 
   const directUriString = `postgresql://${directUser}:${password}@${directHost}:${directPort}/${directName}`
 
-  const directGolangString = `user=${directUser} password=${password} host=${directHost} port=${directPort} dbname=${directName}`
+  const directGolangString = `user=${directUser} 
+password=${password} 
+host=${directHost} 
+port=${directPort} 
+dbname=${directName}`
 
   const directJdbcString = `jdbc:postgresql://${directHost}:${directPort}/${directName}?user=${directUser}&password=${password}`
 
-  const directDotNetString = `User Id=${directUser};Password=${password};Server=${directHost};Port=${directPort};Database=${directName}`
+  // User Id=${directUser};Password=${password};Server=${directHost};Port=${directPort};Database=${directName}`
+  const directDotNetString = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=${directHost};Database=${directName};Username=${directUser};Password=${password};SSL Mode=Require;Trust Server Certificate=true"
+  }
+}`
+
+  // `User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}`
+  const poolerDotNetString = `{
+  "ConnectionStrings": {
+    "DefaultConnection": "User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}"
+  }
+}`
 
   // Pooler connection strings
   const poolerPsqlString = isMd5
@@ -63,11 +79,15 @@ export const getConnectionStrings = (
 
   const poolerUriString = poolingInfo.connectionString
 
-  const poolerGolangString = `user=${poolerUser} password=${password} host=${poolerHost} port=${poolerPort} dbname=${poolerName}${isMd5 ? ` options=reference=${projectRef}` : ''}`
+  const nodejsPoolerUriString = `DATABASE_URL=${poolingInfo.connectionString}`
+
+  const poolerGolangString = `user=${poolerUser} 
+password=${password} 
+host=${poolerHost}
+port=${poolerPort}
+dbname=${poolerName}${isMd5 ? `options=reference=${projectRef}` : ''}`
 
   const poolerJdbcString = `jdbc:postgresql://${poolerHost}:${poolerPort}/${poolerName}?user=${poolerUser}${isMd5 ? `&options=reference%3D${projectRef}` : ''}&password=${password}`
-
-  const poolerDotNetString = `User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}`
 
   return {
     direct: {
@@ -76,7 +96,7 @@ export const getConnectionStrings = (
       golang: directGolangString,
       jdbc: directJdbcString,
       dotnet: directDotNetString,
-      nodejs: directUriString,
+      nodejs: nodejsPoolerUriString,
       php: directGolangString,
       python: directGolangString,
     },
@@ -86,7 +106,7 @@ export const getConnectionStrings = (
       golang: poolerGolangString,
       jdbc: poolerJdbcString,
       dotnet: poolerDotNetString,
-      nodejs: poolerUriString,
+      nodejs: nodejsPoolerUriString,
       php: poolerGolangString,
       python: poolerGolangString,
     },

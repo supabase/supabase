@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
+  CodeBlock,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
@@ -44,18 +45,30 @@ import {
   getPoolerTld,
 } from './DatabaseSettings.utils'
 import { UsePoolerCheckbox } from './UsePoolerCheckbox'
-import { SessionIcon, TransactionIcon } from './pooler-icons'
-import { ConnectionPanel } from './ConnectionPanel'
+import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
+import examples from './DirectConnectionExamples'
 
-const CONNECTION_TYPES = [
-  { id: 'uri', label: 'URI' },
-  { id: 'psql', label: 'PSQL' },
-  { id: 'golang', label: 'Golang' },
-  { id: 'jdbc', label: 'JDBC' },
-  { id: 'dotnet', label: '.NET' },
-  { id: 'nodejs', label: 'Node.js' },
-  { id: 'php', label: 'PHP' },
-  { id: 'python', label: 'Python' },
+const CONNECTION_TYPES: {
+  id: ConnectionType
+  label: string
+  contentType: 'input' | 'code'
+  lang: string
+  fileTitle: string | undefined
+}[] = [
+  { id: 'uri', label: 'URI', contentType: 'input', lang: 'bash', fileTitle: undefined },
+  { id: 'psql', label: 'PSQL', contentType: 'code', lang: 'bash', fileTitle: undefined },
+  { id: 'golang', label: 'Golang', contentType: 'code', lang: 'go', fileTitle: '.env' },
+  { id: 'jdbc', label: 'JDBC', contentType: 'input', lang: 'bash', fileTitle: undefined },
+  {
+    id: 'dotnet',
+    label: '.NET',
+    contentType: 'code',
+    lang: 'csharp',
+    fileTitle: 'appsettings.json',
+  },
+  { id: 'nodejs', label: 'Node.js', contentType: 'code', lang: 'js', fileTitle: '.env' },
+  { id: 'php', label: 'PHP', contentType: 'code', lang: 'php', fileTitle: '.env' },
+  { id: 'python', label: 'Python', contentType: 'code', lang: 'python', fileTitle: '.env' },
 ]
 
 type ConnectionType = 'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
@@ -189,6 +202,40 @@ export const DatabaseConnectionString = () => {
     }
   }, [poolingConfiguration?.pool_mode])
 
+  const lang = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
+  const contentType =
+    CONNECTION_TYPES.find((type) => type.id === selectedTab)?.contentType ?? 'input'
+
+  const getDirectConnectionExample = () => {
+    const example = examples[selectedTab as keyof typeof examples]
+    if (!example) return null
+
+    return {
+      files: example.files,
+      installCommands: example.installCommands,
+      postInstallCommands: example.postInstallCommands,
+    }
+  }
+
+  const exampleFiles = getDirectConnectionExample()?.files
+  const exampleInstallCommands = getDirectConnectionExample()?.installCommands
+  const examplePostInstallCommands = getDirectConnectionExample()?.postInstallCommands
+  const hasCodeExamples = exampleFiles || exampleInstallCommands
+  const fileTitle = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
+
+  const StepLabel = ({
+    number,
+    children,
+    ...props
+  }: { number: number; children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) => (
+    <div {...props} className={cn('flex items-center gap-2', props.className)}>
+      <div className="flex font-mono text-xs items-center justify-center w-6 h-6 border border-strong rounded-md bg-surface-100">
+        {number}
+      </div>
+      <span>{children}</span>
+    </div>
+  )
+
   return (
     <div className="flex flex-col">
       <div className={cn('flex items-center gap-2', DIALOG_PADDING_X)}>
@@ -219,85 +266,165 @@ export const DatabaseConnectionString = () => {
       {isErrorReadReplicas && (
         <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
       )}
+
       {isSuccessReadReplicas && (
         <div className="flex flex-col divide-y divide-border">
-          <ConnectionPanel
-            type="direct"
-            title="Direct connection"
-            description="Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers."
-            connectionString={connectionStrings['direct'][selectedTab]}
-            onCopy={() => handleCopy(selectedTab)}
-            ipv4Status={{
-              type: 'error',
-              title: 'Does not accept IPv4',
-              link: { text: 'Purchase IPv4 support', url: '#' },
-            }}
-            parameters={[
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-            ]}
-          />
+          {/* // handle non terminal examples */}
+          {hasCodeExamples && (
+            <div className="grid grid-cols-2 gap-20 w-full px-7  py-10">
+              <div>
+                <StepLabel number={1} className="mb-4">
+                  Install the following
+                </StepLabel>
+                {getDirectConnectionExample()?.installCommands?.map((cmd, i) => (
+                  <CodeBlock
+                    key={i}
+                    className="[&_code]:text-[12px] [&_code]:text-foreground"
+                    value={cmd}
+                    hideLineNumbers
+                    language="bash"
+                  >
+                    {cmd}
+                  </CodeBlock>
+                ))}
+              </div>
+              <div className="">
+                <StepLabel number={2} className="mb-4">
+                  Add file to project
+                </StepLabel>
+                {getDirectConnectionExample()?.files?.map((file, i) => (
+                  <div key={i} className="">
+                    {/* <p className="text-sm text-foreground-light">{file.name}</p> */}
+                    <CodeBlockFileHeader title={file.name} />
+                    <CodeBlock
+                      wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
+                      // title={file.name}
+                      value={file.content}
+                      hideLineNumbers
+                      language="js"
+                      className="[&_code]:text-[12px] [&_code]:text-foreground"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <ConnectionPanel
-            type="transaction"
-            title="Transaction Pooler"
-            description="Ideal for stateless applications like serverless functions where each interaction with the database is brief and isolated."
-            connectionString={connectionStrings['pooler'][selectedTab]}
-            onCopy={() => handleCopy(selectedTab)}
-            ipv4Status={{
-              type: 'success',
-              title: 'Suitable for IPv4',
-              description: 'Transaction pooler connections are IPv4 proxied for free.',
-            }}
-            notice="Transaction pooler does not support prepared statements"
-            parameters={[
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.port, value: poolingConfiguration?.db_port.toString() ?? '6543', description: 'Port number for transaction pooler' },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
-            ]}
-          />
+          <div>
+            {hasCodeExamples && (
+              <div className="px-7 pt-8">
+                <StepLabel number={3}>Choose type of connection</StepLabel>
+              </div>
+            )}
+            <div className="divide-y divide-border-muted">
+              <ConnectionPanel
+                contentType={contentType}
+                lang={lang}
+                type="direct"
+                title="Direct connection"
+                fileTitle={fileTitle}
+                description="Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers."
+                connectionString={connectionStrings['direct'][selectedTab]}
+                onCopy={() => handleCopy(selectedTab)}
+                ipv4Status={{
+                  type: 'error',
+                  title: 'Does not accept IPv4',
+                  link: { text: 'Purchase IPv4 support', url: '#' },
+                }}
+                parameters={[
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.host, value: connectionInfo.db_host },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.port, value: connectionInfo.db_port },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                ]}
+              />
 
-          <ConnectionPanel
-            type="session"
-            title="Session Pooler"
-            description="Better suited for applications with longer-running sessions that need persistent state or session-based features."
-            connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
-            onCopy={() => handleCopy(selectedTab)}
-            ipv4Status={{
-              type: 'success',
-              title: 'Suitable for IPv4',
-              description: 'Session pooler connections are IPv4 proxied for free.',
-            }}
-            parameters={[
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.port, value: '5432', description: 'Port number for session pooler' },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-              // prettier-ignore
-              { ...CONNECTION_PARAMETERS.pool_mode, value: 'session', description: 'Connection is reserved for the entire session' },
-            ]}
-          />
+              <ConnectionPanel
+                contentType={contentType}
+                lang={lang}
+                type="transaction"
+                title="Transaction connection"
+                fileTitle={fileTitle}
+                description="Ideal for stateless applications like serverless functions where each interaction with the database is brief and isolated."
+                connectionString={connectionStrings['pooler'][selectedTab]}
+                onCopy={() => handleCopy(selectedTab)}
+                ipv4Status={{
+                  type: 'success',
+                  title: 'Suitable for IPv4',
+                  description: 'Transaction pooler connections are IPv4 proxied for free.',
+                }}
+                notice="Transaction pooler does not support prepared statements"
+                parameters={[
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.port, value: poolingConfiguration?.db_port.toString() ?? '6543', description: 'Port number for transaction pooler' },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
+                ]}
+              />
+
+              <ConnectionPanel
+                contentType={contentType}
+                lang={lang}
+                type="session"
+                title="Session connection"
+                fileTitle={fileTitle}
+                description="Better suited for applications with longer-running sessions that need persistent state or session-based features."
+                connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
+                onCopy={() => handleCopy(selectedTab)}
+                ipv4Status={{
+                  type: 'success',
+                  title: 'Suitable for IPv4',
+                  description: 'Session pooler connections are IPv4 proxied for free.',
+                }}
+                parameters={[
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.port, value: '5432', description: 'Port number for session pooler' },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  // prettier-ignore
+                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'session', description: 'Connection is reserved for the entire session' },
+                ]}
+              />
+            </div>
+          </div>
+          {examplePostInstallCommands && (
+            <div className="grid grid-cols-2 gap-20 w-full px-7  py-10">
+              <div>
+                <StepLabel number={3} className="mb-4">
+                  Add the configuration package to read the settings
+                </StepLabel>
+                {getDirectConnectionExample()?.postInstallCommands?.map((cmd, i) => (
+                  <CodeBlock
+                    key={i}
+                    className="text-sm"
+                    value={cmd}
+                    hideLineNumbers
+                    language="bash"
+                  >
+                    {cmd}
+                  </CodeBlock>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {poolerConnStringSyntax.length > 0 && (
+      {/* {poolerConnStringSyntax.length > 0 && (
         <>
           <Separator />
           <Panel.Content className={cn('!py-3 space-y-2')}>
@@ -381,7 +508,7 @@ export const DatabaseConnectionString = () => {
             <DatabaseSettings />
           </div>
         </>
-      )}
+      )} */}
     </div>
   )
 }

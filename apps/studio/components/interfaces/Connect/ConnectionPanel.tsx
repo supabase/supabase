@@ -1,8 +1,8 @@
-import { AlertCircle, Globe, Globe2, X } from 'lucide-react'
-import { cn, DIALOG_PADDING_X } from 'ui'
+import { FileCode, X } from 'lucide-react'
+import { cn, CodeBlock, DIALOG_PADDING_X } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TransactionIcon, SessionIcon } from './pooler-icons'
 import { ConnectionParameters } from './ConnectionParameters'
+import { SessionIcon, TransactionIcon } from './pooler-icons-v2'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -22,6 +22,9 @@ interface ConnectionPanelProps {
     value: string
     description?: string
   }>
+  contentType?: 'input' | 'code'
+  lang?: string
+  fileTitle?: string
 }
 
 const IPv4StatusIcon = ({ className, active }: { className?: string; active: boolean }) => {
@@ -69,6 +72,17 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
   )
 }
 
+export const CodeBlockFileHeader = ({ title }: { title: string }) => {
+  return (
+    <div className="flex items-center justify-between px-4 py-1 bg-surface-100/50 border border-b-0 border-surface rounded-t">
+      <div className="flex items-center gap-2">
+        <FileCode size={12} className="text-foreground-muted" strokeWidth={1.5} />
+        <span className="text-xs text-foreground-light">{title}</span>
+      </div>
+    </div>
+  )
+}
+
 export const ConnectionPanel = ({
   type = 'direct',
   title,
@@ -78,44 +92,83 @@ export const ConnectionPanel = ({
   ipv4Status,
   notice,
   parameters = [],
+  contentType = 'input',
+  lang = 'bash',
+  fileTitle,
 }: ConnectionPanelProps) => {
   return (
     <div className={cn('py-8', DIALOG_PADDING_X)}>
       <div className="grid grid-cols-2 gap-20 w-full">
         <div className="flex flex-col">
-          <h1 className="text-sm">{title}</h1>
+          <h1 className="text-sm mb-2">{title}</h1>
           <p className="text-xs text-foreground-light mb-4">{description}</p>
           <div className="flex flex-col -space-y-px">
-            <Input
-              copy
-              readOnly
-              className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
-              value={connectionString}
-              onCopy={onCopy}
-            />
+            {/* {contentType === 'input' ? ( */}
+            {false ? (
+              <Input
+                copy
+                readOnly
+                className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
+                value={connectionString}
+                onCopy={onCopy}
+              />
+            ) : (
+              <>
+                {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
+                <CodeBlock
+                  wrapperClassName={cn(
+                    '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
+                    fileTitle && '[&_pre]:rounded-t-none'
+                  )}
+                  language={lang}
+                  value={connectionString}
+                  className="[&_code]:text-[12px] [&_code]:text-foreground"
+                  hideLineNumbers
+                />
+              </>
+            )}
             {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
           </div>
         </div>
         <div className="flex flex-col items-end">
           <div className="flex flex-col -space-y-px w-full">
             {type !== 'direct' && (
-              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b">
-                <div className="flex items-center gap-2 -ml-2">
-                  {type === 'transaction' ? <TransactionIcon /> : <SessionIcon />}
+              <>
+                <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b">
+                  <div className="absolute top-2 left-2.5">
+                    {type === 'transaction' ? <TransactionIcon /> : <SessionIcon />}
+                  </div>
+                  <div className="flex flex-col pl-[52px]">
+                    <span className="text-xs font-medium text-foreground">
+                      {type === 'transaction'
+                        ? 'Suitable for stateless applications'
+                        : 'Suitable for long running applications'}
+                    </span>
+                    <span className="text-xs text-foreground-light">
+                      {type === 'transaction'
+                        ? 'Shared pool connection for all client connections'
+                        : ' Dedicated pool connection for each client'}
+                    </span>
+                  </div>
                 </div>
-                <div className="flex flex-col">
-                  <span className="text-xs font-medium text-foreground">
-                    {type === 'transaction'
-                      ? 'Suitable for stateless applications'
-                      : 'Suitable for long running applications'}
-                  </span>
-                  <span className="text-xs text-foreground-light">
-                    {type === 'transaction'
-                      ? 'Shared pool connection for all client connections'
-                      : ' Dedicated pool connection for each client'}
-                  </span>
+                <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b">
+                  {/* <div className="flex items-center gap-2 -ml-2"> */}
+                  {/* {type === 'transaction' ? <TransactionIcon /> : <SessionIcon />} */}
+                  {/* </div> */}
+                  <div className="flex flex-col pl-[52px]">
+                    <span className="text-xs font-medium text-foreground">
+                      {type === 'transaction'
+                        ? 'Suitable for stateless applications'
+                        : 'Suitable for long running applications'}
+                    </span>
+                    <span className="text-xs text-foreground-light">
+                      {type === 'transaction'
+                        ? 'Shared pool connection for all client connections'
+                        : ' Dedicated pool connection for each client'}
+                    </span>
+                  </div>
                 </div>
-              </div>
+              </>
             )}
 
             <div className="border border-muted px-5 flex gap-7 py-3 first:rounded-t last:rounded-b">

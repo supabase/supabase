@@ -39,12 +39,12 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
     <Collapsible_Shadcn_ open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
       <CollapsibleTrigger_Shadcn_
         asChild
-        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none"
+        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light"
       >
         <Button
           type="default"
           size="tiny"
-          className="text-foreground-lighter"
+          className="text-foreground-lighter !bg-dash-sidebar"
           icon={
             <ChevronRight
               size={12}
@@ -58,7 +58,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
           View parameters
         </Button>
       </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_ className="bg-surface-100 rounded-b border font-mono text-sm">
+      <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border font-mono text-sm">
         <div className="px-4 py-2">
           {parameters.map((param) => (
             <div key={param.key} className="py-0.5 group/param">
