@@ -1,18 +1,21 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { SupabaseClient } from '@supabase/supabase-js'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
 import { INTERACTIVE_GRID_COLORS } from './InteractiveGridParty'
+import Cursor from './Multiplayer/Cursor'
+import { getColor } from './Multiplayer/randomColor'
+import { Coordinates } from './Multiplayer/types'
 
 const GRID_SIZE = 100
 const CELL_SIZE = 40
 const CANVAS_WIDTH = 1800
 const CANVAS_HEIGHT = 1600
-const HOVER_DURATION = 500
+const HOVER_DURATION = 100
 const FADE_DURATION = 300
+const Y_THRESHOLD = 65
 
 interface CellState {
   isHovered: boolean
@@ -20,28 +23,24 @@ interface CellState {
   color: string
 }
 
-interface CursorPosition {
-  x: number
-  y: number
-}
-
 export default function InteractiveGridSingle() {
   const { supabase, userData } = useConfData()
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
-    SupabaseClient['channel']
-  > | null>(null)
   const [hoveredCells, setHoveredCells] = useState<Map<string, CellState>>(new Map())
-  const [userCursors, setUserCursors] = useState<Record<string, CursorPosition>>({})
-  const [onlineUsers, setOnlineUsers] = useState<any[]>([])
   const [userColors, setUserColors] = useState<Record<string, string>>({})
   const animationFrameRef = useRef<number>()
-  const isSingular = (onlineUsers?.length ?? 0) === 1
+  const [mousePosition, _setMousePosition] = useState<Coordinates>()
+  const mousePositionRef = useRef<Coordinates>()
 
   const currentUserIdRef = useRef(userData?.id || uuidv4())
   const CURRENT_USER_ID = currentUserIdRef.current
+
+  const setMousePosition = (coordinates: Coordinates) => {
+    mousePositionRef.current = coordinates
+    _setMousePosition(coordinates)
+  }
 
   const getUserColor = useCallback(
     (userId: string | undefined) => {
@@ -62,28 +61,25 @@ export default function InteractiveGridSingle() {
     [userColors]
   )
 
-  const setCellHovered = useCallback(
-    (key: string, isHovered: boolean, color: string) => {
-      setHoveredCells((prev) => {
-        const newState = new Map(prev)
-        if (isHovered) {
-          newState.set(key, { isHovered: true, fadeStartTime: null, color })
-        } else {
-          const existingCell = newState.get(key)
-          if (existingCell && existingCell.isHovered) {
-            newState.set(key, {
-              isHovered: false,
-              fadeStartTime: Date.now() + HOVER_DURATION,
-              color,
-            })
-          }
+  const setCellHovered = useCallback((key: string, isHovered: boolean, color: string) => {
+    setHoveredCells((prev) => {
+      const newState = new Map(prev)
+      if (isHovered) {
+        newState.set(key, { isHovered: true, fadeStartTime: null, color })
+      } else {
+        const existingCell = newState.get(key)
+        if (existingCell && existingCell.isHovered) {
+          newState.set(key, {
+            isHovered: false,
+            fadeStartTime: Date.now() + HOVER_DURATION,
+            color,
+          })
         }
+      }
 
-        return newState
-      })
-    },
-    [realtimeChannel]
-  )
+      return newState
+    })
+  }, [])
 
   const drawGrid = useCallback(
     (ctx: CanvasRenderingContext2D, currentTime: number) => {
@@ -120,18 +116,8 @@ export default function InteractiveGridSingle() {
           }
         }
       }
-
-      Object.entries(userCursors).forEach(([userId, cursor]) => {
-        ctx.fillStyle =
-          userId === CURRENT_USER_ID
-            ? INTERACTIVE_GRID_COLORS(isDarkTheme).CURRENT_USER_HOVER
-            : getUserColor(userId)
-        ctx.beginPath()
-        ctx.arc(cursor.x, cursor.y, 5, 0, 2 * Math.PI)
-        ctx.fill()
-      })
     },
-    [hoveredCells, userCursors, getUserColor, isDarkTheme]
+    [hoveredCells, getUserColor, isDarkTheme]
   )
 
   const animate = useCallback(() => {
@@ -173,7 +159,7 @@ export default function InteractiveGridSingle() {
         })
       }
     },
-    [hoveredCells, setCellHovered, realtimeChannel, getUserColor]
+    [hoveredCells, setCellHovered, getUserColor]
   )
 
   const handleMouseLeave = useCallback(() => {
@@ -183,28 +169,23 @@ export default function InteractiveGridSingle() {
   }, [hoveredCells, setCellHovered, getUserColor, userData])
 
   useEffect(() => {
-    if (!realtimeChannel && supabase) {
-      const hoverChannel = supabase.channel('hover_presence', {
-        config: { broadcast: { ack: true } },
-      })
+    let setMouseEvent: (e: MouseEvent) => void = () => {}
 
-      setRealtimeChannel(hoverChannel)
-
-      hoverChannel.on('presence', { event: 'sync' }, () => {
-        const newState = hoverChannel.presenceState()
-        setOnlineUsers(
-          [...Object.entries(newState).map(([_, value]) => value[0])].filter(onlyUnique)
-        )
-      })
+    setMouseEvent = (e: MouseEvent) => {
+      const top = window.pageYOffset || document.documentElement.scrollTop
+      const [x, y] = [e.clientX, e.clientY - Y_THRESHOLD + top]
+      setMousePosition({ x, y })
     }
+
+    window.addEventListener('mousemove', setMouseEvent)
 
     return () => {
-      realtimeChannel?.unsubscribe()
+      window.removeEventListener('mousemove', setMouseEvent)
     }
-  }, [supabase, realtimeChannel])
+  }, [supabase])
 
   return (
-    <div className="absolute inset-0 w-full h-full flex justify-center items-center lg:max-h-screen overflow-hidden">
+    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen cursor-none">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
@@ -212,6 +193,17 @@ export default function InteractiveGridSingle() {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         className="border border-gray-300 shadow-lg"
+      />
+
+      {/* Current user cursor */}
+      <Cursor
+        x={mousePosition?.x}
+        y={mousePosition?.y}
+        color={getColor('brand').bg}
+        hue={getColor('brand').hue}
+        message={''}
+        isTyping={false}
+        isCurrentUser={true}
       />
     </div>
   )
