@@ -762,18 +762,22 @@ export interface paths {
     delete: operations['v1-delete-a-warehouse-token']
   }
   '/platform/projects/{ref}/analytics/warehouse/collections': {
-    /** Lists project's warehouse collections from logflare */
-    get: operations['v1-list-all-warehouse-collections']
-    /** Create a warehouse collection */
-    post: operations['v1-create-a-warehouse-collection']
+    /** Lists project's telemetry collections from logflare */
+    get: operations['v1-list-all-telemetry-collections']
+    /** Create a telemetry collection */
+    post: operations['v1-create-a-telemetry-collection']
   }
   '/platform/projects/{ref}/analytics/warehouse/collections/{token}': {
-    /** Get a warehouse collection */
-    get: operations['v1-get-a-warehouse-collection']
-    /** Delete a warehouse collection */
-    delete: operations['v1-delete-a-warehouse-collection']
-    /** Update a warehouse collection */
-    patch: operations['v1-update-a-warehouse-collection']
+    /** Get a telemetry collection */
+    get: operations['v1-get-a-telemetry-collection']
+    /** Delete a telemetry collection */
+    delete: operations['v1-delete-a-telemetry-collection']
+    /** Update a telemetry collection */
+    patch: operations['v1-update-a-telemetry-collection']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/collections/{token}/schema': {
+    /** Get a telemetry collection schema */
+    get: operations['v1-get-a-telemetry-collection-schema']
   }
   '/platform/projects/{ref}/analytics/warehouse/endpoints': {
     /** Lists project's warehouse endpoints from logflare */
@@ -1745,18 +1749,22 @@ export interface paths {
     delete: operations['v1-delete-a-warehouse-token']
   }
   '/v0/projects/{ref}/analytics/warehouse/collections': {
-    /** Lists project's warehouse collections from logflare */
-    get: operations['v1-list-all-warehouse-collections']
-    /** Create a warehouse collection */
-    post: operations['v1-create-a-warehouse-collection']
+    /** Lists project's telemetry collections from logflare */
+    get: operations['v1-list-all-telemetry-collections']
+    /** Create a telemetry collection */
+    post: operations['v1-create-a-telemetry-collection']
   }
   '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
-    /** Get a warehouse collection */
-    get: operations['v1-get-a-warehouse-collection']
-    /** Delete a warehouse collection */
-    delete: operations['v1-delete-a-warehouse-collection']
-    /** Update a warehouse collection */
-    patch: operations['v1-update-a-warehouse-collection']
+    /** Get a telemetry collection */
+    get: operations['v1-get-a-telemetry-collection']
+    /** Delete a telemetry collection */
+    delete: operations['v1-delete-a-telemetry-collection']
+    /** Update a telemetry collection */
+    patch: operations['v1-update-a-telemetry-collection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections/{token}/schema': {
+    /** Get a telemetry collection schema */
+    get: operations['v1-get-a-telemetry-collection-schema']
   }
   '/v0/projects/{ref}/analytics/warehouse/endpoints': {
     /** Lists project's warehouse endpoints from logflare */
@@ -4861,7 +4869,8 @@ export interface components {
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
-      cloned: components['schemas']['TargetCloneStatus'][]
+      cloned_from: Record<string, never>
+      clones: components['schemas']['TargetCloneStatus'][]
       id: number
       ref: string
     }
@@ -11996,8 +12005,8 @@ export interface operations {
       }
     }
   }
-  /** Lists project's warehouse collections from logflare */
-  'v1-list-all-warehouse-collections': {
+  /** Lists project's telemetry collections from logflare */
+  'v1-list-all-telemetry-collections': {
     parameters: {
       path: {
         /** @description Project ref */
@@ -12013,14 +12022,14 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to fetch warehouse collections */
+      /** @description Failed to fetch telemetry collections */
       500: {
         content: never
       }
     }
   }
-  /** Create a warehouse collection */
-  'v1-create-a-warehouse-collection': {
+  /** Create a telemetry collection */
+  'v1-create-a-telemetry-collection': {
     responses: {
       201: {
         content: {
@@ -12030,14 +12039,14 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to create warehouse collection */
+      /** @description Failed to create telemetry collection */
       500: {
         content: never
       }
     }
   }
-  /** Get a warehouse collection */
-  'v1-get-a-warehouse-collection': {
+  /** Get a telemetry collection */
+  'v1-get-a-telemetry-collection': {
     responses: {
       200: {
         content: {
@@ -12047,14 +12056,14 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to fetch warehouse collection */
+      /** @description Failed to fetch telemetry collection */
       500: {
         content: never
       }
     }
   }
-  /** Delete a warehouse collection */
-  'v1-delete-a-warehouse-collection': {
+  /** Delete a telemetry collection */
+  'v1-delete-a-telemetry-collection': {
     responses: {
       200: {
         content: {
@@ -12064,14 +12073,14 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to delete warehouse collection */
+      /** @description Failed to delete telemetry collection */
       500: {
         content: never
       }
     }
   }
-  /** Update a warehouse collection */
-  'v1-update-a-warehouse-collection': {
+  /** Update a telemetry collection */
+  'v1-update-a-telemetry-collection': {
     responses: {
       200: {
         content: {
@@ -12081,7 +12090,24 @@ export interface operations {
       403: {
         content: never
       }
-      /** @description Failed to update warehouse collection */
+      /** @description Failed to update telemetry collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a telemetry collection schema */
+  'v1-get-a-telemetry-collection-schema': {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch telemetry collection schema */
       500: {
         content: never
       }

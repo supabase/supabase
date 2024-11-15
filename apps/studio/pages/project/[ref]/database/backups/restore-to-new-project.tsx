@@ -122,11 +122,12 @@ const RestoreToNewProject = () => {
   } = useCloneStatusQuery({
     projectRef: project?.ref,
   })
-  const lastClone = cloneStatus?.cloned[cloneStatus?.cloned.length - 1]
+  const lastClone = cloneStatus?.clones?.[cloneStatus?.clones.length - 1]
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
   const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
   const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
+  const IS_CLONED_PROJECT = cloneStatus?.cloned_from !== undefined
 
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
 
@@ -280,6 +281,17 @@ const RestoreToNewProject = () => {
           'To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled.'
         }
       />
+    )
+  }
+
+  if (IS_CLONED_PROJECT) {
+    return (
+      <Admonition type="default" title={`This project cannot be restored to a new project`}>
+        <Markdown
+          content={`This project was originally restored from another project. This is a temporary limitation. Please [contact us](/support/new?ref=${project?.ref}) if you need to restore a project to multiple other projects.  
+            [Go to original project](/project/${(cloneStatus.cloned_from.source_project as any).ref})`}
+        />
+      </Admonition>
     )
   }
 
