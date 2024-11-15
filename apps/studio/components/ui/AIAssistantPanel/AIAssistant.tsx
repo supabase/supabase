@@ -420,7 +420,10 @@ export const AIAssistant = ({
                 build? Here are some ideas.
               </p>
               <div className="flex flex-wrap gap-2">
-                <Button onClick={() => setValue('Generate a database schema for ...')}>
+                <Button
+                  onClick={() => setValue('Generate a database schema for ...')}
+                  className="rounded-full"
+                >
                   Generate a ...
                 </Button>
                 {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
@@ -429,6 +432,7 @@ export const AIAssistant = ({
                       <TooltipTrigger_Shadcn_ asChild>
                         <Button
                           type="outline"
+                          className="rounded-full"
                           onClick={() => {
                             setMessages([
                               {
