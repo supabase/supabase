@@ -43,7 +43,7 @@ const FeaturePreviewModal = () => {
     })
 
     if (
-      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT &&
+      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2 &&
       isSelectedFeatureEnabled
     ) {
       snap.setAiAssistantPanel({ open: false })
