@@ -9,7 +9,7 @@ import { useState } from 'react'
 
 import {
   useIsAPIDocsSidePanelEnabled,
-  useIsDatabaseFunctionsAssistantEnabled,
+  useIsAssistantV2Enabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -72,7 +72,7 @@ const NavigationBar = () => {
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isFunctionsAssistantEnabled = useIsDatabaseFunctionsAssistantEnabled()
+  const isFunctionsAssistantEnabled = useIsAssistantV2Enabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [allowNavPanelToExpand] = useLocalStorageQuery(

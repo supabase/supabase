@@ -17,7 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionListProps {
   schema: string
@@ -37,7 +37,7 @@ const FunctionList = ({
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,

@@ -33,7 +33,7 @@ import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -92,7 +92,7 @@ const ProjectLayout = ({
   const { open } = aiAssistantPanel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name

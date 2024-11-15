@@ -52,7 +52,7 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useIsDatabaseFunctionsAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { AiAssistantPanel } from './AiAssistantPanel'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -106,7 +106,7 @@ const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
-  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const { open } = appSnap.aiAssistantPanel
 
   const { mutate: formatQuery } = useFormatQueryMutation()

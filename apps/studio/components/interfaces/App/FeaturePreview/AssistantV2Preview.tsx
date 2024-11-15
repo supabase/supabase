@@ -5,7 +5,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 
-export const FunctionsAssistantPreview = () => {
+export const AssistantV2Preview = () => {
   const os = detectOS()
   const { ref } = useParams()
 
