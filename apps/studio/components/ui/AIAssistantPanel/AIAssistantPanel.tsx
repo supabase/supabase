@@ -6,6 +6,7 @@ import { AIAssistant } from './AIAssistant'
 
 export const AiAssistantPanel = () => {
   const { aiAssistantPanel, resetAiAssistantPanel } = useAppStateSnapshot()
+
   const { open } = aiAssistantPanel
   const [chatId, setChatId] = useState(() => uuidv4())
 

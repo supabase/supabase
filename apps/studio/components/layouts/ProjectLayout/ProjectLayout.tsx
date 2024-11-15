@@ -33,6 +33,7 @@ import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -87,11 +88,14 @@ const ProjectLayout = ({
   const { ref: projectRef } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
-  const { aiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open } = aiAssistantPanel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
+
+  const projectName = selectedProject?.name
+  const organizationName = selectedOrganization?.name
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const showProductMenu = selectedProject
@@ -103,6 +107,15 @@ const ProjectLayout = ({
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.metaKey && e.code === 'KeyI') setAiAssistantPanel({ open: !open })
+    }
+    if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssistantV2Enabled, open])
 
   return (
     <AppLayout>
