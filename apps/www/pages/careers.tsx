@@ -119,7 +119,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
             We're on a mission to build the best developer platform
           </h2>
           <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            Explore remote possibilities and join our team to help us achieve it.
+            Explore remote opportunities and join our team to help us achieve it.
           </p>
           <Button asChild type="primary" className="mt-4">
             <Link href="#positions">Open positions</Link>
