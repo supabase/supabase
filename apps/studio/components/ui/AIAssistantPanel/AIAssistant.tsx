@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
@@ -489,6 +490,26 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               ))}
             </div>
           )}
+          {disablePrompts && (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="Assistant has been temporarily disabled"
+              description="We're currently looking into getting it back online"
+            />
+          )}
+
+          {!isApiKeySet && (
+            <Admonition
+              type="default"
+              title="OpenAI API key not set"
+              description={
+                <Markdown
+                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                />
+              }
+            />
+          )}
 
           <AssistantChatForm
             textAreaRef={inputRef}
@@ -518,6 +539,11 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               }
             }}
           />
+          {!hasMessages && (
+            <p className="text-xs text-foreground-lighter mt-2">
+              The Assistant is in Alpha and your prompts might be rate limited
+            </p>
+          )}
         </div>
       </div>
 
