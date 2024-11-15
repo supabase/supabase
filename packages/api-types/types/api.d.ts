@@ -1263,12 +1263,15 @@ export interface paths {
     /** Modify database disk */
     post: operations['SystemProjectDiskController_modifyDisk']
   }
+<<<<<<< HEAD
   '/system/projects/{ref}/disk/custom-config': {
     /** Gets disk autoscale config */
     get: operations['SystemProjectDiskController_getDiskAutoscaleConfig']
     /** Updates disk autoscale config */
     post: operations['SystemProjectDiskController_updateDiskAutoscaleConfig']
   }
+=======
+>>>>>>> e36be4e10258052c1c55937ecb3c34c6af149720
   '/system/projects/{ref}/disk/util': {
     /** Get disk utilization */
     get: operations['SystemProjectDiskController_getDiskUtilization']
@@ -15054,6 +15057,7 @@ export interface operations {
       }
     }
   }
+<<<<<<< HEAD
   /** Gets disk autoscale config */
   SystemProjectDiskController_getDiskAutoscaleConfig: {
     parameters: {
@@ -15105,6 +15109,8 @@ export interface operations {
       }
     }
   }
+=======
+>>>>>>> e36be4e10258052c1c55937ecb3c34c6af149720
   /** Get disk utilization */
   SystemProjectDiskController_getDiskUtilization: {
     parameters: {

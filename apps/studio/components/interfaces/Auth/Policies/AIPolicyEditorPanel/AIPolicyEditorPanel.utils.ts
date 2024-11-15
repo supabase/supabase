@@ -1,7 +1,8 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
+import { isEqual } from 'lodash'
+
 import type { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
-import { isEqual } from 'lodash'
 
 export type MessageWithDebug = Message & { isDebug: boolean }
 

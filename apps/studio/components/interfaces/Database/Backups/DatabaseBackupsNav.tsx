@@ -1,6 +1,7 @@
 import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import React from 'react'
+
 import { NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
@@ -16,19 +17,19 @@ function DatabaseBackupsNav({ projRef, active }: Props) {
       enabled: true,
       id: 'scheduled',
       label: 'Scheduled backups',
-      href: (projRef: string) => `/project/${projRef}/database/backups/scheduled`,
+      href: `/project/${projRef}/database/backups/scheduled`,
     },
     {
       enabled: true,
       id: 'pitr',
       label: 'Point in time',
-      href: (projRef: string) => `/project/${projRef}/database/backups/pitr`,
+      href: `/project/${projRef}/database/backups/pitr`,
     },
     {
       enabled: isCloneToNewProjectEnabled,
       id: 'rtnp',
       label: 'Restore to new project',
-      href: (projRef: string) => `/project/${projRef}/database/backups/restore-to-new-project`,
+      href: `/project/${projRef}/database/backups/restore-to-new-project`,
     },
   ] as const
 
@@ -38,7 +39,7 @@ function DatabaseBackupsNav({ projRef, active }: Props) {
         (item) =>
           item.enabled && (
             <NavMenuItem key={item.label} active={item.id === active}>
-              <Link href={item.href(projRef)}>{item.label}</Link>
+              <Link href={item.href}>{item.label}</Link>
             </NavMenuItem>
           )
       )}

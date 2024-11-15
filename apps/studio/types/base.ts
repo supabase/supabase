@@ -43,7 +43,6 @@ export interface Project extends ProjectBase {
   maxDatabasePreprovisionGb?: string | null
   parent_project_ref?: string
   is_branch_enabled?: boolean
-  serviceVersions: { gotrue: string; postgrest: string; 'supabase-postgres': string }
 
   /**
    * postgrestStatus is available on client side only.

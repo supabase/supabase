@@ -239,10 +239,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
-    queryKey: [table.schema, table.name],
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    table,
+    tableId: table.id,
     sorts,
     filters,
     page: snap.page,
@@ -252,10 +251,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,

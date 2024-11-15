@@ -16,7 +16,6 @@ import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mut
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
 import { User } from 'data/auth/users-infinite-query'
-import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { timeout } from 'lib/helpers'
@@ -58,6 +57,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   })
 
+  const canUpdateUser = useCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
   const canSendMagicLink = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_magic_link')
   const canSendRecovery = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_recovery')
   const canSendOtp = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
@@ -76,7 +76,6 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const [isDeleteFactorsModalOpen, setIsDeleteFactorsModalOpen] = useState(false)
 
   const { data } = useAuthConfigQuery({ projectRef })
-  const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
   const mailerOtpExpiry = data?.MAILER_OTP_EXP ?? 0
   const minutes = Math.floor(mailerOtpExpiry / 60)
@@ -143,24 +142,13 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   }
 
   const handleUnban = () => {
-    if (!settings) {
-      return toast.error(`Failed to ban user: Error loading project config`)
-    } else if (user.id === undefined) {
+    if (projectRef === undefined) return console.error('Proejct ref is required')
+    if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }
 
-    const protocol = settings?.app_config?.protocol ?? 'https'
-    const endpoint = settings?.app_config?.endpoint
-    const { serviceKey } = getAPIKeys(settings)
-
-    if (!endpoint) return toast.error(`Failed to unban user: Unable to retrieve API endpoint`)
-    if (!serviceKey?.api_key) return toast.error(`Failed to unban user: Unable to retrieve API key`)
-
     updateUser({
       projectRef,
-      protocol,
-      endpoint,
-      serviceApiKey: serviceKey.api_key,
       userId: user.id,
       banDuration: 'none',
     })
@@ -221,13 +209,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
-              (x) => x.title.toLowerCase() === provider.name
+              (x) =>
+                x.title.toLowerCase() ===
+                (provider.name === 'linkedin' ? 'linkedin (oidc)' : provider.name)
             )
             const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
               x.toLowerCase().endsWith('_enabled')
             )
             const providerName =
-              provider.name === 'email' ? 'email' : providerMeta?.title ?? provider.name
+              provider.name === 'email'
+                ? 'email'
+                : provider.name === 'linkedin'
+                  ? 'LinkedIn'
+                  : providerMeta?.title ?? provider.name
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -241,7 +235,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   />
                 )}
                 <div className="flex-grow mt-0.5">
-                  <p className="capitalize">{provider.name}</p>
+                  <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
@@ -380,7 +374,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             button={{
               icon: <Ban />,
               text: isBanned ? 'Unban user' : 'Ban user',
-              disabled: !canRemoveMFAFactors,
+              disabled: !canUpdateUser,
               onClick: () => {
                 if (isBanned) {
                   setIsUnbanModalOpen(true)
@@ -465,7 +459,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   )
 }
 
-const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
+export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
     <div className="flex items-center gap-x-2 group">
       <p className="w-36 text-foreground-light text-sm">{property}</p>
@@ -499,7 +493,7 @@ const RowData = ({ property, value }: { property: string; value?: string | boole
   )
 }
 
-const RowAction = ({
+export const RowAction = ({
   title,
   description,
   button,
