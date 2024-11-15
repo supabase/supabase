@@ -24,7 +24,7 @@ const ComplianceConfig = () => {
   const selectedOrganization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-  const { data: settings, isLoading,isSuccess } = useProjectSettingsV2Query({ projectRef: ref })
+  const { data: settings, isLoading, isSuccess } = useProjectSettingsV2Query({ projectRef: ref })
 
   const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
     useComplianceConfigUpdateMutation({
@@ -58,7 +58,7 @@ const ComplianceConfig = () => {
   }
 
   // this is only setable on compliance orgs, currently that means HIPAA orgs
-  if (!hasHipaaAddon){
+  if (!hasHipaaAddon) {
     return
   }
 
