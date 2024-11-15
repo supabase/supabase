@@ -41,7 +41,7 @@ const TicketingFlow = () => {
       size="small"
       onClick={() => setIsPartyMode(!isPartyMode)}
       type="default"
-      className="sm:pl-1 pointer-events-auto"
+      className="sm:pl-1 pointer-events-auto cursor-none"
     >
       <div className="flex items-center">
         <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
@@ -118,7 +118,7 @@ const TicketingFlow = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-md">
+                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-sm">
                     <TicketForm />
                   </div>
                 </m.div>

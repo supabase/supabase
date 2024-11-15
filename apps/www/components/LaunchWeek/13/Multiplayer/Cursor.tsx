@@ -7,6 +7,7 @@ interface Props {
   color: string
   hue: string
   message: string
+  isCurrentUser: boolean
   isTyping: boolean
   isCancelled?: boolean
   isLocalClient?: boolean
@@ -24,6 +25,7 @@ const Cursor: FC<Props> = ({
   color,
   hue,
   message,
+  isCurrentUser,
   isTyping,
   isCancelled,
   isLocalClient,
@@ -79,7 +81,10 @@ const Cursor: FC<Props> = ({
           height="21"
           viewBox="0 0 18 21"
           fill="none"
-          className="absolute top-0 left-0 transform transition pointer-events-none"
+          className={cn(
+            'absolute top-0 left-0 transform transition pointer-events-none z-0',
+            isCurrentUser && 'transition-none z-40'
+          )}
           style={{ color, transform: `translateX(${x}px) translateY(${y}px)` }}
           xmlns="http://www.w3.org/2000/svg"
         >

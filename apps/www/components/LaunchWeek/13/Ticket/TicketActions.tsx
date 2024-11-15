@@ -75,7 +75,7 @@ export default function TicketActions() {
   }
 
   return (
-    <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto">
+    <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto !cursor-none">
       <Button
         type="secondary"
         size={isLessThanMd ? 'tiny' : 'small'}
