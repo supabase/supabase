@@ -5,45 +5,44 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
 
-export type DatabaseQueueDeleteVariables = {
+export type DatabaseQueuePurgeVariables = {
   projectRef: string
   connectionString?: string
   queueName: string
 }
 
-export async function deleteDatabaseQueue({
+export async function purgeDatabaseQueue({
   projectRef,
   connectionString,
   queueName,
-}: DatabaseQueueDeleteVariables) {
+}: DatabaseQueuePurgeVariables) {
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select * from pgmq.drop_queue('${queueName}');`,
-    queryKey: databaseQueuesKeys.delete(queueName),
+    sql: `select * from pgmq.purge_queue('${queueName}');`,
+    queryKey: databaseQueuesKeys.purge(queueName),
   })
 
   return result
 }
 
-type DatabaseQueueDeleteData = Awaited<ReturnType<typeof deleteDatabaseQueue>>
+type DatabaseQueuePurgeData = Awaited<ReturnType<typeof purgeDatabaseQueue>>
 
-export const useDatabaseQueueDeleteMutation = ({
+export const useDatabaseQueuePurgeMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>,
+  UseMutationOptions<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueueDeleteData, ResponseError, DatabaseQueueDeleteVariables>(
-    (vars) => deleteDatabaseQueue(vars),
+  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>(
+    (vars) => purgeDatabaseQueue(vars),
     {
       async onSuccess(data, variables, context) {
         const { projectRef, queueName } = variables
-        await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
         await queryClient.invalidateQueries(
           databaseQueuesKeys.getMessagesInfinite(projectRef, queueName)
         )
@@ -51,7 +50,7 @@ export const useDatabaseQueueDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete database queue: ${data.message}`)
+          toast.error(`Failed to purge database queue: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
