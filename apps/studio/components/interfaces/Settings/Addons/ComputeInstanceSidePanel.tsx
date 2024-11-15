@@ -56,11 +56,11 @@ const ComputeInstanceSidePanel = () => {
   const { panel, setPanel, closePanel } = useAddonsPagePanel()
 
   const visible = panel === 'computeInstance'
-  if (visible) {
-    if (diskAndComputeForm) {
+  useEffect(() => {
+    if (visible && diskAndComputeForm) {
       router.push(`/project/${projectRef}/settings/compute-and-disk`)
     }
-  }
+  }, [visible, diskAndComputeForm, router, projectRef])
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
