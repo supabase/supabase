@@ -1,4 +1,4 @@
-import sampleSize from 'lodash/samplesize'
+import { sampleSize } from 'lodash'
 
 const colors = {
   tomato: {
