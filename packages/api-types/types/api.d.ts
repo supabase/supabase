@@ -5105,8 +5105,10 @@ export interface components {
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
       ssl_enforced: boolean
       is_sensitive?: boolean
-      has_compliance_addon?: boolean
       status: string
+    }
+    ProjectSensitivitySettingResponse: {
+      is_sensitive: boolean
     }
     /** @enum {string} */
     ProjectStatus:
@@ -6492,6 +6494,9 @@ export interface components {
     }
     UpdateProjectBody: {
       name: string
+    }
+    UpdateProjectSensitivityBody: {
+      is_sensitive: boolean
     }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
@@ -13622,29 +13627,30 @@ export interface operations {
       }
     }
   }
-  /** Updates the given project sensitivity */
-  SensitivityController_updateProjectSensitivity: {
+  /** Update project's sensitivity settings */
+  SettingsController_patchProjectSensitivity: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string
-      }
+      } 
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['MarkSensitiveBody']
+        'application/json': components['schemas']['UpdateProjectSensitivityBody']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectSensitivityResponse']
+          'application/json': components['schemas']['ProjectSensitivitySettingResponse']
         }
       }
-      403: {
+      /** @description Failed to update project's sensitivity setting */
+      404: {
         content: never
       }
-      /** @description Failed to update project */
+      /** @description Failed to update project's sensitivity setting */
       500: {
         content: never
       }

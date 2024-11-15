@@ -12,13 +12,19 @@ import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+
 import { Switch, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 const ComplianceConfig = () => {
   const { ref } = useParams()
   const [isSensitive, setIsSensitive] = useState(false)
-
-  const { data: settings, isLoading, isSuccess } = useProjectSettingsV2Query({ projectRef: ref })
+  const selectedOrganization = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+  const { data: settings, isLoading,isSuccess } = useProjectSettingsV2Query({ projectRef: ref })
 
   const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
     useComplianceConfigUpdateMutation({
@@ -51,9 +57,11 @@ const ComplianceConfig = () => {
     updateComplianceConfig({ projectRef: ref, isSensitive: !isSensitive })
   }
 
-  if (!settings?.has_compliance_addon) {
+  // this is only setable on compliance orgs, currently that means HIPAA orgs
+  if (!hasHipaaAddon){
     return
   }
+
   return (
     <div id="compliance-configuration">
       <div className="flex items-center justify-between mb-6">
