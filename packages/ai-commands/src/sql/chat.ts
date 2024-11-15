@@ -25,8 +25,6 @@ export async function chatSql(
       - Always use semicolons
       - Output as markdown
       - Always include code snippets if available
-      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnName", "yAxis": "columnName"}
-      - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
 
       When generating tables, do the following:
@@ -45,6 +43,8 @@ export async function chatSql(
     // is definitely not optimal at all, but just to get an idea started
     const generateInstructionsBasedOnContext = () => {
       switch (context) {
+        // [Joshen] Sorry for the mess, there's duplicate logic here between this and rls.ts - i'm wondering what should be the best practice
+        // here? Do we (1) Put ALL logic into this file, or (2) we split each context into their own files? Latter might be cleaner?
         case 'rls-policies':
           return stripIndent`
           You're a Supabase Postgres expert in writing row level security policies. Your purpose is to

@@ -22,6 +22,7 @@ import type { NextPageWithLayout } from 'types'
 import { Button, Input } from 'ui'
 import { DocsButton } from 'components/ui/DocsButton'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 /**
  * Filter tables by table name and policy name
@@ -65,6 +66,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
+  const isAssistantV2Enabled = useIsDatabaseFunctionsAssistantEnabled()
   const { setAiAssistantPanel, aiAssistantPanel } = useAppStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
@@ -150,10 +152,15 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            setAiAssistantPanel({
-              open: true,
-              initialInput: `Help me create an RLS policy for the table ${table} on the ${schema} schema`,
-            })
+            if (isAssistantV2Enabled) {
+              setAiAssistantPanel({
+                open: true,
+                initialInput: `Help me create an RLS policy for the table ${table} on the ${schema} schema`,
+              })
+            } else {
+              setSelectedTable(table)
+              setShowPolicyAiEditor(true)
+            }
           }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)

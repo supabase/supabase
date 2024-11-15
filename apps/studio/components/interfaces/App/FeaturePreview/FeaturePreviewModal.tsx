@@ -7,6 +7,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
@@ -40,6 +41,13 @@ const FeaturePreviewModal = () => {
       action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
       label: selectedFeatureKey,
     })
+
+    if (
+      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT &&
+      isSelectedFeatureEnabled
+    ) {
+      snap.setAiAssistantPanel({ open: false })
+    }
   }
 
   function handleCloseFeaturePreviewModal() {

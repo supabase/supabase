@@ -6,10 +6,39 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export const maxDuration = 30
-
+const openAiKey = process.env.OPENAI_API_KEY
 const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  if (!openAiKey) {
+    return new Response(
+      JSON.stringify({
+        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
+  const { method } = req
+
+  switch (method) {
+    case 'POST':
+      return handlePost(req, res)
+    default:
+      return new Response(
+        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
+        {
+          status: 405,
+          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
+        }
+      )
+  }
+}
+
+async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages, projectRef, connectionString, includeSchemaMetadata } = req.body
 
   if (!projectRef) {
