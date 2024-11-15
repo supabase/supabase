@@ -143,7 +143,7 @@ export function DiskManagementForm() {
   const diskAndComputeForm = useFlag('diskAndComputeForm')
 
   useEffect(() => {
-    if (!diskAndComputeForm && diskAndComputeForm !== undefined && projectRef) {
+    if (diskAndComputeForm !== undefined && !diskAndComputeForm && projectRef) {
       router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
     }
   }, [diskAndComputeForm, projectRef, router])
