@@ -1,9 +1,10 @@
+import { useState } from 'react'
+
 import { useParams } from 'common'
 import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
 import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
-import { useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { EditWrapperSheet } from './EditWrapperSheet'

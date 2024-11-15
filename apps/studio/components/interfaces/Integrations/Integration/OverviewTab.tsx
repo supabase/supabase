@@ -1,11 +1,11 @@
+import { Link } from 'lucide-react'
+import { useState } from 'react'
+
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Link } from 'lucide-react'
-import { useState } from 'react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -19,22 +19,21 @@ import { IntegrationDefinition } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 
 export const OverviewTab = ({ integration }: { integration: IntegrationDefinition }) => {
-  const { id } = useParams()
   const { project } = useProjectContext()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
   const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
+
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   if (integration.type !== 'wrapper') {
     return <div>Unsupported integration type.</div>
   }
 
   const wrapperMeta = integration.meta
-
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
 
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
 
