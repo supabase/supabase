@@ -4,7 +4,7 @@ import * as Accordion from '@radix-ui/react-accordion'
 import { ChevronUp } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { Fragment, memo } from 'react'
-import { cn } from 'ui'
+import { cn, Separator } from 'ui'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
 import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
@@ -156,10 +156,6 @@ const SideMenuTitle = ({ title }: { title: string }) => {
   )
 }
 
-const Divider = () => {
-  return <div className="h-px w-full bg-control my-3"></div>
-}
-
 interface NavigationMenuRefListItemsProps {
   id: string
   basePath: string
@@ -192,7 +188,7 @@ const NavigationMenuRefListItems = ({
             <Fragment key={section.title}>
               {section.type === 'category' ? (
                 <>
-                  <Divider />
+                  <Separator className="h-px w-full bg-border border-t my-3" />
                   <SideMenuTitle title={section.title} />
                   {section.items.map((item) => (
                     <RenderLink key={item.id} section={item} basePath={basePath} />
