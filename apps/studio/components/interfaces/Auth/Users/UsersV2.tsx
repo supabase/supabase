@@ -188,7 +188,7 @@ export const UsersV2 = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage, users.length])
+  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage, users])
 
   return (
     <div className="h-full flex flex-col">
