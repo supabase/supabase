@@ -116,7 +116,6 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
                         strokeWidth={1.5}
                       />
                       <Input_Shadcn_
-                        autoFocus
                         {...field}
                         autoComplete="new-password"
                         type="password"

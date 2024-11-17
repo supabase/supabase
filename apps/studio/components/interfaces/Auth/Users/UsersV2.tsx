@@ -125,7 +125,7 @@ export const UsersV2 = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const totalUsers = useMemo(() => countData?.result[0].count ?? 0, [countData?.result[0].count])
-  const users = useMemo(() => data?.pages.flatMap((page) => page.result), [data?.pages])
+  const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
@@ -188,7 +188,7 @@ export const UsersV2 = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage])
+  }, [isSuccess, isRefetching, isSuccessStorage, isErrorStorage, errorStorage, users.length])
 
   return (
     <div className="h-full flex flex-col">
