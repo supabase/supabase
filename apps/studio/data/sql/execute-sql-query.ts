@@ -55,7 +55,7 @@ export async function executeSql(
     params: {
       header: { 'x-connection-encrypted': connectionString ?? '' },
       path: { ref: projectRef },
-      // @ts-ignore: This is just a client side thing to identify queries better
+      // @ts-expect-error: This is just a client side thing to identify queries better
       query: {
         key:
           queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
@@ -64,7 +64,7 @@ export async function executeSql(
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
-  } as any) // Needed to fix generated api types for now
+  })
 
   if (error) {
     if (
@@ -114,6 +114,9 @@ export async function executeSql(
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = ResponseError
 
+/**
+ * @deprecated Use the regular useQuery with a function that calls executeSql() instead
+ */
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
     projectRef,
