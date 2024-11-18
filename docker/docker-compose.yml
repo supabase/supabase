@@ -9,15 +9,15 @@ name: supabase
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20241014-c083b3b
+    image: supabase/studio:20241106-f29003e
     restart: unless-stopped
     healthcheck:
       test:
         [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})",
         ]
       timeout: 5s
       interval: 5s
@@ -60,11 +60,11 @@ services:
       analytics:
         condition: service_healthy
     environment:
-      KONG_DATABASE: "off"
+      KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
       KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,rate-limiting
       KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
       KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
       SUPABASE_ANON_KEY: ${ANON_KEY}
@@ -77,7 +77,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.158.1
+    image: supabase/gotrue:v2.164.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -85,15 +85,7 @@ services:
       analytics:
         condition: service_healthy
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:9999/health"
-        ]
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:9999/health']
       timeout: 5s
       interval: 5s
       retries: 3
@@ -154,10 +146,6 @@ services:
       # GOTRUE_HOOK_SEND_EMAIL_URI: "http://host.docker.internal:54321/functions/v1/email_sender"
       # GOTRUE_HOOK_SEND_EMAIL_SECRETS: "v1,whsec_VGhpcyBpcyBhbiBleGFtcGxlIG9mIGEgc2hvcnRlciBCYXNlNjQgc3RyaW5n"
 
-
-
-
-
   rest:
     container_name: supabase-rest
     image: postgrest/postgrest:v12.2.0
@@ -173,10 +161,10 @@ services:
       PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
       PGRST_DB_ANON_ROLE: anon
       PGRST_JWT_SECRET: ${JWT_SECRET}
-      PGRST_DB_USE_LEGACY_GUCS: "false"
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
       PGRST_APP_SETTINGS_JWT_SECRET: ${JWT_SECRET}
       PGRST_APP_SETTINGS_JWT_EXP: ${JWT_EXPIRY}
-    command: "postgrest"
+    command: 'postgrest'
 
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
@@ -191,15 +179,15 @@ services:
     healthcheck:
       test:
         [
-          "CMD",
-          "curl",
-          "-sSfL",
-          "--head",
-          "-o",
-          "/dev/null",
-          "-H",
-          "Authorization: Bearer ${ANON_KEY}",
-          "http://localhost:4000/api/tenants/realtime-dev/health"
+          'CMD',
+          'curl',
+          '-sSfL',
+          '--head',
+          '-o',
+          '/dev/null',
+          '-H',
+          'Authorization: Bearer ${ANON_KEY}',
+          'http://localhost:4000/api/tenants/realtime-dev/health',
         ]
       timeout: 5s
       interval: 5s
@@ -218,7 +206,7 @@ services:
       SECRET_KEY_BASE: UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
       ERL_AFLAGS: -proto_dist inet_tcp
       DNS_NODES: "''"
-      RLIMIT_NOFILE: "10000"
+      RLIMIT_NOFILE: '10000'
       APP_NAME: realtime
       SEED_SELF_HOST: true
 
@@ -235,15 +223,7 @@ services:
       imgproxy:
         condition: service_started
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:5000/status"
-        ]
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://localhost:5000/status']
       timeout: 5s
       interval: 5s
       retries: 3
@@ -261,7 +241,7 @@ services:
       # TODO: https://github.com/supabase/storage-api/issues/55
       REGION: stub
       GLOBAL_S3_BUCKET: stub
-      ENABLE_IMAGE_TRANSFORMATION: "true"
+      ENABLE_IMAGE_TRANSFORMATION: 'true'
       IMGPROXY_URL: http://imgproxy:5001
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -270,14 +250,14 @@ services:
     container_name: supabase-imgproxy
     image: darthsim/imgproxy:v3.8.0
     healthcheck:
-      test: [ "CMD", "imgproxy", "health" ]
+      test: ['CMD', 'imgproxy', 'health']
       timeout: 5s
       interval: 5s
       retries: 3
     environment:
-      IMGPROXY_BIND: ":5001"
+      IMGPROXY_BIND: ':5001'
       IMGPROXY_LOCAL_FILESYSTEM_ROOT: /
-      IMGPROXY_USE_ETAG: "true"
+      IMGPROXY_USE_ETAG: 'true'
       IMGPROXY_ENABLE_WEBP_DETECTION: ${IMGPROXY_ENABLE_WEBP_DETECTION}
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -302,7 +282,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.59.0
+    image: supabase/edge-runtime:v1.62.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -314,7 +294,7 @@ services:
       SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY}
       SUPABASE_DB_URL: postgresql://postgres:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       # TODO: Allow configuring VERIFY_JWT per function. This PR might help: https://github.com/supabase/cli/pull/786
-      VERIFY_JWT: "${FUNCTIONS_VERIFY_JWT}"
+      VERIFY_JWT: '${FUNCTIONS_VERIFY_JWT}'
     volumes:
       - ./volumes/functions:/home/deno/functions:Z
     command:
@@ -324,9 +304,9 @@ services:
 
   analytics:
     container_name: supabase-analytics
-    image: supabase/logflare:1.4.0
+    image: supabase/logflare:1.8.9
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:4000/health" ]
+      test: ['CMD', 'curl', 'http://localhost:4000/health']
       timeout: 5s
       interval: 5s
       retries: 10
@@ -367,7 +347,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.1.78
+    image: supabase/postgres:15.6.1.135
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -411,21 +391,14 @@ services:
       - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
 
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
     healthcheck:
-      test:
-        [
-
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://vector:9001/health"
-        ]
+      test: ['CMD', 'wget', '--no-verbose', '--tries=1', '--spider', 'http://vector:9001/health']
       timeout: 5s
       interval: 5s
       retries: 3
@@ -434,7 +407,7 @@ services:
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-    command: [ "--config", "etc/vector/vector.yml" ]
+    command: ['--config', 'etc/vector/vector.yml']
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
