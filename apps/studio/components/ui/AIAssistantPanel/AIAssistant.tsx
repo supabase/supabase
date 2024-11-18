@@ -151,7 +151,13 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const renderedMessages = useMemo(
     () =>
       messages.map((message) => {
-        return <MemoizedMessage key={message.id} message={message} isLoading={isChatLoading} />
+        return (
+          <MemoizedMessage
+            key={message.id}
+            message={message}
+            isLoading={isChatLoading && message === messages[messages.length - 1]}
+          />
+        )
       }),
     [messages, isChatLoading]
   )
