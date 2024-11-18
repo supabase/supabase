@@ -1,4 +1,4 @@
-import { Code, DatabaseIcon, Edit, FileWarning, Play } from 'lucide-react'
+import { Code, DatabaseIcon, Edit, Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
@@ -9,6 +9,7 @@ import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -24,8 +25,9 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { isReadOnlySelect } from './AIAssistant.utils'
-import { useAppStateSnapshot } from 'state/app-state'
+import { getContextualInvalidationKeys, isReadOnlySelect } from './AIAssistant.utils'
+import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface SqlSnippetWrapperProps {
   id: string
@@ -79,6 +81,8 @@ export const SqlCard = ({
   isLoading,
 }: ParsedSqlProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { setAiAssistantPanel } = useAppStateSnapshot()
@@ -94,7 +98,13 @@ export const SqlCard = ({
   const [showWarning, setShowWarning] = useState(false)
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (res) => {
+    onSuccess: async (res) => {
+      // [Joshen] Only do contextual invalidation within a project context
+      if (!!ref) {
+        const invalidationKeys = getContextualInvalidationKeys({ ref, pathname: router.pathname })
+        await Promise.all(invalidationKeys?.map((x) => queryClient.invalidateQueries(x)))
+      }
+
       setShowResults(true)
       setResults(res.result)
       setShowWarning(false)
@@ -148,13 +158,10 @@ export const SqlCard = ({
 
   return (
     <div className="overflow-hidden">
-      <div className="flex items-center px-5 py-2 gap-2">
+      <div className={cn('flex items-center gap-2 border-t', showWarning ? '' : 'px-5 py-2')}>
         {showWarning ? (
-          <div className="py-2">
-            <FileWarning strokeWidth={1.5} size={20} className="text-warning-600 mb-3" />
-            <h3 className="text-sm font-medium flex-1">
-              This query contains write operations. Are you sure you want to execute it?
-            </h3>
+          <Admonition type="warning" className="mb-0 rounded-none border-0">
+            <p>This query contains write operations. Are you sure you want to execute it?</p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
@@ -185,7 +192,7 @@ export const SqlCard = ({
                 Run
               </Button>
             </div>
-          </div>
+          </Admonition>
         ) : (
           <>
             <DatabaseIcon size={16} strokeWidth={1.5} />
@@ -311,6 +318,8 @@ export const SqlCard = ({
                           </pre>
                         ))}
                         <Button
+                          type="default"
+                          className="mt-2"
                           onClick={() => {
                             setAiAssistantPanel({
                               sqlSnippets: [sql],

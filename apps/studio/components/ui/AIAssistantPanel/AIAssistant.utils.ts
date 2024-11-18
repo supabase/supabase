@@ -1,5 +1,12 @@
+import { authKeys } from 'data/auth/keys'
+import { databasePoliciesKeys } from 'data/database-policies/keys'
+import { databaseTriggerKeys } from 'data/database-triggers/keys'
+import { databaseKeys } from 'data/database/keys'
+import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
+import { tableKeys } from 'data/tables/keys'
 import { CommonDatabaseEntity } from 'state/app-state'
 import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
+import { databaseExtensionsKeys } from 'data/database-extensions/keys'
 
 const PLACEHOLDER_PREFIX = `-- Press tab to use this code
 \n&nbsp;\n`
@@ -224,4 +231,37 @@ export const isReadOnlySelect = (query: string): boolean => {
 
     return normalizedQuery.includes(pattern)
   })
+}
+
+const getContextKey = (pathname: string) => {
+  const [_, __, ___, ...rest] = pathname.split('/')
+  const key = rest.join('/')
+  return key
+}
+
+export const getContextualInvalidationKeys = ({
+  ref,
+  pathname,
+  schema = 'public',
+}: {
+  ref: string
+  pathname: string
+  schema?: string
+}) => {
+  const key = getContextKey(pathname)
+
+  return (
+    (
+      {
+        'auth/users': [authKeys.usersInfinite(ref)],
+        'auth/policies': [databasePoliciesKeys.list(ref)],
+        'database/functions': [databaseKeys.databaseFunctions(ref)],
+        'database/tables': [tableKeys.list(ref, schema, true), tableKeys.list(ref, schema, false)],
+        'database/triggers': [databaseTriggerKeys.list(ref)],
+        'database/types': [enumeratedTypesKeys.list(ref)],
+        'database/extensions': [databaseExtensionsKeys.list(ref)],
+        'database/indexes': [databaseKeys.indexes(ref, schema)],
+      } as const
+    )[key] ?? []
+  )
 }
