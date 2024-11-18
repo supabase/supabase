@@ -176,7 +176,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <Separator />
         )}
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
+        <div className={cn('flex flex-col gap-1.5', PANEL_PADDING)}>
           <RowData property="User UID" value={user.id} />
           <RowData
             property="Created at"
@@ -461,35 +461,38 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
 export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
-    <div className="flex items-center gap-x-2 group">
-      <p className="w-36 text-foreground-light text-sm">{property}</p>
-      {typeof value === 'boolean' ? (
-        <div className="h-[26px] flex items-center justify-center">
-          {value ? (
-            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <Check size={10} className="text-contrast" strokeWidth={4} />
-            </div>
-          ) : (
-            <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
-              <X size={10} className="text-contrast" strokeWidth={4} />
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center gap-x-2 h-[26px]">
-          <p className="text-sm">{!value ? '-' : value}</p>
-          {!!value && (
-            <CopyButton
-              iconOnly
-              type="text"
-              icon={<Copy />}
-              className="transition opacity-0 group-hover:opacity-100 px-1"
-              text={value}
-            />
-          )}
-        </div>
-      )}
-    </div>
+    <>
+      <div className="flex items-center gap-x-2 group justify-between">
+        <p className=" text-foreground-lighter text-sm">{property}</p>
+        {typeof value === 'boolean' ? (
+          <div className="h-[26px] flex items-center justify-center min-w-[70px]">
+            {value ? (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <Check size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            ) : (
+              <div className="rounded-full w-4 h-4 dark:bg-white bg-black flex items-center justify-center">
+                <X size={10} className="text-contrast" strokeWidth={4} />
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-x-2 h-[26px] font-mono min-w-[40px]">
+            <p className="text-sm">{!value ? '-' : value}</p>
+            {!!value && (
+              <CopyButton
+                iconOnly
+                type="text"
+                icon={<Copy />}
+                className="transition opacity-0 group-hover:opacity-100 px-1"
+                text={value}
+              />
+            )}
+          </div>
+        )}
+      </div>
+      <Separator />
+    </>
   )
 }
 
