@@ -11,6 +11,7 @@ import { Edit, MoreVertical, Trash } from 'lucide-react'
 import {
   Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,6 +21,8 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -32,6 +35,8 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
+  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -45,8 +50,9 @@ const PolicyRow = ({
 
   return (
     <Panel.Content
-      className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
-        ' '
+      className={cn(
+        'flex border-overlay',
+        'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
       )}
     >
       <div className="flex grow flex-col space-y-1">
@@ -86,11 +92,31 @@ const PolicyRow = ({
           <DropdownMenuTrigger asChild>
             <Button type="default" className="px-1.5" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-40">
+          <DropdownMenuContent
+            side="bottom"
+            align="end"
+            className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+          >
             <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
               <Edit size={14} />
               <p>Edit policy</p>
             </DropdownMenuItem>
+            {enableAssistantV2 && (
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  setAiAssistantPanel({
+                    open: true,
+                    editor: 'rls-policies',
+                    entity: policy,
+                    tables: [{ schema: policy.schema, name: policy.table }],
+                  })
+                }}
+              >
+                <Edit size={14} />
+                <p>Edit policy with Assistant</p>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItemTooltip
               className="gap-x-2"

@@ -70,7 +70,9 @@
         "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
         "VERCEL_URL",
         "HUBSPOT_PORTAL_ID",
-        "HUBSPOT_ENTERPRISE_FORM_GUID"
+        "HUBSPOT_ENTERPRISE_FORM_GUID",
+        "EMAIL_REPORT_SLACK_WEBHOOK",
+        "EMAIL_ABUSE_SERVICE_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },

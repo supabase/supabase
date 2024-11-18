@@ -16,8 +16,9 @@ import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
+import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
+import { databaseKeys } from 'data/database/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { sqlKeys } from 'data/sql/keys'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -48,7 +49,6 @@ import CodeEditor from '../CodeEditor/CodeEditor'
 import { AIAssistant } from './AIAssistant'
 import { generateCTA, generatePlaceholder, generateTitle, validateQuery } from './AIAssistant.utils'
 import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
-import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
 
 export const AiAssistantPanel = () => {
   const os = detectOS()
@@ -61,6 +61,7 @@ export const AiAssistantPanel = () => {
 
   const { open, editor, content, entity } = aiAssistantPanel
   const previousEditor = usePrevious(editor)
+  const previousEntity = usePrevious(entity)
 
   const [isAcknowledged, setIsAcknowledged] = useLocalStorage(
     LOCAL_STORAGE_KEYS.SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED,
@@ -108,18 +109,20 @@ export const AiAssistantPanel = () => {
     onSuccess: async (res) => {
       // [Joshen] If in a specific editor context mode, assume that intent was to create/update
       // a database entity - so close it once success. Otherwise it's in Quick SQL mode and we
-      // show the results. Currently though it assumes we're "creating", thinking need to support "updating" too
+      // show the results.
       if (editor !== null) {
         switch (editor) {
           case 'functions':
-            await queryClient.invalidateQueries(sqlKeys.query(ref, ['functions-list']))
+            await queryClient.invalidateQueries(databaseKeys.databaseFunctions(ref))
             break
           case 'rls-policies':
             await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
             break
         }
 
-        toast.success(`Successfully created ${entityContext?.name}!`)
+        toast.success(
+          `Successfully ${entity === undefined ? 'created' : 'updated'} ${entityContext?.name}!`
+        )
         setAiAssistantPanel({ open: false })
       } else {
         setShowResults(true)
@@ -257,8 +260,8 @@ export const AiAssistantPanel = () => {
 
   useEffect(() => {
     if (open) {
-      // [Joshen] Only reset the assistant if the editor changed
-      if (previousEditor !== editor) {
+      // [Joshen] Only reset the assistant if the editor changed or if the provided entity has changed
+      if (previousEditor !== editor || previousEntity !== entity) {
         setChatId(uuidv4())
         setError(undefined)
         setShowWarning(false)
