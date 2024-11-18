@@ -76,7 +76,8 @@ ${existingDefinition
 `
       }
     case 'rls-policies':
-      return `${PLACEHOLDER_PREFIX}
+      if (entity === undefined) {
+        return `${PLACEHOLDER_PREFIX}
 CREATE POLICY *name* ON *table_name*\n
 AS PERMISSIVE -- PERMISSIVE | RESTRICTIVE\n
 FOR ALL -- ALL | SELECT | INSERT | UPDATE | DELETE\n
@@ -84,6 +85,33 @@ TO *role_name* -- Default: public\n
 USING ( *using_expression* )\n
 WITH CHECK ( *check_expression* );
 `
+      } else {
+        let expression = ''
+        if (entity.definition !== null && entity.definition !== undefined) {
+          expression += `USING ( *${entity.definition}* )${
+            entity.check === null || entity.check === undefined ? ';' : ''
+          }\n`
+        }
+        if (entity.check !== null && entity.check !== undefined) {
+          expression += `WITH CHECK ( *${entity.check}* );\n`
+        }
+        return `${PLACEHOLDER_PREFIX}
+BEGIN;\n
+&nbsp;\n
+-- To update your policy definition\n
+ALTER POLICY "${entity.name}"\n
+ON "${entity.schema}"."${entity.table}"\n
+TO *${(entity.roles ?? []).join(', ')}*\n
+${expression}
+&nbsp;\n
+-- To rename the policy\n
+ALTER POLICY "${entity.name}"\n
+ON "${entity.schema}"."${entity.table}"\n
+RENAME TO "*New Policy Name*";\n
+&nbsp;\n
+COMMIT;
+`
+      }
     default:
       return undefined
   }
@@ -111,7 +139,7 @@ export const validateQuery = (editor: SupportedAssistantEntities | null, query: 
         formattedQuery.includes('create or replace function')
       )
     case 'rls-policies':
-      return formattedQuery.includes('create policy')
+      return formattedQuery.includes('create policy') || formattedQuery.includes('alter policy')
     default:
       return true
   }
@@ -126,7 +154,7 @@ export const generatePrompt = ({
   type: SupportedAssistantQuickPromptTypes
   context: SupportedAssistantEntities
   schemas: string[]
-  tables: { schema: string; name: string }[]
+  tables: readonly { schema: string; name: string }[]
 }) => {
   if (type === 'examples') {
     return `What are some common examples of user-defined database ${context}? ${PLACEHOLDER_LIMIT}`

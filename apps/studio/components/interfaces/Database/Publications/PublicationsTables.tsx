@@ -119,7 +119,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
               </div> */}
                 </Table.th>,
               ]}
-              body={tables.map((table: any, i: number) => (
+              body={tables.map((table) => (
                 <PublicationsTableItem
                   key={table.id}
                   table={table}

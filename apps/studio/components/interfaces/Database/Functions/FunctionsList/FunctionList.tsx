@@ -11,6 +11,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -110,7 +111,10 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="left">
+                      <DropdownMenuContent
+                        side="left"
+                        className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
+                      >
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"

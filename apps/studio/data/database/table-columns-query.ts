@@ -1,5 +1,6 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 export type TableColumn = {
   schemaname: string
@@ -9,7 +10,7 @@ export type TableColumn = {
   columns: any[]
 }
 
-export const getTableColumnsQuery = (table?: string, schema?: string) => {
+export const getTableColumnsSql = ({ table, schema }: { table?: string; schema?: string }) => {
   const conditions = []
   if (table) {
     conditions.push(`tablename = '${table}'`)
@@ -91,20 +92,32 @@ export type TableColumnsVariables = {
   schema?: string
 }
 
-export type TableColumnsData = { result: TableColumn[] }
+export async function getTableColumns(
+  { projectRef, connectionString, table, schema }: TableColumnsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getTableColumnsSql({ table, schema })
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['table-columns', schema, table] },
+    signal
+  )
+
+  return result as TableColumn[]
+}
+
+export type TableColumnsData = Awaited<ReturnType<typeof getTableColumns>>
 export type TableColumnsError = ExecuteSqlError
 
-export const useTableColumnsQuery = <TData extends TableColumnsData = TableColumnsData>(
-  { projectRef, connectionString, table, schema }: TableColumnsVariables,
-  options: UseQueryOptions<ExecuteSqlData, TableColumnsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+export const useTableColumnsQuery = <TData = TableColumnsData>(
+  { projectRef, connectionString, schema, table }: TableColumnsVariables,
+  { enabled = true, ...options }: UseQueryOptions<TableColumnsData, TableColumnsError, TData> = {}
+) =>
+  useQuery<TableColumnsData, TableColumnsError, TData>(
+    databaseKeys.tableColumns(projectRef, schema, table),
+    ({ signal }) => getTableColumns({ projectRef, connectionString, schema, table }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: getTableColumnsQuery(table, schema),
-      queryKey: ['table-columns', schema, table],
-    },
-    options
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
   )
-}

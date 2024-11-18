@@ -14,9 +14,14 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { Entity, TableLike } from 'data/table-editor/table-editor-query'
+import {
+  Entity,
+  isTableLike,
+  isForeignTable as isTableLikeForeignTable,
+  isMaterializedView as isTableLikeMaterializedView,
+  isView as isTableLikeView,
+} from 'data/table-editor/table-editor-types'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -36,12 +41,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
-  table: TableLike
-  entityType: Entity
+  table: Entity
   canEditViaTableEditor: boolean
 }
 
-const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
+const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
 
@@ -50,13 +54,10 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
     projectRef: project?.ref,
   })
 
-  const isTable = entityType?.type === ENTITY_TYPE.TABLE
-  const isMaterializedView = entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
-  const isView = entityType?.type === ENTITY_TYPE.VIEW
-
-  // check if current entity is a view and has an associated security definer lint
-
-  const isForeignTable = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
+  const isTable = isTableLike(table)
+  const isForeignTable = isTableLikeForeignTable(table)
+  const isView = isTableLikeView(table)
+  const isMaterializedView = isTableLikeMaterializedView(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
   const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
@@ -157,7 +158,7 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
-      rls_enabled: !(table as PostgresTable).rls_enabled,
+      rls_enabled: !(isTable && table.rls_enabled),
     }
 
     updateTable({
@@ -186,7 +187,7 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
             </Tooltip_Shadcn_>
           )}
           {isTable ? (
-            (table as PostgresTable).rls_enabled ? (
+            table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isLocked ? (
                   <ButtonTooltip
@@ -350,7 +351,7 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
           )}
-          {isForeignTable && entityType.schema === 'public' && (
+          {isForeignTable && table.schema === 'public' && (
             <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
               <PopoverTrigger_Shadcn_ asChild>
                 <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
@@ -424,9 +425,9 @@ const GridHeaderActions = ({ table, entityType }: GridHeaderActionsProps) => {
           )}
         </div>
       </ConfirmationModal>
-      {entityType?.type === ENTITY_TYPE.TABLE && (
+      {isTable && (
         <ConfirmModal
-          danger={(table as PostgresTable).rls_enabled}
+          danger={table.rls_enabled}
           visible={rlsConfirmModalOpen}
           title="Confirm to enable Row Level Security"
           description="Are you sure you want to enable Row Level Security for this table?"

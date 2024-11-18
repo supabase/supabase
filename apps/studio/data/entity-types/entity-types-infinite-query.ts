@@ -1,6 +1,5 @@
 import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { Entity } from 'data/table-editor/table-editor-query'
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
@@ -13,6 +12,15 @@ export type EntityTypesVariables = {
   sort?: 'alphabetical' | 'grouped-alphabetical'
   filterTypes?: string[]
 } & Pick<ExecuteSqlVariables, 'connectionString'>
+
+export interface Entity {
+  id: number
+  schema: string
+  name: string
+  type: ENTITY_TYPE
+  comment: string | null
+  rls_enabled: boolean
+}
 
 export type EntityTypesResponse = {
   data: {
@@ -97,7 +105,7 @@ export async function getEntityTypes(
       projectRef,
       connectionString,
       sql,
-      queryKey: ['public', 'entity-types'],
+      queryKey: ['entity-types', ...schemas, page],
     },
     signal
   )
@@ -141,7 +149,6 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       ),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: 0,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit

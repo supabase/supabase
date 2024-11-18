@@ -35,11 +35,13 @@ const TerminalInstructions = forwardRef<
 
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
+
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionsEndpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1`
-      : `https://${endpoint}/functions/v1`
+      : `${protocol}://${endpoint}/functions/v1`
 
   // get the .co or .net TLD from the restUrl
   const restUrl = `https://${endpoint}`

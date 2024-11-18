@@ -1,0 +1,55 @@
+---
+id: 'function-background-tasks'
+title: 'Background Tasks'
+description: 'How to run background tasks in an Edge Function outside of the request handler'
+subtitle: 'How to run background tasks in an Edge Function outside of the request handler'
+tocVideo: 'rSKBTJxG9VA'
+---
+
+Edge Function instances can process background tasks outside of the request handler. Background tasks are useful for asynchronous operations like uploading a file to Storage, updating a database, or sending events to a logging service. You can respond to the request immediately and leave the task running in the background.
+
+### How long a background task can run
+
+A background task can run until the Edge Function instance hits its wall-clock limit or reaches CPU/Memory limit. Check [limits](/docs/guides/functions/limits) for current caps.
+
+### Example
+
+Here's an example of defining a background task using a custom event.
+
+```ts
+// Define a custom event type for the background task.
+class MyBackgroundTaskEvent extends Event {
+  readonly taskPromise: Promise<Response>
+
+  constructor(taskPromise: Promise<Response>) {
+    super('myBackgroundTask')
+    this.taskPromise = taskPromise
+  }
+}
+
+globalThis.addEventListener('myBackgroundTask', async (event) => {
+  const res = await (event as MyBackgroundTaskEvent).taskPromise
+  console.log(await res.json())
+})
+
+Deno.serve(async (req) => {
+  const fetchPromise = fetch('https://httpbin.org/json')
+  const event = new MyBackgroundTaskEvent(fetchPromise)
+  globalThis.dispatchEvent(event)
+
+  return new Response('ok')
+})
+```
+
+### Testing background tasks locally
+
+When testing Edge Functions locally with Supabase CLI, the instances are terminated automatically after a request is completed. This will prevent background tasks from running to completion.
+
+To prevent that, you can update the `supabase/config.toml` with the following settings:
+
+```toml
+[edge_runtime]
+policy = "per_worker"
+```
+
+When running with `per_worker` policy, Function won't auto-reload on edits. You will need to manually restart it by running `supabase functions serve`.

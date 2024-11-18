@@ -12,6 +12,7 @@ import {
   useIsAssistantV2Enabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -265,6 +266,7 @@ const NavigationBar = () => {
               label: 'Home',
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
+              linkElement: <ProjectIndexPageLink projectRef={projectRef} />,
             }}
             onClick={onCloseNavigationIconLink}
           />

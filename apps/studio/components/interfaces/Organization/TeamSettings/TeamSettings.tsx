@@ -11,9 +11,9 @@ import {
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -37,10 +37,10 @@ const TeamSettings = () => {
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     selectedOrganization?.slug,

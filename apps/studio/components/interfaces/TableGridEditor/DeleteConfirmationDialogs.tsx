@@ -1,3 +1,4 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -6,12 +7,12 @@ import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { SupaRow } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseColumnDeleteMutation } from 'data/database-columns/database-column-delete-mutation'
-import { TableLike } from 'data/table-editor/table-editor-query'
+import { Entity } from 'data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from 'data/table-rows/table-row-delete-all-mutation'
 import { useTableRowDeleteMutation } from 'data/table-rows/table-row-delete-mutation'
 import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-mutation'
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
-import { useGetTables } from 'data/tables/tables-query'
+import { TablesData, useGetTables } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { noop } from 'lib/void'
@@ -21,8 +22,8 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Ch
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type DeleteConfirmationDialogsProps = {
-  selectedTable?: TableLike
-  onAfterDeleteTable?: (tables: TableLike[]) => void
+  selectedTable?: Entity | PostgresTable
+  onAfterDeleteTable?: (tables: TablesData) => void
 }
 
 const DeleteConfirmationDialogs = ({
