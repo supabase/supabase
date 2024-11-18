@@ -123,8 +123,7 @@ export const UsersV2 = () => {
     providers: selectedProviders,
   })
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const totalUsers = useMemo(() => countData?.result[0].count ?? 0, [countData?.result[0].count])
+  const totalUsers = countData ?? 0
   const users = useMemo(() => data?.pages.flatMap((page) => page.result) ?? [], [data?.pages])
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {

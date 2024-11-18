@@ -3,7 +3,6 @@ import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
 
@@ -48,9 +47,7 @@ export const useVaultSecretUpdateMutation = ({
         const { id, projectRef } = variables
         await Promise.all([
           queryClient.removeQueries(vaultSecretsKeys.getDecryptedValue(projectRef, id)),
-          queryClient.invalidateQueries(
-            sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
-          ),
+          queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef)),
         ])
         await onSuccess?.(data, variables, context)
       },
