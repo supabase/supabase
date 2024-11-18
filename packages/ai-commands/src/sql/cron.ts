@@ -26,14 +26,49 @@ export async function generateCron(openai: OpenAI, prompt: string) {
         0 0 3 * * 1
         \`\`\`
 
-        Common patterns to remember:
-        - * means "every" for that field
-        - */n means "every n intervals"
-        - n means "exactly at n"
-        - n,m means "at n and m"
-        - n-m means "every value from n to m"
+        This cron expression runs every second:
+        \`\`\`
+        * * * * * *
+        \`\`\`
 
-        Field order: seconds (0-59), minute (0-59), hour (0-23), day (1-31), month (1-12), weekday (0-6, Sunday=0)
+        This cron expression runs every minute:
+        \`\`\`
+        */1 * * * *
+        \`\`\`
+
+        Be careful to not to confuse every second with every minute. Remember that the first place is for seconds not minutes.
+
+        This is every minute:
+        \`\`\`
+        */1 * * * *
+        \`\`\`
+
+        This is every second:
+        \`\`\`
+        * * * * * *
+        \`\`\`
+
+        Additional examples:
+        - Every 5 seconds: \`*/5 * * * * *\`
+        - Every 10 minutes: \`0 */10 * * *\`
+
+        Field order is crucial:
+        - seconds (0-59)
+        - minute (0-59)
+        - hour (0-23)
+        - day (1-31)
+        - month (1-12)
+        - weekday (0-6, Sunday=0)
+
+        Visualizing the difference:
+        | Field     | Every Second | Every Minute |
+        |-----------|--------------|--------------|
+        | Seconds   | *            | 0            |
+        | Minutes   | *            | */1          |
+        | Hours     | *            | *            |
+        | Days      | *            | *            |
+        | Months    | *            | *            |
+        | Weekdays  | *            | *            |
 
         Here is the user's prompt:
         ${prompt}

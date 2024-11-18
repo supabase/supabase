@@ -135,7 +135,7 @@ export const CreateCronJobSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '* * * * * *',
+      schedule: selectedCronJob?.schedule || '*/5 * * * *',
       values: cronJobValues,
     },
   })

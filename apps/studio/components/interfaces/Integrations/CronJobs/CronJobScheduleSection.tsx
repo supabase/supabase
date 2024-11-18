@@ -32,7 +32,7 @@ interface CronJobScheduleSectionProps {
 }
 
 const presets = [
-  { name: 'Every minute', expression: '* * * * * *' },
+  { name: 'Every minute', expression: '*/1 * * * *' },
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
   { name: 'Every Monday at midnight', expression: '0 0 * * 1' },
@@ -113,13 +113,18 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                       value={inputValue}
                       placeholder="E.g. every 5 minutes"
                       className={cn(!useNaturalLanguage && 'hidden')}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                        }
+                      }}
                       onChange={(e) => setInputValue(e.target.value)}
                     />
                   ) : (
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"
-                      placeholder="* * * * *"
+                      placeholder="* * * * * *"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
