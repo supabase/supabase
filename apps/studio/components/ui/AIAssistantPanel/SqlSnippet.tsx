@@ -28,15 +28,21 @@ import { ButtonTooltip } from '../ButtonTooltip'
 import { getContextualInvalidationKeys, isReadOnlySelect } from './AIAssistant.utils'
 import { useParams } from 'common'
 import { useQueryClient } from '@tanstack/react-query'
+import { Markdown } from 'components/interfaces/Markdown'
 
 interface SqlSnippetWrapperProps {
   id: string
   sql: string
-  isLoading: boolean
+  isLoading?: boolean
   readOnly?: boolean
 }
 
-const SqlSnippetWrapper = ({ id, sql, isLoading, readOnly = false }: SqlSnippetWrapperProps) => {
+const SqlSnippetWrapper = ({
+  id,
+  sql,
+  isLoading = false,
+  readOnly = false,
+}: SqlSnippetWrapperProps) => {
   const formatted = (sql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
   const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
@@ -63,7 +69,7 @@ interface ParsedSqlProps {
   id: string
   sql: string
   title: string
-  isLoading: boolean
+  isLoading?: boolean
   readOnly?: boolean
   isChart: boolean
   xAxis: string
@@ -78,7 +84,7 @@ export const SqlCard = ({
   yAxis,
   title,
   readOnly = false,
-  isLoading,
+  isLoading = false,
 }: ParsedSqlProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -256,7 +262,20 @@ export const SqlCard = ({
                   icon={<Play size={14} />}
                   loading={isExecuting}
                   onClick={handleExecute}
-                  tooltip={{ content: { side: 'bottom', text: 'Run query' } }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      className: 'max-w-56 text-center',
+                      text: isExecuting ? (
+                        <Markdown
+                          className="[&>p]:text-xs text-foreground"
+                          content={`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}
+                        />
+                      ) : (
+                        'Run query'
+                      ),
+                    },
+                  }}
                 />
               </div>
             )}
