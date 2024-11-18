@@ -1,7 +1,6 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ComponentProps, PropsWithChildren, useCallback } from 'react'
+import { PropsWithChildren, useCallback } from 'react'
 
 import { loadTableEditorSortsAndFiltersFromLocalStorage } from 'components/grid/SupabaseGrid'
 import {
@@ -17,6 +16,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { ImpersonationRole } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE } from 'state/table-editor'
+import PrefetchableLink, { PrefetchableLinkProps } from './PrefetchableLink'
 
 interface PrefetchEditorTablePageArgs {
   queryClient: QueryClient
@@ -96,14 +96,12 @@ export function usePrefetchEditorTablePage() {
   )
 }
 
-type LinkProps = ComponentProps<typeof Link>
-
-interface EditorTablePageLinkProps extends Omit<LinkProps, 'href'> {
+interface EditorTablePageLinkProps extends Omit<PrefetchableLinkProps, 'href' | 'prefetcher'> {
   projectRef?: string
   id?: string
   sorts?: Sort[]
   filters?: Filter[]
-  href?: LinkProps['href']
+  href?: PrefetchableLinkProps['href']
 }
 
 export function EditorTablePageLink({
@@ -118,12 +116,12 @@ export function EditorTablePageLink({
   const prefetch = usePrefetchEditorTablePage()
 
   return (
-    <Link
+    <PrefetchableLink
       href={href || `/project/${projectRef}/editor/${id}`}
-      onMouseEnter={() => prefetch({ id, sorts, filters })}
+      prefetcher={() => prefetch({ id, sorts, filters })}
       {...props}
     >
       {children}
-    </Link>
+    </PrefetchableLink>
   )
 }
