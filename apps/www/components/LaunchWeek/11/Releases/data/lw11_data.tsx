@@ -80,7 +80,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       {
         icon: products.database.icon[16],
         title: 'Database',
-        description: 'Fully portable Postgres Database',
+        description: 'Fully managed Postgres Database',
         url: 'https://supabase.com/docs/guides/database/overview',
       },
       {
