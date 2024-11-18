@@ -25,6 +25,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import { isReadOnlySelect } from './AIAssistant.utils'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface SqlSnippetWrapperProps {
   id: string
@@ -80,6 +81,7 @@ export const SqlCard = ({
   const router = useRouter()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
   const { newQuery } = useNewQuery()
 
   const isInSQLEditor = router.pathname.includes('/sql')
@@ -302,13 +304,37 @@ export const SqlCard = ({
                 <>
                   <div>
                     {errorContent.length > 0 ? (
-                      errorContent.map((errorText: string, i: number) => (
-                        <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
-                          {errorText}
-                        </pre>
-                      ))
+                      <div>
+                        {errorContent.map((errorText: string, i: number) => (
+                          <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                            {errorText}
+                          </pre>
+                        ))}
+                        <Button
+                          onClick={() => {
+                            setAiAssistantPanel({
+                              sqlSnippets: [sql],
+                              initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorHeader}\n${errorContent.join('\n')}`,
+                            })
+                          }}
+                        >
+                          Debug
+                        </Button>
+                      </div>
                     ) : (
-                      <p className="font-mono text-xs">{error.error}</p>
+                      <>
+                        <p className="font-mono text-xs">{error.error}</p>
+                        <Button
+                          onClick={() => {
+                            setAiAssistantPanel({
+                              sqlSnippets: [sql],
+                              initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${error.error}`,
+                            })
+                          }}
+                        >
+                          Debug
+                        </Button>
+                      </>
                     )}
                   </div>
                 </>
