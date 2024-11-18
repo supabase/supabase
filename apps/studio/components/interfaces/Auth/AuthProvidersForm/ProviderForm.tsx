@@ -15,7 +15,6 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -264,9 +263,13 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   ))}
 
                   {provider?.misc?.alert && (
-                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                    </Alert>
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>{provider.misc.alert.title}</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                   )}
 
                   {provider.misc.requiresRedirect && (
