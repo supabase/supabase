@@ -277,7 +277,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
           className={cn('flex-grow overflow-auto flex flex-col')}
           onScroll={handleScroll}
         >
-          <div className="z-50 bg-background/80 backdrop-blur-md sticky top-0">
+          <div className="z-30 bg-background/80 backdrop-blur-md sticky top-0">
             <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
               <AiIconAnimation loading={false} allowHoverEffect />
 
