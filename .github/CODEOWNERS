@@ -10,4 +10,10 @@
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/lib/redirects.js
 
-/docker/ @supabase/cli
+/docker/ @supabase/dev-workflows
+
+/apps/studio/next.config.js                                         @supabase/security
+/apps/studio/components/interfaces/Billing/Payment                  @supabase/security
+/apps/studio/components/interfaces/Organization/BillingSettings/    @supabase/security
+/apps/studio/components/interfaces/Organization/Documents/          @supabase/security
+/apps/studio/pages/new/index.tsx                                    @supabase/security

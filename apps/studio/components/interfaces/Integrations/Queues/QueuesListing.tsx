@@ -69,10 +69,10 @@ export const QueuesListing = () => {
         {queues.length === 0 ? (
           <div
             className={
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
+              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
             }
           >
-            <p className="text-sm text-foreground-light">No queues created yet</p>
+            <p className="text-sm text-foreground">No queues created yet</p>
             <Button onClick={() => setCreateQueueSheetShown(true)}>Add a new queue</Button>
           </div>
         ) : (
@@ -98,8 +98,11 @@ export const QueuesListing = () => {
                   <Table.th key="arguments" className="table-cell">
                     Type
                   </Table.th>
-                  <Table.th key="created_at" className="table-cell">
+                  <Table.th key="created_at" className="table-cell w-60">
                     Created at
+                  </Table.th>
+                  <Table.th key="queue_size" className="table-cell">
+                    <div className="flex justify-center">Size</div>
                   </Table.th>
                   <Table.th key="buttons" className="table-cell"></Table.th>
                 </>
