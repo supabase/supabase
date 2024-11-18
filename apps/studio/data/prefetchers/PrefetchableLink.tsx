@@ -7,7 +7,7 @@ export interface PrefetchableLinkProps extends Omit<LinkProps, 'onMouseEnter' | 
   prefetcher: () => void
 }
 
-const DELAY = 100
+const DELAY = 75
 
 const PrefetchableLink = forwardRef<HTMLAnchorElement, PrefetchableLinkProps>(
   function PrefetchableLink({ prefetcher, children, ...props }, ref) {
