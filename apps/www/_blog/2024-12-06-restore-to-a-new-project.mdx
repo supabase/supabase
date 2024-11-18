@@ -1,0 +1,61 @@
+---
+title: 'Restore to a New Project'
+description: Effortlessly Clone Your Supabase Project
+author: crispy1975
+image: launch-week-13/
+thumb: launch-week-13/
+categories:
+  - developers
+  - postgres
+tags:
+  - cloning
+  - postgres
+date: '2024-12-06T00:00:01'
+toc_depth: 3
+launchweek: '13'
+---
+
+Today we’re adding [Restore to a New Project](https://supabase.com/docs/guides/platform/backups#restore-to-a-new-project) as a new tool to make life easier for Supabase users who need to migrate data easily to a new Supabase project. Restore to a New Project integrates seamlessly with daily physical backups and Point-in-Time Recovery (PITR) to provide flexible restoration options where historically there have been too many pain points. It is now possible to migrate data to a brand new Supabase project in a few clicks.
+
+<Admonition>
+
+Restore to a New Project requires physical backups to be enabled, and is not available to customers who are currently on the free tier.
+
+</Admonition>
+
+## How it Works
+
+When physical backups are enabled for a project Supabase triggers daily backups of project data. Using these snapshots a specific backup can be selected and restored to a brand-new project that is provisioned specifically for the task. This new project will match the following source project attributes.
+
+- Size of compute instance.
+- Disk settings; volume type, size, IOPS, and throughput.
+- SSL enforcement configuration.
+- Network restrictions.
+
+Once the desired backup is chosen, a project name entered, and secure password set the whole process is automated. The length of time for a project to fully provision will depend on the size of the source project dataset, for smaller projects the process is very quick and the new project will be available in as little as 10 minutes. For larger datasets that run into the hundreds of gigabytes, or terabytes, the process will take longer.
+
+The new project will be made available in the Supabase dashboard as soon as the process has completed. From this point the new project will behave exactly as any other Supabase project and is completely independent of the source.
+
+### Point-in-Time Recovery
+
+In addition to daily backups it is also possible to restore from a project with PITR enabled. This allows for very fine granularity when selecting the desired point to resotre from. The process is very similar to daily backup with the exception of being asked to select the time to restore from on the available days.
+
+## Unlimited Cloning from a Source Project
+
+To ensure maximum flexibility it is possible to restore data from a source project as many times as required, making it perfect for testing, development environments etc. However, please note that cloning from an already cloned project is not currently supported (this is in the works).
+
+<Admonition>
+
+New projects created with this process, as with any new Supabase project, will incur the usual compute and disk costs. These costs are displayed ahead of time to ensure there are no surprises.
+
+</Admonition>
+
+## Accessing Restore to a New Project
+
+The Restore to a New Project feature can be found on the Supabase dashboard under [database backups](https://supabase.com/project/_/database/backups/restore-to-new-project).
+
+<Admonition>
+
+Please be aware that Restore to a New Project is currently in public alpha and any issues should be reported to Supabase support.
+
+</Admonition>
