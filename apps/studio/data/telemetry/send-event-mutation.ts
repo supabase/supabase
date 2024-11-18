@@ -1,15 +1,13 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
-import { isBrowser } from 'common'
+import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendEventGA = components['schemas']['TelemetryEventBody']
-type SendEventPH = components['schemas']['TelemetryEventBodyV2']
+type SendEvent = components['schemas']['TelemetryEventBodyV2']
 
 export type SendEventVariables = {
   action: string
@@ -20,18 +18,15 @@ export type SendEventVariables = {
 
 type SendEventPayload = any
 
-export async function sendEvent({
-  consent,
-  type,
-  body,
-}: {
-  consent: boolean
-  type: 'GA' | 'PH'
-  body: SendEventPayload
-}) {
-  if (!consent) return undefined
+export async function sendEvent({ body }: { body: SendEventPayload }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
 
-  const headers = type === 'PH' ? { Version: '2' } : undefined
+  if (!consent || !IS_PLATFORM) return undefined
+
+  const headers = { Version: '2' }
   const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
   if (error) handleError(error)
   return data
@@ -48,22 +43,16 @@ export const useSendEventMutation = ({
   'mutationFn'
 > = {}) => {
   const router = useRouter()
-  const usePostHogParameters = useFlag('enablePosthogChanges')
-
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(
-          usePostHogParameters
-            ? LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT_PH
-            : LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT
-        )
-      : null) === 'true'
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-  const payload = usePostHogParameters
-    ? ({
+  return useMutation<SendEventData, ResponseError, SendEventVariables>(
+    (vars) => {
+      const { action, ...otherVars } = vars
+
+      const body: SendEvent = {
+        action,
         page_url: window.location.href,
         page_title: title,
         pathname: router.pathname,
@@ -75,30 +64,11 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: {},
-      } as SendEventPH)
-    : ({
-        page_referrer: referrer,
-        page_title: title,
-        page_location: router.asPath.split('#')[0],
-        ga: {
-          screen_resolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
-          language: router?.locale ?? 'en-US',
-        },
-      } as SendEventGA)
+        // @ts-expect-error - API is returning a wrong type
+        custom_properties: otherVars,
+      }
 
-  return useMutation<SendEventData, ResponseError, SendEventVariables>(
-    (vars) => {
-      const { action, ...otherVars } = vars
-      const type = usePostHogParameters ? 'PH' : 'GA'
-      const body = usePostHogParameters
-        ? ({
-            action,
-            ...(payload as Omit<SendEventPH, 'action'>),
-            custom_properties: otherVars,
-          } as unknown as SendEventPH)
-        : ({ ...vars, ...payload } as SendEventGA)
-      return sendEvent({ consent, type, body })
+      return sendEvent({ body })
     },
     {
       async onSuccess(data, variables, context) {

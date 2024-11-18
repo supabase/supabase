@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, noop, sortBy } from 'lodash'
+import { Edit, Edit2, FileText, MoreVertical, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -7,14 +8,17 @@ import Table from 'components/to-be-cleaned/Table'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Edit3, FileText, MoreVertical, Trash } from 'lucide-react'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
+import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionListProps {
   schema: string
@@ -33,6 +37,8 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
+  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -105,7 +111,10 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="left">
+                      <DropdownMenuContent
+                        side="left"
+                        className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+                      >
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
@@ -116,11 +125,23 @@ const FunctionList = ({
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem className="space-x-2" onClick={() => editFunction(x)}>
-                          <Edit3 size={14} />
+                          <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
+                        {enableAssistantV2 && (
+                          <DropdownMenuItem
+                            className="space-x-2"
+                            onClick={() => {
+                              setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
+                            }}
+                          >
+                            <Edit size={14} />
+                            <p>Edit function with Assistant</p>
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
-                          <Trash stroke="red" size={14} />
+                          <Trash size={14} className="text-destructive" />
                           <p>Delete function</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>

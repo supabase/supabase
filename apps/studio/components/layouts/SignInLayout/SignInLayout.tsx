@@ -11,6 +11,7 @@ import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import { tweets } from 'shared-data'
 import { Button } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
 
 type SignInLayoutProps = {
   heading: string
@@ -109,11 +110,7 @@ const SignInLayout = ({
             </div>
 
             <div className="items-center hidden space-x-3 md:ml-10 md:flex md:pr-4">
-              <Button asChild type="default" icon={<FileText />}>
-                <Link href="https://supabase.com/docs" target="_blank" rel="noreferrer">
-                  Documentation
-                </Link>
-              </Button>
+              <DocsButton abbrev={false} href="https://supabase.com/docs" />
             </div>
           </nav>
         </div>

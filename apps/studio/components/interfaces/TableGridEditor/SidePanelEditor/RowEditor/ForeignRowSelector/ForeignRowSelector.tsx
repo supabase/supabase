@@ -1,4 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { DndProvider } from 'react-dnd'
@@ -13,13 +12,12 @@ import RefreshButton from 'components/grid/components/header/RefreshButton'
 import FilterPopover from 'components/grid/components/header/filter/FilterPopover'
 import { SortPopover } from 'components/grid/components/header/sort'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTableRowsQuery } from 'data/table-rows/table-rows-query'
-import { useTableQuery } from 'data/tables/table-query'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { SidePanel } from 'ui'
 import ActionBar from '../../ActionBar'
 import { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { useEncryptedColumns } from '../../SidePanelEditor.utils'
 import Pagination from './Pagination'
 import SelectorGrid from './SelectorGrid'
 
@@ -41,25 +39,13 @@ const ForeignRowSelector = ({
   const { tableId: _tableId, schema: schemaName, table: tableName, columns } = foreignKey ?? {}
   const tableId = _tableId ? Number(_tableId) : undefined
 
-  const { data: table } = useTableQuery({
+  const { data: table } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: tableId,
   })
 
-  const encryptedColumns = useEncryptedColumns({ schemaName, tableName })
-
-  const supaTable =
-    table &&
-    parseSupaTable(
-      {
-        table: table as PostgresTable,
-        columns: (table as PostgresTable).columns ?? [],
-        primaryKeys: (table as PostgresTable).primary_keys,
-        relationships: (table as PostgresTable).relationships,
-      },
-      encryptedColumns
-    )
+  const supaTable = table && parseSupaTable(table)
 
   const [params, setParams] = useState<any>({ filter: [], sort: [] })
 
@@ -73,10 +59,9 @@ const ForeignRowSelector = ({
 
   const { data, isLoading, isSuccess, isError, isRefetching } = useTableRowsQuery(
     {
-      queryKey: [schemaName, tableName],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table: supaTable,
+      tableId: table?.id,
       sorts,
       filters,
       page,

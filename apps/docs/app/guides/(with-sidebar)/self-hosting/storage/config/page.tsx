@@ -21,7 +21,7 @@ const StorageConfigPage = async () => {
     <GuideTemplate
       meta={meta}
       editLink={newEditLink(
-        'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/storage/config.tsx'
+        'supabase/supabase/blob/master/apps/docs/app/guides/(with-sidebar)/self-hosting/storage/config/page.tsx'
       )}
     >
       <MDXRemoteBase source={descriptionMdx} />

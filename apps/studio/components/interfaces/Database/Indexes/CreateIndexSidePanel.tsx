@@ -1,4 +1,5 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -6,7 +7,7 @@ import { toast } from 'sonner'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useIndexesQuery } from 'data/database/indexes-query'
+import { databaseKeys } from 'data/database/keys'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
@@ -43,6 +44,7 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
@@ -50,20 +52,16 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
 
-  const { refetch: refetchIndexes } = useIndexesQuery({
-    schema: selectedSchema,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities, isLoading } = useEntityTypesQuery({
-    schema: selectedSchema,
+  const { data: entities, isLoading: isLoadingEntities } = useEntityTypesQuery({
+    schemas: [selectedSchema],
     sort: 'alphabetical',
-    search: undefined,
+    search: searchTerm,
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -80,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
-      await refetchIndexes()
+      await queryClient.invalidateQueries(databaseKeys.indexes(project?.ref, selectedSchema))
       onClose()
       toast.success(`Successfully created index`)
     },
@@ -94,7 +92,11 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     [entities?.pages]
   )
 
-  const columns = tableColumns?.result[0]?.columns ?? []
+  function handleSearchChange(value: string) {
+    setSearchTerm(value)
+  }
+
+  const columns = tableColumns?.[0]?.columns ?? []
   const columnOptions: MultiSelectOption[] = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
@@ -181,7 +183,11 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 sameWidthAsTrigger
               >
                 <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find schema..." />
+                  <CommandInput_Shadcn_
+                    placeholder="Find table..."
+                    value={searchTerm}
+                    onValueChange={handleSearchChange}
+                  />
                   <CommandList_Shadcn_>
                     <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
@@ -218,7 +224,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             name="select-table"
             description={
               isSelectEntityDisabled &&
-              !isLoading &&
+              !isLoadingEntities &&
               'Create a table in this schema via the Table or SQL editor first'
             }
             isReactForm={false}
@@ -228,28 +234,27 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               open={tableDropdownOpen}
               onOpenChange={setTableDropdownOpen}
             >
-              <PopoverTrigger_Shadcn_ asChild disabled={isSelectEntityDisabled || isLoading}>
-                {isLoading ? (
-                  <ShimmeringLoader className="h-[38px]" />
-                ) : (
-                  <Button
-                    type="default"
-                    size="medium"
-                    className={cn(
-                      'w-full [&>span]:w-full text-left',
-                      selectedEntity === '' && 'text-foreground-lighter'
-                    )}
-                    iconRight={
-                      <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-                    }
-                  >
-                    {selectedEntity !== undefined && selectedEntity !== ''
-                      ? selectedEntity
-                      : isSelectEntityDisabled
-                        ? 'No tables available in schema'
-                        : 'Choose a table'}
-                  </Button>
-                )}
+              <PopoverTrigger_Shadcn_
+                asChild
+                disabled={isSelectEntityDisabled || isLoadingEntities}
+              >
+                <Button
+                  type="default"
+                  size="medium"
+                  className={cn(
+                    'w-full [&>span]:w-full text-left',
+                    selectedEntity === '' && 'text-foreground-lighter'
+                  )}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedEntity !== undefined && selectedEntity !== ''
+                    ? selectedEntity
+                    : isSelectEntityDisabled
+                      ? 'No tables available in schema'
+                      : 'Choose a table'}
+                </Button>
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
                 className="p-0"
@@ -257,10 +262,25 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 align="start"
                 sameWidthAsTrigger
               >
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Find table..." />
+                {/* [Terry] shouldFilter context:
+                https://github.com/pacocoursey/cmdk/issues/267#issuecomment-2252717107 */}
+                <Command_Shadcn_ shouldFilter={false}>
+                  <CommandInput_Shadcn_
+                    placeholder="Find table..."
+                    value={searchTerm}
+                    onValueChange={handleSearchChange}
+                  />
                   <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                    <CommandEmpty_Shadcn_>
+                      {isLoadingEntities ? (
+                        <div className="flex items-center gap-2 text-center justify-center">
+                          <Loader2 size={12} className="animate-spin" />
+                          Loading...
+                        </div>
+                      ) : (
+                        'No tables found'
+                      )}
+                    </CommandEmpty_Shadcn_>
                     <CommandGroup_Shadcn_>
                       <ScrollArea className={(entityTypes || []).length > 7 ? 'h-[210px]' : ''}>
                         {(entityTypes ?? []).map((entity) => (
