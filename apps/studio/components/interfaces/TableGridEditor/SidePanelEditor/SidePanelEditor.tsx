@@ -12,7 +12,6 @@ import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { databaseKeys } from 'data/database/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
-import { sqlKeys } from 'data/sql/keys'
 import { tableEditorKeys } from 'data/table-editor/keys'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { tableRowKeys } from 'data/table-rows/keys'
@@ -258,7 +257,9 @@ const SidePanelEditor = ({
 
       await Promise.all([
         queryClient.invalidateQueries(tableEditorKeys.tableEditor(project?.ref, selectedTable?.id)),
-        queryClient.invalidateQueries(sqlKeys.query(project?.ref, ['foreign-key-constraints'])),
+        queryClient.invalidateQueries(
+          databaseKeys.foreignKeyConstraints(project?.ref, selectedTable?.schema)
+        ),
         queryClient.invalidateQueries(
           databaseKeys.tableDefinition(project?.ref, selectedTable?.id)
         ),
