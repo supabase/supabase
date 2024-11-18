@@ -25,6 +25,7 @@ const TicketingFlow = () => {
   const hasTicket = ticketState === 'ticket'
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
+  const ticketType = hasSecretTicket ? 'secret' : hasPlatinumTicket ? 'platinum' : 'regular'
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -175,6 +176,7 @@ const TicketingFlow = () => {
       {hasTicket && (
         <MetalTicket
           username={DISPLAY_NAME ?? ''}
+          ticketType={ticketType}
           className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
         />
       )}

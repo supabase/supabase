@@ -6,23 +6,45 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { useParams } from 'common'
 import { cn } from 'ui'
+import { useTheme } from 'next-themes'
 
 const ThreeCanvas: React.FC<{
   username: string
   className?: string
+  ticketType?: 'regular' | 'platinum' | 'secret'
   ticketPosition?: 'left' | 'right'
-}> = ({ username = 'Francesco Sansalvadore', className, ticketPosition = 'right' }) => {
-  const params = useParams()
+}> = ({
+  username = 'Francesco Sansalvadore',
+  className,
+  ticketType = 'regular',
+  ticketPosition = 'right',
+}) => {
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
   const canvasRef = useRef<HTMLDivElement>(null)
   const ticketRef = useRef<THREE.Mesh | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-  const textLines = params?.username?.split(' ').reverse() || username?.split(' ').reverse() || []
+  const textLines = username?.split(' ').reverse() || []
   const LINE_HEIGHT = 1.4
   const MIN_CANVAS_HEIGHT = 600
   const positionRight = ticketPosition === 'right'
+
+  const CONFIG = {
+    regular: {
+      ticketColor: isDarkTheme ? 0xf3f3f3 : 0x121212,
+      ticketForeground: isDarkTheme ? 0x171717 : 0xffffff,
+    },
+    platinum: {
+      ticketColor: isDarkTheme ? 0x9ea1a1 : 0xf3f3f3,
+      ticketForeground: 0x0f0f0f,
+    },
+    secret: {
+      ticketColor: 0x9ea1a1,
+      ticketForeground: 0x0f0f0f,
+    },
+  }
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -58,10 +80,14 @@ const ThreeCanvas: React.FC<{
     const loader = new GLTFLoader()
     const metalTexture = new THREE.TextureLoader().load('/images/launchweek/13/ticket/2000px.avif')
     const metalMaterial = new THREE.MeshStandardMaterial({
-      map: metalTexture,
-      color: 0x9ea1a1,
-      metalness: 0.9,
-      roughness: 0.25,
+      color: CONFIG[ticketType].ticketColor,
+      map: ticketType === 'platinum' ? metalTexture : undefined,
+      bumpMap: ticketType === 'platinum' ? metalTexture : undefined,
+      metalnessMap: metalTexture,
+      roughnessMap: metalTexture,
+      metalness: ticketType === 'platinum' ? 0.9 : isDarkTheme ? 0.2 : 0.9,
+      roughness: ticketType === 'platinum' ? 0.19 : isDarkTheme ? 0.2 : 0.5,
+      bumpScale: ticketType === 'platinum' ? 0.25 : undefined,
     })
 
     // Environment Map
@@ -70,7 +96,8 @@ const ThreeCanvas: React.FC<{
       texture.mapping = THREE.EquirectangularReflectionMapping
       scene.environment = texture
       metalMaterial.envMap = texture
-      metalMaterial.envMapIntensity = 7
+      metalMaterial.envMapIntensity = isDarkTheme ? 2 : 1
+      metalMaterial.blending = THREE.AdditiveBlending
     })
 
     let ticket3DImport: THREE.Mesh
@@ -87,6 +114,7 @@ const ThreeCanvas: React.FC<{
         if (child) {
           // @ts-ignore
           child.material = metalMaterial
+          child.castShadow = true
           child.receiveShadow = true
         }
       })
@@ -100,9 +128,9 @@ const ThreeCanvas: React.FC<{
       const fontLoader = new FontLoader()
       fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
         const textMaterial = new THREE.MeshStandardMaterial({
-          color: 0x0f0f0f,
-          metalness: 0.8,
-          roughness: 0.55,
+          color: CONFIG[ticketType].ticketForeground,
+          metalness: 0.2,
+          roughness: 0.35,
         })
 
         ticket3DImport.updateMatrix()
@@ -154,6 +182,29 @@ const ThreeCanvas: React.FC<{
     })
 
     camera.position.z = 30
+    // Lights
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, ticketType === 'platinum' ? 8 : 2)
+    scene.add(ambientLight)
+
+    const spotLight1 = new THREE.SpotLight(0xffffff, 20)
+    spotLight1.position.z = ticketGroup.position.z - 3
+    spotLight1.position.x = ticketGroup.position.x - 6
+    spotLight1.angle = Math.PI / 2
+    spotLight1.lookAt(ticketGroup.position)
+    spotLight1.castShadow = true
+    spotLight1.shadow.mapSize.set(1024, 1024)
+    spotLight1.shadow.camera.near = 5
+    spotLight1.shadow.camera.far = 15
+    scene.add(spotLight1)
+
+    const spotLight2 = new THREE.SpotLight(0xffffff, 20)
+    spotLight2.position.z = ticketGroup.position.z - 2
+    spotLight2.position.x = ticketGroup.position.x + 6
+    spotLight2.angle = Math.PI / 2
+    spotLight2.castShadow = true
+    spotLight2.lookAt(ticketGroup.position)
+    scene.add(spotLight2)
 
     const getTicketScreenPosition = () => {
       if (!ticketRef.current) return null
@@ -252,7 +303,7 @@ const ThreeCanvas: React.FC<{
       canvasRef.current?.removeChild(renderer.domElement)
       renderer.dispose()
     }
-  }, [params])
+  }, [username, isDarkTheme, ticketType])
 
   return (
     <div

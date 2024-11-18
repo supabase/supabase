@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import dayjs from 'dayjs'
 import { NextSeo } from 'next-seo'
-import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
@@ -18,7 +17,6 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
-import classNames from 'classnames'
 
 interface Props {
   user: UserData
@@ -27,7 +25,9 @@ interface Props {
 }
 
 export default function UsernamePage({ user, ogImageUrl }: Props) {
-  const { username, ticket_number: ticketNumber, name } = user
+  const { username, name, platinum, secret } = user
+
+  const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
   const DISPLAY_NAME = name || username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
@@ -37,27 +37,13 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
-  // const { resolvedTheme, setTheme } = useTheme()
-
-  // const isDark = resolvedTheme?.includes('dark')
-  // const isDarkTheme = resolvedTheme === 'dark'
-
-  // useEffect(() => {
-  //   isDarkTheme && setTheme('deep-dark')
-  // }, [isDarkTheme])
-
-  // useEffect(() => {
-  //   return () => {
-  //     isDark && setTheme('dark')
-  //   }
-  // }, [])
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
   const animate = getAnimation({ duration: 1 })
   const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
 
-  if (!ticketNumber) {
+  if (!username) {
     return <Error statusCode={404} />
   }
 
@@ -115,7 +101,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                         <Button type="primary" asChild size="small">
                           <Link
                             href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
-                            className="pointer-events-auto"
+                            className="pointer-events-auto !cursor-none"
                           >
                             Claim your ticket
                           </Link>
@@ -132,6 +118,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             username={DISPLAY_NAME ?? ''}
             className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
             ticketPosition="left"
+            ticketType={ticketType}
           />
         </DefaultLayout>
       </ConfDataContext.Provider>

@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { v4 as uuidv4 } from 'uuid'
 import { useTheme } from 'next-themes'
-import { INTERACTIVE_GRID_COLORS } from './CanvasPartyMode'
 import Cursor from './Cursor'
 import { getColor } from './randomColor'
 import { Coordinates } from './types'
@@ -41,6 +40,11 @@ export default function InteractiveGridSingle() {
     mousePositionRef.current = coordinates
     _setMousePosition(coordinates)
   }
+
+  const INTERACTIVE_GRID_COLORS = (isDark: boolean) => ({
+    GRID_STROKE: isDark ? '#242424' : '#EDEDED',
+    CURRENT_USER_HOVER: isDark ? '#242424' : '#d3d3d3',
+  })
 
   const getUserColor = useCallback(
     (userId: string | undefined) => {

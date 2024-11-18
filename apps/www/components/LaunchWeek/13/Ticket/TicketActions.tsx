@@ -79,7 +79,7 @@ export default function TicketActions() {
       <Button
         type="secondary"
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50 flex-grow"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50 flex-grow !cursor-none"
         disabled
         icon={<Check strokeWidth={2} />}
       >
@@ -90,7 +90,7 @@ export default function TicketActions() {
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow !cursor-none"
         asChild
       >
         <Link href={tweetUrl} target="_blank">
@@ -102,7 +102,7 @@ export default function TicketActions() {
         type={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow !cursor-none"
         asChild
       >
         <Link href={linkedInUrl} target="_blank">
