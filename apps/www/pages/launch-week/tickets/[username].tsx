@@ -6,24 +6,19 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import Error from 'next/error'
 import { createClient, Session } from '@supabase/supabase-js'
-import { Button, Divider, Separator } from 'ui'
-import { SITE_URL, LW_URL, LW12_DATE } from '~/lib/constants'
+import { Button } from 'ui'
+import { SITE_URL, LW_URL } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
+import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import LW12Background from '~/components/LaunchWeek/12/LW12Background'
-import { useTheme } from 'next-themes'
-import TicketCopy from '~/components/LaunchWeek/12/Ticket/TicketCopy'
-
-const LW12TicketContainer = dynamic(
-  () => import('~/components/LaunchWeek/12/Ticket/TicketContainer')
-)
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
+import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
+import classNames from 'classnames'
 
 interface Props {
   user: UserData
@@ -37,12 +32,12 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const DISPLAY_NAME = name || username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} Launch Week Ticket`
-  const DESCRIPTION = `Claim your Supabase Launch Week 12 ticket for a chance to win supa swag.`
+  const DESCRIPTION = `Claim your Supabase Launch Week 13 ticket for a chance to win supa swag.`
   const PAGE_URL = `${LW_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
-  const { resolvedTheme, setTheme } = useTheme()
+  // const { resolvedTheme, setTheme } = useTheme()
 
   // const isDark = resolvedTheme?.includes('dark')
   // const isDarkTheme = resolvedTheme === 'dark'
@@ -93,15 +88,8 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout
-          className="
-            -mt-[60px] pt-[60px]
-            overflow-hidden
-            xl:h-screen !min-h-fit
-            xl:!max-h-[calc(100vh-60px)]
-            "
-        >
-          <SectionContainer className="relative h-full flex-1">
+        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100dvh-65px)] overflow-hidden">
+          <SectionContainer className="relative h-full flex-1 pt-4 md:pt-4 pointer-events-none">
             <div className="relative z-10 flex h-full">
               <LazyMotion features={domAnimation}>
                 <AnimatePresence mode="wait" key={ticketState}>
@@ -110,25 +98,25 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                     initial={initial}
                     animate={animate}
                     exit={exit}
-                    className="w-full flex-1 min-h-[400px] h-full flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-32 text-foreground text-center md:text-left"
+                    className="w-full flex-1 h-full flex flex-col lg:flex-row items-center lg:justify-center lg:items-center gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                   >
-                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center justify-center gap-3">
-                      <LW12TicketContainer />
-                      <TicketCopy />
-                    </div>
-                    <div className="xl:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center xl:items-start xl:justify-center text-center xl:text-left">
-                      <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-2 text-foreground text-center md:text-left max-w-sm">
+                    <div className="w-full lg:w-full h-full mt-3 md:mt-6 lg:mt-0 max-w-lg flex flex-col items-center justify-center gap-3"></div>
+                    <div className="lg:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
+                      <div className="flex flex-col items-center justify-center lg:justify-start lg:items-start gap-2 text-foreground text-center md:text-left max-w-sm">
                         <h1 className="text-foreground text-2xl">
                           {DISPLAY_NAME?.split(' ')[0]}'s Ticket
                         </h1>
                         <span className="text-foreground-light text-2xl">
-                          Join {FIRST_NAME} for Supabase Launch Week 12. Claim your ticket for a
+                          Join {FIRST_NAME} for Supabase Launch Week 13. Claim your ticket for a
                           chance to win limited swag.
                         </span>
                       </div>
                       <div>
                         <Button type="primary" asChild size="small">
-                          <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
+                          <Link
+                            href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
+                            className="pointer-events-auto"
+                          >
                             Claim your ticket
                           </Link>
                         </Button>
@@ -138,8 +126,13 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 </AnimatePresence>
               </LazyMotion>
             </div>
-            <LW12Background className={'opacity-80 dark:opacity-60'} />
           </SectionContainer>
+          <CanvasSingleMode />
+          <MetalTicket
+            username={DISPLAY_NAME ?? ''}
+            className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
+            ticketPosition="left"
+          />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
@@ -163,14 +156,14 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // stores the og images in supabase storage
   fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
-  // supabaseAdmin.functions.invoke(`lw12-ticket-og?username=${encodeURIComponent(username ?? '')}`)
+  // supabaseAdmin.functions.invoke(`lw13-ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // fetch a specific user
   if (username) {
     const { data } = await supabaseAdmin!
       .from('tickets_view')
       .select('name, username, ticket_number, metadata, platinum, secret, role, company, location')
-      .eq('launch_week', 'lw12')
+      .eq('launch_week', 'lw13')
       .eq('username', username)
       .single()
 
@@ -189,7 +182,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
-  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw12/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
+  const ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/images/launch-week/lw13/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {

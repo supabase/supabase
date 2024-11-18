@@ -9,45 +9,50 @@ import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { useParams } from 'common'
 import { cn } from 'ui'
 
-const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
-  username = 'Francesco Sansalvadore',
-  className,
-}) => {
+const ThreeCanvas: React.FC<{
+  username: string
+  className?: string
+  ticketPosition?: 'left' | 'right'
+}> = ({ username = 'Francesco Sansalvadore', className, ticketPosition = 'right' }) => {
   const params = useParams()
   const canvasRef = useRef<HTMLDivElement>(null)
   const ticketRef = useRef<THREE.Mesh | null>(null)
-  const orbitRef = useRef<THREE.Object3D | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const textLines = params?.username?.split(' ').reverse() || username?.split(' ').reverse() || []
   const LINE_HEIGHT = 1.4
+  const MIN_CANVAS_HEIGHT = 600
+  const positionRight = ticketPosition === 'right'
 
   useEffect(() => {
     if (!canvasRef.current) return
 
-    const isDesktop = () => window.innerWidth > 1024
-    const desktopWidth = () => (window.innerWidth / 2) * 3 - 140
-    const canvasWidth = isDesktop() ? desktopWidth() : window.innerWidth
-    const canvasHeight = window.innerHeight - 65
+    const isDesktop = (width: number) => width > 1024
+    const calculateDesktopWidth = () => window.innerWidth
+    const initialCanvasWidth = window.innerWidth
+    const initialCanvasHeight =
+      window.innerHeight < MIN_CANVAS_HEIGHT ? MIN_CANVAS_HEIGHT - 65 : window.innerHeight - 65
+    const getTicketScale = (width: number) => (isDesktop(width) ? 0.35 : 0.3)
+    const getTicketXPosition = (width: number, isRight: boolean) =>
+      isDesktop(width) ? (isRight ? 5 : -5) : 0
+    const ticketYIdleRotation = isDesktop(window.innerWidth) ? 0 : 0
 
     // Initialize scene, camera, and renderer
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75, canvasWidth / canvasHeight, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(
+      25,
+      initialCanvasWidth / initialCanvasHeight,
+      0.1,
+      1000
+    )
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setSize(canvasWidth, canvasHeight)
+    renderer.setSize(initialCanvasWidth, initialCanvasHeight)
     renderer.shadowMap.enabled = true
     canvasRef.current.appendChild(renderer.domElement)
 
-    // Create orbit object for camera rotation
-    const orbit = new THREE.Object3D()
-    orbit.rotation.order = 'YXZ'
-    scene.add(orbit)
-    orbitRef.current = orbit
-
     // Camera setup
-    const cameraDistance = 30
+    const cameraDistance = 10
     camera.position.z = cameraDistance
-    orbit.add(camera)
 
     // Rest of your existing setup code (loader, materials, etc.)
     const loader = new GLTFLoader()
@@ -70,6 +75,9 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
 
     let ticket3DImport: THREE.Mesh
     const ticketGroup = new THREE.Group()
+    ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
+    const ticketScale = getTicketScale(window.innerWidth)
+    ticketGroup.scale.set(ticketScale, ticketScale, ticketScale)
 
     loader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
@@ -140,11 +148,12 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
           textMesh.castShadow = true
           ticketGroup.add(textMesh)
         })
+
+        camera.position.x = 0
       })
     })
 
     camera.position.z = 30
-    ticketGroup.scale.set(1.1, 1.1, 1.1)
 
     const getTicketScreenPosition = () => {
       if (!ticketRef.current) return null
@@ -153,22 +162,19 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
       ticketRef.current.getWorldPosition(vector)
       vector.project(camera)
 
-      const x = (vector.x * 0.5 + 0.5) * canvasWidth
-      const y = -(vector.y * 0.5 - 0.5) * canvasHeight
+      const x = (vector.x * 0.5 + 0.5) * initialCanvasWidth
+      const y = -(vector.y * 0.5 - 0.5) * initialCanvasHeight
 
       return { x, y }
     }
 
     // Animation function with smooth transitions
     const animate = () => {
-      if (orbitRef.current) {
-        // Smooth interpolation
-        orbitRef.current.rotation.x +=
-          (targetRotation.current.x - orbitRef.current.rotation.x) * 0.1
-        orbitRef.current.rotation.y +=
-          (targetRotation.current.y - orbitRef.current.rotation.y) * 0.1
-        orbitRef.current.rotation.z = 0
-      }
+      // Smooth interpolation
+      ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
+      ticketGroup.rotation.y +=
+        ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
+      ticketGroup.rotation.z = 0
 
       renderer.render(scene, camera)
       animationFrameRef.current = requestAnimationFrame(animate)
@@ -179,7 +185,7 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
 
     // Mouse movement handler with distance-based sensitivity
     const handleMouseMove = (e: MouseEvent) => {
-      if (!canvasRef.current || !orbitRef.current) return
+      if (!canvasRef.current) return
 
       // Get canvas bounds
       const canvasRect = canvasRef.current.getBoundingClientRect()
@@ -215,10 +221,18 @@ const ThreeCanvas: React.FC<{ username: string; className?: string }> = ({
 
     // Handle window resize
     const handleResize = () => {
-      const newWidth = isDesktop() ? desktopWidth() : window.innerWidth
-      camera.aspect = newWidth / (window.innerHeight - 65)
+      const newWidth = isDesktop(window.innerWidth) ? calculateDesktopWidth() : window.innerWidth
+      ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
+      const tickeScale = getTicketScale(window.innerWidth)
+      ticketGroup.scale.set(tickeScale, tickeScale, tickeScale)
+      camera.aspect =
+        newWidth /
+        (window.innerHeight < MIN_CANVAS_HEIGHT ? MIN_CANVAS_HEIGHT - 65 : window.innerHeight - 65)
       camera.updateProjectionMatrix()
-      renderer.setSize(newWidth, window.innerHeight - 65)
+      renderer.setSize(
+        newWidth,
+        window.innerHeight < MIN_CANVAS_HEIGHT ? MIN_CANVAS_HEIGHT - 65 : window.innerHeight - 65
+      )
     }
 
     // Event listeners

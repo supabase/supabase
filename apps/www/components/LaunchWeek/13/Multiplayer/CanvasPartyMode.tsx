@@ -47,7 +47,7 @@ interface CellState {
 
 export const INTERACTIVE_GRID_COLORS = (isDark: boolean) => ({
   GRID_STROKE: isDark ? '#242424' : '#EDEDED',
-  CURRENT_USER_HOVER: isDark ? '#242424' : '#d3d3d3',
+  CURRENT_USER_HOVER: isDark ? '#00311D' : '#72E3AD',
 })
 
 // Generate a random user id
