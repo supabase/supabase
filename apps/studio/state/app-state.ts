@@ -27,7 +27,7 @@ export type SuggestionsType = {
 
 type AiAssistantPanelType = {
   open: boolean
-  initialMessages?: MessageType[]
+  messages?: MessageType[] | undefined
   initialInput: string
   sqlSnippets?: string[]
   suggestions?: SuggestionsType
@@ -40,7 +40,7 @@ type AiAssistantPanelType = {
 
 const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   open: false,
-  initialMessages: [],
+  messages: undefined,
   sqlSnippets: undefined,
   initialInput: '',
   suggestions: undefined,

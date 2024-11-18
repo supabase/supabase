@@ -66,11 +66,17 @@ MemoizedMessage.displayName = 'MemoizedMessage'
 
 interface AIAssistantProps {
   id: string
+  initialMessages?: MessageType[] | undefined
   className?: string
   onResetConversation: () => void
 }
 
-export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
+export const AIAssistant = ({
+  id,
+  initialMessages,
+  className,
+  onResetConversation,
+}: AIAssistantProps) => {
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
@@ -78,7 +84,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
 
   const disablePrompts = useFlag('disableAssistantPrompts')
   const { aiAssistantPanel, resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { initialInput, initialMessages, sqlSnippets, suggestions } = aiAssistantPanel
+  const { initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -121,12 +127,13 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
     // [Joshen] Not currently used atm, but initialMessages will be for...
-    initialMessages: initialMessages as unknown as MessageType[],
+    initialMessages,
     body: {
       includeSchemaMetadata,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
+
     onError: (error) => {
       console.log('error:', JSON.stringify(error))
     },
@@ -171,7 +178,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ open: true, sqlSnippets: undefined })
+    setAiAssistantPanel({ sqlSnippets: undefined })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
@@ -231,10 +238,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   }, [])
 
   useEffect(() => {
-    return resetAiAssistantPanel
-  }, [])
-
-  useEffect(() => {
     setValue(initialInput)
     if (inputRef.current) {
       inputRef.current.focus()
@@ -258,7 +261,13 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     handleScroll()
-  }, [messages])
+    // Load messages into state
+    if (!isChatLoading) {
+      setAiAssistantPanel({
+        messages,
+      })
+    }
+  }, [messages, isChatLoading, setAiAssistantPanel])
 
   if (isLoadingTables) {
     return (
