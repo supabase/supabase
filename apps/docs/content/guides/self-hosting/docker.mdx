@@ -187,11 +187,37 @@ Run this form twice to generate new `anon` and `service` API keys. Replace the v
 
 You will need to [restart](#restarting-all-services) the services for the changes to take effect.
 
+### Change database password
+
+If you have not yet started the deployment, you can change the password in the `./docker/.env` file before running `docker compose up -d`.
+
+If you have already started the deployment, you can change the password by altering the `postgres` user in the database with the new password and then updating the `POSTGRES_PASSWORD` in `./docker/.env`
+
+For example:
+```bash
+$ docker exec -it supabase-db psql -U supabase_admin -W
+# Enter the original password from the .env file
+ALTER USER supabase_admin WITH PASSWORD 'new-password';
+ALTER USER postgres WITH PASSWORD 'new-password';
+ALTER USER authenticator WITH PASSWORD 'new-password';
+ALTER USER pgbouncer WITH PASSWORD 'new-password';
+ALTER USER supabase_auth_admin WITH PASSWORD 'new-password';
+ALTER USER supabase_functions_admin WITH PASSWORD 'new-password';
+ALTER USER supabase_storage_admin WITH PASSWORD 'new-password';
+exit
+```
+
+Then update the `POSTGRES_PASSWORD` in the `./docker/.env` file with the new password and run
+
+```bash
+$ docker compose down
+$ docker compose up -d
+```
+
 ### Update secrets
 
 Update the `./docker/.env` file with your own secrets. In particular, these are required:
 
-- `POSTGRES_PASSWORD`: the password for the `postgres` role.
 - `JWT_SECRET`: used by PostgREST and GoTrue, among others.
 - `SITE_URL`: the base URL of your site.
 - `SMTP_*`: mail server credentials. You can use any SMTP server.
@@ -438,6 +464,3 @@ A minimal setup working on Ubuntu, hosted on Digital Ocean.
 1. A Digital Ocean Droplet with 1 GB memory and 25 GB solid-state drive (SSD) is sufficient to start
 2. To access the Dashboard, use the ipv4 IP address of your Droplet.
 3. If you're unable to access Dashboard, run `docker compose ps` to see if the Studio service is running and healthy.
-
-
-
