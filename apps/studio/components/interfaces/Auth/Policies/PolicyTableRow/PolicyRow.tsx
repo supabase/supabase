@@ -21,7 +21,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicyRowProps {
@@ -36,7 +36,7 @@ const PolicyRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -95,13 +95,13 @@ const PolicyRow = ({
           <DropdownMenuContent
             side="bottom"
             align="end"
-            className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+            className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
           >
             <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
               <Edit size={14} />
               <p>Edit policy</p>
             </DropdownMenuItem>
-            {enableAssistantV2 && (
+            {isAssistantV2Enabled && (
               <DropdownMenuItem
                 className="space-x-2"
                 onClick={() => {
