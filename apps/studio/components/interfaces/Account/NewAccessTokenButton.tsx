@@ -5,6 +5,9 @@ import { useState } from 'react'
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
   Alert,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
   DialogFooter,
   DropdownMenu,
@@ -14,6 +17,7 @@ import {
   Form,
   Input,
   Modal,
+  WarningIcon,
 } from 'ui'
 
 export interface NewAccessTokenButtonProps {
@@ -105,27 +109,30 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
             <>
               {tokenScope === 'V0' && (
                 <Modal.Content>
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                  >
-                    <p>
-                      These include deleting organizations and projects which cannot be undone. As
-                      such, be very careful when using this API.
-                    </p>
-                    <div className="mt-4">
-                      <Button asChild type="default" icon={<ExternalLink />}>
-                        <Link
-                          href="https://api.supabase.com/api/v0"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Experimental API documentation
-                        </Link>
-                      </Button>
-                    </div>
-                  </Alert>
+                  <Alert_Shadcn_ variant="warning">
+                    <WarningIcon />
+                    <AlertTitle_Shadcn_>
+                      The experimental API provides additional endpoints which allows you to manage
+                      your organizations and projects.
+                    </AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      <p>
+                        These include deleting organizations and projects which cannot be undone. As
+                        such, be very careful when using this API.
+                      </p>
+                      <div className="mt-4">
+                        <Button asChild type="default" icon={<ExternalLink />}>
+                          <Link
+                            href="https://api.supabase.com/api/v0"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Experimental API documentation
+                          </Link>
+                        </Button>
+                      </div>
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
                 </Modal.Content>
               )}
               <Modal.Content>
