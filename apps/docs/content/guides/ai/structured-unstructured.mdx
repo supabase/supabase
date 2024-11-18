@@ -59,6 +59,12 @@ Client libraries like python's [vecs](https://github.com/supabase/vecs) use this
 #!/usr/bin/env python3
 import vecs
 
+# In practice, do not hard-code your password. Use environment variables.
+DB_CONNECTION = "postgresql://<user>:<password>@<host>:<port>/<db_name>"
+
+# create vector store client
+vx = vecs.create_client(DB_CONNECTION)
+
 docs = vx.get_or_create_collection(name="docs", dimension=1536)
 
 docs.upsert(vectors=[

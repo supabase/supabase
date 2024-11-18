@@ -303,7 +303,10 @@ const EmptyIntegrationConnection = React.forwardRef<
           disabled={disabled}
           onClick={() => onClick()}
           tooltip={{
-            content: { side: 'bottom', text: 'Additional permissions required to add connection' },
+            content: {
+              side: 'bottom',
+              text: disabled ? 'Additional permissions required to add connection' : undefined,
+            },
           }}
         >
           Add new project connection

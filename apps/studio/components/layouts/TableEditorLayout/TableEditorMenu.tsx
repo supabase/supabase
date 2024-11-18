@@ -12,7 +12,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useTableQuery } from 'data/tables/table-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
@@ -41,7 +41,8 @@ import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
 const TableEditorMenu = () => {
-  const { id } = useParams()
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
@@ -67,7 +68,7 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
@@ -96,21 +97,17 @@ const TableEditorMenu = () => {
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const { data: selectedTable } = useTableQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      id: Number(id),
-    },
-    // only run if we have a selected table
-    { enabled: Boolean(id) }
-  )
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   useEffect(() => {
-    if (selectedTable) {
+    if (selectedTable?.schema) {
       setSelectedSchema(selectedTable.schema)
     }
-  }, [selectedTable])
+  }, [selectedTable?.schema])
 
   return (
     <>
@@ -144,7 +141,9 @@ const TableEditorMenu = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to create tables',
+                    text: !canCreateTables
+                      ? 'You need additional permissions to create tables'
+                      : undefined,
                   },
                 }}
               >

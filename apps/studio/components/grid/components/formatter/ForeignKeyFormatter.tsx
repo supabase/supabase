@@ -1,10 +1,11 @@
 import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableQuery } from 'data/tables/table-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
@@ -23,11 +24,13 @@ export const ForeignKeyFormatter = (props: Props) => {
   const { projectRef, tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
 
-  const { data: selectedTable } = useTableQuery({
+  const { data } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
+  const selectedTable = isTableLike(data) ? data : undefined
+
   const relationship = (selectedTable?.relationships ?? []).find(
     (r) =>
       r.source_schema === selectedTable?.schema &&
@@ -62,11 +65,20 @@ export const ForeignKeyFormatter = (props: Props) => {
               className="translate-y-[2px]"
               style={{ padding: '3px' }}
             >
-              <Link
+              <EditorTablePageLink
                 href={`/project/${projectRef}/editor/${targetTable?.id}?schema=${selectedSchema}&filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+                projectRef={projectRef}
+                id={targetTable && String(targetTable?.id)}
+                filters={[
+                  {
+                    column: relationship.target_column_name,
+                    operator: '=',
+                    value: String(value),
+                  },
+                ]}
               >
                 <ArrowRight size={14} />
-              </Link>
+              </EditorTablePageLink>
             </Button>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">View referencing record</TooltipContent_Shadcn_>

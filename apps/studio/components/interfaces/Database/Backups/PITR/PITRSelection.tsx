@@ -162,9 +162,6 @@ const PITRSelection = () => {
               </AlertDescription_Shadcn_>
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
-                {/* <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  Documentation
-                </Button> */}
                 <Button type="default">
                   <Link href={`/project/${ref}/settings/infrastructure`}>
                     Infrastructure settings

@@ -22,20 +22,30 @@ describe('Auth.constants: urlRegex', () => {
     ]
 
     validUrls.forEach((url) => {
-      expect(urlRegex.test(url)).toBe(true)
+      expect(urlRegex().test(url)).toBe(true)
     })
   })
 
   it('should not match invalid URLs', () => {
     const invalidUrls = ['supabase', 'mailto:test@gmail.com', 'hello world.com', 'email@domain.com']
 
-    const failingInvalidUrls = invalidUrls.filter((url) => urlRegex.test(url))
+    const failingInvalidUrls = invalidUrls.filter((url) => urlRegex().test(url))
     if (failingInvalidUrls.length > 0) {
       console.log('Failing invalid URLs:', failingInvalidUrls)
     }
 
     invalidUrls.forEach((url) => {
-      expect(urlRegex.test(url)).toBe(false)
+      expect(urlRegex().test(url)).toBe(false)
     })
+  })
+
+  it('should not match simple domain URLs when excludeSimpleDomains is true', () => {
+    const simpleDomainUrl = 'smtp-pulse.com'
+    expect(urlRegex({ excludeSimpleDomains: true }).test(simpleDomainUrl)).toBe(false)
+  })
+
+  it('should match simple domain URLs when excludeSimpleDomains is false', () => {
+    const simpleDomainUrl = 'smtp-pulse.com'
+    expect(urlRegex({ excludeSimpleDomains: false }).test(simpleDomainUrl)).toBe(true)
   })
 })

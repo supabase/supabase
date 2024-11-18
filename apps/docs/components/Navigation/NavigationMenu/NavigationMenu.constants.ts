@@ -1,3 +1,7 @@
+import type { ComponentProps } from 'react'
+
+import type { IconPanel } from 'ui-patterns/IconPanel'
+
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
@@ -960,10 +964,6 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_net',
         },
         {
-          name: 'pg_partman: Partition Maintenance',
-          url: '/guides/database/extensions/pg_partman',
-        },
-        {
           name: 'pg_plan_filter: Restrict Total Cost',
           url: '/guides/database/extensions/pg_plan_filter',
         },
@@ -982,10 +982,6 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
-        },
-        {
-          name: 'pgmq: Queues',
-          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1253,6 +1249,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Handling Routing in Functions',
           url: '/guides/functions/routing',
+        },
+        {
+          name: 'Background Tasks',
+          url: '/guides/functions/background-tasks',
         },
         {
           name: 'Running AI Models',
@@ -1809,23 +1809,70 @@ export const local_development: NavMenuConstant = {
   ],
 }
 
-export const MIGRATION_PAGES: Partial<NavMenuSection>[] = [
-  { name: 'Amazon RDS', url: '/guides/platform/migrating-to-supabase/amazon-rds' },
-  { name: 'Auth0', url: '/guides/platform/migrating-to-supabase/auth0' },
-  { name: 'Firebase Auth', url: '/guides/platform/migrating-to-supabase/firebase-auth' },
+export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
   {
-    name: 'Firebase Firestore',
+    name: 'Auth0',
+    icon: '/docs/img/icons/auth0-icon',
+    url: '/guides/platform/migrating-to-supabase/auth0',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firebase-auth',
+  },
+  {
+    name: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firestore-data',
   },
   {
     name: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firebase-storage',
   },
-  { name: 'Heroku Postgres', url: '/guides/platform/migrating-to-supabase/heroku' },
-  { name: 'MySQL', url: '/guides/platform/migrating-to-supabase/mysql' },
-  { name: 'MSSQL', url: '/guides/platform/migrating-to-supabase/mssql' },
-  { name: 'Postgres', url: '/guides/platform/migrating-to-supabase/postgres' },
-  { name: 'Render', url: '/guides/platform/migrating-to-supabase/render' },
+  {
+    name: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    url: '/guides/platform/migrating-to-supabase/heroku',
+  },
+  {
+    name: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    url: '/guides/platform/migrating-to-supabase/render',
+  },
+  {
+    name: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    url: '/guides/platform/migrating-to-supabase/amazon-rds',
+  },
+  {
+    name: 'Postgres',
+    icon: '/docs/img/icons/postgres-icon',
+    url: '/guides/platform/migrating-to-supabase/postgres',
+  },
+  {
+    name: 'Vercel Postgres',
+    icon: '/docs/img/icons/vercel-icon',
+    url: '/guides/platform/migrating-to-supabase/vercel-postgres',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Neon',
+    icon: '/docs/img/icons/neon-icon',
+    url: '/guides/platform/migrating-to-supabase/neon',
+    hasLightIcon: true,
+  },
+  {
+    name: 'MySQL',
+    icon: '/docs/img/icons/mysql-icon',
+    url: '/guides/platform/migrating-to-supabase/mysql',
+  },
+  {
+    name: 'MSSQL',
+    icon: '/docs/img/icons/mssql-icon',
+    url: '/guides/platform/migrating-to-supabase/mssql',
+  },
 ]
 
 export const platform: NavMenuConstant = {
@@ -1837,7 +1884,6 @@ export const platform: NavMenuConstant = {
       name: 'Add-ons',
       url: undefined,
       items: [
-        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
         { name: 'IPv4 Address', url: '/guides/platform/ipv4-address' },
@@ -1895,6 +1941,7 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
+        { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
         {

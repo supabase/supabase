@@ -24,13 +24,15 @@ export const ResizingState = () => {
         <div className="space-y-6 py-6">
           <div className="flex px-8 space-x-8">
             <div className="mt-1">
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2 className="animate-spin text-foreground-light" size={18} />
             </div>
-            <div className="space-y-1">
-              <p>Resizing project...</p>
+            <div className="flex flex-col gap-1">
+              <p>Resizing Project Compute size</p>
               <p className="text-sm text-foreground-light">
-                Your project is being restarted to apply compute size changes. It can take a few
-                minutes. Your project will be offline while it is being restarted.
+                Your project is being restarted to apply compute size changes.
+              </p>
+              <p className="text-sm text-foreground-light">
+                This can take a few minutes. Project will be offline while it is being restarted.
               </p>
             </div>
           </div>

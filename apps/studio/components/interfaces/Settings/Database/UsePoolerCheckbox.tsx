@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
@@ -51,12 +51,12 @@ export const UsePoolerCheckbox = ({
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
-  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
+  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsV2Query({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
   const isDatabaseSettingsPage = router.pathname.endsWith('/settings/database')
   const poolingConfiguration = data?.find((x) => x.identifier === state.selectedDatabaseId)
-  const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
+  const resolvesToIpV6 = settings?.db_ip_addr_config === 'ipv6'
 
   const onSelectOption = (value: 'session' | 'transaction') => {
     onSelectPoolingMode(value)
