@@ -1,23 +1,13 @@
 import { useParams } from 'common'
-import { useSearchParams } from 'next/navigation'
+import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ChevronLeft, Home } from 'lucide-react'
+import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'framer-motion'
+import { ChevronLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-  useMotionValueEvent,
-  useMotionValue,
-  useSpring,
-  MotionProps,
-  MotionValue,
-} from 'framer-motion'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useSearchParams } from 'next/navigation'
+import { forwardRef, useRef } from 'react'
 import { cn, NavMenu, NavMenuItem } from 'ui'
-import { useRef, useState, useEffect, RefObject, forwardRef } from 'react'
 
 export const Header = forwardRef<
   HTMLDivElement,
@@ -47,24 +37,25 @@ export const Header = forwardRef<
 
   // Input range: The scrollY range for triggering the animation (e.g., 0 to 200px of scroll)
   const scrollRange = [40, headerRef.current?.offsetHeight ?? 128]
-
   // Output range: The padding range for the nav (from compact to expanded)
   const paddingRange = [40, 86]
+
+  // Output range: The Y position range for the icon (e.g., 0 to 150px movement)
+  const iconYRange = [0, headerRef.current?.offsetHeight ? headerRef.current.offsetHeight / 2 : 64] // Change 150 to set the end Y position of the icon
+  // Output range: The size range for the icon container
+  const sizeRange = [32, 24] // From 24px (scrolled) to 32px (top)
+  // Output range: The padding range for the image
+  const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
+
   const navInnerLeftPaddingX = scroll
     ? useTransform(scroll?.scrollY!, scrollRange, paddingRange)
     : 0
 
-  // Output range: The Y position range for the icon (e.g., 0 to 150px movement)
-  const iconYRange = [0, headerRef.current?.offsetHeight ? headerRef.current.offsetHeight / 2 : 64] // Change 150 to set the end Y position of the icon
   // Map scrollY to the icon's Y position
   const iconY = scroll ? useTransform(scroll?.scrollY!, scrollRange, iconYRange) : 0
 
-  // Output range: The size range for the icon container
-  const sizeRange = [32, 24] // From 24px (scrolled) to 32px (top)
   const iconSize = scroll ? useTransform(scroll?.scrollY!, scrollRange, sizeRange) : 32
 
-  // Output range: The padding range for the image
-  const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
 
   /* prettier-ignore */
@@ -263,3 +254,5 @@ export const Header = forwardRef<
     </>
   )
 })
+
+Header.displayName = 'Header'

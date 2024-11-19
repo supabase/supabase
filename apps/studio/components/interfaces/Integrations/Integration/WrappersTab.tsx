@@ -8,6 +8,10 @@ import { Sheet, SheetContent } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { EditWrapperSheet } from './EditWrapperSheet'
 import WrapperRow from './WrapperRow'
+import { CreateWrapperSheet } from './CreateWrapperSheet'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export const WrappersTab = () => {
   const { id } = useParams()
@@ -16,6 +20,9 @@ export const WrappersTab = () => {
   const [isClosingEditWrapper, setisClosingEditWrapper] = useState(false)
   const [selectedWrapper, setSelectedWrapper] = useState<FDW | null>(null)
   const [selectedWrapperForDelete, setSelectedWrapperForDelete] = useState<FDW | null>(null)
+  const [createWrapperShown, setCreateWrapperShown] = useState(false)
+  const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
+  const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
   const { data, isLoading } = useFDWsQuery({
     projectRef: project?.ref,
@@ -37,16 +44,55 @@ export const WrappersTab = () => {
   // this contains a collection of all wrapper instances for the wrapper type
   const createdWrappers = wrappers.filter((w) => wrapperMetaComparator(integration.meta, w))
 
+  const Container = ({
+    ...props
+  }: { children: React.ReactNode } & React.HTMLProps<HTMLDivElement>) => (
+    <div className=" w-full h-48 mx-10 py-10">
+      {props.children}
+      <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
+        <SheetContent size="default" tabIndex={undefined}>
+          <CreateWrapperSheet
+            wrapperMeta={integration.meta}
+            onClose={() => {
+              setCreateWrapperShown(false)
+              setisClosingCreateWrapper(false)
+            }}
+            isClosing={isClosingCreateWrapper}
+            setIsClosing={setisClosingCreateWrapper}
+          />
+        </SheetContent>
+      </Sheet>
+    </div>
+  )
+
   if (createdWrappers.length === 0) {
     return (
-      <div className=" w-full h-48">
-        <div className="border rounded-lg h-full">No wrappers are installed.</div>
-      </div>
+      <Container>
+        <div className=" w-full h-48 max-w-3xl">
+          <div className="border rounded-lg h-full flex items-center justify-center">
+            No wrappers are installed.
+            <ButtonTooltip
+              type="default"
+              onClick={() => setCreateWrapperShown(true)}
+              disabled={!canCreateWrapper}
+              tooltip={{
+                content: {
+                  text: !canCreateWrapper
+                    ? 'You need additional permissions to create a foreign data wrapper'
+                    : undefined,
+                },
+              }}
+            >
+              Add new wrapper
+            </ButtonTooltip>
+          </div>
+        </div>
+      </Container>
     )
   }
 
   return (
-    <>
+    <Container>
       <WrapperRow
         key={integration.id}
         wrapperMeta={integration.meta}
@@ -59,6 +105,7 @@ export const WrappersTab = () => {
         }}
         onSelectDelete={(w) => setSelectedWrapperForDelete(w)}
       />
+
       <Sheet open={!!editWrapperShown} onOpenChange={() => setisClosingEditWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
           <EditWrapperSheet
@@ -80,6 +127,6 @@ export const WrappersTab = () => {
           onClose={() => setSelectedWrapperForDelete(null)}
         />
       )}
-    </>
+    </Container>
   )
 }

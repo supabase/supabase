@@ -4,20 +4,22 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Link } from 'lucide-react'
+import { Book, Link } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
+  Separator,
   Sheet,
   SheetContent,
   WarningIcon,
 } from 'ui'
-import { IntegrationDefinition, INTEGRATIONS } from '../Landing/Integrations.constants'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { MarkdownContent } from './MarkdownContent'
+import { BuiltBySection } from './build-by-section'
 
 export const OverviewTab = () => {
   const { id } = useParams()
@@ -86,9 +88,11 @@ export const OverviewTab = () => {
   }
 
   return (
-    <>
-      <div>
+    <div className="my-10 flex flex-col gap-10">
+      <BuiltBySection />
+      <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
         <ButtonTooltip
+          type="default"
           onClick={() => setCreateWrapperShown(true)}
           disabled={!canCreateWrapper}
           tooltip={{
@@ -99,9 +103,11 @@ export const OverviewTab = () => {
             },
           }}
         >
-          Add new wrapper of this kind
+          Add new wrapper
         </ButtonTooltip>
       </div>
+      <div className="mx-10">Latest wrappers</div>
+      <Separator />
       <MarkdownContent />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
@@ -116,6 +122,6 @@ export const OverviewTab = () => {
           />
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   )
 }

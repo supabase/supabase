@@ -7,6 +7,7 @@ export type IntegrationDefinition = {
   icon: string
   description: string
   docsUrl: string
+  meta: WrapperMeta
 } & ({ type: 'wrapper'; meta: WrapperMeta } | { type: 'postgres_extension' })
 
 type WrapperLabel = (typeof WRAPPERS)[number]['label']

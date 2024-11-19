@@ -44,7 +44,7 @@ const IntegrationPage: NextPageWithLayout = () => {
   return (
     <div className="py-0">
       <div className="">
-        {selectedTab === 'overview' && <OverviewTab integration={integration} />}
+        {selectedTab === 'overview' && <OverviewTab />}
         {selectedTab === 'wrappers' && <WrappersTab />}
         {selectedTab === 'logs' && (
           <div className="">
