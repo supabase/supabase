@@ -182,7 +182,7 @@ const NavigationBar = () => {
           label="Assistant"
           shortcut="I"
           onClick={() => {
-            snap.setAiAssistantPanel({ open: true })
+            snap.setAiAssistantPanel({ open: !snap.aiAssistantPanel.open })
           }}
         />
       </HoverCardContent_Shadcn_>

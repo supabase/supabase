@@ -115,8 +115,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <SchemaSelector
-              className="w-[260px]"
-              size="small"
+              className="w-[180px]"
+              size="tiny"
               showError={false}
               selectedSchemaName={schema}
               onSelectSchema={(schema) => {
@@ -124,9 +124,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               }}
             />
             <Input
-              size="small"
+              size="tiny"
               placeholder="Filter tables and policies"
-              className="block w-64 text-sm placeholder-border-muted"
+              className="block w-52 text-sm placeholder-border-muted"
               value={searchString || ''}
               onChange={(e) => {
                 const str = e.target.value

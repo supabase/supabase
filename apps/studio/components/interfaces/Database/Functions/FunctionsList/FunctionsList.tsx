@@ -104,10 +104,10 @@ const FunctionsList = ({
       ) : (
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-x-2">
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
@@ -119,10 +119,10 @@ const FunctionsList = ({
               />
               <Input
                 placeholder="Search for a function"
-                size="small"
+                size="tiny"
                 icon={<Search size={14} />}
                 value={filterString}
-                className="w-64"
+                className="w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>

@@ -63,7 +63,8 @@ const RolesList = () => {
       <div className="mb-4 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center space-x-4">
           <Input
-            size="small"
+            size="tiny"
+            className="w-52"
             placeholder="Search for a role"
             icon={<Search size={12} />}
             value={filterString}
@@ -81,10 +82,10 @@ const RolesList = () => {
               )
             }
           />
-          <div className="flex items-center border border-strong rounded-full w-min h-[34px]">
+          <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
               className={[
-                'text-xs w-[90px] h-full text-center rounded-l-full flex items-center justify-center transition',
+                'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
                   ? 'bg-overlay-hover text-foreground'
                   : 'hover:bg-surface-200 text-foreground-light',
@@ -96,7 +97,7 @@ const RolesList = () => {
             <div className="h-full w-[1px] border-r border-strong"></div>
             <button
               className={[
-                'text-xs w-[90px] h-full text-center rounded-r-full flex items-center justify-center transition',
+                'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'
                   ? 'bg-overlay-hover text-foreground'
                   : 'hover:bg-surface-200 text-foreground-light',
@@ -131,7 +132,9 @@ const RolesList = () => {
                       ? `${totalActiveConnections}/${maxConnectionLimit}`
                       : `${totalActiveConnections}`
                   }
+                  labelTopClass="text-xs"
                   labelBottom="Active connections"
+                  labelBottomClass="text-xs"
                 />
               </div>
             </Tooltip.Trigger>

@@ -117,11 +117,11 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database RLS Policies I can add to my public schema`
+                  `Suggest some database RLS policies I can add to my public schema`
                 )
               }
             >
-              Suggest RLS Policies
+              Suggest RLS policies
             </Button>
 
             <Button
@@ -130,10 +130,10 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               type="text"
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
-                sendMessageToAssistant(`Generate some examples of database RLS Policies`)
+                sendMessageToAssistant(`Generate some examples of database RLS policies`)
               }
             >
-              Examples of RLS Policies
+              Examples of RLS policies
             </Button>
 
             <Button
@@ -141,9 +141,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database RLS Policies`)}
+              onClick={() => sendMessageToAssistant(`What are database RLS policies`)}
             >
-              What are RLS Policies?
+              What are RLS policies?
             </Button>
           </div>
         </motion.section>
@@ -162,11 +162,11 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database Functions I can add to my public schema`
+                  `Suggest some database functions I can add to my public schema`
                 )
               }
             >
-              Suggest database Functions
+              Suggest database functions
             </Button>
 
             <Button
@@ -174,9 +174,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<FileText strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`Generate some examples of database Functions`)}
+              onClick={() => sendMessageToAssistant(`Generate some examples of database functions`)}
             >
-              Examples of database Functions
+              Examples of database functions
             </Button>
 
             <Button
@@ -184,9 +184,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database Functions`)}
+              onClick={() => sendMessageToAssistant(`What are database functions`)}
             >
-              What are database Functions?
+              What are database functions?
             </Button>
           </div>
         </motion.section>
@@ -205,7 +205,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database Triggers I can add to my public schema`
+                  `Suggest some database triggers I can add to my public schema`
                 )
               }
             >
@@ -217,9 +217,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<FileText strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`Generate some examples of database Triggers`)}
+              onClick={() => sendMessageToAssistant(`Generate some examples of database triggers`)}
             >
-              Examples of database Triggers
+              Examples of database triggers
             </Button>
 
             <Button
@@ -227,9 +227,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database Functions`)}
+              onClick={() => sendMessageToAssistant(`What are database triggers`)}
             >
-              What are database Functions?
+              What are database triggers?
             </Button>
           </div>
         </motion.section>
