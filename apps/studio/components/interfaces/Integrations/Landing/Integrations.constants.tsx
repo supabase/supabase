@@ -15,6 +15,7 @@ export type IntegrationDefinition = {
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension'; requiredExtensions: string[] }
+  | { type: 'custom' }
 )
 
 type WrapperLabel = (typeof WRAPPERS)[number]['label']
@@ -61,6 +62,15 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     name: `Vault`,
     icon: <Vault className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'Application level encryption for your project',
+    docsUrl: '',
+  },
+  {
+    id: 'supabase-webhooks',
+    type: 'custom' as const,
+    name: `Webhooks`,
+    icon: <Webhook className="absolute inset-0 p-2 text-background w-full h-full" />,
+    description:
+      'Send real-time data from your database to another system whenever a table event occurs',
     docsUrl: '',
   },
   {
