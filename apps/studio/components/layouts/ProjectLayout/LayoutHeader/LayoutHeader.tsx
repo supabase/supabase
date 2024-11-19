@@ -120,7 +120,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             <FeedbackDropdown />
             <NotificationsPopoverV2 />
             <HelpPopover />
-            {isAssistantV2Enabled && <AssistantButton />}
+            {isAssistantV2Enabled && !!projectRef && <AssistantButton />}
           </>
         )}
       </div>
