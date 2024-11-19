@@ -33,8 +33,7 @@ Depending on your billing plan, your database can go into read-only mode which c
 
 ### Disk space usage
 
-Your database size is part of the disk usage for your Supabase project, there are many components to Postgres that consume additional disk space. One of the primary components, is the [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html).
-Postgres will store database changes in log files that are cleared away after they are applied to the database. These same files are also used by [Read Replicas](/docs/guides/platform/read-replicas) or other replication methods.
+Your database size is part of the disk usage for your Supabase project, there are many components to Postgres that consume additional disk space. One of the primary components, is the [Write Ahead Log (WAL)](https://www.postgresql.org/docs/current/wal-intro.html). Postgres will store database changes in log files that are cleared away after they are applied to the database. These same files are also used by [Read Replicas](/docs/guides/platform/read-replicas) or other replication methods.
 
 If you would like to determine the size of the WAL files stored on disk, Postgres provides `pg_ls_waldir` as a helper function; the following query can be run:
 
