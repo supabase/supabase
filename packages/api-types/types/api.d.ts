@@ -987,6 +987,10 @@ export interface paths {
     /** Gets project's settings */
     get: operations['SettingsController_getProjectApi']
   }
+  '/platform/projects/{ref}/settings/sensitivity': {
+    /** Updates the given project sensitivity */
+    patch: operations['SensitivityController_updateProjectSensitivity']
+  }
   '/platform/projects/{ref}/status': {
     /** Gets project's status */
     get: operations['ProjectStatusController_getStatus']
@@ -1211,6 +1215,10 @@ export interface paths {
     /** Processes Orb events */
     post: operations['OrbWebhooksController_processEvent']
   }
+  '/system/organizations/{slug}': {
+    /** Deletes organization */
+    delete: operations['OrganizationSlugSystemController_deleteOrganization']
+  }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['OrgSubscriptionSystemController_getSubscription']
@@ -1236,6 +1244,10 @@ export interface paths {
   '/system/projects': {
     /** Create a project */
     post: operations['SystemProjectsController_createProject']
+  }
+  '/system/projects/{ref}': {
+    /** Deletes the given project */
+    delete: operations['ProjectRefSystemController_deleteProject']
   }
   '/system/projects/{ref}/billing/addons': {
     /** Updates project addon */
@@ -1948,6 +1960,10 @@ export interface paths {
     /** Gets project's settings */
     get: operations['SettingsController_getProjectApi']
   }
+  '/v0/projects/{ref}/settings/sensitivity': {
+    /** Updates the given project sensitivity */
+    patch: operations['SensitivityController_updateProjectSensitivity']
+  }
   '/v0/projects/{ref}/status': {
     /** Gets project's status */
     get: operations['ProjectStatusController_getStatus']
@@ -2105,6 +2121,8 @@ export interface paths {
     post: operations['ApiKeysController_createApiKey']
   }
   '/v1/projects/{ref}/api-keys/{id}': {
+    /** [Alpha] Get API key */
+    get: operations['ApiKeysController_getApiKey']
     /** [Alpha] Deletes an API key for the project */
     delete: operations['ApiKeysController_deleteApiKey']
     /** [Alpha] Updates an API key for the project */
@@ -4206,6 +4224,9 @@ export interface components {
     MarkDefaultPaymentMethodBody: {
       payment_method_id: string
     }
+    MarkSensitiveBody: {
+      is_sensitive: boolean
+    }
     Member: {
       gotrue_id: string
       is_sso_user: boolean | null
@@ -5047,6 +5068,9 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    ProjectSensitivityResponse: {
+      is_sensitive: boolean
+    }
     ProjectServiceApiKeyResponse: {
       api_key: string
       name: string
@@ -5062,6 +5086,7 @@ export interface components {
       db_port: number
       db_user: string
       inserted_at: string
+      is_sensitive?: boolean
       jwt_secret?: string
       name: string
       ref: string
@@ -13508,6 +13533,34 @@ export interface operations {
       }
     }
   }
+  /** Updates the given project sensitivity */
+  SensitivityController_updateProjectSensitivity: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MarkSensitiveBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectSensitivityResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's status */
   ProjectStatusController_getStatus: {
     parameters: {
@@ -14741,6 +14794,24 @@ export interface operations {
       }
     }
   }
+  /** Deletes organization */
+  OrganizationSlugSystemController_deleteOrganization: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete organization */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the current subscription */
   OrgSubscriptionSystemController_getSubscription: {
     parameters: {
@@ -14886,6 +14957,20 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SystemProjectResponse']
         }
+      }
+    }
+  }
+  /** Deletes the given project */
+  ProjectRefSystemController_deleteProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      204: {
+        content: never
       }
     }
   }
@@ -15835,6 +15920,9 @@ export interface operations {
   /** Get project api keys */
   'v1-get-project-api-keys': {
     parameters: {
+      query: {
+        reveal: boolean
+      }
       path: {
         /** @description Project ref */
         ref: string
@@ -15851,6 +15939,9 @@ export interface operations {
   /** [Alpha] Creates a new API key for the project */
   ApiKeysController_createApiKey: {
     parameters: {
+      query: {
+        reveal: boolean
+      }
       path: {
         /** @description Project ref */
         ref: string
@@ -15869,9 +15960,32 @@ export interface operations {
       }
     }
   }
+  /** [Alpha] Get API key */
+  ApiKeysController_getApiKey: {
+    parameters: {
+      query: {
+        reveal: boolean
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ApiKeyResponse']
+        }
+      }
+    }
+  }
   /** [Alpha] Deletes an API key for the project */
   ApiKeysController_deleteApiKey: {
     parameters: {
+      query: {
+        reveal: boolean
+      }
       path: {
         /** @description Project ref */
         ref: string
@@ -15892,6 +16006,9 @@ export interface operations {
   /** [Alpha] Updates an API key for the project */
   ApiKeysController_updateApiKey: {
     parameters: {
+      query: {
+        reveal: boolean
+      }
       path: {
         /** @description Project ref */
         ref: string

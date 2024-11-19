@@ -22,7 +22,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion, passwordStrength } from 'lib/helpers'
 import Link from 'next/link'
-import { useState, useRef, version } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -56,9 +56,6 @@ import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { Markdown } from 'components/interfaces/Markdown'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref ?? 'default'
-
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
