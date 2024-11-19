@@ -640,8 +640,22 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   <FormItemLayout
                     layout="flex"
                     className={cn(CONTAINER_CLASSES)}
-                    label="Allow Supabase Support to access your project temporarily"
-                    description="In some cases, we may require temporary access to your project to complete troubleshooting, or to answer questions related specifically to your project"
+                    label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
+                    description={
+                      <>
+                        By checking this box, you grant permission for our support team to access your project temporarily and, if applicable, to use AI tools to assist in diagnosing and resolving issues.
+                        This access may involve analyzing database configurations, query performance, and other relevant data to expedite troubleshooting and enhance support accuracy.
+                        We are committed to maintaining strict data privacy and security standards in all support activities.{' '}
+                        <Link
+                          href="https://supabase.com/privacy"
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-foreground-light underline hover:text-foreground transition"
+                        >
+                          Privacy Policy
+                        </Link>
+                      </>
+                    }
                   >
                     <FormControl_Shadcn_>
                       <Checkbox_Shadcn_
@@ -731,6 +745,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           </>
         )}
       </form>
-    </Form_Shadcn_>
+    </Form_Shadcn_ >
   )
 }
