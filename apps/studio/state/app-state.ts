@@ -48,6 +48,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   editor: null,
   content: '',
   entity: undefined,
+  tables: [],
 }
 
 export const appState = proxy({
