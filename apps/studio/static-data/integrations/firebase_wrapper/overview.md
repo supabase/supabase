@@ -1,18 +1,5 @@
-The Supabase Wrapper for Firebase integration allows you to seamlessly migrate or integrate your Firebase-based applications with Supabase. This wrapper provides access to Supabase's powerful database and authentication features while minimizing changes to your existing code. It enables you to transition Firebase calls to equivalent Supabase functions, keeping both platforms in sync for smooth migration or hybrid usage.
+Firebase is Google’s comprehensive app development platform that provides tools and infrastructure for building, managing, and scaling applications. It includes features like real-time databases, user authentication, cloud storage, and serverless functions, making it a versatile choice for developers building mobile and web applications. Firebase’s real-time data synchronization and seamless integrations make it ideal for apps requiring live updates, such as chat applications and collaborative tools.
 
-#### Key Features
+Supabase is an open-source backend-as-a-service platform that offers a Postgres database with real-time subscriptions, authentication, and storage capabilities. It streamlines app development with intuitive APIs and tools, making it a flexible alternative for projects that require relational data management and SQL support. Supabase’s developer-focused design bridges the gap between traditional relational databases and modern backend solutions.
 
-- **Effortless Migration**: Convert Firebase queries and authentication to Supabase equivalents with minimal refactoring.
-- **Database Power**: Utilize Supabase's SQL-based database for relational data and complex queries.
-- **Realtime Sync**: Supabase's built-in realtime capabilities ensure data updates remain instant.
-- **Flexible Integration**: Choose which Firebase services to replace or wrap with Supabase.
-
----
-
-#### Example Setup
-
-##### 1. Install Dependencies
-
-```bash
-npm install @supabase/supabase-js firebase
-```
+Integrating Supabase with Firebase allows you to leverage Firebase’s real-time features and cloud infrastructure alongside Supabase’s relational database and SQL capabilities. This combination provides a powerful foundation for modern app development, supporting real-time interactivity and robust data handling.

@@ -85,7 +85,7 @@ export const Header = forwardRef<
                 //   }}
               >
                 {/* Navigation link back to integrations landing */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-0.5">
                   {/* Back arrow */}
 
                   {!isIntegrationsHome && (
@@ -110,7 +110,7 @@ export const Header = forwardRef<
                       layout
                       key="integrations-text"
                       transition={layoutTransition}
-                      className="text-white text-xl"
+                      className="text-foreground text-xl"
                       style={{
                         padding: iconPadding,
                       }}
@@ -151,7 +151,9 @@ export const Header = forwardRef<
                       exit={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
                       layoutId="integration-icon"
-                      className={'relative bg-white rounded z-[3] flex items-center justify-center'}
+                      className={
+                        'relative bg-white border border-muted rounded z-[3] flex items-center justify-center'
+                      }
                       style={{
                         y: iconY, // Controlled by scrollY (0 to 128px)
                         width: iconSize,
@@ -178,7 +180,7 @@ export const Header = forwardRef<
                       className=""
                     >
                       <div className="flex-col justify-start items-start flex">
-                        <div className="text-white text-sm">{integration.name}</div>
+                        <div className="text-foreground text-sm">{integration.name}</div>
                         <div className="text-foreground-light text-xs">
                           {integration.description}
                         </div>
@@ -208,7 +210,7 @@ export const Header = forwardRef<
               //   animate={{ opacity: 1, height: 'auto' }}
               //   exit={{ opacity: 1, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="px-10 [&_ul]:items-center"
+              className="px-10 [&_ul]:items-center bg-200"
               aria-label="Integration menu"
               style={{
                 paddingLeft: !isSticky ? (navInnerLeftPaddingX as number) : 40,
@@ -220,7 +222,7 @@ export const Header = forwardRef<
                   className="w-6 h-6 relative"
                   transition={{ duration: 0 }}
                 >
-                  <div className="w-full h-full bg-foreground rounded" />
+                  <div className="w-full h-full border border-muted bg-white rounded" />
                   <MotionNextImage
                     fill
                     src={integration?.icon as string}

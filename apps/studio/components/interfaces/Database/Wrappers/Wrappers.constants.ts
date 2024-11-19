@@ -1394,6 +1394,11 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'bigquery_wrapper',
+    author: {
+      name: 'Supabase',
+      docsUrl: 'https://supabase.com/docs',
+      websiteUrl: 'https://supabase.com',
+    },
     handlerName: WRAPPER_HANDLERS.BIG_QUERY,
     validatorName: 'big_query_fdw_validator',
     icon: `${BASE_PATH}/img/icons/bigquery-icon.svg`,

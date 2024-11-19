@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { cn } from 'ui'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
@@ -23,19 +24,24 @@ export const MarkdownContent = () => {
       <div className="relative">
         <motion.div
           initial={false}
-          animate={{ height: isExpanded ? 'auto' : 96 }}
+          animate={{ height: isExpanded ? 'auto' : 80 }}
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
           <Markdown content={displayContent} className="!max-w-3xl" />
         </motion.div>
         {!isExpanded && (
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-200 to-transparent" />
+          <div
+            className={cn(
+              'bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-200 to-transparent',
+              !isExpanded ? 'absolute' : 'relative'
+            )}
+          />
         )}
         {content.length > CHAR_LIMIT && (
-          <div className="-bottom-10 absolute z-10">
+          <div className={cn('bottom-0 z-10', !isExpanded ? 'absolute' : 'relative mt-3')}>
             <button
-              className="asbolute text-foreground-light hover:text-foreground underline text-sm"
+              className="text-foreground-light hover:text-foreground underline text-sm"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? 'Show less' : 'Read more'}

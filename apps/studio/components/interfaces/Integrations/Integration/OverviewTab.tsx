@@ -105,13 +105,13 @@ export const OverviewTab = () => {
           Add new wrapper
         </ButtonTooltip>
       </div> */}
+      <MarkdownContent />
       <Separator />
       <div className="mx-10 flex flex-col gap-5">
         Recent wrappers
         <WrapperTable />
       </div>
       <Separator />
-      <MarkdownContent />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateWrapperSheet
