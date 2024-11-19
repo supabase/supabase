@@ -33,7 +33,7 @@ interface PolicyRowProps {
 
 const PolicyRow = ({
   policy,
-  isLocked,
+  isLocked: isLockedDefault,
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
@@ -43,6 +43,10 @@ const PolicyRow = ({
 
   const { project } = useProjectContext()
   const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  // override islocked for Realtime messages table
+  const isLocked =
+    policy.schema === 'realtime' && policy.table === 'messages' ? false : isLockedDefault
 
   // TODO(km): Simple check for roles that allow authenticated access.
   // In the future, we'll use splinter to return proper warnings for policies that allow anonymous user access.
