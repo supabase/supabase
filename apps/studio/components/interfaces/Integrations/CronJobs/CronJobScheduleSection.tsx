@@ -32,11 +32,11 @@ interface CronJobScheduleSectionProps {
 }
 
 const presets = [
-  { name: 'Every minute', expression: '*/1 * * * *' },
+  { name: 'Every minute', expression: '* * * * *' },
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
-  { name: 'Every Monday at midnight', expression: '0 0 * * 1' },
-  { name: 'Every night at midnight', expression: '0 0 0 * * *' },
+  { name: 'Every night at midnight', expression: '0 0 * * *' },
+  { name: 'Every Monday at 2am', expression: '0 2 * * 1' },
 ] as const
 
 export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
@@ -46,7 +46,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 
   const [presetValue, setPresetValue] = useState<string>(initialValue)
   const [inputValue, setInputValue] = useState(initialValue)
-  const [debouncedValue] = useDebounce(inputValue, 500)
+  const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
   const [scheduleString, setScheduleString] = useState('')
 
@@ -78,19 +78,33 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
   }, [debouncedValue, useNaturalLanguage])
 
   useEffect(() => {
-    if (!inputValue) return
+    if (!inputValue || inputValue.length < 5) return // set a min length before showing invalid message
 
     // update the cronstrue string when the input value changes
     try {
       setScheduleString(CronToString(inputValue))
       form.setValue('schedule', inputValue)
-    } catch {}
+    } catch (error) {
+      console.error('Error converting cron expression to string:', error)
+      //setScheduleString('Invalid cron expression')
+    }
   }, [form, inputValue])
 
   useEffect(() => {
-    if (!useNaturalLanguage) {
-      setPresetValue(schedule)
+    if (useNaturalLanguage) return
+
+    setPresetValue(schedule)
+
+    if (!schedule) {
+      setScheduleString('')
+      return
+    }
+
+    try {
       setScheduleString(CronToString(schedule))
+    } catch (error) {
+      console.error('Error converting cron expression to string:', error)
+      //setScheduleString('Invalid cron expression')
     }
   }, [schedule])
 
@@ -141,6 +155,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                         setInputValue('')
                         setPresetValue('')
                         setScheduleString('')
+                        form.setValue('schedule', '')
                       }}
                     />
                     <p className="text-sm text-foreground-light">Use natural language</p>
@@ -199,35 +214,25 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                   <span className="text-sm text-foreground-light">
                     Describe your schedule above
                   </span>
-                ) : scheduleString ? (
+                ) : (
                   <span className="text-sm text-foreground-light flex items-center gap-2">
-                    The cron will be run {/* lowercase the first letter */}
                     {isGeneratingCron ? (
-                      <span className="inline-flex items-center">
-                        {[0, 1, 2].map((i) => (
-                          <motion.span
-                            key={i}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{
-                              duration: 0.5,
-                              repeat: Infinity,
-                              repeatType: 'reverse',
-                              delay: i * 0.2,
-                            }}
-                          >
-                            .
-                          </motion.span>
-                        ))}
-                      </span>
+                      <LoadingDots />
+                    ) : scheduleString === '' ? ( // set a min length before showing invalid message
+                      'Enter a valid cron expression above'
+                    ) : scheduleString.includes('Invalid cron expression') ? (
+                      'Invalid cron expression'
                     ) : (
-                      scheduleString
-                        .split(' ')
-                        .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                        .join(' ') + '.'
+                      <>
+                        The cron will be run{' '}
+                        {scheduleString
+                          .split(' ')
+                          .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
+                          .join(' ') + '.'}
+                      </>
                     )}
                   </span>
-                ) : null}
+                )}
               </div>
             </FormItem_Shadcn_>
           )
@@ -256,5 +261,27 @@ const CronSyntaxLoader = () => {
         </motion.span>
       ))}
     </div>
+  )
+}
+
+const LoadingDots = () => {
+  return (
+    <span className="inline-flex items-center">
+      {[0, 1, 2].map((i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            repeat: Infinity,
+            repeatType: 'reverse',
+            delay: i * 0.2,
+          }}
+        >
+          .
+        </motion.span>
+      ))}
+    </span>
   )
 }
