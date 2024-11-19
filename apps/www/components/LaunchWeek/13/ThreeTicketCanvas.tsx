@@ -112,7 +112,7 @@ const ThreeTicketCanvas: React.FC<{
       metalnessMap: isSecret ? goldTexture : metalTexture,
       roughnessMap: isSecret ? goldTexture : metalTexture,
       metalness: isSecret ? 1 : isPlatinum ? 0.9 : isDarkTheme ? 0.2 : 0.9,
-      roughness: isSecret ? 0.2 : isPlatinum ? 0.19 : isDarkTheme ? 0.2 : 0.5,
+      roughness: isSecret ? 0.1 : isPlatinum ? 0.12 : isDarkTheme ? 0.2 : 0.5,
       bumpScale: isSecret ? 0.85 : isPlatinum ? 0.45 : undefined,
     })
 
@@ -190,13 +190,14 @@ const ThreeTicketCanvas: React.FC<{
       texture.mapping = THREE.EquirectangularReflectionMapping
       scene.environment = texture
       metalMaterial.envMap = texture
-      metalMaterial.envMapIntensity = isDarkTheme ? 3 : 0.5
+      metalMaterial.envMapIntensity = isSecret ? (isDarkTheme ? 3.2 : 2.2) : isDarkTheme ? 3 : 0.5
+      metalMaterial.blending = THREE.NormalBlending
     })
 
     // Lights
     const ambientLight = new THREE.AmbientLight(
       0xffffff,
-      isSecret ? (isDarkTheme ? 4 : 5) : isPlatinum ? (isDarkTheme ? 10 : 8) : 2
+      isSecret ? (isDarkTheme ? 3 : 2) : isPlatinum ? (isDarkTheme ? 10 : 8) : 2
     )
     scene.add(ambientLight)
 

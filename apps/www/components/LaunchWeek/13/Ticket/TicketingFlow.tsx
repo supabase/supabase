@@ -133,6 +133,12 @@ const TicketingFlow = () => {
                   className="w-full flex-1 lg:min-h-[400px] h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
                   <div className="order-first lg:h-full w-full max-w-md xl:max-w-xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
+                    <CountdownComponent
+                      date={LW13_LAUNCH_DATE}
+                      showCard={false}
+                      className="[&_*]:leading-4 text-foreground-lighter -my-6"
+                      size="large"
+                    />
                     {hasPlatinumTicket ? (
                       <div>
                         {hasSecretTicket ? (
