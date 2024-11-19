@@ -1,7 +1,7 @@
 import React from 'react'
 import { ImageResponse } from '@vercel/og'
 import { createClient } from '@supabase/supabase-js'
-import { themes } from '~/components/LaunchWeek/12/Ticket/ticketThemes'
+import { themes } from '~/components/LaunchWeek/13/Ticket/ticketThemes'
 
 export const runtime = 'edge' // 'nodejs' is the default
 export const dynamic = 'force-dynamic' // defaults to auto
@@ -97,22 +97,22 @@ export async function GET(req: Request, res: Response) {
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
     const USERNAME_LEFT = 400
-    const USERNAME_TOP = 440
+    const USERNAME_BOTTOM = 60
     const USERNAME_WIDTH = 400
     const DISPLAY_NAME = name || username
 
     const BACKGROUND = (isDark?: boolean) => ({
       regular: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v1`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-regular-${isDark ? 'dark' : 'light'}.png?v1`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-regular-${isDark ? 'dark' : 'light'}.png?v4`,
       },
       platinum: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v1`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-platinum.png?v1`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-platinum.png?v4`,
       },
       secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon-white.png?v1`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg.png?v1`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v4`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-secret.png?v4`,
       },
     })
 
@@ -135,14 +135,14 @@ export async function GET(req: Request, res: Response) {
           >
             {/* Background  */}
             <img
-              width="1202"
-              height="632"
+              width="1204"
+              height="634"
               style={{
                 position: 'absolute',
-                top: '-1px',
-                left: '-1px',
-                bottom: '-1px',
-                right: '-1px',
+                top: '-2px',
+                left: '-2px',
+                bottom: '-2px',
+                right: '-2px',
                 zIndex: '0',
                 backgroundSize: 'cover',
               }}
@@ -157,13 +157,14 @@ export async function GET(req: Request, res: Response) {
                 justifyContent: 'center',
                 flexDirection: 'column',
                 position: 'absolute',
-                top: USERNAME_TOP,
+                bottom: USERNAME_BOTTOM,
                 left: USERNAME_LEFT,
                 width: USERNAME_WIDTH,
                 height: 'auto',
                 overflow: 'hidden',
                 textOverflow: 'clip',
                 textAlign: 'left',
+                letterSpacing: '-0.5px',
                 marginBottom: '10px',
               }}
             >

@@ -30,6 +30,10 @@ const ThreeCanvas: React.FC<{
   const LINE_HEIGHT = 1.4
   const MIN_CANVAS_HEIGHT = 600
   const positionRight = ticketPosition === 'right'
+  const isPlatinum = ticketType === 'platinum'
+  const isSecret = ticketType === 'secret'
+
+  console.log('ticketType', ticketType)
 
   const CONFIG = {
     regular: {
@@ -41,7 +45,7 @@ const ThreeCanvas: React.FC<{
       ticketForeground: 0x0f0f0f,
     },
     secret: {
-      ticketColor: 0x9ea1a1,
+      ticketColor: isDarkTheme ? 0xe7a938 : 0xf2c66d,
       ticketForeground: 0x0f0f0f,
     },
   }
@@ -69,6 +73,7 @@ const ThreeCanvas: React.FC<{
     )
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(initialCanvasWidth, initialCanvasHeight)
+    renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true
     canvasRef.current.appendChild(renderer.domElement)
 
@@ -78,33 +83,32 @@ const ThreeCanvas: React.FC<{
 
     // Rest of your existing setup code (loader, materials, etc.)
     const loader = new GLTFLoader()
-    const metalTexture = new THREE.TextureLoader().load('/images/launchweek/13/ticket/2000px.avif')
+
+    // Texture from Freepik: https://www.freepik.com/free-photo/golden-wall-background_1213228.htm
+    const metalTexture = new THREE.TextureLoader().load(
+      '/images/launchweek/13/ticket/metal-texture.jpg'
+    )
+    const goldTexture = new THREE.TextureLoader().load(
+      '/images/launchweek/13/ticket/gold-texture.jpg'
+    )
+
     const metalMaterial = new THREE.MeshStandardMaterial({
       color: CONFIG[ticketType].ticketColor,
-      map: ticketType === 'platinum' ? metalTexture : undefined,
-      bumpMap: ticketType === 'platinum' ? metalTexture : undefined,
-      metalnessMap: metalTexture,
-      roughnessMap: metalTexture,
-      metalness: ticketType === 'platinum' ? 0.9 : isDarkTheme ? 0.2 : 0.9,
-      roughness: ticketType === 'platinum' ? 0.19 : isDarkTheme ? 0.2 : 0.5,
-      bumpScale: ticketType === 'platinum' ? 0.25 : undefined,
+      map: isSecret ? goldTexture : isPlatinum ? metalTexture : undefined,
+      bumpMap: isSecret ? goldTexture : isPlatinum ? metalTexture : undefined,
+      metalnessMap: isSecret ? goldTexture : metalTexture,
+      roughnessMap: isSecret ? goldTexture : metalTexture,
+      metalness: isSecret ? 1 : isPlatinum ? 0.9 : isDarkTheme ? 0.2 : 0.9,
+      roughness: isSecret ? 0.2 : isPlatinum ? 0.19 : isDarkTheme ? 0.2 : 0.5,
+      bumpScale: isSecret ? 0.85 : isPlatinum ? 0.45 : undefined,
     })
 
-    // Environment Map
-    const rgbeLoader = new RGBELoader()
-    rgbeLoader.load('/images/launchweek/13/ticket/canary_wharf_1k.hdr', (texture) => {
-      texture.mapping = THREE.EquirectangularReflectionMapping
-      scene.environment = texture
-      metalMaterial.envMap = texture
-      metalMaterial.envMapIntensity = isDarkTheme ? 2 : 1
-      metalMaterial.blending = THREE.AdditiveBlending
-    })
-
+    // Load Ticket model, fonts and textures
     let ticket3DImport: THREE.Mesh
     const ticketGroup = new THREE.Group()
-    ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
     const ticketScale = getTicketScale(window.innerWidth)
     ticketGroup.scale.set(ticketScale, ticketScale, ticketScale)
+    ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
 
     loader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
@@ -123,74 +127,88 @@ const ThreeCanvas: React.FC<{
       scene.add(ticketGroup)
       ticketRef.current = ticket3DImport
       camera.lookAt(ticket3DImport.position)
+    })
 
-      // Load font and add text geometry
-      const fontLoader = new FontLoader()
-      fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
-        const textMaterial = new THREE.MeshStandardMaterial({
-          color: CONFIG[ticketType].ticketForeground,
-          metalness: 0.2,
-          roughness: 0.35,
+    const textMaterial = new THREE.MeshStandardMaterial({
+      color: CONFIG[ticketType].ticketForeground,
+      metalness: 0.2,
+      roughness: 0.35,
+    })
+    const PADDING_LEFT = -6.4
+
+    // Load font and add text geometry
+    const fontLoader = new FontLoader()
+
+    // Load Inter font
+    fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
+      textLines.map((text, index) => {
+        const textGeometry = new TextGeometry(text, {
+          font,
+          size: 1.0,
+          height: 0.4,
         })
-
-        ticket3DImport.updateMatrix()
-
-        const PADDING_LEFT = -6.4
-
-        textLines.map((text, index) => {
-          const textGeometry = new TextGeometry(text, {
-            font,
-            size: 1.0,
-            height: 0.4,
-          })
-          const textMesh = new THREE.Mesh(textGeometry, textMaterial)
-          textMesh.updateMatrix()
-          // textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
-          textMesh.position.set(PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
-          textMesh.castShadow = true
-          ticketGroup.add(textMesh)
-        })
-
-        const footerContent = [
-          {
-            text: 'LAUNCH WEEK 13',
-            position: { x: PADDING_LEFT, y: -6.8, z: -0.2 },
-            size: 0.59,
-          },
-          {
-            text: '2-6 DEC 2024',
-            position: { x: PADDING_LEFT, y: -7.7, z: -0.2 },
-            size: 0.55,
-          },
-        ]
-
-        footerContent.map((line) => {
-          const textGeometry = new TextGeometry(line.text, {
-            font,
-            size: line.size,
-            height: 0.4,
-          })
-          const textMesh = new THREE.Mesh(textGeometry, textMaterial)
-          textMesh.updateMatrix()
-          textMesh.position.set(line.position.x, line.position.y, line.position.z)
-          textMesh.castShadow = true
-          ticketGroup.add(textMesh)
-        })
-
-        camera.position.x = 0
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+        textMesh.updateMatrix()
+        // textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
+        textMesh.position.set(PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
+        textMesh.castShadow = true
+        ticketGroup.add(textMesh)
       })
     })
 
-    camera.position.z = 30
-    // Lights
+    fontLoader.load('/images/launchweek/13/ticket/SourceCodePro_Regular.json', (font) => {
+      const footerContent = [
+        {
+          text: 'LAUNCH WEEK 13',
+          position: { x: PADDING_LEFT, y: -6.8, z: -0.2 },
+          size: 0.59,
+        },
+        {
+          text: '2-6 DEC 2024',
+          position: { x: PADDING_LEFT, y: -7.7, z: -0.2 },
+          size: 0.55,
+        },
+      ]
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, ticketType === 'platinum' ? 8 : 2)
+      footerContent.map((line) => {
+        const textGeometry = new TextGeometry(line.text, {
+          font,
+          size: line.size,
+          height: 0.4,
+        })
+        const textMesh = new THREE.Mesh(textGeometry, textMaterial)
+        textMesh.updateMatrix()
+        textMesh.position.set(line.position.x, line.position.y, line.position.z)
+        textMesh.castShadow = true
+        ticketGroup.add(textMesh)
+      })
+    })
+
+    ticketGroup.updateMatrix()
+    camera.position.x = 0
+    camera.position.z = 30
+
+    // Environment Map
+    const envMapLoader = new THREE.TextureLoader()
+    envMapLoader.load('/images/launchweek/13/ticket/env-map.jpg', (texture) => {
+      texture.mapping = THREE.EquirectangularReflectionMapping
+      scene.environment = texture
+      metalMaterial.envMap = texture
+      metalMaterial.envMapIntensity = isDarkTheme ? 3 : 0.5
+      // metalMaterial.blending = THREE.NormalBlending
+    })
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(
+      0xffffff,
+      isSecret ? (isDarkTheme ? 4 : 5) : isPlatinum ? (isDarkTheme ? 10 : 8) : 2
+    )
     scene.add(ambientLight)
 
-    const spotLight1 = new THREE.SpotLight(0xffffff, 20)
-    spotLight1.position.z = ticketGroup.position.z - 3
-    spotLight1.position.x = ticketGroup.position.x - 6
-    spotLight1.angle = Math.PI / 2
+    const spotLight1 = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
+    spotLight1.position.z = ticketGroup.position.z + 4
+    spotLight1.position.x = ticketGroup.position.x - 10
+    spotLight1.angle = (Math.PI / 2) * 0.5
     spotLight1.lookAt(ticketGroup.position)
     spotLight1.castShadow = true
     spotLight1.shadow.mapSize.set(1024, 1024)
@@ -198,11 +216,14 @@ const ThreeCanvas: React.FC<{
     spotLight1.shadow.camera.far = 15
     scene.add(spotLight1)
 
-    const spotLight2 = new THREE.SpotLight(0xffffff, 20)
-    spotLight2.position.z = ticketGroup.position.z - 2
-    spotLight2.position.x = ticketGroup.position.x + 6
-    spotLight2.angle = Math.PI / 2
+    const spotLight2 = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
+    spotLight2.position.z = ticketGroup.position.z + 4
+    spotLight2.position.x = ticketGroup.position.x + 10
+    spotLight2.angle = (Math.PI / 2) * 0.5
     spotLight2.castShadow = true
+    spotLight2.shadow.mapSize.set(1024, 1024)
+    spotLight2.shadow.camera.near = 5
+    spotLight2.shadow.camera.far = 15
     spotLight2.lookAt(ticketGroup.position)
     scene.add(spotLight2)
 
@@ -312,7 +333,7 @@ const ThreeCanvas: React.FC<{
         className
       )}
     >
-      <div ref={canvasRef} className="w-full lg:h-full" />
+      <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
     </div>
   )
 }
