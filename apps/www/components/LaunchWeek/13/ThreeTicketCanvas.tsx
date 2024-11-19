@@ -360,7 +360,6 @@ const ThreeTicketCanvas: React.FC<{
         className
       )}
     >
-      <div className="absolute right-4 top-4">flipped: {isFlipped.current ? 'true' : 'false'}</div>
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
     </div>
   )
