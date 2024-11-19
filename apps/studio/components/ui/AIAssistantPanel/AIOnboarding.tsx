@@ -72,7 +72,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database RLS Policies I can add to my public schema`
+                  "Create a table of countries and a table of cities. The cities table should have a country column that's a foreign key to the countries table."
                 )
               }
             >
@@ -85,7 +85,9 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               type="text"
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
-                sendMessageToAssistant(`Generate some examples of database RLS Policies`)
+                sendMessageToAssistant(
+                  'Give me a list of new users from the auth.users table who signed up in the past week'
+                )
               }
             >
               Query your data
@@ -96,7 +98,11 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database RLS Policies`)}
+              onClick={() =>
+                sendMessageToAssistant(
+                  'Give me a chart showing the number of new sign ups in the auth.users table per day over the last week'
+                )
+              }
             >
               Chart your data
             </Button>
@@ -117,7 +123,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database RLS policies I can add to my public schema`
+                  'Suggest some database RLS policies I can add to my public schema'
                 )
               }
             >
@@ -130,7 +136,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               type="text"
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
-                sendMessageToAssistant(`Generate some examples of database RLS policies`)
+                sendMessageToAssistant('Generate some examples of database RLS policies')
               }
             >
               Examples of RLS policies
@@ -162,7 +168,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database functions I can add to my public schema`
+                  'Suggest some database functions I can add to my public schema'
                 )
               }
             >
@@ -174,7 +180,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<FileText strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`Generate some examples of database functions`)}
+              onClick={() => sendMessageToAssistant('Generate some examples of database functions')}
             >
               Examples of database functions
             </Button>
@@ -184,7 +190,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database functions`)}
+              onClick={() => sendMessageToAssistant('What are database functions')}
             >
               What are database functions?
             </Button>
@@ -205,7 +211,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               className="w-full justify-start py-1 h-auto"
               onClick={() =>
                 sendMessageToAssistant(
-                  `Suggest some database triggers I can add to my public schema`
+                  'Suggest some database triggers I can add to my public schema'
                 )
               }
             >
@@ -227,7 +233,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
               icon={<MessageCircleMore strokeWidth={1.5} size={16} />}
               type="text"
               className="w-full justify-start py-1 h-auto"
-              onClick={() => sendMessageToAssistant(`What are database triggers`)}
+              onClick={() => sendMessageToAssistant('What are database triggers')}
             >
               What are database triggers?
             </Button>

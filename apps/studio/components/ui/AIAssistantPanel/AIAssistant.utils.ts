@@ -135,7 +135,7 @@ export const isReadOnlySelect = (query: string): boolean => {
     'procedure',
   ]
 
-  const allowedPatterns = ['inserted']
+  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted']
 
   // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
   return !disallowedPatterns.some((pattern) => {

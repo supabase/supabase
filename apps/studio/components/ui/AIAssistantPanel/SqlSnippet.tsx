@@ -57,7 +57,7 @@ const SqlSnippetWrapper = ({
     <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
         sql={updatedFormatted}
-        isChart={props.isChart}
+        isChart={props.isChart === 'true'}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
         title={title}
