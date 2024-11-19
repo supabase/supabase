@@ -25,7 +25,11 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { getContextualInvalidationKeys, isReadOnlySelect } from './AIAssistant.utils'
+import {
+  getContextualInvalidationKeys,
+  identifyQueryType,
+  isReadOnlySelect,
+} from './AIAssistant.utils'
 import { useParams } from 'common'
 import { useQueryClient } from '@tanstack/react-query'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -192,9 +196,12 @@ export const SqlCard = ({
                       return { result: [] }
                     },
                   })
+
                   sendEvent({
                     action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
                     value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
+                    label: 'mutation',
+                    category: identifyQueryType(sql) ?? 'unknown',
                   })
                 }}
               >
@@ -270,7 +277,16 @@ export const SqlCard = ({
                   className="w-7 h-7"
                   icon={<Play size={14} />}
                   loading={isExecuting}
-                  onClick={handleExecute}
+                  onClick={() => {
+                    handleExecute()
+                    if (isReadOnlySelect(sql)) {
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                        value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
+                        label: 'select',
+                      })
+                    }
+                  }}
                   tooltip={{
                     content: {
                       side: 'bottom',

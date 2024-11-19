@@ -77,7 +77,7 @@ export const AIAssistant = ({
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const { aiAssistantPanel, resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
   const { initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -103,10 +103,11 @@ export const AIAssistant = ({
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (label: string) => {
+  const sendTelemetryEvent = (value: string) => {
     sendEvent({
-      label,
+      value,
       action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
     })
   }
 
@@ -175,7 +176,12 @@ export const AIAssistant = ({
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
-    sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+
+    if (content.includes('Help me to debug')) {
+      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
+    } else {
+      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+    }
   }
 
   const confirmOptInToShareSchemaData = async () => {
