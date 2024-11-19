@@ -81,7 +81,6 @@ describe('rls chat', () => {
     )
     const responseText = await collectStream(responseStream)
     const [sql] = extractMarkdownSql(responseText)
-    console.log({ sql })
     const [policy] = await getPolicies(sql)
     const { roles } = await getPolicyInfo(policy)
 
