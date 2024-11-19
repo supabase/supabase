@@ -503,9 +503,7 @@ const DisplayCondition = observer(() => {
   return (
     <div className="text-sm leading-4 grid gap-2 md:grid md:grid-cols-12">
       <div className="flex flex-col space-y-2 col-span-4">
-        <label className="block text-foreground-light text-sm leading-4 break-all">
-          Condition (read-only)
-        </label>
+        <label className="block text-foreground-light text-sm leading-4 break-all">Condition</label>
       </div>
       <div className="col-span-8 h-[100px]">
         <CodeEditor
@@ -516,8 +514,11 @@ const DisplayCondition = observer(() => {
           defaultValue={_localState!.formState.condition.value}
         />
         <div className="mt-2 text-foreground-lighter leading-normal text-sm">
-          This condition must be met for the trigger to fire. To update the condition, you must drop
-          and recreate this trigger.
+          This condition must be met for the trigger to fire.
+          <br />
+          <span className="text-foreground">
+            To update the condition, you must drop and recreate this trigger.
+          </span>
         </div>
       </div>
     </div>
