@@ -66,7 +66,6 @@ export const Message = function Message({
                 </div>
               ) : (
                 <SqlSnippet
-                  id={id}
                   readOnly={readOnly}
                   isLoading={isLoading}
                   sql={props.children[0].props.children}

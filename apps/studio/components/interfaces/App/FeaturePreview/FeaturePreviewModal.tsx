@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS, TELEMETRY_EVENTS } from 'lib/constants'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()

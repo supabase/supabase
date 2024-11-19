@@ -29,16 +29,16 @@ import { getContextualInvalidationKeys, isReadOnlySelect } from './AIAssistant.u
 import { useParams } from 'common'
 import { useQueryClient } from '@tanstack/react-query'
 import { Markdown } from 'components/interfaces/Markdown'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 
 interface SqlSnippetWrapperProps {
-  id: string
   sql: string
   isLoading?: boolean
   readOnly?: boolean
 }
 
 const SqlSnippetWrapper = ({
-  id,
   sql,
   isLoading = false,
   readOnly = false,
@@ -52,7 +52,6 @@ const SqlSnippetWrapper = ({
   return (
     <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
-        id={id}
         sql={updatedFormatted}
         isChart={props.isChart}
         xAxis={props.xAxis}
@@ -66,7 +65,6 @@ const SqlSnippetWrapper = ({
 }
 
 interface ParsedSqlProps {
-  id: string
   sql: string
   title: string
   isLoading?: boolean
@@ -77,7 +75,6 @@ interface ParsedSqlProps {
 }
 
 export const SqlCard = ({
-  id,
   sql,
   isChart,
   xAxis,
@@ -102,6 +99,8 @@ export const SqlCard = ({
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
   const [showWarning, setShowWarning] = useState(false)
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async (res) => {
@@ -193,6 +192,10 @@ export const SqlCard = ({
                       return { result: [] }
                     },
                   })
+                  sendEvent({
+                    action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                    value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
+                  })
                 }}
               >
                 Run
@@ -221,7 +224,13 @@ export const SqlCard = ({
                     size="tiny"
                     className="w-7 h-7"
                     icon={<Edit size={14} />}
-                    onClick={handleEditInSQLEditor}
+                    onClick={() => {
+                      handleEditInSQLEditor()
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                        value: TELEMETRY_VALUES.EDIT_IN_SQL_EDITOR,
+                      })
+                    }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
                 ) : (
@@ -285,13 +294,13 @@ export const SqlCard = ({
 
       {showCode && (
         <CodeBlock
+          hideLineNumbers
           value={sql}
           language="sql"
           className={cn(
             'max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
-          hideLineNumbers
         />
       )}
 
@@ -353,6 +362,8 @@ export const SqlCard = ({
                       <>
                         <p className="font-mono text-xs">{error.error}</p>
                         <Button
+                          type="default"
+                          className="mt-2"
                           onClick={() => {
                             setAiAssistantPanel({
                               sqlSnippets: [sql],

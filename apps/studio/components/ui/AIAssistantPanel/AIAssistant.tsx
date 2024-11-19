@@ -22,13 +22,8 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import {
-  BASE_PATH,
-  IS_PLATFORM,
-  OPT_IN_TAGS,
-  TELEMETRY_EVENTS,
-  TELEMETRY_VALUES,
-} from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
 import {

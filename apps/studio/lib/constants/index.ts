@@ -83,18 +83,3 @@ export const OPT_IN_TAGS = {
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
-
-// [Joshen] Just adding these to start consolidating our telemetry configs
-// may change depending on how we choose to standardize across all apps
-// Events define the name of the event and it'll be used as the primary identification
-export enum TELEMETRY_EVENTS {
-  FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
-  AI_ASSISTANT_V2 = 'AI Assistant V2',
-}
-
-// [Joshen] Values refer to the "action" of the "event"
-// e.g prompt submitted (action) through the AI assistant (event)
-// e.g enabled feature x (action) via the feature preview (event)
-export enum TELEMETRY_VALUES {
-  PROMPT_SUBMITTED = 'prompt-submitted',
-}
