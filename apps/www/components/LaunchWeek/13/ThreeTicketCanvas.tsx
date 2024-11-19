@@ -61,7 +61,7 @@ const ThreeTicketCanvas: React.FC<{
       size: 0.59,
     },
     {
-      text: '2-6 DEC 2024',
+      text: '2-6 DEC / 7AM PT',
       position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: -0.2 },
       size: 0.55,
     },
