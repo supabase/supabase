@@ -643,9 +643,13 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
                     description={
                       <>
-                        By checking this box, you grant permission for our support team to access your project temporarily and, if applicable, to use AI tools to assist in diagnosing and resolving issues.
-                        This access may involve analyzing database configurations, query performance, and other relevant data to expedite troubleshooting and enhance support accuracy.
-                        We are committed to maintaining strict data privacy and security standards in all support activities.{' '}
+                        By checking this box, you grant permission for our support team to access
+                        your project temporarily and, if applicable, to use AI tools to assist in
+                        diagnosing and resolving issues. This access may involve analyzing database
+                        configurations, query performance, and other relevant data to expedite
+                        troubleshooting and enhance support accuracy. We are committed to
+                        maintaining strict data privacy and security standards in all support
+                        activities.{' '}
                         <Link
                           href="https://supabase.com/privacy"
                           target="_blank"
@@ -745,6 +749,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           </>
         )}
       </form>
-    </Form_Shadcn_ >
+    </Form_Shadcn_>
   )
 }
