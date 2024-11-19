@@ -29,6 +29,12 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
   }}
 />
 
+Branching uses the `config.toml` file in your `supabase` directory to prepare and deploy the different services to each branch. These are:
+1. Database - Using the `migrations` directory for schema changes and applying the contents of `seed.sql` for seed data
+2. Auth - The `auth` section of the `config.toml` file is used to sync your project config with the Branch
+3. Storage - Buckets defined in the  `storage` section of the `config.toml` are created upon deployment of a new Branch and are seeded with files within the directory defined in the `objects_path` property
+4. Edge Functions - Functions within the `functions` directory are deployed
+
 ### Branching workflow
 
 Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
