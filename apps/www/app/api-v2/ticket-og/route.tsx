@@ -61,7 +61,7 @@ export async function GET(req: Request, res: Response) {
     const { data: user, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
       .select(
-        'id, name, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
+        'id, name, metadata, shared_on_twitter, shared_on_linkedin, platinum, secret, role, company, location'
       )
       .eq('launch_week', 'lw13')
       .eq('username', username)
@@ -74,9 +74,12 @@ export async function GET(req: Request, res: Response) {
       name,
       secret,
       platinum: isPlatinum,
+      metadata,
       shared_on_twitter: sharedOnTwitter,
       shared_on_linkedin: sharedOnLinkedIn,
     } = user
+
+    const isDark = metadata.theme !== 'light'
 
     const platinum = isPlatinum ?? (!!sharedOnTwitter && !!sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum)
@@ -85,9 +88,9 @@ export async function GET(req: Request, res: Response) {
     // Generate image and upload to storage.
     const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
-    const STYLING_CONFIG = {
-      TICKET_FOREGROUND: themes[ticketType].TICKET_FOREGROUND,
-    }
+    const STYLING_CONFIG = (isDark?: boolean) => ({
+      TICKET_FOREGROUND: themes(isDark)[ticketType].TICKET_FOREGROUND,
+    })
 
     const fontData = await font
     const monoFontData = await mono_font
@@ -98,20 +101,20 @@ export async function GET(req: Request, res: Response) {
     const USERNAME_WIDTH = 400
     const DISPLAY_NAME = name || username
 
-    const BACKGROUND = {
+    const BACKGROUND = (isDark?: boolean) => ({
       regular: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg.png`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v1`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-regular-${isDark ? 'dark' : 'light'}.png?v1`,
       },
       platinum: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg.png?ASdf`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png?v1`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg-platinum.png?v1`,
       },
       secret: {
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon-white.png`,
-        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg.png`,
+        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon-white.png?v1`,
+        BACKGROUND_IMG: `${STORAGE_URL}/assets/ticket-og-bg.png?v1`,
       },
-    }
+    })
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -123,7 +126,7 @@ export async function GET(req: Request, res: Response) {
               position: 'relative',
               fontFamily: '"Circular"',
               overflow: 'hidden',
-              color: STYLING_CONFIG.TICKET_FOREGROUND,
+              color: STYLING_CONFIG(isDark).TICKET_FOREGROUND,
               display: 'flex',
               flexDirection: 'column',
               padding: '60px',
@@ -143,7 +146,7 @@ export async function GET(req: Request, res: Response) {
                 zIndex: '0',
                 backgroundSize: 'cover',
               }}
-              src={BACKGROUND[ticketType].BACKGROUND_IMG}
+              src={BACKGROUND(isDark)[ticketType].BACKGROUND_IMG}
             />
 
             {/* Name & username */}

@@ -90,11 +90,11 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                     <div className="lg:h-full w-full max-w-lg gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
                       <div className="flex flex-col items-center justify-center lg:justify-start lg:items-start gap-2 text-foreground text-center md:text-left max-w-sm">
                         <h1 className="text-foreground text-2xl">
-                          {DISPLAY_NAME?.split(' ')[0]}'s Ticket
+                          Join {DISPLAY_NAME?.split(' ')[0]} <br /> for Launch Week 13
                         </h1>
-                        <span className="text-foreground-light text-2xl">
-                          Join {FIRST_NAME} for Supabase Launch Week 13. Claim your ticket for a
-                          chance to win limited swag.
+                        <span className="text-foreground-lighter">
+                          Claim your own ticket for a chance to win limited swag and to follow all
+                          the announcements.
                         </span>
                       </div>
                       <div>
@@ -141,9 +141,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // fetch the normal ticket
   // stores the og images in supabase storage
-  fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
-
-  // supabaseAdmin.functions.invoke(`lw13-ticket-og?username=${encodeURIComponent(username ?? '')}`)
+  fetch(
+    // @ts-ignore
+    `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
+  )
 
   // fetch a specific user
   if (username) {

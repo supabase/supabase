@@ -1,6 +1,7 @@
 import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { Check } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
@@ -9,6 +10,7 @@ import { useParams } from '~/hooks/useParams'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 
 export default function TicketActions() {
+  const { resolvedTheme } = useTheme()
   const { userData, supabase } = useConfData()
   const { platinum, username, metadata, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
@@ -53,7 +55,7 @@ export default function TicketActions() {
           .from(TICKETS_TABLE)
           .update({
             shared_on_twitter: 'now',
-            metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
+            metadata: { ...metadata, theme: resolvedTheme, hasSharedSecret: hasSecretTicket },
           })
           .eq('launch_week', 'lw13')
           .eq('username', username)
@@ -62,7 +64,7 @@ export default function TicketActions() {
           .from(TICKETS_TABLE)
           .update({
             shared_on_linkedin: 'now',
-            metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
+            metadata: { ...metadata, theme: resolvedTheme, hasSharedSecret: hasSecretTicket },
           })
           .eq('launch_week', 'lw13')
           .eq('username', username)

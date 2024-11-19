@@ -1,6 +1,6 @@
-export const themes = {
+export const themes = (isDark?: boolean) => ({
   regular: {
-    TICKET_FOREGROUND: '#FAFAFA',
+    TICKET_FOREGROUND: isDark ? '#1F1F1F' : '#FAFAFA',
   },
   platinum: {
     TICKET_FOREGROUND: '#1F1F1F',
@@ -8,4 +8,4 @@ export const themes = {
   secret: {
     TICKET_FOREGROUND: '#EDEDED',
   },
-}
+})

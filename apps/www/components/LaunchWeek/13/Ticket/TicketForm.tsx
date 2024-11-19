@@ -7,10 +7,12 @@ import { useKey } from 'react-use'
 
 import { useCommandMenuOpen } from 'ui-patterns'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { useTheme } from 'next-themes'
 
 type FormState = 'default' | 'loading' | 'error'
 
 export default function TicketForm() {
+  const { resolvedTheme } = useTheme()
   const [formState, setFormState] = useState<FormState>('default')
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
@@ -36,6 +38,7 @@ export default function TicketForm() {
             email,
             name,
             username,
+            metadata: { theme: resolvedTheme },
             referred_by: router.query?.referral ?? null,
           })
           .select()
