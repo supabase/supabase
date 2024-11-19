@@ -15,26 +15,29 @@ import {
   SheetContent,
   WarningIcon,
 } from 'ui'
-import { IntegrationDefinition } from '../Landing/Integrations.constants'
+import { IntegrationDefinition, INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
+import { MarkdownContent } from './MarkdownContent'
 
-export const OverviewTab = ({ integration }: { integration: IntegrationDefinition }) => {
+export const OverviewTab = () => {
   const { id } = useParams()
   const { project } = useProjectContext()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
   const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
-  if (integration.type !== 'wrapper') {
-    return <div>Unsupported integration type.</div>
-  }
-
-  const wrapperMeta = integration.meta
-
   const { data } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const integration = INTEGRATIONS.find((i) => i.id === id)
+
+  if (integration?.type !== 'wrapper') {
+    return <div>Unsupported integration type.</div>
+  }
+
+  const wrapperMeta = integration.meta
 
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
 
@@ -99,6 +102,7 @@ export const OverviewTab = ({ integration }: { integration: IntegrationDefinitio
           Add new wrapper of this kind
         </ButtonTooltip>
       </div>
+      <MarkdownContent />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateWrapperSheet

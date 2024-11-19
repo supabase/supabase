@@ -59,21 +59,18 @@ export const Header = forwardRef<
   // Map scrollY to the icon's Y position
   const iconY = scroll ? useTransform(scroll?.scrollY!, scrollRange, iconYRange) : 0
 
-  const MotionNavMenu = motion(NavMenu) as React.ComponentType<
-    React.ComponentProps<typeof NavMenu> & MotionProps
-  >
-
   // Output range: The size range for the icon container
   const sizeRange = [32, 24] // From 24px (scrolled) to 32px (top)
   const iconSize = scroll ? useTransform(scroll?.scrollY!, scrollRange, sizeRange) : 32
 
   // Output range: The padding range for the image
-  const iconPaddingRange = [1.5, 2] // From 1.5px (scrolled) to 4px (top)
+  const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
 
-  // const isSticky = scroll?.scrollY?.get() > 128
-
-  console.log(iconPadding.get())
+  /* prettier-ignore */
+  const MotionNavMenu = motion(NavMenu) as React.ComponentType<React.ComponentProps<typeof NavMenu> & MotionProps>
+  /* prettier-ignore */
+  const MotionNextImage = motion(Image) as React.ComponentType<React.ComponentProps<typeof Image> & MotionProps>
 
   return (
     <>
@@ -123,6 +120,9 @@ export const Header = forwardRef<
                       key="integrations-text"
                       transition={layoutTransition}
                       className="text-white text-xl"
+                      style={{
+                        padding: iconPadding,
+                      }}
                     >
                       Integrations
                     </motion.span>
@@ -163,17 +163,16 @@ export const Header = forwardRef<
                       className={'relative bg-white rounded z-[3] flex items-center justify-center'}
                       style={{
                         y: iconY, // Controlled by scrollY (0 to 128px)
-
                         width: iconSize,
                         height: iconSize,
                       }}
                     >
-                      <Image
+                      <MotionNextImage
                         fill
                         src={integration.icon}
                         alt={`${integration.name}`}
                         style={{
-                          padding: iconPadding.get(),
+                          padding: iconPadding,
                         }}
                       />
                     </motion.div>
@@ -221,25 +220,22 @@ export const Header = forwardRef<
               className="px-10 [&_ul]:items-center"
               aria-label="Integration menu"
               style={{
-                paddingLeft: !isSticky ? navInnerLeftPaddingX : 40,
+                paddingLeft: !isSticky ? (navInnerLeftPaddingX as number) : 40,
               }}
             >
               {isSticky && (
                 <motion.div
-                  initial={{ opacity: 1, scale: 1 }}
                   layoutId="integration-icon"
-                  //   initial={{ opacity: 0, scale: 0.67 }}
-                  //   animate={{ opacity: 1, scale: 0.67 }}
                   className="w-6 h-6 relative"
                   transition={{ duration: 0 }}
                 >
                   <div className="w-full h-full bg-foreground rounded" />
-                  <Image
+                  <MotionNextImage
                     fill
                     src={integration?.icon as string}
                     alt={`${integration?.name}`}
                     style={{
-                      padding: iconPadding.get(),
+                      padding: iconPadding,
                     }}
                   />
                 </motion.div>

@@ -21,13 +21,16 @@ import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Page } from 'openai/pagination'
 import { useEffect, useRef, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import { GetStaticProps, GetStaticPaths } from 'next'
+import fs from 'fs'
+import path from 'path'
 
 import type { NextPageWithLayout } from 'types'
 import { Button, NavMenu, NavMenuItem } from 'ui'
 
 const IntegrationPage: NextPageWithLayout = () => {
-  const x = useMotionValue(0)
-
   const { id } = useParams()
   const { project } = useProjectContext()
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
@@ -40,39 +43,6 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   return (
     <div className="py-0">
-      {/* <Link
-        href={`/project/${project?.ref}/integrations/landing`}
-        className="flex flex-row items-center gap-1 pl-10 text-foreground-light"
-      >
-        <ChevronLeft size={14} />
-        <span className="text-sm  hover:underline">Integrations</span>
-      </Link>
-      <div className="flex flex-row pl-10"></div>
-      <div className="pl-10 pt-5 flex flex-row gap-4">
-        <div className="w-12 h-12 relative">
-          <div className="w-full h-full bg-foreground rounded-md" />
-          <Image fill src={integration.icon} alt={`${integration.name}`} className="p-2" />
-        </div>
-        <div className="grow basis-0 w-full">
-          <div className="flex-col justify-start items-start flex">
-            <div className="text-white text-lg">{integration.name}</div>
-            <div className="text-foreground-light text-sm">{integration.description}</div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* <NavMenu className="pl-10 mt-9" aria-label="Vault menu">
-        <NavMenuItem active={selectedTab === 'overview'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=overview`}>Overview</Link>
-        </NavMenuItem>
-        <NavMenuItem active={selectedTab === 'wrappers'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=wrappers`}>Wrappers</Link>
-        </NavMenuItem>
-        <NavMenuItem active={selectedTab === 'logs'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=logs`}>Logs</Link>
-        </NavMenuItem>
-      </NavMenu> */}
-      <motion.div style={{ x }} />
       <div className="">
         {selectedTab === 'overview' && <OverviewTab integration={integration} />}
         {selectedTab === 'wrappers' && <WrappersTab />}
