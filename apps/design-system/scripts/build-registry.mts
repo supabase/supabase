@@ -219,6 +219,9 @@ export const Index: Record<string, any> = {
       if (type === 'example') {
         packagePath = `registry/${style.name}/${type}`
       }
+      if (type === 'block') {
+        packagePath = `registry/${style.name}/${type}`
+      }
 
       index += `
     "${item.name}": {

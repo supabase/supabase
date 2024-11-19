@@ -171,8 +171,8 @@ export function createClient() {
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -227,7 +227,7 @@ export const config = {
 }
 ```
 
-```ts utils/supabase/middlware.ts
+```ts utils/supabase/middleware.ts
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -482,6 +482,8 @@ const supabase = createServerClient(
 
 ```html index.astro
 <script>
+  import { createBrowserClient } from "@supabase/ssr";
+
   const supabase = createBrowserClient(
     import.meta.env.PUBLIC_SUPABASE_URL,
     import.meta.env.PUBLIC_SUPABASE_ANON_KEY
@@ -516,6 +518,36 @@ export async function GET(context: APIContext) {
 
   return ...
 }
+```
+
+</TabPanel>
+
+<TabPanel id="astro-middleware" label="Middleware">
+
+```ts middleware.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { defineMiddleware } from 'astro:middleware'
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            context.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  return next()
+})
 ```
 
 </TabPanel>

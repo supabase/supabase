@@ -52,7 +52,7 @@ const BillingBreakdown = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         {!canReadSubscriptions ? (
-          <NoPermission resourceText="view this organization's billing" />
+          <NoPermission resourceText="view this organization's billing breakdown" />
         ) : (
           <>
             {isLoadingSubscription && (
@@ -69,17 +69,12 @@ const BillingBreakdown = () => {
 
             {invoiceFeatureEnabled && (
               <>
-                <p className="text-sm text-foreground-light">
+                <p className="prose text-sm">
                   The table shows your upcoming invoice, excluding credits. This invoice will
                   continue updating until the end of your billing period on{' '}
                   {billingCycleEnd.format('MMMM DD')}. See{' '}
-                  <Link
-                    className="text-green-900 transition hover:text-green-1000"
-                    href={`/org/${orgSlug}/usage`}
-                  >
-                    usage page
-                  </Link>{' '}
-                  for a more detailed usage breakdown.
+                  <Link href={`/org/${orgSlug}/usage`}>usage page</Link> for a more detailed usage
+                  breakdown.
                 </p>
 
                 <UpcomingInvoice slug={orgSlug} />

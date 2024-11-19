@@ -12,7 +12,7 @@ export default async function ContributingPage() {
   const content = await readFile(contentFile, 'utf-8')
 
   return (
-    <SidebarSkeleton>
+    <SidebarSkeleton hideSideNav>
       <div className="px-8 py-16">
         <article className="prose mx-auto">
           <MDXProviderGuides>

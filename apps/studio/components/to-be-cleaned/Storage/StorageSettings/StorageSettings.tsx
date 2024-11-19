@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Clock } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -13,7 +13,9 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
@@ -29,9 +31,17 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Switch,
 } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
+import { Markdown } from 'components/interfaces/Markdown'
+
+interface StorageSettingsState {
+  fileSizeLimit: number
+  unit: StorageSizeUnits
+  imageTransformationEnabled: boolean
+}
 
 const StorageSettings = () => {
   const { ref: projectRef } = useParams()
@@ -45,20 +55,37 @@ const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
-  const { isFreeTier } = config || {}
 
-  const [initialValues, setInitialValues] = useState({
+  const organization = useSelectedOrganization()
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: organization?.slug,
+  })
+  const isFreeTier = isSuccessSubscription && subscription.plan.id === 'free'
+
+  const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.BYTES,
+    imageTransformationEnabled: !isFreeTier,
   })
 
   useEffect(() => {
     if (isSuccess && config) {
-      const { fileSizeLimit } = config
+      const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      setInitialValues({ fileSizeLimit: value, unit: unit })
+      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+
+      setInitialValues({
+        fileSizeLimit: value,
+        unit: unit,
+        imageTransformationEnabled,
+      })
+
       // Reset the form values when the config values load
-      form.reset({ fileSizeLimit: value, unit: unit })
+      form.reset({
+        fileSizeLimit: value,
+        unit: unit,
+        imageTransformationEnabled,
+      })
     }
   }, [isSuccess, config])
 
@@ -70,6 +97,7 @@ const StorageSettings = () => {
     .object({
       fileSizeLimit: z.coerce.number(),
       unit: z.nativeEnum(StorageSizeUnits),
+      imageTransformationEnabled: z.boolean(),
     })
     .superRefine((data, ctx) => {
       const { unit, fileSizeLimit } = data
@@ -88,7 +116,7 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
+  const { fileSizeLimit: limit, unit: storageUnit, imageTransformationEnabled } = form.watch()
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -102,6 +130,11 @@ const StorageSettings = () => {
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
+      features: {
+        imageTransformation: {
+          enabled: data.imageTransformationEnabled,
+        },
+      },
     })
   }
 
@@ -142,7 +175,7 @@ const StorageSettings = () => {
                                 type="number"
                                 {...field}
                                 className="w-full"
-                                disabled={!canUpdateStorageSettings}
+                                disabled={isFreeTier || !canUpdateStorageSettings}
                               />
                             </FormControl_Shadcn_>
                             <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
@@ -198,7 +231,31 @@ const StorageSettings = () => {
                   </p>
                 </div>
               </div>
+
+              <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
+                <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
+                  <p className="text-sm">Enable Image Transformation</p>
+                </div>
+                <div className="relative flex flex-col col-span-12 gap-x-6 gap-y-2 lg:col-span-8">
+                  <div className="grid grid-cols-12 col-span-12 gap-2 items-center">
+                    <FormField_Shadcn_
+                      control={form.control}
+                      name="imageTransformationEnabled"
+                      render={({ field }) => (
+                        <Switch
+                          size="large"
+                          disabled={isFreeTier}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
+                    />
+                  </div>
+                  <Markdown content="Optimize and resize images on the fly. [Learn more](https://supabase.com/docs/guides/storage/serving/image-transformations)." />
+                </div>
+              </div>
             </div>
+
             {isFreeTier && (
               <div className="px-6 pb-6">
                 <UpgradeToPro
@@ -223,7 +280,7 @@ const StorageSettings = () => {
                     type="default"
                     htmlType="reset"
                     onClick={() => form.reset()}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Cancel
                   </Button>
@@ -231,7 +288,7 @@ const StorageSettings = () => {
                     type="primary"
                     htmlType="submit"
                     loading={isUpdating}
-                    disabled={!canUpdateStorageSettings || isUpdating}
+                    disabled={!form.formState.isDirty || !canUpdateStorageSettings || isUpdating}
                   >
                     Save
                   </Button>

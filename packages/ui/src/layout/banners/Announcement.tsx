@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react'
 
 import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
-import IconX from '../../components/Icon/icons/IconX/IconX'
 import { cn } from '../../lib/utils/cn'
 import _announcement from './data/Announcement.json'
+import { X } from 'lucide-react'
 
 export interface AnnouncementProps {
   show: boolean
@@ -64,10 +64,10 @@ const Announcement = ({
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
           <div
-            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-100"
+            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground transition-opacity hover:opacity-100"
             onClick={handleClose}
           >
-            <IconX size={16} />
+            <X size={16} />
           </div>
         )}
         {children}

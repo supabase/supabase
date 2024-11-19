@@ -68,7 +68,26 @@ When your user signs in, call [signInWithOAuth()](/docs/reference/dart/auth-sign
 
 ```dart
 Future<void> signInWithGithub() async {
-  await supabase.auth.signInWithOAuth(OAuthProvider.github);
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.github,
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
+}
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [signInWithWithOAuth](/docs/reference/swift/auth-signinwithoauth) with `.github` as the `Provider`:
+
+```swift
+func signInWithGithub() async throws {
+  try await supabase.auth.signInWithOAuth(
+    provider: .github,
+    redirectTo: URL(string: "my-custom-scheme://my-app-host")
+  )
 }
 ```
 

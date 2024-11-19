@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
-import { boolean, number, object } from 'yup'
+import { toast } from 'sonner'
+import { boolean, number, object, string } from 'yup'
 
 import { useParams } from 'common'
 import { FormActions } from 'components/ui/Forms/FormActions'
@@ -16,6 +16,8 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from 'lib/constants'
+import FormField from '../AuthProvidersForm/FormField'
+
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,8 +25,8 @@ import {
   Form,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { WarningIcon } from 'ui'
 
 const schema = object({
   JWT_EXP: number()
@@ -34,6 +36,10 @@ const schema = object({
   SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number()
     .min(0, 'Must be a value more than 0')
     .required('Must have a Reuse Interval value'),
+  MFA_PHONE_OTP_LENGTH: number()
+    .min(6, 'Must be a value 6 or larger')
+    .max(30, 'must be a value no greater than 30'),
+  MFA_PHONE_TEMPLATE: string().required('SMS template is required.'),
   MFA_MAX_ENROLLED_FACTORS: number()
     .min(0, 'Must be be a value more than 0')
     .max(30, 'Must be a value no greater than 30'),
@@ -43,7 +49,36 @@ const schema = object({
   API_MAX_REQUEST_DURATION: number()
     .min(5, 'Must be 5 or larger')
     .max(30, 'Must be a value no greater than 30'),
+  MFA_TOTP: string().required(),
+  MFA_PHONE: string().required(),
 })
+
+function determineMFAStatus(verifyEnabled: boolean, enrollEnabled: boolean) {
+  return verifyEnabled ? (enrollEnabled ? 'Enabled' : 'Verify Enabled') : 'Disabled'
+}
+
+const MFAFactorSelectionOptions = [
+  {
+    label: 'Enabled',
+    value: 'Enabled',
+  },
+  {
+    label: 'Verify Enabled',
+    value: 'Verify Enabled',
+  },
+  {
+    label: 'Disabled',
+    value: 'Disabled',
+  },
+]
+
+const MfaStatusToState = (status: (typeof MFAFactorSelectionOptions)[number]['value']) => {
+  return status === 'Enabled'
+    ? { verifyEnabled: true, enrollEnabled: true }
+    : status === 'Verify Enabled'
+      ? { verifyEnabled: true, enrollEnabled: false }
+      : { verifyEnabled: false, enrollEnabled: false }
+}
 
 const AdvancedAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
@@ -67,20 +102,73 @@ const AdvancedAuthSettingsForm = () => {
 
   const isTeamsEnterprisePlan =
     isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
+  const isProPlanAndUp = isSuccessSubscription && subscription?.plan?.id !== 'free'
+  const promptProPlanUpgrade = IS_PLATFORM && !isProPlanAndUp
+
+  const projectAddons = subscription?.project_addons.find((addon) => addon.ref === projectRef)
+  const hasPurchasedAuthMFAAddOn = projectAddons?.addons.some(
+    (addon) => addon.type === 'auth_mfa_phone'
+  )
   const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const INITIAL_VALUES = {
     SITE_URL: authConfig?.SITE_URL,
     JWT_EXP: authConfig?.JWT_EXP,
     REFRESH_TOKEN_ROTATION_ENABLED: authConfig?.REFRESH_TOKEN_ROTATION_ENABLED || false,
+    MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
+    MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
     SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: authConfig?.SECURITY_REFRESH_TOKEN_REUSE_INTERVAL,
     MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS || 10,
     DB_MAX_POOL_SIZE: authConfig?.DB_MAX_POOL_SIZE || 10,
     API_MAX_REQUEST_DURATION: authConfig?.API_MAX_REQUEST_DURATION || 10,
+    // TOTP is enabled by default. Auth environment variables are distinct from UI state - we use MFA_TOTP and MFA_PHONE to hold the derivedUI state.
+    // MFA_TOTP_VERIFY_ENABLED and MFA_TOTP_ENROLL_ENABLED -> Enabled
+    // MFA_TOTP_VERIFY_ENABLED and !MFA_TOTP_ENROLL_ENABLED -> Verify Enabled
+    // !MFA_TOTP_VERIFY_ENABLED and !MFA_TOTP_ENROLL_ENABLED -> Disabled
+    MFA_TOTP:
+      determineMFAStatus(
+        authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
+        authConfig?.MFA_TOTP_ENROLL_ENABLED ?? true
+      ) || 'Enabled',
+    MFA_PHONE:
+      determineMFAStatus(
+        authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
+        authConfig?.MFA_PHONE_ENROLL_ENABLED || false
+      ) || 'Disabled',
   }
 
+  // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
+  const sendSMSHookIsEnabled =
+    authConfig?.HOOK_SEND_SMS_URI !== null && authConfig?.HOOK_SEND_SMS_ENABLED === true
+  const hasValidMFAPhoneProvider =
+    authConfig?.EXTERNAL_PHONE_ENABLED === true &&
+    (authConfig?.SMS_PROVIDER === 'twilio' || authConfig?.SMS_PROVIDER === 'vonage')
+  const hasValidMFAProvider = hasValidMFAPhoneProvider || sendSMSHookIsEnabled
+  const phoneMFAIsEnabled =
+    INITIAL_VALUES.MFA_PHONE === 'Enabled' || INITIAL_VALUES.MFA_PHONE === 'Verify Enabled'
+
   const onSubmit = (values: any, { resetForm }: any) => {
-    const payload = { ...values }
+    let payload = { ...values }
+    const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
+      MfaStatusToState(values.MFA_TOTP)
+    // MFA (Phone) is only available on Pro Plans and up. We translate the UI state, MFA_PHONE and MFA_TOTP into the underlying
+    // Auth config state - MFA_PHONE_*_ENABLED and MFA_TOTP_*_ENABLED.
+    if (isProPlanAndUp) {
+      const { verifyEnabled: MFA_PHONE_VERIFY_ENABLED, enrollEnabled: MFA_PHONE_ENROLL_ENABLED } =
+        MfaStatusToState(values.MFA_PHONE)
+      payload = {
+        ...payload,
+        MFA_PHONE_ENROLL_ENABLED,
+        MFA_PHONE_VERIFY_ENABLED,
+      }
+    }
+    payload = {
+      ...payload,
+      MFA_TOTP_ENROLL_ENABLED,
+      MFA_TOTP_VERIFY_ENABLED,
+    }
+    delete payload.MFA_TOTP
+    delete payload.MFA_PHONE
 
     if (!isTeamsEnterprisePlan) {
       delete payload.DB_MAX_POOL_SIZE
@@ -117,7 +205,7 @@ const AdvancedAuthSettingsForm = () => {
 
   return (
     <Form id={formId} initialValues={INITIAL_VALUES} onSubmit={onSubmit} validationSchema={schema}>
-      {({ handleReset, resetForm, values, initialValues }: any) => {
+      {({ handleReset, resetForm, values, initialValues, setFieldValue }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
@@ -126,12 +214,16 @@ const AdvancedAuthSettingsForm = () => {
           if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
         }, [isSuccess])
 
+        const hasUpgradedPhoneMFA =
+          INITIAL_VALUES.MFA_PHONE === 'Disabled' && values.MFA_PHONE !== INITIAL_VALUES.MFA_PHONE
+
         return (
           <>
             <FormHeader
               title="Advanced Settings"
               description="These settings rarely need to be changed."
             />
+
             <FormPanel
               disabled={true}
               footer={
@@ -190,6 +282,19 @@ const AdvancedAuthSettingsForm = () => {
                 header={<FormSectionLabel>Multi-Factor Authentication (MFA)</FormSectionLabel>}
               >
                 <FormSectionContent loading={isLoading}>
+                  <FormField
+                    name="MFA_TOTP"
+                    properties={{
+                      type: 'select',
+                      title: 'TOTP (App Authenticator)',
+                      description: 'Control use of TOTP (App Authenticator) factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig}
+                    setFieldValue={setFieldValue}
+                  />
+
                   <InputNumber
                     id="MFA_MAX_ENROLLED_FACTORS"
                     size="small"
@@ -198,6 +303,66 @@ const AdvancedAuthSettingsForm = () => {
                     actions={<span className="mr-3 text-foreground-lighter">factors</span>}
                     disabled={!canUpdateConfig}
                   />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection header={<FormSectionLabel>Advanced MFA</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  {promptProPlanUpgrade && (
+                    <UpgradeToPro
+                      primaryText="Upgrade to Pro"
+                      secondaryText="Advanced MFA requires the Pro Plan"
+                    />
+                  )}
+                  <FormField
+                    name="MFA_PHONE"
+                    properties={{
+                      type: 'select',
+                      title: 'Phone',
+                      description: 'Control use of phone factors',
+                      enum: MFAFactorSelectionOptions,
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
+                  />
+                  {!hasValidMFAProvider && phoneMFAIsEnabled && (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        Please configure a valid phone provider. Only Twilio, Vonage, and Send SMS
+                        Hooks are supported at this time.
+                      </AlertTitle_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+
+                  <InputNumber
+                    id="MFA_PHONE_OTP_LENGTH"
+                    size="small"
+                    label="Phone OTP Length"
+                    descriptionText="Number of digits in OTP"
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                  />
+                  <FormField
+                    name="MFA_PHONE_TEMPLATE"
+                    properties={{
+                      title: 'Phone verification message',
+                      type: 'multiline-string',
+                      description: 'To format the OTP code use `{{ .Code }}`',
+                    }}
+                    formValues={values}
+                    disabled={!canUpdateConfig || !isProPlanAndUp}
+                    setFieldValue={setFieldValue}
+                  />
+                  {hasUpgradedPhoneMFA && (
+                    <Alert_Shadcn_ variant="warning">
+                      <WarningIcon />
+                      <AlertTitle_Shadcn_>
+                        Enabling advanced MFA with phone will result in an additional charge of $75
+                        per month for the first project in the organization and an additional $10
+                        per month for additional projects.
+                      </AlertTitle_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                 </FormSectionContent>
               </FormSection>
 

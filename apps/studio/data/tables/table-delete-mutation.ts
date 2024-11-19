@@ -1,8 +1,10 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
+import { tableEditorKeys } from 'data/table-editor/keys'
 import { viewKeys } from 'data/views/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
@@ -34,7 +36,10 @@ export async function deleteTable({
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Alaister] we have to manually cast the data to PostgresTable
+  // because the API types are slightly wrong
+  return data as PostgresTable
 }
 
 type TableDeleteData = Awaited<ReturnType<typeof deleteTable>>
@@ -55,13 +60,11 @@ export const useTableDeleteMutation = ({
       async onSuccess(data, variables, context) {
         const { id, projectRef, schema } = variables
         await Promise.all([
+          queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
-          queryClient.invalidateQueries(tableKeys.table(projectRef, id)),
           queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
           // invalidate all views from this schema
           queryClient.invalidateQueries(viewKeys.listBySchema(projectRef, schema)),
-          // invalidate the view if there's a view with this id
-          queryClient.invalidateQueries(viewKeys.view(projectRef, id)),
         ])
 
         await onSuccess?.(data, variables, context)

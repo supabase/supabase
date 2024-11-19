@@ -1,18 +1,17 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
-import type { SupaTable } from 'components/grid/types'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
 import type { ResponseError } from 'types'
+import { tableRowKeys } from './keys'
 
 export type TableRowUpdateVariables = {
   projectRef: string
   connectionString?: string
-  table: SupaTable
+  table: { id: number; name: string; schema?: string }
   configuration: { identifiers: any }
   payload: any
   enumArrayColumns: string[]
@@ -60,6 +59,7 @@ export async function updateTableRow({
     connectionString,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+    queryKey: ['table-row-update', table.id],
   })
 
   return result
@@ -82,7 +82,9 @@ export const useTableRowUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef, table } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
+        await queryClient.invalidateQueries(
+          tableRowKeys.tableRows(projectRef, { table: { id: table.id } })
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

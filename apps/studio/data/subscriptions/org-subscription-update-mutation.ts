@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { handleError, put } from 'data/fetchers'
-import { toast } from 'react-hot-toast'
+import { invoicesKeys } from 'data/invoices/keys'
+import { usageKeys } from 'data/usage/keys'
+import { toast } from 'sonner'
 import type { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
-import { usageKeys } from 'data/usage/keys'
 import type { SubscriptionTier } from './types'
-import { invoicesKeys } from 'data/invoices/keys'
 
 export type OrgSubscriptionUpdateVariables = {
   slug: string

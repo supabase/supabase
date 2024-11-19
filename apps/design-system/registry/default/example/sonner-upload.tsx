@@ -1,11 +1,8 @@
 import { Check, Loader2 } from 'lucide-react'
-import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Progress } from 'ui'
 
 export default function SonnerUpload() {
-  const [isUploading, setIsUploadingState] = useState(false)
-
   const uploadPromise = (files: number, toastId: number) => {
     toast.loading(<UploadContent progress={0} files={files} />, {
       id: toastId,
@@ -70,14 +67,12 @@ export default function SonnerUpload() {
           const max = 20 // specify the maximum value
           const files = Math.floor(Math.random() * max)
           try {
-            setIsUploadingState(true)
             const promise = await uploadPromise(files, toastId)
             // @ts-expect-error
             toast.success(<UploadContent progress={promise.progress} files={promise.files} />, {
               duration: 2000,
               id: toastId,
             })
-            setIsUploadingState(false)
           } catch (error) {}
         }}
       >

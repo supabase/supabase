@@ -6,7 +6,7 @@ import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
 
 export type ContentBase = {
-  id?: string
+  id: string
   name: string
   description?: string
   visibility: 'user' | 'project' | 'org' | 'public'
@@ -34,6 +34,8 @@ export type Content = ContentBase &
         content: LogSqlSnippets.Content
       }
   )
+
+export type ContentType = 'sql' | 'report' | 'log_sql'
 
 export async function getContent(
   projectRef: string | undefined,

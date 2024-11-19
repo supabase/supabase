@@ -594,7 +594,7 @@ functions:
           - [Steps to obtain Android client ID](https://developers.google.com/identity/sign-in/android/start-integrating#configure_a_project)
           - [Steps to obtain iOS client ID](https://developers.google.com/identity/sign-in/ios/start-integrating#get_an_oauth_client_id)
 
-          Add the web client ID to the `Authentication -> Providers -> Google -> Authorized Client IDs` section in your Supabase dashboard
+          Add the web client ID to the `Authentication -> Providers -> Google -> Client IDs` section in your Supabase dashboard
         code: |
           ```dart
           import 'package:google_sign_in/google_sign_in.dart';
@@ -753,7 +753,12 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          await supabase.auth.signInWithOAuth(OAuthProvider.github);
+          await supabase.auth.signInWithOAuth(
+            OAuthProvider.github,
+            redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+            authScreenLaunchMode:
+                kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+          );
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
@@ -1346,7 +1351,7 @@ functions:
         code: |
           ```dart
           final ResendResponse res = await supabase.auth.resend(
-            type: OtpType.email,
+            type: OtpType.signup,
             email: 'email@example.com',
           );
           ```
@@ -1403,7 +1408,7 @@ functions:
         name: Unsubscribe from auth subscription
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {});
 
           authSubscription.cancel();
           ```
@@ -1455,7 +1460,7 @@ functions:
           final AuthResponse response = await supabase.auth.setSession(refreshToken);
 
           final session = res.session;
-          ```  
+          ```
         response: |
           ```json
           AuthResponse(
@@ -2491,8 +2496,8 @@ functions:
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name');
+            .from('countries')
+            .select();
           ```
         data:
           sql: |
@@ -6667,7 +6672,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 

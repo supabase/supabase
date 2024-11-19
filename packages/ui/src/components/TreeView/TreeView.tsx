@@ -70,8 +70,16 @@ const TreeViewItem = forwardRef<
     useEffect(() => {
       if (isEditing) {
         inputRef.current?.focus()
+      } else {
+        setLocalValueState(name)
       }
     }, [isEditing])
+
+    useEffect(() => {
+      if (!isLoading) {
+        setLocalValueState(name)
+      }
+    }, [isLoading])
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
@@ -158,7 +166,7 @@ const TreeViewItem = forwardRef<
                 'transition-colors',
                 'fill-foreground-muted',
                 'group-aria-selected:fill-foreground',
-                'w-5 h-5',
+                'w-5 h-5 shrink-0',
                 '-ml-0.5'
               )}
               size={16}

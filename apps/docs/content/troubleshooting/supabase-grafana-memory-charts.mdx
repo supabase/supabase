@@ -1,0 +1,57 @@
+---
+title = "Interpreting Supabase Grafana Memory Charts"
+github_url = "https://github.com/orgs/supabase/discussions/27021"
+topics = [ "database" ]
+keywords = [ "Grafana", "performance", "memory" ]
+date_created = "2024-06-05"
+database_id = "179d70f3-1e26-4346-9ee8-d340fad382a3"
+---
+
+> [Supabase Grafana Installation Guide](/docs/guides/platform/metrics#deploying-supabase-grafana)
+
+Here are examples of unhealthy memory usage:
+![image](https://github.com/supabase/supabase/assets/91111415/baebfc74-642d-4988-992c-bb0f473a05ad)
+![image](https://github.com/supabase/supabase/assets/91111415/b95c83cf-aa98-4b50-8e07-29f57aaa676c)
+
+- **Yellow**: represents active memory
+- **Red**: represents SWAP, which is disk storage that the system treats as if it were actually memory
+- **Green**: it is unclaimed (the system will always leave some memory unclaimed)
+- **Blue**: it is cached data and a buffer
+
+The cache in PostgreSQL is important because the database will store frequently accessed data in it for rapid retrieval. If too much active memory is needed, it runs the risk of excessively displacing cache. This will force queries to check disk, which is slow.
+
+Most data in a database is idle, but in cases where there is little available memory or uncached data is rapidly accessed, [thrashing](<https://en.wikipedia.org/wiki/Thrashing_(computer_science)>) can occur.
+
+Ideally, you want queries to hit the cache 99% of the time. You can use the [Supabase CLI](/docs/guides/database/inspect) `inspect db cache hit` command to check your cache hit rate. Alternatively, you can run the [query](https://github.com/supabase/cli/blob/c9cce58025fded16b4c332747f819a44f45c3b83/internal/inspect/bloat/bloat.go#L17) found in the CLI's GitHub repo in the [SQL Editor](/dashboard/project/_/sql/)
+
+```sh
+# login to the CLI
+npx supabase login
+
+# initlize a local supabase directory
+npx supabase init
+
+#link your project
+npx supabase link
+
+# find cache hit rate
+npx supabase inspect db cache-hit --linked
+
+```
+
+If the cache hit rate begins to drop below the ideal amount, one should consider taking the following actions:
+
+Optimizing:
+
+1. [Apply indexes](https://github.com/orgs/supabase/discussions/22449): can reduce the amount of data pulled from disk into memory
+2. [Increasing the compute size](/docs/guides/platform/compute-add-ons)
+3. [Distribute load by using read-replicas](/dashboard/project/_/settings/infrastructure)
+4. [Partitions](/docs/guides/database/partitions): Generally should be used on _very_ large tables to minimize data pulled from disk into memory
+5. [Remove bloat](/docs/guides/database/bloat): Bloat can fragment data across pages, causing redundant data to be pulled from disk.
+6. Table refactoring: Split tables to isolate columns that are less frequently accessed, so they are not redundantly pulled into memory while accessing hotter data
+
+### Other useful Supabase Grafana guides:
+
+- [Connections](https://github.com/orgs/supabase/discussions/27141)
+- [Disk](https://github.com/orgs/supabase/discussions/27003)
+- [CPU](https://github.com/orgs/supabase/discussions/27022)

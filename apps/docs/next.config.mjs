@@ -9,6 +9,7 @@ import configureBundleAnalyzer from '@next/bundle-analyzer'
 import withYaml from 'next-plugin-yaml'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
@@ -43,17 +44,8 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: true,
-    domains: [
-      'avatars.githubusercontent.com',
-      'github.com',
-      'supabase.github.io',
-      'user-images.githubusercontent.com',
-      'raw.githubusercontent.com',
-      'weweb-changelog.ghost.io',
-      'img.youtube.com',
-      'archbee-image-uploads.s3.amazonaws.com',
-      'obuldanrptloktxcffvn.supabase.co',
-    ],
+    // @ts-ignore
+    remotePatterns,
   },
   // TODO: @next/mdx ^13.0.2 only supports experimental mdxRs flag. next ^13.0.2 will stop warning about this being unsupported.
   // mdxRs: true,
@@ -63,16 +55,22 @@ const nextConfig = {
     },
   },
   transpilePackages: ['ui', 'ui-patterns', 'common', 'dayjs', 'shared-data', 'api-types', 'icons'],
-  /**
-   * The SQL to REST API translator relies on libpg-query, which packages a
-   * native Node.js module that wraps the Postgres query parser.
-   *
-   * The default webpack config can't load native modules, so we need a custom
-   * loader for it, which calls process.dlopen to load C++ Addons.
-   *
-   * See https://github.com/eisberg-labs/nextjs-node-loader
-   */
-  webpack: (config) => {
+  experimental: {
+    outputFileTracingIncludes: {
+      '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+      '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
+    },
+  },
+  webpack: (config, options) => {
+    /**
+     * The SQL to REST API translator relies on libpg-query, which packages a
+     * native Node.js module that wraps the Postgres query parser.
+     *
+     * The default webpack config can't load native modules, so we need a custom
+     * loader for it, which calls process.dlopen to load C++ Addons.
+     *
+     * See https://github.com/eisberg-labs/nextjs-node-loader
+     */
     config.module.rules.push({
       test: /\.node$/,
       use: [
@@ -103,6 +101,35 @@ const nextConfig = {
           {
             key: 'X-Frame-Options',
             value: 'DENY',
+          },
+        ],
+        has: [
+          {
+            type: 'host',
+            value: 'supabase.com',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Strict-Transport-Security',
+            value: '',
+          },
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+        ],
+        has: [
+          {
+            type: 'host',
+            value: '(?:.+\\.vercel\\.app)',
           },
         ],
       },

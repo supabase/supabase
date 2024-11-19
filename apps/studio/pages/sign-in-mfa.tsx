@@ -1,21 +1,20 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useTelemetryProps } from 'common'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
-import Telemetry from 'lib/telemetry'
 import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const queryClient = useQueryClient()
   const [loading, setLoading] = useState(true)
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -42,15 +41,9 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            Telemetry.sendEvent(
-              { category: 'account', action: 'sign_in', label: '' },
-              telemetryProps,
-              router
-            )
+            sendEvent({ category: 'account', action: 'sign_in', label: '' })
             await queryClient.resetQueries()
-
             router.push(getReturnToPath())
-
             return
           }
           if (data.currentLevel !== data.nextLevel) {

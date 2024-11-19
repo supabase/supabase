@@ -29,7 +29,7 @@ export const getIntegrationTypeLabel = (type: INTEGRATION_TYPES) => {
     case 'auth0':
       return 'Auth0'
     case 'awsCognito':
-      return 'AWS Cognito'
+      return 'Amazon Cognito'
     case 'custom':
     default:
       return 'Custom'

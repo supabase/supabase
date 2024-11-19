@@ -1,11 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
-import { sqlKeys } from 'data/sql/keys'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
@@ -44,9 +43,7 @@ export const useVaultSecretCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(
-          sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))
-        )
+        await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

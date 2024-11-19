@@ -2,31 +2,19 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
-import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  Alert,
-  Button,
-  Form,
-  IconExternalLink,
-  IconKey,
-  IconLoader,
-  IconSearch,
-  IconTrash,
-  IconX,
-  Input,
-  Listbox,
-  Modal,
-  Separator,
-} from 'ui'
+import { Key, Loader, Search, Trash, X } from 'lucide-react'
+import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -111,7 +99,7 @@ const EncryptionKeysManagement = () => {
               placeholder="Search by name or ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
-              icon={<IconSearch strokeWidth={2} size={16} />}
+              icon={<Search strokeWidth={2} size={16} />}
               actions={
                 searchValue.length > 0
                   ? [
@@ -119,7 +107,7 @@ const EncryptionKeysManagement = () => {
                         key="clear"
                         size="tiny"
                         type="text"
-                        icon={<IconX />}
+                        icon={<X />}
                         className="px-1"
                         onClick={() => setSearchValue('')}
                       />,
@@ -148,44 +136,21 @@ const EncryptionKeysManagement = () => {
               </Listbox>
             </div>
           </div>
-          <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <Link
-                href="https://supabase.com/docs/guides/database/vault"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Vault Documentation
-              </Link>
-            </Button>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button
-                  type="primary"
-                  disabled={!canManageKeys}
-                  onClick={() => setShowAddKeyModal(true)}
-                >
-                  Add new key
-                </Button>
-              </Tooltip.Trigger>
-              {!canManageKeys && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to add keys
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
-            </Tooltip.Root>
+          <div className="flex items-center gap-x-2">
+            <DocsButton href="https://supabase.com/docs/guides/database/vault" />
+            <ButtonTooltip
+              type="primary"
+              disabled={!canManageKeys}
+              onClick={() => setShowAddKeyModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canManageKeys ? 'You need additional permissions to add keys' : undefined,
+                },
+              }}
+            >
+              Add new key
+            </ButtonTooltip>
           </div>
         </div>
 
@@ -193,11 +158,7 @@ const EncryptionKeysManagement = () => {
         <div className="border rounded">
           {isLoading ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <IconLoader
-                className="animate-spin text-foreground-light"
-                size={16}
-                strokeWidth={1.5}
-              />
+              <Loader className="animate-spin text-foreground-light" size={16} strokeWidth={1.5} />
               <p className="text-sm text-foreground">Loading keys from the Vault</p>
             </div>
           ) : (
@@ -206,7 +167,7 @@ const EncryptionKeysManagement = () => {
                 return (
                   <Fragment key={key.key_id}>
                     <div className="px-6 py-4 flex items-center space-x-4">
-                      <IconKey className="text-foreground-light" strokeWidth={2} />
+                      <Key className="text-foreground-light" strokeWidth={2} />
                       <div className="space-y-1 min-w-[70%] max-w-[70%]">
                         <p
                           className="text-sm truncate text-foreground"
@@ -230,7 +191,7 @@ const EncryptionKeysManagement = () => {
                             <Button
                               type="default"
                               className="py-2"
-                              icon={<IconTrash />}
+                              icon={<Trash />}
                               disabled={!canManageKeys}
                               onClick={() => setSelectedKeyToRemove(key)}
                             />

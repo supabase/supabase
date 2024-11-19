@@ -11,6 +11,7 @@ import {
   CommandEmpty_Shadcn_ as CommandEmpty,
   CommandItem_Shadcn_ as CommandItem,
   CommandGroup_Shadcn_ as CommandGroup,
+  CommandList_Shadcn_ as CommandList,
   cn,
   ScrollArea,
 } from 'ui'
@@ -72,30 +73,32 @@ export function ComboBox<Opt extends ComboBoxOption>({
       <PopoverContent className="p-0" side="bottom">
         <Command>
           <CommandInput placeholder={`Search ${name}...`} className="border-none ring-0" />
-          <CommandEmpty>No {name} found.</CommandEmpty>
-          <CommandGroup>
-            <ScrollArea className={options.length > 10 ? 'h-[280px]' : ''}>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.id}
-                  value={option.value}
-                  onSelect={(selectedValue: string) => {
-                    setOpen(false)
-                    onSelectOption(selectedValue)
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Check
-                    className={cn(
-                      'mr-2 h-4 w-4',
-                      selectedOption === option.value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {option.displayName}
-                </CommandItem>
-              ))}
-            </ScrollArea>
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>No {name} found.</CommandEmpty>
+            <CommandGroup>
+              <ScrollArea className={options.length > 10 ? 'h-[280px]' : ''}>
+                {options.map((option) => (
+                  <CommandItem
+                    key={option.id}
+                    value={option.value}
+                    onSelect={(selectedValue: string) => {
+                      setOpen(false)
+                      onSelectOption(selectedValue)
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Check
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        selectedOption === option.value ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                    {option.displayName}
+                  </CommandItem>
+                ))}
+              </ScrollArea>
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

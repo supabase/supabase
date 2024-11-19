@@ -1,24 +1,23 @@
-import { useParams, useTelemetryProps } from 'common'
-import { ChevronDown, ExternalLink } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
+import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluckObjectFields } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
-  Button,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
@@ -48,7 +47,7 @@ const CONNECTION_TYPES = [
   { id: 'golang', label: 'Golang' },
   { id: 'jdbc', label: 'JDBC' },
   { id: 'dotnet', label: '.NET' },
-  { id: 'nodejs', label: 'Nodejs' },
+  { id: 'nodejs', label: 'Node.js' },
   { id: 'php', label: 'PHP' },
   { id: 'python', label: 'Python' },
 ]
@@ -58,8 +57,6 @@ interface DatabaseConnectionStringProps {
 }
 
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
   const project = useSelectedProject()
   const { ref: projectRef, connectionString } = useParams()
   const snap = useDatabaseSettingsStateSnapshot()
@@ -93,6 +90,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user', 'inserted_at']
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
   const connectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
@@ -103,15 +102,11 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
 
   const handleCopy = (id: string) => {
     const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label
-    Telemetry.sendEvent(
-      {
-        category: 'settings',
-        action: 'copy_connection_string',
-        label: labelValue ? labelValue : '',
-      },
-      telemetryProps,
-      router
-    )
+    sendEvent({
+      category: 'settings',
+      action: 'copy_connection_string',
+      label: labelValue ? labelValue : '',
+    })
   }
 
   const connectionStrings =
@@ -186,14 +181,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 )}
               >
                 <DatabaseSelector />
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <a
-                    target="_blank"
-                    href="https://supabase.com/docs/guides/database/connecting-to-postgres"
-                  >
-                    Documentation
-                  </a>
-                </Button>
+                <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres" />
               </div>
             </div>
             <Tabs

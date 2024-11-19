@@ -13,7 +13,7 @@ import {
 } from 'recharts'
 
 import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.constants'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import type { CategoricalChartState } from 'recharts/types/chart/types'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
@@ -96,7 +96,7 @@ const BarChart = ({
     return (
       <NoDataPlaceholder
         message={emptyStateMessage}
-        description="It may take up to 24 hours for data to show"
+        description="It may take up to 24 hours for data to refresh"
         size={size}
         className={className}
         attribute={title}

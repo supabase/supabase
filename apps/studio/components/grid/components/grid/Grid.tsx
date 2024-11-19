@@ -1,17 +1,19 @@
+/* eslint-disable react/display-name */
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { forwardRef, useRef } from 'react'
 import DataGrid, { DataGridHandle, RowsChangeData } from 'react-data-grid'
 import { memo } from 'react-tracked'
 
 import { formatClipboardValue } from 'components/grid/utils/common'
+import { TableGridInnerLoadingState } from 'components/interfaces/TableGridEditor/LoadingState'
+import { formatForeignKeys } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.utils'
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { copyToClipboard } from 'lib/helpers'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { Filter, GridProps, SupaRow } from '../../types'
 import { useKeyboardShortcuts } from '../common/Hooks'
@@ -142,12 +144,17 @@ export const Grid = memo(
         const { targetTableSchema, targetTableName, targetColumnName } =
           table?.columns.find((x) => x.name == columnName)?.foreignKey ?? {}
 
-        return data?.find(
+        const fk = data?.find(
           (key: any) =>
-            key.target_schema == targetTableSchema &&
-            key.target_table == targetTableName &&
-            key.target_columns == targetColumnName
+            key.source_schema === table?.schema &&
+            key.source_table === table?.name &&
+            key.source_columns.includes(columnName) &&
+            key.target_schema === targetTableSchema &&
+            key.target_table === targetTableName &&
+            key.target_columns.includes(targetColumnName)
         )
+
+        return fk !== undefined ? formatForeignKeys([fk])[0] : undefined
       }
 
       function onRowDoubleClick(row: any, column: any) {
@@ -170,7 +177,7 @@ export const Grid = memo(
 
       return (
         <div
-          className={`${containerClass} flex flex-col`}
+          className={cn(`flex flex-col`, containerClass)}
           style={{ width: width || '100%', height: height || '50vh' }}
         >
           <DataGrid
@@ -186,11 +193,7 @@ export const Grid = memo(
                 // RDG used to use flex, but with v7 they've moved to CSS grid and the
                 // in built no rows fallback only takes the width of the CSS grid itself
                 <div style={{ width: `calc(100vw - 255px - 55px)` }}>
-                  {isLoading && (
-                    <div className="p-2 col-span-full">
-                      <GenericSkeletonLoader />
-                    </div>
-                  )}
+                  {isLoading && <TableGridInnerLoadingState />}
                   {isError && (
                     <div className="p-2 col-span-full">
                       <AlertError error={error} subject="Failed to retrieve rows from table" />
@@ -225,7 +228,7 @@ export const Grid = memo(
                           className="flex flex-col items-center justify-center col-span-full"
                         >
                           <p className="text-sm text-light">
-                            The filters applied has returned no results from this table
+                            The filters applied have returned no results from this table
                           </p>
                           <div className="flex items-center space-x-2 mt-4">
                             <Button type="default" onClick={() => removeAllFilters()}>

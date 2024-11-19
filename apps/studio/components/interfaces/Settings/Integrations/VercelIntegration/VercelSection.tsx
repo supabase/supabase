@@ -1,7 +1,7 @@
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
@@ -40,6 +40,7 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
   const canReadVercelConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -53,8 +54,6 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
     PermissionAction.UPDATE,
     'integrations.vercel_connections'
   )
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
@@ -140,8 +139,8 @@ You can change the scope of the access for Supabase by configuring
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
       ? 'https://vercel.com/integrations/supabase'
       : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? `https://vercel.com/integrations/supabase-v2-staging`
-        : 'https://vercel.com/integrations/supabase-v2-local'
+        ? `https://vercel.com/integrations/supabase-staging`
+        : 'https://vercel.com/integrations/supabase-local'
 
   let connections =
     (isProjectScoped
@@ -187,7 +186,7 @@ You can change the scope of the access for Supabase by configuring
                           >
                             <IntegrationConnectionItem
                               connection={connection}
-                              disabled={!canUpdateVercelConnection}
+                              disabled={isBranch || !canUpdateVercelConnection}
                               type={'Vercel' as IntegrationName}
                               onDeleteConnection={onDeleteVercelConnection}
                               className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
@@ -198,7 +197,7 @@ You can change the scope of the access for Supabase by configuring
                                   <VercelIntegrationConnectionForm
                                     connection={connection}
                                     integration={vercelIntegration}
-                                    disabled={!canUpdateVercelConnection}
+                                    disabled={isBranch || !canUpdateVercelConnection}
                                   />
                                 </div>
                               </div>
@@ -216,7 +215,7 @@ You can change the scope of the access for Supabase by configuring
                   )}
                   <EmptyIntegrationConnection
                     orgSlug={org?.slug}
-                    disabled={!canCreateVercelConnection}
+                    disabled={isBranch || !canCreateVercelConnection}
                     onClick={() => onAddVercelConnection(vercelIntegration.id)}
                   >
                     Add new project connection

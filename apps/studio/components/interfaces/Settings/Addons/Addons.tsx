@@ -1,12 +1,12 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { capitalize } from 'lodash'
+import { AlertCircle, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
 import {
   getAddons,
   subscriptionHasHipaaAddon,
@@ -26,7 +26,7 @@ import {
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
@@ -36,42 +36,31 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
-import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertCircle,
-  IconChevronRight,
-  IconExternalLink,
-  IconInfo,
-} from 'ui'
+import { useAddonsPagePanel } from 'state/addons-page'
+import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
-  const { ref: projectRef, panel } = useParams()
-  const snap = useSubscriptionPageStateSnapshot()
-  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
+  const { ref: projectRef } = useParams()
+  const { setPanel } = useAddonsPagePanel()
   const selectedOrg = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
-
+  const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
-  const allowedPanelValues = ['computeInstance', 'pitr', 'customDomain']
-  if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
-    snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
-  }
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
 
   const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -118,7 +107,7 @@ const Addons = () => {
     return computeMeta
   }, [selectedProject, computeInstance])
 
-  const canUpdateIPv4 = projectSettings?.project.db_ip_addr_config === 'ipv6'
+  const canUpdateIPv4 = settings?.db_ip_addr_config === 'ipv6'
 
   return (
     <>
@@ -127,7 +116,7 @@ const Addons = () => {
       {isBranch && (
         <ScaffoldContainer>
           <Alert_Shadcn_ variant="default" className="mt-6">
-            <IconAlertCircle strokeWidth={2} />
+            <AlertCircle strokeWidth={2} />
             <AlertTitle_Shadcn_>
               You are currently on a preview branch of your project
             </AlertTitle_Shadcn_>
@@ -168,7 +157,7 @@ const Addons = () => {
           {selectedProject?.infra_compute_size === 'nano' && subscription?.plan.id !== 'free' && (
             <ScaffoldContainer className="mt-4">
               <Alert_Shadcn_ variant="default">
-                <IconInfo strokeWidth={2} />
+                <Info strokeWidth={2} />
                 <AlertTitle_Shadcn_>Free compute upgrade to Micro</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   Paid Plans include a free upgrade to Micro compute. Your project is ready to
@@ -192,7 +181,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About compute add-ons</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -204,7 +193,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">Connection Pooler</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -236,31 +225,49 @@ const Addons = () => {
                     {isLoading || (computeInstance === undefined && isLoadingProject) ? (
                       <ShimmeringLoader className="w-32" />
                     ) : (
-                      <p>
-                        {computeInstance?.variant.name ??
-                          capitalize(selectedProject?.infra_compute_size) ??
-                          'Micro'}
-                      </p>
+                      <div className="flex py-3">
+                        <ComputeBadge
+                          infraComputeSize={selectedProject?.infra_compute_size}
+                          size={'large'}
+                        />
+                      </div>
                     )}
-                    <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
-                      projectNotActive={!isProjectActive}
-                      tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={
-                          isBranch ||
-                          !isProjectActive ||
-                          projectUpdateDisabled ||
-                          computeSizeChangesDisabled
-                        }
+
+                    {!diskAndComputeFormEnabled ? (
+                      <ProjectUpdateDisabledTooltip
+                        projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
+                        projectNotActive={!isProjectActive}
+                        tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
                       >
-                        Change compute size
-                      </Button>
-                    </ProjectUpdateDisabledTooltip>
+                        <Button
+                          type="default"
+                          className="mt-2 pointer-events-auto"
+                          onClick={() => setPanel('computeInstance')}
+                          disabled={
+                            isBranch ||
+                            !isProjectActive ||
+                            projectUpdateDisabled ||
+                            computeSizeChangesDisabled
+                          }
+                        >
+                          Change compute size
+                        </Button>
+                      </ProjectUpdateDisabledTooltip>
+                    ) : (
+                      <NoticeBar
+                        visible={true}
+                        type="default"
+                        title="Compute size has moved"
+                        description="Compute size is now managed alongside Disk configuration on the new Compute and Disk page."
+                        actions={
+                          <Button type="default" asChild>
+                            <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                              Go to Compute and Disk
+                            </Link>
+                          </Button>
+                        }
+                      />
+                    )}
 
                     {Number(mostRecentRemainingIOBudget?.disk_io_budget) === 0 ? (
                       <Alert
@@ -298,14 +305,13 @@ const Addons = () => {
                         </p>
                       </Alert>
                     ) : null}
-
                     <div className="mt-2 w-full flex items-center justify-between border-b py-2">
                       <Link href={`/project/${projectRef}/settings/infrastructure#ram`}>
                         <div className="group flex items-center space-x-2">
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             Memory
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -320,7 +326,7 @@ const Addons = () => {
                           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
                             CPU
                           </p>
-                          <IconChevronRight
+                          <ChevronRight
                             strokeWidth={1.5}
                             size={16}
                             className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
@@ -340,40 +346,44 @@ const Addons = () => {
                       <p className="text-sm text-foreground-light">No. of pooler connections</p>
                       <p className="text-sm">{meta?.connections_pooler ?? '-'}</p>
                     </div>
-                    <div className="w-full flex items-center justify-between border-b py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Max Disk Throughput
+                    {!diskAndComputeFormEnabled && (
+                      <>
+                        <div className="w-full flex items-center justify-between border-b py-2">
+                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
+                            <div className="group flex items-center space-x-2">
+                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                                Max Disk Throughput
+                              </p>
+                              <ChevronRight
+                                strokeWidth={1.5}
+                                size={16}
+                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                              />
+                            </div>
+                          </Link>
+                          <p className="text-sm">
+                            {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                           </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
                         </div>
-                      </Link>
-                      <p className="text-sm">
-                        {meta?.max_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                      </p>
-                    </div>
-                    <div className="w-full flex items-center justify-between py-2">
-                      <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
-                        <div className="group flex items-center space-x-2">
-                          <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-                            Baseline Disk Throughput
+                        <div className="w-full flex items-center justify-between py-2">
+                          <Link href={`/project/${projectRef}/settings/infrastructure#disk_io`}>
+                            <div className="group flex items-center space-x-2">
+                              <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
+                                Baseline Disk Throughput
+                              </p>
+                              <ChevronRight
+                                strokeWidth={1.5}
+                                size={16}
+                                className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
+                              />
+                            </div>
+                          </Link>
+                          <p className="text-sm">
+                            {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
                           </p>
-                          <IconChevronRight
-                            strokeWidth={1.5}
-                            size={16}
-                            className="transition opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0"
-                          />
                         </div>
-                      </Link>
-                      <p className="text-sm">
-                        {meta?.baseline_disk_io_mbs?.toLocaleString() ?? '-'} Mbps
-                      </p>
-                    </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </ScaffoldSectionContent>
@@ -397,7 +407,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About IPv4 deprecation</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -437,7 +447,7 @@ const Addons = () => {
                           <Button
                             type="default"
                             className="mt-2 pointer-events-auto"
-                            onClick={() => snap.setPanelKey('ipv4')}
+                            onClick={() => setPanel('ipv4')}
                             disabled={
                               isBranch ||
                               !isProjectActive ||
@@ -492,7 +502,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About PITR backups</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -566,7 +576,7 @@ const Addons = () => {
                         <Button
                           type="default"
                           className="mt-2 pointer-events-auto"
-                          onClick={() => snap.setPanelKey('pitr')}
+                          onClick={() => setPanel('pitr')}
                           disabled={
                             isBranch ||
                             !isProjectActive ||
@@ -602,7 +612,7 @@ const Addons = () => {
                       >
                         <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                           <p className="text-sm m-0">About custom domains</p>
-                          <IconExternalLink size={16} strokeWidth={1.5} />
+                          <ExternalLink size={16} strokeWidth={1.5} />
                         </div>
                       </Link>
                     </div>
@@ -643,7 +653,7 @@ const Addons = () => {
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('customDomain')}
+                        onClick={() => setPanel('customDomain')}
                         disabled={isBranch || !isProjectActive || projectUpdateDisabled}
                       >
                         Change custom domain

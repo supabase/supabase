@@ -25,7 +25,7 @@ export const REPLICA_STATUS: {
   INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
 }
 
-// [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
+// [Joshen] Coordinates from https://github.com/tobilg/aws-edge-locations/blob/main/data/aws-edge-locations.json
 // In the format of [lon, lat]
 export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTHEAST_ASIA: [103.8, 1.37],
@@ -40,6 +40,10 @@ export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTH_ASIA: [72.88, 19.08],
   OCEANIA: [151.2, -33.86],
   SOUTH_AMERICA: [-46.38, -23.34],
+  CENTRAL_EU_2: [8.54, 47.45],
+  EAST_US_2: [-83, 39.96],
+  NORTH_EU: [17.91, 59.65],
+  WEST_EU_3: [2.35, 48.86],
 }
 
 export const FLY_REGIONS_COORDINATES: { [key: string]: [number, number] } = {

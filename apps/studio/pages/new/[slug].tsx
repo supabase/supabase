@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
@@ -17,10 +17,15 @@ import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
+import {
+  PostgresVersionSelector,
+  extractPostgresVersionDetails,
+} from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -48,7 +53,6 @@ import passwordStrength from 'lib/password-strength'
 import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
-  Admonition,
   Badge,
   Button,
   CollapsibleContent_Shadcn_,
@@ -75,9 +79,11 @@ import {
   TableRow,
   cn,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -189,9 +195,10 @@ const instanceSizeSpecs: Record<
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
-  const { slug } = useParams()
+  const { slug, projectName } = useParams()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
+  const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
@@ -202,16 +209,24 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
+    enabled:
+      orgSubscription !== undefined &&
+      !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+  })
+  const overdueInvoices = (allOverdueInvoices ?? []).filter(
+    (x) => x.organization_id === currentOrg?.id
+  )
+  const hasOutstandingInvoices = overdueInvoices.length > 0
+
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =
     allProjects?.filter(
       (project) =>
         project.organization_id === currentOrg?.id && project.status !== PROJECT_STATUS.INACTIVE
     ) ?? []
-
-  const { data: orgSubscription } = useOrgSubscriptionQuery({
-    orgSlug: slug,
-  })
   const { data: defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
@@ -243,7 +258,10 @@ const Wizard: NextPageWithLayout = () => {
   const freePlanWithExceedingLimits =
     orgSubscription?.plan?.id === 'free' && hasMembersExceedingFreeTierLimit
 
-  const canCreateProject = isAdmin && !freePlanWithExceedingLimits
+  const isManagedByVercel = currentOrg?.managed_by === 'vercel-marketplace'
+
+  const canCreateProject =
+    isAdmin && !freePlanWithExceedingLimits && !isManagedByVercel && !hasOutstandingInvoices
 
   const delayedCheckPasswordStrength = useRef(
     debounce((value) => checkPasswordStrength(value), 300)
@@ -288,6 +306,7 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: z.string(),
       dataApi: z.boolean(),
       useApiSchema: z.boolean(),
+      postgresVersionSelection: z.string(),
     })
     .superRefine(({ dbPassStrength }, refinementContext) => {
       if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
@@ -304,7 +323,7 @@ const Wizard: NextPageWithLayout = () => {
     mode: 'onChange',
     defaultValues: {
       organization: slug,
-      projectName: '',
+      projectName: projectName || '',
       postgresVersion: '',
       cloudProvider: PROVIDERS[DEFAULT_PROVIDER].id,
       dbPass: '',
@@ -313,6 +332,7 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize: sizes[0],
       dataApi: true,
       useApiSchema: false,
+      postgresVersionSelection: '',
     },
   })
 
@@ -355,7 +375,11 @@ const Wizard: NextPageWithLayout = () => {
       instanceSize,
       dataApi,
       useApiSchema,
+      postgresVersionSelection,
     } = values
+
+    const { postgresEngine, releaseChannel } =
+      extractPostgresVersionDetails(postgresVersionSelection)
 
     const data: ProjectCreateVariables = {
       cloudProvider: cloudProvider,
@@ -370,6 +394,8 @@ const Wizard: NextPageWithLayout = () => {
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
+      postgresEngine: postgresEngine,
+      releaseChannel: releaseChannel,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
@@ -397,6 +423,7 @@ const Wizard: NextPageWithLayout = () => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
     // While the form data does load immediately
     if (slug) form.setValue('organization', slug)
+    if (projectName) form.setValue('projectName', projectName || '')
   }, [slug])
 
   useEffect(() => {
@@ -458,7 +485,7 @@ const Wizard: NextPageWithLayout = () => {
                 <Button
                   htmlType="submit"
                   loading={isCreatingNewProject || isSuccessNewProject}
-                  disabled={isCreatingNewProject || isSuccessNewProject}
+                  disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
                 >
                   Create new project
                 </Button>
@@ -532,30 +559,6 @@ const Wizard: NextPageWithLayout = () => {
                       />
                     </Panel.Content>
 
-                    {showNonProdFields && (
-                      <Panel.Content>
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="postgresVersion"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="Postgres version"
-                              layout="horizontal"
-                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
-                            >
-                              <FormControl_Shadcn_>
-                                <Input_Shadcn_
-                                  placeholder="Postgres version"
-                                  {...field}
-                                  autoComplete="off"
-                                />
-                              </FormControl_Shadcn_>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </Panel.Content>
-                    )}
-
                     {cloudProviderEnabled && showNonProdFields && (
                       <Panel.Content>
                         <FormField_Shadcn_
@@ -609,16 +612,27 @@ const Wizard: NextPageWithLayout = () => {
                             <FormItemLayout
                               layout="horizontal"
                               label={
-                                <div className="space-y-4">
+                                <div className="flex flex-col gap-y-4">
                                   <span>Compute Size</span>
 
-                                  <div className="flex flex-col space-y-2">
+                                  <div className="flex flex-col gap-y-2">
                                     <Link
-                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                       target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
                                     >
                                       <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
                                         <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Billing</p>
                                         <ExternalLink size={16} strokeWidth={1.5} />
                                       </div>
                                     </Link>
@@ -684,26 +698,7 @@ const Wizard: NextPageWithLayout = () => {
                             </FormItemLayout>
                           )}
                         />
-                        <FormItemLayout
-                          className="pt-4"
-                          label={
-                            <div className="space-y-4">
-                              <span>Compute Billing</span>
-                              <div className="flex flex-col space-y-2">
-                                <Link
-                                  href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
-                                  target="_blank"
-                                >
-                                  <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                    <p className="text-sm m-0">Docs</p>
-                                    <ExternalLink size={16} strokeWidth={1.5} />
-                                  </div>
-                                </Link>
-                              </div>
-                            </div>
-                          }
-                          layout="horizontal"
-                        >
+                        <FormItemLayout layout="horizontal">
                           <div className="flex justify-between mr-2">
                             <span>Additional Monthly Compute Costs</span>
                             <div className="text-brand flex gap-1 items-center">
@@ -768,7 +763,7 @@ const Wizard: NextPageWithLayout = () => {
                                   </TableBody>
                                 </Table>
                                 <PopoverSeparator />
-                                <Table className="mt-3">
+                                <Table>
                                   <TableHeader className="[&_th]:h-7">
                                     <TableRow>
                                       <TableHead colSpan={2}>Compute Credits</TableHead>
@@ -799,7 +794,7 @@ const Wizard: NextPageWithLayout = () => {
                                   </TableBody>
                                 </Table>
 
-                                <div className="p-4 text-xs text-foreground-light mt-2 space-y-1">
+                                <div className="p-4 text-xs text-foreground-light space-y-1">
                                   <p>
                                     Compute is charged usage-based whenever your billing cycle
                                     resets. Given compute charges are hourly, your invoice will
@@ -898,6 +893,48 @@ const Wizard: NextPageWithLayout = () => {
                         )}
                       />
                     </Panel.Content>
+
+                    {!projectVersionSelectionDisabled && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersionSelection"
+                          render={({ field }) => (
+                            <PostgresVersionSelector
+                              field={field}
+                              form={form}
+                              cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                              organizationSlug={slug}
+                              dbRegion={form.getValues('dbRegion')}
+                            />
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    {showNonProdFields && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersion"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Custom Postgres version"
+                              layout="horizontal"
+                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  placeholder="Postgres version"
+                                  {...field}
+                                  autoComplete="off"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
 
                     <Panel.Content>
                       <Collapsible_Shadcn_>
@@ -1040,14 +1077,49 @@ const Wizard: NextPageWithLayout = () => {
                   </>
                 )}
 
-                {isAdmin && freePlanWithExceedingLimits && slug && (
+                {freePlanWithExceedingLimits ? (
+                  isAdmin &&
+                  slug && (
+                    <Panel.Content>
+                      <FreeProjectLimitWarning
+                        membersExceededLimit={membersExceededLimit || []}
+                        orgSlug={slug}
+                      />
+                    </Panel.Content>
+                  )
+                ) : isManagedByVercel ? (
                   <Panel.Content>
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      orgSlug={slug}
+                    <PartnerManagedResource
+                      partner="vercel-marketplace"
+                      resource="Projects"
+                      cta={{
+                        installationId: currentOrg?.partner_id,
+                        message: 'Visit Vercel to create a project',
+                      }}
                     />
                   </Panel.Content>
-                )}
+                ) : hasOutstandingInvoices ? (
+                  <Panel.Content>
+                    <Admonition
+                      type="default"
+                      title="Your organization has overdue invoices"
+                      description={
+                        <div className="space-y-3">
+                          <p className="text-sm leading-normal">
+                            Please resolve all outstanding invoices first before creating a new
+                            project
+                          </p>
+
+                          <div>
+                            <Button asChild type="default">
+                              <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </Panel.Content>
+                ) : null}
               </div>
             )}
           </>

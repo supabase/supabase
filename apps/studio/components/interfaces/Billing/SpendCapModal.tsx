@@ -1,6 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Link from 'next/link'
-import { Button, IconHelpCircle, Modal } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
+import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 
 interface SpendCapModalProps {
   visible: boolean
@@ -9,157 +8,104 @@ interface SpendCapModalProps {
 
 const SpendCapModal = ({ visible, onHide }: SpendCapModalProps) => {
   return (
-    <Modal hideFooter visible={visible} size="xlarge" header="Spend cap" onCancel={() => onHide()}>
+    <Modal
+      hideFooter
+      visible={visible}
+      size="xlarge"
+      header={
+        <div className="flex justify-between items-center">
+          <span>Spend Cap</span>
+          <DocsButton href="https://supabase.com/docs/guides/platform/spend-cap" />
+        </div>
+      }
+      showCloseButton={false}
+      onCancel={() => onHide()}
+    >
       <Modal.Content>
         <div className="space-y-4">
           <p className="text-sm">
-            Enabling the spend cap sets a limit on your usage to stay within your plan's quota,
-            which controls costs but can limit service. Disabling the spend cap removes these
-            limits, but any extra usage beyond the plan's limit will be charged per usage.
+            Enabling the Spend Cap limits your usage to your plan's quota, which controls costs but
+            can restrict your service. Disabling the spend cap removes these limits, but any extra
+            usage beyond the plan's limit will be charged per usage.
           </p>
           <p className="text-sm">
-            Take a look at the following table to see which resources are chargeable and how they
-            are charged:
+            Launching additional projects or enabling project add-ons will incur additional monthly
+            fees independent of your Spend Cap.
           </p>
+
           {/* Maybe instead of a table, show something more interactive like a spend cap playground */}
           {/* Maybe ideate this in Figma first but this is good enough for now */}
-          <div className="border rounded border-control bg-overlay-hover">
-            <div className="flex items-center px-4 pt-2 pb-1">
-              <p className="w-[50%] text-sm text-foreground-light">Item</p>
-              <p className="w-[25%] text-sm text-foreground-light">Limit</p>
-              <p className="w-[25%] text-sm text-foreground-light">Rate</p>
-            </div>
-            <div className="py-2">
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Database size</p>
-                <p className="w-[25%] text-sm">8GB</p>
-                <p className="w-[25%] text-sm">$0.125 per GB</p>
-              </div>
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Egress</p>
-                <p className="w-[25%] text-sm">250GB</p>
-                <p className="w-[25%] text-sm">$0.09 per GB</p>
-              </div>
-            </div>
-            <div className="py-2">
-              <div className="flex items-center px-4 py-1">
-                <div className="flex w-[50%] items-center space-x-2">
-                  <p className="text-sm">Auth MAUs</p>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="transition opacity-50 cursor-pointer hover:opacity-100"
-                      />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              Monthly Active Users: A user that has made an API request in the last
-                              month
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </div>
-                <p className="w-[25%] text-sm">100,000</p>
-                <p className="w-[25%] text-sm">$0.00325 per user</p>
-              </div>
-              <div className="flex items-center px-4 py-1">
-                <div className="flex w-[50%] items-center space-x-2">
-                  <p className="text-sm">Single Sign-On (SAML 2.0) MAUs</p>
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger>
-                      <IconHelpCircle
-                        size={16}
-                        strokeWidth={1.5}
-                        className="transition opacity-50 cursor-pointer hover:opacity-100"
-                      />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                              'border border-background', //border
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              Single Sign-On Monthly Active Users: A user that has made an API
-                              request in the last month
-                            </span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
-                </div>
-                <p className="w-[25%] text-sm">50</p>
-                <p className="w-[25%] text-sm">$0.015 per user</p>
-              </div>
-            </div>
 
-            <div className="py-2">
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Storage size</p>
-                <p className="w-[25%] text-sm">100GB</p>
-                <p className="w-[25%] text-sm">$0.021 per GB</p>
-              </div>
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Storage Image Transformations</p>
-                <p className="w-[25%] text-sm">100 origin images</p>
-                <p className="w-[25%] text-sm">$5 per 1000 origin images</p>
-              </div>
-            </div>
+          <Table>
+            <TableHeader className="[&_th]:h-7">
+              <TableRow>
+                <TableHead className="w-[50%]">Item</TableHead>
+                <TableHead className="w-[25%]">Limit</TableHead>
+                <TableHead className="w-[25%]">Rate</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="[&_td]:py-2">
+              <TableRow>
+                <TableCell>Disk Size</TableCell>
+                <TableCell>8 GB per project</TableCell>
+                <TableCell>$0.125 per GB</TableCell>
+              </TableRow>
 
-            <div className="py-2">
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Realtime concurrent peak connections</p>
-                <p className="w-[25%] text-sm">500</p>
-                <p className="w-[25%] text-sm">$10 per 1000</p>
-              </div>
+              <TableRow>
+                <TableCell>Egress</TableCell>
+                <TableCell>250 GB</TableCell>
+                <TableCell>$0.09 per GB</TableCell>
+              </TableRow>
 
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Realtime messages</p>
-                <p className="w-[25%] text-sm">5 Million</p>
-                <p className="w-[25%] text-sm">$2.50 per Million</p>
-              </div>
-            </div>
+              <TableRow>
+                <TableCell>Auth MAUs</TableCell>
+                <TableCell>100,000</TableCell>
+                <TableCell>$0.00325 per user</TableCell>
+              </TableRow>
 
-            <div className="py-2">
-              <div className="flex items-center px-4 py-1">
-                <p className="w-[50%] text-sm">Function invocations</p>
-                <p className="w-[25%] text-sm">2 Million</p>
-                <p className="w-[25%] text-sm">$2 per Million</p>
-              </div>
-            </div>
-          </div>
+              <TableRow>
+                <TableCell>Auth Third-Party MAUs</TableCell>
+                <TableCell>50</TableCell>
+                <TableCell>$0.00325 per user</TableCell>
+              </TableRow>
 
-          <p className="text-sm">
-            See{' '}
-            <Link
-              href="https://supabase.com/pricing"
-              className="text-brand"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span>pricing page</span>
-            </Link>{' '}
-            for a full overview.
-          </p>
+              <TableRow>
+                <TableCell>Auth Single Sign-On MAUs</TableCell>
+                <TableCell>50</TableCell>
+                <TableCell>$0.015 per user</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Storage Size</TableCell>
+                <TableCell>100 GB</TableCell>
+                <TableCell>$0.021 per GB</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Storage Image Transformations</TableCell>
+                <TableCell>100 origin images</TableCell>
+                <TableCell>$5 per 1000 images</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Realtime Concurrent Peak Connections</TableCell>
+                <TableCell>500</TableCell>
+                <TableCell>$10 per 1000</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Realtime Messages</TableCell>
+                <TableCell>5 Million</TableCell>
+                <TableCell>$2.50 per Million</TableCell>
+              </TableRow>
+
+              <TableRow>
+                <TableCell>Function Invocations</TableCell>
+                <TableCell>2 Million</TableCell>
+                <TableCell>$2 per Million</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </Modal.Content>
       <Modal.Separator />

@@ -6,7 +6,7 @@ import { SidebarSkeleton } from './MainSkeleton'
 
 const HomeLayout = ({ children }: PropsWithChildren) => {
   return (
-    <SidebarSkeleton>
+    <SidebarSkeleton hideSideNav>
       <article>
         <HomePageCover title="Supabase Documentation" />
         <LayoutMainContent>

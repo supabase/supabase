@@ -1,6 +1,6 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
@@ -63,7 +63,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             project.organization_id === organization?.id &&
             (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||
               project.status === PROJECT_STATUS['COMING_UP'] ||
-              project.status === PROJECT_STATUS['RESTORING'])
+              project.status === PROJECT_STATUS['RESTORING'] ||
+              project.status === PROJECT_STATUS['RESTARTING'] ||
+              project.status === PROJECT_STATUS['RESIZING'])
         )
         .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [organization?.id, supabaseProjectsData]

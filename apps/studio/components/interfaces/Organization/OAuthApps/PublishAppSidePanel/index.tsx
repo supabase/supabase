@@ -1,9 +1,10 @@
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { Edit, Upload } from 'lucide-react'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -20,9 +21,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconEdit,
-  IconExternalLink,
-  IconUpload,
   Input,
   Modal,
   SidePanel,
@@ -237,7 +235,7 @@ const PublishAppSidePanel = ({
                                 <DropdownMenu>
                                   <DropdownMenuTrigger asChild>
                                     <Button type="default" className="px-1">
-                                      <IconEdit />
+                                      <Edit />
                                     </Button>
                                   </DropdownMenuTrigger>
                                   <DropdownMenuContent align="end" side="bottom">
@@ -274,7 +272,7 @@ const PublishAppSidePanel = ({
                                   (uploadButtonRef.current as any).click()
                               }}
                             >
-                              <IconUpload size={18} strokeWidth={1.5} className="text-foreground" />
+                              <Upload size={18} strokeWidth={1.5} className="text-foreground" />
                               <p className="text-xs text-foreground-light">Upload logo</p>
                             </div>
                           )}
@@ -338,15 +336,7 @@ const PublishAppSidePanel = ({
                             of its projects.
                           </span>
                         </div>
-                        <Button asChild type="default" icon={<IconExternalLink />}>
-                          <Link
-                            href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Documentation
-                          </Link>
-                        </Button>
+                        <DocsButton href="https://supabase.com/docs/guides/platform/oauth-apps/oauth-scopes" />
                       </div>
 
                       <ScopesPanel scopes={scopes} setScopes={setScopes} />

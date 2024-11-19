@@ -1,9 +1,9 @@
-import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
@@ -88,15 +88,7 @@ export const IndexAdvisorDisabledState = () => {
               Enable extensions
             </Button>
           )}
-          <Button asChild type="outline" icon={<ExternalLink />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton href="https://supabase.com/docs/guides/database/extensions/index_advisor" />
         </div>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>

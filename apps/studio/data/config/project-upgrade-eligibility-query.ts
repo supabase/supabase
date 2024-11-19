@@ -6,19 +6,12 @@ import { useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { components } from 'api-types'
 
+export type ProjectUpgradeTargetVersion = components['schemas']['ProjectVersion']
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
-export type ProjectUpgradeEligibilityResponse = {
-  eligible: boolean
-  current_app_version: string
-  latest_app_version: string
-  target_upgrade_versions: { postgres_version: number; app_version: string }[]
-  requires_manual_intervention: string | null
-  potential_breaking_changes: string[]
-  duration_estimate_hours: number
-  legacy_auth_custom_roles: string[]
-  extension_dependent_objects: string[]
-}
+export type ProjectUpgradeEligibilityResponse =
+  components['schemas']['ProjectUpgradeEligibilityResponse']
 
 export async function getProjectUpgradeEligibility(
   { projectRef }: ProjectUpgradeEligibilityVariables,
@@ -28,10 +21,11 @@ export async function getProjectUpgradeEligibility(
 
   const { data, error } = await get('/v1/projects/{ref}/upgrade/eligibility', {
     params: { path: { ref: projectRef } },
+    signal,
   })
 
   if (error) handleError(error)
-  return data as ProjectUpgradeEligibilityResponse
+  return data
 }
 
 export type ProjectUpgradeEligibilityData = Awaited<ReturnType<typeof getProjectUpgradeEligibility>>
@@ -52,8 +46,7 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
       enabled:
         enabled &&
         project !== undefined &&
-        project.status !== PROJECT_STATUS.INACTIVE &&
-        project.status !== PROJECT_STATUS.COMING_UP &&
+        project.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
         typeof projectRef !== 'undefined' &&
         IS_PLATFORM,
       ...options,

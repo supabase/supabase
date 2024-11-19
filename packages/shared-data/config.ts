@@ -6,7 +6,7 @@ const config = {
          * The number of emails that can be sent per hour using the inbuilt email server.
          */
         inbuilt_smtp_per_hour: {
-          value: 3,
+          value: 2,
         },
       },
       magic_link: {
@@ -98,6 +98,15 @@ const config = {
         },
       },
     },
+    hook_timeouts: {
+      postgres_hooks: {
+        value: 2,
+      },
+      http_hooks: {
+        value: 5,
+
+      },
+    }
   },
   branching: {
     inactivity_period_in_minutes: {

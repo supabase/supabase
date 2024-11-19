@@ -1,5 +1,5 @@
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import { IconArrowLeft, IconArrowRight } from 'ui'
 
 const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCount: number }) => {
   // TODO: not sure if this is the most efficient way to do this. may need to refactor.
@@ -15,7 +15,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
           href={`/discussions?page=${currentPage - 1}`}
           className="border border-control bg-surface-100 inline-flex h-8 w-8 items-center justify-center rounded"
         >
-          <IconArrowLeft className="stroke-2 transition group-hover:-translate-x-1" height={12.5} />
+          <ArrowLeft className="stroke-2 transition group-hover:-translate-x-1" height={12.5} />
         </Link>
       </li>
       {pages.map((page: number, i: number) => {
@@ -38,10 +38,7 @@ const Pagination = ({ currentPage, totalCount }: { currentPage: number; totalCou
           href={`/discussions?page=${currentPage + 1}`}
           className="border-control bg-surface-100 inline-flex h-8 w-8 items-center justify-center rounded border"
         >
-          <IconArrowRight
-            className="stroke-2 transition group-hover:-translate-x-1"
-            height={12.5}
-          />
+          <ArrowRight className="stroke-2 transition group-hover:-translate-x-1" height={12.5} />
         </Link>
       </li>
     </ul>

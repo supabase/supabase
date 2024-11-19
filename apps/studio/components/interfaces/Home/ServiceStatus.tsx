@@ -1,5 +1,7 @@
-import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
-import { useState } from 'react'
+import dayjs from 'dayjs'
+import { AlertTriangle, CheckCircle2, ChevronRight, Info, Loader2 } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
@@ -7,7 +9,45 @@ import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-serv
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import {
+  Button,
+  InfoIcon,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
+import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+
+const SERVICE_STATUS_THRESHOLD = 5 // minutes
+
+const StatusMessage = ({
+  isLoading,
+  isSuccess,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isSuccess: boolean
+  isProjectNew: boolean
+}) => {
+  if (isLoading) return 'Checking status'
+  if (isProjectNew) return 'Coming up...'
+  if (isSuccess) return 'No issues'
+  return 'Unable to connect'
+}
+
+const StatusIcon = ({
+  isLoading,
+  isSuccess,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isSuccess: boolean
+  isProjectNew: boolean
+}) => {
+  if (isLoading || isProjectNew) return <Loader2 size={14} className="animate-spin" />
+  if (isSuccess) return <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
+  return <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
+}
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -29,13 +69,21 @@ const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // [Joshen] Need pooler service check eventually
-  const { data: status, isLoading } = useProjectServiceStatusQuery({ projectRef: ref })
-  const { data: edgeFunctionsStatus } = useEdgeFunctionServiceStatusQuery({ projectRef: ref })
-  const { isLoading: isLoadingPostgres, isSuccess: isSuccessPostgres } =
-    usePostgresServiceStatusQuery({
-      projectRef: ref,
-      connectionString: project?.connectionString,
-    })
+  const {
+    data: status,
+    isLoading,
+    refetch: refetchServiceStatus,
+  } = useProjectServiceStatusQuery({ projectRef: ref })
+  const { data: edgeFunctionsStatus, refetch: refetchEdgeFunctionServiceStatus } =
+    useEdgeFunctionServiceStatusQuery({ projectRef: ref })
+  const {
+    isLoading: isLoadingPostgres,
+    isSuccess: isSuccessPostgres,
+    refetch: refetchPostgresServiceStatus,
+  } = usePostgresServiceStatusQuery({
+    projectRef: ref,
+    connectionString: project?.connectionString,
+  })
 
   const authStatus = status?.find((service) => service.name === 'auth')
   const restStatus = status?.find((service) => service.name === 'rest')
@@ -49,6 +97,7 @@ const ServiceStatus = () => {
     docsUrl?: string
     isLoading: boolean
     isSuccess?: boolean
+    logsUrl: string
   }[] = [
     {
       name: 'Database',
@@ -56,6 +105,7 @@ const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading: isLoadingPostgres,
       isSuccess: isSuccessPostgres,
+      logsUrl: '/logs/postgres-logs',
     },
     {
       name: 'PostgREST',
@@ -63,6 +113,7 @@ const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       isSuccess: restStatus?.healthy,
+      logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
       ? [
@@ -72,6 +123,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: authStatus?.healthy,
+            logsUrl: '/logs/auth-logs',
           },
         ]
       : []),
@@ -83,6 +135,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: realtimeStatus?.healthy,
+            logsUrl: '/logs/realtime-logs',
           },
         ]
       : []),
@@ -94,6 +147,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: storageStatus?.healthy,
+            logsUrl: '/logs/storage-logs',
           },
         ]
       : []),
@@ -105,6 +159,7 @@ const ServiceStatus = () => {
             docsUrl: 'https://supabase.com/docs/guides/functions/troubleshooting',
             isLoading,
             isSuccess: edgeFunctionsStatus?.healthy,
+            logsUrl: '/logs/edge-functions-logs',
           },
         ]
       : []),
@@ -113,13 +168,40 @@ const ServiceStatus = () => {
   const isLoadingChecks = services.some((service) => service.isLoading)
   const allServicesOperational = services.every((service) => service.isSuccess)
 
+  // If the project is less than 5 minutes old, and status is not operational, then it's likely the service is still starting up
+  const isProjectNew =
+    dayjs.utc().diff(dayjs.utc(project?.inserted_at), 'minute') < SERVICE_STATUS_THRESHOLD ||
+    project?.status === 'COMING_UP'
+
+  useEffect(() => {
+    let timer: any
+
+    if (isProjectNew) {
+      const secondsSinceProjectCreated = dayjs
+        .utc()
+        .diff(dayjs.utc(project?.inserted_at), 'seconds')
+      const remainingTimeTillNextCheck = SERVICE_STATUS_THRESHOLD * 60 - secondsSinceProjectCreated
+
+      timer = setTimeout(() => {
+        refetchServiceStatus()
+        refetchPostgresServiceStatus()
+        refetchEdgeFunctionServiceStatus()
+      }, remainingTimeTillNextCheck * 1000)
+    }
+
+    return () => {
+      clearTimeout(timer)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isProjectNew])
+
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type="default"
           icon={
-            isLoadingChecks ? (
+            isLoadingChecks || isProjectNew ? (
               <Loader2 className="animate-spin" />
             ) : (
               <div
@@ -133,31 +215,43 @@ const ServiceStatus = () => {
           {isBranch ? 'Preview Branch' : 'Project'} Status
         </Button>
       </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="end">
+      <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
         {services.map((service) => (
-          <div
+          <Link
+            href={`/project/${ref}${service.logsUrl}`}
             key={service.name}
-            className="px-4 py-2 text-xs flex items-center justify-between border-b last:border-none"
+            className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
           >
-            <div>
-              <p>{service.name}</p>
-              <p className="text-foreground-light">
-                {service.isLoading
-                  ? 'Checking status'
-                  : service.isSuccess
-                    ? 'No issues'
-                    : 'Unable to connect'}
-              </p>
+            <div className="flex gap-x-2">
+              <StatusIcon
+                isLoading={service.isLoading}
+                isSuccess={!!service.isSuccess}
+                isProjectNew={isProjectNew}
+              />
+              <div className="flex-1">
+                <p>{service.name}</p>
+                <p className="text-foreground-light flex items-center gap-1">
+                  <StatusMessage
+                    isLoading={service.isLoading}
+                    isSuccess={!!service.isSuccess}
+                    isProjectNew={isProjectNew}
+                  />
+                </p>
+              </div>
             </div>
-            {service.isLoading ? (
-              <Loader2 className="animate-spin text-foreground-light" size={18} />
-            ) : service.isSuccess ? (
-              <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
-            ) : (
-              <AlertTriangle className="text-warning" size={18} strokeWidth={1.5} />
-            )}
-          </div>
+            <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
+              <span className="text-xs text-foreground">View logs</span>
+              <ChevronRight size={14} className="text-foreground" />
+            </div>
+          </Link>
         ))}
+        <PopoverSeparator />
+        <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
+          <div className="mt-0.5">
+            <InfoIcon />
+          </div>
+          Recently restored projects can take up to 5 minutes to become fully operational.
+        </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

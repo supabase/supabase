@@ -1,18 +1,30 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { components } from 'api-types'
+
+export type ReleaseChannel = components['schemas']['ReleaseChannel']
+export type PostgresEngine = components['schemas']['PostgresEngine']
 
 export type ProjectRestoreVariables = {
   ref: string
+  postgresEngine?: PostgresEngine
+  releaseChannel?: ReleaseChannel
 }
 
-export async function restoreProject({ ref }: ProjectRestoreVariables) {
+export async function restoreProject({
+  ref,
+  postgresEngine,
+  releaseChannel,
+}: ProjectRestoreVariables) {
   const { data, error } = await post('/platform/projects/{ref}/restore', {
     params: { path: { ref } },
-    // @ts-ignore
-    body: {},
+    body: {
+      postgres_engine: postgresEngine,
+      release_channel: releaseChannel,
+    },
   })
   if (error) handleError(error)
   return data

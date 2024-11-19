@@ -119,7 +119,18 @@ Add an intent-filter to enable deep linking:
 
 </TabPanel>
 <TabPanel id="web" label="Web">
-There are no additional configurations.
+Supabase redirects do not work with Flutter's [default URL strategy](https://docs.flutter.dev/ui/navigation/url-strategies).
+We can switch to the path URL strategy as follows:
+
+```dart
+import 'package:flutter_web_plugins/url_strategy.dart';
+
+void main() {
+  usePathUrlStrategy();
+  runApp(ExampleApp());
+}
+```
+
 </TabPanel>
 </Tabs>
 

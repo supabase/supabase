@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
-import type { Json } from '~/types'
+import type { Json } from '~/features/helpers.types'
 import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
@@ -99,14 +99,6 @@ export function useSpec(specFile?: string) {
   return spec
 }
 
-export const useCloseMenuOnRouteChange = () => {
-  const pathname = usePathname()
-
-  useEffect(() => {
-    menuState.setMenuMobileOpen(false)
-  }, [pathname])
-}
-
 export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
@@ -117,16 +109,22 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Api
     case pathname.startsWith('auth'):
       return MenuId.Auth
-    case pathname.startsWith('cli'):
-      return MenuId.Cli
+    case pathname.startsWith('local-development'):
+      return MenuId.LocalDevelopment
     case pathname.startsWith('database'):
       return MenuId.Database
+    case pathname.startsWith('deployment'):
+      return MenuId.Deployment
     case pathname.startsWith('functions'):
       return MenuId.Functions
     case pathname.startsWith('getting-started'):
       return MenuId.GettingStarted
     case pathname.startsWith('graphql'):
       return MenuId.Graphql
+    case pathname.startsWith('integrations'):
+      return MenuId.Integrations
+    case pathname.startsWith('monitoring-troubleshooting'):
+      return MenuId.MonitoringTroubleshooting
     case pathname.startsWith('platform'):
       return MenuId.Platform
     case pathname.startsWith('realtime'):
@@ -140,4 +138,12 @@ export const getMenuId = (pathname: string | null) => {
     default:
       return MenuId.GettingStarted
   }
+}
+
+export const useCloseMenuOnRouteChange = () => {
+  const pathname = usePathname()
+
+  useEffect(() => {
+    menuState.setMenuMobileOpen(false)
+  }, [pathname])
 }

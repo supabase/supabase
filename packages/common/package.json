@@ -5,6 +5,8 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "clean": "rimraf node_modules",
+    "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
     "typecheck_CURRENTLY_IGNORED": "tsc --noEmit"
   },
   "dependencies": {
@@ -13,14 +15,14 @@
     "dat.gui": "^0.7.9",
     "lodash": "^4.17.21",
     "next-themes": "^0.3.0",
-    "react-hot-toast": "^2.4.1",
     "react-use": "^17.4.0"
   },
   "devDependencies": {
+    "@types/lodash": "4.17.5",
     "@types/react": "^18.2.24",
     "@types/react-dom": "^18.2.8",
     "tsconfig": "*",
-    "typescript": "^5.5.0"
+    "typescript": "~5.5.0"
   },
   "peerDependencies": {
     "@supabase/supabase-js": "*",

@@ -12,13 +12,15 @@ import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import LogEventChart from './LogEventChart'
 import LogTable from './LogTable'
 import { LOGS_TABLES, LOG_ROUTES_WITH_REPLICA_SUPPORT, LogsTableName } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate, QueryType } from './Logs.types'
 import { ensureNoTimestampConflict, maybeShowUpgradePrompt } from './Logs.utils'
 import UpgradePrompt from './UpgradePrompt'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
+import useSingleLog from 'hooks/analytics/useSingleLog'
 
 /**
  * Acts as a container component for the entire log display
@@ -36,6 +38,7 @@ interface LogsPreviewerProps {
   filterOverride?: Filters
   condensedLayout?: boolean
   tableName?: LogsTableName
+  EmptyState?: React.ReactNode
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -44,6 +47,7 @@ export const LogsPreviewer = ({
   condensedLayout = false,
   tableName,
   children,
+  EmptyState,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -69,7 +73,19 @@ export const LogsPreviewer = ({
     setFilters,
     refresh,
     setParams,
-  } = useLogsPreview(projectRef as string, table, filterOverride)
+  } = useLogsPreview({ projectRef, table, filterOverride })
+
+  const [selectedLogId, setSelectedLogId] = useSelectedLog()
+  const {
+    data: selectedLog,
+    isLoading: isSelectedLogLoading,
+    error: selectedLogError,
+  } = useSingleLog({
+    projectRef,
+    id: selectedLogId ?? undefined,
+    queryType,
+    paramsToMerge: params,
+  })
 
   const { showUpgradePrompt, setShowUpgradePrompt } = useUpgradePrompt(
     params.iso_timestamp_start as string
@@ -78,14 +94,14 @@ export const LogsPreviewer = ({
   useEffect(() => {
     setFilters((prev) => ({
       ...prev,
-      search_query: s as string,
-      database: db as string,
+      search_query: s,
+      database: db,
     }))
     if (ite || its) {
       setParams((prev) => ({
         ...prev,
-        iso_timestamp_start: (its || '') as string,
-        iso_timestamp_end: (ite || '') as string,
+        iso_timestamp_start: its || '',
+        iso_timestamp_end: ite || '',
       }))
     }
   }, [db, s, ite, its])
@@ -181,7 +197,7 @@ export const LogsPreviewer = ({
   }
 
   return (
-    <div className="flex flex-col flex-grow h-full">
+    <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
         csvData={logData}
         isLoading={isLoading}
@@ -219,14 +235,15 @@ export const LogsPreviewer = ({
       <div
         className={
           'transition-all duration-500 ' +
-          (showChart && !isLoading && logData.length > 0
-            ? 'mb-4 h-24 pt-4 opacity-100'
-            : 'h-0 opacity-0')
+          (showChart && logData.length > 0 ? 'mb-4 h-28 opacity-100' : 'h-0 opacity-0')
         }
       >
-        <div className={condensedLayout ? 'px-4' : ''}>
-          {!isLoading && showChart && (
+        <div className={condensedLayout ? 'px-3' : ''}>
+          {showChart && (
             <LogEventChart
+              className={cn({
+                'opacity-40': isLoading,
+              })}
               data={eventChartData}
               onBarClick={(isoTimestamp) => {
                 handleSearch('event-chart-bar-click', {
@@ -239,7 +256,7 @@ export const LogsPreviewer = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-col flex-grow pt-4">
+      <div className="relative flex flex-col flex-grow flex-1 overflow-auto">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
           <LogTable
@@ -249,27 +266,34 @@ export const LogsPreviewer = ({
             queryType={queryType}
             isHistogramShowing={showChart}
             onHistogramToggle={() => setShowChart(!showChart)}
-            params={params}
             error={error}
+            EmptyState={EmptyState}
+            onSelectedLogChange={(log) => setSelectedLogId(log?.id ?? null)}
+            selectedLog={selectedLog}
+            isSelectedLogLoading={isSelectedLogLoading}
+            selectedLogError={selectedLogError ?? undefined}
           />
         </LoadingOpacity>
-        {!error && (
-          <div className="border-t flex flex-row justify-between p-2">
-            <Button
-              onClick={loadOlder}
-              icon={<Rewind />}
-              type="default"
-              loading={isLoadingOlder}
-              disabled={isLoadingOlder}
-            >
-              Load older
-            </Button>
-            <div className="flex flex-row justify-end mt-2">
-              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-            </div>
-          </div>
-        )}
       </div>
+      {!error && logData.length > 0 && (
+        <div className="border-t flex flex-row items-center gap-3 p-2">
+          <Button
+            onClick={loadOlder}
+            icon={<Rewind />}
+            type="default"
+            loading={isLoadingOlder}
+            disabled={isLoadingOlder}
+          >
+            Load older
+          </Button>
+          <div className="text-sm text-foreground-lighter">
+            Showing <span className="font-mono">{logData.length}</span> results
+          </div>
+          <div className="flex flex-row justify-end mt-2">
+            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }

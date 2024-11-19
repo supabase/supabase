@@ -31,25 +31,24 @@ const RadioGroupCardItem = React.forwardRef<
       className={cn(
         'flex flex-col gap-2',
         'w-48',
-        'bg-overlay/50',
+        'bg-overlay',
         'rounded-md',
         'border',
         'p-2',
-        'shadow-sm',
-        'hover:bg-surface-300',
+        // 'hover:bg-selection',
         'hover:border-foreground-muted',
         'hover:z-[1] focus-visible:z-[1]',
         'data-[state=checked]:z-[1]',
-        'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
-        'data-[state=checked]:bg-surface-300',
-        'data-[state=checked]:border-foreground-muted',
+        'data-[state=checked]:ring-2 data-[state=checked]:ring-border',
+        'data-[state=checked]:bg-surface-200 dark:data-[state=checked]:bg-surface-300',
+        'data-[state=checked]:border-foreground/50',
         'transition-colors',
         'group',
         props.className
       )}
     >
       {props.children}
-      <div className="flex gap-2 w-full">
+      <label className="flex gap-2 w-full" id={props.id} htmlFor={props.value}>
         {showIndicator && (
           <div
             className="
@@ -71,9 +70,9 @@ const RadioGroupCardItem = React.forwardRef<
           </div>
         )}
 
-        <label
-          htmlFor={props.value}
+        <div
           className={cn(
+            'w-full',
             'text-xs transition-colors text-left',
             'text-light',
             'group-hover:text-foreground group-data-[state=checked]:text-foreground',
@@ -81,8 +80,8 @@ const RadioGroupCardItem = React.forwardRef<
           )}
         >
           {label}
-        </label>
-      </div>
+        </div>
+      </label>
     </RadioGroupPrimitive.Item>
   )
 })

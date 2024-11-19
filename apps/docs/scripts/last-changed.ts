@@ -21,6 +21,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 import { SimpleGit, simpleGit } from 'simple-git'
+import toml from 'toml'
 
 import { Section } from './helpers.mdx'
 
@@ -157,7 +158,15 @@ async function updateTimestamps(
 }
 
 function processMdx(rawContent: string): Array<SectionWithChecksum> {
-  const { content } = matter(rawContent)
+  let content: string
+  try {
+    content = matter(rawContent).content
+  } catch (err) {
+    content = matter(rawContent, {
+      language: 'toml',
+      engines: { toml: toml.parse.bind(toml) },
+    }).content
+  }
 
   const GLOBAL_HEADING_REGEX = /(?:^|\n)(?=#+\s+[^\n]+[\n$])/g
   const sections = content.split(GLOBAL_HEADING_REGEX)

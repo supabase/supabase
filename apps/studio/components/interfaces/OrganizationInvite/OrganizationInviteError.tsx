@@ -18,32 +18,24 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
   const signOut = useSignOut()
   const { profile } = useProfile()
 
-  const hasError =
-    isError || data?.token_does_not_exist || data?.expired_token || !data?.email_match
-
   return (
-    <div
-      className={cn(
-        'flex flex-col items-center justify-center gap-y-1 text-sm',
-        hasError ? 'text-foreground-light' : 'text-foreground'
-      )}
-    >
+    <div className={cn('flex flex-col items-center justify-center gap-y-1 text-sm')}>
       {isError ? (
         <AlertError
           error={error}
           subject="Failed to retrieve token"
-          className="[&>h5]:text-left [&>div]:items-start rounded-t-none"
+          className="border-0 rounded-b [&>h5]:text-left [&>div]:items-start rounded-t-none"
         />
       ) : data?.token_does_not_exist ? (
-        <>
+        <div className="p-4 flex flex-col gap-y-1">
           <p>The invite token is invalid.</p>
           <p className="text-foreground-lighter">
             Try copying and pasting the link from the invite email, or ask the organization owner to
             invite you again.
           </p>
-        </>
+        </div>
       ) : !data?.email_match ? (
-        <>
+        <div className="p-4 flex flex-col gap-y-1">
           <p>
             Your email address {profile?.primary_email} does not match the email address this
             invitation was sent to.
@@ -62,14 +54,14 @@ export const OrganizationInviteError = ({ data, error, isError }: OrganizationIn
             and then sign in or create a new account using the same email address used in the
             invitation.
           </p>
-        </>
+        </div>
       ) : data.expired_token ? (
-        <>
+        <div className="p-4 flex flex-col gap-y-1">
           <p>The invite token has expired.</p>
           <p className="text-foreground-lighter">
             Please request a new one from the organization owner.
           </p>
-        </>
+        </div>
       ) : null}
     </div>
   )

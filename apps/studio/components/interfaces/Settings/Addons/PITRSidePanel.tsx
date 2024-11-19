@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
@@ -18,20 +17,20 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { useAddonsPagePanel } from 'state/addons-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconAlertTriangle,
-  IconExternalLink,
+  CriticalIcon,
   Radio,
   SidePanel,
+  WarningIcon,
   cn,
 } from 'ui'
-import { CriticalIcon, WarningIcon } from 'ui'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const PITR_CATEGORY_OPTIONS: {
   id: 'off' | 'on'
@@ -54,7 +53,6 @@ const PITR_CATEGORY_OPTIONS: {
 ]
 
 const PITRSidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { resolvedTheme } = useTheme()
   const project = useSelectedProject()
@@ -67,15 +65,8 @@ const PITRSidePanel = () => {
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'pitr'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, setPanel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'pitr'
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
@@ -85,7 +76,7 @@ const PITRSidePanel = () => {
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully updated point in time recovery duration`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to update PITR: ${error.message}`)
@@ -94,7 +85,7 @@ const PITRSidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled point in time recovery`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable PITR: ${error.message}`)
@@ -142,7 +133,7 @@ const PITRSidePanel = () => {
     <SidePanel
       size="xlarge"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={
@@ -166,7 +157,7 @@ const PITRSidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Point in Time Recovery</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/backups#point-in-time-recovery"
               target="_blank"
@@ -306,7 +297,7 @@ const PITRSidePanel = () => {
                     <Button
                       key="change-compute"
                       type="default"
-                      onClick={() => snap.setPanelKey('computeInstance')}
+                      onClick={() => setPanel('computeInstance')}
                     >
                       Change compute size
                     </Button>,
@@ -355,58 +346,11 @@ const PITRSidePanel = () => {
             </div>
           )}
 
-          {hasChanges && !blockDowngradeDueToReadReplicas && (
-            <>
-              {selectedOption === 'pitr_0' ||
-              (selectedPitr?.price ?? 0) < (subscriptionPitr?.variant.price ?? 0)
-                ? subscription?.billing_via_partner === false &&
-                  // Old addon billing with upfront payment
-                  subscription.usage_based_billing_project_addons === false && (
-                    <p className="text-sm text-foreground-light">
-                      Upon clicking confirm, the add-on is removed immediately and any unused time
-                      in the current billing cycle is added as prorated credits to your organization
-                      and used in subsequent billing cycles.
-                    </p>
-                  )
-                : !subscription?.billing_via_partner && (
-                    <p className="text-sm text-foreground-light">
-                      {subscription?.usage_based_billing_project_addons === false ? (
-                        <span>
-                          Upon clicking confirm, the amount of{' '}
-                          <span className="text-foreground">
-                            {formatCurrency(selectedPitr?.price)}
-                          </span>{' '}
-                          will be added to your monthly invoice. The addon is prepaid per month and
-                          in case of a downgrade, you get credits for the remaining time. For the
-                          current billing cycle you're immediately charged a prorated amount for the
-                          remaining days.
-                        </span>
-                      ) : (
-                        <span>
-                          There are no immediate charges. The addon is billed at the end of your
-                          billing cycle based on your usage and prorated to the hour.
-                        </span>
-                      )}
-                    </p>
-                  )}
-
-              {
-                // Billed via partner
-                subscription?.billing_via_partner &&
-                  // Project addons are still billed the old way (upfront payment)
-                  subscription?.usage_based_billing_project_addons === false &&
-                  // Scheduled billing plan change
-                  subscription.scheduled_plan_change?.target_plan !== undefined && (
-                    <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                      <IconAlertTriangle className="h-4 w-4" />
-                      <AlertDescription_Shadcn_>
-                        You have a scheduled subscription change that will be canceled if you change
-                        your PITR add on.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )
-              }
-            </>
+          {hasChanges && !blockDowngradeDueToReadReplicas && selectedOption !== 'pitr_0' && (
+            <p className="text-sm text-foreground-light">
+              There are no immediate charges. The addon is billed at the end of your billing cycle
+              based on your usage and prorated to the hour.
+            </p>
           )}
         </div>
       </SidePanel.Content>

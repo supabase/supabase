@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
@@ -31,6 +31,11 @@ export async function resizeProjectDisk({ projectRef, volumeSize }: ProjectDiskR
 
 type ProjectDiskResizeData = Awaited<ReturnType<typeof resizeProjectDisk>>
 
+/**
+ * @deprecated We'll need to use the new endpoint instead
+ * @param param0
+ * @returns
+ */
 export const useProjectDiskResizeMutation = ({
   onSuccess,
   onError,

@@ -6,11 +6,43 @@ const pricingMetricBytes = [
   PricingMetric.STORAGE_SIZE,
 ]
 
-export const formatUsage = (pricingMetric: PricingMetric, usage: number) => {
+const pricingMetricNotHrs = [
+  PricingMetric.FUNCTION_INVOCATIONS,
+  PricingMetric.LOG_DRAIN_EVENTS,
+  PricingMetric.MONTHLY_ACTIVE_USERS,
+  PricingMetric.MONTHLY_ACTIVE_SSO_USERS,
+  PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS,
+  PricingMetric.REALTIME_MESSAGE_COUNT,
+  PricingMetric.REALTIME_PEAK_CONNECTIONS,
+  PricingMetric.STORAGE_IMAGES_TRANSFORMED,
+]
+
+export const formatUsage = (
+  pricingMetric: PricingMetric,
+  allocation: { usage: number; hours?: number }
+) => {
   if (pricingMetricBytes.includes(pricingMetric)) {
-    return +(usage / 1e9).toFixed(2).toLocaleString()
+    const formattedUsage = +(allocation.usage / 1e9).toFixed(2).toLocaleString()
+
+    // To avoid very low usage displaying as "0", we will show "<0.01" instead
+    if (allocation.usage > 0 && formattedUsage === 0) {
+      return '<0.01'
+    } else {
+      return formattedUsage
+    }
+  }
+
+  if (allocation.hours && !pricingMetricNotHrs.includes(pricingMetric)) {
+    return (
+      allocation.usage.toLocaleString() +
+      ' (' +
+      Math.round(allocation.usage / allocation.hours).toLocaleString() +
+      'x' +
+      allocation.hours.toLocaleString() +
+      ' hours)'
+    )
   } else {
-    return usage.toLocaleString()
+    return allocation.usage.toLocaleString()
   }
 }
 
@@ -25,6 +57,9 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_7,
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
+      PricingMetric.LOG_DRAIN,
+      PricingMetric.AUTH_MFA_PHONE,
+      PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)
   ) {
     return 'Hours'

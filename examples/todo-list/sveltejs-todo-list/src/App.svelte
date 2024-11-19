@@ -25,7 +25,7 @@
   });
 </script>
 
-<div class="w-full h-full bg-gray-200">
+<div class="w-full h-full bg-200">
   {#if user}
     <Home bind:user />
   {:else}

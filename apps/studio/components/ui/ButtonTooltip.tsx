@@ -1,4 +1,4 @@
-import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef, ReactNode } from 'react'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_, cn } from 'ui'
 
 export const ButtonTooltip = forwardRef<
@@ -6,7 +6,7 @@ export const ButtonTooltip = forwardRef<
   ComponentPropsWithoutRef<typeof Button> & {
     tooltip: {
       content: ComponentProps<typeof TooltipContent_Shadcn_> & {
-        text?: string
+        text?: string | ReactNode
       }
     }
   }
@@ -18,7 +18,7 @@ export const ButtonTooltip = forwardRef<
           {props.children}
         </Button>
       </TooltipTrigger_Shadcn_>
-      {props.disabled && props.tooltip.content.text !== undefined && (
+      {props.tooltip.content.text !== undefined && (
         <TooltipContent_Shadcn_ {...props.tooltip.content}>
           {props.tooltip.content.text}
         </TooltipContent_Shadcn_>

@@ -1,11 +1,11 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import pgMeta from '@supabase/pg-meta'
+import { databaseKeys } from 'data/database/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
-import { sqlKeys } from 'data/sql/keys'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
@@ -47,7 +47,7 @@ export const useDatabaseFunctionCreateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(sqlKeys.query(projectRef, ['functions-list']))
+        await queryClient.invalidateQueries(databaseKeys.databaseFunctions(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -13,7 +13,14 @@ Postgres includes several built-in foreign data wrappers, such as [`postgres_fdw
 
 Wrappers introduce some new terminology and different workflows.
 
-![FDW](/docs/img/database/fdw-light.png)
+<Image
+  alt="Foreign Data Wrappers (FDW)"
+  zoomable
+  src={{
+    dark: '/docs/img/database/foreign-data-wrappers/extracting-data.png',
+    light: '/docs/img/database/foreign-data-wrappers/extracting-data--light.png',
+  }}
+/>
 
 ### Remote servers
 
@@ -105,9 +112,22 @@ select cron.schedule(
 );
 ```
 
-![FDW](/docs/img/database/fdw-qetl-light.png)
+<Image
+  alt="FDW with pg_cron"
+  zoomable
+  src={{
+    dark: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron.png',
+    light: '/docs/img/database/foreign-data-wrappers/extracting-data-pgcron--light.png',
+  }}
+/>
 
 This process can be taxing on your database if you are moving large amounts of data. Often, it's better to use an external tool for batch ETL, such as [Fivetran](https://fivetran.com/) or [Airbyte](https://airbyte.io/).
+
+### WebAssembly Wrappers
+
+WebAssembly (Wasm) is a binary instruction format that enables high-performance execution of code on the web. Wrappers now includes a Wasm runtime, which provides a sandboxed execution environment, to run Wasm foreign data wrappers. Combined Wrappers with Wasm, developing and distributing new FDW becomes much easier and you can even build your own Wasm FDW and use it on Supabase platform.
+
+To learn more about Wasm FDW, visit [Wrappers official documentation](https://supabase.github.io/wrappers/).
 
 ## Security
 

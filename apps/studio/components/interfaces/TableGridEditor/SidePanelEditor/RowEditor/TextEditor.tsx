@@ -1,19 +1,20 @@
 import { Editor } from '@monaco-editor/react'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { Loader } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import { Button, SidePanel, cn } from 'ui'
 import ActionBar from '../ActionBar'
+import { isValueTruncated } from './RowEditor.utils'
 
 interface TextEditorProps {
   visible: boolean
@@ -34,23 +35,34 @@ export const TextEditor = ({
 }: TextEditorProps) => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   const [strValue, setStrValue] = useState('')
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const value = row?.[column as keyof typeof row] as unknown as string
-  const isTruncated = value?.endsWith('...') && value.length > MAX_CHARACTERS
+  const isTruncated = isValueTruncated(value)
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isLoading, isSuccess, reset } = useGetCellValueMutation()
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined || row === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (
+      selectedTable === undefined ||
+      project === undefined ||
+      row === undefined ||
+      !isTableLike(selectedTable)
+    )
+      return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 
@@ -77,11 +89,18 @@ export const TextEditor = ({
     }
   }, [visible])
 
+  // reset the mutation when the panel closes. Fixes an issue where the value is truncated if you close and reopen the
+  // panel again
+  const onClose = useCallback(() => {
+    reset()
+    closePanel()
+  }, [reset])
+
   return (
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={() => closePanel()}
+      onCancel={onClose}
       header={
         <div className="flex items-center justify-between">
           <p>
@@ -100,7 +119,7 @@ export const TextEditor = ({
       customFooter={
         <ActionBar
           hideApply={readOnly}
-          closePanel={closePanel}
+          closePanel={onClose}
           backButtonLabel="Cancel"
           applyButtonLabel="Save value"
           applyFunction={readOnly ? undefined : saveValue}

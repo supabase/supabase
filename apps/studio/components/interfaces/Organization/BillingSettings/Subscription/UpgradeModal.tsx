@@ -1,6 +1,6 @@
 import { includes, without } from 'lodash'
 import { useReducer, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendUpgradeFeedbackMutation } from 'data/feedback/upgrade-survey-send'

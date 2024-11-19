@@ -121,9 +121,7 @@ const PreviewFilterPanel = ({
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
-    <div
-      className={'flex w-full items-center justify-between' + (condensedLayout ? ' px-4 pt-4' : '')}
-    >
+    <div className={'flex w-full items-center justify-between' + (condensedLayout ? ' p-3' : '')}>
       <div className="flex flex-row items-center gap-x-2">
         <form
           id="log-panel-search"
@@ -214,7 +212,7 @@ const PreviewFilterPanel = ({
         <div className="flex items-center justify-center gap-x-2">
           <Tooltip_Shadcn_ delayDuration={100}>
             <TooltipTrigger_Shadcn_ asChild>
-              <Button asChild className="px-1" type="default" icon={<Terminal />}>
+              <Button asChild className="px-1.5" type="default" icon={<Terminal />}>
                 <Link href={queryUrl} />
               </Button>
             </TooltipTrigger_Shadcn_>

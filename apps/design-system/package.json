@@ -10,33 +10,41 @@
     "start": "next start",
     "lint": "next lint",
     "content:build": "contentlayer2 build",
+    "clean": "rimraf node_modules .next .turbo",
     "typecheck": "contentlayer2 build && tsc --noEmit -p tsconfig.json"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.1.1",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "contentlayer2": "0.4.6",
     "eslint-config-supabase": "*",
     "fs": "^0.0.1-security",
     "jotai": "^2.8.0",
     "lodash.template": "4.5.0",
-    "lucide-react": "^0.338.0",
+    "lucide-react": "*",
     "markdown-wasm": "^1.2.0",
-    "next": "^14.2.3",
+    "next": "^14.2.10",
     "next-contentlayer2": "0.4.6",
+    "next-themes": "^0.3.0",
     "react": "^18.2.0",
     "react-docgen": "^7.0.3",
     "react-dom": "^18.2.0",
+    "react-hook-form": "^7.45.0",
     "react-inlinesvg": "^4.0.4",
     "react-wrap-balancer": "^1.1.0",
+    "recharts": "^2.12.7",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-pretty-code": "^0.6.0",
     "rehype-slug": "^6.0.0",
     "remark": "^14.0.3",
     "remark-code-import": "^1.2.0",
     "remark-gfm": "^4.0.0",
+    "sonner": "^1.5.0",
     "ts-morph": "^22.0.0",
     "ui": "*",
-    "unist-util-visit": "^5.0.0"
+    "ui-patterns": "*",
+    "unist-util-visit": "^5.0.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@shikijs/compat": "^1.1.7",
@@ -52,7 +60,7 @@
     "shiki": "^1.1.7",
     "tailwindcss": "^3.3.0",
     "tsconfig": "*",
-    "typescript": "^5.5.0",
+    "typescript": "~5.5.0",
     "unist-builder": "3.0.0"
   }
 }

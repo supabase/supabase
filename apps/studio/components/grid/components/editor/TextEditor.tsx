@@ -1,21 +1,23 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import useTable from 'hooks/misc/useTable'
 import {
   Button,
   Popover,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTrackedState } from '../../store/Store'
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
@@ -38,13 +40,19 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const state = useTrackedState()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const { data: selectedTable } = useTable(id)
   const project = useSelectedProject()
+
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
   const initialValue = row[column.key as keyof TRow] as unknown as string
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
+  const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
 
   const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
 
@@ -54,12 +62,12 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     initialValue.length > MAX_CHARACTERS
 
   const loadFullValue = () => {
-    if (selectedTable === undefined || project === undefined) return
-    if ((selectedTable as PostgresTable).primary_keys.length === 0) {
+    if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
+    if (selectedTable.primary_keys.length === 0) {
       return toast('Unable to load value as table has no primary keys')
     }
 
-    const pkMatch = (selectedTable as PostgresTable).primary_keys.reduce((a, b) => {
+    const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
       return { ...a, [b.name]: (row as any)[b.name] }
     }, {})
 
@@ -105,89 +113,109 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
-              value={value ?? ''}
-              language="markdown"
-            />
-            <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
-          </div>
-        ) : (
-          <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-            <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
-              value={value ?? ''}
-              readOnly={!isEditable}
-              onChange={onChange}
-            />
-            {isEditable && (
-              <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
-                <div className="space-y-1">
-                  <div className="flex items-center space-x-2">
-                    <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
-                      <span className="text-[10px]">⏎</span>
+    <>
+      <Popover
+        open={isPopoverOpen}
+        side="bottom"
+        align="start"
+        sideOffset={-35}
+        className="rounded-none"
+        overlay={
+          isTruncated && !isSuccess ? (
+            <div
+              style={{ width: `${gridColumn?.width || column.width}px` }}
+              className="flex items-center justify-center flex-col relative"
+            >
+              <MonacoEditor
+                readOnly
+                onChange={() => {}}
+                width={`${gridColumn?.width || column.width}px`}
+                value={value ?? ''}
+                language="markdown"
+              />
+              <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+            </div>
+          ) : (
+            <BlockKeys
+              value={value}
+              onEscape={cancelChanges}
+              onEnter={saveChanges}
+              ignoreOutsideClicks={isConfirmNextModalOpen}
+            >
+              <MonacoEditor
+                width={`${gridColumn?.width || column.width}px`}
+                value={value ?? ''}
+                readOnly={!isEditable}
+                onChange={onChange}
+              />
+              {isEditable && (
+                <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
+                  <div className="space-y-1">
+                    <div className="flex items-center space-x-2">
+                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                        <span className="text-[10px]">⏎</span>
+                      </div>
+                      <p className="text-xs text-foreground-light">Save changes</p>
                     </div>
-                    <p className="text-xs text-foreground-light">Save changes</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
-                      <span className="text-[10px]">Esc</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                        <span className="text-[10px]">Esc</span>
+                      </div>
+                      <p className="text-xs text-foreground-light">Cancel changes</p>
                     </div>
-                    <p className="text-xs text-foreground-light">Cancel changes</p>
                   </div>
-                </div>
-                <div className="flex flex-col items-end gap-y-1">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_ asChild>
+                  <div className="flex flex-col items-end gap-y-1">
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="default"
+                          className="px-1"
+                          onClick={() => onSelectExpand()}
+                          icon={<Maximize size={12} strokeWidth={2} />}
+                        />
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">Expand editor</TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                    {isNullable && (
                       <Button
+                        size="tiny"
                         type="default"
-                        className="px-1"
-                        onClick={() => onSelectExpand()}
-                        icon={<Maximize size={12} strokeWidth={2} />}
-                      />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom">Expand editor</TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
-                  {isNullable && (
-                    <Button
-                      asChild
-                      htmlType="button"
-                      type="default"
-                      size="tiny"
-                      onClick={() => saveChanges(null)}
-                    >
-                      <div>Set to NULL</div>
-                    </Button>
-                  )}
+                        htmlType="button"
+                        onClick={() => setIsConfirmNextModalOpen(true)}
+                      >
+                        Set to NULL
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-          </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && value.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-text-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+              )}
+            </BlockKeys>
+          )
+        }
       >
-        {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
-      </div>
-    </Popover>
+        <div
+          className={cn(
+            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+            'sb-grid-text-editor__trigger'
+          )}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
+        </div>
+      </Popover>
+      <ConfirmationModal
+        visible={isConfirmNextModalOpen}
+        title="Confirm setting value to NULL"
+        confirmLabel="Confirm"
+        onCancel={() => setIsConfirmNextModalOpen(false)}
+        onConfirm={() => {
+          saveChanges(null)
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          Are you sure you wish to set this value to NULL? This action cannot be undone.
+        </p>
+      </ConfirmationModal>
+    </>
   )
 }

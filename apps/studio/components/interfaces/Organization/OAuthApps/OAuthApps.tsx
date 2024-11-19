@@ -12,12 +12,13 @@ import { AuthorizedApp, useAuthorizedAppsQuery } from 'data/oauth/authorized-app
 import { OAuthAppCreateResponse } from 'data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from 'data/oauth/oauth-apps-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Alert, Button, IconX, Input } from 'ui'
+import { Alert, Button, Input } from 'ui'
 import AuthorizedAppRow from './AuthorizedAppRow'
 import DeleteAppModal from './DeleteAppModal'
 import OAuthAppRow from './OAuthAppRow'
 import PublishAppModal from './PublishAppSidePanel'
 import RevokeAppModal from './RevokeAppModal'
+import { X } from 'lucide-react'
 
 // [Joshen] Note on nav UX
 // Kang Ming mentioned that it might be better to split Published Apps and Authorized Apps into 2 separate tabs
@@ -61,7 +62,7 @@ const OAuthApps = () => {
   if (!canReadOAuthApps) {
     return (
       <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view invoices" />
+        <NoPermission resourceText="view OAuth apps" />
       </ScaffoldContainerLegacy>
     )
   }
@@ -84,7 +85,9 @@ const OAuthApps = () => {
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: 'You need additional permissions to create apps',
+                  text: !canCreateOAuthApps
+                    ? 'You need additional permissions to create apps'
+                    : undefined,
                 },
               }}
             >
@@ -112,7 +115,7 @@ const OAuthApps = () => {
               <div className="absolute top-4 right-4">
                 <Button
                   type="text"
-                  icon={<IconX size={18} />}
+                  icon={<X size={18} />}
                   className="px-1"
                   onClick={() => setCreatedApp(undefined)}
                 />

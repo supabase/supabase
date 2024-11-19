@@ -1,7 +1,8 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { replicaKeys } from './keys'
 
-export const replicationLagQuery = () => {
+export const replicationLagSql = () => {
   const sql = /* SQL */ `
 select 
   case
@@ -20,24 +21,34 @@ export type ReplicationLagVariables = {
   connectionString?: string
 }
 
-export type ReplicationLagData = number
+export async function getReplicationLag(
+  { projectRef, connectionString, id }: ReplicationLagVariables,
+  signal?: AbortSignal
+) {
+  const sql = replicationLagSql()
+
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey: ['replica-lag', id] },
+    signal
+  )
+
+  return Number((result[0] ?? null)?.physical_replica_lag_second ?? 0)
+}
+
+export type ReplicationLagData = Awaited<ReturnType<typeof getReplicationLag>>
 export type ReplicationLagError = ExecuteSqlError
 
-export const useReplicationLagQuery = <TData extends ReplicationLagData = ReplicationLagData>(
+export const useReplicationLagQuery = <TData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,
-  { enabled, ...options }: UseQueryOptions<ExecuteSqlData, ReplicationLagError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<ReplicationLagData, ReplicationLagError, TData> = {}
 ) =>
-  useExecuteSqlQuery(
+  useQuery<ReplicationLagData, ReplicationLagError, TData>(
+    replicaKeys.replicaLag(projectRef, id),
+    ({ signal }) => getReplicationLag({ projectRef, connectionString, id }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: replicationLagQuery(),
-      queryKey: ['replica-lag', id],
-    },
-    {
-      select(data) {
-        return Number((data.result[0] ?? null)?.physical_replica_lag_second ?? 0) as TData
-      },
       enabled: enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined',
       ...options,
     }

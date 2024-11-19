@@ -8,29 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
-
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
-
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql SQL_EDITOR
-     -- Create the table
-     CREATE TABLE countries (
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(255) NOT NULL
-     );
-     -- Insert some sample data into the table
-     INSERT INTO countries (name) VALUES ('United States');
-     INSERT INTO countries (name) VALUES ('Canada');
-     INSERT INTO countries (name) VALUES ('Mexico');
-     ````
-
-    </StepHikeCompact.Code>
+    
+    <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
 
@@ -45,7 +24,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      npm create svelte@latest myapp
+      npx sv create my-app
       ```
 
     </StepHikeCompact.Code>
@@ -64,7 +43,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd myapp && npm install @supabase/supabase-js
+      cd my-app && npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -74,7 +53,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Create the Supabase client">
 
-    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+    Create a `src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
@@ -98,7 +77,7 @@ hideToc: true
 
     Use `load` method to fetch the data server-side and display the query results as a simple list.
 
-    Create `+page.server.js` file in the `routes` directory with the following code.
+    Create `+page.server.js` file in the `src/routes` directory with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -119,7 +98,7 @@ hideToc: true
 
     <StepHikeCompact.Details title="">
 
-    Replace the existing content in your `+page.svelte` file in the `routes` directory with the following code.
+    Replace the existing content in your `+page.svelte` file in the `src/routes` directory with the following code.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -127,7 +106,7 @@ hideToc: true
 
       ```svelte src/routes/+page.svelte
         <script>
-          export let data;
+          let { data } = $props();
         </script>
 
         <ul>

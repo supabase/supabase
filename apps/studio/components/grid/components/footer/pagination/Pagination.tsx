@@ -1,25 +1,21 @@
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { PostgresTable } from '@supabase/postgres-meta'
 
+import { useParams } from 'common'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
-import useTable from 'hooks/misc/useTable'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import {
-  Button,
-  InputNumber,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useParams } from 'common'
 import { useDispatch, useTrackedState } from '../../../store/Store'
 import { DropdownControl } from '../../common/DropdownControl'
+import { formatEstimatedCount } from './Pagination.utils'
 
 const rowsPerPageOptions = [
   { value: 100, label: '100 rows' },
@@ -36,26 +32,36 @@ const Pagination = () => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const { data: selectedTable } = useTable(id)
-  // [Joshen] Only applicable to table entities
-  const rowsCountEstimate = (selectedTable as PostgresTable)?.live_rows_estimate ?? null
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
+  // rowsCountEstimate is only applicable to table entities
+  const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
 
   const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
   const filters = formatFilterURLParams(filter as string[])
   const page = snap.page
-  const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
 
+  const [value, setValue] = useState<string>(page.toString())
+
+  // keep input value in-sync with actual page
+  useEffect(() => {
+    setValue(String(page))
+  }, [page])
+
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
@@ -71,6 +77,7 @@ const Pagination = () => {
     }
   )
 
+  const count = data?.is_estimate ? formatEstimatedCount(data.count) : data?.count.toLocaleString()
   const maxPages = Math.ceil((data?.count ?? 0) / snap.rowsPerPage)
   const totalPages = (data?.count ?? 0) > 0 ? maxPages : 1
 
@@ -120,9 +127,8 @@ const Pagination = () => {
     snap.setPage(nextPage)
   }
 
-  const onPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    const pageNum = Number(value) > maxPages ? maxPages : Number(value)
+  const onPageChange = (page: number) => {
+    const pageNum = page > maxPages ? maxPages : page
     snap.setPage(pageNum || 1)
   }
 
@@ -158,16 +164,25 @@ const Pagination = () => {
               onClick={onPreviousPage}
             />
             <p className="text-xs text-foreground-light">Page</p>
-            <div className="w-12">
-              <InputNumber
-                size="tiny"
-                value={page}
-                onChange={onPageChange}
-                style={{ width: '3rem' }}
-                min={1}
-                max={maxPages}
-              />
-            </div>
+            <Input
+              className="w-12"
+              size="tiny"
+              min={1}
+              max={maxPages}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={(e) => {
+                const parsedValue = Number(value)
+                if (
+                  e.code === 'Enter' &&
+                  !Number.isNaN(parsedValue) &&
+                  parsedValue >= 1 &&
+                  parsedValue <= maxPages
+                ) {
+                  onPageChange(parsedValue)
+                }
+              }}
+            />
 
             <p className="text-xs text-foreground-light">of {totalPages.toLocaleString()}</p>
 
@@ -193,9 +208,7 @@ const Pagination = () => {
 
           <div className="flex items-center gap-x-2">
             <p className="text-xs text-foreground-light">
-              {`${data.count.toLocaleString()} ${
-                data.count === 0 || data.count > 1 ? `records` : 'record'
-              }`}{' '}
+              {`${count} ${data.count === 0 || data.count > 1 ? `records` : 'record'}`}{' '}
               {data.is_estimate ? '(estimated)' : ''}
             </p>
 

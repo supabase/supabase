@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -13,21 +12,11 @@ import type { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconAlertTriangle,
-  IconExternalLink,
-  Radio,
-  SidePanel,
-  cn,
-} from 'ui'
+import { useAddonsPagePanel } from 'state/addons-page'
+import { Alert, AlertDescription_Shadcn_, Alert_Shadcn_, Button, Radio, SidePanel, cn } from 'ui'
+import { ExternalLink, AlertTriangle } from 'lucide-react'
 
 const IPv4SidePanel = () => {
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
@@ -35,22 +24,15 @@ const IPv4SidePanel = () => {
 
   const canUpdateIPv4 = useCheckPermissions(PermissionAction.BILLING_WRITE, 'stripe.subscriptions')
 
-  const snap = useSubscriptionPageStateSnapshot()
-  const visible = snap.panelKey === 'ipv4'
-  const onClose = () => {
-    const { panel, ...queryWithoutPanel } = router.query
-    router.push({ pathname: router.pathname, query: queryWithoutPanel }, undefined, {
-      shallow: true,
-    })
-    snap.setPanelKey(undefined)
-  }
+  const { panel, closePanel } = useAddonsPagePanel()
+  const visible = panel === 'ipv4'
 
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
       toast.success(`Successfully enabled IPv4`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to enable IPv4: ${error.message}`)
@@ -59,7 +41,7 @@ const IPv4SidePanel = () => {
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
       toast.success(`Successfully disabled IPv4.`)
-      onClose()
+      closePanel()
     },
     onError: (error) => {
       toast.error(`Unable to disable IPv4: ${error.message}`)
@@ -100,7 +82,7 @@ const IPv4SidePanel = () => {
     <SidePanel
       size="large"
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
       disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
@@ -114,7 +96,7 @@ const IPv4SidePanel = () => {
       header={
         <div className="flex items-center justify-between">
           <h4>Dedicated IPv4 address</h4>
-          <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
@@ -205,72 +187,30 @@ const IPv4SidePanel = () => {
 
           {hasChanges && (
             <>
-              {selectedOption === 'ipv4_none' ||
-              (selectedIPv4?.price ?? 0) < (subscriptionIpV4Option?.variant.price ?? 0) ? (
-                subscription?.billing_via_partner === false &&
-                // Old addon billing with upfront payment
-                subscription.usage_based_billing_project_addons === false && (
-                  <p className="text-sm text-foreground-light">
-                    Upon clicking confirm, the add-on is removed immediately and any unused time in
-                    the current billing cycle is added as prorated credits to your organization and
-                    used in subsequent billing cycles.
-                  </p>
-                )
-              ) : (
-                <>
-                  <Alert withIcon variant="info" title="Potential downtime">
-                    There might be some downtime when enabling the add-on since some DNS clients
-                    might have cached the old DNS entry. Generally, this should be less than a
-                    minute.
-                  </Alert>
-                  <p className="text-sm text-foreground-light">
-                    By default, this is only applied to the Primary database for your project. If{' '}
-                    <Link
-                      href="/docs/guides/platform/read-replicas"
-                      className="text-brand"
-                      target="_blank"
-                    >
-                      Read replicas
-                    </Link>{' '}
-                    are used, each replica also gets its own IPv4 address, with a corresponding{' '}
-                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
-                    charge.
-                  </p>
-                  {!subscription?.billing_via_partner && (
-                    <p className="text-sm text-foreground-light">
-                      {subscription?.usage_based_billing_project_addons === false ? (
-                        <span>
-                          Upon clicking confirm, the respective amount will be added to your monthly
-                          invoice. The addon is prepaid per month and in case of a downgrade, you
-                          get credits for the remaining time. For the current billing cycle you're
-                          immediately charged a prorated amount for the remaining days.
-                        </span>
-                      ) : (
-                        <span>
-                          There are no immediate charges. The addon is billed at the end of your
-                          billing cycle based on your usage and prorated to the hour.
-                        </span>
-                      )}
-                    </p>
-                  )}
-
-                  {
-                    // Billed via partner
-                    subscription?.billing_via_partner &&
-                      // Project addons are still billed the old way (upfront payment)
-                      subscription?.usage_based_billing_project_addons === false &&
-                      // Scheduled billing plan change
-                      subscription.scheduled_plan_change?.target_plan !== undefined && (
-                        <Alert_Shadcn_ variant={'warning'} className="mb-2">
-                          <IconAlertTriangle className="h-4 w-4" />
-                          <AlertDescription_Shadcn_>
-                            You have a scheduled subscription change that will be canceled if you
-                            change your PITR add on.
-                          </AlertDescription_Shadcn_>
-                        </Alert_Shadcn_>
-                      )
-                  }
-                </>
+              <Alert withIcon variant="info" title="Potential downtime">
+                There might be some downtime when enabling the add-on since some DNS clients might
+                have cached the old DNS entry. Generally, this should be less than a minute.
+              </Alert>
+              {selectedOption !== 'ipv4_none' && (
+                <p className="text-sm text-foreground-light">
+                  By default, this is only applied to the Primary database for your project. If{' '}
+                  <Link
+                    href="/docs/guides/platform/read-replicas"
+                    className="text-brand"
+                    target="_blank"
+                  >
+                    Read replicas
+                  </Link>{' '}
+                  are used, each replica also gets its own IPv4 address, with a corresponding{' '}
+                  <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
+                  charge.
+                </p>
+              )}
+              {!subscription?.billing_via_partner && (
+                <p className="text-sm text-foreground-light">
+                  There are no immediate charges. The addon is billed at the end of your billing
+                  cycle based on your usage and prorated to the hour.
+                </p>
               )}
             </>
           )}

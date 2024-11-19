@@ -5,7 +5,7 @@ import { useParams } from 'common'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -23,18 +23,28 @@ const CustomDomainConfig = () => {
   const customDomainsDisabledDueToQuota = useFlag('customDomainsDisabledDueToQuota')
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-
   const plan = subscription?.plan?.id
-  const { isLoading: isSettingsLoading, data: settings } = useProjectApiQuery({
-    projectRef: ref,
-  })
+
+  const { isLoading: isSettingsLoading } = useProjectSettingsV2Query({ projectRef: ref })
 
   const {
     isLoading: isCustomDomainsLoading,
     isError,
     isSuccess,
     data,
-  } = useCustomDomainsQuery({ projectRef: ref })
+  } = useCustomDomainsQuery(
+    { projectRef: ref },
+    {
+      refetchInterval(data) {
+        // while setting up the ssl certificate, we want to poll every 5 seconds
+        if (data?.customDomain?.ssl.status) {
+          return 5000
+        }
+
+        return false
+      },
+    }
+  )
 
   const isLoading = isSettingsLoading || isCustomDomainsLoading
 
@@ -89,11 +99,7 @@ const CustomDomainConfig = () => {
               {(data.status === '1_not_started' ||
                 data.status === '2_initiated' ||
                 data.status === '3_challenge_verified') && (
-                <CustomDomainVerify
-                  projectRef={ref}
-                  customDomain={data.customDomain}
-                  settings={settings}
-                />
+                <CustomDomainVerify customDomain={data.customDomain} />
               )}
 
               {data.status === '4_origin_setup_completed' && (

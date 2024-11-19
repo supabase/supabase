@@ -1,27 +1,24 @@
 import { useIsLoggedIn, useParams } from 'common'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
+import CopyButton from 'components/ui/CopyButton'
 import { Loading } from 'components/ui/Loading'
 import { createCliLoginSession } from 'data/cli/login'
 import { withAuth } from 'hooks/misc/withAuth'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { NextPageWithLayout } from 'types'
+import { InputOTP, InputOTPGroup, InputOTPSlot } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const CliLoginPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const { session_id, public_key, token_name, success } = useParams()
-  const [isSuccessfulLogin, setSuccessfulLogin] = useState(false)
+  const { session_id, public_key, token_name, device_code } = useParams()
   const isLoggedIn = useIsLoggedIn()
 
   useEffect(() => {
-    if (!isLoggedIn || !router.isReady) {
-      return
-    }
-
-    if (success) {
-      setSuccessfulLogin(true)
+    if (!isLoggedIn || !router.isReady || device_code) {
       return
     }
 
@@ -32,10 +29,10 @@ const CliLoginPage: NextPageWithLayout = () => {
       }
 
       try {
-        const session = await createCliLoginSession(session_id, public_key, token_name)
+        const { nonce } = await createCliLoginSession(session_id, public_key, token_name)
 
-        if (session) {
-          router.push(`/cli/login?success=true`)
+        if (nonce) {
+          router.push(`/cli/login?device_code=${nonce.substring(0, 8)}`)
         } else {
           router.push(`/404`)
         }
@@ -46,14 +43,28 @@ const CliLoginPage: NextPageWithLayout = () => {
     }
 
     createSession()
-  }, [isLoggedIn, router, router.isReady, session_id, public_key, token_name, success])
+  }, [isLoggedIn, router, router.isReady, session_id, public_key, token_name, device_code])
 
   return (
     <APIAuthorizationLayout>
       <div className={`flex flex-col items-center justify-center h-full`}>
-        {isSuccessfulLogin ? (
+        {device_code ? (
           <>
-            <p>Well done! Now close this window, go back to your terminal and hack away!</p>
+            <h1 className="text-xl py-2">
+              Your Supabase Account is being used to login on Supabase CLI.
+            </h1>
+            <p>Enter this verification code on Supabase CLI to authorize login.</p>
+            <div className="flex flex-row gap-2 py-10">
+              <InputOTP maxLength={8} value={device_code} disabled>
+                <InputOTPGroup>
+                  {Array.from({ length: 8 }, (_, i) => (
+                    <InputOTPSlot className="text-xl" index={i} />
+                  ))}
+                </InputOTPGroup>
+              </InputOTP>
+              <CopyButton iconOnly size="large" type="text" className="px-2" text={device_code} />
+            </div>
+            <p>After authorizing the login attempt, you can close this window.</p>
             <p>
               If you ever want to remove your new token, go to{' '}
               <Link href="/account/tokens" className="underline">
@@ -61,6 +72,11 @@ const CliLoginPage: NextPageWithLayout = () => {
               </Link>{' '}
               page.
             </p>
+            <Admonition
+              type="tip"
+              title="Browser login flow requires Supabase CLI version 1.219.0 and above."
+              className="mt-16"
+            />
           </>
         ) : (
           <Loading />

@@ -5,14 +5,14 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Philipp Steinrötter at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 07 Dec 2023 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Fri, 08 Dec 2023 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-philipp-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/postgres-language-server-implementing-parser</guid>
   <title>Postgres Language Server: implementing the Parser</title>
   <link>https://supabase.com/blog/postgres-language-server-implementing-parser</link>
   <description>A detailed analysis of our iterations to implement a Parser for Postgres</description>
-  <pubDate>Thu, 07 Dec 2023 23:00:00 GMT</pubDate>
+  <pubDate>Fri, 08 Dec 2023 00:00:00 -0700</pubDate>
 </item>
 
     </channel>

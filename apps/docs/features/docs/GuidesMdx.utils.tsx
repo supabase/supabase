@@ -1,13 +1,18 @@
 import matter from 'gray-matter'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
 import { type Metadata, type ResolvingMetadata } from 'next'
-import { redirect } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { readFile, readdir } from 'node:fs/promises'
 import { extname, join, sep } from 'node:path'
 
+import { pluckPromise } from '~/features/helpers.fn'
 import { cache_fullProcess_withDevCacheBust, existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
-import { notFoundLink } from '~/features/recommendations/NotFound.utils'
-import { BASE_PATH, MISC_URL } from '~/lib/constants'
+import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
+import { BASE_PATH } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
@@ -21,11 +26,14 @@ const PUBLISHED_SECTIONS = [
   'ai',
   'api',
   'auth',
-  'cli',
   'database',
+  'deployment',
   'functions',
   'getting-started',
   // 'graphql', -- technically published, but completely federated
+  'integrations',
+  'local-development',
+  'monitoring-troubleshooting',
   'platform',
   'realtime',
   'resources',
@@ -44,14 +52,14 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 
   let mdx: string
   try {
     mdx = await readFile(fullPath, 'utf-8')
   } catch {
-    redirect(notFoundLink(slug.join('/')))
+    notFound()
   }
 
   const editLink = newEditLink(
@@ -108,9 +116,6 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   return result
 }
 
-const pluckPromise = <T, K extends keyof T>(promise: Promise<T>, key: K) =>
-  promise.then((data) => data[key])
-
 const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
@@ -136,14 +141,27 @@ const genGuideMeta =
       openGraph: {
         ...parentOg,
         url: `${BASE_PATH}${pathname}`,
-        images: {
-          url: `${MISC_URL}/functions/v1/og-images?site=docs&type=${encodeURIComponent(ogType)}&title=${encodeURIComponent(meta.title)}&description=${encodeURIComponent(meta.description ?? 'undefined')}`,
-          width: 800,
-          height: 600,
-          alt: meta.title,
-        },
+        images: generateOpenGraphImageMeta({
+          type: ogType,
+          title: meta.title,
+          description: meta.description,
+        }),
       },
     }
   }
 
-export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta }
+function removeRedundantH1(content: string) {
+  const mdxTree = fromMarkdown(content, 'utf-8', {
+    extensions: [gfm()],
+    mdastExtensions: [gfmFromMarkdown()],
+  })
+
+  const maybeH1 = mdxTree.children[0]
+  if (maybeH1 && maybeH1.type === 'heading' && maybeH1.depth === 1) {
+    content = content.slice(maybeH1.position?.end?.offset)
+  }
+
+  return content
+}
+
+export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta, removeRedundantH1 }

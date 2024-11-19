@@ -1,5 +1,5 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -51,8 +51,6 @@ export const useGetCellValueMutation = ({
     (vars) => getCellValue(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, table } = variables
-        // await queryClient.invalidateQueries(sqlKeys.query(projectRef, [table.schema, table.name]))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

@@ -3,17 +3,7 @@ import { DatabaseUpgradeProgress, DatabaseUpgradeStatus } from '@supabase/shared
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  Button,
-  IconAlertCircle,
-  IconCheck,
-  IconCheckCircle,
-  IconCircle,
-  IconLoader,
-  IconMaximize2,
-  IconMinimize2,
-  IconSettings,
-} from 'ui'
+import { Button } from 'ui'
 
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
@@ -22,9 +12,21 @@ import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-quer
 import { IS_PLATFORM } from 'lib/constants'
 import { useProjectContext } from '../ProjectContext'
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
+import {
+  CheckCircle,
+  AlertCircle,
+  Settings,
+  Circle,
+  Minimize2,
+  Maximize2,
+  Loader,
+  Check,
+} from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
 
 const UpgradingState = () => {
   const { ref } = useParams()
+  const queryParams = useSearchParams()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [loading, setLoading] = useState(false)
@@ -33,6 +35,7 @@ const UpgradingState = () => {
     {
       projectRef: ref,
       projectStatus: project?.status,
+      trackingId: queryParams.get('trackingId'),
     },
     {
       enabled: IS_PLATFORM,
@@ -76,7 +79,7 @@ const UpgradingState = () => {
             {isCompleted ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <IconCheckCircle className="text-brand" size={40} strokeWidth={1.5} />
+                  <CheckCircle className="text-brand" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">Upgrade completed!</p>
@@ -94,7 +97,7 @@ const UpgradingState = () => {
             ) : isFailed ? (
               <div className="grid gap-4">
                 <div className="relative mx-auto max-w-[300px]">
-                  <IconAlertCircle className="text-amber-900" size={40} strokeWidth={1.5} />
+                  <AlertCircle className="text-amber-900" size={40} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   <p className="text-center">We ran into an issue while upgrading your project</p>
@@ -122,9 +125,9 @@ const UpgradingState = () => {
               <div className="grid w-[480px] gap-4">
                 <div className="relative mx-auto max-w-[300px]">
                   <div className="absolute flex items-center justify-center w-full h-full">
-                    <IconSettings className="animate-spin" size={20} strokeWidth={2} />
+                    <Settings className="animate-spin" size={20} strokeWidth={2} />
                   </div>
-                  <IconCircle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
+                  <Circle className="text-foreground-lighter" size={50} strokeWidth={1.5} />
                 </div>
                 <div className="space-y-2">
                   {isPerformingFullPhysicalBackup ? (
@@ -153,15 +156,15 @@ const UpgradingState = () => {
                     style={{ maxHeight: isExpanded ? '500px' : '110px' }}
                   >
                     {isExpanded ? (
-                      <IconMinimize2
-                        size="tiny"
+                      <Minimize2
+                        size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
                         onClick={() => setIsExpanded(false)}
                       />
                     ) : (
-                      <IconMaximize2
-                        size="tiny"
+                      <Maximize2
+                        size={14}
                         strokeWidth={2}
                         className="absolute z-10 cursor-pointer top-3 right-3"
                         onClick={() => setIsExpanded(true)}
@@ -188,7 +191,7 @@ const UpgradingState = () => {
                           <div key={message.key} className="flex items-center space-x-4">
                             {isCurrent ? (
                               <div className="flex items-center justify-center w-5 h-5 rounded-full">
-                                <IconLoader
+                                <Loader
                                   size={20}
                                   className="animate-spin text-foreground-light"
                                   strokeWidth={2}
@@ -196,7 +199,7 @@ const UpgradingState = () => {
                               </div>
                             ) : isCompleted ? (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <IconCheck size={12} className="text-white" strokeWidth={3} />
+                                <Check size={12} className="text-white" strokeWidth={3} />
                               </div>
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />

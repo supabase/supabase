@@ -1,18 +1,24 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
+import { Edit2, ExternalLink, HelpCircle } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
-import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
+import {
+  invalidateOrganizationsQuery,
+  useOrganizationsQuery,
+} from 'data/organizations/organizations-query'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
-import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
+import { useProfile } from 'lib/profile'
+import { parseAsBoolean, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
+import { Button, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -42,43 +48,55 @@ interface NewOrgFormProps {
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   const router = useRouter()
+  const user = useProfile()
+  const { data: organizations, isSuccess } = useOrganizationsQuery()
   const stripe = useStripe()
   const elements = useElements()
   const queryClient = useQueryClient()
-  const { plan, name, kind, size, spend_cap } = useParams()
+  const [state, setState] = useQueryStates({
+    plan: parseAsStringLiteral(Object.keys(PRICING_TIER_LABELS_ORG)).withDefault('FREE'),
+    name: parseAsString.withDefault(''),
+    kind: parseAsStringLiteral(Object.keys(ORG_KIND_TYPES)).withDefault(ORG_KIND_DEFAULT),
+    size: parseAsString.withDefault(ORG_SIZE_DEFAULT),
+    spend_cap: parseAsBoolean.withDefault(true),
+    returnTo: parseAsString.withDefault(''),
+    auth_id: parseAsString.withDefault(''),
+  })
+  const {
+    name: orgName,
+    kind: orgKind,
+    spend_cap: isSpendCapEnabled,
+    plan: dbPricingTierKey,
+    size: orgSize,
+    returnTo,
+    auth_id,
+  } = state
 
-  const [orgName, setOrgName] = useState(name || '')
-  const [orgKind, setOrgKind] = useState(
-    kind && Object.keys(ORG_KIND_TYPES).includes(kind) ? kind : ORG_KIND_DEFAULT
-  )
-  const [orgSize, setOrgSize] = useState(size || ORG_SIZE_DEFAULT)
   // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
 
-  // URL param support for passing plan
-  const [dbPricingTierKey, setDbPricingTierKey] = useState(
-    plan && ['free', 'team', 'pro'].includes(plan) ? plan.toUpperCase() : 'FREE'
-  )
-
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(spend_cap ? Boolean(spend_cap) : true)
 
   useEffect(() => {
-    const query: Record<string, string> = {}
-    query.plan = dbPricingTierKey.toLowerCase()
-    if (orgName) query.name = orgName
-    if (orgKind) query.kind = orgKind
-    if (orgSize) query.size = orgSize
-    if (isSpendCapEnabled) query.spend_cap = isSpendCapEnabled.toString()
-
-    router.push({ query })
-  }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
+    if (!orgName && organizations?.length === 0 && !user.isLoading) {
+      const prefilledOrgName = user.profile?.username ? user.profile.username + `'s Org` : 'My Org'
+      setState({ ...state, name: prefilledOrgName })
+    }
+  }, [isSuccess])
 
   const { mutate: createOrganization } = useOrganizationCreateMutation({
-    onSuccess: async (org: any) => {
+    onSuccess: async (org) => {
       await invalidateOrganizationsQuery(queryClient)
-      router.push(`/new/${org.slug}`)
+      const prefilledProjectName = user.profile?.username
+        ? user.profile.username + `'s Project`
+        : 'My Project'
+
+      if (returnTo && auth_id) {
+        router.push(`${returnTo}?auth_id=${auth_id}`, undefined, { shallow: false })
+      } else {
+        router.push(`/new/${org.slug}?projectName=${prefilledProjectName}`)
+      }
     },
     onError: () => {
       resetPaymentMethod()
@@ -92,19 +110,19 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   }
 
   function onOrgNameChange(e: any) {
-    setOrgName(e.target.value)
+    setState({ ...state, name: e.target.value })
   }
 
   function onOrgKindChange(value: any) {
-    setOrgKind(value)
+    setState({ ...state, kind: value })
   }
 
   function onOrgSizeChange(value: any) {
-    setOrgSize(value)
+    setState({ ...state, size: value })
   }
 
   function onDbPricingPlanChange(value: string) {
-    setDbPricingTierKey(value)
+    setState({ ...state, plan: value as any })
   }
 
   async function createOrg(paymentMethodId?: string) {
@@ -262,24 +280,37 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
         <Panel.Content>
           <Listbox
-            label="Pricing Plan"
+            label={
+              <div className="flex flex-col gap-2">
+                <span>Plan</span>
+
+                <a
+                  href="https://supabase.com/pricing"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-sm flex items-center gap-2 opacity-75 hover:opacity-100 transition"
+                >
+                  Pricing
+                  <ExternalLink size={16} strokeWidth={1.5} />
+                </a>
+              </div>
+            }
             layout="horizontal"
             value={dbPricingTierKey}
             // @ts-ignore
             onChange={onDbPricingPlanChange}
             // @ts-ignore
             descriptionText={
-              <>
-                Select a plan that suits your needs.&nbsp;
-                <a
-                  className="underline"
-                  target="_blank"
-                  rel="noreferrer"
-                  href="https://supabase.com/pricing"
-                >
-                  More details
-                </a>
-              </>
+              dbPricingTierKey !== 'FREE' ? (
+                <p>
+                  The plan applies only to this new organization. To upgrade an existing
+                  organization,{' '}
+                  <Link className="underline" href="/org/_/billing?panel=subscriptionPlan">
+                    click here
+                  </Link>
+                  .
+                </p>
+              ) : undefined
             }
           >
             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => {
@@ -301,7 +332,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 label={
                   <div className="flex space-x-4">
                     <span>Spend Cap</span>
-                    <IconHelpCircle
+                    <HelpCircle
                       size={16}
                       strokeWidth={1.5}
                       className="transition opacity-50 cursor-pointer hover:opacity-100"
@@ -310,14 +341,13 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                   </div>
                 }
                 checked={isSpendCapEnabled}
-                onChange={() => setIsSpendCapEnabled(!isSpendCapEnabled)}
+                onChange={() => setState({ ...state, spend_cap: !isSpendCapEnabled })}
                 descriptionText={
                   <div>
                     <p>
-                      By default, Pro Plan organizations have a spend cap to control costs. When
-                      enabled, usage is limited to the plan's quota, with restrictions when limits
-                      are exceeded. To scale beyond Pro limits without restrictions, disable the
-                      spend cap and pay for over-usage beyond the quota.
+                      With Spend Cap enabled, usage is limited to the plan's quota, with
+                      restrictions when limits are exceeded. To scale beyond Pro Plan limits,
+                      disable the Spend Cap to pay over-usage.
                     </p>
                   </div>
                 }
@@ -356,7 +386,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                 <div>
                   <Button
                     type="outline"
-                    icon={<IconEdit2 />}
+                    icon={<Edit2 />}
                     onClick={() => resetPaymentMethod()}
                     disabled={newOrgLoading}
                     className="hover:border-muted"

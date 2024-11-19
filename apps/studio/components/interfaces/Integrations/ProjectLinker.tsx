@@ -1,7 +1,7 @@
 import { ChevronDown, PlusIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useRef, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import {

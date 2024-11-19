@@ -1,11 +1,11 @@
 # This file tracks properties of this Flutter project.
 # Used by Flutter tool to assess capabilities and perform upgrades etc.
 #
-# This file should be version controlled.
+# This file should be version controlled and should not be manually edited.
 
 version:
-  revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-  channel: stable
+  revision: "4cf269e36de2573851eaef3c763994f8f9be494d"
+  channel: "stable"
 
 project_type: app
 
@@ -13,26 +13,26 @@ project_type: app
 migration:
   platforms:
     - platform: root
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: android
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: ios
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: linux
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: macos
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: web
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
     - platform: windows
-      create_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
-      base_revision: ffccd96b62ee8cec7740dab303538c5fc26ac543
+      create_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
+      base_revision: 4cf269e36de2573851eaef3c763994f8f9be494d
 
   # User provided section
 

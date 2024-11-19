@@ -1,4 +1,6 @@
-import { Button, IconExternalLink } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 const NoChannelEmptyState = () => {
   return (
@@ -17,11 +19,7 @@ const NoChannelEmptyState = () => {
           <p className="text-foreground">Not sure what to do?</p>
           <p className="text-foreground-lighter text-xs">Browse our documentation</p>
         </div>
-        <Button type="default" iconRight={<IconExternalLink />}>
-          <a href="https://supabase.com/docs/guides/realtime" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </Button>
+        <DocsButton href="https://supabase.com/docs/guides/realtime" />
       </div>
     </div>
   )

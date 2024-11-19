@@ -10,7 +10,7 @@ subtitle: 'This documentation covers frequently asked questions around subscript
 #### What are organizations and projects?
 
 The Supabase Platform has "organizations" and "projects". An organization may contain multiple projects. Each project is a dedicated Supabase instance with all of its sub-services including Storage, Auth, Functions and Realtime.
-Each organization only has a single subscription with a single Plan (Free, Pro, Team or Enterprise). Project addons such as [Compute](https://supabase.com/docs/guides/platform/compute-add-ons), [Custom Domains](https://supabase.com/docs/guides/platform/custom-domains) and [PITR](https://supabase.com/docs/guides/platform/backups#point-in-time-recovery) are configured per project and are added to your organization subscription.
+Each organization only has a single subscription with a single Plan (Free, Pro, Team or Enterprise). Project addons such as [Compute](/docs/guides/platform/compute-add-ons), [IPv4](/docs/guides/platform/ipv4-address), [Log Drains](/docs/guides/platform/log-drains), [Advanced MFA](/docs/guides/auth/auth-mfa/phone), [Custom Domains](https://supabase.com/docs/guides/platform/custom-domains) and [PITR](https://supabase.com/docs/guides/platform/backups#point-in-time-recovery) are configured per project and are added to your organization subscription.
 Read more on [how billing is organized](https://supabase.com/docs/guides/platform/org-based-billing#how-billing-is-organized).
 
 #### How many free projects can I have?
@@ -39,7 +39,7 @@ No, we do not charge for paused projects. Compute hours are only counted for act
 
 #### How are multiple projects billed under a paid organization?
 
-We provide a dedicated server for every Supabase project. Each paid organization comes with $10 in Compute Credits to cover one project on the default compute size. Additional projects start at ~$10 a month (billed hourly). See how billing for compute works [here](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+We provide a dedicated server for every Supabase project. Each paid organization comes with $10 in Compute Credits to cover one project on the default compute size. Additional projects start at ~$10 a month (billed hourly). See how billing for compute works [here](https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
 
 Running 3 projects in a Pro Plan organization on the default micro instance:
 
@@ -54,19 +54,19 @@ Refer to our docs on [how billing works](https://supabase.com/docs/guides/platfo
 
 Each Supabase project is a dedicated VM and Postgres database. By default, your instance runs on the Micro compute instance. You have the option to upgrade your compute size in your [Project settings](https://supabase.com/dashboard/project/_/settings/addons). See [Compute Add-ons](https://supabase.com/docs/guides/platform/compute-add-ons) for available options.
 
-When you change your compute size, there are no immediate upfront charges. Instead, you will be billed based on the compute runtime hours during your billing cycle reset.
+When you change your compute size, there are no immediate upfront charges. Instead, you will be billed based on the compute hours during your billing cycle reset.
 
 If you launch additional instances on your paid plan, we will add the corresponding compute hours to your final invoice.
 
 If you upgrade your project to a larger instance for 10 hours and then downgrade, you’ll only pay for the larger instance for the 10 hours of usage at the end of your billing cycle. You can see your current compute usage on your [organization’s usage page](https://supabase.com/dashboard/org/_/usage).
 
-Read more on [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+Read more on [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours).
 
 #### What is unified egress and how is it billed?
 
-Unified egress refers to the total egress quota available to each organization. This quota can be utilized for various purposes such as Storage, Realtime, Auth, Functions, Supavisor and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
+Unified egress refers to the total egress quota available to each organization. This quota can be utilized for various purposes such as Storage, Realtime, Auth, Functions, Supavisor, Log Drains and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
 
-To learn more about unified egress and its details, please refer to the information provided [here](https://supabase.com/docs/guides/platform/org-based-billing#:~:text=running%20any%20projects.-,Unified%20egress,-%23).
+To learn more about unified egress and its details, please refer to the information provided [here](/docs/guides/platform/org-based-billing#unified-egress).
 
 ## Plans and subscriptions
 
@@ -154,6 +154,10 @@ Any changes made to your billing details will only be reflected in your upcoming
 
 We accept credit card payments only. If you cannot pay via credit card, we do offer alternatives for larger upfront payments. Please create a [support ticket](https://supabase.help) in case you’re interested.
 
+#### What credit card brands are supported?
+
+Visa, Mastercard, American Express, Japan Credit Bureau (JCB), China UnionPay (CUP), Cartes Bancaires
+
 #### What currency can I pay in?
 
 All our invoices are issued in USD, but you can pay in any currency as long as your credit card provider allows charging in USD after conversion.
@@ -182,10 +186,14 @@ We were unable to charge your payment method. This likely means that the payment
 You can be overdue when
 
 - A card is expired
-- The bank declined the payment.
-- There was no card on record - No payment method was added.
-  To rectify, you can add a new payment method by navigating to your [organization’s billing page](https://supabase.com/dashboard/org/_/billing).
-  If you are facing any issues, please raise a [support ticket](https://supabase.help).
+- The bank declined the payment
+- You had insufficient funds
+- There was no card on record
+
+Check your payment methods in your [organization’s billing page](https://supabase.com/dashboard/org/_/billing) to ensure there are no expired payment methods and the correct payment method is marked as default.
+If you are still facing issues, please raise a [support ticket](https://supabase.help).
+
+Payments are always in USD and may show up as coming from Singapore, given our payment entity is in Singapore. Make sure you allow payments from Singapore and in USD
 
 #### Can I delay my payment?
 

@@ -4,7 +4,7 @@ import ProductDropdown from '~/components/Nav/ProductDropdown'
 import { data as DevelopersData } from 'data/Developers'
 import SolutionsData from 'data/Solutions'
 
-export const menu = {
+export const getMenu = () => ({
   primaryNav: [
     {
       title: 'Product',
@@ -21,6 +21,10 @@ export const menu = {
       subMenu: DevelopersData,
     },
     {
+      title: 'Enterprise',
+      url: '/enterprise',
+    },
+    {
       title: 'Pricing',
       url: '/pricing',
     },
@@ -33,4 +37,4 @@ export const menu = {
       url: '/blog',
     },
   ],
-}
+})

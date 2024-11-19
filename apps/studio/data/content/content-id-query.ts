@@ -3,7 +3,6 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { contentKeys } from './keys'
-import { components } from 'api-types'
 
 export async function getContentById(
   { projectRef, id }: { projectRef?: string; id?: string },

@@ -1,10 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
 import { isArray } from 'lodash'
-import { ChevronRight, ExternalLink } from 'lucide-react'
+import { Check, ChevronRight, ExternalLink, Info } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import Table from 'components/to-be-cleaned/Table'
@@ -13,6 +14,7 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
+import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
@@ -25,7 +27,7 @@ import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Button, IconCheck, IconInfo, Modal, SidePanel, cn } from 'ui'
+import { Button, Modal, SidePanel, cn } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
@@ -37,6 +39,8 @@ const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
+
+  const queryClient = useQueryClient()
 
   const originalPlanRef = useRef<string>()
 
@@ -98,7 +102,9 @@ const PlanUpdateSidePanel = () => {
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const hasMembersExceedingFreeTierLimit =
+    (membersExceededLimit || []).length > 0 &&
+    orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
   const expandUsageFee = (fee: string) => {
@@ -136,6 +142,20 @@ const PlanUpdateSidePanel = () => {
     if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod && !paymentViaInvoice) {
       return toast.error('Please select a payment method')
+    }
+
+    if (selectedPaymentMethod) {
+      queryClient.setQueriesData(organizationKeys.paymentMethods(slug), (prev: any) => {
+        if (!prev) return prev
+        return {
+          ...prev,
+          defaultPaymentMethodId: selectedPaymentMethod,
+          data: prev.data.map((pm: any) => ({
+            ...pm,
+            is_default: pm.id === selectedPaymentMethod,
+          })),
+        }
+      })
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -258,7 +278,7 @@ const PlanUpdateSidePanel = () => {
                           className="flex py-2"
                         >
                           <div className="w-[12px]">
-                            <IconCheck
+                            <Check
                               className="h-3 w-3 text-brand translate-y-[2.5px]"
                               aria-hidden="true"
                               strokeWidth={3}
@@ -423,7 +443,7 @@ const PlanUpdateSidePanel = () => {
               <InformationBox
                 className="mt-4"
                 title="Usage-billing for Compute"
-                icon={<IconInfo />}
+                icon={<Info />}
                 defaultVisibility={true}
                 hideCollapse={true}
                 description={

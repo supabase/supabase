@@ -72,7 +72,7 @@ const PricingComputeSection = () => {
                 <h4 className="text-lg">Choose the best compute size for you</h4>
                 <p className="text-[13px] text-foreground-lighter">
                   Every project on the Supabase Platform comes with its own dedicated Postgres
-                  instance. Select the compute compute size that fits your needs.
+                  instance. Select the compute size that fits your needs.
                 </p>
                 <p className="text-[13px] text-foreground-lighter">
                   Compute instances are billed hourly and you can scale up or down at any time. Paid
@@ -82,7 +82,7 @@ const PricingComputeSection = () => {
                 <p className="text-[13px] text-foreground-lighter">
                   Read more on{' '}
                   <Link
-                    href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                    href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
                     target="_blank"
                     className="transition text-brand hover:text-brand-600"
                   >

@@ -1,7 +1,8 @@
 import { noop } from 'lodash'
-import { Badge, IconCode, IconDatabase } from 'ui'
+import { Badge } from 'ui'
 
 import Description from 'components/interfaces/Docs/Description'
+import { Code, Database } from 'lucide-react'
 
 function getColumnType(type: string, format: string) {
   // json and jsonb both have type=undefined, so check format instead
@@ -69,7 +70,7 @@ const Param = ({
             <div>
               <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
-                  <IconCode size="tiny" />
+                  <Code size="14" />
                   <span>{getColumnType(type, format)}</span>
                 </span>
               </span>
@@ -82,7 +83,7 @@ const Param = ({
             <div>
               <span className="flex grow-0 bg-slate-300 px-2 py-0.5 rounded-md text-foreground-light">
                 <span className="flex items-center gap-2 text-sm">
-                  <IconDatabase size="tiny" />
+                  <Database size="14" />
                   <span>{format}</span>
                 </span>
               </span>

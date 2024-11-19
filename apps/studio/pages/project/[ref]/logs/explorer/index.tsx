@@ -2,8 +2,9 @@ import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { IS_PLATFORM } from 'common'
 import {
   Button,
   Form,
@@ -13,41 +14,42 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from 'ui'
-import { IS_PLATFORM } from 'common'
 
-import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
-import LoadingOpacity from 'components/ui/LoadingOpacity'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import useLogsQuery from 'hooks/analytics/useLogsQuery'
-import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import type { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
-import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
-import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
-import {
-  maybeShowUpgradePrompt,
-  useEditorHints,
-} from 'components/interfaces/Settings/Logs/Logs.utils'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import {
-  DatePickerToFrom,
-  LogTemplate,
-  LogsWarning,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useLocalStorage } from '@uidotdev/usehooks'
 import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LOGS_TABLES,
   TEMPLATES,
 } from 'components/interfaces/Settings/Logs/Logs.constants'
-import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import {
+  DatePickerToFrom,
+  LogTemplate,
+  LogsWarning,
+} from 'components/interfaces/Settings/Logs/Logs.types'
+import {
+  maybeShowUpgradePrompt,
+  useEditorHints,
+} from 'components/interfaces/Settings/Logs/Logs.utils'
+import LogsQueryPanel, { SourceType } from 'components/interfaces/Settings/Logs/LogsQueryPanel'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
+import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
+import { createWarehouseQueryTemplates } from 'components/interfaces/Settings/Logs/Warehouse.utils'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
+import LoadingOpacity from 'components/ui/LoadingOpacity'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
+import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import useLogsQuery from 'hooks/analytics/useLogsQuery'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useContentUpdateMutation } from 'data/content/content-update-mutation'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -141,10 +143,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (q) {
       onSelectTemplate({
         mode: 'custom',
-        searchString: q as string,
+        searchString: q,
       })
+      setWarehouseEditorValue(q)
     }
-  }, [])
+  }, [q])
 
   useEffect(() => {
     let newWarnings = []
@@ -193,7 +196,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const whQuery = warehouseEditorValue
 
       if (!warehouseCollections?.length) {
-        toast.error('You do not have any collections in your warehouse yet.')
+        toast.error('You do not have any collections yet.')
         return
       }
 
@@ -213,9 +216,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const logsSourceExists = logsSources.find((source) => whQuery.includes(source))
 
       if (logsSourceExists) {
-        toast.error(
-          'Cannot query logs tables from a warehouse query. Please remove the logs table from the query.'
-        )
+        toast.error('Cannot query logs tables from current query.')
         return
       }
 
@@ -261,6 +262,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   function handleOnSave() {
+    // if we have a queryId, we are editing a saved query
+    const queryId = router.query.queryId as string
+    if (queryId) {
+      updateContent({
+        projectRef: projectRef!,
+        id: queryId,
+        type: 'log_sql',
+        content: {
+          sql: editorValue,
+        },
+      })
+
+      return
+    }
+
     setSaveModalOpen(!saveModalOpen)
   }
 
@@ -295,10 +311,26 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     },
   })
 
+  const { mutate: updateContent } = useContentUpdateMutation({
+    onError: (e) => {
+      const error = e as { message: string }
+      console.error(error)
+      setSaveModalOpen(false)
+      toast.error(`Failed to update query: ${error.message}`)
+    },
+    onSuccess: (values) => {
+      setSaveModalOpen(false)
+      toast.success(`Updated "${values[0].name}" log query`)
+    },
+  })
+
+  const [selectedLog, setSelectedLog] = useState<any>(null)
+  const results = sourceType === 'warehouse' ? warehouseResults?.result : logData
+
   return (
     <div className="w-full h-full mx-auto">
       <ResizablePanelGroup
-        className="w-full h-full"
+        className="w-full h-full max-h-screen"
         direction="vertical"
         autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
@@ -338,7 +370,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql" // its bq sql but monaco doesn't have a language for it
               defaultValue={warehouseEditorValue}
               onInputChange={(v) => setWarehouseEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           ) : (
             <CodeEditor
@@ -346,27 +378,29 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
-        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
+        <ResizablePanel collapsible minSize={5} className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
               showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
-              params={params}
-              data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
+              data={results}
               error={error}
               projectRef={projectRef}
+              onSelectedLogChange={setSelectedLog}
+              selectedLog={selectedLog}
             />
+
+            <div className="flex flex-row justify-end mt-2">
+              <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
+            </div>
           </LoadingOpacity>
-          <div className="flex flex-row justify-end mt-2">
-            <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
-          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
 

@@ -68,7 +68,12 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     }
 
     return (
-      <form ref={formRef} className="relative" {...props} onSubmit={onSubmit}>
+      <form
+        ref={formRef}
+        {...props}
+        onSubmit={onSubmit}
+        className={cn('relative', props.className)}
+      >
         {icon && (
           <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}>
             {icon}
@@ -78,7 +83,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           ref={textAreaRef}
           autoFocus
           disabled={disabled}
-          contentEditable
           className={cn(icon ? 'pl-12' : '', 'text-sm pr-10 rounded-[18px]')}
           placeholder={placeholder}
           spellCheck={false}

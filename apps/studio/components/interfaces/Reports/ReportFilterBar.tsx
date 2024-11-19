@@ -218,7 +218,7 @@ const ReportFilterBar = ({
                 size="tiny"
                 className="!p-0 !space-x-0"
                 onClick={() => onRemoveFilters([filter])}
-                icon={<X size={14} className="text-foreground-light" />}
+                icon={<X className="text-foreground-light" />}
               >
                 <span className="sr-only">Remove</span>
               </Button>
@@ -298,7 +298,7 @@ const ReportFilterBar = ({
             asChild
             type="default"
             size="tiny"
-            icon={<Plus size={14} className={`text-foreground-light `} />}
+            icon={<Plus className={`text-foreground-light `} />}
           >
             <span>Add filter</span>
           </Button>

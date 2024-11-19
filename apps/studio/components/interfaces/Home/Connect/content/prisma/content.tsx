@@ -6,7 +6,7 @@ import {
   ConnectTabTriggers,
   ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
@@ -31,6 +31,10 @@ DIRECT_URL="${connectionStringPooler.session}"
       <ConnectTabContent value="prisma/schema.prisma">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")

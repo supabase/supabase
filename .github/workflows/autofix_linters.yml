@@ -5,6 +5,9 @@ on:
     types:
       - labeled
 
+permissions:
+  contents: write
+
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -13,43 +16,30 @@ concurrency:
 jobs:
   autofix:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     if: ${{ github.event_name == 'pull_request' && (github.event.label.name == 'autofix') }}
     steps:
-      - name: Calculate number of commits
-        run: echo "PR_FETCH_DEPTH=$(( ${{ github.event.pull_request.commits }} + 1 ))" >> "${GITHUB_ENV}"
-
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
           sparse-checkout: apps
-          fetch-depth: ${{ env.PR_FETCH_DEPTH }}
+          ref: ${{ github.head_ref }}
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
-     # Installing all dependencies takes up to three minutes, hacking around to only installing prettier+deps
       - name: Install required dependencies
-        run: |
-          rm package.json
-          rm package-lock.json
-          npm i prettier@4.0.0-alpha.8 prettier-plugin-sql-cst
+        run: npm ci
 
       - name: Run Prettier in fix mode
-        run: |
-          npx prettier --write 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'
+        run: npm run format
 
       - name: Commit changes and push to existing branch
         run: |
-          git checkout -- package.json
-          git checkout -- package-lock.json
           git config --global user.name 'github-tidy-bot'
           git config --global user.email 'github-tidy-bot@supabase.com'
           if [[ `git status --porcelain` ]]; then
             echo "[bot] Changes detected, committing."
-       
+
             echo "[bot] Running in non-squash mode."
             git commit -am "ci: Autofix updates from GitHub workflow"
             git push

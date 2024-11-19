@@ -7,8 +7,9 @@ import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Alert, Button, IconSearch, Input, SidePanel } from 'ui'
+import { Alert, Button, Input, SidePanel } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
+import { Search } from 'lucide-react'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -21,8 +22,8 @@ const Migrations = () => {
   })
   const migrations =
     search.length === 0
-      ? data?.result ?? []
-      : data?.result.filter(
+      ? data ?? []
+      : data?.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
         ) ?? []
 
@@ -61,9 +62,9 @@ const Migrations = () => {
         )}
         {isSuccess && (
           <div>
-            {data.result.length <= 0 && <MigrationsEmptyState />}
+            {data.length <= 0 && <MigrationsEmptyState />}
 
-            {data.result.length > 0 && (
+            {data.length > 0 && (
               <>
                 <div className="w-80 mb-4">
                   <Input
@@ -71,7 +72,7 @@ const Migrations = () => {
                     placeholder="Search for a migration"
                     value={search}
                     onChange={(e: any) => setSearch(e.target.value)}
-                    icon={<IconSearch size="tiny" />}
+                    icon={<Search size="14" />}
                   />
                 </div>
                 <Table

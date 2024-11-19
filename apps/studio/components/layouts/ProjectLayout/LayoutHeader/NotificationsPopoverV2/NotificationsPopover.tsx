@@ -1,18 +1,8 @@
-import clsx from 'clsx'
+import { ArchiveIcon, InboxIcon } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  Button,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-} from 'ui'
+import { toast } from 'sonner'
 
 import AlertError from 'components/ui/AlertError'
-import { CriticalIcon, WarningIcon } from 'ui'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -22,9 +12,20 @@ import { useNotificationsV2UpdateMutation } from 'data/notifications/notificatio
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'
+import {
+  Button,
+  CriticalIcon,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  WarningIcon,
+  cn,
+} from 'ui'
 import NotificationRow from './NotificationRow'
 import { NotificationsFilter } from './NotificationsFilter'
-import { ArchiveIcon, InboxIcon } from 'lucide-react'
 
 const NotificationsPopoverV2 = () => {
   const [open, setOpen] = useState(false)
@@ -94,7 +95,7 @@ const NotificationsPopoverV2 = () => {
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type={hasNewNotifications ? 'outline' : 'text'}
-          className={clsx(
+          className={cn(
             'h-[26px]',
             // !hasCritical || !hasWarning || !hasNewNotifications ? 'w-[26px]' : '',
             'group',
@@ -112,7 +113,7 @@ const NotificationsPopoverV2 = () => {
               <WarningIcon className="relative !w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
-                className={clsx(
+                className={cn(
                   'transition-all -mr-3 group-hover:-mr-1',
                   'z-10 h-4 flex items-center justify-center rounded-full bg-black dark:bg-white',
                   (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
@@ -154,10 +155,10 @@ const NotificationsPopoverV2 = () => {
                   >
                     Inbox
                     <div
-                      className={clsx([
+                      className={cn(
                         'flex items-center justify-center text-xs rounded-full bg-surface-300 h-4',
-                        (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4',
-                      ])}
+                        (summary?.unread_count ?? 0) > 9 ? 'px-0.5 w-auto' : 'w-4'
+                      )}
                     >
                       {summary?.unread_count}
                     </div>

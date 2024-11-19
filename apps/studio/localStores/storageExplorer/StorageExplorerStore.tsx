@@ -1,8 +1,19 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
-import { makeAutoObservable, toJS } from 'mobx'
-import toast from 'react-hot-toast'
+import {
+  capitalize,
+  chunk,
+  compact,
+  find,
+  findIndex,
+  has,
+  isEqual,
+  isObject,
+  uniq,
+  uniqBy,
+} from 'lodash'
+import { makeAutoObservable } from 'mobx'
+import { toast } from 'sonner'
 import * as tus from 'tus-js-client'
 
 import {
@@ -19,7 +30,6 @@ import {
   StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { ToastLoader } from 'components/ui/ToastLoader'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
@@ -32,8 +42,9 @@ import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
+import Link from 'next/link'
+import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { Button, toast as UiToast } from 'ui'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -65,7 +76,7 @@ const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Do not close the browser until it's completed"
 
 class StorageExplorerStore {
-  private projectRef: string = ''
+  projectRef: string = ''
   view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
@@ -117,12 +128,7 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(
-    projectRef: string,
-    url: string,
-    serviceKey: string,
-    protocol: string = PROJECT_ENDPOINT_PROTOCOL
-  ) {
+  initStore(projectRef: string, url: string, serviceKey: string, protocol: string) {
     this.projectRef = projectRef
     this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey
@@ -255,7 +261,6 @@ class StorageExplorerStore {
   popOpenedFoldersAtIndex = (index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index + 1)
   }
-
   clearOpenedFolders = () => {
     this.openedFolders = []
   }
@@ -306,11 +311,7 @@ class StorageExplorerStore {
     if (formattedName === null) return
 
     if (!/^[a-zA-Z0-9_-\s]*$/.test(formattedName)) {
-      return UiToast({
-        variant: 'destructive',
-        description: 'Folder name contains invalid special characters',
-        duration: 6000,
-      })
+      return toast.error('Folder name contains invalid special characters')
     }
 
     if (formattedName.length === 0) {
@@ -441,7 +442,7 @@ class StorageExplorerStore {
 
   // https://stackoverflow.com/a/53058574
   private getFilesDataTransferItems = async (items: DataTransferItemList) => {
-    const { dismiss } = UiToast({ description: 'Retrieving items to upload...' })
+    const toastId = toast('Retrieving items to upload...')
     const files: (File & { path: string })[] = []
     const queue: FileSystemEntry[] = []
     for (const item of items) {
@@ -464,7 +465,7 @@ class StorageExplorerStore {
         queue.push(...(await this.readAllDirectoryEntries(dirEntry.createReader())))
       }
     }
-    dismiss()
+    toast.dismiss(toastId)
     return files
   }
 
@@ -493,22 +494,20 @@ class StorageExplorerStore {
     }
   }
 
-  onUploadProgress(toastId?: string) {
+  onUploadProgress(toastId?: string | number) {
     const totalFiles = this.uploadProgresses.length
     const progress =
       (this.uploadProgresses.reduce((acc, { percentage }) => acc + percentage, 0) / totalFiles) *
       100
     const remainingTime = this.calculateTotalRemainingTime(this.uploadProgresses)
 
-    return toast.loading(
-      <ToastLoader
+    return toast(
+      <SonnerProgress
         progress={progress}
         message={`Uploading ${totalFiles} file${totalFiles > 1 ? 's' : ''}...`}
-        labelTopOverride={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) ? `${this.formatTime(remainingTime)} remaining – ` : ''}${progress.toFixed(2)}%`}
-      >
-        <div className="flex items-center gap-2">
-          <p className="flex-1 text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          {toastId && (
+        progressPrefix={`${remainingTime && !isNaN(remainingTime) && isFinite(remainingTime) && remainingTime !== 0 ? `${this.formatTime(remainingTime)} remaining – ` : ''}`}
+        action={
+          toastId && (
             <Button
               type="default"
               size="tiny"
@@ -517,10 +516,10 @@ class StorageExplorerStore {
             >
               Cancel
             </Button>
-          )}
-        </div>
-      </ToastLoader>,
-      { id: toastId }
+          )
+        }
+      />,
+      { id: toastId, closeButton: false, position: 'bottom-right' }
     )
   }
 
@@ -562,11 +561,19 @@ class StorageExplorerStore {
           <p className="text-foreground">
             Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
             {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the upload limit of {value}
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of {value}
             {unit}.
           </p>
           <p className="text-foreground-light">
-            You may change the file size upload limit under Storage in Project Settings.
+            You can change the global file size upload limit in{' '}
+            <Link
+              className="underline"
+              href={`/project/${this.projectRef}/settings/storage`}
+              target="_blank"
+            >
+              Storage settings
+            </Link>
+            .
           </p>
         </div>,
         { duration: 8000 }
@@ -585,8 +592,7 @@ class StorageExplorerStore {
             {numberOfFilesRejected > 1 ? 'their' : 'its'} size
             {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
           </p>
-        </div>,
-        { duration: 8000 }
+        </div>
       )
 
       if (numberOfFilesRejected === filesWithinUploadLimit.length) return
@@ -712,6 +718,7 @@ class StorageExplorerStore {
 
           // Max chunk size is 500MB
           chunkSize = Math.min(chunkSize, 500 * 1024 * 1024)
+          const uploadDataDuringCreation = file.size <= chunkSize
 
           const upload = new tus.Upload(file, {
             endpoint: this.resumableUploadUrl,
@@ -720,7 +727,7 @@ class StorageExplorerStore {
               authorization: `Bearer ${this.serviceKey}`,
               'x-source': 'supabase-dashboard',
             },
-            uploadDataDuringCreation: true,
+            uploadDataDuringCreation: uploadDataDuringCreation,
             removeFingerprintOnSuccess: true,
             metadata: {
               bucketName: this.selectedBucket.name,
@@ -730,13 +737,34 @@ class StorageExplorerStore {
             chunkSize,
             onShouldRetry(error) {
               const status = error.originalResponse ? error.originalResponse.getStatus() : 0
-              const doNotRetryStatuses = [400, 403, 404, 409, 429]
+              const doNotRetryStatuses = [400, 403, 404, 409, 413, 415, 429]
 
               return !doNotRetryStatuses.includes(status)
             },
-            onError(error) {
+            onError: (error) => {
               numberOfFilesUploadedFail += 1
-              toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              if (error instanceof tus.DetailedError) {
+                const status = error.originalResponse?.getStatus()
+                if (status === 415) {
+                  // Unsupported mime type
+                  toast.error(
+                    capitalize(
+                      error?.originalResponse?.getBody() ||
+                        `Failed to upload ${file.name}: ${metadata.mimetype} is not allowed`
+                    ),
+                    {
+                      description: `Allowed MIME types: ${this.selectedBucket.allowed_mime_types?.join(', ')}`,
+                    }
+                  )
+                } else if (status === 413) {
+                  // Payload too large
+                  toast.error(
+                    `Failed to upload ${file.name}: File size exceeds the bucket upload limit.`
+                  )
+                }
+              } else {
+                toast.error(`Failed to upload ${file.name}: ${error.message}`)
+              }
               reject(error)
             },
             onProgress: (bytesSent, bytesTotal) => {
@@ -821,25 +849,29 @@ class StorageExplorerStore {
       } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
         toast.error(
           `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
-          { id: toastId }
+          { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
         )
       } else if (numberOfFilesUploadedSuccess === numberOfFilesToUpload) {
         toast.success(
           `Successfully uploaded ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
+          { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
         )
       } else {
         toast.success(
           `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-          { id: toastId }
+          { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
         )
       }
     } catch (e) {
-      toast.error('Failed to upload files', { id: toastId })
+      toast.error('Failed to upload files', {
+        id: toastId,
+        closeButton: true,
+        duration: SONNER_DEFAULT_DURATION,
+      })
     }
 
     const t2 = new Date()
@@ -848,7 +880,7 @@ class StorageExplorerStore {
     )
   }
 
-  abortUploads = (toastId: string) => {
+  abortUploads = (toastId: string | number) => {
     this.abortUploadCallbacks[toastId].forEach((callback) => callback())
     this.abortUploadCallbacks[toastId] = []
   }
@@ -859,8 +891,7 @@ class StorageExplorerStore {
     let numberOfFilesMovedFail = 0
     this.clearSelectedItems()
 
-    const { dismiss } = UiToast({
-      description: STORAGE_PROGRESS_INFO_TEXT,
+    const toastId = toast(STORAGE_PROGRESS_INFO_TEXT, {
       duration: Infinity,
     })
 
@@ -890,16 +921,16 @@ class StorageExplorerStore {
     )
 
     if (numberOfFilesMovedFail === this.selectedItemsToMove.length) {
-      UiToast({ variant: 'destructive', description: 'Failed to move files' })
+      toast.error('Failed to move files')
     } else {
-      UiToast({
-        description: `Successfully moved ${
+      toast(
+        `Successfully moved ${
           this.selectedItemsToMove.length - numberOfFilesMovedFail
-        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`,
-      })
+        } files to ${formattedNewPathToFile.length > 0 ? formattedNewPathToFile : 'the root of your bucket'}`
+      )
     }
 
-    dismiss()
+    toast.dismiss(toastId)
 
     // Clear file preview cache if moved files exist in cache
     const idsOfItemsToMove = this.selectedItemsToMove.map((item) => item.id)
@@ -968,10 +999,9 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
-    const toastId = toast.loading(
-      <ToastLoader progress={0} message={`Deleting ${prefixes.length} file(s)...`}>
-        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-      </ToastLoader>
+    const toastId = toast(
+      <SonnerProgress progress={0} message={`Deleting ${prefixes.length} file(s)...`} />,
+      { closeButton: false, position: 'bottom-right' }
     )
 
     // batch BATCH_SIZE prefixes per request
@@ -988,11 +1018,12 @@ class StorageExplorerStore {
     await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader progress={progress * 100} message={`Deleting ${prefixes.length} file(s)...`}>
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+      toast(
+        <SonnerProgress
+          progress={progress * 100}
+          message={`Deleting ${prefixes.length} file(s)...`}
+        />,
+        { id: toastId, closeButton: false, position: 'bottom-right' }
       )
     }, Promise.resolve())
 
@@ -1014,7 +1045,12 @@ class StorageExplorerStore {
       await Promise.all(
         parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
       )
-      toast.success(`Successfully deleted ${prefixes.length} file(s)`, { id: toastId })
+
+      toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+        id: toastId,
+        closeButton: true,
+        duration: SONNER_DEFAULT_DURATION,
+      })
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
     } else {
@@ -1029,14 +1065,12 @@ class StorageExplorerStore {
     try {
       const files = await this.getAllItemsAlongFolder(folder)
 
-      toast.loading(
-        <ToastLoader
+      toast(
+        <SonnerProgress
           progress={0}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        >
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+        />,
+        { id: toastId, closeButton: false, position: 'bottom-right' }
       )
 
       const promises = files.map((file) => {
@@ -1077,14 +1111,12 @@ class StorageExplorerStore {
         async (previousPromise, nextBatch) => {
           const previousResults = await previousPromise
           const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-          toast.loading(
-            <ToastLoader
+          toast(
+            <SonnerProgress
               progress={progress * 100}
               message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-            >
-              <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-            </ToastLoader>,
-            { id: toastId }
+            />,
+            { id: toastId, closeButton: false, position: 'bottom-right' }
           )
           return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
         },
@@ -1101,7 +1133,11 @@ class StorageExplorerStore {
       const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
 
       if (downloadedFiles.length === 0) {
-        toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
+        toast.error(`Failed to download files from "${folder.name}"`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
       }
 
       downloadedFiles.forEach((file) => {
@@ -1122,10 +1158,14 @@ class StorageExplorerStore {
           : `Downloaded folder "${folder.name}". However, ${
               files.length - downloadedFiles.length
             } files did not download successfully.`,
-        { id: toastId }
+        { id: toastId, closeButton: true, duration: SONNER_DEFAULT_DURATION }
       )
     } catch (error: any) {
-      toast.error(`Failed to download folder: ${error.message}`, { id: toastId })
+      toast.error(`Failed to download folder: ${error.message}`, {
+        id: toastId,
+        closeButton: true,
+        duration: SONNER_DEFAULT_DURATION,
+      })
     }
   }
 
@@ -1166,14 +1206,12 @@ class StorageExplorerStore {
     const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader
+      toast(
+        <SonnerProgress
           progress={progress * 100}
           message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        >
-          <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-        </ToastLoader>,
-        { id: toastId }
+        />,
+        { id: toastId, closeButton: false, position: 'bottom-right' }
       )
       return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
     }, Promise.resolve<{ name: string; blob: Blob }[]>([]))
@@ -1192,7 +1230,11 @@ class StorageExplorerStore {
     link.click()
     link.parentNode?.removeChild(link)
 
-    toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
+    toast.success(`Successfully downloaded ${downloadedFiles.length} files`, {
+      id: toastId,
+      closeButton: true,
+      duration: SONNER_DEFAULT_DURATION,
+    })
   }
 
   downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
@@ -1227,12 +1269,20 @@ class StorageExplorerStore {
       link.parentNode?.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
-        toast.success(`Downloading ${fileName}`, { id: toastId })
+        toast.success(`Downloading ${fileName}`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
       }
       return true
     } catch {
       if (toastId) {
-        toast.error(`Failed to download ${fileName}`, { id: toastId })
+        toast.error(`Failed to download ${fileName}`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
       }
       return false
     }
@@ -1513,10 +1563,9 @@ class StorageExplorerStore {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     }
 
-    const toastId = toast.loading(
-      <ToastLoader progress={0} message={`Renaming folder to ${newName}`}>
-        <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-      </ToastLoader>
+    const toastId = toast(
+      <SonnerProgress progress={0} message={`Renaming folder to ${newName}`} />,
+      { closeButton: false, position: 'bottom-right' }
     )
 
     try {
@@ -1573,18 +1622,24 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loading(
-          <ToastLoader progress={progress * 100} message={`Renaming folder to ${newName}`}>
-            <p className="text-xs text-foreground-light">{STORAGE_PROGRESS_INFO_TEXT}</p>
-          </ToastLoader>,
-          { id: toastId }
+        toast(
+          <SonnerProgress progress={progress * 100} message={`Renaming folder to ${newName}`} />,
+          { id: toastId, closeButton: false, position: 'bottom-right' }
         )
       }, Promise.resolve())
 
       if (!hasErrors) {
-        toast.success(`Successfully renamed folder to ${newName}`, { id: toastId })
+        toast.success(`Successfully renamed folder to ${newName}`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
       } else {
-        toast.error(`Renamed folder to ${newName} with some errors`, { id: toastId })
+        toast.error(`Renamed folder to ${newName} with some errors`, {
+          id: toastId,
+          closeButton: true,
+          duration: SONNER_DEFAULT_DURATION,
+        })
       }
       await this.refetchAllOpenedFolders()
 
@@ -1595,7 +1650,11 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e: any) {
-      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, { id: toastId })
+      toast.error(`Failed to rename folder to ${newName}: ${e.message}`, {
+        id: toastId,
+        closeButton: true,
+        duration: SONNER_DEFAULT_DURATION,
+      })
     }
   }
 

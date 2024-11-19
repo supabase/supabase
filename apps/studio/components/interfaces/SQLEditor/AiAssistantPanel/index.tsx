@@ -1,95 +1,168 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Message as MessageType } from 'ai'
-import { useTelemetryProps } from 'common'
-import Telemetry from 'lib/telemetry'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { compact, last } from 'lodash'
-import { Loader2 } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { Info } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
+import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
+import { Message as MessageType } from 'ai'
+import { useChat } from 'ai/react'
+import { useParams } from 'common'
+import { IS_PLATFORM } from 'common/constants/environment'
+import { Markdown } from 'components/interfaces/Markdown'
+import { SchemaComboBox } from 'components/ui/SchemaComboBox'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
+import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
-import { useAppStateSnapshot } from 'state/app-state'
+import uuidv4 from 'lib/uuid'
 import {
-  ExpandingTextArea,
+  AiIconAnimation,
+  Alert_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
   Button,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Form_Shadcn_,
   cn,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  WarningIcon,
 } from 'ui'
-import { AiIcon } from 'ui-patterns/Cmdk'
+import { AssistantChatForm } from 'ui-patterns/AssistantChat'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import OptInToOpenAIToggle from '../../Organization/GeneralSettings/OptInToOpenAIToggle'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
 interface AiAssistantPanelProps {
-  messages: MessageWithDebug[]
   selectedMessage?: string
-  loading: boolean
-  onSubmit: (s: string) => void
-  onClearHistory: () => void
+  existingSql: string
+  includeSchemaMetadata: boolean
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
 }
 
 export const AiAssistantPanel = ({
-  messages,
   selectedMessage,
-  loading,
-  onSubmit,
+  existingSql,
   onDiff,
-  onClearHistory,
   onClose,
+  includeSchemaMetadata,
 }: AiAssistantPanelProps) => {
-  const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
-  const snap = useAppStateSnapshot()
-  const organization = useSelectedOrganization()
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const telemetryProps = useTelemetryProps()
+  const project = useSelectedProject()
+  const selectedOrganization = useSelectedOrganization()
 
-  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  const [chatId, setChatId] = useState(uuidv4())
+  const [value, setValue] = useState<string>('')
+  const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
+  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
+
+  const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
+  const [showAiNotOptimizedWarningSetting, setShowAiNotOptimizedWarningSetting] =
+    useLocalStorageQuery(LOCAL_STORAGE_KEYS.SHOW_AI_NOT_OPTIMIZED_WARNING(ref as string), true)
+  const shouldShowNotOptimizedAlert =
+    selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
+
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
+  const { data } = useEntityDefinitionsQuery(
+    {
+      schemas: selectedSchemas,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: includeSchemaMetadata }
+  )
+
+  const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
+
+  // Use chat id because useChat doesn't have a reset function to clear all messages
+  const {
+    messages: chatMessages,
+    append,
+    isLoading,
+  } = useChat({
+    id: chatId,
+    api: `${BASE_PATH}/api/ai/sql/generate-v2`,
+    body: {
+      existingSql: existingSql,
+      entityDefinitions: entityDefinitions,
+    },
+  })
+  const messages = useMemo(() => {
+    const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
+
+    return merged.sort(
+      (a, b) =>
+        (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
+        a.role.localeCompare(b.role)
+    )
+  }, [chatMessages])
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
+  const pendingReply = isLoading && last(messages)?.role === 'user'
 
-  const FormSchema = z.object({ chat: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { chat: '' },
-  })
-  const pendingReply = loading && last(messages)?.role === 'user'
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  // try to scroll on each rerender to the bottom
-  useEffect(() => {
-    if (loading && bottomRef.current) {
-      setTimeout(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-      }, 500)
+  const confirmOptInToShareSchemaData = async () => {
+    if (!canUpdateOrganization) {
+      return toast.error('You do not have the required permissions to update this organization')
     }
-  })
+
+    if (!selectedOrganization?.slug) return console.error('Organization slug is required')
+
+    const existingOptInTags = selectedOrganization?.opt_in_tags ?? []
+
+    const updatedOptInTags = existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
+      ? existingOptInTags
+      : [...existingOptInTags, OPT_IN_TAGS.AI_SQL]
+
+    updateOrganization(
+      { slug: selectedOrganization?.slug, opt_in_tags: updatedOptInTags },
+      {
+        onSuccess: () => {
+          toast.success('Successfully opted-in')
+          setIsConfirmOptInModalOpen(false)
+        },
+      }
+    )
+  }
 
   useEffect(() => {
-    if (!loading) {
-      form.setValue('chat', '')
-      form.setFocus('chat')
+    if (!isLoading) {
+      setValue('')
+      if (inputRef.current) inputRef.current.focus()
     }
-  }, [loading])
 
-  const formRef = useRef<HTMLFormElement>(null)
+    // Try to scroll on each rerender to the bottom
+    setTimeout(
+      () => {
+        if (bottomRef.current) {
+          bottomRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      },
+      isLoading ? 100 : 500
+    )
+  }, [isLoading])
 
   return (
-    <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
+    <div className="flex flex-col h-full border-l border-control">
       <div
         className={cn(
           'overflow-auto flex-1',
@@ -105,99 +178,179 @@ export const AiAssistantPanel = ({
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
           action={
-            <Button type="default" onClick={onClose}>
-              Close Assistant
-            </Button>
+            <div className="flex gap-2">
+              {messages.length > 0 && (
+                <Button type="warning" onClick={() => setChatId(uuidv4())}>
+                  Clear history
+                </Button>
+              )}
+              <Button type="default" onClick={onClose}>
+                Close Assistant
+              </Button>
+            </div>
           }
         >
-          <div className="flex flex-row justify-between">
-            <Button
-              type="default"
-              className="w-min"
-              icon={
-                <div
-                  className={cn(
-                    'w-2 h-2 rounded-full',
-                    includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
-                  )}
-                />
-              }
-              onClick={() => snap.setShowAiSettingsModal(true)}
-            >
-              {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
-            </Button>
-            <Button type="warning" onClick={() => onClearHistory()}>
-              Clear history
-            </Button>
-          </div>
+          {includeSchemaMetadata ? (
+            <div className="mt-2">
+              <span className="inline-block text-lighter">
+                Include these schemas in your prompts:
+              </span>
+              <div className="flex flex-row justify-between space-x-2 mt-2">
+                <div className="flex items-center gap-2">
+                  <SchemaComboBox
+                    disabled={!includeSchemaMetadata}
+                    selectedSchemas={selectedSchemas}
+                    onSelectSchemas={setSelectedSchemas}
+                    label={
+                      includeSchemaMetadata && selectedSchemas.length > 0
+                        ? `${selectedSchemas.length} schema${
+                            selectedSchemas.length > 1 ? 's' : ''
+                          } selected`
+                        : 'No schemas selected'
+                    }
+                  />
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_ className="flex items-center gap-2 text-lighter">
+                      <Info className="text-lighter w-4 h-4" />
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ className="w-72" side="right">
+                      Select specific schemas to send with your queries. Supabase AI can use this
+                      data to improve the responses it shows you.
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {shouldShowNotOptimizedAlert ? (
+                <Alert_Shadcn_ className="[&>svg]:left-5 border-l-0 border-r-0 rounded-none -mx-5 px-5 w-[calc(100%+40px)]">
+                  <WarningIcon />
+                  <AlertTitle_Shadcn_>AI Assistant is not optimized</AlertTitle_Shadcn_>
+                  <AlertDescription_Shadcn_>
+                    You need to agree to share anonymous schema data with OpenAI for the best
+                    experience.
+                  </AlertDescription_Shadcn_>
+                  <div className="flex items-center gap-4 mt-6">
+                    <Button type="default" onClick={() => setIsConfirmOptInModalOpen(true)}>
+                      Update AI settings
+                    </Button>
+
+                    <Button type="text" onClick={() => setShowAiNotOptimizedWarningSetting(false)}>
+                      Dismiss
+                    </Button>
+                  </div>
+                </Alert_Shadcn_>
+              ) : (
+                <></>
+              )}
+            </>
+          )}
         </Message>
+        {messages.map((m, index) => {
+          const isFirstUserMessage =
+            m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
 
-        {messages.map((m) => (
-          <Message
-            key={`message-${m.id}`}
-            name={m.name}
-            role={m.role}
-            content={m.content}
-            createdAt={new Date(m.createdAt || new Date()).getTime()}
-            isDebug={m.isDebug}
-            isSelected={selectedMessage === m.id}
-            onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-          />
-        ))}
-
+          return (
+            <Message
+              key={`message-${m.id}`}
+              name={m.name}
+              role={m.role}
+              content={m.content}
+              createdAt={new Date(m.createdAt || new Date()).getTime()}
+              isDebug={m.isDebug}
+              isSelected={selectedMessage === m.id}
+              onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
+            >
+              {isFirstUserMessage && !includeSchemaMetadata && !shouldShowNotOptimizedAlert && (
+                <Alert_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-col gap-4">
+                    <span>
+                      Quick reminder that you're not sending project metadata with your queries. By
+                      opting into sending anonymous data, Supabase AI can improve the answers it
+                      shows you.
+                    </span>
+                    <Button
+                      type="default"
+                      className="w-fit"
+                      onClick={() => setIsConfirmOptInModalOpen(true)}
+                    >
+                      Update AI settings
+                    </Button>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+              {isFirstUserMessage && includeSchemaMetadata && selectedSchemas.length === 0 && (
+                <Alert_Shadcn_>
+                  <AlertDescription_Shadcn_ className="flex flex-col gap-4">
+                    <span>
+                      We recommend including the schemas for better answers by Supabase AI.
+                    </span>
+                  </AlertDescription_Shadcn_>
+                </Alert_Shadcn_>
+              )}
+            </Message>
+          )
+        })}
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
-
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <Form_Shadcn_ {...form}>
-        <form
-          ref={formRef}
-          className="sticky p-5 flex-0 border-t"
-          onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
-            onSubmit(data.chat)
-            Telemetry.sendEvent(
-              {
-                category: 'sql_editor_ai_assistant',
-                action: 'ai_suggestion_asked',
-                label: 'sql-editor-ai-assistant',
-              },
-              telemetryProps,
-              router
-            )
-          })}
-        >
-          <FormField_Shadcn_
-            control={form.control}
-            name="chat"
-            render={({ field }) => (
-              <FormItem_Shadcn_ asChild>
-                <FormControl_Shadcn_>
-                  <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                    <ExpandingTextArea
-                      {...field}
-                      autoComplete="off"
-                      disabled={loading}
-                      autoFocus
-                      spellCheck={false}
-                      className="pl-12 text-sm rounded-[18px] max-h-96"
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' && !event.shiftKey) {
-                          event.preventDefault()
-                          formRef?.current?.requestSubmit()
-                        }
-                      }}
-                      placeholder="Ask a question about your SQL query"
-                    />
-                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
-                  </div>
-                </FormControl_Shadcn_>
-              </FormItem_Shadcn_>
-            )}
-          />
-        </form>
-      </Form_Shadcn_>
+      <div className="sticky p-5 flex-0 border-t grid gap-4">
+        {!isApiKeySet && (
+          <Alert>
+            <AlertTitle>OpenAI API key not set</AlertTitle>
+            <AlertDescription>
+              <Markdown
+                content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+              />
+            </AlertDescription>
+          </Alert>
+        )}
+        <AssistantChatForm
+          textAreaRef={inputRef}
+          loading={isLoading}
+          disabled={isLoading || !isApiKeySet}
+          icon={
+            <AiIconAnimation
+              allowHoverEffect
+              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
+            />
+          }
+          placeholder="Ask a question about your SQL query"
+          value={value}
+          onValueChange={(e) => setValue(e.target.value)}
+          onSubmit={(event) => {
+            event.preventDefault()
+            append({
+              content: value,
+              role: 'user',
+              createdAt: new Date(),
+            })
+            sendEvent({
+              category: 'sql_editor_ai_assistant',
+              action: 'ai_suggestion_asked',
+              label: 'sql-editor-ai-assistant',
+            })
+          }}
+        />
+      </div>
+      <ConfirmationModal
+        visible={isConfirmOptInModalOpen}
+        size="large"
+        title="Confirm sending anonymous data to OpenAI"
+        confirmLabel="Confirm"
+        onCancel={() => setIsConfirmOptInModalOpen(false)}
+        onConfirm={confirmOptInToShareSchemaData}
+        loading={isUpdating}
+      >
+        <p className="text-sm text-foreground-light">
+          By opting into sending anonymous data, Supabase AI can improve the answers it shows you.
+          This is an organization-wide setting, and affects all projects in your organization.
+        </p>
+
+        <OptInToOpenAIToggle />
+      </ConfirmationModal>
     </div>
   )
 }

@@ -3,8 +3,7 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
+@import './../../../packages/ui/build/css/themes/dark-combined.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @font-face {
@@ -284,6 +283,14 @@ th code {
   @apply text-nowrap;
 }
 
+/* 
+ * Prevents very long code lines (checksums, URLs, etc., from breaking table
+ * widths
+ */
+.prose :where(td) code {
+  @apply break-all;
+}
+
 /* Zoomable image */
 
 [data-rmiz-modal]:focus,
@@ -334,4 +341,11 @@ th code {
   100% {
     background-position: 1000px 0;
   }
+}
+
+.skip-link {
+  @apply sr-only;
+}
+.skip-link:focus {
+  @apply not-sr-only;
 }

@@ -17,10 +17,8 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconEdit3,
-  IconMoreVertical,
-  IconTrash,
 } from 'ui'
+import { MoreVertical, Edit3, Trash } from 'lucide-react'
 
 export interface HookListProps {
   schema: string
@@ -97,20 +95,18 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                 {canUpdateWebhook ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <IconMoreVertical />
-                      </Button>
+                      <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="left">
                       <>
                         <DropdownMenuItem className="space-x-2" onClick={() => editHook(x)}>
-                          <IconEdit3 size="tiny" />
+                          <Edit3 size="14" />
                           <p>Edit hook</p>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteHook(x)}>
-                          <IconTrash stroke="red" size="tiny" />
+                          <Trash stroke="red" size="14" />
                           <p>Delete hook</p>
                         </DropdownMenuItem>
                       </>
@@ -119,7 +115,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                 ) : (
                   <Tooltip.Root delayDuration={0}>
                     <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<IconMoreVertical />} />
+                      <Button disabled type="default" icon={<MoreVertical />} />
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content side="left">

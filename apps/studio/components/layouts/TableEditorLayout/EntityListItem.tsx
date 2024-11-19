@@ -13,25 +13,39 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
+import {
+  MAX_EXPORT_ROW_COUNT,
+  MAX_EXPORT_ROW_COUNT_MESSAGE,
+} from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { Markdown } from 'components/interfaces/Markdown'
+import {
+  formatTableRowsToSQL,
+  getEntityLintDetails,
+} from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
+import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
@@ -49,6 +63,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const isActive = Number(id) === entity.id
 
@@ -61,7 +76,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const viewHasLints: boolean = getEntityLintDetails(
@@ -69,7 +84,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const materializedViewHasLints: boolean = getEntityLintDetails(
@@ -77,7 +92,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const formatTooltipText = (entityType: string) => {
@@ -95,22 +110,23 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          { id: toastId }
         )
+      }
+
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,
@@ -135,6 +151,58 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       }
 
       toast.success(`Successfully exported ${entity.name} as CSV`, { id: toastId })
+    } catch (error: any) {
+      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
+    }
+  }
+
+  const exportTableAsSQL = async () => {
+    if (IS_PLATFORM && !project?.connectionString) {
+      return console.error('Connection string is required')
+    }
+    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
+
+    try {
+      const table = await getTableEditor({
+        id: entity.id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          { id: toastId }
+        )
+      }
+
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
+
+      const rows = await fetchAllTableRows({
+        projectRef,
+        connectionString: project?.connectionString,
+        table: supaTable,
+      })
+      const formattedRows = rows.map((row) => {
+        const formattedRow = row
+        Object.keys(row).map((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null)
+            formattedRow[column] = JSON.stringify(formattedRow[column])
+        })
+        return formattedRow
+      })
+
+      if (formattedRows.length > 0) {
+        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
+        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+        saveAs(sqlData, `${entity!.name}_rows.sql`)
+      }
+
+      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
     } catch (error: any) {
       toast.error(`Failed to export table: ${error.message}`, { id: toastId })
     }
@@ -199,9 +267,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   return (
-    <Link
+    <EditorTablePageLink
       title={entity.name}
-      href={`/project/${projectRef}/editor/${entity.id}`}
+      id={String(entity.id)}
+      href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
       className={cn(
@@ -218,9 +287,25 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
         <Tooltip.Trigger className="min-w-4" asChild>
           {entity.type === ENTITY_TYPE.TABLE ? (
-            <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+            <Table2
+              size={15}
+              strokeWidth={1.5}
+              className={cn(
+                'text-foreground-muted group-hover:text-foreground-lighter',
+                isActive && 'text-foreground-lighter',
+                'transition-colors'
+              )}
+            />
           ) : entity.type === ENTITY_TYPE.VIEW ? (
-            <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+            <Eye
+              size={15}
+              strokeWidth={1.5}
+              className={cn(
+                'text-foreground-muted group-hover:text-foreground-lighter',
+                isActive && 'text-foreground-lighter',
+                'transition-colors'
+              )}
+            />
           ) : (
             <div
               className={cn(
@@ -276,7 +361,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
             <MoreHorizontal size={14} strokeWidth={2} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
+          <DropdownMenuContent side="bottom" align="start" className="w-44">
             <DropdownMenuItem
               key="edit-table"
               className="space-x-2"
@@ -302,27 +387,46 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
               <Link
                 key="view-policies"
-                href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
+                href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
               >
                 <Lock size={12} />
                 <span>View Policies</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem
-              key="download-table-csv"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                exportTableAsCSV()
-              }}
-            >
-              <Download size={12} />
-              <span>Export as CSV</span>
-            </DropdownMenuItem>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-x-2">
+                <Download size={12} />
+                Export Data
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem
+                  key="download-table-csv"
+                  className="space-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsCSV()
+                  }}
+                >
+                  <span>Export table as CSV</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  key="download-table-sql"
+                  className="gap-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    exportTableAsSQL()
+                  }}
+                >
+                  <span>Export table as SQL</span>
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem
               key="delete-table"
-              className="space-x-2"
+              className="gap-x-2"
               onClick={(e) => {
                 e.stopPropagation()
                 snap.onDeleteTable()
@@ -334,7 +438,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
-    </Link>
+    </EditorTablePageLink>
   )
 }
 

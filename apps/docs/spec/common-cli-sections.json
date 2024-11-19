@@ -18,6 +18,12 @@
     "title": "General",
     "items": [
       {
+        "id": "supabase-bootstrap",
+        "title": "Launch a quick start template",
+        "slug": "supabase-bootstrap",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-init",
         "title": "Initialize a local project",
         "slug": "supabase-init",
@@ -180,6 +186,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-migration-fetch",
+        "title": "Fetch migration files from history table",
+        "slug": "supabase-migration-fetch",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-migration-repair",
         "title": "Repair migration history table",
         "slug": "supabase-migration-repair",
@@ -193,7 +205,7 @@
       },
       {
         "id": "supabase-migration-up",
-        "title": "Apply pending migrations locally",
+        "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
         "type": "cli-command"
       }
@@ -347,6 +359,30 @@
   },
   {
     "type": "category",
+    "title": "Organizations",
+    "items": [
+      {
+        "id": "supabase-orgs",
+        "title": "Manage organizations",
+        "slug": "supabase-orgs",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-orgs-create",
+        "title": "Create an organization",
+        "slug": "supabase-orgs-create",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-orgs-list",
+        "title": "List all organizations",
+        "slug": "supabase-orgs-list",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Projects",
     "items": [
       {
@@ -377,6 +413,24 @@
         "id": "supabase-projects-delete",
         "title": "Delete a project",
         "slug": "supabase-projects-delete",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Config",
+    "items": [
+      {
+        "id": "supabase-config",
+        "title": "Manage project configurations",
+        "slug": "supabase-config",
+        "type": "cli-command"
+      },
+      {
+        "id": "supabase-config-push",
+        "title": "Push config from a local file",
+        "slug": "supabase-config-push",
         "type": "cli-command"
       }
     ]
@@ -425,30 +479,6 @@
         "id": "supabase-branches-disable",
         "title": "Disable preview branching",
         "slug": "supabase-branches-disable",
-        "type": "cli-command"
-      }
-    ]
-  },
-  {
-    "type": "category",
-    "title": "Organizations",
-    "items": [
-      {
-        "id": "supabase-orgs",
-        "title": "Manage organizations",
-        "slug": "supabase-orgs",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-orgs-create",
-        "title": "Create an organization",
-        "slug": "supabase-orgs-create",
-        "type": "cli-command"
-      },
-      {
-        "id": "supabase-orgs-list",
-        "title": "List all organizations",
-        "slug": "supabase-orgs-list",
         "type": "cli-command"
       }
     ]

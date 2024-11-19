@@ -2,7 +2,18 @@
 /packages/shared-data/plans.ts @roryw10 @kevcodez
 
 /apps/studio/ @supabase/Dashboard
-/apps/www/ @supabase/Website
-/apps/www/_blog @supabase/marketing
+
+# temporary until we've ironed out all the problems with sync workflow
+/apps/docs/content/troubleshooting/ @charislam
+
+/apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
-/docker/ @supabase/cli
+/apps/www/lib/redirects.js
+
+/docker/ @supabase/dev-workflows
+
+/apps/studio/next.config.js                                         @supabase/security
+/apps/studio/components/interfaces/Billing/Payment                  @supabase/security
+/apps/studio/components/interfaces/Organization/BillingSettings/    @supabase/security
+/apps/studio/components/interfaces/Organization/Documents/          @supabase/security
+/apps/studio/pages/new/index.tsx                                    @supabase/security
