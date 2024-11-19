@@ -1,15 +1,14 @@
 'use client'
 
 import React, { useEffect, useRef } from 'react'
+import { useTheme } from 'next-themes'
+import { cn } from 'ui'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { cn } from 'ui'
-import { useTheme } from 'next-themes'
 
-const ThreeCanvas: React.FC<{
+const ThreeTicketCanvas: React.FC<{
   username: string
   className?: string
   ticketType?: 'regular' | 'platinum' | 'secret'
@@ -22,18 +21,18 @@ const ThreeCanvas: React.FC<{
 }) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
+
   const canvasRef = useRef<HTMLDivElement>(null)
   const ticketRef = useRef<THREE.Mesh | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-  const textLines = username?.split(' ').reverse() || []
-  const LINE_HEIGHT = 1.4
-  const MIN_CANVAS_HEIGHT = 600
+  const DISPLAY_NAME = username?.split(' ').reverse() || []
   const positionRight = ticketPosition === 'right'
   const isPlatinum = ticketType === 'platinum'
   const isSecret = ticketType === 'secret'
-
-  console.log('ticketType', ticketType)
+  const LINE_HEIGHT = 1.4
+  const MIN_CANVAS_HEIGHT = 600
+  const TICKET_FONT_PADDING_LEFT = -6.4
 
   const CONFIG = {
     regular: {
@@ -50,18 +49,32 @@ const ThreeCanvas: React.FC<{
     },
   }
 
+  const isDesktop = (width: number) => width > 1024
+  const getTicketScale = (width: number) => (isDesktop(width) ? 0.35 : 0.3)
+  const getTicketXPosition = (width: number, isRight: boolean) =>
+    isDesktop(width) ? (isRight ? 5 : -5) : 0
+
+  const FOOTER_CONTENT = [
+    {
+      text: 'LAUNCH WEEK 13',
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: -0.2 },
+      size: 0.59,
+    },
+    {
+      text: '2-6 DEC 2024',
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: -0.2 },
+      size: 0.55,
+    },
+  ]
+
   useEffect(() => {
     if (!canvasRef.current) return
 
-    const isDesktop = (width: number) => width > 1024
     const calculateDesktopWidth = () => window.innerWidth
-    const initialCanvasWidth = window.innerWidth
+    const initialCanvasWidth = calculateDesktopWidth()
     const initialCanvasHeight =
       window.innerHeight < MIN_CANVAS_HEIGHT ? MIN_CANVAS_HEIGHT - 65 : window.innerHeight - 65
-    const getTicketScale = (width: number) => (isDesktop(width) ? 0.35 : 0.3)
-    const getTicketXPosition = (width: number, isRight: boolean) =>
-      isDesktop(width) ? (isRight ? 5 : -5) : 0
-    const ticketYIdleRotation = isDesktop(window.innerWidth) ? 0 : 0
+    const ticketYIdleRotation = isDesktop(calculateDesktopWidth()) ? 0 : 0
 
     // Initialize scene, camera, and renderer
     const scene = new THREE.Scene()
@@ -78,11 +91,11 @@ const ThreeCanvas: React.FC<{
     canvasRef.current.appendChild(renderer.domElement)
 
     // Camera setup
-    const cameraDistance = 10
+    const cameraDistance = 30
     camera.position.z = cameraDistance
 
     // Rest of your existing setup code (loader, materials, etc.)
-    const loader = new GLTFLoader()
+    const gltfLoader = new GLTFLoader()
 
     // Texture from Freepik: https://www.freepik.com/free-photo/golden-wall-background_1213228.htm
     const metalTexture = new THREE.TextureLoader().load(
@@ -110,10 +123,9 @@ const ThreeCanvas: React.FC<{
     ticketGroup.scale.set(ticketScale, ticketScale, ticketScale)
     ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
 
-    loader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
+    gltfLoader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
       ticket3DImport.rotation.x = Math.PI * 0.5
-
       ticket3DImport.traverse((child) => {
         if (child) {
           // @ts-ignore
@@ -134,14 +146,13 @@ const ThreeCanvas: React.FC<{
       metalness: 0.2,
       roughness: 0.35,
     })
-    const PADDING_LEFT = -6.4
 
     // Load font and add text geometry
     const fontLoader = new FontLoader()
 
     // Load Inter font
     fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
-      textLines.map((text, index) => {
+      DISPLAY_NAME.map((text, index) => {
         const textGeometry = new TextGeometry(text, {
           font,
           size: 1.0,
@@ -149,28 +160,15 @@ const ThreeCanvas: React.FC<{
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
-        // textMesh.position.set(-5.8, -5 + LINE_HEIGHT * (index + 1), -0.2)
-        textMesh.position.set(PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
+        textMesh.position.set(TICKET_FONT_PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
         textMesh.castShadow = true
         ticketGroup.add(textMesh)
       })
     })
 
+    // Load mono font
     fontLoader.load('/images/launchweek/13/ticket/SourceCodePro_Regular.json', (font) => {
-      const footerContent = [
-        {
-          text: 'LAUNCH WEEK 13',
-          position: { x: PADDING_LEFT, y: -6.8, z: -0.2 },
-          size: 0.59,
-        },
-        {
-          text: '2-6 DEC 2024',
-          position: { x: PADDING_LEFT, y: -7.7, z: -0.2 },
-          size: 0.55,
-        },
-      ]
-
-      footerContent.map((line) => {
+      FOOTER_CONTENT.map((line) => {
         const textGeometry = new TextGeometry(line.text, {
           font,
           size: line.size,
@@ -185,8 +183,6 @@ const ThreeCanvas: React.FC<{
     })
 
     ticketGroup.updateMatrix()
-    camera.position.x = 0
-    camera.position.z = 30
 
     // Environment Map
     const envMapLoader = new THREE.TextureLoader()
@@ -195,7 +191,6 @@ const ThreeCanvas: React.FC<{
       scene.environment = texture
       metalMaterial.envMap = texture
       metalMaterial.envMapIntensity = isDarkTheme ? 3 : 0.5
-      // metalMaterial.blending = THREE.NormalBlending
     })
 
     // Lights
@@ -205,27 +200,16 @@ const ThreeCanvas: React.FC<{
     )
     scene.add(ambientLight)
 
-    const spotLight1 = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
-    spotLight1.position.z = ticketGroup.position.z + 4
-    spotLight1.position.x = ticketGroup.position.x - 10
-    spotLight1.angle = (Math.PI / 2) * 0.5
-    spotLight1.lookAt(ticketGroup.position)
-    spotLight1.castShadow = true
-    spotLight1.shadow.mapSize.set(1024, 1024)
-    spotLight1.shadow.camera.near = 5
-    spotLight1.shadow.camera.far = 15
-    scene.add(spotLight1)
-
-    const spotLight2 = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
-    spotLight2.position.z = ticketGroup.position.z + 4
-    spotLight2.position.x = ticketGroup.position.x + 10
-    spotLight2.angle = (Math.PI / 2) * 0.5
-    spotLight2.castShadow = true
-    spotLight2.shadow.mapSize.set(1024, 1024)
-    spotLight2.shadow.camera.near = 5
-    spotLight2.shadow.camera.far = 15
-    spotLight2.lookAt(ticketGroup.position)
-    scene.add(spotLight2)
+    const spotLight = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
+    spotLight.position.z = ticketGroup.position.z + 4
+    spotLight.position.x = ticketGroup.position.x + 10
+    spotLight.angle = (Math.PI / 2) * 0.5
+    spotLight.castShadow = true
+    spotLight.shadow.mapSize.set(1024, 1024)
+    spotLight.shadow.camera.near = 5
+    spotLight.shadow.camera.far = 15
+    spotLight.lookAt(ticketGroup.position)
+    scene.add(spotLight)
 
     const getTicketScreenPosition = () => {
       if (!ticketRef.current) return null
@@ -240,7 +224,6 @@ const ThreeCanvas: React.FC<{
       return { x, y }
     }
 
-    // Animation function with smooth transitions
     const animate = () => {
       // Smooth interpolation
       ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
@@ -265,7 +248,6 @@ const ThreeCanvas: React.FC<{
       // Calculate center of the canvas
       const centerX = canvasRect.left + canvasRect.width / 2
       const centerY = canvasRect.top + canvasRect.height / 2
-
       const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
 
       // Calculate distance from cursor to center of ticket
@@ -293,7 +275,7 @@ const ThreeCanvas: React.FC<{
 
     // Handle window resize
     const handleResize = () => {
-      const newWidth = isDesktop(window.innerWidth) ? calculateDesktopWidth() : window.innerWidth
+      const newWidth = calculateDesktopWidth()
       ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
       const tickeScale = getTicketScale(window.innerWidth)
       ticketGroup.scale.set(tickeScale, tickeScale, tickeScale)
@@ -338,4 +320,4 @@ const ThreeCanvas: React.FC<{
   )
 }
 
-export default ThreeCanvas
+export default ThreeTicketCanvas

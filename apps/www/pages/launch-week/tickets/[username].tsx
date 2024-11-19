@@ -11,12 +11,12 @@ import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
+import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
 
 interface Props {
   user: UserData
@@ -114,7 +114,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             </div>
           </SectionContainer>
           <CanvasSingleMode />
-          <MetalTicket
+          <ThreeTicketCanvas
             username={DISPLAY_NAME ?? ''}
             className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
             ticketPosition="left"

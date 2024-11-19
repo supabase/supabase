@@ -7,7 +7,7 @@ import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
 import CountdownComponent from '~/components/LaunchWeek/13/Countdown'
 import CanvasPartyMode from '~/components/LaunchWeek/13/Multiplayer/CanvasPartyMode'
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
-import MetalTicket from '~/components/LaunchWeek/13/MetalTicket'
+import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import useLWPartyMode from '~/components/LaunchWeek/13/useLWPartyMode'
@@ -174,7 +174,7 @@ const TicketingFlow = () => {
       </SectionContainer>
       {isPartyMode ? <CanvasPartyMode /> : <CanvasSingleMode />}
       {hasTicket && (
-        <MetalTicket
+        <ThreeTicketCanvas
           username={DISPLAY_NAME ?? ''}
           ticketType={ticketType}
           className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
