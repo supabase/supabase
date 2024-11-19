@@ -26,9 +26,8 @@ import {
   BASE_PATH,
   IS_PLATFORM,
   OPT_IN_TAGS,
-  TELEMETRY_ACTIONS,
-  TELEMETRY_CATEGORIES,
-  TELEMETRY_LABELS,
+  TELEMETRY_EVENTS,
+  TELEMETRY_VALUES,
 } from 'lib/constants'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -109,11 +108,10 @@ export const AIAssistant = ({
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (action: string) => {
+  const sendTelemetryEvent = (label: string) => {
     sendEvent({
-      action,
-      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
-      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+      label,
+      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
     })
   }
 
@@ -182,7 +180,7 @@ export const AIAssistant = ({
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
-    sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
+    sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
   }
 
   const confirmOptInToShareSchemaData = async () => {

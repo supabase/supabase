@@ -86,19 +86,15 @@ export const KB = 1024
 
 // [Joshen] Just adding these to start consolidating our telemetry configs
 // may change depending on how we choose to standardize across all apps
-export enum TELEMETRY_CATEGORIES {
-  AI_ASSISTANT = 'ai-assistant',
+// Events define the name of the event and it'll be used as the primary identification
+export enum TELEMETRY_EVENTS {
+  FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
+  AI_ASSISTANT_V2 = 'AI Assistant V2',
 }
 
-export enum TELEMETRY_LABELS {
-  QUICK_SQL_EDITOR = 'quick-sql-editor',
-}
-
-export const TELEMETRY_ACTIONS = {
-  PROMPT_SUBMITTED: 'prompt-submitted',
-  QUICK_PROMPT_SELECTED: (type: string) => `quick-prompt-selected-${type}`,
-  SCHEMA_CONTEXT_ADDED: 'schema-context-added',
-  TABLE_CONTEXT_ADDED: 'table-context-added',
-  FIX_WITH_ASSISTANT: 'fix-with-assistant',
-  EXPLAIN_CODE: 'explain-code',
+// [Joshen] Values refer to the "action" of the "event"
+// e.g prompt submitted (action) through the AI assistant (event)
+// e.g enabled feature x (action) via the feature preview (event)
+export enum TELEMETRY_VALUES {
+  PROMPT_SUBMITTED = 'prompt-submitted',
 }
