@@ -1,17 +1,29 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
 import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useState } from 'react'
-import { Sheet, SheetContent } from 'ui'
+import {
+  Card,
+  CardContent,
+  Sheet,
+  SheetContent,
+  Table,
+  TableBody,
+  TableCaption,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { EditWrapperSheet } from './EditWrapperSheet'
 import WrapperRow from './WrapperRow'
-import { CreateWrapperSheet } from './CreateWrapperSheet'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { WrapperTable } from './WrapperTable'
 
 export const WrappersTab = () => {
   const { id } = useParams()
@@ -47,7 +59,7 @@ export const WrappersTab = () => {
   const Container = ({
     ...props
   }: { children: React.ReactNode } & React.HTMLProps<HTMLDivElement>) => (
-    <div className=" w-full h-48 mx-10 py-10">
+    <div className="w-full mx-10 py-10 ">
       {props.children}
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
@@ -68,7 +80,7 @@ export const WrappersTab = () => {
   if (createdWrappers.length === 0) {
     return (
       <Container>
-        <div className=" w-full h-48 max-w-3xl">
+        <div className=" w-full h-48 max-w-4xl">
           <div className="border rounded-lg h-full flex items-center justify-center">
             No wrappers are installed.
             <ButtonTooltip
@@ -92,35 +104,8 @@ export const WrappersTab = () => {
   }
 
   return (
-    <Container>
-      <WrapperRow
-        key={integration.id}
-        wrapperMeta={integration.meta}
-        wrappers={createdWrappers}
-        isOpen={true}
-        onOpen={() => {}}
-        onEdit={(w) => {
-          setEditWrapperShown(true)
-          setSelectedWrapper(w)
-        }}
-        onSelectDelete={(w) => setSelectedWrapperForDelete(w)}
-      />
-
-      <Sheet open={!!editWrapperShown} onOpenChange={() => setisClosingEditWrapper(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
-          <EditWrapperSheet
-            wrapper={selectedWrapper!}
-            wrapperMeta={integration.meta}
-            onClose={() => {
-              setEditWrapperShown(false)
-              setisClosingEditWrapper(false)
-            }}
-            isClosing={isClosingEditWrapper}
-            setIsClosing={setisClosingEditWrapper}
-          />
-        </SheetContent>
-      </Sheet>
-
+    <Container className="">
+      <WrapperTable wrappers={wrappers} />
       {selectedWrapperForDelete && (
         <DeleteWrapperModal
           selectedWrapper={selectedWrapperForDelete}

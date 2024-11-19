@@ -20,6 +20,8 @@ import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { MarkdownContent } from './MarkdownContent'
 import { BuiltBySection } from './build-by-section'
+import { WrapperTable } from './WrapperTable'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 
 export const OverviewTab = () => {
   const { id } = useParams()
@@ -40,12 +42,9 @@ export const OverviewTab = () => {
   }
 
   const wrapperMeta = integration.meta
-
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
-
   const hasRequiredVersion =
     (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
-
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version !== wrappersExtension?.default_version
 
@@ -90,7 +89,7 @@ export const OverviewTab = () => {
   return (
     <div className="my-10 flex flex-col gap-10">
       <BuiltBySection />
-      <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
+      {/* <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
         <ButtonTooltip
           type="default"
           onClick={() => setCreateWrapperShown(true)}
@@ -105,8 +104,12 @@ export const OverviewTab = () => {
         >
           Add new wrapper
         </ButtonTooltip>
+      </div> */}
+      <Separator />
+      <div className="mx-10 flex flex-col gap-5">
+        Recent wrappers
+        <WrapperTable />
       </div>
-      <div className="mx-10">Latest wrappers</div>
       <Separator />
       <MarkdownContent />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>

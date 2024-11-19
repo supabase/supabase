@@ -19,7 +19,7 @@ export const MarkdownContent = () => {
   const displayContent = isExpanded ? content : content.slice(0, CHAR_LIMIT)
 
   return (
-    <div className="prose dark:prose-dark px-10">
+    <div className="px-10">
       <div className="relative">
         <motion.div
           initial={false}
@@ -27,7 +27,7 @@ export const MarkdownContent = () => {
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
-          <Markdown content={displayContent} />
+          <Markdown content={displayContent} className="!max-w-3xl" />
         </motion.div>
         {!isExpanded && (
           <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-scale-100 to-transparent" />

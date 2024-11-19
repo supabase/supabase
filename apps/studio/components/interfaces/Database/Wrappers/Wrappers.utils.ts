@@ -1,4 +1,4 @@
-import { FDW } from 'data/fdw/fdws-query'
+import { FDW, FDWTable } from 'data/fdw/fdws-query'
 import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
 import type { WrapperMeta } from './Wrappers.types'
 
@@ -50,10 +50,24 @@ export const makeValidateRequired = (options: { name: string; required: boolean 
   }
 }
 
-export const formatWrapperTables = (wrapper: any, wrapperMeta?: WrapperMeta) => {
+interface FormattedWrapperTable {
+  index: number
+  columns: { name: string }[]
+  is_new_schema: boolean
+  schema: string
+  schema_name: string
+  table_name: string
+  object?: string // From options object for Firebase/Stripe
+  [key: string]: any // For other dynamic options from table.options
+}
+
+export const formatWrapperTables = (
+  wrapper: { handler: string; tables?: FDWTable[] },
+  wrapperMeta?: WrapperMeta
+): FormattedWrapperTable[] => {
   const tables = wrapper?.tables ?? []
 
-  return tables.map((table: any) => {
+  return tables.map((table) => {
     let index: number = 0
     const options = Object.fromEntries(table.options.map((option: string) => option.split('=')))
 
