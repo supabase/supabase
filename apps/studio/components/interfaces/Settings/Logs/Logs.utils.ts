@@ -211,6 +211,17 @@ limit ${limit}
   ${orderBy}
   limit ${limit}
   `
+
+    case 'pg_cron':
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity 
+from postgres_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as parsed
+where parsed.application_name = 'pg_cron'
+${where}
+${orderBy}
+limit ${limit}
+`
   }
 }
 
