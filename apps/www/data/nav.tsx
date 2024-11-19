@@ -3,9 +3,8 @@ import ProductDropdown from '~/components/Nav/ProductDropdown'
 
 import { data as DevelopersData } from 'data/Developers'
 import SolutionsData from 'data/Solutions'
-import { BlogPost } from 'contentlayer/generated'
 
-export const getMenu = (latestBlogPosts: BlogPost[]) => ({
+export const getMenu = () => ({
   primaryNav: [
     {
       title: 'Product',
@@ -17,7 +16,7 @@ export const getMenu = (latestBlogPosts: BlogPost[]) => ({
     {
       title: 'Developers',
       hasDropdown: true,
-      dropdown: <DevelopersDropdown blogPosts={latestBlogPosts} />,
+      dropdown: <DevelopersDropdown />,
       dropdownContainerClassName: 'rounded-xl',
       subMenu: DevelopersData,
     },

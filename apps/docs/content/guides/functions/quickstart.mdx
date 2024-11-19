@@ -186,6 +186,26 @@ verify_jwt = false
 import_map = './import_map.json'
 ```
 
+### Not using TypeScript
+
+When you create a new Edge Function, it will use TypeScript by default. However, it is possible to write and deploy Edge Functions using pure JavaScript.
+
+Save your Function as a JavaScript file (eg: `index.js`) and then update the `supabase/config.toml` as follows:
+
+<Admonition type="info">
+
+`entrypoint` is available only in Supabase CLI version 1.215.0 or higher.
+
+</Admonition>
+
+```toml supabase/config.toml
+[functions.hello-world]
+# other entries
+entrypoint = './functions/hello-world/index.js' # path must be relative to config.toml
+```
+
+You can use any `.ts`, `.js`, `.tsx`, `.jsx` or `.mjs` file as the `entrypoint` for a Function.
+
 ### Error handling
 
 The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:

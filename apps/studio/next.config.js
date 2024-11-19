@@ -41,7 +41,7 @@ const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
 const STRIPE_JS_URL = 'https://js.stripe.com'
 const STRIPE_NETWORK_URL = 'https://*.stripe.network'
 const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://1.1.1.1'
+const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
 const VERCEL_URL = 'https://vercel.com'
 const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
 const GITHUB_API_URL = 'https://api.github.com'
@@ -65,8 +65,8 @@ const csp = [
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
         `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
         `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
@@ -74,12 +74,12 @@ const csp = [
         `worker-src 'self' blob: data:;`,
       ]
     : [
-        `default-src 'self' ${DEFAULT_SRC_URLS};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS};`,
-        `frame-src 'self' ${FRAME_SRC_URLS};`,
+        `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS};`,
+        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS};`,
-        `font-src 'self' ${FONT_SRC_URLS};`,
+        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
+        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
         `worker-src 'self' blob: data:;`,
       ]),
   `object-src 'none';`,
@@ -101,6 +101,16 @@ const nextConfig = {
   output: 'standalone',
   experimental: {
     webpackBuildWorker: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: `/.well-known/vercel/flags`,
+        // TODO: Replace this with supabase.com/.well-known/vercel/flags once this PR is merged.
+        destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
+        basePath: false,
+      },
+    ]
   },
   async redirects() {
     return [
@@ -362,7 +372,12 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/reports/query-performance',
-        destination: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/query-performance',
+        destination: '/project/:ref/advisors/query-performance',
       },
       {
         permanent: true,
@@ -383,6 +398,36 @@ const nextConfig = {
         permanent: true,
         source: '/project/:ref/database/performance-advisor',
         destination: '/project/:ref/advisors/performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/webhooks',
+        destination: '/project/:ref/integrations/webhooks',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/database/wrappers',
+        destination: '/project/:ref/integrations/wrappers',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/.....',
+        destination: '/project/:ref/integrations/cron-jobs',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/api/graphiql',
+        destination: '/project/:ref/integrations/graphiql',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/secrets',
+        destination: '/project/:ref/integrations/vault/secrets',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/vault/keys',
+        destination: '/project/:ref/integrations/vault/keys',
       },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -416,6 +461,15 @@ const nextConfig = {
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
           },
         ],
       },
@@ -501,29 +555,36 @@ const nextConfig = {
 // ensure that your source maps include changes from all other Webpack plugins
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
-    ? withSentryConfig(
-        withBundleAnalyzer(nextConfig),
-        {
-          silent: true,
+    ? withSentryConfig(withBundleAnalyzer(nextConfig), {
+        silent: true,
+
+        // For all available options, see:
+        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+
+        // Upload a larger set of source maps for prettier stack traces (increases build time)
+        widenClientFileUpload: true,
+
+        // Automatically annotate React components to show their full name in breadcrumbs and session replay
+        reactComponentAnnotation: {
+          enabled: true,
         },
-        {
-          // For all available options, see:
-          // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-          // Upload a larger set of source maps for prettier stack traces (increases build time)
-          widenClientFileUpload: true,
+        // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+        // This can increase your server load as well as your hosting bill.
+        // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+        // side errors will fail.
+        tunnelRoute: '/monitoring',
 
-          // Transpiles SDK to be compatible with IE11 (increases bundle size)
-          transpileClientSDK: false,
+        // Hides source maps from generated client bundles
+        hideSourceMaps: true,
 
-          // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-          tunnelRoute: '/monitoring',
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        disableLogger: true,
 
-          // Hides source maps from generated client bundles
-          hideSourceMaps: true,
-
-          // Automatically tree-shake Sentry logger statements to reduce bundle size
-          disableLogger: true,
-        }
-      )
+        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+        // See the following for more information:
+        // https://docs.sentry.io/product/crons/
+        // https://vercel.com/docs/cron-jobs
+        automaticVercelMonitors: true,
+      })
     : nextConfig

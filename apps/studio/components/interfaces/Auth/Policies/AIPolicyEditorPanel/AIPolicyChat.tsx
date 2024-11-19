@@ -1,13 +1,11 @@
-import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
 import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 
-import { useTelemetryProps } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
@@ -44,13 +42,11 @@ export const AIPolicyChat = ({
   onDiff,
   clearHistory,
 }: AIPolicyChatProps) => {
-  const router = useRouter()
+  const { profile } = useProfile()
   const project = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { profile } = useProfile()
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const telemetryProps = useTelemetryProps()
 
+  const bottomRef = useRef<HTMLDivElement>(null)
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
   const [value, setValue] = useState<string>('')
   const [hasSuggested, setHasSuggested] = useState(false)
@@ -61,6 +57,8 @@ export const AIPolicyChat = ({
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
   const pendingReply = loading && last(messages)?.role === 'user'
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     if (!loading) {
@@ -203,15 +201,11 @@ export const AIPolicyChat = ({
           onSubmit={(event) => {
             event.preventDefault()
             onSubmit(value)
-            Telemetry.sendEvent(
-              {
-                category: 'rls_editor',
-                action: 'ai_suggestion_asked',
-                label: 'rls-ai-assistant',
-              },
-              telemetryProps,
-              router
-            )
+            sendEvent({
+              category: 'rls_editor',
+              action: 'ai_suggestion_asked',
+              label: 'rls-ai-assistant',
+            })
           }}
         />
       </div>

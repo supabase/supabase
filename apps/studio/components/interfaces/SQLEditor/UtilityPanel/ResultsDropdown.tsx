@@ -1,15 +1,13 @@
 import { compact, isObject, isString, map } from 'lodash'
+import { ChevronDownIcon, Clipboard, Download } from 'lucide-react'
 import { markdownTable } from 'markdown-table'
-import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
 import { toast } from 'sonner'
 
-import { useTelemetryProps } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { copyToClipboard } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
-import { ChevronDownIcon, Clipboard, Download } from 'lucide-react'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -25,12 +23,12 @@ export type ResultsDropdownProps = {
 
 const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
-  const telemetryProps = useTelemetryProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const result = snapV2.results?.[id]?.[0] ?? undefined
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
-  const router = useRouter()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const csvData = useMemo(() => {
     if (result?.rows) {
@@ -68,11 +66,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
   function onDownloadCSV() {
     csvRef.current?.link.click()
-    Telemetry.sendEvent(
-      { category: 'sql_editor', action: 'sql_download_csv', label: '' },
-      telemetryProps,
-      router
-    )
+    sendEvent({ category: 'sql_editor', action: 'sql_download_csv', label: '' })
   }
 
   function onCopyAsMarkdown() {
@@ -92,11 +86,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(markdownData, () => {
         toast.success('Copied results to clipboard')
-        Telemetry.sendEvent(
-          { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
-          telemetryProps,
-          router
-        )
+        sendEvent({ category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' })
       })
     }
   }
@@ -109,11 +99,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
 
       copyToClipboard(JSON.stringify(result.rows, null, 2), () => {
         toast.success('Copied results to clipboard')
-        Telemetry.sendEvent(
-          { category: 'sql_editor', action: 'sql_copy_as_json', label: '' },
-          telemetryProps,
-          router
-        )
+        sendEvent({ category: 'sql_editor', action: 'sql_copy_as_json', label: '' })
       })
     }
   }

@@ -103,9 +103,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
         </p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" className="px-1">
-              <MoreVertical />
-            </Button>
+            <Button type="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom">
             <Tooltip.Root delayDuration={0}>

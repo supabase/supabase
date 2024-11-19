@@ -30,6 +30,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { ResizingState } from './ResizingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -239,6 +240,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
+  const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
@@ -261,6 +263,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isRestarting && !isBackupsPage) {
     return <RestartingState />
+  }
+
+  if (isResizing && !isBackupsPage) {
+    return <ResizingState />
   }
 
   if (isProjectUpgrading && !isBackupsPage) {

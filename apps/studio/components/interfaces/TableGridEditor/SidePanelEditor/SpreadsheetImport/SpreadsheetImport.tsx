@@ -1,5 +1,6 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,7 +19,6 @@ import {
   parseSpreadsheetText,
 } from './SpreadsheetImport.utils'
 import SpreadsheetImportPreview from './SpreadsheetImportPreview'
-import { ExternalLink } from 'lucide-react'
 
 const MAX_CSV_SIZE = 1024 * 1024 * 100 // 100 MB
 

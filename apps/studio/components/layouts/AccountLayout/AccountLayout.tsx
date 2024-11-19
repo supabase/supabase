@@ -4,6 +4,7 @@ import { PropsWithChildren, useEffect } from 'react'
 
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -27,9 +28,11 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
   const selectedOrganization = useSelectedOrganization()
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const { mutateAsync: sendReset } = useSendResetMutation()
 
   const signOut = useSignOut()
   const onClickLogout = async () => {
+    await sendReset()
     await signOut()
     await router.push('/sign-in')
   }

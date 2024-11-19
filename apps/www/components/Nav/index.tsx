@@ -1,9 +1,10 @@
-import React, { useState } from 'react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
+import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
@@ -13,16 +14,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+
 import ScrollProgress from '~/components/ScrollProgress'
+import { getMenu } from '~/data/nav'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
-import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
+import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { allBlogPosts } from 'contentlayer/generated'
-import { getMenu } from '~/data/nav'
-import { sortDates } from '~/lib/helpers'
 
 interface Props {
   hideNavbar: boolean
@@ -35,8 +34,7 @@ const Nav = (props: Props) => {
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const latestBlogPosts = allBlogPosts.sort(sortDates).slice(0, 2)
-  const menu = getMenu(latestBlogPosts)
+  const menu = getMenu()
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')

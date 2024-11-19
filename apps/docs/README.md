@@ -31,7 +31,7 @@ We use documentation specifications which can be used to generate human-readable
 - CLISpec (custom to Supabase): for CLI commands and usage.
 
 The benefit of using custom specifications is that we can generate many other types from a strict schema (eg, HTML and manpages).
-It also means that we can switch to any documentation system we want. On this site we use Next.JS, but on Supabase's official website, we use a custom React site and expose only a subset of the available API for each tool.
+It also means that we can switch to any documentation system we want. On this site we use Next.js, but on Supabase's official website, we use a custom React site and expose only a subset of the available API for each tool.
 
 ## Contributing
 

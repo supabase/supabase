@@ -1,18 +1,18 @@
-import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
-import { ExternalLink, Loader2, Megaphone, MegaphoneIcon } from 'lucide-react'
+import { ExternalLink, Loader2, Megaphone } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 
+import { useParams } from 'common'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { Button, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 import MessageSelection from './MessageSelection'
 import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
+import { DocsButton } from 'components/ui/DocsButton'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -84,15 +84,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Not sure what to do?</p>
                 <p className="text-foreground-lighter text-xs">Browse our documentation</p>
               </div>
-              <Button type="default" iconRight={<ExternalLink />}>
-                <a
-                  href="https://supabase.com/docs/guides/realtime"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Documentation
-                </a>
-              </Button>
+              <DocsButton href="https://supabase.com/docs/guides/realtime" />
             </div>
           </div>
         </>
@@ -116,8 +108,8 @@ const MessagesTable = ({
 }: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
-  const telemetryProps = useTelemetryProps()
-  const router = useRouter()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   useEffect(() => {
     if (!data) return
@@ -185,15 +177,11 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        Telemetry.sendEvent(
-                          {
-                            category: 'realtime_inspector',
-                            action: 'focused-specific-message',
-                            label: 'realtime_inspector_results',
-                          },
-                          telemetryProps,
-                          router
-                        )
+                        sendEvent({
+                          category: 'realtime_inspector',
+                          action: 'focused-specific-message',
+                          label: 'realtime_inspector_results',
+                        })
                         setFocusedLog(row)
                       }}
                     />

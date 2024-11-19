@@ -45,6 +45,7 @@ const GitHubSection = () => {
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
+  const isBranch = project?.parent_project_ref !== undefined
 
   const canReadGitHubConnection = useCheckPermissions(
     PermissionAction.READ,
@@ -66,8 +67,6 @@ const GitHubSection = () => {
       toast.success('Successfully deleted Github connection')
     },
   })
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const connections =
     allConnections?.filter((connection) =>
@@ -138,7 +137,7 @@ const GitHubSection = () => {
 
                       <div className="border-b border-l border-r rounded-b-lg">
                         <GitHubIntegrationConnectionForm
-                          disabled={!canUpdateGitHubConnection}
+                          disabled={isBranch || !canUpdateGitHubConnection}
                           connection={{
                             id: String(connection.id),
                             added_by: {
@@ -170,7 +169,7 @@ const GitHubSection = () => {
                   onClick={onAddGitHubConnection}
                   orgSlug={org?.slug}
                   showNode={false}
-                  disabled={!canCreateGitHubConnection}
+                  disabled={isBranch || !canCreateGitHubConnection}
                 >
                   Add new project connection
                 </EmptyIntegrationConnection>
