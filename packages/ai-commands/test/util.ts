@@ -32,7 +32,7 @@ export async function collectStream<R extends BufferSource>(stream: ReadableStre
     content += text.slice(1, text.length - 2)
   }
 
-  return content
+  return content.replaceAll('\\n', '\n').replaceAll('\\"', '"')
 }
 
 /**
