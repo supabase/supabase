@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
-import { Clock5, Layers } from 'lucide-react'
+import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export type IntegrationDefinition = {
@@ -51,6 +51,15 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     name: `Cron`,
     icon: <Clock5 className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'cron-based scheduler in Postgres',
+    docsUrl: '',
+  },
+  {
+    id: 'supabase-vault',
+    type: 'postgres_extension' as const,
+    requiredExtensions: ['supabase_vault'],
+    name: `Vault`,
+    icon: <Vault className="absolute inset-0 p-2 text-background w-full h-full" />,
+    description: 'Application level encryption for your project',
     docsUrl: '',
   },
 ] as const
