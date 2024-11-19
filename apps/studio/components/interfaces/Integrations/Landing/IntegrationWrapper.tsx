@@ -18,7 +18,7 @@ export const IntegrationWrapper = ({
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   return (
-    <div className="py-8 h-full">
+    <div className="pt-8 h-full flex flex-col">
       <Link
         href={`/project/${project?.ref}/integrations/landing`}
         className="flex flex-row items-center gap-1 pl-10 text-foreground-light"

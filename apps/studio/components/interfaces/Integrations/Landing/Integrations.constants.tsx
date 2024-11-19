@@ -2,6 +2,7 @@ import Image from 'next/image'
 
 import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { BASE_PATH } from 'lib/constants'
 import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
 import { ReactNode } from 'react'
 
@@ -60,6 +61,15 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     name: `Vault`,
     icon: <Vault className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'Application level encryption for your project',
+    docsUrl: '',
+  },
+  {
+    id: 'supabase-graphiql',
+    type: 'postgres_extension' as const,
+    requiredExtensions: ['pg_graphql'],
+    name: `GraphiQL`,
+    icon: <Image fill src={`${BASE_PATH}/img/graphql.svg`} alt="GraphiQL" className="p-2" />,
+    description: 'In-browser IDE for GraphQL',
     docsUrl: '',
   },
 ] as const
