@@ -12,8 +12,6 @@ export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>
     const { id } = useParams()
     const integration = INTEGRATIONS.find((i) => i.id === id)
 
-    console.log(integration)
-
     const { name, docsUrl, websiteUrl } = integration?.meta?.author ?? {}
 
     if (!name && !docsUrl && !websiteUrl) return null

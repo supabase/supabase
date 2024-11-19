@@ -28,7 +28,9 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     connectionString: project?.connectionString,
   })
 
-  const wrappers = data?.result || []
+  const wrappers = data?.result.filter((x) => x.handler === integration?.meta.handlerName) || []
+
+  console.log(wrappers)
 
   return (
     <Card className="max-w-5xl">

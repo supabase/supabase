@@ -3,7 +3,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
-const CHAR_LIMIT = 750 // Adjust this number as needed
+const CHAR_LIMIT = 500 // Adjust this number as needed
 
 export const MarkdownContent = () => {
   const { id } = useParams()
@@ -23,14 +23,14 @@ export const MarkdownContent = () => {
       <div className="relative">
         <motion.div
           initial={false}
-          animate={{ height: isExpanded ? 'auto' : 256 }}
+          animate={{ height: isExpanded ? 'auto' : 96 }}
           className="overflow-hidden"
           transition={{ duration: 0.4 }}
         >
           <Markdown content={displayContent} className="!max-w-3xl" />
         </motion.div>
         {!isExpanded && (
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-scale-100 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-200 to-transparent" />
         )}
         {content.length > CHAR_LIMIT && (
           <div className="-bottom-10 absolute z-10">
