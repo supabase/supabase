@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
-import { Layers } from 'lucide-react'
+import { Clock5, Layers } from 'lucide-react'
 import { ReactNode } from 'react'
 
 export type IntegrationDefinition = {
@@ -41,7 +41,16 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     requiredExtensions: ['pgmq'],
     name: `Queues`,
     icon: <Layers className="absolute inset-0 p-2 text-background w-full h-full" />,
-    description: 'No description',
+    description: 'Lightweight message queue in Postgres',
+    docsUrl: '',
+  },
+  {
+    id: 'supabase-cron',
+    type: 'postgres_extension' as const,
+    requiredExtensions: ['pg_cron'],
+    name: `Cron`,
+    icon: <Clock5 className="absolute inset-0 p-2 text-background w-full h-full" />,
+    description: 'cron-based scheduler in Postgres',
     docsUrl: '',
   },
 ] as const
