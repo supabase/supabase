@@ -4904,6 +4904,10 @@ export interface components {
         | 'unsupported_reg_types'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
+        | 'ssl_not_enforced'
+        | 'network_restrictions_not_set'
+        | 'password_requirements_min_length'
+        | 'pitr_not_enabled'
       remediation: Record<string, never>
       title: string
     }
