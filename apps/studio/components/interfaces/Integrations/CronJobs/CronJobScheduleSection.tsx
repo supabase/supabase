@@ -138,7 +138,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"
-                      placeholder="* * * * * *"
+                      placeholder="* * * * *"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter') {
                           e.preventDefault()
@@ -203,11 +203,11 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                       isGeneratingCron ? 'animate-pulse text-foreground-lighter' : 'text-foreground'
                     )}
                   >
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
+                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * *'}
                   </span>
                 ) : (
                   <span className="text-xl font-mono text-foreground-lighter">
-                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * * *'}
+                    {isGeneratingCron ? <CronSyntaxLoader /> : presetValue || '* * * * *'}
                   </span>
                 )}
                 {!inputValue && !isGeneratingCron && !scheduleString ? (
@@ -245,7 +245,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 const CronSyntaxLoader = () => {
   return (
     <div className="flex gap-2">
-      {['*', '*', '*', '*', '*', '*'].map((char, i) => (
+      {['*', '*', '*', '*', '*'].map((char, i) => (
         <motion.span
           key={i}
           initial={{ opacity: 0.3 }}
