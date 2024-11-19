@@ -391,9 +391,6 @@ services:
       - ./volumes/db/pooler.sql:/docker-entrypoint-initdb.d/migrations/99-pooler.sql:Z
       # Use named volume to persist pgsodium decryption key between restarts
       - db-config:/etc/postgresql-custom
-    ports:
-      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
-
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
