@@ -10,8 +10,6 @@ export const AvailableIntegrations = () => {
     connectionString: project?.connectionString,
   })
 
-  const wrappers = data?.result || []
-
   return (
     <div className="p-9 flex flex-col gap-y-5">
       <h2>Available integrations</h2>

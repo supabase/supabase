@@ -1,5 +1,6 @@
 import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { IntegrationCard } from './IntegrationCard'
 import { INTEGRATIONS } from './Integrations.constants'
@@ -7,6 +8,10 @@ import { INTEGRATIONS } from './Integrations.constants'
 export const InstalledIntegrations = () => {
   const { project } = useProjectContext()
   const { data, isLoading } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -20,6 +25,12 @@ export const InstalledIntegrations = () => {
   const installedIntegrations = INTEGRATIONS.filter((i) => {
     if (i.type === 'wrapper') {
       return wrappers.find((w) => wrapperMetaComparator(i.meta, w))
+    }
+    if (i.type === 'postgres_extension') {
+      return i.requiredExtensions.every((extName) => {
+        const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
+        return !!foundExtension?.installed_version
+      })
     }
     return false
   })
@@ -39,7 +50,7 @@ export const InstalledIntegrations = () => {
       <h2>Available integrations</h2>
       <div className="flex flex-row flex-wrap gap-x-4 gap-y-3">
         {installedIntegrations.map((i) => (
-          <IntegrationCard {...i} />
+          <IntegrationCard key={i.id} {...i} />
         ))}
       </div>
     </div>

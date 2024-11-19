@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -21,11 +20,11 @@ export const IntegrationCard = ({ id, name, icon, description }: IntegrationCard
       >
         <div className="w-10 h-10 relative">
           <div className="w-full h-full bg-foreground rounded-md" />
-          <Image fill src={icon} alt={`${name}`} className="p-2" />
+          {icon}
         </div>
         <div className="grow basis-0 w-full">
           <div className="flex-col justify-start items-start gap-1 flex">
-            <div className="text-white text-sm">{name}</div>
+            <div className="text-foreground text-sm">{name}</div>
             <div className="text-foreground-light text-xs">{description}</div>
           </div>
         </div>

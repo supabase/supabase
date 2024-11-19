@@ -5,13 +5,12 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ChevronLeft } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 import { NavMenu, NavMenuItem } from 'ui'
 
-const LandingPage: NextPageWithLayout = () => {
+const WrapperPage: NextPageWithLayout = () => {
   const { id } = useParams()
   const { project } = useProjectContext()
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
@@ -35,7 +34,7 @@ const LandingPage: NextPageWithLayout = () => {
       <div className="pl-10 pt-5 flex flex-row gap-4">
         <div className="w-12 h-12 relative">
           <div className="w-full h-full bg-foreground rounded-md" />
-          <Image fill src={integration.icon} alt={`${integration.name}`} className="p-2" />
+          {integration.icon}
         </div>
         <div className="grow basis-0 w-full">
           <div className="flex-col justify-start items-start flex">
@@ -65,7 +64,7 @@ const LandingPage: NextPageWithLayout = () => {
   )
 }
 
-LandingPage.getLayout = (page) => {
+WrapperPage.getLayout = (page) => {
   return (
     <ProjectLayout title={'Integrations'} product="Integrations" isBlocking={false}>
       {page}
@@ -73,4 +72,4 @@ LandingPage.getLayout = (page) => {
   )
 }
 
-export default LandingPage
+export default WrapperPage
