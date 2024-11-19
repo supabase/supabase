@@ -26,17 +26,19 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
 import CronSyntaxChart from './CronSyntaxChart'
+import { secondsPattern } from './CronJobs.utils'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
 }
 
-const presets = [
+const PRESETS = [
   { name: 'Every minute', expression: '* * * * *' },
   { name: 'Every 5 minutes', expression: '*/5 * * * *' },
   { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
   { name: 'Every night at midnight', expression: '0 0 * * *' },
-  { name: 'Every Monday at 2am', expression: '0 2 * * 1' },
+  { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
+  { name: 'Every 30 seconds', expression: '30 seconds' },
 ] as const
 
 export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
@@ -163,7 +165,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
 
                   <div className="mt-2">
                     <ul className="flex gap-2 flex-wrap mt-2">
-                      {presets.map((preset) => (
+                      {PRESETS.map((preset) => (
                         <li key={preset.name}>
                           <Button
                             type="outline"
@@ -225,10 +227,12 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                     ) : (
                       <>
                         The cron will be run{' '}
-                        {scheduleString
-                          .split(' ')
-                          .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                          .join(' ') + '.'}
+                        {secondsPattern.test(schedule)
+                          ? 'every ' + schedule
+                          : scheduleString
+                              .split(' ')
+                              .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
+                              .join(' ') + '.'}
                       </>
                     )}
                   </span>
