@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { cn } from 'ui'
 import * as THREE from 'three'
@@ -26,6 +26,11 @@ const ThreeTicketCanvas: React.FC<{
   const ticketRef = useRef<THREE.Mesh | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const isFlipped = useRef(false) // Tracks the flipped state
+  const dragStartX = useRef<number | null>(null)
+  const dragDelta = useRef(0)
+  const isDragging = useRef(false)
+  const flipDelta = 100 // Threshold for flipping
   const DISPLAY_NAME = username?.split(' ').reverse() || []
   const positionRight = ticketPosition === 'right'
   const isPlatinum = ticketType === 'platinum'
@@ -54,15 +59,17 @@ const ThreeTicketCanvas: React.FC<{
   const getTicketXPosition = (width: number, isRight: boolean) =>
     isDesktop(width) ? (isRight ? 5 : -5) : 0
 
+  const TEXT_Z_POSITION = 0
+
   const FOOTER_CONTENT = [
     {
       text: 'LAUNCH WEEK 13',
-      position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: -0.2 },
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: TEXT_Z_POSITION },
       size: 0.59,
     },
     {
       text: '2-6 DEC / 7AM PT',
-      position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: -0.2 },
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: TEXT_Z_POSITION },
       size: 0.55,
     },
   ]
@@ -74,7 +81,7 @@ const ThreeTicketCanvas: React.FC<{
     const initialCanvasWidth = calculateDesktopWidth()
     const initialCanvasHeight =
       window.innerHeight < MIN_CANVAS_HEIGHT ? MIN_CANVAS_HEIGHT - 65 : window.innerHeight - 65
-    const ticketYIdleRotation = isDesktop(calculateDesktopWidth()) ? 0 : 0
+    const ticketYIdleRotation = 0
 
     // Initialize scene, camera, and renderer
     const scene = new THREE.Scene()
@@ -156,11 +163,15 @@ const ThreeTicketCanvas: React.FC<{
         const textGeometry = new TextGeometry(text, {
           font,
           size: 1.0,
-          height: 0.4,
+          height: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
-        textMesh.position.set(TICKET_FONT_PADDING_LEFT, -5 + LINE_HEIGHT * (index + 1), -0.2)
+        textMesh.position.set(
+          TICKET_FONT_PADDING_LEFT,
+          -5 + LINE_HEIGHT * (index + 1),
+          TEXT_Z_POSITION
+        )
         textMesh.castShadow = true
         ticketGroup.add(textMesh)
       })
@@ -172,7 +183,7 @@ const ThreeTicketCanvas: React.FC<{
         const textGeometry = new TextGeometry(line.text, {
           font,
           size: line.size,
-          height: 0.4,
+          height: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
@@ -226,12 +237,10 @@ const ThreeTicketCanvas: React.FC<{
     }
 
     const animate = () => {
-      // Smooth interpolation
+      // Smooth rotation
       ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
       ticketGroup.rotation.y +=
         ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
-      ticketGroup.rotation.z = 0
-
       renderer.render(scene, camera)
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -239,39 +248,70 @@ const ThreeTicketCanvas: React.FC<{
     // Start animation
     animate()
 
-    // Mouse movement handler with distance-based sensitivity
+    // Mouse tilt and drag logic
     const handleMouseMove = (e: MouseEvent) => {
       if (!canvasRef.current) return
+      if (isDragging.current) {
+        // Update drag delta
+        if (dragStartX.current !== null) {
+          dragDelta.current = e.clientX - dragStartX.current
+          ticketGroup.rotation.y = targetRotation.current.y + dragDelta.current * 0.01
+        }
+      } else {
+        // Get canvas bounds
+        const canvasRect = canvasRef.current.getBoundingClientRect()
 
-      // Get canvas bounds
-      const canvasRect = canvasRef.current.getBoundingClientRect()
+        // Calculate center of the canvas
+        const centerX = canvasRect.left + canvasRect.width / 2
+        const centerY = canvasRect.top + canvasRect.height / 2
+        const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
 
-      // Calculate center of the canvas
-      const centerX = canvasRect.left + canvasRect.width / 2
-      const centerY = canvasRect.top + canvasRect.height / 2
-      const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
+        // Calculate distance from cursor to center of ticket
+        const deltaX = e.clientX - (canvasRect.left + ticketPosition.x)
+        const deltaY = e.clientY - (canvasRect.top + ticketPosition.y)
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
-      // Calculate distance from cursor to center of ticket
-      const deltaX = e.clientX - (canvasRect.left + ticketPosition.x)
-      const deltaY = e.clientY - (canvasRect.top + ticketPosition.y)
-      const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
+        // Maximum distance for sensitivity calculation (diagonal of the canvas)
+        const maxDistance = Math.sqrt(
+          Math.pow(canvasRect.width / 2, 2) + Math.pow(canvasRect.height / 2, 2)
+        )
 
-      // Maximum distance for sensitivity calculation (diagonal of the canvas)
-      const maxDistance = Math.sqrt(
-        Math.pow(canvasRect.width / 2, 2) + Math.pow(canvasRect.height / 2, 2)
-      )
+        // Calculate sensitivity based on distance (inverse relationship)
+        const sensitivity = 0.002 * (1 - Math.min(distance / maxDistance, 1))
 
-      // Calculate sensitivity based on distance (inverse relationship)
-      const sensitivity = 0.002 * (1 - Math.min(distance / maxDistance, 1))
+        // Update target rotation with distance-based sensitivity
+        targetRotation.current.y = deltaX * sensitivity + (isFlipped.current ? Math.PI : 0)
+        targetRotation.current.x = deltaY * sensitivity * 0.3
+      }
+    }
 
-      // Update target rotation with distance-based sensitivity
-      targetRotation.current.y = deltaX * sensitivity
-      targetRotation.current.x = deltaY * sensitivity * 0.3
+    const handleMouseDown = (e: MouseEvent) => {
+      isDragging.current = true
+      dragStartX.current = e.clientX
+    }
+
+    const handleMouseUp = () => {
+      if (!isDragging.current) return
+      isDragging.current = false
+
+      if (Math.abs(dragDelta.current) > flipDelta) {
+        // Flip the ticket
+        isFlipped.current = !isFlipped.current
+        // targetRotation.current.y += isFlipped.current ? Math.PI : -Math.PI
+      } else {
+        // Reset rotation
+        ticketGroup.rotation.y = targetRotation.current.y
+      }
+
+      // Reset drag state
+      dragStartX.current = null
+      dragDelta.current = 0
     }
 
     // Reset handler with smooth transition
     const resetRotation = () => {
       targetRotation.current = { x: 0, y: 0 }
+      isFlipped.current = false
     }
 
     // Handle window resize
@@ -292,12 +332,16 @@ const ThreeTicketCanvas: React.FC<{
 
     // Event listeners
     window.addEventListener('resize', handleResize)
+    window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseout', resetRotation)
 
     // Cleanup
     return () => {
       window.removeEventListener('resize', handleResize)
+      window.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseout', resetRotation)
 
@@ -316,6 +360,7 @@ const ThreeTicketCanvas: React.FC<{
         className
       )}
     >
+      <div className="absolute right-4 top-4">flipped: {isFlipped.current ? 'true' : 'false'}</div>
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
     </div>
   )
