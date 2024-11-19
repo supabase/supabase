@@ -46,10 +46,10 @@ export const Header = forwardRef<
   const headerRef = useRef<HTMLDivElement>(null)
 
   // Input range: The scrollY range for triggering the animation (e.g., 0 to 200px of scroll)
-  const scrollRange = [48, headerRef.current?.offsetHeight ?? 128]
+  const scrollRange = [40, headerRef.current?.offsetHeight ?? 128]
 
   // Output range: The padding range for the nav (from compact to expanded)
-  const paddingRange = [40, 84]
+  const paddingRange = [40, 86]
   const navInnerLeftPaddingX = scroll
     ? useTransform(scroll?.scrollY!, scrollRange, paddingRange)
     : 0
@@ -63,32 +63,43 @@ export const Header = forwardRef<
     React.ComponentProps<typeof NavMenu> & MotionProps
   >
 
+  // Output range: The size range for the icon container
+  const sizeRange = [32, 24] // From 24px (scrolled) to 32px (top)
+  const iconSize = scroll ? useTransform(scroll?.scrollY!, scrollRange, sizeRange) : 32
+
+  // Output range: The padding range for the image
+  const iconPaddingRange = [1.5, 2] // From 1.5px (scrolled) to 4px (top)
+  const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
+
   // const isSticky = scroll?.scrollY?.get() > 128
+
+  console.log(iconPadding.get())
 
   return (
     <>
-      <motion.div
-        ref={ref}
-        layout
-        transition={layoutTransition}
-        className={cn(isIntegrationsHome && 'border-b', ' relative')}
-      >
-        {/* Main header content */}
-        <div className="py-6">
-          <div className="relative">
-            {/* Container with animated padding */}
-            <motion.div
-              layout
-              transition={layoutTransition}
-              className="px-10 flex flex-col gap-5"
-              //   animate={{
-              //     paddingTop: isIntegrationsHome ? '20px' : '0px',
-              //   }}
-            >
-              {/* Navigation link back to integrations landing */}
-              <div className="flex items-center gap-2">
-                {/* Back arrow */}
-                <AnimatePresence>
+      <AnimatePresence>
+        <motion.div
+          ref={ref}
+          layout
+          transition={layoutTransition}
+          className={cn(isIntegrationsHome && 'border-b', ' relative')}
+        >
+          {/* Main header content */}
+          <div className="py-6">
+            <div className="relative">
+              {/* Container with animated padding */}
+              <motion.div
+                layout
+                transition={layoutTransition}
+                className="px-10 flex flex-col gap-5"
+                //   animate={{
+                //     paddingTop: isIntegrationsHome ? '20px' : '0px',
+                //   }}
+              >
+                {/* Navigation link back to integrations landing */}
+                <div className="flex items-center gap-2">
+                  {/* Back arrow */}
+
                   {!isIntegrationsHome && (
                     <motion.div
                       initial={{ opacity: 0, x: -10, width: 0 }}
@@ -104,69 +115,77 @@ export const Header = forwardRef<
                       </Link>
                     </motion.div>
                   )}
-                </AnimatePresence>
 
-                {/* Two separate spans with the same key */}
-                {isIntegrationsHome ? (
-                  <motion.span
-                    layout
-                    key="integrations-text"
-                    transition={layoutTransition}
-                    className="text-white text-xl"
-                  >
-                    Integrations
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    layout
-                    key="integrations-text"
-                    transition={layoutTransition}
-                    className="text-xs text-foreground-light hover:text-foreground"
-                  >
-                    <Link href={`/project/${project?.ref}/integrations/landing`}>Integrations</Link>
-                  </motion.span>
-                )}
-              </div>
+                  {/* Two separate spans with the same key */}
+                  {isIntegrationsHome ? (
+                    <motion.span
+                      layout
+                      key="integrations-text"
+                      transition={layoutTransition}
+                      className="text-white text-xl"
+                    >
+                      Integrations
+                    </motion.span>
+                  ) : (
+                    <motion.span
+                      layout
+                      key="integrations-text"
+                      transition={layoutTransition}
+                      className="text-xs text-foreground-light hover:text-foreground"
+                    >
+                      <Link href={`/project/${project?.ref}/integrations/landing`}>
+                        Integrations
+                      </Link>
+                    </motion.span>
+                  )}
+                </div>
 
-              {/* Integration details section - only shown when viewing a specific integration */}
-              <AnimatePresence>
+                {/* Integration details section - only shown when viewing a specific integration */}
+
                 {!isIntegrationsHome && integration && (
                   <motion.div
                     layout
-                    transition={layoutTransition}
-                    initial={{ opacity: 0, x: -20, height: 0 }}
-                    animate={{ opacity: 1, x: 0, height: 'auto' }}
-                    exit={{ opacity: 0, y: -20, height: 0 }}
-                    className="flex flex-row gap-4 items-center"
+                    transition={{
+                      duration: 0.2,
+                      delay: 0.2,
+                    }}
+                    className="flex items-center gap-4"
                   >
                     {/* Integration icon */}
-                    <AnimatePresence>
-                      {!isSticky && (
-                        <motion.div
-                          layoutId="integration-icon"
-                          className={cn('w-6 h-6 relative z-[3]')}
-                          style={{
-                            y: iconY, // Controlled by scrollY (0 to 128px)
-                          }}
-                          transition={{ duration: 0 }}
-                        >
-                          <div className="w-full h-full bg-foreground rounded-md" />
-                          <Image
-                            fill
-                            src={integration.icon}
-                            alt={`${integration.name}`}
-                            className="p-1"
-                          />
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+
+                    {/* {!isSticky && ( */}
+                    <motion.div
+                      initial={{ opacity: 1, y: 0 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2 }}
+                      layoutId="integration-icon"
+                      className={'relative bg-white rounded z-[3] flex items-center justify-center'}
+                      style={{
+                        y: iconY, // Controlled by scrollY (0 to 128px)
+
+                        width: iconSize,
+                        height: iconSize,
+                      }}
+                    >
+                      <Image
+                        fill
+                        src={integration.icon}
+                        alt={`${integration.name}`}
+                        style={{
+                          padding: iconPadding.get(),
+                        }}
+                      />
+                    </motion.div>
+                    {/* )} */}
+
                     {/* Integration name and description */}
                     <motion.div
-                      initial={{ opacity: 1 }}
-                      //   animate={{ opacity: 1, x: 0 }}
-                      //   exit={{ opacity: 0, y: -10 }}
-                      transition={{ delay: 0.3, duration: 0.05 }}
-                      className="grow basis-0 w-full"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto', minHeight: 32 }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className=""
                     >
                       <div className="flex-col justify-start items-start flex">
                         <div className="text-white text-sm">{integration.name}</div>
@@ -177,31 +196,34 @@ export const Header = forwardRef<
                     </motion.div>
                   </motion.div>
                 )}
-              </AnimatePresence>
-            </motion.div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </motion.div>
-
+        </motion.div>
+      </AnimatePresence>
       {/* Sticky nav using Framer Motion */}
-      {!isIntegrationsHome && (
-        // <motion.div
-        //   layout
-        //   transition={layoutTransition}
-        //   initial={{ opacity: 0, height: 0 }}
-        //   animate={{ opacity: 1, height: 'auto' }}
-        //   exit={{ opacity: 0, height: 0 }}
-        //   className="sticky top-0 z-50 bg-background border-b"
-        // >
-        <div className="sticky top-[0px] z-[1] bg-dash-sidebar" ref={navRef}>
-          <MotionNavMenu
-            className="px-10 [&_ul]:items-center"
-            aria-label="Integration menu"
-            style={{
-              paddingLeft: !isSticky ? navInnerLeftPaddingX : 40,
-            }}
-          >
-            <AnimatePresence>
+      <AnimatePresence>
+        {!isIntegrationsHome && (
+          // <motion.div
+          //   layout
+          //   transition={layoutTransition}
+          //   initial={{ opacity: 0, height: 0 }}
+          //   animate={{ opacity: 1, height: 'auto' }}
+          //   exit={{ opacity: 0, height: 0 }}
+          //   className="sticky top-0 z-50 bg-background border-b"
+          // >
+          <div className="sticky top-[0px] z-[1] bg-dash-sidebar" ref={navRef}>
+            <MotionNavMenu
+              //   initial={{ opacity: 1, height: 0 }}
+              //   animate={{ opacity: 1, height: 'auto' }}
+              //   exit={{ opacity: 1, height: 0 }}
+              transition={{ duration: 0.2 }}
+              className="px-10 [&_ul]:items-center"
+              aria-label="Integration menu"
+              style={{
+                paddingLeft: !isSticky ? navInnerLeftPaddingX : 40,
+              }}
+            >
               {isSticky && (
                 <motion.div
                   initial={{ opacity: 1, scale: 1 }}
@@ -211,34 +233,37 @@ export const Header = forwardRef<
                   className="w-6 h-6 relative"
                   transition={{ duration: 0 }}
                 >
-                  <div className="w-full h-full bg-foreground rounded-md" />
+                  <div className="w-full h-full bg-foreground rounded" />
                   <Image
                     fill
                     src={integration?.icon as string}
                     alt={`${integration?.name}`}
-                    className="p-1"
+                    style={{
+                      padding: iconPadding.get(),
+                    }}
                   />
                 </motion.div>
               )}
-            </AnimatePresence>
-            <NavMenuItem active={selectedTab === 'overview'}>
-              <Link href={`/project/${project?.ref}/integrations/${id}?tab=overview`}>
-                Overview
-              </Link>
-            </NavMenuItem>
-            <NavMenuItem active={selectedTab === 'wrappers'}>
-              <Link href={`/project/${project?.ref}/integrations/${id}?tab=wrappers`}>
-                Wrappers
-              </Link>
-            </NavMenuItem>
-            <NavMenuItem active={selectedTab === 'logs'}>
-              <Link href={`/project/${project?.ref}/integrations/${id}?tab=logs`}>Logs</Link>
-            </NavMenuItem>
-          </MotionNavMenu>
-          {/* <motion.div className="h-[10px] bg-red-900 origin-left" style={{ scaleX }} /> */}
-        </div>
-        // </motion.div>
-      )}
+
+              <NavMenuItem active={selectedTab === 'overview'}>
+                <Link href={`/project/${project?.ref}/integrations/${id}?tab=overview`}>
+                  Overview
+                </Link>
+              </NavMenuItem>
+              <NavMenuItem active={selectedTab === 'wrappers'}>
+                <Link href={`/project/${project?.ref}/integrations/${id}?tab=wrappers`}>
+                  Wrappers
+                </Link>
+              </NavMenuItem>
+              <NavMenuItem active={selectedTab === 'logs'}>
+                <Link href={`/project/${project?.ref}/integrations/${id}?tab=logs`}>Logs</Link>
+              </NavMenuItem>
+            </MotionNavMenu>
+            {/* <motion.div className="h-[10px] bg-red-900 origin-left" style={{ scaleX }} /> */}
+          </div>
+          // </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 })
