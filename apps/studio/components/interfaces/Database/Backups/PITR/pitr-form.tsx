@@ -68,11 +68,13 @@ export function PITRForm({
   const recoveryTimeString = selectedDate.format('DD MMM YYYY HH:mm:ss')
   const recoveryTimeStringUtc = selectedDate.utc().format('DD MMM YYYY HH:mm:ss')
 
-  const isBeforeLatest = selectedDate.isBefore(latestAvailableBackup)
-  const isAfterEarliest = selectedDate.isAfter(earliestAvailableBackup)
   const isWithinRange = useMemo(
-    () => !!selectedDate && isBeforeLatest && isAfterEarliest,
-    [selectedDate, isBeforeLatest, isAfterEarliest]
+    () =>
+      (!!selectedDate && selectedDate.isSame(latestAvailableBackup)) ||
+      selectedDate.isSame(earliestAvailableBackup) ||
+      (selectedDate.isBefore(latestAvailableBackup) &&
+        selectedDate.isAfter(earliestAvailableBackup)),
+    [selectedDate, latestAvailableBackup, earliestAvailableBackup]
   )
 
   const onUpdateDate = (date: Date) => {
