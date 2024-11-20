@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
@@ -24,20 +23,10 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { validateQuery } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 
 export const InlineEditor = () => {
-  const os = detectOS()
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
-  const queryClient = useQueryClient()
   const { inlineEditorPanel, setInlineEditorPanel } = useAppStateSnapshot()
-  const isEnabled = useIsDatabaseFunctionsAssistantEnabled()
-
-  const { open } = inlineEditorPanel
-
-  const [isAcknowledged, setIsAcknowledged] = useLocalStorage(
-    LOCAL_STORAGE_KEYS.SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED,
-    false
-  )
 
   const [error, setError] = useState<QueryResponseError>()
   const [results, setResults] = useState<undefined | any[]>(undefined)

@@ -34,6 +34,7 @@ import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { InlineEditor } from 'components/interfaces/SQLEditor/InlineEditor'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -88,7 +89,7 @@ const ProjectLayout = ({
   const { ref: projectRef } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel, inlineEditorPanel } = useAppStateSnapshot()
   const { open } = aiAssistantPanel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -186,6 +187,20 @@ const ProjectLayout = ({
                     )}
                   </main>
                 </ResizablePanel>
+                {inlineEditorPanel.open && (
+                  <>
+                    {!aiAssistantPanel.open && <ResizableHandle />}
+                    <ResizablePanel
+                      id="panel-inline-editor"
+                      className={cn('min-w-[400px] max-w-[400px] bg-surface-100', {
+                        'absolute z-50 top-[48px] bottom-0 border-l': aiAssistantPanel.open,
+                      })}
+                      style={{ right: 400 }}
+                    >
+                      <InlineEditor />
+                    </ResizablePanel>
+                  </>
+                )}
                 {aiAssistantPanel.open && (
                   <>
                     <ResizableHandle />
