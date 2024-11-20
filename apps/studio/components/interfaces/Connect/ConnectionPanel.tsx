@@ -163,7 +163,7 @@ export const ConnectionPanel = ({
               </>
             )}
 
-            <div className="border border-muted px-5 flex gap-7 py-3 first:rounded-t last:rounded-b">
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
               <div className="flex items-center gap-2">
                 <IPv4StatusIcon active={ipv4Status.type === 'success'} />
               </div>

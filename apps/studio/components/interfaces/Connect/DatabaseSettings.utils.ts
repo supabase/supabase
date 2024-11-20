@@ -9,6 +9,7 @@ type ConnectionStrings = {
   nodejs: string
   php: string
   python: string
+  sqlalchemy: string
 }
 
 export const getConnectionStrings = (
@@ -89,6 +90,18 @@ dbname=${poolerName}${isMd5 ? `options=reference=${projectRef}` : ''}`
 
   const poolerJdbcString = `jdbc:postgresql://${poolerHost}:${poolerPort}/${poolerName}?user=${poolerUser}${isMd5 ? `&options=reference%3D${projectRef}` : ''}&password=${password}`
 
+  const sqlalchemyString = `user=${directUser} 
+password=${password} 
+host=${directHost} 
+port=${directPort} 
+dbname=${directName}`
+
+  const poolerSqlalchemyString = `user=${poolerUser} 
+password=${password} 
+host=${poolerHost} 
+port=${poolerPort} 
+dbname=${poolerName}`
+
   return {
     direct: {
       psql: directPsqlString,
@@ -99,6 +112,7 @@ dbname=${poolerName}${isMd5 ? `options=reference=${projectRef}` : ''}`
       nodejs: nodejsPoolerUriString,
       php: directGolangString,
       python: directGolangString,
+      sqlalchemy: sqlalchemyString,
     },
     pooler: {
       psql: poolerPsqlString,
@@ -109,6 +123,7 @@ dbname=${poolerName}${isMd5 ? `options=reference=${projectRef}` : ''}`
       nodejs: nodejsPoolerUriString,
       php: poolerGolangString,
       python: poolerGolangString,
+      sqlalchemy: poolerSqlalchemyString,
     },
   }
 }

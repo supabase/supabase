@@ -3,7 +3,6 @@ import { getAddons } from 'components/interfaces/Billing/Subscription/Subscripti
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -32,21 +31,13 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
-import {
-  DefaultSessionModeNotice,
-  IPv4AddonDirectConnectionNotice,
-  IPv4DeprecationNotice,
-} from './DatabaseConnectionNotices'
-import DatabaseSettings from './DatabaseSettings'
+import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import {
   constructConnStringSyntax,
   getConnectionStrings,
   getPoolerTld,
 } from './DatabaseSettings.utils'
-import { UsePoolerCheckbox } from './UsePoolerCheckbox'
-import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import examples from './DirectConnectionExamples'
+import examples, { Example } from './DirectConnectionExamples'
 
 const CONNECTION_TYPES: {
   id: ConnectionType
@@ -69,9 +60,19 @@ const CONNECTION_TYPES: {
   { id: 'nodejs', label: 'Node.js', contentType: 'code', lang: 'js', fileTitle: '.env' },
   { id: 'php', label: 'PHP', contentType: 'code', lang: 'php', fileTitle: '.env' },
   { id: 'python', label: 'Python', contentType: 'code', lang: 'python', fileTitle: '.env' },
+  { id: 'sqlalchemy', label: 'SQLAlchemy', contentType: 'code', lang: 'python', fileTitle: '.env' },
 ]
 
-type ConnectionType = 'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
+type ConnectionType =
+  | 'uri'
+  | 'psql'
+  | 'golang'
+  | 'jdbc'
+  | 'dotnet'
+  | 'nodejs'
+  | 'php'
+  | 'python'
+  | 'sqlalchemy'
 
 const CONNECTION_PARAMETERS = {
   host: {
@@ -110,7 +111,6 @@ export const DatabaseConnectionString = () => {
     projectRef,
   })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
-  const defaultPoolingMode = poolingConfiguration?.pool_mode
 
   const {
     data: databases,
@@ -150,7 +150,6 @@ export const DatabaseConnectionString = () => {
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? getConnectionStrings(connectionInfo, poolingConfiguration, {
           projectRef,
-          // usePoolerConnection: snap.usePoolerConnection,
         })
       : {
           direct: {
@@ -162,6 +161,7 @@ export const DatabaseConnectionString = () => {
             nodejs: '',
             php: '',
             python: '',
+            sqlalchemy: '',
           },
           pooler: {
             uri: '',
@@ -172,6 +172,7 @@ export const DatabaseConnectionString = () => {
             nodejs: '',
             php: '',
             python: '',
+            sqlalchemy: '',
           },
         }
 
@@ -179,49 +180,38 @@ export const DatabaseConnectionString = () => {
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? getPoolerTld(poolingConfiguration?.connectionString)
       : 'com'
-  const poolerConnStringSyntax =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
-          selectedTab,
-          usePoolerConnection: snap.usePoolerConnection,
-          ref: projectRef as string,
-          cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
-          region: isProjectLoading ? '' : project?.region || '',
-          tld: snap.usePoolerConnection ? poolerTld : connectionTld,
-          portNumber: snap.usePoolerConnection
-            ? poolingMode === 'transaction'
-              ? poolingConfiguration?.db_port.toString()
-              : '5432'
-            : connectionInfo.db_port.toString(),
-        })
-      : []
+  // const poolerConnStringSyntax =
+  //   isSuccessPoolingInfo && poolingConfiguration !== undefined
+  //     ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
+  //         selectedTab,
+  //         usePoolerConnection: snap.usePoolerConnection,
+  //         ref: projectRef as string,
+  //         cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
+  //         region: isProjectLoading ? '' : project?.region || '',
+  //         tld: snap.usePoolerConnection ? poolerTld : connectionTld,
+  //         portNumber: `[5432 or 6543]`,
+  //       })
+  //     : []
 
-  useEffect(() => {
-    if (poolingConfiguration?.pool_mode === 'session') {
-      setPoolingMode(poolingConfiguration.pool_mode)
-    }
-  }, [poolingConfiguration?.pool_mode])
+  // useEffect(() => {
+  //   // if (poolingConfiguration?.pool_mode === 'session') {
+  //   //   setPoolingMode(poolingConfiguration.pool_mode)
+  //   // }
+  // }, [poolingConfiguration?.pool_mode])
 
   const lang = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
   const contentType =
     CONNECTION_TYPES.find((type) => type.id === selectedTab)?.contentType ?? 'input'
 
-  const getDirectConnectionExample = () => {
-    const example = examples[selectedTab as keyof typeof examples]
-    if (!example) return null
+  const example: Example = examples[selectedTab]
 
-    return {
-      files: example.files,
-      installCommands: example.installCommands,
-      postInstallCommands: example.postInstallCommands,
-    }
-  }
-
-  const exampleFiles = getDirectConnectionExample()?.files
-  const exampleInstallCommands = getDirectConnectionExample()?.installCommands
-  const examplePostInstallCommands = getDirectConnectionExample()?.postInstallCommands
+  const exampleFiles = example?.files
+  const exampleInstallCommands = example?.installCommands
+  const examplePostInstallCommands = example?.postInstallCommands
   const hasCodeExamples = exampleFiles || exampleInstallCommands
   const fileTitle = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
+
+  let stepNumber = 0
 
   const StepLabel = ({
     number,
@@ -273,10 +263,10 @@ export const DatabaseConnectionString = () => {
           {hasCodeExamples && (
             <div className="grid grid-cols-2 gap-20 w-full px-7 py-8">
               <div>
-                <StepLabel number={1} className="mb-4">
+                <StepLabel number={++stepNumber} className="mb-4">
                   Install the following
                 </StepLabel>
-                {getDirectConnectionExample()?.installCommands?.map((cmd, i) => (
+                {exampleInstallCommands?.map((cmd, i) => (
                   <CodeBlock
                     key={i}
                     className="[&_code]:text-[12px] [&_code]:text-foreground"
@@ -288,32 +278,32 @@ export const DatabaseConnectionString = () => {
                   </CodeBlock>
                 ))}
               </div>
-              <div className="">
-                <StepLabel number={2} className="mb-4">
-                  Add file to project
-                </StepLabel>
-                {getDirectConnectionExample()?.files?.map((file, i) => (
-                  <div key={i} className="">
-                    {/* <p className="text-sm text-foreground-light">{file.name}</p> */}
-                    <CodeBlockFileHeader title={file.name} />
-                    <CodeBlock
-                      wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
-                      // title={file.name}
-                      value={file.content}
-                      hideLineNumbers
-                      language="js"
-                      className="[&_code]:text-[12px] [&_code]:text-foreground"
-                    />
-                  </div>
-                ))}
-              </div>
+              {exampleFiles && exampleFiles?.length > 0 && (
+                <div className="">
+                  <StepLabel number={++stepNumber} className="mb-4">
+                    Add file to project
+                  </StepLabel>
+                  {exampleFiles?.map((file, i) => (
+                    <div key={i} className="">
+                      <CodeBlockFileHeader title={file.name} />
+                      <CodeBlock
+                        wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
+                        value={file.content}
+                        hideLineNumbers
+                        language="js"
+                        className="[&_code]:text-[12px] [&_code]:text-foreground"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
           <div>
             {hasCodeExamples && (
               <div className="px-7 pt-8">
-                <StepLabel number={3}>Choose type of connection</StepLabel>
+                <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
               </div>
             )}
             <div className="divide-y divide-border-muted">
@@ -329,10 +319,15 @@ export const DatabaseConnectionString = () => {
                 ipv4Status={{
                   type: !ipv4Addon ? 'error' : 'success',
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-                  link: {
-                    text: 'Purchase IPv4 support',
-                    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-                  },
+                  link: !ipv4Addon
+                    ? {
+                        text: 'Purchase IPv4 support',
+                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+                      }
+                    : {
+                        text: 'Update IPv4 settings',
+                        url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+                      },
                 }}
                 parameters={[
                   // prettier-ignore
@@ -345,7 +340,6 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
                 ]}
               />
-
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
@@ -374,7 +368,6 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
                 ]}
               />
-
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
@@ -407,10 +400,10 @@ export const DatabaseConnectionString = () => {
           {examplePostInstallCommands && (
             <div className="grid grid-cols-2 gap-20 w-full px-7  py-10">
               <div>
-                <StepLabel number={3} className="mb-4">
+                <StepLabel number={++stepNumber} className="mb-4">
                   Add the configuration package to read the settings
                 </StepLabel>
-                {getDirectConnectionExample()?.postInstallCommands?.map((cmd, i) => (
+                {examplePostInstallCommands?.map((cmd, i) => (
                   <CodeBlock
                     key={i}
                     className="text-sm"
@@ -427,14 +420,58 @@ export const DatabaseConnectionString = () => {
         </div>
       )}
 
-      {poolerConnStringSyntax.length > 0 && (
+      {/* <Separator />
+        <Collapsible_Shadcn_ className={cn('px-8 pt-5', selectedTab === 'python' && 'pb-5')}>
+          <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+            <div className="flex items-center gap-x-2 w-full">
+              <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                How to connect to a different database or switch to another user
+              </p>
+              <ChevronDown
+                className="transition-transform duration-200"
+                strokeWidth={1.5}
+                size={14}
+              />
+            </div>
+          </CollapsibleTrigger_Shadcn_>
+          <CollapsibleContent_Shadcn_ className="my-2">
+            <div className="text-foreground-light">
+              <p className="text-xs">
+                You can use the following URI format to switch to a different database or user
+                {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
+              </p>
+              <p className="text-sm tracking-tight text-foreground-lighter">
+                {poolerConnStringSyntax.map((x, idx) => {
+                  if (x.tooltip) {
+                    return (
+                      <Tooltip_Shadcn_ key={`syntax-${idx}`}>
+                        <TooltipTrigger_Shadcn_ asChild>
+                          <span className="text-foreground text-xs font-mono">{x.value}</span>
+                        </TooltipTrigger_Shadcn_>
+                        <TooltipContent_Shadcn_ side="bottom">{x.tooltip}</TooltipContent_Shadcn_>
+                      </Tooltip_Shadcn_>
+                    )
+                  } else {
+                    return (
+                      <span key={`syntax-${idx}`} className="text-xs font-mono">
+                        {x.value}
+                      </span>
+                    )
+                  }
+                })}
+              </p>
+            </div>
+          </CollapsibleContent_Shadcn_>
+        </Collapsible_Shadcn_> */}
+
+      {selectedTab === 'python' && (
         <>
           <Separator />
-          <Collapsible_Shadcn_ className={cn('px-8 pt-5', selectedTab === 'python' && 'pb-5')}>
+          <Collapsible_Shadcn_ className="px-8 pt-5">
             <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
               <div className="flex items-center gap-x-2 w-full">
                 <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                  How to connect to a different database or switch to another user
+                  Connecting to SQL Alchemy
                 </p>
                 <ChevronDown
                   className="transition-transform duration-200"
@@ -444,67 +481,19 @@ export const DatabaseConnectionString = () => {
               </div>
             </CollapsibleTrigger_Shadcn_>
             <CollapsibleContent_Shadcn_ className="my-2">
-              <div className="text-foreground-light">
-                <p className="text-xs">
-                  You can use the following URI format to switch to a different database or user
-                  {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
+              <div className="text-foreground-light text-xs grid gap-2">
+                <p>
+                  Please use <code>postgresql://</code> instead of <code>postgres://</code> as your
+                  dialect when connecting via SQLAlchemy.
                 </p>
-                <p className="text-sm tracking-tight text-foreground-lighter">
-                  {poolerConnStringSyntax.map((x, idx) => {
-                    if (x.tooltip) {
-                      return (
-                        <Tooltip_Shadcn_ key={`syntax-${idx}`}>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <span className="text-foreground text-xs font-mono">{x.value}</span>
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_ side="bottom">{x.tooltip}</TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
-                      )
-                    } else {
-                      return (
-                        <span key={`syntax-${idx}`} className="text-xs font-mono">
-                          {x.value}
-                        </span>
-                      )
-                    }
-                  })}
+                <p>
+                  Example:
+                  <code>create_engine("postgresql+psycopg2://...")</code>
                 </p>
+                <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
               </div>
             </CollapsibleContent_Shadcn_>
           </Collapsible_Shadcn_>
-
-          {selectedTab === 'python' && (
-            <>
-              <Separator />
-              <Collapsible_Shadcn_ className="px-8 pt-5">
-                <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
-                  <div className="flex items-center gap-x-2 w-full">
-                    <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                      Connecting to SQL Alchemy
-                    </p>
-                    <ChevronDown
-                      className="transition-transform duration-200"
-                      strokeWidth={1.5}
-                      size={14}
-                    />
-                  </div>
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="my-2">
-                  <div className="text-foreground-light text-xs grid gap-2">
-                    <p>
-                      Please use <code>postgresql://</code> instead of <code>postgres://</code> as
-                      your dialect when connecting via SQLAlchemy.
-                    </p>
-                    <p>
-                      Example:
-                      <code>create_engine("postgresql+psycopg2://...")</code>
-                    </p>
-                    <p className="text-sm font-mono tracking-tight text-foreground-lighter"></p>
-                  </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
-            </>
-          )}
         </>
       )}
     </div>

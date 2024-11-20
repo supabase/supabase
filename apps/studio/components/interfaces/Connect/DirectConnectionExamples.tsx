@@ -1,3 +1,12 @@
+export type Example = {
+  installCommands?: string[]
+  postInstallCommands?: string[]
+  files?: {
+    name: string
+    content: string
+  }[]
+}
+
 const examples = {
   nodejs: {
     installCommands: ['npm install postgres'],
@@ -52,6 +61,88 @@ func main() {
     ],
     postInstallCommands: [
       'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION',
+    ],
+  },
+  python: {
+    installCommands: ['pip install python-dotenv psycopg2'],
+    files: [
+      {
+        name: 'main.py',
+        content: `import psycopg2
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env
+load_dotenv()
+
+# Fetch variables
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
+
+# Connect to the database
+try:
+    connection = psycopg2.connect(
+        user=USER,
+        password=PASSWORD,
+        host=HOST,
+        port=PORT,
+        dbname=DBNAME
+    )
+    print("Connection successful!")
+    
+    # Create a cursor to execute SQL queries
+    cursor = connection.cursor()
+    
+    # Example query
+    cursor.execute("SELECT NOW();")
+    result = cursor.fetchone()
+    print("Current Time:", result)
+
+    # Close the cursor and connection
+    cursor.close()
+    connection.close()
+    print("Connection closed.")
+
+except Exception as e:
+    print(f"Failed to connect: {e}")`,
+      },
+    ],
+  },
+  sqlalchemy: {
+    installCommands: ['pip install python-dotenv sqlalchemy psycopg2'],
+    files: [
+      {
+        name: 'main.py',
+        content: `from sqlalchemy import create_engine
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env
+load_dotenv()
+
+# Fetch variables
+USER = os.getenv("user")
+PASSWORD = os.getenv("password")
+HOST = os.getenv("host")
+PORT = os.getenv("port")
+DBNAME = os.getenv("dbname")
+
+# Construct the SQLAlchemy connection string
+DATABASE_URL = f"postgresql+psycopg2://{USER}:{PASSWORD}@{HOST}:{PORT}/{DBNAME}?sslmode=require"
+
+# Create the SQLAlchemy engine
+engine = create_engine(DATABASE_URL)
+
+# Test the connection
+try:
+    with engine.connect() as connection:
+        print("Connection successful!")
+except Exception as e:
+    print(f"Failed to connect: {e}")`,
+      },
     ],
   },
 }
