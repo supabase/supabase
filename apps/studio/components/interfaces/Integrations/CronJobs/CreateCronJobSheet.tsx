@@ -17,7 +17,6 @@ import {
   Button,
   Form_Shadcn_,
   FormControl_Shadcn_,
-  FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormLabel_Shadcn_,
   Input_Shadcn_,
@@ -35,7 +34,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
+import {
+  buildCronQuery,
+  buildHttpRequestCommand,
+  cronPattern,
+  secondsPattern,
+  parseCronJobCommand,
+} from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
@@ -44,8 +49,6 @@ import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
-import { checkDomainOfScale } from 'recharts/types/util/ChartUtils'
-import { InfoIcon } from 'lucide-react'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -94,13 +97,18 @@ const FormSchema = z.object({
     .trim()
     .min(1)
     .refine((value) => {
-      try {
-        CronToString(value)
-      } catch {
-        return false
+      if (cronPattern.test(value)) {
+        try {
+          CronToString(value)
+          return true
+        } catch {
+          return false
+        }
+      } else if (secondsPattern.test(value)) {
+        return true
       }
-      return true
-    }, 'The schedule needs to be in a Cron format.'),
+      return false
+    }, 'The schedule needs to be in a valid Cron format or specify seconds like "x seconds".'),
   values: z.discriminatedUnion('type', [
     edgeFunctionSchema,
     httpRequestSchema,
@@ -135,7 +143,7 @@ export const CreateCronJobSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '* * * * * *',
+      schedule: selectedCronJob?.schedule || '*/5 * * * *',
       values: cronJobValues,
     },
   })
