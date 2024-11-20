@@ -1,19 +1,17 @@
+import { useParams } from 'common'
+import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
+import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { Header } from 'components/layouts/Integrations/header'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ProductMenu } from 'components/ui/ProductMenu'
+import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useScroll } from 'framer-motion'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
-import { generateAdvisorsMenu } from '../AdvisorsLayout/AdvisorsMenu.utils'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useRouter } from 'next/router'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
-import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
-import { Table2 } from 'lucide-react'
 import Image from 'next/image'
-import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 /**
  * Layout component for the Integrations section
@@ -24,13 +22,16 @@ const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
   if (layoutSidebar) {
     return <IntegrationsLayoutSide {...props} />
   }
-  return <IntegrationsLayoutTop {...props} />
+  return <IntegrationTopHeaderLayout {...props} />
 }
 
 /**
  * Top level layout
  */
-const IntegrationsLayoutTop = ({ ...props }: PropsWithChildren) => {
+const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
+  const project = useSelectedProject()
+  const { id } = useParams()
+  const router = useRouter()
   // Refs for the main scrollable area and header
   const mainElementRef = useRef<HTMLDivElement>(null)
   const headerRef = useRef<HTMLDivElement>(null)
@@ -74,12 +75,24 @@ const IntegrationsLayoutTop = ({ ...props }: PropsWithChildren) => {
     }
   }, [scroll.scrollY])
 
+  const { data: fdwData } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const wrappers = fdwData?.result || []
+
+  const page = router.pathname.split('/')[4]
+
   return (
     <ProjectLayout
       ref={mainElementRef}
       title={'Integrations'}
       product="Integrations"
       isBlocking={false}
+      productMenu={
+        <ProductMenu page={page} menu={generateIntegrationsMenu(wrappers, id, project?.ref)} />
+      }
     >
       <Header ref={headerRef} scroll={scroll} isSticky={isSticky} />
       {props.children}
@@ -101,71 +114,15 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 
   const wrappers = fdwData?.result || []
 
-  const generateIntegrationsMenu = () => {
-    const installedIntegrations = INTEGRATIONS.filter((integration) => {
-      if (integration.type === 'wrapper') {
-        return wrappers.find((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
-      }
-      return false
-    })
-
-    return [
-      {
-        title: 'Installed Integrations',
-        items: [
-          {
-            name: 'All Integrations',
-            key: 'all-integrations',
-            url: `/project/${project?.ref}/integrations/landing`,
-            icon: <Table2 size={14} />,
-          },
-        ],
-      },
-      {
-        title: 'Installed Integrations',
-        items: installedIntegrations.map((integration) => ({
-          name: integration.name,
-          key: integration.id,
-          url: `/project/${project?.ref}/integrations/${integration.id}`,
-          icon: (
-            <div className="relative w-6 h-6 bg-surface-400 border rounded">
-              <Image fill src={integration.icon} alt={integration.name} className="p-0.5" />
-            </div>
-          ),
-        })),
-      },
-      id
-        ? {
-            title: 'Pages',
-            items: [
-              {
-                name: 'Overview',
-                key: 'settings',
-                url: `/project/${project?.ref}/integrations/${id}?tab=overview`,
-              },
-              {
-                name: 'Wrappers',
-                key: 'settings',
-                url: `/project/${project?.ref}/integrations/${id}?tab=wrappers`,
-              },
-              {
-                name: 'Logs',
-                key: 'settings',
-                url: `/project/${project?.ref}/integrations/${id}?tab=logs`,
-              },
-            ],
-          }
-        : undefined,
-    ].filter(Boolean)
-  }
-
   // generateIntegrationsMenu()
 
   return (
     <ProjectLayout
       isLoading={false}
       product="Integrations"
-      productMenu={<ProductMenu page={page} menu={generateIntegrationsMenu()} />}
+      // productMenu={
+      //   <ProductMenu page={page} menu={generateIntegrationsMenu(wrappers, id, project?.ref)} />
+      // }
     >
       {props.children}
     </ProjectLayout>
@@ -174,3 +131,68 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 
 // Wrap component with authentication HOC before exporting
 export default withAuth(IntegrationsLayout)
+
+const generateIntegrationsMenu = (wrappers: FDW[], integrationId?: string, projectRef?: string) => {
+  const installedIntegrations = INTEGRATIONS.filter((integration) => {
+    if (integration.type === 'wrapper') {
+      return wrappers.find((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
+    }
+    return false
+  })
+
+  return [
+    {
+      title: 'Installed Integrations',
+      // hideTitle: true,
+      items: [
+        {
+          name: 'All Integratons',
+          key: 'all-integrations',
+          url: `/project/${projectRef}/integrations/landing`,
+          // icon: <Grid2x2Plus size={14} />,
+        },
+      ],
+    },
+    {
+      title: 'Installed Integrations',
+      items: installedIntegrations.map((integration) => ({
+        name: integration.name,
+        key: integration.id,
+        url: `/project/${projectRef}/integrations/${integration.id}`,
+        icon: (
+          <div className="relative w-6 h-6 bg-surface-400 border rounded">
+            <Image
+              key={`icon-${integration.id}`}
+              fill
+              src={integration.icon}
+              alt={integration.name}
+              className="p-0.5"
+            />
+          </div>
+        ),
+      })),
+    },
+    // integrationId
+    //   ? {
+    //       title: 'Pages',
+    //       items: [
+    //         {
+    //           name: 'Overview',
+    //           key: 'settings',
+    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=overview`,
+    //         },
+    //         {
+    //           name: 'Wrappers',
+    //           key: 'settings',
+    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=wrappers`,
+    //         },
+    //         {
+    //           name: 'Logs',
+    //           key: 'settings',
+    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=logs`,
+    //         },
+    //       ],
+    //     }
+    //   : undefined,
+  ].filter(Boolean)
+}
