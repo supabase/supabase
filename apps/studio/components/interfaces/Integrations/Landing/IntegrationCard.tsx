@@ -6,7 +6,7 @@ import { IntegrationDefinition } from './Integrations.constants'
 
 type IntegrationCardProps = IntegrationDefinition & {}
 
-export const IntegrationCard = ({ id, name, icon, type, description }: IntegrationCardProps) => {
+export const IntegrationCard = ({ id, name, icon, description }: IntegrationCardProps) => {
   const { project } = useProjectContext()
 
   return (
@@ -20,7 +20,7 @@ export const IntegrationCard = ({ id, name, icon, type, description }: Integrati
       >
         <div className="w-10 h-10 relative">
           <div className="w-full h-full bg-white border rounded-md" />
-          {icon}
+          {icon()}
         </div>
         <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-0">
           <div className="flex-col justify-start items-start gap-0 flex">

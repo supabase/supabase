@@ -89,7 +89,9 @@ const IntegrationTopHeaderLayout = ({
     }
   }, [scroll.scrollY])
 
-  const page = router.pathname.split('/')[4]
+  const segments = router.asPath.split('/')
+  // construct the page url to be used to determine the active state for the sidebar
+  const page = `${segments[3]}${segments[4] ? `/${segments[4]}` : ''}`
 
   const { installedIntegrations } = useInstalledIntegrations()
   const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
@@ -146,11 +148,10 @@ const generateIntegrationsMenu = (
   return [
     {
       title: 'All Integrations',
-      hideTitle: true,
       items: [
         {
           name: 'All Integrations',
-          key: 'all-integrations',
+          key: 'integrations',
           url: `/project/${projectRef}/integrations`,
           items: [],
         },
@@ -160,10 +161,12 @@ const generateIntegrationsMenu = (
       title: 'Installed Integrations',
       items: integrations.map((integration) => ({
         name: integration.name,
-        key: integration.id,
+        key: `integrations/${integration.id}`,
         url: `/project/${projectRef}/integrations/${integration.id}`,
         icon: (
-          <div className="relative w-6 h-6 bg-surface-400 border rounded">{integration.icon}</div>
+          <div className="relative w-6 h-6 bg-white border rounded">
+            {integration.icon({ className: 'p-1' })}
+          </div>
         ),
         items: [],
       })),

@@ -137,15 +137,11 @@ export const Header = forwardRef<
                         height: iconSize,
                       }}
                     >
-                      {integration.icon}
-                      {/* <MotionNextImage
-                        fill
-                        src={integration.icon}
-                        alt={`${integration.name}`}
-                        style={{
+                      {integration.icon({
+                        style: {
                           padding: iconPadding.get(),
-                        }}
-                      /> */}
+                        },
+                      })}
                     </motion.div>
                     {/* )} */}
 

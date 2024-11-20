@@ -1,12 +1,21 @@
 import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'framer-motion'
-import Image from 'next/image'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
+import { parseAsString, useQueryState } from 'nuqs'
 import React, { forwardRef, ReactNode, useRef } from 'react'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+
+const MotionNavMenu = motion(NavMenu) as React.ComponentType<
+  React.ComponentProps<typeof NavMenu> & MotionProps
+>
+
+// Output range: The padding range for the nav (from compact to expanded)
+const paddingRange = [40, 86]
+
+// Output range: The padding range for the image
+const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
 export const IntegrationTabs = forwardRef<
   HTMLDivElement,
@@ -25,31 +34,18 @@ export const IntegrationTabs = forwardRef<
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   // Get the selected tab from URL query
-  const searchParams = useSearchParams()
-  const selectedTab = searchParams?.get('tab') ?? 'overview'
+  const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   const headerRef = useRef<HTMLDivElement>(null)
 
   // Input range: The scrollY range for triggering the animation (e.g., 0 to 200px of scroll)
   const scrollRange = [40, headerRef.current?.offsetHeight ?? 128]
-  // Output range: The padding range for the nav (from compact to expanded)
-  const paddingRange = [40, 86]
-
-  // Output range: The padding range for the image
-  const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
   const navInnerLeftPaddingX = scroll
     ? useTransform(scroll?.scrollY!, scrollRange, paddingRange)
     : 0
 
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
-
-  const MotionNavMenu = motion(NavMenu) as React.ComponentType<
-    React.ComponentProps<typeof NavMenu> & MotionProps
-  >
-  const MotionNextImage = motion(Image) as React.ComponentType<
-    React.ComponentProps<typeof Image> & MotionProps
-  >
 
   return (
     <AnimatePresence>
@@ -80,14 +76,11 @@ export const IntegrationTabs = forwardRef<
               transition={{ duration: 0 }}
             >
               <div className="w-full h-full border border-muted bg-white rounded" />
-              <MotionNextImage
-                fill
-                src={integration?.icon as string}
-                alt={`${integration?.name}`}
-                style={{
+              {integration?.icon({
+                style: {
                   padding: iconPadding.get(),
-                }}
-              />
+                },
+              })}
             </motion.div>
           )}
 

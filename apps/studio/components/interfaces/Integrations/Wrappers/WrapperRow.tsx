@@ -66,7 +66,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               <div key={table.id} className="flex items-center -space-x-3">
                 {/* <IconFirestore size={16} /> */}
                 <Badge className="bg-surface-300 bg-opacity-100 pr-1 gap-2 z-[1] font-mono text-[0.75rem] h-6 text-foreground">
-                  <div className="relative w-3 h-3">{integration.icon}</div>
+                  <div className="relative w-3 h-3">{integration.icon()}</div>
                   {target}{' '}
                   <ChevronRight
                     size={12}

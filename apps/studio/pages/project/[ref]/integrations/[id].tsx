@@ -98,8 +98,9 @@ const WrapperPage: NextPageWithLayout = () => {
     return null
   }
 
+  // the key={id} is added to have animations when switching from a wrapper to a wrapper.
   return (
-    <IntegrationsLayout id={id!} tabs={tabs}>
+    <IntegrationsLayout id={id!} tabs={tabs} key={id}>
       {tabs.find((t) => t.id === selectedTab)?.content}
     </IntegrationsLayout>
   )
