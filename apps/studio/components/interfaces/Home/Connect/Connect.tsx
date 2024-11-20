@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { DatabaseConnectionString as OldDatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 
-import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -31,7 +30,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
-import { PoolingModesDialog } from 'components/interfaces/Connect/PoolingModesDialog'
 import { useFlag } from 'hooks/ui/useFlag'
 
 const Connect = () => {
@@ -280,7 +278,6 @@ const Connect = () => {
           </Tabs_Shadcn_>
         </DialogContent>
       </Dialog>
-      <PoolingModesDialog />
     </>
   )
 }

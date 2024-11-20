@@ -6,7 +6,7 @@ export function useFlag<T = boolean>(name: string) {
   const store: any = useContext(FlagContext)
 
   if (name === 'connectDialogUpdate') {
-    return true
+    return false
   }
 
   const isObjectEmpty = (objectName: Object) => {
