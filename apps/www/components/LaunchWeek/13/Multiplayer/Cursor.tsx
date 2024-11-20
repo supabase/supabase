@@ -37,6 +37,7 @@ const Cursor: FC<Props> = ({
   const timeoutRef = useRef() as any
   const chatBubbleRef = useRef() as any
 
+  const [isTouchDevice, setIsTouchDevice] = useState(false)
   const [flipX, setFlipX] = useState(false)
   const [flipY, setFlipY] = useState(false)
   const [hideInput, setHideInput] = useState(false)
@@ -72,6 +73,15 @@ const Cursor: FC<Props> = ({
     setFlipX((x || 0) + MAX_BUBBLE_WIDTH_THRESHOLD >= window.innerWidth)
     setFlipY((y || 0) + MAX_BUBBLE_HEIGHT_THRESHOLD >= window.innerHeight)
   }, [x, y, isTyping, chatBubbleRef])
+
+  useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) {
+      // touchscreen
+      setIsTouchDevice(false)
+    }
+  }, [])
+
+  if (isCurrentUser && isTouchDevice) return null
 
   return (
     <>
