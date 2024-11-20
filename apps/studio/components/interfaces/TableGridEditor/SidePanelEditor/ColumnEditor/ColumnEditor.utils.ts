@@ -4,7 +4,6 @@ import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
-import type { PartitionedTable, Table } from 'data/table-editor/table-editor-types'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -248,5 +247,52 @@ export const getForeignKeyCascadeAction = (action?: string) => {
       return 'Set NULL'
     default:
       return undefined
+  }
+}
+
+export const getPlaceholderText = (format?: string, columnFieldName?: string) => {
+  const columnName = columnFieldName || 'column_name'
+
+  switch (format) {
+    case 'int2':
+    case 'int4':
+    case 'int8':
+    case 'numeric':
+      return `"${columnName}" > 0`
+
+    case 'float4':
+    case 'float8':
+      return `"${columnName}" > 0.0`
+
+    case 'text':
+    case 'varchar':
+      return `length("${columnName}") <= 50`
+
+    case 'json':
+    case 'jsonb':
+      return `jsonb_typeof("${columnName}"->'active') = 'boolean'`
+
+    case 'bool':
+      return `"${columnName}" in (true, false)`
+
+    case 'date':
+      return `"${columnName}" > '2024-01-01'`
+
+    case 'time':
+      return `"${columnName}" between '09:00:00' and '12:00:00'`
+
+    case 'timetz':
+      return `"${columnName}" at time zone 'UTC' between '09:00:00+00' and '17:00:00+00'`
+
+    case 'uuid':
+      return `"${columnName}" '00000000-0000-0000-0000-000000000000'`
+
+    case 'timestamp':
+      return `"${columnName}" > '2023-01-01 00:00' and "${columnName}" < '2025-01-01 00:00'`
+    case 'timestamptz':
+      return `"${columnName}" > '2023-01-01 00:00:00+00' and "${columnName}" < '2025-01-01 00:00:00+00'`
+
+    default:
+      return `length("${columnName}") < 500`
   }
 }
