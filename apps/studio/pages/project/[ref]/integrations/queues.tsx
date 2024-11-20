@@ -1,11 +1,12 @@
+import { useQueryState } from 'nuqs'
+import { ReactNode, useMemo, useState } from 'react'
+
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { IntegrationWrapper } from 'components/interfaces/Integrations/Landing/IntegrationWrapper'
 import { QueuesOverviewTab } from 'components/interfaces/Integrations/NewQueues/OverviewTab'
 import { QueuesTab } from 'components/interfaces/Integrations/NewQueues/QueuesTab'
 import { QueueTab } from 'components/interfaces/Integrations/NewQueues/QueueTab'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
-import { useQueryState } from 'nuqs'
-import { ReactNode, useMemo, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 
 const QueuesPage: NextPageWithLayout = () => {

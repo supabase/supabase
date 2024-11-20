@@ -38,7 +38,7 @@ export const WRAPPER_HANDLERS: Record<WrapperLabel, string> = {
 
 const supabaseIntegrations: IntegrationDefinition[] = [
   {
-    id: 'supabase-queues',
+    id: 'queues',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pgmq'],
     name: `Queues`,
@@ -47,7 +47,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     docsUrl: '',
   },
   {
-    id: 'supabase-cron',
+    id: 'cron-jobs',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
@@ -56,7 +56,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     docsUrl: '',
   },
   {
-    id: 'supabase-vault',
+    id: 'vault',
     type: 'postgres_extension' as const,
     requiredExtensions: ['supabase_vault'],
     name: `Vault`,
@@ -65,7 +65,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     docsUrl: '',
   },
   {
-    id: 'supabase-webhooks',
+    id: 'webhooks',
     type: 'custom' as const,
     name: `Webhooks`,
     icon: <Webhook className="absolute inset-0 p-2 text-background w-full h-full" />,
@@ -74,7 +74,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     docsUrl: '',
   },
   {
-    id: 'supabase-graphiql',
+    id: 'graphiql',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_graphql'],
     name: `GraphiQL`,
