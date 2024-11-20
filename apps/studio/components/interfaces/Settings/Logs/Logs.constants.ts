@@ -363,7 +363,7 @@ export enum LogsTableName {
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
-  PG_CRON = 'pg_cron',
+  PG_CRON = 'postgres_logs',
 }
 
 export const LOGS_TABLES = {
