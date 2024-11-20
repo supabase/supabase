@@ -46,7 +46,12 @@ const ConnectDropdown = ({
             {label}
           </span>
           <PopoverTrigger_Shadcn_ asChild>
-            <Button size="small" type="default" className="gap-0 rounded-l-none">
+            <Button
+              size="small"
+              type="default"
+              className="gap-0 rounded-l-none"
+              iconRight={<ChevronDown strokeWidth={1.5} />}
+            >
               <div className="flex items-center gap-2">
                 {selectedItem?.icon ? (
                   <ConnectionIcon connection={selectedItem.icon} />
@@ -54,7 +59,6 @@ const ConnectDropdown = ({
                   <Box size={12} />
                 )}
                 {selectedItem?.label}
-                <ChevronDown className="text-muted" strokeWidth={1} size={12} />
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>

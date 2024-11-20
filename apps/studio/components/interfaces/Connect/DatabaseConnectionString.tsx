@@ -16,6 +16,7 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   CodeBlock,
+  CodeBlockLang,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
@@ -43,7 +44,7 @@ const CONNECTION_TYPES: {
   id: ConnectionType
   label: string
   contentType: 'input' | 'code'
-  lang: string
+  lang: CodeBlockLang
   fileTitle: string | undefined
 }[] = [
   { id: 'uri', label: 'URI', contentType: 'input', lang: 'bash', fileTitle: undefined },
@@ -203,7 +204,7 @@ export const DatabaseConnectionString = () => {
   const contentType =
     CONNECTION_TYPES.find((type) => type.id === selectedTab)?.contentType ?? 'input'
 
-  const example: Example = examples[selectedTab]
+  const example: Example | undefined = examples[selectedTab as keyof typeof examples]
 
   const exampleFiles = example?.files
   const exampleInstallCommands = example?.installCommands
@@ -238,7 +239,7 @@ export const DatabaseConnectionString = () => {
             onValueChange={(connectionType: ConnectionType) => setSelectedTab(connectionType)}
           >
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
-              <SelectValue_Shadcn_ className="[&_svg]:pl-2" />
+              <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
               {CONNECTION_TYPES.map((type) => (
@@ -290,7 +291,7 @@ export const DatabaseConnectionString = () => {
                         wrapperClassName="[&_pre]:max-h-40 [&_pre]:px-4 [&_pre]:py-3 [&_pre]:rounded-t-none"
                         value={file.content}
                         hideLineNumbers
-                        language="js"
+                        language={lang}
                         className="[&_code]:text-[12px] [&_code]:text-foreground"
                       />
                     </div>

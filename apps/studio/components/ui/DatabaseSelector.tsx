@@ -74,9 +74,7 @@ const DatabaseSelector = ({
                 variant === 'connected-on-both' && 'rounded-none border-x-0'
               )}
               icon={isLoading && <Loader2 className="animate-spin" />}
-              iconRight={
-                <ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />
-              }
+              iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             >
               {selectedAdditionalOption ? (
                 <span>{selectedAdditionalOption.name}</span>
