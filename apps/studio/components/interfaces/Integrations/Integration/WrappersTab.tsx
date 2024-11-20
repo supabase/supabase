@@ -1,4 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useState } from 'react'
+
 import { useParams } from 'common'
 import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
 import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
@@ -6,23 +8,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useState } from 'react'
-import {
-  Card,
-  CardContent,
-  Sheet,
-  SheetContent,
-  Table,
-  TableBody,
-  TableCaption,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
+import { Sheet, SheetContent } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
-import { EditWrapperSheet } from './EditWrapperSheet'
-import WrapperRow from './WrapperRow'
 import { WrapperTable } from './WrapperTable'
 
 export const WrappersTab = () => {

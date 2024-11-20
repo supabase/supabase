@@ -1,38 +1,15 @@
+import { parseAsString, useQueryState } from 'nuqs'
+
 import { useParams } from 'common'
 import { OverviewTab } from 'components/interfaces/Integrations/Integration/OverviewTab'
 import { WrappersTab } from 'components/interfaces/Integrations/Integration/WrappersTab'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { Header } from 'components/layouts/Integrations/header'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import { ScrollProgressBar } from 'components/layouts/Integrations/scroll-example'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
-import {
-  useMotionValue,
-  useMotionValueEvent,
-  motion,
-  useViewportScroll,
-  useScroll,
-  useSpring,
-} from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { parseAsString, useQueryState } from 'nuqs'
-import { Page } from 'openai/pagination'
-import { useEffect, useRef, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
-import { GetStaticProps, GetStaticPaths } from 'next'
-import fs from 'fs'
-import path from 'path'
-
 import type { NextPageWithLayout } from 'types'
-import { Button, NavMenu, NavMenuItem } from 'ui'
+import { Button } from 'ui'
 
-const IntegrationPage: NextPageWithLayout = () => {
+const WrapperPage: NextPageWithLayout = () => {
   const { id } = useParams()
-  const { project } = useProjectContext()
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
@@ -98,6 +75,6 @@ const IntegrationPage: NextPageWithLayout = () => {
   )
 }
 
-IntegrationPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
+WrapperPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
 
-export default IntegrationPage
+export default WrapperPage

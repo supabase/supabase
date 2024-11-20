@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { Link } from 'lucide-react'
+import { useState } from 'react'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Book, Link } from 'lucide-react'
-import { useState } from 'react'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -17,11 +16,11 @@ import {
   WarningIcon,
 } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { BuiltBySection } from './build-by-section'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { MarkdownContent } from './MarkdownContent'
-import { BuiltBySection } from './build-by-section'
 import { WrapperTable } from './WrapperTable'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useParams } from 'common'
 
 export const OverviewTab = () => {
   const { id } = useParams()
