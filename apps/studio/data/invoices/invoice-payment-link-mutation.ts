@@ -17,7 +17,7 @@ export async function updateInvoicePaymentLink({
   if (!slug) throw new Error('Org slug is required')
   if (!invoiceId) throw new Error('Invoice ID is required')
 
-  const { data, error, response } = await get(
+  const { data, error } = await get(
     '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link',
     {
       params: {
