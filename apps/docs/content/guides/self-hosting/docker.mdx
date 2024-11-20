@@ -195,7 +195,7 @@ If you have already started the deployment, you can change the password by alter
 
 For example:
 ```bash
-$ docker exec -it supabase-db psql -U supabase_admin -W
+docker exec -it supabase-db psql -U supabase_admin -W
 # Enter the original password from the .env file
 ALTER USER supabase_admin WITH PASSWORD 'new-password';
 ALTER USER postgres WITH PASSWORD 'new-password';
