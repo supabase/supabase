@@ -3,8 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import { useParams } from 'common'
 import { getAddons } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import AlertError from 'components/ui/AlertError'
-import DatabaseSelector from 'components/ui/DatabaseSelector'
-import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -13,13 +11,6 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Input, WarningIcon } from 'ui'
-import {
-  DefaultSessionModeNotice,
-  IPv4AddonDirectConnectionNotice,
-  IPv4DeprecationNotice,
-} from './DatabaseConnectionNotices'
-import { UsePoolerCheckbox } from './UsePoolerCheckbox'
 
 const DatabaseSettings = () => {
   const { ref: projectRef, connectionString } = useParams()
