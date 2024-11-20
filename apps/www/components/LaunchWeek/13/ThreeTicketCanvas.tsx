@@ -26,6 +26,7 @@ const ThreeTicketCanvas: React.FC<{
   const ticketRef = useRef<THREE.Mesh | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const targetScale = useRef<number>(0)
   const isFlipped = useRef(false) // Tracks the flipped state
   const dragStartX = useRef<number | null>(null)
   const dragDelta = useRef(0)
@@ -37,6 +38,7 @@ const ThreeTicketCanvas: React.FC<{
   const isSecret = ticketType === 'secret'
   const LINE_HEIGHT = 1.5
   const MIN_CANVAS_HEIGHT = 600
+  const MOUSE_DOWN_SCALE_VARIATION = 0.05
   const TICKET_FONT_PADDING_LEFT = -6.4
 
   const CONFIG = {
@@ -77,6 +79,8 @@ const ThreeTicketCanvas: React.FC<{
   useEffect(() => {
     if (!canvasRef.current) return
 
+    let scale = getTicketScale(window.innerWidth)
+    targetScale.current = scale
     const calculateDesktopWidth = () => window.innerWidth
     const initialCanvasWidth = calculateDesktopWidth()
     const initialCanvasHeight =
@@ -241,6 +245,14 @@ const ThreeTicketCanvas: React.FC<{
       ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
       ticketGroup.rotation.y +=
         ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
+      if (ticketGroup.scale.x < targetScale.current) {
+        scale += 0.001
+      } else if (ticketGroup.scale.x > targetScale.current) {
+        scale -= 0.001
+      } else {
+        scale = targetScale.current
+      }
+      ticketGroup.scale.set(scale, scale, scale)
       renderer.render(scene, camera)
       animationFrameRef.current = requestAnimationFrame(animate)
     }
@@ -298,6 +310,7 @@ const ThreeTicketCanvas: React.FC<{
     const handlePointerDown = (clientX: number) => {
       isDragging.current = true
       dragStartX.current = clientX
+      targetScale.current += MOUSE_DOWN_SCALE_VARIATION
     }
 
     const handleMouseUp = () => handlePointerUp()
@@ -305,6 +318,7 @@ const ThreeTicketCanvas: React.FC<{
     const handlePointerUp = () => {
       if (!isDragging.current) return
       isDragging.current = false
+      targetScale.current -= MOUSE_DOWN_SCALE_VARIATION
 
       if (Math.abs(dragDelta.current) > flipDelta) {
         // Flip the ticket
@@ -351,6 +365,7 @@ const ThreeTicketCanvas: React.FC<{
     window.addEventListener('touchmove', handleTouchMove)
     window.addEventListener('touchstart', handleTouchStart)
     window.addEventListener('touchend', handleTouchEnd)
+    window.addEventListener('touchcancel', resetRotation)
 
     // Cleanup
     return () => {
@@ -362,6 +377,7 @@ const ThreeTicketCanvas: React.FC<{
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchend', handleTouchEnd)
+      window.removeEventListener('touchcancel', resetRotation)
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
@@ -369,7 +385,7 @@ const ThreeTicketCanvas: React.FC<{
       canvasRef.current?.removeChild(renderer.domElement)
       renderer.dispose()
     }
-  }, [username, isDarkTheme, ticketType])
+  }, [username, isDarkTheme, ticketType, isFlipped.current])
 
   return (
     <div
