@@ -141,15 +141,32 @@ export function formatDate(dateString: string): string {
   return date.toLocaleString(undefined, options)
 }
 
+// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
+export const secondsPattern = /^\d+\s+seconds$/
+export const cronPattern =
+  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
+
+export function isSecondsFormat(schedule: string): boolean {
+  return secondsPattern.test(schedule.trim())
+}
+
 export function computeNextRunFromCurrentTime(schedule: string, currentTime: Date): string {
   try {
-    const interval = parser.parseExpression(schedule, { currentDate: currentTime })
-    const nextRun = interval.next().toDate()
+    let nextRun: Date
 
-    // Format the date using dayjs
+    if (isSecondsFormat(schedule)) {
+      // Handle "x seconds" format
+      const seconds = parseInt(schedule.split(' ')[0])
+      nextRun = new Date(currentTime.getTime() + seconds * 1000)
+    } else {
+      // Handle cron syntax
+      const interval = parser.parseExpression(schedule, { currentDate: currentTime })
+      nextRun = interval.next().toDate()
+    }
+
     return dayjs(nextRun).utc().format('YYYY-MM-DD HH:mm:ss [UTC]')
   } catch (err) {
-    console.error('Error parsing cron schedule:', err)
-    return 'Invalid cron schedule'
+    console.error('Error parsing schedule:', err)
+    return 'Invalid schedule format'
   }
 }

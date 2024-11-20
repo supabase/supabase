@@ -1,25 +1,20 @@
-import { CronJobsListing } from 'components/interfaces/Integrations/CronJobs/CronJobsListing'
 import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { DocsButton } from 'components/ui/DocsButton'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useEffect, useState } from 'react'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
-import { CronJobsDisabledState } from '../../../../components/interfaces/Integrations/CronJobs/CronJobsDisabledState'
+
+import { CronJobsDisabledState } from 'components/interfaces/Integrations/CronJobs/CronJobsDisabledState'
 
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
-import { Sheet, SheetContent } from 'ui'
-import { useQueryState } from 'nuqs'
 import CronJobRunsDataGrid from 'components/interfaces/Integrations/CronJobs/CronJobRunsDataGrid'
 import CronJobsDataGrid from 'components/interfaces/Integrations/CronJobs/CronJobsDataGrid'
+import { CronJobsFormHeader } from 'components/interfaces/Integrations/CronJobs/CronJobsFormHeader'
+import { useQueryState } from 'nuqs'
+import { Sheet, SheetContent } from 'ui'
 
-import { ChevronRight } from 'lucide-react'
-import { CronJobsFormHeader } from '../../../../components/interfaces/Integrations/CronJobs/CronJobsFormHeader'
 const CronJobsPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const [isClosingCreateCronJobSheet, setIsClosingCreateCronJobSheet] = useState(false)
@@ -81,11 +76,7 @@ const CronJobsPage: NextPageWithLayout = () => {
       ) : (
         <>
           <CronJobsFormHeader />
-          <CronJobRunsDataGrid
-            jobId={Number(urlCronJob)}
-            jobState={jobState}
-            updateJobState={updateJobState}
-          />
+          <CronJobRunsDataGrid updateJobState={updateJobState} />
         </>
       )}
       <Sheet
@@ -105,60 +96,6 @@ const CronJobsPage: NextPageWithLayout = () => {
         </SheetContent>
       </Sheet>
     </>
-    // <ScaffoldContainer className="h-full">
-    //   <ScaffoldSection className="h-full">
-    //     <div className="col-span-12 h-full pb-8">
-    //       {pgCronExtensionInstalled && (
-    //         <FormHeader
-    //           title="Cron jobs"
-    //           description="Schedule and automate tasks like running queries or maintenance routines at specified intervals"
-    //           actions={
-    //             <>
-    //               <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
-    //               <Button
-    //                 type="primary"
-    //                 onClick={() =>
-    //                   setCreateCronJobSheetShown({
-    //                     jobname: '',
-    //                     schedule: '',
-    //                     command: '',
-    //                     active: true,
-    //                   })
-    //                 }
-    //               >
-    //                 Create a new cron job
-    //               </Button>
-    //             </>
-    //           }
-    //         />
-    //       )}
-    //       {isLoadingExtensions ? (
-    //         <GenericSkeletonLoader />
-    //       ) : !pgCronExtensionInstalled ? (
-    //         <CronJobsDisabledState />
-    //       ) : (
-    //         <CronJobsListing />
-    //       )}
-    //     </div>
-    //   </ScaffoldSection>
-
-    //   <Sheet
-    //     open={!!createCronJobSheetShown}
-    //     onOpenChange={() => setIsClosingCreateCronJobSheet(true)}
-    //   >
-    //     <SheetContent size="default" tabIndex={undefined}>
-    //       <CreateCronJobSheet
-    //         selectedCronJob={createCronJobSheetShown}
-    //         onClose={() => {
-    //           setIsClosingCreateCronJobSheet(false)
-    //           setCreateCronJobSheetShown(undefined)
-    //         }}
-    //         isClosing={isClosingCreateCronJobSheet}
-    //         setIsClosing={setIsClosingCreateCronJobSheet}
-    //       />
-    //     </SheetContent>
-    //   </Sheet>
-    // </ScaffoldContainer>
   )
 }
 

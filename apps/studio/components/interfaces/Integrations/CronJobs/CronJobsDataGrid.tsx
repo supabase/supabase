@@ -1,36 +1,29 @@
-import { ChevronRight, Pencil, Trash, X, Eye } from 'lucide-react'
-import { useRef, useState, useEffect } from 'react'
+import { ChevronRight, Pencil, Trash } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
-import { useParams } from 'common'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
-import { useRouter } from 'next/router'
 import {
   Badge,
   Button,
-  ResizableHandle,
+  cn,
   ResizablePanel,
   ResizablePanelGroup,
   Sheet,
   SheetContent,
-  cn,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
-import DeleteCronJob from './DeleteCronJob'
-import { Jobs } from 'openai/resources/fine-tuning/jobs'
-import { DocsButton } from 'components/ui/DocsButton'
-import { CronJobsFormHeader } from './CronJobsFormHeader'
 import { computeNextRunFromCurrentTime } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
-import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
+import DeleteCronJob from './DeleteCronJob'
 
 interface CronJobsDataGridProps {
   jobState: { jobId: string; selectedJob: CronJob | null }
@@ -40,19 +33,13 @@ interface CronJobsDataGridProps {
 const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) => {
   const { project } = useProjectContext()
 
-  const {
-    data: cronJobs,
-    error,
-    isLoading,
-    isError,
-    refetch,
-  } = useCronJobsQuery({
+  const { data: cronJobs, isLoading } = useCronJobsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
   const gridRef = useRef<DataGridHandle>(null)
-  const { ref } = useParams()
-  const router = useRouter()
+
   const { project: selectedProject } = useProjectContext()
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
@@ -70,10 +57,11 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
 
   const [currentTime, setCurrentTime] = useState(new Date())
 
+  // Update the current run time every 30 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date())
-    }, 30000) // Update every 30 seconds
+    }, 30000)
 
     return () => clearInterval(interval)
   }, [])
@@ -92,7 +80,7 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
     {
       id: 'schedule',
       name: 'Schedule',
-      minWidth: 150,
+      minWidth: 120,
       value: (row: CronJob) => <div className="text-xs">{row.schedule}</div>,
     },
     {
@@ -109,23 +97,26 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
       name: 'Command',
       minWidth: 150,
       value: (row: CronJob) => (
-        <HoverCard_Shadcn_ openDelay={200}>
-          <HoverCardTrigger_Shadcn_ asChild className="cursor-pointer">
-            <span className="font-mono px-2 py-1 bg-alternative-200 rounded-md text-sm flex items-center gap-2">
-              <Eye size={12} className="text-foreground-lighter" />
-              <span className="text-foreground-light text-sm truncate max-w-36">{row.command}</span>
-            </span>
-          </HoverCardTrigger_Shadcn_>
-          <HoverCardContent_Shadcn_>
-            <SimpleCodeBlock
-              showCopy={false}
-              className="sql"
-              parentClassName="!p-0 [&>div>span]:text-xs"
+        <div className="flex items-center gap-1.5">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <span className="text-xs cursor-pointer truncate max-w-[300px]">{row.command}</span>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_
+              side="bottom"
+              align="center"
+              className="max-w-[300px] text-wrap"
             >
-              {row.command}
-            </SimpleCodeBlock>
-          </HoverCardContent_Shadcn_>
-        </HoverCard_Shadcn_>
+              <SimpleCodeBlock
+                showCopy={false}
+                className="sql"
+                parentClassName="!p-0 [&>div>span]:text-xs"
+              >
+                {row.command}
+              </SimpleCodeBlock>
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+        </div>
       ),
     },
     {
@@ -200,13 +191,6 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
     return result
   })
 
-  function handleSidepanelClose() {
-    //setSelectedJob(null)
-    const { id, ...otherParams } = router.query
-    //router.push({ query: otherParams })
-    updateJobState('', null)
-  }
-
   return (
     <>
       <ResizablePanelGroup
@@ -273,40 +257,6 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
             </div>
           </ResizablePanel>
         </div>
-
-        {jobState.jobId !== '' && (
-          <>
-            <ResizableHandle withHandle />
-            <ResizablePanel
-              defaultSize={30}
-              maxSize={45}
-              minSize={30}
-              className="bg-studio border-t"
-            >
-              <Button
-                type="text"
-                className="absolute top-3 right-3 px-1"
-                icon={<X />}
-                onClick={handleSidepanelClose}
-              />
-              <div className="p-5">
-                <h3 className="text-sm mb-4">{jobState.selectedJob?.jobname}</h3>
-
-                <div className="grid gap-4">
-                  <div>
-                    <h4 className="text-sm font-medium">Schedule</h4>
-                    <p className="text-sm">schedule here</p>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-medium">Last Run</h4>
-                    last run
-                    {/* <p className="text-sm">{selectedJob.}</p> */}
-                  </div>
-                </div>
-              </div>
-            </ResizablePanel>
-          </>
-        )}
       </ResizablePanelGroup>
 
       <Sheet
