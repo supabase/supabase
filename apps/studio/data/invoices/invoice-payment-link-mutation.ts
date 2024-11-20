@@ -17,7 +17,7 @@ export async function updateInvoicePaymentLink({
   if (!slug) throw new Error('Org slug is required')
   if (!invoiceId) throw new Error('Invoice ID is required')
 
-  const { data, error } = await get(
+  const { data, error, response } = await get(
     '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link',
     {
       params: {
@@ -48,17 +48,14 @@ export const useInvoicePaymentLinkGetMutation = ({
     (vars) => updateInvoicePaymentLink(vars),
     {
       async onError(error, variables, context) {
-        // The API may return a 400 error if the invoice is already paid,
-        // so we invalidate the cache to reflect the updated status
-        if (error.code === 400) {
-          await Promise.all([
-            queryClient.invalidateQueries(invoicesKeys.list(variables.slug, undefined)),
-            queryClient.invalidateQueries(invoicesKeys.count(variables.slug)),
-          ])
-        }
+        // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status
+        await Promise.all([
+          queryClient.invalidateQueries(invoicesKeys.list(variables.slug, undefined)),
+          queryClient.invalidateQueries(invoicesKeys.count(variables.slug)),
+        ])
 
         if (onError === undefined) {
-          toast.error(`Failed to mutate: ${error.message}`)
+          toast.error(error.message)
         } else {
           onError(error, variables, context)
         }
