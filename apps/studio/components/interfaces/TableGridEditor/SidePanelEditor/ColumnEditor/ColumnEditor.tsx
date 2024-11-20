@@ -23,7 +23,7 @@ import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import { POSTGRES_DATA_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
+import { TEXT_TYPES } from '../SidePanelEditor.constants'
 import type {
   ColumnField,
   CreateColumnPayload,
@@ -35,6 +35,7 @@ import {
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
+  getPlaceholderText,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -74,7 +75,9 @@ const ColumnEditor = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
-  const [placeholder, setPlaceholder] = useState(`e.g length(${columnFields?.name || 'column_name'}) < 500`);
+  const [placeholder, setPlaceholder] = useState(
+    getPlaceholderText(columnFields?.format, columnFields?.name)
+  )
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -123,52 +126,7 @@ const ColumnEditor = ({
 
   if (!columnFields) return null
 
-  const setPlacholderText = (format: string | undefined, columnFieldName: string) => {
-    const columnName = Boolean(columnFieldName) === true ? columnFieldName : "column_name"
-    switch (format) {
-      case "int2":
-      case "int4":
-      case "int8":
-      case "numeric":
-        setPlaceholder(`${columnName} > 0`)
-        break
-      case "float4":
-      case "float8":
-        setPlaceholder(`${columnName} > 0.0`)
-        break
-      case "text":
-      case "varchar":
-        setPlaceholder(`LENGTH(${columnName}) <= 50`)
-        break;
-      case "json":
-      case "jsonb":
-        setPlaceholder(`JSONB_TYPEOF(${columnName}->'active') = 'boolean'`)
-        break;
-      case "bool":
-        setPlaceholder(`${columnName} IN (TRUE, FALSE)`)
-        break;
-      case "date":
-        setPlaceholder(`${columnName} > "2024-01-01"`)
-        break;
-      case "time":
-        setPlaceholder(`${columnName} BETWEEN '09:00:00' AND '12:00:00'`)
-        break;
-      case "timetz":
-        setPlaceholder(`${columnName} AT TIME ZONE 'UTC' BETWEEN '09:00:00+00' AND '17:00:00+00'`)
-        break;
-      case "uuid":
-        setPlaceholder(`${columnName} '00000000-0000-0000-0000-000000000000'`)
-        break;
-      case "timestamp":
-        setPlaceholder(`${columnName} > '2023-01-01 00:00' AND ${columnName} < '2025-01-01 00:00' `)
-      case "timestamptz":
-        setPlaceholder(`${columnName} > '2023-01-01 00:00:00+00' AND ${columnName} < '2025-01-01 00:00:00+00' `)
-      default:
-        break;
-    }
-  }
   const onUpdateField = (changes: Partial<ColumnField>) => {
-    setPlacholderText(changes.format, columnFields.name)
     const isTextBasedColumn = TEXT_TYPES.includes(columnFields.format)
     if (!isTextBasedColumn && changes.defaultValue === '') {
       changes.defaultValue = null
@@ -192,6 +150,7 @@ const ColumnEditor = ({
 
     const updatedColumnFields: ColumnField = { ...columnFields, ...changes }
     setColumnFields(updatedColumnFields)
+    setPlaceholder(getPlaceholderText(updatedColumnFields.format, updatedColumnFields.name))
     updateEditorDirty()
 
     const updatedErrors = { ...errors }
