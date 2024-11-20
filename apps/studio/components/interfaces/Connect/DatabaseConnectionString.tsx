@@ -11,7 +11,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluckObjectFields } from 'lib/helpers'
 import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
@@ -250,7 +250,7 @@ export const DatabaseConnectionString = () => {
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </div>
-        <DatabaseSelector />
+        <DatabaseSelector buttonProps={{ size: 'small' }} />
       </div>
 
       {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}

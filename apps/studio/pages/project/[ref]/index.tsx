@@ -17,8 +17,11 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const Home: NextPageWithLayout = () => {
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
+
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
 
@@ -56,6 +59,7 @@ const Home: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-3">
           {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
+          {!connectDialogUpdate && <Connect />}
         </div>
       </div>
 

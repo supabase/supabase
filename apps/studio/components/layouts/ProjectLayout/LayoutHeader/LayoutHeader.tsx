@@ -18,8 +18,11 @@ import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 import Connect from 'components/interfaces/Home/Connect/Connect'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
+
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
@@ -102,7 +105,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             )}
           </div>
         )}
-        <Connect />
+        {connectDialogUpdate && <Connect />}
         {!isBranchingEnabled && <EnableBranchingButton />}
 
         {/* Additional breadcrumbs are supplied */}

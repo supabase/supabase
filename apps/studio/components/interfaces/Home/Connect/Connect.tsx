@@ -4,6 +4,8 @@ import { ExternalLink, Plug } from 'lucide-react'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
+import { DatabaseConnectionString as OldDatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -30,8 +32,11 @@ import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 import { PoolingModesDialog } from 'components/interfaces/Connect/PoolingModesDialog'
+import { useFlag } from 'hooks/ui/useFlag'
 
 const Connect = () => {
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
+
   const { ref: projectRef } = useParams()
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
@@ -148,7 +153,11 @@ const Connect = () => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
+          <Button
+            type="default"
+            className={cn(connectDialogUpdate && 'rounded-full')}
+            icon={<Plug className="rotate-90" />}
+          >
             <span>Connect</span>
           </Button>
         </DialogTrigger>
@@ -260,7 +269,13 @@ const Connect = () => {
               value="direct"
               className={cn('!mt-0', 'p-0', 'flex flex-col gap-6', DIALOG_PADDING_Y)}
             >
-              <DatabaseConnectionString />
+              {connectDialogUpdate ? (
+                <DatabaseConnectionString />
+              ) : (
+                <div className="px-7">
+                  <OldDatabaseConnectionString appearance="minimal" />
+                </div>
+              )}
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
         </DialogContent>

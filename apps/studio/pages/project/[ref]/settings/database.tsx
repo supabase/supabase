@@ -16,10 +16,18 @@ import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/lay
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Button } from 'ui'
+import { Plug } from 'lucide-react'
+import { Pointer } from 'lucide-react'
+import { GitBranch } from 'lucide-react'
+import { ChevronsDownUp } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
+import { ConnectionStringMoved } from './connection-string-moved'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
   const showDiskAndComputeForm = useFlag('diskAndComputeForm')
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
   const project = useSelectedProject()
 
   const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
@@ -35,8 +43,14 @@ const ProjectSettings: NextPageWithLayout = () => {
         <div className="space-y-10">
           <div className="flex flex-col gap-y-10">
             <DatabaseReadOnlyAlert />
-            <DatabaseConnectionString appearance="default" />
-            <DatabaseSettings />
+            {connectDialogUpdate ? (
+              <ConnectionStringMoved />
+            ) : (
+              <>
+                <DatabaseConnectionString appearance="default" />
+                <DatabaseSettings />
+              </>
+            )}
             <ConnectionPooling />
           </div>
 

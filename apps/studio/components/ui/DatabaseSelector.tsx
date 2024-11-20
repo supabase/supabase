@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Button,
+  ButtonProps,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
@@ -30,12 +31,15 @@ interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
   onSelectId?: (id: string) => void // Optional callback
+
+  buttonProps?: ButtonProps
 }
 
 const DatabaseSelector = ({
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
+  buttonProps,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -66,15 +70,16 @@ const DatabaseSelector = ({
             </span>
             <Button
               type="default"
-              size="small"
+              icon={isLoading && <Loader2 className="animate-spin" />}
+              iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
+              {...buttonProps}
               className={cn(
                 'pr-2 rounded-l-none',
                 variant === 'connected-on-right' && 'rounded-r-none',
                 variant === 'connected-on-left' && 'rounded-l-none border-l-0',
-                variant === 'connected-on-both' && 'rounded-none border-x-0'
+                variant === 'connected-on-both' && 'rounded-none border-x-0',
+                buttonProps?.className
               )}
-              icon={isLoading && <Loader2 className="animate-spin" />}
-              iconRight={<ChevronDown strokeWidth={1.5} size={12} />}
             >
               {selectedAdditionalOption ? (
                 <span>{selectedAdditionalOption.name}</span>
