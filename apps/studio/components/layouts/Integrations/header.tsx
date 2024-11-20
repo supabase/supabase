@@ -96,7 +96,7 @@ export const Header = forwardRef<
                       transition={{ duration: 0.15 }}
                     >
                       <Link
-                        href={`/project/${project?.ref}/integrations/landing`}
+                        href={`/project/${project?.ref}/integrations`}
                         className="text-foreground-light hover:text-foreground transition flex items-center"
                       >
                         <ChevronLeft size={14} />
@@ -124,9 +124,7 @@ export const Header = forwardRef<
                       transition={layoutTransition}
                       className="text-xs text-foreground-light hover:text-foreground"
                     >
-                      <Link href={`/project/${project?.ref}/integrations/landing`}>
-                        Integrations
-                      </Link>
+                      <Link href={`/project/${project?.ref}/integrations`}>Integrations</Link>
                     </motion.span>
                   )}
                 </div>

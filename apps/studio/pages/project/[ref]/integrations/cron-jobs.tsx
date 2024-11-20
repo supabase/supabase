@@ -8,27 +8,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useMemo } from 'react'
 import type { NextPageWithLayout } from 'types'
 
-const tabs = [
-  {
-    id: 'overview',
-    label: 'Overview',
-    content: (
-      <div className="p-9">
-        <CronjobsOverviewTab />
-      </div>
-    ),
-  },
-  {
-    id: 'cronjobs',
-    label: 'Cronjobs',
-    content: (
-      <div className="p-9">
-        <CronjobsTab />
-      </div>
-    ),
-  },
-]
-
 const CronJobsPage: NextPageWithLayout = () => {
   const id = 'supabase-cron'
 

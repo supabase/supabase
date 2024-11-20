@@ -4,7 +4,7 @@ import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import type { NextPageWithLayout } from 'types'
 import { Separator } from 'ui'
 
-const LandingPage: NextPageWithLayout = () => {
+const IntegrationsPage: NextPageWithLayout = () => {
   return (
     <div>
       <InstalledIntegrations />
@@ -14,8 +14,8 @@ const LandingPage: NextPageWithLayout = () => {
   )
 }
 
-LandingPage.getLayout = (page) => {
+IntegrationsPage.getLayout = (page) => {
   return <IntegrationsLayout>{page}</IntegrationsLayout>
 }
 
-export default LandingPage
+export default IntegrationsPage

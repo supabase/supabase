@@ -6,11 +6,16 @@ import { IntegrationDefinition } from './Integrations.constants'
 
 type IntegrationCardProps = IntegrationDefinition & {}
 
-export const IntegrationCard = ({ id, name, icon, description }: IntegrationCardProps) => {
+export const IntegrationCard = ({ id, name, icon, type, description }: IntegrationCardProps) => {
   const { project } = useProjectContext()
 
+  let url = `/project/${project?.ref}/integrations/${id}`
+  if (type === 'wrapper') {
+    url = `/project/${project?.ref}/integrations/wrappers/${id}`
+  }
+
   return (
-    <Link href={`/project/${project?.ref}/integrations/${id}`}>
+    <Link href={url}>
       <div
         className={cn([
           'w-80 h-28 pl-5 pr-6 py-3 bg-surface-100 hover:bg-surface-200 hover:border-strong ',

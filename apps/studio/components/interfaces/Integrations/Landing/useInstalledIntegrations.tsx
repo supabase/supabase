@@ -1,12 +1,12 @@
 import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { INTEGRATIONS } from './Integrations.constants'
 
 export const useInstalledIntegrations = () => {
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
   const { data, isLoading: isFDWLoading } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -27,7 +27,7 @@ export const useInstalledIntegrations = () => {
 
   const installedIntegrationsIds = INTEGRATIONS.filter((i) => {
     // special handling for supabase webhooks
-    if (i.id === 'supabase-webhooks') {
+    if (i.id === 'webhooks') {
       return isHooksEnabled
     }
     if (i.type === 'wrapper') {

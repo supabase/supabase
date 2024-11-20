@@ -1,11 +1,13 @@
 import { useParams } from 'common'
-import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
-import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import {
+  IntegrationDefinition,
+  INTEGRATIONS,
+} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { Header } from 'components/layouts/Integrations/header'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useScroll } from 'framer-motion'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -75,14 +77,10 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
     }
   }, [scroll.scrollY])
 
-  const { data: fdwData } = useFDWsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const wrappers = fdwData?.result || []
-
   const page = router.pathname.split('/')[4]
+
+  const { installedIntegrations } = useInstalledIntegrations()
+  const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
 
   return (
     <ProjectLayout
@@ -91,7 +89,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
       product="Integrations"
       isBlocking={false}
       productMenu={
-        <ProductMenu page={page} menu={generateIntegrationsMenu(wrappers, id, project?.ref)} />
+        <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
       }
     >
       <Header ref={headerRef} scroll={scroll} isSticky={isSticky} />
@@ -107,22 +105,16 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
 
-  const { data: fdwData } = useFDWsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  const wrappers = fdwData?.result || []
-
-  // generateIntegrationsMenu()
+  const { installedIntegrations } = useInstalledIntegrations()
+  const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
 
   return (
     <ProjectLayout
       isLoading={false}
       product="Integrations"
-      // productMenu={
-      //   <ProductMenu page={page} menu={generateIntegrationsMenu(wrappers, id, project?.ref)} />
-      // }
+      productMenu={
+        <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
+      }
     >
       {props.children}
     </ProjectLayout>
@@ -133,37 +125,31 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 export default withAuth(IntegrationsLayout)
 
 const generateIntegrationsMenu = (
-  wrappers: FDW[],
-  integrationId?: string,
+  integrations: IntegrationDefinition[],
   projectRef?: string
 ): ProductMenuGroup[] => {
-  const installedIntegrations = INTEGRATIONS.filter((integration) => {
-    if (integration.type === 'wrapper') {
-      return wrappers.find((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
-    }
-    return false
-  })
-
   return [
     {
       title: 'Installed Integrations',
       // hideTitle: true,
       items: [
         {
-          name: 'All Integratons',
+          name: 'All Integrations',
           key: 'all-integrations',
-          url: `/project/${projectRef}/integrations/landing`,
+          url: `/project/${projectRef}/integrations`,
           items: [],
-          // icon: <Grid2x2Plus size={14} />,
         },
       ],
     },
     {
       title: 'Installed Integrations',
-      items: installedIntegrations.map((integration) => ({
+      items: integrations.map((integration) => ({
         name: integration.name,
         key: integration.id,
-        url: `/project/${projectRef}/integrations/${integration.id}`,
+        url:
+          integration.type === 'wrapper'
+            ? `/project/${projectRef}/integrations/wrappers/${integration.id}`
+            : `/project/${projectRef}/integrations/${integration.id}`,
         icon: (
           <div className="relative w-6 h-6 bg-surface-400 border rounded">{integration.icon}</div>
         ),
