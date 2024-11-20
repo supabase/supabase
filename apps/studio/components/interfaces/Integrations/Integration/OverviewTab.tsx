@@ -1,9 +1,8 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Link } from 'lucide-react'
 import { useState } from 'react'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
@@ -11,14 +10,20 @@ import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Button,
+  Separator,
   Sheet,
   SheetContent,
   WarningIcon,
 } from 'ui'
-import { IntegrationDefinition } from '../Landing/Integrations.constants'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import { BuiltBySection } from './build-by-section'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
+import { MarkdownContent } from './MarkdownContent'
+import { WrapperTable } from './WrapperTable'
+import { useParams } from 'common'
 
-export const OverviewTab = ({ integration }: { integration: IntegrationDefinition }) => {
+export const OverviewTab = () => {
+  const { id } = useParams()
   const { project } = useProjectContext()
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
@@ -29,17 +34,16 @@ export const OverviewTab = ({ integration }: { integration: IntegrationDefinitio
     connectionString: project?.connectionString,
   })
 
-  if (integration.type !== 'wrapper') {
+  const integration = INTEGRATIONS.find((i) => i.id === id)
+
+  if (integration?.type !== 'wrapper') {
     return <div>Unsupported integration type.</div>
   }
 
   const wrapperMeta = integration.meta
-
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
-
   const hasRequiredVersion =
     (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
-
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version !== wrappersExtension?.default_version
 
@@ -82,9 +86,11 @@ export const OverviewTab = ({ integration }: { integration: IntegrationDefinitio
   }
 
   return (
-    <>
-      <div>
+    <div className="my-10 flex flex-col gap-10">
+      <BuiltBySection />
+      {/* <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
         <ButtonTooltip
+          type="default"
           onClick={() => setCreateWrapperShown(true)}
           disabled={!canCreateWrapper}
           tooltip={{
@@ -95,9 +101,16 @@ export const OverviewTab = ({ integration }: { integration: IntegrationDefinitio
             },
           }}
         >
-          Add new wrapper of this kind
+          Add new wrapper
         </ButtonTooltip>
+      </div> */}
+      <MarkdownContent />
+      <Separator />
+      <div className="mx-10 flex flex-col gap-5">
+        Recent wrappers
+        <WrapperTable />
       </div>
+      <Separator />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
         <SheetContent size="default" tabIndex={undefined}>
           <CreateWrapperSheet
@@ -111,6 +124,6 @@ export const OverviewTab = ({ integration }: { integration: IntegrationDefinitio
           />
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   )
 }

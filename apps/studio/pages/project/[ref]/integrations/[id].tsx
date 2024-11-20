@@ -1,18 +1,15 @@
+import { parseAsString, useQueryState } from 'nuqs'
+
 import { useParams } from 'common'
 import { OverviewTab } from 'components/interfaces/Integrations/Integration/OverviewTab'
 import { WrappersTab } from 'components/interfaces/Integrations/Integration/WrappersTab'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
-import { ChevronLeft } from 'lucide-react'
-import Link from 'next/link'
-import { parseAsString, useQueryState } from 'nuqs'
+import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import type { NextPageWithLayout } from 'types'
-import { NavMenu, NavMenuItem } from 'ui'
+import { Button } from 'ui'
 
 const WrapperPage: NextPageWithLayout = () => {
   const { id } = useParams()
-  const { project } = useProjectContext()
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
@@ -22,54 +19,62 @@ const WrapperPage: NextPageWithLayout = () => {
   }
 
   return (
-    <div className="py-8">
-      <Link
-        href={`/project/${project?.ref}/integrations/landing`}
-        className="flex flex-row items-center gap-1 pl-10 text-foreground-light"
-      >
-        <ChevronLeft size={14} />
-        <span className="text-sm  hover:underline">Integrations</span>
-      </Link>
-      <div className="flex flex-row pl-10"></div>
-      <div className="pl-10 pt-5 flex flex-row gap-4">
-        <div className="w-12 h-12 relative">
-          <div className="w-full h-full bg-foreground rounded-md" />
-          {integration.icon}
-        </div>
-        <div className="grow basis-0 w-full">
-          <div className="flex-col justify-start items-start flex">
-            <div className="text-white text-lg">{integration.name}</div>
-            <div className="text-foreground-light text-sm">{integration.description}</div>
-          </div>
-        </div>
-      </div>
-
-      <NavMenu className="pl-10 mt-9" aria-label="Vault menu">
-        <NavMenuItem active={selectedTab === 'overview'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=overview`}>Overview</Link>
-        </NavMenuItem>
-        <NavMenuItem active={selectedTab === 'wrappers'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=wrappers`}>Wrappers</Link>
-        </NavMenuItem>
-        <NavMenuItem active={selectedTab === 'logs'}>
-          <Link href={`/project/${project?.ref}/integrations/${id}?tab=logs`}>Logs</Link>
-        </NavMenuItem>
-      </NavMenu>
-      <div className="p-9">
-        {selectedTab === 'overview' && <OverviewTab integration={integration} />}
+    <div className="py-0">
+      <div className="">
+        {selectedTab === 'overview' && <OverviewTab />}
         {selectedTab === 'wrappers' && <WrappersTab />}
+        {selectedTab === 'logs' && (
+          <div className="">
+            <div className="px-10 bg-surface-100 flex items-center gap-2 py-2 border-b">
+              <div className="flex items-center gap-2">
+                <Button className="px-2 py-1 text-xs bg-surface-100 hover:bg-surface-200 rounded-md transition">
+                  Clear logs
+                </Button>
+                <Button className="px-2 py-1 text-xs bg-surface-100 hover:bg-surface-200 rounded-md transition">
+                  Download
+                </Button>
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <select className="px-2 py-1 text-xs bg-surface-100 rounded-md">
+                  <option>Last 24 hours</option>
+                  <option>Last 7 days</option>
+                  <option>Last 30 days</option>
+                </select>
+                <input
+                  type="search"
+                  placeholder="Search logs..."
+                  className="px-2 py-1 text-xs bg-surface-100 rounded-md w-[200px]"
+                />
+              </div>
+            </div>
+            <div className="">
+              {[...Array(100)].map((_, i) => (
+                <div key={i} className="px-10 py-0.5 font-mono text-sm hover:bg-surface-100/50">
+                  <div className="flex items-center gap-2 text-foreground-light">
+                    <span className="text-foreground-lighter">[{new Date().toISOString()}]</span>
+                    <span className="px-1.5 py-0.5 bg-success-900/30 text-success-500 rounded-full text-xs">
+                      SUCCESS
+                    </span>
+                    <span className="text-foreground">Integration {id} execution completed</span>
+                  </div>
+                  {/* <div className="mt-2 pl-6 text-foreground-light">
+                Integration executed successfully
+              </div>
+              <div className="mt-2 pl-6 flex items-center gap-2 text-xs text-foreground-lighter">
+                <span>duration=0.24s</span>
+                <span>status=success</span>
+                <span>request_id=req_8f3d92</span>
+              </div> */}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      {selectedTab === 'logs' && <div className="p-10">This tab hasn't been done yet</div>}
     </div>
   )
 }
 
-WrapperPage.getLayout = (page) => {
-  return (
-    <ProjectLayout title={'Integrations'} product="Integrations" isBlocking={false}>
-      {page}
-    </ProjectLayout>
-  )
-}
+WrapperPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
 
 export default WrapperPage
