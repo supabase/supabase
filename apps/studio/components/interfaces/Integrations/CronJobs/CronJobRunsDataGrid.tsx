@@ -263,7 +263,7 @@ const CronJobRunsDataGrid = ({ updateJobState }: CronJobsDataGridProps) => {
                   <h3 className="text-sm">Explore</h3>
                   <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
                     {/* [Terry] need to link to the exact jobid, but not currently supported */}
-                    <Link target="_blank" href={`/projects/${project?.ref}/logs/pgcron-logs/`}>
+                    <Link target="_blank" href={`/project/${project?.ref}/logs/pgcron-logs/`}>
                       View logs
                     </Link>
                   </Button>

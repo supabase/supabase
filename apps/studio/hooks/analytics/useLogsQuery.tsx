@@ -94,13 +94,6 @@ const useLogsQuery = (
         docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-ilike-and-similar-to-keywords-are-not-supported',
       }
     }
-    if (usesWildcard) {
-      error = {
-        message:
-          'Wildcard (*) queries are not supported. Please remove the wildcard and try again.',
-        docs: 'https://supabase.com/docs/guides/platform/advanced-log-filtering#the-wildcard-operator--to-select-columns-is-not-supported',
-      }
-    }
   }
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))

@@ -164,6 +164,12 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/edge-functions-logs`,
       items: [],
     },
+    {
+      name: 'Cron Jobs',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
