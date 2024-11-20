@@ -88,7 +88,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
       form.setValue('schedule', inputValue)
     } catch (error) {
       console.error('Error converting cron expression to string:', error)
-      //setScheduleString('Invalid cron expression')
     }
   }, [form, inputValue])
 
@@ -106,7 +105,6 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
       setScheduleString(CronToString(schedule))
     } catch (error) {
       console.error('Error converting cron expression to string:', error)
-      //setScheduleString('Invalid cron expression')
     }
   }, [schedule])
 
