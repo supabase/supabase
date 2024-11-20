@@ -212,7 +212,7 @@ limit ${limit}
   limit ${limit}
   `
 
-    case 'pg_cron':
+    case 'pg_cron_logs':
       const baseWhere = `where (parsed.application_name = 'pg_cron' OR event_message LIKE '%cron job%')`
 
       const pgCronWhere = where ? `${baseWhere} AND ${where.substring(6)}` : baseWhere
