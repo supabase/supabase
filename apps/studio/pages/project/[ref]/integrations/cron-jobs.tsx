@@ -46,7 +46,10 @@ const CronJobsPage: NextPageWithLayout = () => {
   }, [isError, pgCronExtensionInstalled, refetch])
 
   // store the jobId in the url
-  const [urlCronJob, setUrlCronJob] = useQueryState('jobid', { defaultValue: '' })
+  const [urlCronJob, setUrlCronJob] = useQueryState('jobid', {
+    defaultValue: '',
+    history: 'push',
+  })
 
   // Sync the jobId from useQueryState with the combined state
   useEffect(() => {
