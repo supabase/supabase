@@ -17,14 +17,13 @@ import Cursor from './Cursor'
 
 /**
  * [x] multiplayer cursors
+ * [x] show own cursor
  * [x] show own trail
+ * [x] show other users cursors
  * [x] brand color for current user
  * [x] gray for online users
- * [x] show own cursor
- * [x] abstract reusable setHoverTrail function
- * [x] show other users cursors
  * [x] offset cursor position by scroll offset Y
- * [ ] show other users trails (?)
+ * [ ] hide own cursor on touch devices
  */
 
 const GRID_SIZE = 100
@@ -362,7 +361,7 @@ export default function InteractiveGrid() {
 
       {/* Online users cursors */}
       {Object.entries(users).reduce((acc, [userId, data]) => {
-        const { x, y, color, message, isTyping, hue } = data
+        const { x, y, message, isTyping } = data
         if (x && y) {
           acc.push(
             <Cursor

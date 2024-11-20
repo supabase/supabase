@@ -75,9 +75,9 @@ const Cursor: FC<Props> = ({
   }, [x, y, isTyping, chatBubbleRef])
 
   useEffect(() => {
+    // touchscreen
     if (window.matchMedia('(pointer: coarse)').matches) {
-      // touchscreen
-      setIsTouchDevice(false)
+      setIsTouchDevice(true)
     }
   }, [])
 

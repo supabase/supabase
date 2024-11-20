@@ -12,7 +12,7 @@ import TicketingFlow from '~/components/LaunchWeek/13/Ticket/TicketingFlow'
 export default function LaunchWeekIndex() {
   const { query } = useRouter()
 
-  const TITLE = `${LW13_TITLE} | ${LW13_DATE}`
+  const TITLE = `${LW13_TITLE} | 2-6 Dec / 7am PT`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/13/lw13-og.png`
 
