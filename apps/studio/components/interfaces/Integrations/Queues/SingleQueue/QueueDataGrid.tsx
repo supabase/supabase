@@ -9,8 +9,11 @@ import { PostgresQueueMessage } from 'data/database-queues/database-queue-messag
 import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
+import { ResponseError } from 'types'
+import AlertError from 'components/ui/AlertError'
 
 interface QueueDataGridProps {
+  error?: ResponseError | null
   isLoading: boolean
   messages: PostgresQueueMessage[]
   showMessageModal: () => void
@@ -122,6 +125,7 @@ const columns = messagesCols.map((col) => {
 })
 
 export const QueueMessagesDataGrid = ({
+  error,
   isLoading,
   messages,
   showMessageModal,
@@ -181,6 +185,10 @@ export const QueueMessagesDataGrid = ({
           noRowsFallback: isLoading ? (
             <div className="absolute top-14 px-6 w-full">
               <GenericSkeletonLoader />
+            </div>
+          ) : !!error ? (
+            <div className="absolute top-16 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+              <AlertError subject="Failed to retrieve queue messages" error={error} />
             </div>
           ) : (
             <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">

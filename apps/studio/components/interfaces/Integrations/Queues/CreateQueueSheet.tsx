@@ -104,6 +104,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
   }
 
   const onSubmit: SubmitHandler<CreateQueueForm> = async ({ name, values }) => {
+    console.log({ name, values })
     let query = `SELECT pgmq.create('${name}');`
     if (values.type === 'partitioned') {
       query = `select from pgmq.create_partitioned('${name}', '${values.partitionInterval}', '${values.retentionInterval}');`

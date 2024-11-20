@@ -41,7 +41,7 @@ export const QueuesListing = () => {
 
   const pgmqExtension = (extensions ?? []).find((ext) => ext.name === 'pgmq')
   // TODO: Change this to true for local development to work
-  const pgmqExtensionInstalled = pgmqExtension?.installed_version
+  const pgmqExtensionInstalled = true // pgmqExtension?.installed_version
 
   useEffect(() => {
     // refetch the queues after the pgmq extension has been installed
@@ -63,8 +63,9 @@ export const QueuesListing = () => {
     <>
       <div className="w-full space-y-4">
         <FormHeader
+          className="mb-0"
           title="Queues"
-          description="Use message queues to handle asynchronous tasks, manage workloads, and enable reliable communication between different parts of your application."
+          description="Handle asynchronous tasks and manage workloads between different parts of your application."
         />
         {queues.length === 0 ? (
           <div
@@ -80,10 +81,10 @@ export const QueuesListing = () => {
             <div className="flex items-center justify-between flex-wrap">
               <Input
                 placeholder="Search for a queue"
-                size="small"
+                size="tiny"
                 icon={<Search size={14} />}
                 value={searchQuery || ''}
-                className="w-64"
+                className="w-52"
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
 

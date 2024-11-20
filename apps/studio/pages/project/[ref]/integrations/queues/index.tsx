@@ -1,4 +1,5 @@
 import { QueuesListing } from 'components/interfaces/Integrations/Queues/QueuesListing'
+import { QueuesSettings } from 'components/interfaces/Integrations/Queues/QueuesSettings'
 import ProjectIntegrationsLayout from 'components/layouts/ProjectIntegrationsLayout/ProjectIntegrationsLayout'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import type { NextPageWithLayout } from 'types'
@@ -15,8 +16,9 @@ const QueuesPage: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer className="h-full">
       <ScaffoldSection className="h-full">
-        <div className="col-span-12 h-full pb-8">
+        <div className="col-span-12 h-full pb-8 flex flex-col gap-y-8">
           <QueuesListing />
+          <QueuesSettings />
         </div>
       </ScaffoldSection>
     </ScaffoldContainer>

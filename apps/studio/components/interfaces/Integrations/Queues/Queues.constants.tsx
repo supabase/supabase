@@ -2,7 +2,7 @@ import { Rows2, Rows3, Rows4 } from 'lucide-react'
 
 export const QUEUE_TYPES = [
   {
-    value: 'basic',
+    value: 'normal',
     icon: <Rows4 strokeWidth={1} />,
     label: 'Basic queue',
     description: 'Create a basic queue.',
