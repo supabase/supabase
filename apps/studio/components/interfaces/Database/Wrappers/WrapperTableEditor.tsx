@@ -4,11 +4,23 @@ import ActionBar from 'components/interfaces/TableGridEditor/SidePanelEditor/Act
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { Form, Input, Listbox, Modal, SidePanel } from 'ui'
+import {
+  Form,
+  Input,
+  Listbox,
+  Modal,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  SidePanel,
+} from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
 import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 import { Plus, Database } from 'lucide-react'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export type WrapperTableEditorProps = {
   visible: boolean
@@ -72,32 +84,32 @@ const WrapperTableEditor = ({
     >
       <SidePanel.Content>
         <div className="my-4 space-y-6">
-          <Listbox
-            size="small"
-            label="Select a target the table will point to"
-            value={selectedTableIndex}
-            onChange={(value) => setSelectedTableIndex(value)}
-          >
-            <Listbox.Option key="empty" value="" label="---">
-              ---
-            </Listbox.Option>
-
-            {tables.map((table, i) => {
-              return (
-                <Listbox.Option
-                  className="group"
-                  key={String(i)}
-                  value={String(i)}
-                  label={table.label}
-                >
-                  <div className="space-y-1">
-                    <p>{table.label}</p>
-                    <p className="text-foreground-lighter">{table.description}</p>
-                  </div>
-                </Listbox.Option>
-              )
-            })}
-          </Listbox>
+          <FormItemLayout label="Select a target the table will point to" isReactForm={false}>
+            <Select_Shadcn_
+              value={selectedTableIndex}
+              onValueChange={(value) => setSelectedTableIndex(value)}
+            >
+              <SelectTrigger_Shadcn_ className="mt-0">
+                <SelectValue_Shadcn_>
+                  {selectedTableIndex
+                    ? tables[selectedTableIndex as unknown as number].label
+                    : 'Select a value'}
+                </SelectValue_Shadcn_>
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {tables.map((table, i) => {
+                  return (
+                    <SelectItem_Shadcn_ key={String(i)} value={String(i)}>
+                      <div className="space-y-1">
+                        <p>{table.label}</p>
+                        <p className="text-foreground-lighter">{table.description}</p>
+                      </div>
+                    </SelectItem_Shadcn_>
+                  )
+                })}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </FormItemLayout>
 
           {selectedTable && (
             <TableForm table={selectedTable} onSubmit={onSubmit} initialData={initialData} />
