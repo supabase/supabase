@@ -271,7 +271,7 @@ export const DatabaseConnectionString = () => {
         <div className="flex flex-col divide-y divide-border">
           {/* // handle non terminal examples */}
           {hasCodeExamples && (
-            <div className="grid grid-cols-2 gap-20 w-full px-7  py-10">
+            <div className="grid grid-cols-2 gap-20 w-full px-7 py-8">
               <div>
                 <StepLabel number={1} className="mb-4">
                   Install the following
@@ -327,9 +327,12 @@ export const DatabaseConnectionString = () => {
                 connectionString={connectionStrings['direct'][selectedTab]}
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
-                  type: 'error',
-                  title: 'Not IPv4 compatible',
-                  link: { text: 'Purchase IPv4 support', url: '#' },
+                  type: !ipv4Addon ? 'error' : 'success',
+                  title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+                  link: {
+                    text: 'Purchase IPv4 support',
+                    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
+                  },
                 }}
                 parameters={[
                   // prettier-ignore
@@ -347,7 +350,7 @@ export const DatabaseConnectionString = () => {
                 contentType={contentType}
                 lang={lang}
                 type="transaction"
-                title="Transaction connection"
+                title="Transaction pooler"
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with the database is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
@@ -376,7 +379,7 @@ export const DatabaseConnectionString = () => {
                 contentType={contentType}
                 lang={lang}
                 type="session"
-                title="Session connection"
+                title="Session pooler"
                 fileTitle={fileTitle}
                 description="Better suited for applications with longer-running sessions that need persistent state or session-based features."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
@@ -424,57 +427,56 @@ export const DatabaseConnectionString = () => {
         </div>
       )}
 
-      {/* {poolerConnStringSyntax.length > 0 && (
+      {poolerConnStringSyntax.length > 0 && (
         <>
           <Separator />
-          <Panel.Content className={cn('!py-3 space-y-2')}>
-            <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
-                <div className="flex items-center gap-x-2 w-full">
-                  <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                    How to connect to a different database or switch to another user
-                  </p>
-                  <ChevronDown
-                    className="transition-transform duration-200"
-                    strokeWidth={1.5}
-                    size={14}
-                  />
-                </div>
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_ className="my-2">
-                <div className="text-foreground-light">
-                  <p className="text-xs">
-                    You can use the following URI format to switch to a different database or user
-                    {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
-                  </p>
-                  <p className="text-sm tracking-tight text-foreground-lighter">
-                    {poolerConnStringSyntax.map((x, idx) => {
-                      if (x.tooltip) {
-                        return (
-                          <Tooltip_Shadcn_ key={`syntax-${idx}`}>
-                            <TooltipTrigger_Shadcn_ asChild>
-                              <span className="text-foreground text-xs font-mono">{x.value}</span>
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_ side="bottom">
-                              {x.tooltip}
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
-                        )
-                      } else {
-                        return (
-                          <span key={`syntax-${idx}`} className="text-xs font-mono">
-                            {x.value}
-                          </span>
-                        )
-                      }
-                    })}
-                  </p>
-                </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+          <Collapsible_Shadcn_ className={cn('px-8 pt-5', selectedTab === 'python' && 'pb-5')}>
+            <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+              <div className="flex items-center gap-x-2 w-full">
+                <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                  How to connect to a different database or switch to another user
+                </p>
+                <ChevronDown
+                  className="transition-transform duration-200"
+                  strokeWidth={1.5}
+                  size={14}
+                />
+              </div>
+            </CollapsibleTrigger_Shadcn_>
+            <CollapsibleContent_Shadcn_ className="my-2">
+              <div className="text-foreground-light">
+                <p className="text-xs">
+                  You can use the following URI format to switch to a different database or user
+                  {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
+                </p>
+                <p className="text-sm tracking-tight text-foreground-lighter">
+                  {poolerConnStringSyntax.map((x, idx) => {
+                    if (x.tooltip) {
+                      return (
+                        <Tooltip_Shadcn_ key={`syntax-${idx}`}>
+                          <TooltipTrigger_Shadcn_ asChild>
+                            <span className="text-foreground text-xs font-mono">{x.value}</span>
+                          </TooltipTrigger_Shadcn_>
+                          <TooltipContent_Shadcn_ side="bottom">{x.tooltip}</TooltipContent_Shadcn_>
+                        </Tooltip_Shadcn_>
+                      )
+                    } else {
+                      return (
+                        <span key={`syntax-${idx}`} className="text-xs font-mono">
+                          {x.value}
+                        </span>
+                      )
+                    }
+                  })}
+                </p>
+              </div>
+            </CollapsibleContent_Shadcn_>
+          </Collapsible_Shadcn_>
 
-            {selectedTab === 'python' && (
-              <Collapsible_Shadcn_>
+          {selectedTab === 'python' && (
+            <>
+              <Separator />
+              <Collapsible_Shadcn_ className="px-8 pt-5">
                 <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
                   <div className="flex items-center gap-x-2 w-full">
                     <p className="text-xs text-foreground-light group-hover:text-foreground transition">
@@ -501,14 +503,10 @@ export const DatabaseConnectionString = () => {
                   </div>
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
-            )}
-          </Panel.Content>
-          <Separator />
-          <div className={cn(DIALOG_PADDING_X)}>
-            <DatabaseSettings />
-          </div>
+            </>
+          )}
         </>
-      )} */}
+      )}
     </div>
   )
 }

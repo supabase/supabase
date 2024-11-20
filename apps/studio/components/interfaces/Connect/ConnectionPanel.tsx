@@ -149,11 +149,6 @@ export const ConnectionPanel = ({
                         ? 'Suitable for a large number of connected clients'
                         : 'Not suitable if you have a large number of clients'}
                     </span>
-                    {/* <span className="text-xs text-foreground-light">
-                      {type === 'transaction'
-                        ? 'Shared pool connection for all client connections'
-                        : 'Dedicated pool connection for each client'}
-                    </span> */}
                   </div>
                 </div>
                 <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
@@ -163,11 +158,6 @@ export const ConnectionPanel = ({
                         ? 'Pre-warmed connection pool to the database'
                         : 'Connections from the pooler are not shared'}
                     </span>
-                    {/* <span className="text-xs text-foreground-lighter">
-                      {type === 'transaction'
-                        ? 'Shared by all clients connected to the pooler'
-                        : 'Each connection is one database connection'}
-                    </span> */}
                   </div>
                 </div>
               </>
@@ -183,7 +173,10 @@ export const ConnectionPanel = ({
                   <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
                 )}
                 {ipv4Status.link && (
-                  <a href={ipv4Status.link.url} className="text-xs text-brand hover:text-brand-600">
+                  <a
+                    href={ipv4Status.link.url}
+                    className="text-xs text-light hover:text-foreground"
+                  >
                     {ipv4Status.link.text}
                   </a>
                 )}
