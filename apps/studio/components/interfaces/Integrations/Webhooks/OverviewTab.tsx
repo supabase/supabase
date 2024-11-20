@@ -8,10 +8,14 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { toast } from 'sonner'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
 
 export const WebhooksOverviewTab = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+
+  const integration = INTEGRATIONS.find((i) => i.id === 'webhooks')!
 
   const {
     data: schemas,
@@ -49,7 +53,7 @@ export const WebhooksOverviewTab = () => {
   console.log(isPermissionsLoaded, isEnablingHooks)
 
   return (
-    <div>
+    <IntegrationOverviewTab integration={integration}>
       {isSchemasLoaded && isHooksEnabled ? (
         <div>This integration depends on database webhooks which are enabled on this project.</div>
       ) : (
@@ -80,6 +84,6 @@ export const WebhooksOverviewTab = () => {
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
       )}
-    </div>
+    </IntegrationOverviewTab>
   )
 }
