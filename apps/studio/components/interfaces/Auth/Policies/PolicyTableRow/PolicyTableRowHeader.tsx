@@ -1,26 +1,30 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { Lock, Unlock } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  AiIconAnimation,
-  Badge,
-  Button,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { useAppStateSnapshot } from 'state/app-state'
+import { AiIconAnimation, Badge } from 'ui'
 
 interface PolicyTableRowHeaderProps {
-  table: PostgresTable
+  table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }
   isLocked: boolean
-  onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectToggleRLS: (table: {
+    id: number
+    schema: string
+    name: string
+    rls_enabled: boolean
+  }) => void
   onSelectCreatePolicy: () => void
 }
 
@@ -31,7 +35,10 @@ const PolicyTableRowHeader = ({
   onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const { ref } = useParams()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
+  const enableAssistantV2 = useIsAssistantV2Enabled()
+  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const isRealtimeSchema = table.schema === 'realtime'
@@ -90,13 +97,13 @@ const PolicyTableRowHeader = ({
             )}
             <ButtonTooltip
               type="default"
-              disabled={!canToggleRLS}
+              disabled={!canToggleRLS || !canCreatePolicies}
               onClick={() => onSelectCreatePolicy()}
               tooltip={{
                 content: {
                   side: 'bottom',
                   text: !canToggleRLS
-                    ? !canToggleRLS
+                    ? !canToggleRLS || !canCreatePolicies
                       ? 'You need additional permissions to create RLS policies'
                       : undefined
                     : undefined,
@@ -106,25 +113,32 @@ const PolicyTableRowHeader = ({
               Create policy
             </ButtonTooltip>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="default"
-                  className="px-1"
-                  onClick={() => {
-                    onSelectCreatePolicy()
-                    setEditView('conversation')
-                  }}
-                >
-                  <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
-                {!canToggleRLS
-                  ? 'You need additional permissions to create RLS policies'
-                  : 'Create with Supabase Assistant'}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              type="default"
+              className="px-1"
+              onClick={() => {
+                if (enableAssistantV2) {
+                  setAiAssistantPanel({
+                    open: true,
+                    initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
+                  })
+                } else {
+                  onSelectCreatePolicy()
+                  setEditView('conversation')
+                }
+              }}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    !canToggleRLS || !canCreatePolicies
+                      ? 'You need additional permissions to create RLS policies'
+                      : 'Create with Supabase Assistant',
+                },
+              }}
+            >
+              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+            </ButtonTooltip>
           </div>
         </div>
       )}

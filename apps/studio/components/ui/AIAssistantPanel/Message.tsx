@@ -8,25 +8,21 @@ import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { SqlSnippet } from './SqlSnippet'
 
 interface MessageProps {
-  name?: string
+  id: string
   role: 'function' | 'system' | 'user' | 'assistant' | 'data' | 'tool'
   content?: string
-  createdAt?: number
-  isSelected?: boolean
-  isLoading?: boolean
+  isLoading: boolean
   readOnly?: boolean
   action?: React.ReactNode
   variant?: 'default' | 'warning'
 }
 
 export const Message = function Message({
-  name,
+  id,
   role,
   content,
-  createdAt,
   isLoading,
   readOnly,
-  isSelected = false,
   children,
   action = null,
   variant = 'default',

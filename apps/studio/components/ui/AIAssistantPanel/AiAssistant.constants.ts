@@ -1,3 +1,4 @@
+import { databaseKeys } from 'data/database/keys'
 import { SupportedAssistantEntities } from './AIAssistant.types'
 
 export const ASSISTANT_SUPPORT_ENTITIES: {

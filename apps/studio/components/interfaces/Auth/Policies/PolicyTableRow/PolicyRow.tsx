@@ -21,6 +21,8 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -33,6 +35,8 @@ const PolicyRow = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
+  const { setAiAssistantPanel } = useAppStateSnapshot()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -88,11 +92,29 @@ const PolicyRow = ({
           <DropdownMenuTrigger asChild>
             <Button type="default" className="px-1.5" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-40">
+          <DropdownMenuContent
+            side="bottom"
+            align="end"
+            className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
+          >
             <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
               <Edit size={14} />
               <p>Edit policy</p>
             </DropdownMenuItem>
+            {isAssistantV2Enabled && (
+              <DropdownMenuItem
+                className="space-x-2"
+                onClick={() => {
+                  setAiAssistantPanel({
+                    open: true,
+                    initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                  })
+                }}
+              >
+                <Edit size={14} />
+                <p>Edit policy with Assistant</p>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItemTooltip
               className="gap-x-2"

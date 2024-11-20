@@ -2,14 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { motion } from 'framer-motion'
 import { last } from 'lodash'
 import { FileText } from 'lucide-react'
-import { useRouter } from 'next/router'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
-import { useParams } from 'common'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
@@ -23,17 +22,10 @@ import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import {
-  BASE_PATH,
-  IS_PLATFORM,
-  OPT_IN_TAGS,
-  TELEMETRY_ACTIONS,
-  TELEMETRY_CATEGORIES,
-  TELEMETRY_LABELS,
-} from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
@@ -49,40 +41,44 @@ import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 
-const MemoizedMessage = memo(({ message }: { message: MessageType }) => {
-  return (
-    <Message
-      key={message.id}
-      name={message.name}
-      role={message.role}
-      content={message.content}
-      createdAt={new Date(message.createdAt || new Date()).getTime()}
-      readOnly={message.role === 'user'}
-    />
-  )
-})
+const MemoizedMessage = memo(
+  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+    return (
+      <Message
+        key={message.id}
+        id={message.id}
+        role={message.role}
+        content={message.content}
+        readOnly={message.role === 'user'}
+        isLoading={isLoading}
+      />
+    )
+  }
+)
 
 MemoizedMessage.displayName = 'MemoizedMessage'
 
 interface AIAssistantProps {
   id: string
+  initialMessages?: MessageType[] | undefined
   className?: string
   onResetConversation: () => void
 }
 
-export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantProps) => {
-  const router = useRouter()
+export const AIAssistant = ({
+  id,
+  initialMessages,
+  className,
+  onResetConversation,
+}: AIAssistantProps) => {
   const project = useSelectedProject()
-  const { id: snippetId } = useParams()
-
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const { snippets } = useSqlEditorV2StateSnapshot()
-  const { aiAssistantPanel, resetAiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { open, initialInput, initialMessages, sqlSnippets, suggestions } = aiAssistantPanel
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -97,10 +93,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
-  const isInSQLEditor = router.pathname.includes('/sql/[id]')
-  const snippet = snippets[snippetId ?? '']
-  const snippetContent = snippet?.snippet?.content?.sql
-
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -111,11 +103,11 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   })
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (action: string) => {
+  const sendTelemetryEvent = (value: string) => {
     sendEvent({
-      action,
-      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
-      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+      value,
+      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
     })
   }
 
@@ -129,12 +121,13 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
     // [Joshen] Not currently used atm, but initialMessages will be for...
-    initialMessages: initialMessages as unknown as MessageType[],
+    initialMessages,
     body: {
       includeSchemaMetadata,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
+
     onError: (error) => {
       console.log('error:', JSON.stringify(error))
     },
@@ -142,8 +135,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
-
-  const isLoading = isChatLoading
 
   const messages = useMemo(() => {
     const merged = [
@@ -161,9 +152,15 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   const renderedMessages = useMemo(
     () =>
       messages.map((message) => {
-        return <MemoizedMessage key={message.id} message={message} />
+        return (
+          <MemoizedMessage
+            key={message.id}
+            message={message}
+            isLoading={isChatLoading && message === messages[messages.length - 1]}
+          />
+        )
       }),
-    [messages]
+    [messages, isChatLoading]
   )
 
   const hasMessages = messages.length > 0
@@ -175,11 +172,16 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ open: true, sqlSnippets: undefined })
+    setAiAssistantPanel({ sqlSnippets: undefined })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
-    sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
+
+    if (content.includes('Help me to debug')) {
+      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
+    } else {
+      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+    }
   }
 
   const confirmOptInToShareSchemaData = async () => {
@@ -235,17 +237,6 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   }, [])
 
   useEffect(() => {
-    return resetAiAssistantPanel
-  }, [])
-
-  useEffect(() => {
-    if (open && isInSQLEditor && !!snippetContent) {
-      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, isInSQLEditor, snippetContent])
-
-  useEffect(() => {
     setValue(initialInput)
     if (inputRef.current) {
       inputRef.current.focus()
@@ -254,7 +245,7 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
   }, [initialInput])
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isChatLoading) {
       if (inputRef.current) inputRef.current.focus()
     }
 
@@ -262,14 +253,20 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
       () => {
         if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
       },
-      isLoading ? 100 : 500
+      isChatLoading ? 100 : 500
     )
-  }, [isLoading])
+  }, [isChatLoading])
 
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
     handleScroll()
-  }, [messages])
+    // Load messages into state
+    if (!isChatLoading) {
+      setAiAssistantPanel({
+        messages,
+      })
+    }
+  }, [messages, isChatLoading, setAiAssistantPanel])
 
   if (isLoadingTables) {
     return (
@@ -288,14 +285,14 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
           className={cn('flex-grow overflow-auto flex flex-col')}
           onScroll={handleScroll}
         >
-          <div className="z-50 bg-background/80 backdrop-blur-md sticky top-0">
+          <div className="z-30 bg-background/80 backdrop-blur-md sticky top-0">
             <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
               <AiIconAnimation loading={false} allowHoverEffect />
 
               <div className="text-sm flex-1">{hasMessages ? 'New chat' : 'Assistant'}</div>
               <div className="flex gap-2">
                 {(hasMessages || suggestions || sqlSnippets) && (
-                  <Button type="default" disabled={isLoading} onClick={onResetConversation}>
+                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
                     Reset
                   </Button>
                 )}
@@ -507,14 +504,34 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               ))}
             </div>
           )}
+          {disablePrompts && (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="Assistant has been temporarily disabled"
+              description="We're currently looking into getting it back online"
+            />
+          )}
+
+          {!isApiKeySet && (
+            <Admonition
+              type="default"
+              title="OpenAI API key not set"
+              description={
+                <Markdown
+                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                />
+              }
+            />
+          )}
 
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
               'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
-            loading={isLoading}
-            disabled={!isApiKeySet || disablePrompts || isLoading}
+            loading={isChatLoading}
+            disabled={!isApiKeySet || disablePrompts || isChatLoading}
             placeholder={
               hasMessages
                 ? 'Reply to the assistant...'
@@ -536,6 +553,11 @@ export const AIAssistant = ({ id, className, onResetConversation }: AIAssistantP
               }
             }}
           />
+          {!hasMessages && (
+            <p className="text-xs text-foreground-lighter mt-2">
+              The Assistant is in Alpha and your prompts might be rate limited
+            </p>
+          )}
         </div>
       </div>
 

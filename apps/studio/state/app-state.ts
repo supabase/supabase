@@ -27,7 +27,7 @@ export type SuggestionsType = {
 
 type AiAssistantPanelType = {
   open: boolean
-  initialMessages?: MessageType[]
+  messages?: MessageType[] | undefined
   initialInput: string
   sqlSnippets?: string[]
   suggestions?: SuggestionsType
@@ -36,17 +36,19 @@ type AiAssistantPanelType = {
   content?: string
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
+  tables: { schema: string; name: string }[]
 }
 
 const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   open: false,
-  initialMessages: [],
+  messages: undefined,
   sqlSnippets: undefined,
   initialInput: '',
   suggestions: undefined,
   editor: null,
   content: '',
   entity: undefined,
+  tables: [],
 }
 
 type InlineEditorType = {
@@ -154,6 +156,7 @@ export const appState = proxy({
   aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
   setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,

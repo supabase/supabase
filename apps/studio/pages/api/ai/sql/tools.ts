@@ -3,7 +3,7 @@ import { stripIndent } from 'common-tags'
 import { z } from 'zod'
 
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
-import { getEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export const getTools = ({
@@ -24,15 +24,13 @@ export const getTools = ({
         schemas: z.array(z.string()).describe('The schema names to get the definitions for'),
       }),
       execute: async ({ schemas }) => {
-        console.log('schema:', schemas)
-
         try {
           const result = includeSchemaMetadata
             ? await executeSql(
                 {
                   projectRef,
                   connectionString,
-                  sql: getEntityDefinitionsQuery({ schemas }),
+                  sql: getEntityDefinitionsSql({ schemas }),
                 },
                 undefined,
                 {
@@ -42,7 +40,6 @@ export const getTools = ({
               )
             : { result: [] }
 
-          console.log('response2:', result)
           return result
         } catch (error) {
           console.error('Failed to execute SQL:', error)

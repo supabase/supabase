@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -33,7 +33,7 @@ import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import { useAppStateSnapshot } from 'state/app-state'
-import { InlineEditor } from 'components/interfaces/SQLEditor/InlineEditor'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -88,14 +88,14 @@ const ProjectLayout = ({
   const { ref: projectRef } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
-  const { aiAssistantPanel, inlineEditorPanel } = useAppStateSnapshot()
-
-  const assistantPanelRef = useRef<HTMLDivElement>(null)
-  const [inlineEditorRight, setInlineEditorRight] = useState(0)
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open } = aiAssistantPanel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+
+  const projectName = selectedProject?.name
+  const organizationName = selectedOrganization?.name
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const showProductMenu = selectedProject
@@ -108,13 +108,14 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
-  const handleAssistantResize = () => {
-    if (assistantPanelRef.current) {
-      const panelWidth = assistantPanelRef.current.getBoundingClientRect().width
-      console.log('width:', panelWidth)
-      setInlineEditorRight(aiAssistantPanel.open ? panelWidth : 0)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.metaKey && e.code === 'KeyI') setAiAssistantPanel({ open: !open })
     }
-  }
+    if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssistantV2Enabled, open])
 
   return (
     <AppLayout>
@@ -185,31 +186,14 @@ const ProjectLayout = ({
                     )}
                   </main>
                 </ResizablePanel>
-                {inlineEditorPanel.open && (
-                  <>
-                    {!aiAssistantPanel.open && <ResizableHandle />}
-                    <ResizablePanel
-                      id="panel-inline-editor"
-                      className={cn('min-w-[400px] max-w-[400px] bg-surface-100', {
-                        'absolute z-50 top-[48px] bottom-0 border-l': aiAssistantPanel.open,
-                      })}
-                      style={{ right: 400 }}
-                    >
-                      <InlineEditor />
-                    </ResizablePanel>
-                  </>
-                )}
                 {aiAssistantPanel.open && (
                   <>
                     <ResizableHandle />
                     <ResizablePanel
                       id="panel-assistant"
-                      className="min-w-[400px] max-w-[400px] w-[400px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
-                      // onResize={handleAssistantResize}
+                      className="min-w-[400px] max-w-[500px] bg xl:max-w-none xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
                     >
-                      <div ref={assistantPanelRef} className="w-full h-full">
-                        <AiAssistantPanel />
-                      </div>
+                      <AiAssistantPanel />
                     </ResizablePanel>
                   </>
                 )}

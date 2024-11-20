@@ -53,12 +53,12 @@ const Indexes = () => {
   })
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess() {
-      refetchIndexes()
+    onSuccess: async () => {
+      await refetchIndexes()
       setSelectedIndexToDelete(undefined)
       toast.success('Successfully deleted index')
     },
-    onError(error) {
+    onError: (error) => {
       toast.error(`Failed to delete index: ${error.message}`)
     },
   })
@@ -69,7 +69,7 @@ const Indexes = () => {
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const sortedIndexes = sortBy(allIndexes?.result ?? [], (index) => index.name.toLocaleLowerCase())
+  const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes =
     search.length > 0
       ? sortedIndexes.filter((index) => index.name.includes(search) || index.table.includes(search))
@@ -109,17 +109,17 @@ const Indexes = () => {
             )}
             {isSuccessSchemas && (
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={setSelectedSchema}
               />
             )}
             <Input
-              size="small"
+              size="tiny"
               value={search}
-              className="w-64"
+              className="w-52"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<Search size={14} />}

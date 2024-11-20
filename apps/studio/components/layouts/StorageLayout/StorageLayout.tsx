@@ -37,7 +37,8 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
     if (isPaused) return
 
     if (endpoint) {
-      storageExplorerStore.initStore(projectRef!, endpoint, serviceApiKey, 'https')
+      const protocol = settings?.app_config?.protocol ?? 'https'
+      storageExplorerStore.initStore(projectRef!, endpoint, serviceApiKey, protocol)
     } else {
       toast.error(
         'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io'

@@ -1,4 +1,4 @@
-import { Code, DatabaseIcon, Edit, FileWarning, Play } from 'lucide-react'
+import { Code, DatabaseIcon, Edit, Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
@@ -9,6 +9,7 @@ import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -24,23 +25,28 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
-import { isReadOnlySelect } from './AIAssistant.utils'
+import {
+  getContextualInvalidationKeys,
+  identifyQueryType,
+  isReadOnlySelect,
+} from './AIAssistant.utils'
+import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
+import { Markdown } from 'components/interfaces/Markdown'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 
 interface SqlSnippetWrapperProps {
   sql: string
+  isLoading?: boolean
   readOnly?: boolean
 }
 
-interface ParsedSqlProps {
-  sql: string
-  title: string
-  readOnly?: boolean
-  isChart: boolean
-  xAxis: string
-  yAxis: string
-}
-
-const SqlSnippetWrapper = ({ sql, readOnly = false }: SqlSnippetWrapperProps) => {
+const SqlSnippetWrapper = ({
+  sql,
+  isLoading = false,
+  readOnly = false,
+}: SqlSnippetWrapperProps) => {
   const formatted = (sql || [''])[0]
   const propsMatch = formatted.match(/--\s*props:\s*(\{[^}]+\})/)
   const props = propsMatch ? JSON.parse(propsMatch[1]) : {}
@@ -51,14 +57,25 @@ const SqlSnippetWrapper = ({ sql, readOnly = false }: SqlSnippetWrapperProps) =>
     <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
       <SqlCard
         sql={updatedFormatted}
-        isChart={props.isChart}
+        isChart={props.isChart === 'true'}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
         title={title}
         readOnly={readOnly}
+        isLoading={isLoading}
       />
     </div>
   )
+}
+
+interface ParsedSqlProps {
+  sql: string
+  title: string
+  isLoading?: boolean
+  readOnly?: boolean
+  isChart: boolean
+  xAxis: string
+  yAxis: string
 }
 
 export const SqlCard = ({
@@ -68,23 +85,35 @@ export const SqlCard = ({
   yAxis,
   title,
   readOnly = false,
+  isLoading = false,
 }: ParsedSqlProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const queryClient = useQueryClient()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
   const { newQuery } = useNewQuery()
 
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
+
   const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
   const [showWarning, setShowWarning] = useState(false)
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const { mutate: executeSql, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: (res) => {
-      console.log('SQL executed successfully:', res)
+    onSuccess: async (res) => {
+      // [Joshen] Only do contextual invalidation within a project context
+      if (!!ref) {
+        const invalidationKeys = getContextualInvalidationKeys({ ref, pathname: router.pathname })
+        await Promise.all(invalidationKeys?.map((x) => queryClient.invalidateQueries(x)))
+      }
+
       setShowResults(true)
       setResults(res.result)
       setShowWarning(false)
@@ -118,13 +147,6 @@ export const SqlCard = ({
     })
   }, [project?.ref, project?.connectionString, sql, executeSql, readOnly])
 
-  useEffect(() => {
-    if (isReadOnlySelect(sql) && !results && !readOnly) {
-      handleExecute()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, handleExecute, readOnly])
-
   const handleEditInSQLEditor = () => {
     if (isInSQLEditor) {
       snapV2.setDiffContent(sql, DiffType.Addition)
@@ -136,15 +158,19 @@ export const SqlCard = ({
   const [errorHeader, ...errorContent] =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
+  useEffect(() => {
+    if (isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
+      handleExecute()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sql, readOnly, isLoading])
+
   return (
     <div className="overflow-hidden">
-      <div className="flex items-center px-5 py-2 gap-2">
+      <div className={cn('flex items-center gap-2 border-t', showWarning ? '' : 'px-5 py-2')}>
         {showWarning ? (
-          <div className="py-2">
-            <FileWarning strokeWidth={1.5} size={20} className="text-warning-600 mb-3" />
-            <h3 className="text-sm font-medium flex-1">
-              This query contains write operations. Are you sure you want to execute it?
-            </h3>
+          <Admonition type="warning" className="mb-0 rounded-none border-0">
+            <p>This query contains write operations. Are you sure you want to execute it?</p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
@@ -170,12 +196,19 @@ export const SqlCard = ({
                       return { result: [] }
                     },
                   })
+
+                  sendEvent({
+                    action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                    value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
+                    label: 'mutation',
+                    category: identifyQueryType(sql) ?? 'unknown',
+                  })
                 }}
               >
                 Run
               </Button>
             </div>
-          </div>
+          </Admonition>
         ) : (
           <>
             <DatabaseIcon size={16} strokeWidth={1.5} />
@@ -198,7 +231,13 @@ export const SqlCard = ({
                     size="tiny"
                     className="w-7 h-7"
                     icon={<Edit size={14} />}
-                    onClick={handleEditInSQLEditor}
+                    onClick={() => {
+                      handleEditInSQLEditor()
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                        value: TELEMETRY_VALUES.EDIT_IN_SQL_EDITOR,
+                      })
+                    }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
                 ) : (
@@ -238,8 +277,30 @@ export const SqlCard = ({
                   className="w-7 h-7"
                   icon={<Play size={14} />}
                   loading={isExecuting}
-                  onClick={handleExecute}
-                  tooltip={{ content: { side: 'bottom', text: 'Run query' } }}
+                  onClick={() => {
+                    handleExecute()
+                    if (isReadOnlySelect(sql)) {
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+                        value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
+                        label: 'select',
+                      })
+                    }
+                  }}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      className: 'max-w-56 text-center',
+                      text: isExecuting ? (
+                        <Markdown
+                          className="[&>p]:text-xs text-foreground"
+                          content={`Query is running. You may cancel ongoing queries via the [SQL Editor](/project/${ref}/sql?viewOngoingQueries=true).`}
+                        />
+                      ) : (
+                        'Run query'
+                      ),
+                    },
+                  }}
                 />
               </div>
             )}
@@ -249,13 +310,13 @@ export const SqlCard = ({
 
       {showCode && (
         <CodeBlock
+          hideLineNumbers
           value={sql}
           language="sql"
           className={cn(
             'max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
-          hideLineNumbers
         />
       )}
 
@@ -294,13 +355,41 @@ export const SqlCard = ({
                 <>
                   <div>
                     {errorContent.length > 0 ? (
-                      errorContent.map((errorText: string, i: number) => (
-                        <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
-                          {errorText}
-                        </pre>
-                      ))
+                      <div>
+                        {errorContent.map((errorText: string, i: number) => (
+                          <pre key={`err-${i}`} className="font-mono text-xs whitespace-pre-wrap">
+                            {errorText}
+                          </pre>
+                        ))}
+                        <Button
+                          type="default"
+                          className="mt-2"
+                          onClick={() => {
+                            setAiAssistantPanel({
+                              sqlSnippets: [sql],
+                              initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorHeader}\n${errorContent.join('\n')}`,
+                            })
+                          }}
+                        >
+                          Debug
+                        </Button>
+                      </div>
                     ) : (
-                      <p className="font-mono text-xs">{error.error}</p>
+                      <>
+                        <p className="font-mono text-xs">{error.error}</p>
+                        <Button
+                          type="default"
+                          className="mt-2"
+                          onClick={() => {
+                            setAiAssistantPanel({
+                              sqlSnippets: [sql],
+                              initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${error.error}`,
+                            })
+                          }}
+                        >
+                          Debug
+                        </Button>
+                      </>
                     )}
                   </div>
                 </>

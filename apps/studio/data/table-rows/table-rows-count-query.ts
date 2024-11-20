@@ -1,20 +1,22 @@
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useQuery, useQueryClient, type UseQueryOptions } from '@tanstack/react-query'
 import { Query } from 'components/grid/query/Query'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
 
 type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
   enforceExactCount?: boolean
-  impersonatedRole?: ImpersonationRole
 }
 
 export const THRESHOLD_COUNT = 50000
-const COUNT_ESTIMATE_SQL = `
+const COUNT_ESTIMATE_SQL = /* SQL */ `
 CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
     query text
 ) RETURNS integer LANGUAGE plpgsql AS $$
@@ -27,7 +29,7 @@ END;
 $$;
 `.trim()
 
-export const getTableRowsCountSqlQuery = ({
+export const getTableRowsCountSql = ({
   table,
   filters = [],
   enforceExactCount = false,
@@ -92,56 +94,78 @@ export type TableRowsCount = {
   is_estimate?: boolean
 }
 
-export type TableRowsCountVariables = GetTableRowsCountArgs & {
+export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
+  queryClient: QueryClient
+  tableId?: number
+  impersonatedRole?: ImpersonationRole
   projectRef?: string
   connectionString?: string
-  queryKey?: QueryKey
 }
 
 export type TableRowsCountData = TableRowsCount
 export type TableRowsCountError = ExecuteSqlError
 
-export const useTableRowsCountQuery = <TData extends TableRowsCountData = TableRowsCountData>(
+export async function getTableRowsCount(
   {
+    queryClient,
     projectRef,
     connectionString,
-    queryKey,
-    table,
-    enforceExactCount,
+    tableId,
+    filters,
     impersonatedRole,
-    ...args
+    enforceExactCount,
   }: TableRowsCountVariables,
-  options: UseQueryOptions<ExecuteSqlData, TableRowsCountError, TData> = {}
-) => {
-  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+  signal?: AbortSignal
+) {
+  const entity = await prefetchTableEditor(queryClient, {
+    projectRef,
+    connectionString,
+    id: tableId,
+  })
+  if (!entity) {
+    throw new Error('Table not found')
+  }
 
-  return useExecuteSqlQuery(
+  const table = parseSupaTable(entity)
+
+  const sql = wrapWithRoleImpersonation(
+    getTableRowsCountSql({ table, filters, enforceExactCount }),
+    {
+      projectRef: projectRef ?? 'ref',
+      role: impersonatedRole,
+    }
+  )
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: wrapWithRoleImpersonation(
-        getTableRowsCountSqlQuery({ table, enforceExactCount, ...args }),
-        { projectRef: projectRef ?? 'ref', role: impersonatedRole }
-      ),
-      queryKey: [
-        ...(queryKey ?? []),
-        {
-          table: { name: table?.name, schema: table?.schema },
-          enforceExactCount,
-          impersonatedRole,
-          ...args,
-        },
-      ],
-      isRoleImpersonationEnabled,
+      sql,
+      queryKey: ['table-rows-count', table.id],
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
     },
+    signal
+  )
+
+  return {
+    count: result[0].count,
+    is_estimate: result[0].is_estimate ?? false,
+  } as TableRowsCount
+}
+
+export const useTableRowsCountQuery = <TData = TableRowsCountData>(
+  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsCountVariables, 'queryClient'>,
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<TableRowsCountData, TableRowsCountError, TData> = {}
+) => {
+  const queryClient = useQueryClient()
+  return useQuery<TableRowsCountData, TableRowsCountError, TData>(
+    tableRowKeys.tableRowsCount(projectRef, { table: { id: tableId }, ...args }),
+    ({ signal }) =>
+      getTableRowsCount({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     {
-      select(data) {
-        return {
-          count: data.result[0].count,
-          is_estimate: data.result[0].is_estimate ?? false,
-        } as TData
-      },
-      enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
       ...options,
     }
   )

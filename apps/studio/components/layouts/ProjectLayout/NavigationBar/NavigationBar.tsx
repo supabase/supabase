@@ -9,9 +9,10 @@ import { useState } from 'react'
 
 import {
   useIsAPIDocsSidePanelEnabled,
-  useIsDatabaseFunctionsAssistantEnabled,
+  useIsAssistantV2Enabled,
 } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -72,7 +73,7 @@ const NavigationBar = () => {
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isFunctionsAssistantEnabled = useIsDatabaseFunctionsAssistantEnabled()
+  const isFunctionsAssistantEnabled = useIsAssistantV2Enabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [allowNavPanelToExpand] = useLocalStorageQuery(
@@ -181,7 +182,7 @@ const NavigationBar = () => {
           label="Assistant"
           shortcut="I"
           onClick={() => {
-            snap.setAiAssistantPanel({ open: true })
+            snap.setAiAssistantPanel({ open: !snap.aiAssistantPanel.open })
           }}
         />
       </HoverCardContent_Shadcn_>
@@ -265,6 +266,7 @@ const NavigationBar = () => {
               label: 'Home',
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
+              linkElement: <ProjectIndexPageLink projectRef={projectRef} />,
             }}
             onClick={onCloseNavigationIconLink}
           />
