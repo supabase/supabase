@@ -133,6 +133,7 @@ const ColumnEditor = ({
     }
 
     const changedName = 'name' in changes && changes.name !== columnFields.name
+    const changedFormat = 'format' in changes && changes.format !== columnFields.format
 
     if (
       changedName &&
@@ -148,9 +149,14 @@ const ColumnEditor = ({
       )
     }
 
+    if (changedName || changedFormat) {
+      setPlaceholder(
+        getPlaceholderText(changes.format || columnFields.format, changes.name || columnFields.name)
+      )
+    }
+
     const updatedColumnFields: ColumnField = { ...columnFields, ...changes }
     setColumnFields(updatedColumnFields)
-    setPlaceholder(getPlaceholderText(updatedColumnFields.format, updatedColumnFields.name))
     updateEditorDirty()
 
     const updatedErrors = { ...errors }
