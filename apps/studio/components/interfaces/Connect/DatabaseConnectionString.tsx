@@ -328,7 +328,7 @@ export const DatabaseConnectionString = () => {
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: 'error',
-                  title: 'Does not accept IPv4',
+                  title: 'Not IPv4 compatible',
                   link: { text: 'Purchase IPv4 support', url: '#' },
                 }}
                 parameters={[
@@ -354,7 +354,7 @@ export const DatabaseConnectionString = () => {
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: 'success',
-                  title: 'Suitable for IPv4',
+                  title: 'IPv4 compatible',
                   description: 'Transaction pooler connections are IPv4 proxied for free.',
                 }}
                 notice="Transaction pooler does not support prepared statements"
@@ -383,7 +383,7 @@ export const DatabaseConnectionString = () => {
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: 'success',
-                  title: 'Suitable for IPv4',
+                  title: 'IPv4 compatible',
                   description: 'Session pooler connections are IPv4 proxied for free.',
                 }}
                 parameters={[
