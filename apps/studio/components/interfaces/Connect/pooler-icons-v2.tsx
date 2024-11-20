@@ -277,7 +277,7 @@ export const TransactionIcon = () => {
           </React.Fragment>
         ))}
         <TopRect isActive={bottomLineActive} />
-        <BottomRect isActive={bottomLineActive} />
+        <BottomRect isActive={true} />
       </svg>
       {[0, 1, 2].map((index) => (
         <FlowingLine
@@ -289,10 +289,16 @@ export const TransactionIcon = () => {
         />
       ))}
       <FlowingLine
-        x={CIRCLE_START_X + 1 * CIRCLE_SPACING}
+        x={CIRCLE_START_X + 0.5 * CIRCLE_SPACING}
         y1={BOTTOM_LINE_START}
         y2={BOTTOM_LINE_END}
-        isActive={bottomLineActive}
+        isActive={true}
+      />
+      <FlowingLine
+        x={CIRCLE_START_X + 1.5 * CIRCLE_SPACING}
+        y1={BOTTOM_LINE_START}
+        y2={BOTTOM_LINE_END}
+        isActive={true}
       />
     </div>
   )
