@@ -4,18 +4,14 @@ import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
 
 import { useParams } from 'common'
+import { formatWrapperTables } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useState } from 'react'
-import { SheetContent, SheetTrigger, Sheet, TableRow, TableCell, Badge } from 'ui'
+import { Badge, Sheet, SheetContent, SheetTrigger, TableCell, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { EditWrapperSheet } from './EditWrapperSheet'
-import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
-import tables from 'pages/api/pg-meta/[ref]/tables'
-import { formatWrapperTables } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
-import Image from 'next/image'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -31,8 +27,12 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
+  if (!integration || integration.type !== 'wrapper') {
+    return <div>A wrapper with this id doesn't exist</div>
+  }
+
   const serverOptions = Object.fromEntries(
-    wrapper.server_options.map((option: any) => option.split('='))
+    wrapper.server_options.map((option) => option.split('='))
   )
   const [encryptedMetadata, visibleMetadata] = partition(
     integration?.meta?.server.options.filter((option) => !option.hidden),
@@ -66,9 +66,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
               <div key={table.id} className="flex items-center -space-x-3">
                 {/* <IconFirestore size={16} /> */}
                 <Badge className="bg-surface-300 bg-opacity-100 pr-1 gap-2 z-[1] font-mono text-[0.75rem] h-6 text-foreground">
-                  <div className="relative w-3 h-3">
-                    <Image fill src={integration?.icon ?? ''} alt={`${integration?.name}`} />
-                  </div>
+                  <div className="relative w-3 h-3">{integration.icon}</div>
                   {target}{' '}
                   <ChevronRight
                     size={12}
@@ -120,11 +118,11 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
             <SheetContent size="default" tabIndex={undefined}>
               <EditWrapperSheet
                 wrapper={wrapper!}
-                wrapperMeta={integration?.meta}
-                // onClose={() => {
-                //   setEditWrapperShown(false)
-                //   setisClosingEditWrapper(false)
-                // }}
+                wrapperMeta={integration.meta}
+                onClose={() => {
+                  setEditWrapperShown(false)
+                  setisClosingEditWrapper(false)
+                }}
                 isClosing={isClosingEditWrapper}
                 setIsClosing={setisClosingEditWrapper}
               />

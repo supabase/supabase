@@ -1,9 +1,9 @@
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 import { useParams } from 'common'
-import { cn } from 'ui'
 import { Book } from 'lucide-react'
-import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import Link from 'next/link'
+import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { cn } from 'ui'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
 
 interface BuiltBySectionProps extends ComponentPropsWithoutRef<'div'> {}
 
@@ -11,6 +11,8 @@ export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>
   ({ className, ...props }, ref) => {
     const { id } = useParams()
     const integration = INTEGRATIONS.find((i) => i.id === id)
+
+    if (!integration || integration.type !== 'wrapper') return null
 
     const { name, docsUrl, websiteUrl } = integration?.meta?.author ?? {}
 

@@ -4,12 +4,12 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { Header } from 'components/layouts/Integrations/header'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
 import { useScroll } from 'framer-motion'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
@@ -132,7 +132,11 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 // Wrap component with authentication HOC before exporting
 export default withAuth(IntegrationsLayout)
 
-const generateIntegrationsMenu = (wrappers: FDW[], integrationId?: string, projectRef?: string) => {
+const generateIntegrationsMenu = (
+  wrappers: FDW[],
+  integrationId?: string,
+  projectRef?: string
+): ProductMenuGroup[] => {
   const installedIntegrations = INTEGRATIONS.filter((integration) => {
     if (integration.type === 'wrapper') {
       return wrappers.find((wrapper) => wrapperMetaComparator(integration.meta, wrapper))
@@ -149,6 +153,7 @@ const generateIntegrationsMenu = (wrappers: FDW[], integrationId?: string, proje
           name: 'All Integratons',
           key: 'all-integrations',
           url: `/project/${projectRef}/integrations/landing`,
+          items: [],
           // icon: <Grid2x2Plus size={14} />,
         },
       ],
@@ -160,16 +165,9 @@ const generateIntegrationsMenu = (wrappers: FDW[], integrationId?: string, proje
         key: integration.id,
         url: `/project/${projectRef}/integrations/${integration.id}`,
         icon: (
-          <div className="relative w-6 h-6 bg-surface-400 border rounded">
-            <Image
-              key={`icon-${integration.id}`}
-              fill
-              src={integration.icon}
-              alt={integration.name}
-              className="p-0.5"
-            />
-          </div>
+          <div className="relative w-6 h-6 bg-surface-400 border rounded">{integration.icon}</div>
         ),
+        items: [],
       })),
     },
     // integrationId

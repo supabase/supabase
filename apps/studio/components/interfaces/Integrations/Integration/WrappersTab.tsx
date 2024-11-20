@@ -93,7 +93,7 @@ export const WrappersTab = () => {
 
   return (
     <Container className="">
-      <WrapperTable wrappers={wrappers} />
+      <WrapperTable />
       {selectedWrapperForDelete && (
         <DeleteWrapperModal
           selectedWrapper={selectedWrapperForDelete}

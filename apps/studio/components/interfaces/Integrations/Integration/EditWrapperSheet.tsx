@@ -121,7 +121,10 @@ export const EditWrapperSheet = ({
             // eslint-disable-next-line react-hooks/rules-of-hooks
             const [loadingSecrets, setLoadingSecrets] = useState(false)
 
-            const initialTables = formatWrapperTables(wrapper?.tables ?? [])
+            const initialTables = formatWrapperTables({
+              handler: wrapper.handler,
+              tables: wrapper?.tables ?? [],
+            })
             const hasFormChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
             const hasTableChanges = JSON.stringify(initialTables) !== JSON.stringify(wrapperTables)
             const hasChanges = hasFormChanges || hasTableChanges

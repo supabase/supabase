@@ -1,5 +1,6 @@
 import { useParams } from 'common'
-import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useFDWsQuery } from 'data/fdw/fdws-query'
 import {
   Card,
   CardContent,
@@ -12,7 +13,6 @@ import {
 } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import WrapperRow from './WrapperRow'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -28,9 +28,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     connectionString: project?.connectionString,
   })
 
-  const wrappers = data?.result.filter((x) => x.handler === integration?.meta.handlerName) || []
+  if (!integration || integration.type !== 'wrapper') {
+    return <div>The referenced id doesn't correspond to a wrapper integration.</div>
+  }
 
-  console.log(wrappers)
+  const wrappers = data?.result.filter((x) => x.handler === integration.meta.handlerName) || []
 
   return (
     <Card className="max-w-5xl">

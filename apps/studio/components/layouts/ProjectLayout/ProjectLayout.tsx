@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, RefObject, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -13,7 +13,7 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
@@ -26,11 +26,11 @@ import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
+import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizingState } from './ResizingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -67,7 +67,6 @@ export interface ProjectLayoutProps {
   hideIconBar?: boolean
   selectedTable?: string
   resizableSidebar?: boolean
-  mainElementRef?: RefObject<HTMLDivElement>
 }
 
 const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
@@ -83,7 +82,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       hideIconBar = false,
       selectedTable,
       resizableSidebar = false,
-      mainElementRef,
     },
     ref
   ) => {
@@ -185,6 +183,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
   }
 )
 
+ProjectLayout.displayName = 'ProjectLayout'
+
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 
 export default ProjectLayout
@@ -234,84 +234,78 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = forwardRef<HTMLDivElement, ContentWrapperProps>(
-  ({ isLoading, isBlocking = true, children }, divRef) => {
-    const router = useRouter()
-    const { ref } = useParams()
-    const state = useDatabaseSelectorStateSnapshot()
-    const selectedProject = useSelectedProject()
+const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
+  const router = useRouter()
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
+  const selectedProject = useSelectedProject()
 
-    const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
-    const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
-    const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
+  const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
+  const isVaultPage = router.pathname === '/project/[ref]/settings/vault'
+  const isBackupsPage = router.pathname.includes('/project/[ref]/database/backups')
 
-    const requiresDbConnection: boolean =
-      (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
-    const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
-    const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
+  const requiresDbConnection: boolean =
+    (!isSettingsPages && !routesToIgnoreDBConnection.includes(router.pathname)) || isVaultPage
+  const requiresPostgrestConnection = !routesToIgnorePostgrestConnection.includes(router.pathname)
+  const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
-    const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
-    const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
-    const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
-    const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
-    const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
-    const isProjectBuilding =
-      selectedProject?.status === PROJECT_STATUS.COMING_UP ||
-      selectedProject?.status === PROJECT_STATUS.UNKNOWN
-    const isProjectPausing =
-      selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
-      selectedProject?.status === PROJECT_STATUS.PAUSING
-    const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
-    const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
+  const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
+  const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
+  const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
+  const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
+  const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
+  const isProjectBuilding =
+    selectedProject?.status === PROJECT_STATUS.COMING_UP ||
+    selectedProject?.status === PROJECT_STATUS.UNKNOWN
+  const isProjectPausing =
+    selectedProject?.status === PROJECT_STATUS.GOING_DOWN ||
+    selectedProject?.status === PROJECT_STATUS.PAUSING
+  const isProjectPauseFailed = selectedProject?.status === PROJECT_STATUS.PAUSE_FAILED
+  const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-    useEffect(() => {
-      if (ref) state.setSelectedDatabaseId(ref)
-    }, [ref])
+  useEffect(() => {
+    if (ref) state.setSelectedDatabaseId(ref)
+  }, [ref])
 
-    if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-      return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
-    }
-
-    if (isRestarting && !isBackupsPage) {
-      return <RestartingState />
-    }
-
-    if (isResizing && !isBackupsPage) {
-      return <ResizingState />
-    }
-
-    if (isProjectUpgrading && !isBackupsPage) {
-      return <UpgradingState />
-    }
-
-    if (isProjectPausing) {
-      return <PausingState project={selectedProject} />
-    }
-
-    if (isProjectPauseFailed) {
-      return <PauseFailedState />
-    }
-
-    if (requiresPostgrestConnection && isProjectOffline) {
-      return <ConnectingState project={selectedProject} />
-    }
-
-    if (requiresDbConnection && isProjectRestoring) {
-      return <RestoringState />
-    }
-
-    if (isProjectRestoreFailed && !isBackupsPage) {
-      return <RestoreFailedState />
-    }
-
-    if (requiresDbConnection && isProjectBuilding) {
-      return <BuildingState />
-    }
-
-    return (
-      <Fragment key={selectedProject?.ref} ref={divRef}>
-        {children}
-      </Fragment>
-    )
+  if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
+    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
-)
+
+  if (isRestarting && !isBackupsPage) {
+    return <RestartingState />
+  }
+
+  if (isResizing && !isBackupsPage) {
+    return <ResizingState />
+  }
+
+  if (isProjectUpgrading && !isBackupsPage) {
+    return <UpgradingState />
+  }
+
+  if (isProjectPausing) {
+    return <PausingState project={selectedProject} />
+  }
+
+  if (isProjectPauseFailed) {
+    return <PauseFailedState />
+  }
+
+  if (requiresPostgrestConnection && isProjectOffline) {
+    return <ConnectingState project={selectedProject} />
+  }
+
+  if (requiresDbConnection && isProjectRestoring) {
+    return <RestoringState />
+  }
+
+  if (isProjectRestoreFailed && !isBackupsPage) {
+    return <RestoreFailedState />
+  }
+
+  if (requiresDbConnection && isProjectBuilding) {
+    return <BuildingState />
+  }
+
+  return <Fragment key={selectedProject?.ref}>{children}</Fragment>
+}
