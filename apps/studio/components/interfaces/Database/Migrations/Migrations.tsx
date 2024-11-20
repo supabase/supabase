@@ -22,8 +22,8 @@ const Migrations = () => {
   })
   const migrations =
     search.length === 0
-      ? data?.result ?? []
-      : data?.result.filter(
+      ? data ?? []
+      : data?.filter(
           (migration) => migration.version.includes(search) || migration.name?.includes(search)
         ) ?? []
 
@@ -62,9 +62,9 @@ const Migrations = () => {
         )}
         {isSuccess && (
           <div>
-            {data.result.length <= 0 && <MigrationsEmptyState />}
+            {data.length <= 0 && <MigrationsEmptyState />}
 
-            {data.result.length > 0 && (
+            {data.length > 0 && (
               <>
                 <div className="w-80 mb-4">
                   <Input

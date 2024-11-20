@@ -1,59 +1,30 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { sqlKeys } from 'data/sql/keys'
-import { post } from 'lib/common/fetch'
-import { IS_PLATFORM } from 'lib/constants'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type UserCreateVariables = {
-  projectRef?: string
-  protocol: string
-  endpoint: string
-  serviceApiKey: string
+  projectRef: string
   user: {
     email: string
     password: string
-    autoConfirmUser: string
+    autoConfirmUser: boolean
   }
 }
 
-export type UserCreateResponse = {
-  id: string
-  phone: string
-  role: string
-  updated_at: string
-  app_metadata: {
-    provider: string
-    providers: string[]
-  }
-  aud: string
-  created_at: string
-  email: string
-  email_confirmed_at: string
-  identities: any[]
-  user_metadata: any
-}
-
-export async function createUser({ protocol, endpoint, serviceApiKey, user }: UserCreateVariables) {
-  const response = await post(
-    `${protocol}://${endpoint}/auth/v1/admin/users`,
-    {
+export async function createUser({ projectRef, user }: UserCreateVariables) {
+  const { data, error } = await post('/platform/auth/{ref}/users', {
+    params: { path: { ref: projectRef } },
+    body: {
       email: user.email,
       password: user.password,
       email_confirm: user.autoConfirmUser,
     },
-    {
-      headers: {
-        apikey: serviceApiKey,
-        Authorization: `Bearer ${serviceApiKey}`,
-      },
-    }
-  )
-  if (response.error) throw response.error
-  return response
+  })
+  if (error) handleError(error)
+  return data
 }
 
 type UserCreateData = Awaited<ReturnType<typeof createUser>>
@@ -74,9 +45,9 @@ export const useUserCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
 
-        Promise.all([
+        await Promise.all([
           queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-          queryClient.invalidateQueries(sqlKeys.query(projectRef, authKeys.usersCount(projectRef))),
+          queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
         ])
 
         await onSuccess?.(data, variables, context)

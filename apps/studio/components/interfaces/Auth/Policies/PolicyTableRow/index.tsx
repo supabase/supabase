@@ -88,6 +88,7 @@ const PolicyTableRow = ({
       {policies?.map((policy) => (
         <PolicyRow
           key={policy.id}
+          isLocked={isLocked}
           policy={policy}
           onSelectEditPolicy={onSelectEditPolicy}
           onSelectDeletePolicy={onSelectDeletePolicy}

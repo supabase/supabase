@@ -31,7 +31,7 @@ export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInf
         <Markdown
           className="!max-w-full"
           content={`The monthly fees for the paid plan still apply. To cancel your subscription, head over to
-          your [organization billing settings](/org/${organization?.slug}/billing).`}
+          your [organization billing settings](/dashboard/org/${organization?.slug}/billing).`}
         />
       }
     />
