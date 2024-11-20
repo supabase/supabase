@@ -17,6 +17,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
@@ -48,12 +49,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         headerBorder ? 'border-b border-default' : ''
       }`}
     >
-      <div className="-ml-2 flex items-center text-sm">
-        {/* Organization is selected */}
+      <div className="-ml-2 flex items-center text-sm gap-3">
         {projectRef && (
-          <>
+          <div className="flex items-center">
             <OrganizationDropdown />
-
             {projectRef && (
               <>
                 <span className="text-border-stronger">
@@ -71,9 +70,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-
                 <ProjectDropdown />
-
                 {exceedingLimits && (
                   <div className="ml-2">
                     <Link href={`/org/${selectedOrganization?.slug}/usage`}>
@@ -83,8 +80,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 )}
               </>
             )}
-
-            {selectedProject && (
+            {selectedProject && isBranchingEnabled && (
               <>
                 <span className="text-border-stronger">
                   <svg
@@ -101,11 +97,13 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                     <path d="M16 3.549L7.12 20.600"></path>
                   </svg>
                 </span>
-                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
+                {isBranchingEnabled && <BranchDropdown />}
               </>
             )}
-          </>
+          </div>
         )}
+        <Connect />
+        {!isBranchingEnabled && <EnableBranchingButton />}
 
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
