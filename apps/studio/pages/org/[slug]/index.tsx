@@ -1,7 +1,7 @@
 import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
-import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
+import { NoProjectsOnPaidOrgInfo } from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import ProjectCard from 'components/interfaces/Home/ProjectList/ProjectCard'
 import ShimmeringCard from 'components/interfaces/Home/ProjectList/ShimmeringCard'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'

@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
@@ -59,9 +60,9 @@ import { formatAllEntities } from './Tables.utils'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: any) => void
-  onDeleteTable: (table: any) => void
-  onDuplicateTable: (table: any) => void
+  onEditTable: (table: PostgresTable) => void
+  onDeleteTable: (table: PostgresTable) => void
+  onDuplicateTable: (table: PostgresTable) => void
 }
 
 const TableList = ({
@@ -262,7 +263,7 @@ const TableList = ({
           className="w-64"
           placeholder="Search for a table"
           value={filterString}
-          onChange={(e: any) => setFilterString(e.target.value)}
+          onChange={(e) => setFilterString(e.target.value)}
           icon={<Search size={12} />}
         />
 
@@ -383,9 +384,11 @@ const TableList = ({
                                   x.type === ENTITY_TYPE.FOREIGN_TABLE &&
                                     'text-yellow-900 bg-yellow-500',
                                   x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                    'text-purple-1000 bg-purple-500',
-                                  x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    'text-foreground-light bg-border-stronger'
+                                    'text-purple-1000 bg-purple-500'
+                                  // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
+                                  // once we update the endpoint to include partitioned tables, we can uncomment this
+                                  // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                                  //   'text-foreground-light bg-border-stronger'
                                 )}
                               >
                                 {Object.entries(ENTITY_TYPE)
@@ -443,9 +446,7 @@ const TableList = ({
                         {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
-                        {(realtimePublication?.tables ?? []).find(
-                          (table: any) => table.id === x.id
-                        ) ? (
+                        {(realtimePublication?.tables ?? []).find((table) => table.id === x.id) ? (
                           <div className="flex justify-center">
                             <Check size={18} strokeWidth={2} className="text-brand" />
                           </div>

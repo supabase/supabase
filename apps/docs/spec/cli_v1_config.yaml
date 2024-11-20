@@ -779,6 +779,16 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
+        
+  - id: 'auth.external.provider.skip_nonce_check'
+    title: 'auth.external.<provider>.skip_nonce_check'
+    tags: ['auth']
+    required: false
+    description: |
+      Disables nonce validation during OIDC authentication flow for the specified provider. Enable only when client libraries cannot properly handle nonce verification. Be aware that this reduces security by allowing potential replay attacks with stolen ID tokens.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'functions.function_name.enabled'
     title: 'functions.<function_name>.enabled'

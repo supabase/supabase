@@ -119,7 +119,7 @@ const WrapperRow = ({
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {wrapper.tables ? (
-                          wrapper.tables.map((table: any) => (
+                          wrapper.tables.map((table) => (
                             <EditorTablePageLink
                               key={table.id}
                               projectRef={ref}

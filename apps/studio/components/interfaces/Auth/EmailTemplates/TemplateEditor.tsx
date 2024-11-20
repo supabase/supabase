@@ -10,6 +10,7 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import InformationBox from 'components/ui/InformationBox'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -17,7 +18,6 @@ import type { FormSchema } from 'types'
 import {
   Form,
   Input,
-  Tabs,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -25,8 +25,6 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { SpamValidation } from './SpamValidation'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { TabsContent } from '@ui/components/shadcn/ui/tabs'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -166,6 +164,14 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                               </ReactMarkdown>
                             ) : null
                           }
+                          onChange={(e) => {
+                            if (projectRef) {
+                              debounceValidateSpam({
+                                projectRef,
+                                template: { subject: e.target.value, content: bodyValue },
+                              })
+                            }
+                          }}
                           disabled={!canUpdateConfig}
                         />
                       </div>

@@ -78,10 +78,10 @@ export const useRealtimeMessages = (
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: projectRef })
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
   // the default host is prod until the correct one comes through an API call.
-  const host = settings
-    ? `https://${settings.app_config?.endpoint}`
-    : `https://${projectRef}.supabase.co`
+  const host = settings ? `${protocol}://${endpoint}` : `https://${projectRef}.supabase.co`
 
   const realtimeUrl = `${host}/realtime/v1`.replace(/^http/i, 'ws')
 
