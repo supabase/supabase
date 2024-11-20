@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
-import aiSpace from 'public/images/ai/ai-space.png'
+import aiSpace from 'public/images/ai/ai-space.jpg'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 
