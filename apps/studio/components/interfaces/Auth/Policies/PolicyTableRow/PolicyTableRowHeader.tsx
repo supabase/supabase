@@ -120,9 +120,7 @@ const PolicyTableRowHeader = ({
                 if (enableAssistantV2) {
                   setAiAssistantPanel({
                     open: true,
-                    editor: 'rls-policies',
-                    entity: undefined,
-                    tables: [{ schema: table.schema, name: table.name }],
+                    initialInput: `Create a new policy for the ${table.schema} schema on the ${table.name} table that ...`,
                   })
                 } else {
                   onSelectCreatePolicy()

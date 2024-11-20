@@ -134,7 +134,7 @@ const FunctionList = ({
                             onClick={() => {
                               setAiAssistantPanel({
                                 open: true,
-                                initialInput: 'Help me update this function to do...',
+                                initialInput: 'Update this function to do...',
                                 suggestions: {
                                   title:
                                     'I can help you make a change to this function, here are a few example prompts to get you started:',

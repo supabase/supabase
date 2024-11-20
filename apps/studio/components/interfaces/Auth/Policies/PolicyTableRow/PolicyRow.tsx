@@ -107,9 +107,7 @@ const PolicyRow = ({
                 onClick={() => {
                   setAiAssistantPanel({
                     open: true,
-                    editor: 'rls-policies',
-                    entity: policy,
-                    tables: [{ schema: policy.schema, name: policy.table }],
+                    initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                   })
                 }}
               >

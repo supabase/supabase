@@ -155,7 +155,7 @@ const FunctionsList = ({
                       onClick={() =>
                         setAiAssistantPanel({
                           open: true,
-                          initialInput: `Help me create a new function for the schema ${selectedSchema} that does ...`,
+                          initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                         })
                       }
                       tooltip={{
