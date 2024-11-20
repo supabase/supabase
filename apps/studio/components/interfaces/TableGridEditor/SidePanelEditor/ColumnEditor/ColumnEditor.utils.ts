@@ -288,9 +288,10 @@ export const getPlaceholderText = (format?: string, columnFieldName?: string) =>
       return `"${columnName}" '00000000-0000-0000-0000-000000000000'`
 
     case 'timestamp':
-      return `"${columnName}" > '2023-01-01 00:00' and "${columnName}" < '2025-01-01 00:00' `
+      return `"${columnName}" > '2023-01-01 00:00' and "${columnName}" < '2025-01-01 00:00'`
     case 'timestamptz':
-      return `"${columnName}" > '2023-01-01 00:00:00+00' and "${columnName}" < '2025-01-01 00:00:00+00' `
+      return `"${columnName}" > '2023-01-01 00:00:00+00' and "${columnName}" < '2025-01-01 00:00:00+00'`
+
     default:
       return `length("${columnName}") < 500`
   }
