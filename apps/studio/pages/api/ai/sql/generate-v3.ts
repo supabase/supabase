@@ -106,7 +106,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       Please make sure that all queries are valid Postgres SQL queries
 
       Follow these instructions:
-      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
+      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
 
       Here are the existing database schema names you can retrieve: ${schemas}
       `,
