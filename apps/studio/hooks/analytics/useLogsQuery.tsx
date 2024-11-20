@@ -55,7 +55,6 @@ const useLogsQuery = (
 
   const usesWith = checkForWithClause(params.sql || '')
   const usesILIKE = checkForILIKEClause(params.sql || '')
-  const usesWildcard = checkForWildcard(params.sql || '')
 
   const {
     data,
