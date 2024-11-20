@@ -110,3 +110,8 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
 
   return DEFAULT_CRONJOB_COMMAND
 }
+
+// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
+export const secondsPattern = /^\d+\s+seconds$/
+export const cronPattern =
+  /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
