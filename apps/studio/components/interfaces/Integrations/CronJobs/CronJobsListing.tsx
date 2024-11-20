@@ -31,10 +31,7 @@ export const CronJobsListing = () => {
     <>
       <div className="w-full space-y-4">
         {(cronJobs ?? []).length == 0 ? (
-          <>
-            cat
-            <CronJobsEmptyState />
-          </>
+          <CronJobsEmptyState context="jobs" />
         ) : (
           <div className="w-full space-y-4">
             {(cronJobs ?? []).map((job) => (
