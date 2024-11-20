@@ -74,7 +74,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100dvh-65px)] overflow-hidden">
+        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100vh)] md:min-h-[calc(100vh-65px)] overflow-hidden">
           <SectionContainer className="relative h-full flex-1 pt-4 md:pt-4 pointer-events-none">
             <div className="relative z-10 flex h-full">
               <LazyMotion features={domAnimation}>

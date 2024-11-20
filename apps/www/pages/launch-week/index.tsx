@@ -82,7 +82,7 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100dvh-65px)] overflow-hidden">
+        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100vh)] md:min-h-[calc(100vh-65px)] overflow-hidden">
           <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>

@@ -35,7 +35,7 @@ const ThreeTicketCanvas: React.FC<{
   const positionRight = ticketPosition === 'right'
   const isPlatinum = ticketType === 'platinum'
   const isSecret = ticketType === 'secret'
-  const LINE_HEIGHT = 1.4
+  const LINE_HEIGHT = 1.5
   const MIN_CANVAS_HEIGHT = 600
   const TICKET_FONT_PADDING_LEFT = -6.4
 
@@ -162,7 +162,7 @@ const ThreeTicketCanvas: React.FC<{
       DISPLAY_NAME.map((text, index) => {
         const textGeometry = new TextGeometry(text, {
           font,
-          size: 1.0,
+          size: 1.1,
           height: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
@@ -248,13 +248,18 @@ const ThreeTicketCanvas: React.FC<{
     // Start animation
     animate()
 
-    // Mouse tilt and drag logic
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => handlePointerMove(e.clientX, e.clientY)
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0]
+      handlePointerMove(touch.clientX, touch.clientY)
+    }
+    // Tilt and drag logic
+    const handlePointerMove = (clientX: number, clientY: number) => {
       if (!canvasRef.current) return
       if (isDragging.current) {
         // Update drag delta
         if (dragStartX.current !== null) {
-          dragDelta.current = e.clientX - dragStartX.current
+          dragDelta.current = clientX - dragStartX.current
           ticketGroup.rotation.y = targetRotation.current.y + dragDelta.current * 0.01
         }
       } else {
@@ -267,8 +272,8 @@ const ThreeTicketCanvas: React.FC<{
         const ticketPosition = getTicketScreenPosition() || { x: centerX, y: centerY }
 
         // Calculate distance from cursor to center of ticket
-        const deltaX = e.clientX - (canvasRect.left + ticketPosition.x)
-        const deltaY = e.clientY - (canvasRect.top + ticketPosition.y)
+        const deltaX = clientX - (canvasRect.left + ticketPosition.x)
+        const deltaY = clientY - (canvasRect.top + ticketPosition.y)
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY)
 
         // Maximum distance for sensitivity calculation (diagonal of the canvas)
@@ -285,12 +290,19 @@ const ThreeTicketCanvas: React.FC<{
       }
     }
 
-    const handleMouseDown = (e: MouseEvent) => {
+    const handleMouseDown = (e: MouseEvent) => handlePointerDown(e.clientX)
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0]
+      handlePointerDown(touch.clientX)
+    }
+    const handlePointerDown = (clientX: number) => {
       isDragging.current = true
-      dragStartX.current = e.clientX
+      dragStartX.current = clientX
     }
 
-    const handleMouseUp = () => {
+    const handleMouseUp = () => handlePointerUp()
+    const handleTouchEnd = () => handlePointerUp()
+    const handlePointerUp = () => {
       if (!isDragging.current) return
       isDragging.current = false
 
@@ -336,6 +348,9 @@ const ThreeTicketCanvas: React.FC<{
     window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseout', resetRotation)
+    window.addEventListener('touchmove', handleTouchMove)
+    window.addEventListener('touchstart', handleTouchStart)
+    window.addEventListener('touchend', handleTouchEnd)
 
     // Cleanup
     return () => {
@@ -344,6 +359,9 @@ const ThreeTicketCanvas: React.FC<{
       window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseout', resetRotation)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchend', handleTouchEnd)
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
