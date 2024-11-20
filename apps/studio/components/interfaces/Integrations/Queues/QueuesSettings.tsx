@@ -105,6 +105,7 @@ export const QueuesSettings = () => {
                     >
                       <FormControl_Shadcn_>
                         <Switch
+                          name="enable"
                           size="large"
                           disabled={!canUpdatePostgrestConfig}
                           checked={field.value}

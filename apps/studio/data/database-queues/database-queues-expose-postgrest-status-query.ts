@@ -12,22 +12,20 @@ export type DatabaseQueuesVariables = {
 
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST
 const queueSqlQuery = minify(/**SQL */ `
-  SELECT EXISTS (
-    SELECT 1 
-    FROM pg_proc p
-    JOIN pg_namespace n ON p.pronamespace = n.oid
-    WHERE n.nspname = 'public'
-    AND (
-        (p.proname = 'pop' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text') OR
-        (p.proname = 'send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg jsonb, sleep_seconds integer') OR
-        (p.proname = 'send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg jsonb, available_at timestamp with time zone') OR
-        (p.proname = 'send_batch' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msgs jsonb[], sleep_seconds integer') OR
-        (p.proname = 'send_batch' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msgs jsonb[], available_at timestamp with time zone') OR
-        (p.proname = 'archive' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg_id bigint') OR
-        (p.proname = 'delete' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg_id bigint') OR
-        (p.proname = 'read' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, sleep integer, qty integer, conditional jsonb')
-    )
-);
+  SELECT (count(*) = 8) as exists
+  FROM pg_proc p
+  JOIN pg_namespace n ON p.pronamespace = n.oid
+  WHERE n.nspname = 'public'
+  AND (
+      (p.proname = 'pop' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text') OR
+      (p.proname = 'send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg jsonb, sleep_seconds integer') OR
+      (p.proname = 'send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg jsonb, available_at timestamp with time zone') OR
+      (p.proname = 'send_batch' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msgs jsonb[], sleep_seconds integer') OR
+      (p.proname = 'send_batch' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msgs jsonb[], available_at timestamp with time zone') OR
+      (p.proname = 'archive' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg_id bigint') OR
+      (p.proname = 'delete' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg_id bigint') OR
+      (p.proname = 'read' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, sleep_seconds integer, qty integer')
+  );
 `)
 
 export async function getDatabaseQueuesExposePostgrestStatus({

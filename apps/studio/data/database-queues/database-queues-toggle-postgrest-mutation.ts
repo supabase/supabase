@@ -177,8 +177,7 @@ comment on function public.delete(queue_name text, msg_id bigint) is 'Permanentl
 create or replace function public.read(
     queue_name text,
     sleep_seconds integer,
-    qty integer,
-    conditional jsonb
+    qty integer
 )
   returns setof pgmq.message_record
   language plpgsql
@@ -190,13 +189,43 @@ begin
     from pgmq.read(
         queue_name := queue_name,
         vt := sleep_seconds,
-        qty := n,
-        conditional := conditional
+        qty := n
     );
 end;
 $$;
 
-comment on function public.read(queue_name text, sleep_seconds integer, qty integer, conditional jsonb) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout) and conditional filtering.';
+comment on function public.read(queue_name text, sleep_seconds integer, qty integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout) and conditional filtering.';
+
+-- Grant usage on schemas to roles
+grant usage on schema public to service_role, anon, authenticated;
+grant usage on schema pgmq to service_role, anon, authenticated;
+
+-- Grant execute permissions on wrapper functions to roles
+grant execute on function public.pop(text) to service_role, anon, authenticated;
+grant execute on function public.send(text, jsonb, integer) to service_role, anon, authenticated;
+grant execute on function public.send(text, jsonb, timestamp with time zone) to service_role, anon, authenticated;
+grant execute on function public.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
+grant execute on function public.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
+grant execute on function public.archive(text, bigint) to service_role, anon, authenticated;
+grant execute on function public.delete(text, bigint) to service_role, anon, authenticated;
+grant execute on function public.read(text, integer, integer) to service_role, anon, authenticated;
+
+-- Grant execute permissions on inner pgmq functions to roles
+grant execute on function pgmq.pop(text) to service_role, anon, authenticated;
+grant execute on function pgmq.send(text, jsonb, integer) to service_role, anon, authenticated;
+-- grant execute on function pgmq.send(payload jsonb, text, text, boolean) to service_role, anon, authenticated;
+grant execute on function pgmq.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
+-- grant execute on function pgmq.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
+grant execute on function pgmq.archive(text, bigint) to service_role, anon, authenticated;
+grant execute on function pgmq.delete(text, bigint) to service_role, anon, authenticated;
+grant execute on function pgmq.read(text, integer, integer) to service_role, anon, authenticated;
+
+-- For the service role, we want full access
+-- Grant permissions on existing tables
+grant all privileges on all tables in schema pgmq to service_role;
+
+-- Ensure service_role has permissions on future tables
+alter default privileges in schema pgmq grant all privileges on tables to service_role;
 `)
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
@@ -208,8 +237,24 @@ const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
     public.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone),
     public.archive(queue_name text, msg_id bigint),
     public.delete(queue_name text, msg_id bigint),
-    public.read(queue_name text, sleep integer, qty integer, conditional jsonb)
+    public.read(queue_name text, sleep integer, qty integer)
   ;
+
+  -- Revoke execute permissions on inner pgmq functions to roles
+  revoke execute on function pgmq.pop(text) from service_role, anon, authenticated;
+  revoke execute on function pgmq.send(text, jsonb, integer) from service_role, anon, authenticated;
+  -- revoke execute on function pgmq.send(payload jsonb, text, text, boolean) from service_role, anon, authenticated;
+  revoke execute on function pgmq.send_batch(text, jsonb[], integer) from service_role, anon, authenticated;
+  -- revoke execute on function pgmq.send_batch(text, jsonb[], timestamp with time zone) from service_role, anon, authenticated;
+  revoke execute on function pgmq.archive(text, bigint) from service_role, anon, authenticated;
+  revoke execute on function pgmq.delete(text, bigint) from service_role, anon, authenticated;
+  revoke execute on function pgmq.read(text, integer, integer) from service_role, anon, authenticated;
+
+  -- For service role, revoke permissions on existing tables
+  revoke all privileges on all tables in schema pgmq from service_role;
+
+  -- Ensure service_role has no permissions on future tables
+  alter default privileges in schema pgmq revoke all privileges on tables from service_role;
 `)
 
 export async function toggleQueuesExposurePostgrest({
