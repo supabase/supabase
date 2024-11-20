@@ -23,7 +23,7 @@ export const InstalledIntegrations = () => {
 
   return (
     <div className="px-9 py-6 flex flex-col gap-y-5">
-      <h2>Available integrations</h2>
+      <h2>Installed integrations</h2>
       <div className="flex flex-row flex-wrap gap-x-4 gap-y-3">
         {installedIntegrations.map((i) => (
           <IntegrationCard key={i.id} {...i} />

@@ -1,24 +1,25 @@
+import { useMemo } from 'react'
+
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { IntegrationWrapper } from 'components/interfaces/Integrations/Landing/IntegrationWrapper'
 import { CronjobsTab } from 'components/interfaces/Integrations/NewCronJobs/CronjobsTab'
 import { CronjobsOverviewTab } from 'components/interfaces/Integrations/NewCronJobs/OverviewTab'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
+import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useMemo } from 'react'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 
 const CronJobsPage: NextPageWithLayout = () => {
-  const id = 'supabase-cron'
-
+  const id = 'cron-jobs'
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
   const pgCronExtensionInstalled = !!pgCronExtension?.installed_version
@@ -38,7 +39,7 @@ const CronJobsPage: NextPageWithLayout = () => {
         ? [
             {
               id: 'cronjobs',
-              label: 'Cronjobs',
+              label: 'Cron jobs',
               content: (
                 <div className="p-9">
                   <CronjobsTab />
@@ -54,14 +55,10 @@ const CronJobsPage: NextPageWithLayout = () => {
     return null
   }
 
-  return <IntegrationWrapper integration={integration} tabs={tabs} />
-}
-
-CronJobsPage.getLayout = (page) => {
   return (
-    <ProjectLayout title="Integrations" product="Integrations" isBlocking={false}>
-      {page}
-    </ProjectLayout>
+    <IntegrationsLayout id={id} tabs={tabs}>
+      {tabs.find((t) => t.id === selectedTab)?.content}
+    </IntegrationsLayout>
   )
 }
 

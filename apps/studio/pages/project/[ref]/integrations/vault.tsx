@@ -1,8 +1,8 @@
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { IntegrationWrapper } from 'components/interfaces/Integrations/Landing/IntegrationWrapper'
 import { VaultOverviewTab } from 'components/interfaces/Integrations/Vault/OverviewTab'
 import { EncryptionKeysManagement, SecretsManagement } from 'components/interfaces/Settings/Vault'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
+import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 
 const tabs = [
@@ -36,22 +36,19 @@ const tabs = [
 ]
 
 const VaultPage: NextPageWithLayout = () => {
-  const id = 'supabase-vault'
-
+  const id = 'vault'
   const integration = INTEGRATIONS.find((i) => i.id === id)
+
+  const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   if (!integration) {
     return null
   }
 
-  return <IntegrationWrapper integration={integration} tabs={tabs} />
-}
-
-VaultPage.getLayout = (page) => {
   return (
-    <ProjectLayout title="Integrations" product="Integrations" isBlocking={false}>
-      {page}
-    </ProjectLayout>
+    <IntegrationsLayout id={id} tabs={tabs}>
+      {tabs.find((t) => t.id === selectedTab)?.content}
+    </IntegrationsLayout>
   )
 }
 

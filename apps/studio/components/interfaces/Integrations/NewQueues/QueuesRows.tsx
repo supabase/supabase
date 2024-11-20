@@ -36,7 +36,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       key={queue.queue_name}
       onClick={() => {
         router.push(
-          `/project/${selectedProject?.ref}/integrations/supabase-queues?tab=queue_${queue.queue_name}`
+          `/project/${selectedProject?.ref}/integrations/queues?tab=queue_${queue.queue_name}`
         )
       }}
       className="hover:"

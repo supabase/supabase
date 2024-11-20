@@ -17,7 +17,7 @@ export const AvailableIntegrations = () => {
       <h2>Available integrations</h2>
       <div className="flex flex-row flex-wrap gap-x-4 gap-y-3">
         {integrations.map((i) => (
-          <IntegrationCard {...i} />
+          <IntegrationCard key={i.id} {...i} />
         ))}
       </div>
     </div>

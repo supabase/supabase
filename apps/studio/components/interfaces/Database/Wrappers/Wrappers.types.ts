@@ -9,11 +9,6 @@ export type WrapperMeta = {
   tables: Table[]
   docsUrl: string
   minimumExtensionVersion?: string
-  author?: {
-    name?: string
-    docsUrl?: string
-    websiteUrl?: string
-  }
 }
 
 export type ServerOption = {

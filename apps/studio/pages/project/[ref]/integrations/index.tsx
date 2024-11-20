@@ -14,8 +14,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
   )
 }
 
-IntegrationsPage.getLayout = (page) => {
-  return <IntegrationsLayout>{page}</IntegrationsLayout>
-}
+IntegrationsPage.getLayout = (page) => <IntegrationsLayout>{page}</IntegrationsLayout>
 
 export default IntegrationsPage

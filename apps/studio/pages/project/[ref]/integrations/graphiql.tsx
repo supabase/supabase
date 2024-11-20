@@ -1,8 +1,8 @@
 import { GraphiQLTab } from 'components/interfaces/Integrations/GraphQL/GraphiQLTab'
 import { GraphqlOverviewTab } from 'components/interfaces/Integrations/GraphQL/OverviewTab'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { IntegrationWrapper } from 'components/interfaces/Integrations/Landing/IntegrationWrapper'
-import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
+import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { parseAsString, useQueryState } from 'nuqs'
 import type { NextPageWithLayout } from 'types'
 
 const tabs = [
@@ -27,22 +27,19 @@ const tabs = [
 ]
 
 const GraphiQL: NextPageWithLayout = () => {
-  const id = 'supabase-graphiql'
-
+  const id = 'graphiql'
   const integration = INTEGRATIONS.find((i) => i.id === id)
+
+  const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
   if (!integration) {
     return null
   }
 
-  return <IntegrationWrapper integration={integration} tabs={tabs} />
-}
-
-GraphiQL.getLayout = (page) => {
   return (
-    <ProjectLayout title="Integrations" product="Integrations" isBlocking={false}>
-      {page}
-    </ProjectLayout>
+    <IntegrationsLayout id={id} tabs={tabs}>
+      {tabs.find((t) => t.id === selectedTab)?.content}
+    </IntegrationsLayout>
   )
 }
 

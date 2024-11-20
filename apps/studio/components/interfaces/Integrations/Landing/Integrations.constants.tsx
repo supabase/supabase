@@ -12,11 +12,22 @@ export type IntegrationDefinition = {
   icon: ReactNode
   description: string
   docsUrl: string
+  author: {
+    name: string
+    docsUrl: string
+    websiteUrl: string
+  }
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension'; requiredExtensions: string[] }
   | { type: 'custom' }
 )
+
+const authorSupabase = {
+  name: 'Supabase',
+  docsUrl: 'https://supabase.com/docs',
+  websiteUrl: 'https://supabase.com',
+}
 
 type WrapperLabel = (typeof WRAPPERS)[number]['label']
 
@@ -45,15 +56,17 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     icon: <Layers className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'Lightweight message queue in Postgres',
     docsUrl: '',
+    author: authorSupabase,
   },
   {
     id: 'cron-jobs',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_cron'],
-    name: `Cron`,
+    name: `Cron Jobs`,
     icon: <Clock5 className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'cron-based scheduler in Postgres',
     docsUrl: '',
+    author: authorSupabase,
   },
   {
     id: 'vault',
@@ -63,6 +76,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     icon: <Vault className="absolute inset-0 p-2 text-background w-full h-full" />,
     description: 'Application level encryption for your project',
     docsUrl: '',
+    author: authorSupabase,
   },
   {
     id: 'webhooks',
@@ -72,6 +86,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     description:
       'Send real-time data from your database to another system whenever a table event occurs',
     docsUrl: '',
+    author: authorSupabase,
   },
   {
     id: 'graphiql',
@@ -81,6 +96,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     icon: <Image fill src={`${BASE_PATH}/img/graphql.svg`} alt="GraphiQL" className="p-2" />,
     description: 'In-browser IDE for GraphQL',
     docsUrl: '',
+    author: authorSupabase,
   },
 ] as const
 
@@ -93,6 +109,7 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     description: WRAPPER_HANDLERS[w.label] || 'No description',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/stripe',
     meta: w,
+    author: authorSupabase,
   }
 })
 

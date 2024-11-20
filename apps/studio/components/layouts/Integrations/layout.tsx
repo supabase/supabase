@@ -13,13 +13,19 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
+import { IntegrationTabs } from './tabs'
 
 /**
  * Layout component for the Integrations section
  * Handles scroll-based sticky header behavior and authentication
  */
-const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
+const IntegrationsLayout = ({
+  ...props
+}: PropsWithChildren<{
+  id?: string
+  tabs?: { id: string; label: string; content: ReactNode }[]
+}>) => {
   const layoutSidebar = useFlag('integrationLayoutSidebar')
   if (layoutSidebar) {
     return <IntegrationsLayoutSide {...props} />
@@ -30,9 +36,15 @@ const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
 /**
  * Top level layout
  */
-const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
+const IntegrationTopHeaderLayout = ({
+  id,
+  tabs = [],
+  ...props
+}: PropsWithChildren<{
+  id?: string
+  tabs?: { id: string; label: string; content: ReactNode }[]
+}>) => {
   const project = useSelectedProject()
-  const { id } = useParams()
   const router = useRouter()
   // Refs for the main scrollable area and header
   const mainElementRef = useRef<HTMLDivElement>(null)
@@ -92,7 +104,10 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
         <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
       }
     >
-      <Header ref={headerRef} scroll={scroll} isSticky={isSticky} />
+      <Header id={id} scroll={scroll} ref={headerRef} />
+      {id && tabs.length > 0 ? (
+        <IntegrationTabs id={id} tabs={tabs} scroll={scroll} isSticky={isSticky} />
+      ) : null}
       {props.children}
     </ProjectLayout>
   )
@@ -130,8 +145,8 @@ const generateIntegrationsMenu = (
 ): ProductMenuGroup[] => {
   return [
     {
-      title: 'Installed Integrations',
-      // hideTitle: true,
+      title: 'All Integrations',
+      hideTitle: true,
       items: [
         {
           name: 'All Integrations',
@@ -146,10 +161,7 @@ const generateIntegrationsMenu = (
       items: integrations.map((integration) => ({
         name: integration.name,
         key: integration.id,
-        url:
-          integration.type === 'wrapper'
-            ? `/project/${projectRef}/integrations/wrappers/${integration.id}`
-            : `/project/${projectRef}/integrations/${integration.id}`,
+        url: `/project/${projectRef}/integrations/${integration.id}`,
         icon: (
           <div className="relative w-6 h-6 bg-surface-400 border rounded">{integration.icon}</div>
         ),

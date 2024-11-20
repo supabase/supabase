@@ -42,8 +42,11 @@ export const useInstalledIntegrations = () => {
     return false
   }).map((i) => i.id)
 
+  const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
+
   return {
-    installedIntegrations: installedIntegrationsIds,
-    isLoading: isSchemasLoading || isFDWLoading || isExtensionsLoading,
+    // show all integrations at once instead of showing partial results
+    installedIntegrations: isLoading ? [] : installedIntegrationsIds,
+    isLoading,
   }
 }

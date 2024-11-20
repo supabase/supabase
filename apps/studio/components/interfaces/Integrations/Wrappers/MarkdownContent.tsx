@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
@@ -5,15 +6,16 @@ import { cn } from 'ui'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
-export const MarkdownContent = ({ integrationId }: { integrationId: string }) => {
+export const MarkdownContent = () => {
+  const { id } = useParams()
   const [content, setContent] = useState<string>('')
   const [isExpanded, setIsExpanded] = useState(false)
 
   useEffect(() => {
-    import(`static-data/integrations/${integrationId}/overview.md`)
+    import(`static-data/integrations/${id}/overview.md`)
       .then((module) => setContent(String(module.default)))
       .catch((error) => console.error('Error loading markdown:', error))
-  }, [integrationId])
+  }, [id])
 
   const displayContent = isExpanded ? content : content.slice(0, CHAR_LIMIT)
 
