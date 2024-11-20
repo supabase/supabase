@@ -19,7 +19,7 @@ const Wrappers = ({ isEnabled }: { isEnabled: boolean }) => {
   const [open, setOpen] = useState<string>('')
   const [selectedWrapperToDelete, setSelectedWrapperToDelete] = useState<FDW>()
 
-  const wrappers = data?.result ?? []
+  const wrappers = data ?? []
 
   return (
     <>

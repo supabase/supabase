@@ -8,6 +8,7 @@ import { Badge, Button, Checkbox, Input, Listbox, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
 import NoTableState from 'components/ui/States/NoTableState'
 import {
@@ -19,9 +20,9 @@ import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/databas
 import { useTablesQuery } from 'data/tables/tables-query'
 import { BASE_PATH } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PauseCircle, PlayCircle, Terminal } from 'lucide-react'
 import type { Dictionary } from 'types'
 import ChooseFunctionForm from './ChooseFunctionForm'
-import { PauseCircle, PlayCircle, Terminal } from 'lucide-react'
 
 class CreateTriggerFormState {
   id: number | undefined
@@ -46,6 +47,8 @@ class CreateTriggerFormState {
   table: { value: string }
   // @ts-ignore
   tableId: { value: number; error?: string }
+  // @ts-ignore
+  condition: { value: string }
 
   constructor() {
     makeAutoObservable(this)
@@ -80,6 +83,7 @@ class CreateTriggerFormState {
     this.schema = { value: trigger?.schema ?? '' }
     this.table = { value: trigger?.table ?? '' }
     this.tableId = { value: trigger?.table_id ?? '' }
+    this.condition = { value: trigger?.condition ?? '' }
   }
 
   update(state: Dictionary<any>) {
@@ -342,6 +346,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
                   <div className="space-y-6 px-6">
                     <InputName />
                     <SelectEnabledMode />
+                    {_localState.formState.condition.value && <DisplayCondition />}
                   </div>
                 ) : (
                   <>
@@ -489,6 +494,34 @@ const SelectEnabledMode = observer(({}) => {
         <span className="block text-foreground-lighter">Will not fire</span>
       </Listbox.Option>
     </Listbox>
+  )
+})
+
+const DisplayCondition = observer(() => {
+  const _localState = useContext(CreateTriggerContext)
+
+  return (
+    <div className="text-sm leading-4 grid gap-2 md:grid md:grid-cols-12">
+      <div className="flex flex-col space-y-2 col-span-4">
+        <label className="block text-foreground-light text-sm leading-4 break-all">Condition</label>
+      </div>
+      <div className="col-span-8 h-[100px]">
+        <CodeEditor
+          isReadOnly
+          autofocus={false}
+          id={`trigger-condition-${_localState!.formState.id}`}
+          language="pgsql"
+          defaultValue={_localState!.formState.condition.value}
+        />
+        <div className="mt-2 text-foreground-lighter leading-normal text-sm">
+          This condition must be met for the trigger to fire.
+          <br />
+          <span className="text-foreground">
+            To update the condition, you must drop and recreate this trigger.
+          </span>
+        </div>
+      </div>
+    </div>
   )
 })
 
