@@ -37,6 +37,7 @@ const CronJobsPage: NextPageWithLayout = () => {
 
   const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
   const pgCronExtensionInstalled = pgCronExtension?.installed_version
+  const installedVersion = pgCronExtension?.installed_version
 
   useEffect(() => {
     // refetch the cron jobs after the pgcron extension has been installed
