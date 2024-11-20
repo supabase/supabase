@@ -20,7 +20,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
-import { validateQuery } from 'components/ui/AIAssistantPanel/AIAssistant.utils'
 
 export const InlineEditor = () => {
   const router = useRouter()

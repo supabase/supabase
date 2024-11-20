@@ -140,6 +140,9 @@ export const appState = proxy({
 
   inlineEditorPanel: INITIAL_INLINE_EDITOR as InlineEditorType,
   setInlineEditorPanel: (value: Partial<InlineEditorType>) => {
+    if (value.open) {
+      appState.aiAssistantPanel.open = false
+    }
     appState.inlineEditorPanel = {
       ...appState.inlineEditorPanel,
       ...value,
@@ -156,6 +159,10 @@ export const appState = proxy({
   aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
   setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
+    if (value.open) {
+      appState.inlineEditorPanel.open = false
+    }
 
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
