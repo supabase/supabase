@@ -58,7 +58,13 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
   const queryClient = useQueryClient()
   const queryKey = ['localStorage', key]
 
-  const { data: storedValue = initialValue } = useQuery(queryKey, () => {
+  const {
+    error,
+    data: storedValue = initialValue,
+    isSuccess,
+    isLoading,
+    isError,
+  } = useQuery(queryKey, () => {
     if (typeof window === 'undefined') {
       return initialValue
     }
@@ -83,5 +89,5 @@ export function useLocalStorageQuery<T>(key: string, initialValue: T) {
     queryClient.invalidateQueries(queryKey)
   }
 
-  return [storedValue, setValue] as const
+  return [storedValue, setValue, { isSuccess, isLoading, isError, error }] as const
 }

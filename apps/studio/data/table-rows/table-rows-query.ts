@@ -1,30 +1,33 @@
-import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import {
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+  type UseQueryOptions,
+} from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
 import { Query } from 'components/grid/query/Query'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
 import {
   JSON_TYPES,
   TEXT_TYPES,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { prefetchTableEditor } from 'data/table-editor/table-editor-query'
 import { KB } from 'lib/constants'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,
   wrapWithRoleImpersonation,
 } from 'lib/role-impersonation'
-import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import {
-  ExecuteSqlData,
-  ExecuteSqlError,
-  executeSql,
-  useExecuteSqlQuery,
-} from '../sql/execute-sql-query'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ExecuteSqlError, executeSql } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
-import { formatFilterValue } from './utils'
+import { tableRowKeys } from './keys'
 import { THRESHOLD_COUNT } from './table-rows-count-query'
+import { formatFilterValue } from './utils'
 
-type GetTableRowsArgs = {
+export interface GetTableRowsArgs {
   table?: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
@@ -70,7 +73,16 @@ export const fetchAllTableRows = async ({
   const rows: any[] = []
   const query = new Query()
 
-  let queryChains = query.from(table.name, table.schema ?? undefined).select()
+  const arrayBasedColumns = table.columns
+    .filter(
+      (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
+    )
+    .map((column) => `"${column.name}"::text[]`)
+
+  let queryChains = query
+    .from(table.name, table.schema ?? undefined)
+    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+
   filters
     .filter((filter) => filter.value && filter.value !== '')
     .forEach((filter) => {
@@ -122,7 +134,7 @@ export const fetchAllTableRows = async ({
   return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
-export const getTableRowsSqlQuery = ({
+export const getTableRowsSql = ({
   table,
   filters = [],
   sorts = [],
@@ -186,55 +198,97 @@ export const getTableRowsSqlQuery = ({
 
 export type TableRows = { rows: SupaRow[] }
 
-export type TableRowsVariables = GetTableRowsArgs & {
+export type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
+  queryClient: QueryClient
   projectRef?: string
   connectionString?: string
-  queryKey?: QueryKey
+  tableId?: number
 }
 
 export type TableRowsData = TableRows
 export type TableRowsError = ExecuteSqlError
 
-export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
-  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
-  options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
-) => {
-  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+export async function getTableRows(
+  {
+    queryClient,
+    projectRef,
+    connectionString,
+    tableId,
+    impersonatedRole,
+    filters,
+    sorts,
+    limit,
+    page,
+  }: TableRowsVariables,
+  signal?: AbortSignal
+) {
+  const entity = await prefetchTableEditor(queryClient, {
+    projectRef,
+    connectionString,
+    id: tableId,
+  })
+  if (!entity) {
+    throw new Error('Table not found')
+  }
 
-  return useExecuteSqlQuery(
+  const table = parseSupaTable(entity)
+
+  const sql = wrapWithRoleImpersonation(
+    getTableRowsSql({ table, filters, sorts, limit, page, impersonatedRole }),
+    {
+      projectRef: projectRef ?? 'ref',
+      role: impersonatedRole,
+    }
+  )
+  const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
-        projectRef: projectRef ?? 'ref',
-        role: impersonatedRole,
-      }),
-      queryKey: [
-        ...(queryKey ?? []),
-        {
-          table: {
-            name: table?.name,
-            schema: table?.schema,
-            columns: table?.columns.map((c) => c.name),
-          },
-          impersonatedRole,
-          ...args,
-        },
-      ],
-      isRoleImpersonationEnabled,
+      sql,
+      queryKey: ['table-rows', table?.id],
+      isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
     },
-    {
-      select(data) {
-        const rows = data.result.map((x: any, index: number) => {
-          return { idx: index, ...x } as SupaRow
-        })
+    signal
+  )
 
-        return {
-          rows,
-        } as TData
-      },
-      enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
+  const rows = result.map((x: any, index: number) => {
+    return { idx: index, ...x }
+  }) as SupaRow[]
+
+  return {
+    rows,
+  }
+}
+
+export const useTableRowsQuery = <TData = TableRowsData>(
+  { projectRef, connectionString, tableId, ...args }: Omit<TableRowsVariables, 'queryClient'>,
+  { enabled = true, ...options }: UseQueryOptions<TableRowsData, TableRowsError, TData> = {}
+) => {
+  const queryClient = useQueryClient()
+  return useQuery<TableRowsData, TableRowsError, TData>(
+    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    ({ signal }) =>
+      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined' && typeof tableId !== 'undefined',
       ...options,
     }
+  )
+}
+
+export function prefetchTableRows(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    tableId,
+    impersonatedRole,
+    ...args
+  }: Omit<TableRowsVariables, 'queryClient'>
+) {
+  return client.fetchQuery(
+    tableRowKeys.tableRows(projectRef, { table: { id: tableId }, ...args }),
+    ({ signal }) =>
+      getTableRows({ queryClient: client, projectRef, connectionString, tableId, ...args }, signal)
   )
 }

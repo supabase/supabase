@@ -10,10 +10,11 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
+import { Code, ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
 import FunctionsNav from '../../interfaces/Functions/FunctionsNav'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
-import { Code, ExternalLink } from 'lucide-react'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface FunctionsLayoutProps {
   title?: string
@@ -29,9 +30,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
   if (!canReadFunctions) {
     return (
       <ProjectLayout title={title || 'Edge Functions'} product="Edge Functions">
-        <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">
-          <NoPermission isFullPage resourceText="access your project's edge functions" />
-        </main>
+        <NoPermission isFullPage resourceText="access your project's edge functions" />
       </ProjectLayout>
     )
   }
@@ -123,16 +122,10 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                         }
                       />
                     )}
-                    <Button
-                      asChild
-                      type="default"
+                    <DocsButton
                       className="translate-y-[1px]"
-                      icon={<ExternalLink size={14} strokeWidth={1.5} />}
-                    >
-                      <Link href="https://supabase.com/docs/guides/functions" target="_link">
-                        Documentation
-                      </Link>
-                    </Button>
+                      href="https://supabase.com/docs/guides/functions"
+                    />
                   </div>
                 </div>
               </div>

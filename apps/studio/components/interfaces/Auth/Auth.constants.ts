@@ -23,8 +23,21 @@ const chromeExtensionRegex = /chrome-extension:\/\/([a-zA-Z]*)/gm
 // New regex for custom scheme URLs
 const customSchemeRegex = /^([a-zA-Z][a-zA-Z0-9+.-]*):(?:\/{1,3})?([a-zA-Z0-9_.-]*)$/
 
-// combine the above regexes
-export const urlRegex = new RegExp(
-  `(${baseUrlRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})|(${customSchemeRegex.source})`,
-  'i'
-)
+// Exclude simple domain names without protocol
+const excludeSimpleDomainRegex = /^[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/
+
+// combine the above regexes, with optional exclusion of options
+// usage: urlRegex() or urlRegex({ excludeSimpleDomains: false })
+export function urlRegex(
+  options: { excludeSimpleDomains?: boolean } = { excludeSimpleDomains: true }
+): RegExp {
+  const { excludeSimpleDomains } = options
+  const excludeSimpleDomainPart = excludeSimpleDomains
+    ? `(?!${excludeSimpleDomainRegex.source})`
+    : ''
+
+  return new RegExp(
+    `${excludeSimpleDomainPart}((${baseUrlRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})|(${customSchemeRegex.source}))`,
+    'i'
+  )
+}

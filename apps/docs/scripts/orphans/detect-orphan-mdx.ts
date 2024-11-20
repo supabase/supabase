@@ -12,11 +12,9 @@ import {
   realtime,
   storage,
   ai,
-  supabase_cli,
   platform,
   resources,
   self_hosting,
-  migrate,
 } from '../../components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 const DOCS_ROOT_DIR = join(__dirname, '..', '..')
@@ -73,11 +71,9 @@ const main = async () => {
       realtime.items,
       storage.items,
       ai.items,
-      supabase_cli.items,
       platform.items,
       resources.items,
       self_hosting.items,
-      migrate.items,
     ]
       .flatMap((items) => recGetUrl(items))
       // Remove initial slash

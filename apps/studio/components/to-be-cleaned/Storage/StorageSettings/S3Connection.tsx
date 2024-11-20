@@ -12,14 +12,13 @@ import Table from 'components/to-be-cleaned/Table'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { AlertDescription_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, WarningIcon } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { WarningIcon } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
@@ -34,16 +33,18 @@ export const S3Connection = () => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [deleteCred, setDeleteCred] = useState<{ id: string; description: string }>()
 
-  const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
+  const canReadS3Credentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_READ, '*')
 
-  const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery(
     { projectRef },
     { enabled: canReadS3Credentials }
   )
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
-  const s3connectionUrl = getConnectionURL(projectRef ?? '', projectAPI)
+  const s3connectionUrl = getConnectionURL(projectRef ?? '', protocol, endpoint)
 
   return (
     <>

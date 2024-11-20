@@ -1,16 +1,21 @@
-import { ChevronDown, ExternalLink } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import {
-  DISK_LIMITS,
   DISK_PRICING,
   DiskType,
-} from 'components/interfaces/DiskManagement/DiskManagement.constants'
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import {
+  calculateIOPSPrice,
+  calculateThroughputPrice,
+} from 'components/interfaces/DiskManagement/DiskManagement.utils'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import {
@@ -24,6 +29,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { AWS_REGIONS_DEFAULT, BASE_PATH } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
 import {
@@ -46,11 +52,6 @@ import {
   cn,
 } from 'ui'
 import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
-import {
-  calculateIOPSPrice,
-  calculateThroughputPrice,
-} from 'components/interfaces/DiskManagement/DiskManagement.utils'
-import { formatCurrency } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -71,11 +72,21 @@ const DeployNewReplicaPanel = ({
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const diskManagementV2 = useFlag('diskManagementV2')
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
+
+  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
+    enabled:
+      subscription !== undefined && !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+  })
+  const overdueInvoices = (allOverdueInvoices ?? []).filter(
+    (x) => x.organization_id === project?.organization_id
+  )
+  const hasOverdueInvoices = overdueInvoices.length > 0
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(
@@ -88,10 +99,7 @@ const DeployNewReplicaPanel = ({
 
   // @ts-ignore
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
-  const showNewDiskManagementUI =
-    diskManagementV2 &&
-    subscription?.usage_based_billing_project_addons &&
-    project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
   const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
   const additionalCostIOPS = calculateIOPSPrice({
@@ -163,6 +171,8 @@ const DeployNewReplicaPanel = ({
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
+  const isProWithSpendCapEnabled =
+    subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
   const isMinimallyOnSmallCompute =
     currentComputeAddon?.variant.identifier !== undefined &&
     currentComputeAddon?.variant.identifier !== 'ci_micro'
@@ -172,7 +182,9 @@ const DeployNewReplicaPanel = ({
     isAWSProvider &&
     !isFreePlan &&
     isWalgEnabled &&
-    currentComputeAddon !== undefined
+    currentComputeAddon !== undefined &&
+    !hasOverdueInvoices &&
+    !isProWithSpendCapEnabled
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -216,7 +228,22 @@ const DeployNewReplicaPanel = ({
       confirmText="Deploy replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-4">
-        {!isAWSProvider ? (
+        {hasOverdueInvoices ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Your organization has overdue invoices</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Please resolve all outstanding invoices first before deploying a new read replica
+              </span>
+              <div className="mt-3">
+                <Button asChild type="default">
+                  <Link href={`/org/${org?.slug}/invoices`}>View invoices</Link>
+                </Button>
+              </div>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : !isAWSProvider ? (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
@@ -227,17 +254,11 @@ const DeployNewReplicaPanel = ({
                 Projects provisioned by other cloud providers currently will not be able to use read
                 replicas
               </span>
-              <div className="mt-3">
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Documentation
-                  </a>
-                </Button>
-              </div>
+              <DocsButton
+                abbrev={false}
+                className="mt-3"
+                href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+              />
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         ) : currentPgVersion < 15 ? (
@@ -261,18 +282,115 @@ const DeployNewReplicaPanel = ({
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
-        ) : (
-          <>
-            {!isMinimallyOnSmallCompute && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  Project required to at least be on a Small compute
-                </AlertTitle_Shadcn_>
+        ) : !isMinimallyOnSmallCompute ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Project required to at least be on a Small compute
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                This is to ensure that read replicas can keep up with the primary databases'
+                activities.
+              </span>
+              <div className="flex items-center gap-x-2 mt-3">
+                <Button asChild type="default">
+                  <Link
+                    href={
+                      isFreePlan
+                        ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
+                        : diskAndComputeFormEnabled
+                          ? `/project/${projectRef}/settings/compute-and-disk`
+                          : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                    }
+                  >
+                    {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                  </Link>
+                </Button>
+                <DocsButton
+                  abbrev={false}
+                  href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                />
+              </div>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : !isWalgEnabled ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              {refetchInterval !== false
+                ? 'Physical backups are currently being enabled'
+                : 'Physical backups are required to deploy replicas'}
+            </AlertTitle_Shadcn_>
+            {refetchInterval === false && (
+              <AlertDescription_Shadcn_ className="mb-2">
+                Physical backups are used under the hood to spin up read replicas for your project.
+              </AlertDescription_Shadcn_>
+            )}
+            <AlertDescription_Shadcn_>
+              {refetchInterval !== false
+                ? 'This warning will go away once physical backups have been enabled - check back in a few minutes!'
+                : 'Enabling physical backups will take a few minutes, after which you will be able to deploy read replicas.'}
+            </AlertDescription_Shadcn_>
+            {refetchInterval !== false ? (
+              <AlertDescription_Shadcn_ className="mt-2">
+                You may start deploying read replicas thereafter once this is completed.
+              </AlertDescription_Shadcn_>
+            ) : (
+              <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+                <Button
+                  type="default"
+                  loading={isEnabling}
+                  disabled={isEnabling}
+                  onClick={() => {
+                    if (projectRef) enablePhysicalBackups({ ref: projectRef })
+                  }}
+                >
+                  Enable physical backups
+                </Button>
+                <DocsButton
+                  abbrev={false}
+                  href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                />
+              </AlertDescription_Shadcn_>
+            )}
+          </Alert_Shadcn_>
+        ) : isProWithSpendCapEnabled ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Spend cap needs to be disabled to deploy replicas
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                Launching a replica incurs additional disk size that will exceed the plan's quota.
+                Disable the spend cap first to allow overages before launching a replica.
+              </span>
+              <div className="flex items-center gap-x-2 mt-3">
+                <Button asChild type="default">
+                  <Link href={`/org/${org?.slug}/billing?panel=costControl`}>
+                    Disable spend cap
+                  </Link>
+                </Button>
+              </div>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        ) : reachedMaxReplicas ? (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              You can only deploy up to {maxNumberOfReplicas} read replicas at once
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              If you'd like to spin up another read replica, please drop an existing replica first.
+            </AlertDescription_Shadcn_>
+            {maxNumberOfReplicas === MAX_REPLICAS_BELOW_XL && (
+              <>
                 <AlertDescription_Shadcn_>
                   <span>
-                    This is to ensure that read replicas can keep up with the primary databases'
-                    activities.
+                    Alternatively, you may deploy up to{' '}
+                    <span className="text-foreground">{MAX_REPLICAS_ABOVE_XL}</span> replicas if
+                    your project is on an XL compute or higher.
                   </span>
                   <div className="flex items-center gap-x-2 mt-3">
                     <Button asChild type="default">
@@ -280,113 +398,20 @@ const DeployNewReplicaPanel = ({
                         href={
                           isFreePlan
                             ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            : diskAndComputeFormEnabled
+                              ? `/project/${projectRef}/settings/compute-and-disk`
+                              : `/project/${projectRef}/settings/addons?panel=computeInstance`
                         }
                       >
-                        {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
+                        Upgrade compute size
                       </Link>
-                    </Button>
-                    <Button asChild type="default" icon={<ExternalLink />}>
-                      <a
-                        href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </a>
                     </Button>
                   </div>
                 </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+              </>
             )}
-
-            {isMinimallyOnSmallCompute && !isWalgEnabled && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  {refetchInterval !== false
-                    ? 'Physical backups are currently being enabled'
-                    : 'Physical backups are required to deploy replicas'}
-                </AlertTitle_Shadcn_>
-                {refetchInterval === false && (
-                  <AlertDescription_Shadcn_ className="mb-2">
-                    Physical backups are used under the hood to spin up read replicas for your
-                    project.
-                  </AlertDescription_Shadcn_>
-                )}
-                <AlertDescription_Shadcn_>
-                  {refetchInterval !== false
-                    ? 'This warning will go away once physical backups have been enabled - check back in a few minutes!'
-                    : 'Enabling physical backups will take a few minutes, after which you will be able to deploy read replicas.'}
-                </AlertDescription_Shadcn_>
-                {refetchInterval !== false ? (
-                  <AlertDescription_Shadcn_ className="mt-2">
-                    You may start deploying read replicas thereafter once this is completed.
-                  </AlertDescription_Shadcn_>
-                ) : (
-                  <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
-                    <Button
-                      type="default"
-                      loading={isEnabling}
-                      disabled={isEnabling}
-                      onClick={() => {
-                        if (projectRef) enablePhysicalBackups({ ref: projectRef })
-                      }}
-                    >
-                      Enable physical backups
-                    </Button>
-                    <Button asChild type="default" icon={<ExternalLink />}>
-                      <a
-                        href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </a>
-                    </Button>
-                  </AlertDescription_Shadcn_>
-                )}
-              </Alert_Shadcn_>
-            )}
-
-            {reachedMaxReplicas && (
-              <Alert_Shadcn_>
-                <WarningIcon />
-                <AlertTitle_Shadcn_>
-                  You can only deploy up to {maxNumberOfReplicas} read replicas at once
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  If you'd like to spin up another read replica, please drop an existing replica
-                  first.
-                </AlertDescription_Shadcn_>
-                {maxNumberOfReplicas === MAX_REPLICAS_BELOW_XL && (
-                  <>
-                    <AlertDescription_Shadcn_>
-                      <span>
-                        Alternatively, you may deploy up to{' '}
-                        <span className="text-foreground">{MAX_REPLICAS_ABOVE_XL}</span> replicas if
-                        your project is on an XL compute or higher.
-                      </span>
-                      <div className="flex items-center gap-x-2 mt-3">
-                        <Button asChild type="default">
-                          <Link
-                            href={
-                              isFreePlan
-                                ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                                : `/project/${projectRef}/settings/addons?panel=computeInstance`
-                            }
-                          >
-                            Upgrade compute size
-                          </Link>
-                        </Button>
-                      </div>
-                    </AlertDescription_Shadcn_>
-                  </>
-                )}
-              </Alert_Shadcn_>
-            )}
-          </>
-        )}
+          </Alert_Shadcn_>
+        ) : null}
 
         <div className="flex flex-col gap-y-6 mt-2">
           <Listbox

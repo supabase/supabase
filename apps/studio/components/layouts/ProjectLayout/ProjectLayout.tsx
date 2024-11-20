@@ -21,15 +21,16 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
-import ProjectPausedState from './ProjectPausedState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { ResizingState } from './ResizingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -95,6 +96,7 @@ const ProjectLayout = ({
       (selectedProject.status === PROJECT_STATUS.COMING_UP &&
         router.pathname.includes('/project/[ref]/settings'))
     : true
+
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
@@ -125,26 +127,29 @@ const ProjectLayout = ({
             direction="horizontal"
             autoSaveId="project-layout"
           >
-            {showProductMenu && productMenu && (
-              <>
-                <ResizablePanel
-                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
-                  defaultSize={0} // forces panel to smallest width possible, at w-64
-                >
-                  <MenuBarWrapper
-                    isLoading={isLoading}
-                    isBlocking={isBlocking}
-                    productMenu={productMenu}
-                  >
-                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                  </MenuBarWrapper>
-                </ResizablePanel>
-                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
-              </>
-            )}
-            <ResizablePanel className="h-full">
+            <ResizablePanel
+              id="panel-left"
+              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
+                hidden: !showProductMenu || !productMenu,
+              })}
+              defaultSize={0} // forces panel to smallest width possible, at w-64
+            >
+              <MenuBarWrapper
+                isLoading={isLoading}
+                isBlocking={isBlocking}
+                productMenu={productMenu}
+              >
+                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+              </MenuBarWrapper>
+            </ResizablePanel>
+            <ResizableHandle
+              className={cn({ hidden: !showProductMenu || !productMenu })}
+              withHandle
+              disabled={resizableSidebar ? false : true}
+            />
+            <ResizablePanel id="panel-right" className="h-full flex flex-col">
+              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
               <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
                 {showPausedState ? (
                   <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
                     <div className="w-full">
@@ -235,6 +240,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   const isRestarting = selectedProject?.status === PROJECT_STATUS.RESTARTING
+  const isResizing = selectedProject?.status === PROJECT_STATUS.RESIZING
   const isProjectUpgrading = selectedProject?.status === PROJECT_STATUS.UPGRADING
   const isProjectRestoring = selectedProject?.status === PROJECT_STATUS.RESTORING
   const isProjectRestoreFailed = selectedProject?.status === PROJECT_STATUS.RESTORE_FAILED
@@ -257,6 +263,10 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
 
   if (isRestarting && !isBackupsPage) {
     return <RestartingState />
+  }
+
+  if (isResizing && !isBackupsPage) {
+    return <ResizingState />
   }
 
   if (isProjectUpgrading && !isBackupsPage) {

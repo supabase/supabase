@@ -8,10 +8,10 @@ import {
   useTelemetryProps,
 } from 'common'
 import { noop } from 'lodash'
-import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
+import { PrivacySettings } from '../PrivacySettings'
 
 interface ConsentToastProps {
   onAccept: () => void
@@ -22,20 +22,35 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
   const isMobile = useBreakpoint(639)
 
   return (
-    <div className="space-y-3 py-1 flex flex-col w-full">
+    <div className="py-1 flex flex-col gap-y-3 w-full">
       <div>
-        <p className="text-foreground">
-          We only collect analytics essential to ensuring smooth operation of our services.{' '}
-          <Link
-            className="inline sm:hidden underline text-light"
+        <p className="text-sm text-foreground">
+          We use first-party cookies to improve our services.{' '}
+          <a
             target="_blank"
-            rel="noreferrer"
-            href="https://supabase.com/privacy"
+            rel="noreferrer noopener"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="hidden sm:inline underline underline-offset-2 decoration-foreground-lighter hover:decoration-foreground-light transition-all"
           >
             Learn more
-          </Link>
+          </a>{' '}
         </p>
+        <div className="flex items-center justify-start gap-x-2 sm:hidden">
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://supabase.com/privacy#8-cookies-and-similar-technologies-used-on-our-european-services"
+            className="underline underline-offset-2 text-foreground-light hover:decoration-foreground-light transition-all"
+          >
+            Learn more
+          </a>
+          <span className="text-foreground-lighter text-xs">•</span>
+          <PrivacySettings className="underline underline-offset-2 inline text-light">
+            Privacy settings
+          </PrivacySettings>
+        </div>
       </div>
+
       <div className="flex items-center space-x-2">
         <Button
           type="default"
@@ -54,9 +69,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
           Opt out
         </Button>
         <Button asChild type="text" className="hidden sm:block text-light hover:text-foreground">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/privacy">
-            Learn more
-          </Link>
+          <PrivacySettings>Privacy settings</PrivacySettings>
         </Button>
       </div>
     </div>
@@ -92,7 +105,12 @@ export const useConsent = () => {
           id: 'consent-toast',
           position: 'bottom-right',
           duration: Infinity,
-          closeButton: true,
+          closeButton: false,
+          dismissible: false,
+          className: cn(
+            '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
+            'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
+          ),
         }
       )
     }
@@ -110,7 +128,9 @@ export const useConsent = () => {
   }, [])
 
   useEffect(() => {
-    triggerConsentToast()
+    setTimeout(() => {
+      consentValue === null && triggerConsentToast()
+    }, 300)
   }, [consentValue])
 
   return {

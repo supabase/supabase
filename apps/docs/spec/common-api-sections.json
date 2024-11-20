@@ -226,6 +226,12 @@
     "title": "Edge Functions",
     "items": [
       {
+        "id": "v1-create-a-function",
+        "title": "Create a function",
+        "slug": "v1-create-a-function",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-function",
         "title": "Delete a function",
         "slug": "v1-delete-a-function",
@@ -382,15 +388,21 @@
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-eligibility",
-        "title": "Get postgrest upgrade eligibility",
-        "slug": "v1-get-postgrest-upgrade-eligibility",
+        "id": "v1-get-postgres-upgrade-eligibility",
+        "title": "Get postgres upgrade eligibility",
+        "slug": "v1-get-postgres-upgrade-eligibility",
         "type": "operation"
       },
       {
-        "id": "v1-get-postgrest-upgrade-status",
-        "title": "Get postgrest upgrade status",
-        "slug": "v1-get-postgrest-upgrade-status",
+        "id": "v1-get-postgres-upgrade-status",
+        "title": "Get postgres upgrade status",
+        "slug": "v1-get-postgres-upgrade-status",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-project",
+        "title": "Get project",
+        "slug": "v1-get-project",
         "type": "operation"
       },
       {
@@ -490,9 +502,21 @@
     "title": "Storage",
     "items": [
       {
+        "id": "v1-get-storage-config",
+        "title": "Get storage config",
+        "slug": "v1-get-storage-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-buckets",
         "title": "List all buckets",
         "slug": "v1-list-all-buckets",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-storage-config",
+        "title": "Update storage config",
+        "slug": "v1-update-storage-config",
         "type": "operation"
       }
     ]

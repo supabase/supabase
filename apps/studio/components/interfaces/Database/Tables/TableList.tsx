@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
@@ -30,12 +31,12 @@ import { useDatabasePublicationsQuery } from 'data/database-publications/databas
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -59,11 +60,13 @@ import { formatAllEntities } from './Tables.utils'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: any) => void
-  onDeleteTable: (table: any) => void
+  onEditTable: (table: PostgresTable) => void
+  onDeleteTable: (table: PostgresTable) => void
+  onDuplicateTable: (table: PostgresTable) => void
 }
 
 const TableList = ({
+  onDuplicateTable,
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
@@ -71,7 +74,9 @@ const TableList = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+
+  const prefetchEditorTablePage = usePrefetchEditorTablePage()
+
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useState<string>('')
@@ -179,6 +184,7 @@ const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+
   const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
@@ -257,7 +263,7 @@ const TableList = ({
           className="w-64"
           placeholder="Search for a table"
           value={filterString}
-          onChange={(e: any) => setFilterString(e.target.value)}
+          onChange={(e) => setFilterString(e.target.value)}
           icon={<Search size={12} />}
         />
 
@@ -270,7 +276,9 @@ const TableList = ({
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to create tables',
+                text: !canUpdateTables
+                  ? 'You need additional permissions to create tables'
+                  : undefined,
               },
             }}
           >
@@ -376,9 +384,11 @@ const TableList = ({
                                   x.type === ENTITY_TYPE.FOREIGN_TABLE &&
                                     'text-yellow-900 bg-yellow-500',
                                   x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                    'text-purple-1000 bg-purple-500',
-                                  x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    'text-foreground-light bg-border-stronger'
+                                    'text-purple-1000 bg-purple-500'
+                                  // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
+                                  // once we update the endpoint to include partitioned tables, we can uncomment this
+                                  // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                                  //   'text-foreground-light bg-border-stronger'
                                 )}
                               >
                                 {Object.entries(ENTITY_TYPE)
@@ -436,9 +446,7 @@ const TableList = ({
                         {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
-                        {(realtimePublication?.tables ?? []).find(
-                          (table: any) => table.id === x.id
-                        ) ? (
+                        {(realtimePublication?.tables ?? []).find((table) => table.id === x.id) ? (
                           <div className="flex justify-center">
                             <Check size={18} strokeWidth={2} className="text-brand" />
                           </div>
@@ -473,6 +481,9 @@ const TableList = ({
                                   onClick={() =>
                                     router.push(`/project/${project?.ref}/editor/${x.id}`)
                                   }
+                                  onMouseEnter={() =>
+                                    prefetchEditorTablePage({ id: x.id ? String(x.id) : undefined })
+                                  }
                                 >
                                   <Eye size={12} />
                                   <p>View in Table Editor</p>
@@ -505,7 +516,9 @@ const TableList = ({
                                       className="space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        snap.onDuplicateTable()
+                                        if (canUpdateTables) {
+                                          onDuplicateTable(x)
+                                        }
                                       }}
                                     >
                                       <Copy size={12} />

@@ -10,7 +10,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
@@ -128,6 +128,8 @@ const CreateProject = () => {
     delayedCheckPasswordStrength(password)
   }
 
+  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
+
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
@@ -138,7 +140,6 @@ const CreateProject = () => {
     },
   })
 
-  const [newProjectRef, setNewProjectRef] = useState<string | undefined>(undefined)
   async function onCreateProject() {
     if (!organizationIntegration) return console.error('No organization installation details found')
     if (!organizationIntegration?.id) return console.error('No organization installation ID found')
@@ -162,30 +163,22 @@ const CreateProject = () => {
       dbSql,
     })
   }
-  const isInstallingRef = useRef(false)
 
   // Wait for the new project to be created before creating the connection
-  useProjectApiQuery(
+  useProjectSettingsV2Query(
     { projectRef: newProjectRef },
     {
       enabled: newProjectRef !== undefined,
       // refetch until the project is created
       refetchInterval: (data) => {
-        return (data?.autoApiService.service_api_keys.length ?? 0) > 0 ? false : 1000
+        return ((data?.service_api_keys ?? []).length ?? 0) > 0 ? false : 1000
       },
       async onSuccess(data) {
-        const isReady = data.autoApiService.service_api_keys.length > 0
+        const isReady = (data?.service_api_keys ?? []).length > 0
 
-        if (
-          !isReady ||
-          !organizationIntegration ||
-          !foreignProjectId ||
-          !newProjectRef ||
-          isInstallingRef.current
-        ) {
+        if (!isReady || !organizationIntegration || !foreignProjectId || !newProjectRef) {
           return
         }
-        isInstallingRef.current = true
 
         const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 

@@ -47,8 +47,11 @@ export async function _handleRevalidateRequest(request: NextRequest) {
     return new Response('Invalid Authorization header', { status: 401 })
   }
 
-  const result = requestBodySchema.safeParse(await request.json())
-  if (!result.success) {
+  let result: z.infer<typeof requestBodySchema>
+  try {
+    result = requestBodySchema.parse(await request.json())
+  } catch (error) {
+    console.error(error)
     return new Response(
       'Malformed request body: should be a JSON object with a "tags" array of strings.',
       { status: 400 }
@@ -64,7 +67,7 @@ export async function _handleRevalidateRequest(request: NextRequest) {
     const { data: lastRevalidation, error } = await supabaseAdmin.rpc(
       'get_last_revalidation_for_tags',
       {
-        tags: result.data.tags,
+        tags: result.tags,
       }
     )
     if (error) {
@@ -86,12 +89,12 @@ export async function _handleRevalidateRequest(request: NextRequest) {
 
   const { error } = await supabaseAdmin
     .from('validation_history')
-    .insert(result.data.tags.map((tag) => ({ tag })))
+    .insert(result.tags.map((tag) => ({ tag })))
   if (error) {
     console.error('Failed to update revalidation table: %o', error)
   }
 
-  result.data.tags.forEach((tag) => {
+  result.tags.forEach((tag) => {
     revalidateTag(tag)
   })
 

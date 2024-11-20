@@ -6,13 +6,12 @@ import CopyToClipboard from 'react-copy-to-clipboard'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, cn } from 'ui'
 import type { Message } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { MessageRole, MessageStatus, queryAi } from 'ui-patterns/CommandMenu/prepackaged/ai'
@@ -22,7 +21,7 @@ const useSaveGeneratedSql = () => {
   const { ref } = useParams()
   const { profile } = useProfile()
   const selectedProject = useSelectedProject()
-  const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
     subject: { id: profile?.id },
@@ -31,6 +30,8 @@ const useSaveGeneratedSql = () => {
   const saveGeneratedSql = useCallback(
     (answer: string, title: string) => {
       if (!ref) return console.error('Project ref is required')
+      if (!profile) return console.error('Profile is required')
+      if (!selectedProject) return console.error('Project is required')
 
       if (!canCreateSQLSnippet) {
         toast('Unable to save query as you do not have sufficient permissions for this project')
@@ -48,21 +49,20 @@ const useSaveGeneratedSql = () => {
   `
 
       try {
-        const snippet = createSqlSnippetSkeleton({
+        const snippet = createSqlSnippetSkeletonV2({
           id: uuidv4(),
           name: title || 'Generated query',
-          owner_id: profile?.id,
-          project_id: selectedProject?.id,
           sql: formattedSql,
+          owner_id: profile.id,
+          project_id: selectedProject.id,
         })
-
-        snap.addSnippet(snippet as SqlSnippet, ref)
+        snapV2.addSnippet({ projectRef: ref, snippet })
         toast.success(`Successfully saved snippet!`)
       } catch (error: any) {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [canCreateSQLSnippet, profile?.id, ref, selectedProject?.id, snap]
+    [canCreateSQLSnippet, profile?.id, ref, selectedProject?.id, snapV2]
   )
 
   return saveGeneratedSql

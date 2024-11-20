@@ -22,8 +22,6 @@ import {
   Switch,
 } from 'ui'
 
-const VERCEL_CONNECTION_FORM_ID = 'vercel-connection-form'
-
 const VercelIntegrationConnectionForm = ({
   disabled,
   connection,
@@ -80,10 +78,12 @@ const VercelIntegrationConnectionForm = ({
     })
   }
 
+  const vercelConnectionFormId = `vercel-connection-form-${connection.id}`
+
   return (
     <Form_Shadcn_ {...form}>
       <form
-        id={VERCEL_CONNECTION_FORM_ID}
+        id={vercelConnectionFormId}
         onSubmit={form.handleSubmit(onSubmit)}
         className={'w-full space-y-6'}
       >
@@ -175,6 +175,7 @@ const VercelIntegrationConnectionForm = ({
                     <Input_Shadcn_
                       {...field}
                       className="w-full"
+                      disabled={disabled}
                       placeholder="An empty prefix will result in no public env vars"
                     />
                   </FormControl_Shadcn_>
@@ -228,7 +229,8 @@ const VercelIntegrationConnectionForm = ({
           )}
 
           <FormActions
-            form={VERCEL_CONNECTION_FORM_ID}
+            disabled={disabled}
+            form={vercelConnectionFormId}
             hasChanges={form.formState.isDirty}
             isSubmitting={isLoading}
             handleReset={() => form.reset()}

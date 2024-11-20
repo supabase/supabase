@@ -1,4 +1,5 @@
 import { cva } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 import React from 'react'
 import {
   FormDescription_Shadcn_,
@@ -8,7 +9,6 @@ import {
   cn,
 } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
-import { AnimatePresence, motion } from 'framer-motion'
 
 type Props = {
   align?: 'left' | 'right'
@@ -27,7 +27,7 @@ type Props = {
   name?: string
 }
 
-const ContainerVariants = cva('relative grid gap-2', {
+const ContainerVariants = cva('relative grid gap-10', {
   variants: {
     size: {
       tiny: 'text-xs',
@@ -362,14 +362,15 @@ export const FormLayout = React.forwardRef<
                 <FormLabel_Shadcn_
                   className="flex gap-2 items-center break-all"
                   data-formlayout-id={'formLabel'}
+                  htmlFor={props.name || id}
                 >
                   <LabelContents />
                 </FormLabel_Shadcn_>
               ) : (
                 <Label_Shadcn_
-                  htmlFor={props.name}
-                  data-formlayout-id={'label'}
                   className="flex gap-2 items-center break-all"
+                  data-formlayout-id={'label'}
+                  htmlFor={props.name || id}
                 >
                   <LabelContents />
                 </Label_Shadcn_>

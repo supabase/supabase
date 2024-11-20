@@ -10,6 +10,10 @@ export interface Metric {
   category: string
   unitName?: string
   tip?: string
+  docLink?: {
+    title: string
+    url: string
+  }
 }
 
 export const BILLING_BREAKDOWN_METRICS: Metric[] = [
@@ -91,14 +95,20 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
   {
     key: PricingMetric.DISK_SIZE_GB_HOURS_GP3,
     name: 'Disk Size',
+    anchor: 'diskSize',
     units: 'absolute',
     unitName: 'GB-Hrs',
     category: 'Database',
-    tip: 'Each project gets provisioned with 8 GB of disk. When you get close to the disk size limit, we autoscale your disk by 1.5x. The first 8 GB of disk is free for every single project.',
+    tip: 'Each project gets provisioned with 8 GB of GP3 disk for free. When you get close to the disk size limit, we autoscale your disk by 1.5x. Each GB of provisioned disk size beyond 8 GB incurs a GB-Hr every hour. Each extra GB is billed at $0.125/month ($0.000171/GB-Hr), prorated down to the hour.',
+    docLink: {
+      title: 'Read more',
+      url: 'https://supabase.com/docs/guides/platform/org-based-billing#disk-size',
+    },
   },
   {
     key: PricingMetric.DISK_SIZE_GB_HOURS_IO2,
     name: 'Disk Size IO2',
+    anchor: 'diskSize',
     units: 'absolute',
     unitName: 'GB-Hrs',
     category: 'Database',

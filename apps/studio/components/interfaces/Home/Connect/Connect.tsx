@@ -5,10 +5,9 @@ import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import Panel from 'components/ui/Panel'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -44,6 +43,9 @@ const Connect = () => {
       .find((item) => item.key === selectedParent)
       ?.children.find((child) => child.key === selectedChild)?.children[0]?.key || ''
   )
+
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
 
   const handleParentChange = (value: string) => {
     setSelectedParent(value)
@@ -126,32 +128,13 @@ const Connect = () => {
     return []
   }
 
-  const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
-
-  const { data: apiSettings } = useProjectApiQuery({
-    projectRef,
-  })
-
-  // Get the API service
-  const apiService = (projectSettings?.services ?? []).find(
-    (x: any) => x.app.id == DEFAULT_PROJECT_API_SERVICE_ID
-  )
-
-  const canReadAPIKeys = useCheckPermissions(PermissionAction.READ, 'service_api_keys')
-
-  // Get the API service
-  const apiHost = canReadAPIKeys
-    ? `${apiSettings?.autoApiService?.protocol ?? 'https'}://${
-        apiSettings?.autoApiService?.endpoint ?? '-'
-      }`
-    : ''
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
+  const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null
 
-  const anonKey = canReadAPIKeys
-    ? apiService?.service_api_keys.find((key) => key.tags === 'anon')?.api_key ?? null
-    : null
-
-  const projectKeys = { apiUrl, anonKey }
+  const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }
+  const projectKeys = { apiUrl, anonKey: anonKey?.api_key ?? null }
 
   const filePath = getContentFilePath({
     connectionObject,
@@ -168,7 +151,7 @@ const Connect = () => {
             <span>Connect</span>
           </Button>
         </DialogTrigger>
-        <DialogContent className={cn('sm:max-w-5xl p-0')}>
+        <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
           <DialogHeader className="pb-3">
             <DialogTitle>Connect to your project</DialogTitle>
             <DialogDescription>
@@ -254,7 +237,20 @@ const Connect = () => {
                   <p className="text-xs text-foreground-lighter my-3">
                     Add the following files below to your application
                   </p>
-                  <ConnectTabContent projectKeys={projectKeys} filePath={filePath} />
+                  <ConnectTabContent
+                    projectKeys={projectKeys}
+                    filePath={filePath}
+                    className="rounded-b-none"
+                  />
+                  <Panel.Notice
+                    className="border border-t-0 rounded-lg rounded-t-none"
+                    title="New API keys coming Q4 2024"
+                    description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
+`}
+                    href="https://github.com/orgs/supabase/discussions/29260"
+                    buttonText="Read the announcement"
+                  />
                 </TabsContent_Shadcn_>
               )
             })}

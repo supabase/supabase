@@ -8,14 +8,14 @@ info:
     Supabase Swift.
 
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_swift_v2.yml
-  slugPrefix: "/"
+  slugPrefix: '/'
   libraries:
-    - id: "Swift"
-      version: "2.0.0"
+    - id: 'Swift'
+      version: '2.0.0'
 
 functions:
   - id: initializing
-    title: "Initializing"
+    title: 'Initializing'
     description: |
       You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
       The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
@@ -70,7 +70,7 @@ functions:
 
           Note: each client connection can only access a single schema, so the code above can access the `other_schema` schema but cannot access the `public` schema.
   - id: auth-api
-    title: "Overview"
+    title: 'Overview'
     notes: |
       The auth methods can be accessed via the `supabase.auth` namespace.
 
@@ -147,7 +147,7 @@ functions:
           let auth = supabase.auth
           ```
   - id: sign-up
-    title: "signUp()"
+    title: 'signUp()'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -249,7 +249,7 @@ functions:
           )
           ```
   - id: on-auth-state-change
-    title: "onAuthStateChange()"
+    title: 'onAuthStateChange()'
     notes: |
       - Subscribes to important events occurring on the user's session.
       - Emitted events:
@@ -311,7 +311,7 @@ functions:
           }
           ```
   - id: sign-in-anonymously
-    title: "signInAnonymously()"
+    title: 'signInAnonymously()'
     notes: |
       - Returns an anonymous user
       - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
@@ -334,7 +334,7 @@ functions:
           )
           ```
   - id: sign-in-with-password
-    title: "signInWithPassword()"
+    title: 'signInWithPassword()'
     notes: |
       - Requires either an email and password or a phone number and password.
     overwriteParams:
@@ -380,7 +380,7 @@ functions:
           )
           ```
   - id: sign-in-with-otp
-    title: "signInWithOTP()"
+    title: 'signInWithOTP()'
     overwriteParams:
       - name: email
         isOptional: true
@@ -459,7 +459,7 @@ functions:
           )
           ```
   - id: sign-in-with-oauth
-    title: "signInWithOAuth()"
+    title: 'signInWithOAuth()'
     overwriteParams:
       - name: provider
         type: Provider
@@ -476,7 +476,7 @@ functions:
         description: >
           A space-separated list of scopes granted to the OAuth application.
       - name: queryParams
-        type: "[(name: String, value: String?)]"
+        type: '[(name: String, value: String?)]'
         isOptional: true
         description: >
           Additional query params.
@@ -558,10 +558,10 @@ functions:
           )
           ```
   - id: sign-in-with-id-token
-    title: "signInWithIdToken()"
+    title: 'signInWithIdToken()'
     examples:
       - id: sign-in-with-id-token
-        name: "Sign In using ID Token"
+        name: 'Sign In using ID Token'
         description: Use this method to implement native Sign In With Apple.
         code: |
           ```swift
@@ -574,7 +574,7 @@ functions:
           )
           ```
   - id: sign-in-with-sso
-    title: "signInWithSSO()"
+    title: 'signInWithSSO()'
     overwriteParams:
       - name: providerId
         isOptional: true
@@ -633,7 +633,7 @@ functions:
             UIApplication.shared.open(url)
           ```
   - id: sign-out
-    title: "signOut()"
+    title: 'signOut()'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
@@ -645,7 +645,7 @@ functions:
           try await supabase.auth.signOut()
           ```
   - id: verify-otp
-    title: "verifyOTP()"
+    title: 'verifyOTP()'
     overwriteParams:
       - name: email
         isOptional: true
@@ -704,7 +704,7 @@ functions:
             )
           ```
   - id: get-session
-    title: "session"
+    title: 'session'
     description: |
       - Returns the session, refreshing it if necessary. If no session can be found, a `GoTrueError.sessionNotFound` error is thrown.
     examples:
@@ -724,7 +724,7 @@ functions:
           let session = supabase.auth.currentSession
           ```
   - id: get-user
-    title: "user()"
+    title: 'user()'
     description: |
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
       - Fetches the user object from the database instead of local session.
@@ -753,7 +753,7 @@ functions:
           let user = supabase.auth.currentUser
           ```
   - id: update-user
-    title: "updateUser()"
+    title: 'updateUser()'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
@@ -864,7 +864,7 @@ functions:
           )
           ```
   - id: get-user-identities
-    title: "userIdentities()"
+    title: 'userIdentities()'
     notes: |
       - The user needs to be signed in to call `userIdentities()`.
     examples:
@@ -876,7 +876,7 @@ functions:
           let identities = try await supabase.auth.userIdentities()
           ```
   - id: link-identity
-    title: "linkIdentity()"
+    title: 'linkIdentity()'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `linkIdentity()`.
@@ -904,7 +904,7 @@ functions:
           }
           ```
   - id: unlink-identity
-    title: "unlinkIdentity()"
+    title: 'unlinkIdentity()'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `unlinkIdentity()`.
@@ -928,7 +928,7 @@ functions:
           try await supabase.auth.unlinkIdentity(googleIdentity)
           ```
   - id: send-password-reauthentication
-    title: "reauthenticate()"
+    title: 'reauthenticate()'
     notes: |
       - This method is used together with `update(user:)` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
@@ -944,7 +944,7 @@ functions:
           try await supabase.auth.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
-    title: "resend()"
+    title: 'resend()'
     notes: |
       - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOTP()` method again.
@@ -995,7 +995,7 @@ functions:
           )
           ```
   - id: set-session
-    title: "setSession()"
+    title: 'setSession()'
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
@@ -1011,7 +1011,7 @@ functions:
             try await supabase.auth.setSession(accessToken: "access_token", refreshToken: "refresh_token")
           ```
   - id: refresh-session
-    title: "refreshSession()"
+    title: 'refreshSession()'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
     examples:
@@ -1031,7 +1031,7 @@ functions:
           ```
 
   - id: exchange-code-for-session
-    title: "exchangeCodeForSession()"
+    title: 'exchangeCodeForSession()'
     notes: |
       - Used when `flowType` is set to `pkce` in client options.
     examples:
@@ -1043,7 +1043,7 @@ functions:
           try await supabase.auth.exchangeCodeForSession(authCode: "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: auth-mfa-api
-    title: "Overview"
+    title: 'Overview'
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
@@ -1051,7 +1051,7 @@ functions:
 
       Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
-    title: "mfa.enroll()"
+    title: 'mfa.enroll()'
     notes: |
       - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge).
@@ -1081,7 +1081,7 @@ functions:
           let uri = response.totp?.uri
           ```
   - id: mfa-challenge
-    title: "mfa.challenge()"
+    title: 'mfa.challenge()'
     notes: |
       - An [enrolled factor](/docs/reference/swift/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
@@ -1098,7 +1098,7 @@ functions:
           )
           ```
   - id: mfa-verify
-    title: "mfa.verify()"
+    title: 'mfa.verify()'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/swift/auth-mfa-challenge) first.
     examples:
@@ -1116,7 +1116,7 @@ functions:
           )
           ```
   - id: mfa-challenge-and-verify
-    title: "mfa.challengeAndVerify()"
+    title: 'mfa.challengeAndVerify()'
     notes: |
       - An [enrolled factor](/docs/swift/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify) in a single step.
@@ -1134,7 +1134,7 @@ functions:
           )
           ```
   - id: mfa-unenroll
-    title: "mfa.unenroll()"
+    title: 'mfa.unenroll()'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -1148,7 +1148,7 @@ functions:
           )
           ```
   - id: mfa-get-authenticator-assurance-level
-    title: "mfa.getAuthenticatorAssuranceLevel()"
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
@@ -1165,7 +1165,7 @@ functions:
           let currentAuthenticationMethods = aal.currentAuthenticationMethods
           ```
   - id: mfa-list-factors
-    title: "mfa.listFactors()"
+    title: 'mfa.listFactors()'
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -1175,7 +1175,7 @@ functions:
           let factors = try await supabase.auth.mfa.listFactors()
           ```
   - id: admin-api
-    title: "Overview"
+    title: 'Overview'
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
@@ -1196,7 +1196,7 @@ functions:
           let adminAuthClient = supabase.auth.admin
           ```
   - id: delete-user
-    title: "deleteUser()"
+    title: 'deleteUser()'
     notes: |
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
@@ -1210,7 +1210,7 @@ functions:
           )
           ```
   - id: select
-    title: "Fetch data: select()"
+    title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/swift/using-modifiers)
@@ -1889,7 +1889,7 @@ functions:
         hideCodeBlock: true
 
   - id: insert
-    title: "Create data: insert()"
+    title: 'Create data: insert()'
     examples:
       - id: create-a-record
         name: Create a record
@@ -2004,7 +2004,7 @@ functions:
         hideCodeBlock: true
 
   - id: update
-    title: "Modify data: update()"
+    title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/swift/using-filters) to target the item(s) you wish to update.
     examples:
@@ -2159,7 +2159,7 @@ functions:
         hideCodeBlock: true
 
   - id: upsert
-    title: "Upsert data: upsert()"
+    title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
     examples:
@@ -2309,7 +2309,7 @@ functions:
         hideCodeBlock: true
 
   - id: delete
-    title: "Delete data: delete()"
+    title: 'Delete data: delete()'
 
     notes: |
       - `delete()` should always be combined with [filters](/docs/reference/swift/using-filters) to target the item(s) you wish to delete.
@@ -2351,7 +2351,7 @@ functions:
         isSpotlight: true
 
   - id: rpc
-    title: "Postgres functions: rpc()"
+    title: 'Postgres functions: rpc()'
     description: |
       You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
       Functions are useful when the logic rarely changes—like for password resets and updates.
@@ -3041,7 +3041,7 @@ functions:
                   )
                 """
               )
-              .order("name", ascending: false, foreignTable: "cities")
+              .order("name", ascending: false, referencedTable: "cities")
               .execute()
             ```
         data:
@@ -3152,7 +3152,7 @@ functions:
               )
               """
             )
-            .limit(1, foreignTable: "cities")
+            .limit(1, referencedTable: "cities")
             .execute()
           ```
         data:
@@ -3611,27 +3611,25 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = await supabase.channel("room1")
+          let channel = supabase.channel("room1")
 
-          let broadcastStream = await channel.broadcastStream(event: "cursor-pos")
+          let broadcastStream = channel.broadcastStream(event: "cursor-pos")
 
           await channel.subscribe()
 
           Task {
-            for await message in broadcastMessage {
-              print("Cursor position received", message.payload)
+            for await message in broadcastStream {
+              print("Cursor position received", message)
             }
           }
 
-          Task {
-            await channel.broadcast(
-              event: "cursor-pos",
-              message: [
-                "x": .double(.random(in: 0...1)),
-                "y": .double(.random(in: 0...1))
-              ]
-            )
-          }
+          await channel.broadcast(
+            event: "cursor-pos",
+            message: [
+              "x": .double(.random(in: 0...1)),
+              "y": .double(.random(in: 0...1))
+            ]
+          )
           ```
 
       - id: listen-to-broadcast-callback
@@ -3639,10 +3637,10 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = await supabase.channel("room1")
+          let channel = supabase.channel("room1")
 
-          let subscription = await channel.onBroadcast(event: "cursor-pos") { message in 
-            print("Cursor position received", message.payload)
+          let subscription = channel.onBroadcast(event: "cursor-pos") { message in
+            print("Cursor position received", message)
           }
 
           await channel.subscribe()
@@ -3656,7 +3654,7 @@ functions:
           )
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
 
       - id: listen-to-presence-updates
@@ -3667,9 +3665,9 @@ functions:
             let username: String
           }
 
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let presenceChange = await channel.presenceChange()
+          let presenceChange = channel.presenceChange()
 
           await channel.subscribe()
 
@@ -3681,9 +3679,7 @@ functions:
           }
 
           // Send your own state
-          Task {
-            try await channel.track(PresenceState(username: "John"))
-          }
+          try await channel.track(PresenceState(username: "John"))
 
       - id: listen-to-presence-updates-callback
         name: Listen to presence updates using callback
@@ -3693,11 +3689,15 @@ functions:
             let username: String
           }
 
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let subscription = await channel.onPresenceChange() { presence in 
-            let joins = try presence.decodeJoins(as: PresenceState.self)
-            let leaves = try presence.decodeLeaves(as: PresenceState.self)
+          let subscription = channel.onPresenceChange() { presence in
+            do {
+              let joins = try presence.decodeJoins(as: PresenceState.self)
+              let leaves = try presence.decodeLeaves(as: PresenceState.self)
+            } catch {
+              // Handle decoding error
+            }
           }
 
           await channel.subscribe()
@@ -3706,25 +3706,25 @@ functions:
           try await channel.track(PresenceState(username: "John"))
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
 
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let changeStream = await channel.postgresChange(AnyAction.self, schema: "public")
+          let changeStream = channel.postgresChange(AnyAction.self, schema: "public")
 
           await channel.subscribe()
 
           for await change in changeStream {
             switch change {
-              case .delete(let action): print("Deleted: \(action.oldRecord)")
-              case .insert(let action): print("Inserted: \(action.record)")
-              case .select(let action): print("Selected: \(action.record)")
-              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            case .delete(let action): print("Deleted: \(action.oldRecord)")
+            case .insert(let action): print("Inserted: \(action.record)")
+            case .select(let action): print("Selected: \(action.record)")
+            case .update(let action): print("Updated: \(action.oldRecord) with \(action.record)")
             }
           }
           ```
@@ -3732,29 +3732,29 @@ functions:
         name: Listen to all database changes using callback
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let subscription = await channel.onPostgresChange(AnyAction.self, schema: "public") { change in 
+          let subscription = channel.onPostgresChange(AnyAction.self, schema: "public") { change in
             switch change {
-              case .delete(let action): print("Deleted: \(action.oldRecord)")
-              case .insert(let action): print("Inserted: \(action.record)")
-              case .select(let action): print("Selected: \(action.record)")
-              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            case .delete(let action): print("Deleted: \(action.oldRecord)")
+            case .insert(let action): print("Inserted: \(action.record)")
+            case .select(let action): print("Selected: \(action.record)")
+            case .update(let action): print("Updated: \(action.oldRecord) with \(action.record)")
             }
           }
 
           await channel.subscribe()
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let changeStream = await channel.postgresChange(
+          let changeStream = channel.postgresChange(
             AnyAction.self, 
             schema: "public",
             table: "users"
@@ -3767,7 +3767,7 @@ functions:
               case .delete(let action): print("Deleted: \(action.oldRecord)")
               case .insert(let action): print("Inserted: \(action.record)")
               case .select(let action): print("Selected: \(action.record)")
-              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+              case .update(let action): print("Updated: \(action.oldRecord) with \(action.record)")
             }
           }
           ```
@@ -3775,34 +3775,34 @@ functions:
         name: Listen to a specific table using callback
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let subscription = await channel.onPostgresChange(
-            AnyAction.self, 
+          let subscription = channel.onPostgresChange(
+            AnyAction.self,
             schema: "public",
             table: "users"
-          ) { change in 
+          ) { change in
             switch change {
-              case .delete(let action): print("Deleted: \(action.oldRecord)")
-              case .insert(let action): print("Inserted: \(action.record)")
-              case .select(let action): print("Selected: \(action.record)")
-              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            case .delete(let action): print("Deleted: \(action.oldRecord)")
+            case .insert(let action): print("Inserted: \(action.record)")
+            case .select(let action): print("Selected: \(action.record)")
+            case .update(let action): print("Updated: \(action.oldRecord) with \(action.record)")
             }
           }
 
           await channel.subscribe()
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
-          let insertions = await channel.postgresChange(
-            InsertAction.self, 
+          let insertions = channel.postgresChange(
+            InsertAction.self,
             schema: "public",
             table: "users"
           )
@@ -3817,9 +3817,9 @@ functions:
         name: Listen to inserts using callback
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let subscription = await channel.onPostgresChange(
+          let subscription = channel.onPostgresChange(
             InsertAction.self, 
             schema: "public",
             table: "users"
@@ -3830,7 +3830,7 @@ functions:
           await channel.subscribe()
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -3843,9 +3843,9 @@ functions:
           ```
         code: |
           ```swift
-           let channel = await supabase.channel("channelId") 
+           let channel = supabase.channel("channelId") 
            
-           let updates = await channel.postgresChange(
+           let updates = channel.postgresChange(
              UpdateAction.self, 
              schema: "public",
              table: "users"
@@ -3868,9 +3868,9 @@ functions:
           ```
         code: |
           ```swift
-           let channel = await supabase.channel("channelId") 
+           let channel = supabase.channel("channelId") 
            
-           let subscription = await channel.onPostgresChange(
+           let subscription = channel.onPostgresChange(
              UpdateAction.self, 
              schema: "public",
              table: "users"
@@ -3881,7 +3881,7 @@ functions:
            await channel.subscribe()
            
            // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
            ```
       - id: listen-to-deletes
         name: Listen to deletes
@@ -3894,9 +3894,9 @@ functions:
           ```
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let deletions = await channel.postgresChange(
+          let deletions = channel.postgresChange(
             DeleteAction.self, 
             schema: "public",
             table: "users"
@@ -3919,9 +3919,9 @@ functions:
           ```
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let subscription = await channel.onPostgresChange(
+          let subscription = channel.onPostgresChange(
             DeleteAction.self, 
             schema: "public",
             table: "users"
@@ -3932,15 +3932,15 @@ functions:
           await channel.subscribe()
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let deletions = await channel.postgresChange(
+          let deletions = channel.postgresChange(
             DeleteAction.self, 
             schema: "public",
             table: "users",
@@ -3957,9 +3957,9 @@ functions:
         name: Listen to row level changes using callback
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
-          let subscription = await channel.onPostgresChange(
+          let subscription = channel.onPostgresChange(
             DeleteAction.self, 
             schema: "public",
             table: "users",
@@ -3971,13 +3971,13 @@ functions:
           await channel.subscribe()
 
           // remove subscription some time later
-          subscription.remove()
+          subscription.cancel()
           ```
 
   - id: remove-channel
     description: |
       Unsubscribes and removes Realtime channel from Realtime client.
-    title: "removeChannel()"
+    title: 'removeChannel()'
     notes: |
       - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
       - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
@@ -3988,7 +3988,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
           //...
           await supabase.removeChannel(channel)
@@ -3998,14 +3998,14 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = await supabase.channel("channelId") 
+          let channel = supabase.channel("channelId") 
 
           //...
           await channel.unsubscribe()
           ```
   - id: remove-all-channels
     title: removeAllChannels()
-    $ref: "@supabase/supabase-js.index.SupabaseClient.removeAllChannels"
+    $ref: '@supabase/supabase-js.index.SupabaseClient.removeAllChannels'
     notes: |
       Unsubscribes and removes all Realtime channels from Realtime client.
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
@@ -4020,7 +4020,7 @@ functions:
           ```
   - id: get-channels
     title: getChannels()
-    $ref: "@supabase/supabase-js.index.SupabaseClient.getChannels"
+    $ref: '@supabase/supabase-js.index.SupabaseClient.getChannels'
     notes: |
       Returns all Realtime channels.
     examples:
@@ -4029,7 +4029,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channels = await supabase.channels
+          let channels = supabase.channels
           ```
 
   - id: list-buckets

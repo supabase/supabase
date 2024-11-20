@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { GeneralContent, ResourceContent, RpcContent } from 'components/interfaces/Docs'
 import LangSelector from 'components/interfaces/Docs/LangSelector'
 import DocsLayout from 'components/layouts/DocsLayout/DocsLayout'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
@@ -26,10 +26,7 @@ const DocView = () => {
   const [selectedLang, setSelectedLang] = useState<any>('js')
   const [showApiKey, setShowApiKey] = useState<any>(DEFAULT_KEY)
 
-  const { data, error } = useProjectApiQuery({ projectRef })
-  const apiService = data?.autoApiService
-  const anonKey = apiService?.defaultApiKey ?? undefined
-
+  const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
   const {
     data: jsonSchema,
     error: jsonSchemaError,
@@ -40,14 +37,15 @@ const DocView = () => {
 
   const refreshDocs = async () => await refetch()
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}`
-      : `${data?.autoApiService.protocol ?? 'https'}://${data?.autoApiService.endpoint ?? '-'}`
+      : `${protocol}://${hostEndpoint ?? '-'}`
 
   const { paths } = jsonSchema || {}
   const PAGE_KEY: any = resource || rpc || page || 'index'
-  const autoApiService = { ...(data?.autoApiService ?? {}), endpoint }
 
   const { resources, rpcs } = Object.entries(paths || {}).reduce(
     (a, [name]) => {
@@ -84,18 +82,18 @@ const DocView = () => {
     { resources: {}, rpcs: {} }
   )
 
-  if (error || jsonSchemaError) {
+  if (settingsError || jsonSchemaError) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <p className="text-foreground-light">
           <p>Error connecting to API</p>
-          <p>{`${error || jsonSchemaError}`}</p>
+          <p>{`${settingsError || jsonSchemaError}`}</p>
         </p>
       </div>
     )
   }
 
-  if (isLoading || !data || !jsonSchema) {
+  if (isLoading || !settings || !jsonSchema) {
     return (
       <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
         <h3 className="text-xl">Building docs ...</h3>
@@ -109,11 +107,9 @@ const DocView = () => {
         <div className="sticky top-0 z-40 flex flex-row-reverse w-full ">
           <LangSelector
             selectedLang={selectedLang}
-            setSelectedLang={setSelectedLang}
             showApiKey={showApiKey}
+            setSelectedLang={setSelectedLang}
             setShowApiKey={setShowApiKey}
-            apiKey={anonKey}
-            autoApiService={autoApiService}
           />
         </div>
         <div>
@@ -128,7 +124,6 @@ const DocView = () => {
             />
           ) : rpc ? (
             <RpcContent
-              autoApiService={autoApiService}
               selectedLang={selectedLang}
               rpcId={rpc}
               paths={paths}
@@ -137,12 +132,7 @@ const DocView = () => {
               refreshDocs={refreshDocs}
             />
           ) : (
-            <GeneralContent
-              autoApiService={autoApiService}
-              selectedLang={selectedLang}
-              showApiKey={showApiKey.key}
-              page={page}
-            />
+            <GeneralContent selectedLang={selectedLang} showApiKey={showApiKey.key} page={page} />
           )}
         </div>
       </div>

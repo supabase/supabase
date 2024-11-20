@@ -70,18 +70,10 @@ try await supabase.storage.from("bucket_name").upload(path: "file_path", file: f
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
-val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
-    install(Storage)
-}
-
-suspend fun uploadData(bytes: ByteArray) {
-    supabase.storage.from("bucket_name").upload("file_path", bytes)
-}
+supabase.storage.from("bucket_name").upload("file_path", bytes)
 
 //Or on JVM/Android: (This will stream the data from the file to supabase)
-suspend fun uploadFile(file: File) {
-    supabase.storage.from("bucket_name").upload("file_path", file)
-}
+supabase.storage.from("bucket_name").upload("file_path", file)
 ```
 
 </TabPanel>
@@ -145,6 +137,15 @@ try await supabase.storage.from("bucket_name")
       upsert: true
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.storage.from("bucket_name").upload("file_path", bytes) {
+    upsert = true
+}
 ```
 
 </TabPanel>
@@ -212,6 +213,15 @@ try await supabase.storage.from("bucket_name")
       contentType: "image/jpeg"
     )
   )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+supabase.storage.from("bucket_name").upload("file_path", bytes) {
+    contentType = ContentType.Image.JPEG
+}
 ```
 
 </TabPanel>

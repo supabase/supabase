@@ -70,6 +70,15 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/.well-known/vercel/flags',
+        headers: [
+          {
+            key: 'content-type',
+            value: 'application/json',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
@@ -84,7 +93,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel
+    // We are already running linting via GH action, this will skip linting during production build on Vercel.
     ignoreDuringBuilds: true,
   },
 }

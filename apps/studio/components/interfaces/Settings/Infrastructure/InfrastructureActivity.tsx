@@ -21,6 +21,7 @@ import {
 } from 'components/layouts/Scaffold'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DataPoint } from 'data/analytics/constants'
@@ -33,7 +34,17 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Admonition } from 'ui-patterns/admonition'
 import { INFRA_ACTIVITY_METRICS } from './Infrastructure.constants'
+
+const NON_DEDICATED_IO_RESOURCES = [
+  'ci_micro',
+  'ci_small',
+  'ci_medium',
+  'ci_large',
+  'ci_xlarge',
+  'ci_2xlarge',
+]
 
 const InfrastructureActivity = () => {
   const { ref: projectRef } = useParams()
@@ -54,6 +65,9 @@ const InfrastructureActivity = () => {
   const selectedAddons = addons?.selected_addons ?? []
 
   const { computeInstance } = getAddons(selectedAddons)
+  const hasDedicatedIOResources =
+    computeInstance !== undefined &&
+    !NON_DEDICATED_IO_RESOURCES.includes(computeInstance.variant.identifier)
 
   function getCurrentComputeInstanceSpecs() {
     if (computeInstance?.variant.meta) {
@@ -269,7 +283,7 @@ const InfrastructureActivity = () => {
                         {currentComputeInstanceSpecs.baseline_disk_io_mbs ===
                         currentComputeInstanceSpecs.max_disk_io_mbs ? (
                           <p className="text-sm text-foreground-light">
-                            Your current compute can has a baseline and maximum disk throughput of{' '}
+                            Your current compute has a baseline and maximum disk throughput of{' '}
                             {currentComputeInstanceSpecs.max_disk_io_mbs?.toLocaleString()} Mbps.
                           </p>
                         ) : (
@@ -374,7 +388,22 @@ const InfrastructureActivity = () => {
                       </p>
                     ))}
                   </div>
-                  {chartMeta[attribute.key].isLoading ? (
+                  {attribute.key === 'disk_io_consumption' && hasDedicatedIOResources ? (
+                    <>
+                      <Admonition
+                        type="note"
+                        title={`Your compute instance of ${computeInstance.variant.name} comes with dedicated I/O resources`}
+                        description="Your project thus does not rely on I/O balance or burst capacity as larger
+                      add-ons are designed for sustained, high performance with specific IOPS and
+                      throughput limits without needing to burst."
+                      >
+                        <DocsButton
+                          abbrev={false}
+                          href="https://supabase.com/docs/guides/platform/compute-add-ons#disk-throughput-and-iops"
+                        />
+                      </Admonition>
+                    </>
+                  ) : chartMeta[attribute.key].isLoading ? (
                     <div className="space-y-2">
                       <ShimmeringLoader />
                       <ShimmeringLoader className="w-3/4" />

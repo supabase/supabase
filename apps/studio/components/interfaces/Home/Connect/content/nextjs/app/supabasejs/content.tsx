@@ -6,7 +6,7 @@ import {
   ConnectTabTriggers,
   ConnectTabContent,
 } from 'components/interfaces/Home/Connect/ConnectTabs'
-import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
+import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 
 const ContentFile = ({ projectKeys }: ContentFileProps) => {
   return (
@@ -35,7 +35,7 @@ import { createClient } from '@/utils/supabase/server'
 import { cookies } from 'next/headers'
 
 export default async function Page() {
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const supabase = createClient(cookieStore)
 
   const { data: todos } = await supabase.from('todos').select()

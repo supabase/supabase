@@ -16,12 +16,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Content, ContentData } from 'data/content/content-query'
 import { contentKeys } from 'data/content/keys'
-import { Snippet } from 'data/content/sql-folders-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -57,10 +54,7 @@ const UtilityActions = ({
   const os = detectOS()
   const client = useQueryClient()
   const { project } = useProjectContext()
-
-  const snap = useSqlEditorStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const enableFolders = useFlag('sqlFolderOrganization')
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -68,13 +62,8 @@ const UtilityActions = ({
     true
   )
 
-  const snippet = enableFolders ? snapV2.snippets[id] : snap.snippets[id]
-  const isFavorite =
-    snippet !== undefined
-      ? enableFolders
-        ? (snippet.snippet as Snippet).favorite
-        : snippet.snippet.content.favorite
-      : false
+  const snippet = snapV2.snippets[id]
+  const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -84,11 +73,7 @@ const UtilityActions = ({
   }
 
   const addFavorite = async () => {
-    if (enableFolders) {
-      snapV2.addFavorite(id)
-    } else {
-      snap.addFavorite(id)
-    }
+    snapV2.addFavorite(id)
 
     client.setQueryData<ContentData>(
       contentKeys.list(project?.ref),
@@ -112,11 +97,7 @@ const UtilityActions = ({
   }
 
   const removeFavorite = async () => {
-    if (enableFolders) {
-      snapV2.removeFavorite(id)
-    } else {
-      snap.removeFavorite(id)
-    }
+    snapV2.removeFavorite(id)
 
     client.setQueryData<ContentData>(
       contentKeys.list(project?.ref),
@@ -244,10 +225,7 @@ const UtilityActions = ({
         <div className="flex items-center">
           <DatabaseSelector
             variant="connected-on-right"
-            onSelectId={() => {
-              if (enableFolders) snapV2.resetResult(id)
-              else snap.resetResult(id)
-            }}
+            onSelectId={() => snapV2.resetResult(id)}
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button

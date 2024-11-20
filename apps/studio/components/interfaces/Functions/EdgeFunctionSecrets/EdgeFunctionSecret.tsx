@@ -12,7 +12,11 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const canUpdateSecrets = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
+  const canUpdateSecrets = useCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  // [Joshen] Following API's validation:
+  // https://github.com/supabase/infrastructure/blob/develop/api/src/routes/v1/projects/ref/secrets/secrets.controller.ts#L106
+  const isReservedSecret = !!secret.name.match(/^(SUPABASE_).*/)
+
   return (
     <Table.tr>
       <Table.td>
@@ -31,12 +35,16 @@ const EdgeFunctionSecret = ({ secret, onSelectDelete }: EdgeFunctionSecretProps)
             type="text"
             icon={<Trash />}
             className="px-1"
-            disabled={!canUpdateSecrets}
+            disabled={!canUpdateSecrets || isReservedSecret}
             onClick={() => onSelectDelete()}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: 'You need additional permissions to delete edge function secrets',
+                text: isReservedSecret
+                  ? 'This is a reserved secret and cannot be deleted'
+                  : !canUpdateSecrets
+                    ? 'You need additional permissions to delete edge function secrets'
+                    : undefined,
               },
             }}
           />

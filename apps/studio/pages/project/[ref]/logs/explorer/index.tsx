@@ -48,6 +48,8 @@ import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import type { LogSqlSnippets, NextPageWithLayout } from 'types'
+import { useContentUpdateMutation } from 'data/content/content-update-mutation'
+import { useSelectedLog } from 'hooks/analytics/useSelectedLog'
 
 const PLACEHOLDER_WAREHOUSE_QUERY =
   '-- Fetch the last 10 logs in the last 7 days \nselect id, timestamp, event_message from `COLLECTION_NAME` \nwhere timestamp > timestamp_sub(current_timestamp(), interval 7 day) \norder by timestamp desc limit 10'
@@ -145,7 +147,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       })
       setWarehouseEditorValue(q)
     }
-  }, [])
+  }, [q])
 
   useEffect(() => {
     let newWarnings = []
@@ -260,6 +262,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   function handleOnSave() {
+    // if we have a queryId, we are editing a saved query
+    const queryId = router.query.queryId as string
+    if (queryId) {
+      updateContent({
+        projectRef: projectRef!,
+        id: queryId,
+        type: 'log_sql',
+        content: {
+          sql: editorValue,
+        },
+      })
+
+      return
+    }
+
     setSaveModalOpen(!saveModalOpen)
   }
 
@@ -293,6 +310,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       toast.success(`Saved "${values[0].name}" log query`)
     },
   })
+
+  const { mutate: updateContent } = useContentUpdateMutation({
+    onError: (e) => {
+      const error = e as { message: string }
+      console.error(error)
+      setSaveModalOpen(false)
+      toast.error(`Failed to update query: ${error.message}`)
+    },
+    onSuccess: (values) => {
+      setSaveModalOpen(false)
+      toast.success(`Updated "${values[0].name}" log query`)
+    },
+  })
+
+  const [selectedLog, setSelectedLog] = useState<any>(null)
+  const results = sourceType === 'warehouse' ? warehouseResults?.result : logData
 
   return (
     <div className="w-full h-full mx-auto">
@@ -337,7 +370,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql" // its bq sql but monaco doesn't have a language for it
               defaultValue={warehouseEditorValue}
               onInputChange={(v) => setWarehouseEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           ) : (
             <CodeEditor
@@ -345,7 +378,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
-              onInputRun={handleRun}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           )}
         </ResizablePanel>
@@ -353,15 +386,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <ResizablePanel collapsible minSize={5} className="overflow-auto">
           <LoadingOpacity active={isLoading}>
             <LogTable
-              maxHeight="100%"
               showHistogramToggle={false}
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
-              params={params}
-              data={sourceType === 'warehouse' ? warehouseResults?.result : logData}
+              data={results}
               error={error}
               projectRef={projectRef}
+              onSelectedLogChange={setSelectedLog}
+              selectedLog={selectedLog}
             />
 
             <div className="flex flex-row justify-end mt-2">

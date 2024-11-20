@@ -1,10 +1,11 @@
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresSchema } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -13,10 +14,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
-import { TableNode } from 'ui-patterns/SchemaTableNode'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
-import { useParams } from 'common'
+import { TableNode } from './SchemaTableNode'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -84,22 +84,22 @@ export const SchemaGraph = () => {
     if (schema === undefined) return console.error('Schema is required')
 
     const nodes = reactFlowInstance.getNodes()
-    const nodesPositionData = nodes.reduce((a, b) => {
-      return { ...a, [b.id]: b.position }
-    }, {})
-    setStoredPositions(nodesPositionData)
+    if (nodes.length > 0) {
+      const nodesPositionData = nodes.reduce((a, b) => {
+        return { ...a, [b.id]: b.position }
+      }, {})
+      setStoredPositions(nodesPositionData)
+    }
   }
 
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
-      getGraphDataFromTables(ref as string, schema, tables as PostgresTable[]).then(
-        ({ nodes, edges }) => {
-          reactFlowInstance.setNodes(nodes)
-          reactFlowInstance.setEdges(edges)
-          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
-        }
-      )
+      getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
+        reactFlowInstance.setNodes(nodes)
+        reactFlowInstance.setEdges(edges)
+        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+      })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
 

@@ -1,4 +1,22 @@
-export const RESOURCE_WARNING_MESSAGES = {
+interface ResourceWarningMessage {
+  // should match pathnames, ex: ('/', 'project/[ref]/auth', 'project/[ref]/database', '/project/[ref]/settings/auth')
+  restrictToRoutes?: string[]
+
+  bannerContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+    allowDismissable?: boolean
+  }
+  cardContent: {
+    warning: { title: string; description: string }
+    critical: { title?: string; description?: string }
+  }
+  docsUrl?: string
+  buttonText?: string
+  metric: string | null
+}
+
+export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> = {
   is_readonly_mode_enabled: {
     bannerContent: {
       warning: {
@@ -25,7 +43,7 @@ export const RESOURCE_WARNING_MESSAGES = {
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'View Compute and Disk',
     metric: 'read_only',
   },
   disk_io_exhaustion: {
@@ -194,5 +212,37 @@ export const RESOURCE_WARNING_MESSAGES = {
     docsUrl: undefined,
     buttonText: 'Check usage',
     metric: null,
+  },
+  // [Joshen] We can remove this once auth team gives the signal to
+  auth_restricted_email_sending: {
+    restrictToRoutes: ['/project/[ref]/auth', '/project/[ref]/settings/auth'], // project home, auth, settings
+    bannerContent: {
+      warning: {
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
+      },
+      critical: {
+        title: "Authentication emails are only sent to organization members' email addresses",
+        description:
+          'Set up a custom SMTP provider to handle flows like password reset which require sending emails to any user',
+      },
+      allowDismissable: true,
+    },
+    cardContent: {
+      warning: {
+        title: 'Auth emails are restricted',
+        description:
+          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user",
+      },
+      critical: {
+        title: 'Auth emails are restricted',
+        description:
+          "Your project can only send Auth emails to your organization's members. Set up a custom SMTP provider to send Auth emails to any user.",
+      },
+    },
+    docsUrl: 'https://github.com/orgs/supabase/discussions/29370',
+    buttonText: 'Set up custom SMTP now',
+    metric: 'auth_restricted_email_sending',
   },
 }

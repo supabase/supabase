@@ -122,7 +122,9 @@ export async function generateReferenceMetadata(
   { params: { slug } }: { params: { slug: Array<string> } },
   resolvingParent: ResolvingMetadata
 ): Promise<Metadata> {
+  console.log('[ENTER] generateReferenceMetadata')
   const { alternates: parentAlternates, openGraph: parentOg } = await resolvingParent
+  console.log('[INFO] generateReferenceMetadata: post await resolvingParent')
 
   const parsedPath = parseReferencePath(slug)
   const isClientSdkReference = parsedPath.__type === 'clientSdk'
@@ -165,6 +167,7 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
+    console.log('[PRE-RETURN] generateReferenceMetadata: isCliReference')
     return {
       title: 'CLI Reference | Supabase Docs',
       description: 'CLI reference for the Supabase CLI',
@@ -202,17 +205,59 @@ export async function redirectNonexistentReferenceSection(
 }
 
 export function normalizeMarkdown(markdownUnescaped: string): string {
-  const markdown = markdownUnescaped.replaceAll(/(?<!\\)\{/g, '\\{').replaceAll(/(?<!\\)\}/g, '\\}')
+  /**
+   * Need to first escape the braces so that the MDX parser doesn't choke on
+   * them. Unlike the MDX parser, the regular Markdown parser handles braces
+   * gracefully, so we use it to find the positions of the code blocks, then
+   * escape all other braces before the final conversion with the MDX parser.
+   */
+  const markdownTree = fromMarkdown(markdownUnescaped)
+
+  const codeBlocks = [] as Array<{
+    type: string
+    start: number
+    end: number
+  }>
+  visit(markdownTree, ['code', 'inlineCode'], (node) => {
+    codeBlocks.push({
+      type: node.type,
+      start: node.position.start.offset,
+      end: node.position.end.offset,
+    })
+  })
+  // Sort code blocks by start offset in descending order
+  codeBlocks.sort((a, b) => b.start - a.start)
+
+  let markdown = markdownUnescaped
+  let lastIndex = markdown.length
+
+  // Iterate through the sorted code blocks
+  for (const block of codeBlocks) {
+    // Escape braces in the text between the current code block and the last processed position
+    const textBetween = markdown.slice(block.end, lastIndex)
+    const escapedTextBetween = textBetween.replace(/(?<!\\)([{}])/g, '\\$1')
+
+    // Replace the original text with the escaped version
+    markdown = markdown.slice(0, block.end) + escapedTextBetween + markdown.slice(lastIndex)
+
+    // Update the last processed position
+    lastIndex = block.start
+  }
+
+  // Escape braces in the remaining text before the first code block
+  if (lastIndex > 0) {
+    const remainingText = markdown.slice(0, lastIndex)
+    const escapedRemainingText = remainingText.replace(/(?<!\\)([{}])/g, '\\$1')
+    markdown = escapedRemainingText + markdown.slice(lastIndex)
+  }
 
   const mdxTree = fromMarkdown(markdown, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
   })
-
   visit(mdxTree, 'text', (node) => {
     node.value = node.value.replace(/\n/g, ' ')
   })
-
   const content = toMarkdown(mdxTree, {
     extensions: [mdxToMarkdown()],
   })

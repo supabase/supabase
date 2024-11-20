@@ -1,23 +1,26 @@
 import Link from 'next/link'
 import React from 'react'
+
+import { useParams } from 'common'
 import { NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
-  projRef: string
   active: 'scheduled' | 'pitr'
 }
 
-function DatabaseBackupsNav({ projRef, active }: Props) {
+function DatabaseBackupsNav({ active }: Props) {
+  const { ref } = useParams()
+
   const navMenuItems = [
     {
       id: 'scheduled',
       label: 'Scheduled backups',
-      href: `/project/${projRef}/database/backups/scheduled`,
+      href: `/project/${ref}/database/backups/scheduled`,
     },
     {
       id: 'pitr',
       label: 'Point in time',
-      href: `/project/${projRef}/database/backups/pitr`,
+      href: `/project/${ref}/database/backups/pitr`,
     },
   ]
 

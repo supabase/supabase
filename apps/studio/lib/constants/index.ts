@@ -5,7 +5,6 @@ export * from './infrastructure'
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
 export const API_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_URL : '/api'
-export const API_ADMIN_URL = IS_PLATFORM ? process.env.NEXT_PUBLIC_API_ADMIN_URL : undefined
 export const PG_META_URL = IS_PLATFORM
   ? process.env.PLATFORM_PG_META_URL
   : process.env.STUDIO_PG_META_URL
@@ -30,13 +29,14 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
-  TELEMETRY_CONSENT: 'supabase-consent',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
-  UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_FUNCTIONS_ASSISTANT: 'supabase-ui-functions-assistant',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+
+  SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
@@ -70,6 +70,10 @@ export const LOCAL_STORAGE_KEYS = {
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
+
+  AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  AUTH_EMAIL_WARNING_BANNER_ACKNOWLEDGE: (ref: string) =>
+    `supabase-auth-email-warning-banner-${ref}`,
 }
 
 export const OPT_IN_TAGS = {
@@ -79,3 +83,22 @@ export const OPT_IN_TAGS = {
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
+
+// [Joshen] Just adding these to start consolidating our telemetry configs
+// may change depending on how we choose to standardize across all apps
+export enum TELEMETRY_CATEGORIES {
+  AI_ASSISTANT = 'ai-assistant',
+}
+
+export enum TELEMETRY_LABELS {
+  QUICK_SQL_EDITOR = 'quick-sql-editor',
+}
+
+export const TELEMETRY_ACTIONS = {
+  PROMPT_SUBMITTED: 'prompt-submitted',
+  QUICK_PROMPT_SELECTED: (type: string) => `quick-prompt-selected-${type}`,
+  SCHEMA_CONTEXT_ADDED: 'schema-context-added',
+  TABLE_CONTEXT_ADDED: 'table-context-added',
+  FIX_WITH_ASSISTANT: 'fix-with-assistant',
+  EXPLAIN_CODE: 'explain-code',
+}

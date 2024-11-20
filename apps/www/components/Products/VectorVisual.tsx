@@ -1,8 +1,13 @@
 import { detectBrowser, isBrowser } from 'common'
 import Image from 'next/image'
 import React, { useEffect, useRef, useState } from 'react'
+import { cn } from 'ui'
 
-const VectorVisual = () => {
+interface Props {
+  className?: string
+}
+
+const VectorVisual: React.FC<Props> = ({ className }) => {
   const containerRef = useRef(null)
   const ref = useRef(null)
   const [gradientPos, setGradientPos] = useState({ x: 0, y: 0 })
@@ -49,15 +54,16 @@ const VectorVisual = () => {
 
   return (
     <figure
-      className="
-        absolute inset-0
-        z-0 flex items-end
-        top-auto
-        aspect-[390/430]
-        w-full md:w-[calc(100%+4rem)] 2xl:w-full
-        md:-mx-8 2xl:mx-0
-        -bottom-0 sm:-bottom-28 md:bottom-0 lg:-bottom-28 xl:bottom-0
-        "
+      className={cn(
+        'absolute inset-0',
+        'z-0 flex items-end',
+        'top-auto',
+        'aspect-[390/430]',
+        'w-full md:w-[calc(100%+4rem)] 2xl:w-full',
+        'md:-mx-8 2xl:mx-0',
+        '-bottom-0 sm:-bottom-28 md:bottom-0 lg:-bottom-28 xl:bottom-0',
+        className
+      )}
       ref={containerRef}
       role="img"
       aria-label="Supabase Vector uses pgvector to store, index, and access embeddings"

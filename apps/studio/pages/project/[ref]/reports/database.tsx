@@ -22,13 +22,12 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -53,18 +52,14 @@ const DatabaseUsage = () => {
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
-  const showNewDiskManagementUI =
-    subscription?.usage_based_billing_project_addons &&
-    diskManagementV2 &&
-    project?.cloud_provider === 'AWS'
+  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
 
   const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const databaseSizeBytes = data?.result[0].db_size ?? 0
+  const databaseSizeBytes = data ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
@@ -130,56 +125,67 @@ const DatabaseUsage = () => {
             <div className="space-y-6">
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="ram_usage"
+                  label="Memory usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'ram_usage'}
-                  label={'Memory usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="swap_usage"
+                  label="Swap usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'swap_usage'}
-                  label={'Swap usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="avg_cpu_usage"
+                  label="Average CPU usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'avg_cpu_usage'}
-                  label={'Average CPU usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="max_cpu_usage"
+                  label="Max CPU usage"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'max_cpu_usage'}
-                  label={'Max CPU usage'}
-                  interval={dateRange.interval}
-                  provider={'infra-monitoring'}
                 />
               )}
 
               {dateRange && (
                 <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="disk_io_consumption"
+                  label="Disk IO consumed"
+                  interval={dateRange.interval}
                   startDate={dateRange?.period_start?.date}
                   endDate={dateRange?.period_end?.date}
-                  attribute={'disk_io_consumption'}
-                  label={'Disk IO consumed'}
+                />
+              )}
+
+              {dateRange && (
+                <ChartHandler
+                  provider="infra-monitoring"
+                  attribute="pg_stat_database_num_backends"
+                  label="Number of database connections"
                   interval={dateRange.interval}
-                  provider={'infra-monitoring'}
+                  startDate={dateRange?.period_start?.date}
+                  endDate={dateRange?.period_end?.date}
                 />
               )}
             </div>
@@ -214,7 +220,10 @@ const DatabaseUsage = () => {
           renderer={(props) => {
             return (
               <div>
-                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full">
+                <p className="text-sm -mt-4 text-foreground-lighter">
+                  The data refreshes every 24 hours.
+                </p>
+                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
                   <div className="grid gap-2 col-span-2">
                     <h5 className="text-sm">Space used</h5>
                     <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>

@@ -12,6 +12,7 @@
     "allure:generate": "rm -rf allure-report && node_modules/allure-commandline/bin/allure generate",
     "allure:serve": "node_modules/allure-commandline/bin/allure serve",
     "test:report": "npm run allure:generate && npm run allure:serve",
+    "clean": "rimraf node_modules",
     "format": "prettier --write \"./**/*.{js,jsx,ts,tsx,css,md}\""
   },
   "author": "Supabase, Inc.",
@@ -31,6 +32,6 @@
     "jest-allure2-adapter": "^0.3.12",
     "jest-environment-jsdom": "^29.7.0",
     "postgres": "^3.0.5",
-    "typescript": "^5.5.0"
+    "typescript": "~5.5.0"
   }
 }

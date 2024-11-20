@@ -88,7 +88,7 @@ const DocsAiPage = () => {
           />
         )}
       </CommandHeader>
-      <div className={cn('flex-grow min-h-0 overflow-auto p-4')}>
+      <div className={cn('flex-grow min-h-0 overflow-auto')}>
         {!hasError && messages.length > 0 && <AiMessages messages={messages} />}
         {!hasError && messages.length === 0 && <EmptyState handleSubmit={handleSubmit} />}
         {hasError && <ErrorState handleReset={handleReset} />}
@@ -270,12 +270,10 @@ function EmptyState({ handleSubmit }: { handleSubmit: (message: string) => void 
   const query = useQuery()
 
   return (
-    <CommandList_Shadcn_>
+    <CommandList_Shadcn_ className="max-h-[unset]">
       <CommandGroup_Shadcn_
         heading="Examples"
         className={cn(
-          // Double padding from command group primitive and container, remove the primitive one
-          '!p-0',
           'text-border-strong',
           '[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5',
           '[&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted'

@@ -68,16 +68,15 @@ In the CLI, run [`domains create`](/docs/reference/cli/supabase-domains-create) 
 supabase domains create --project-ref abcdefghijklmnopqrst --custom-hostname api.example.com
 ```
 
-Two TXT records are returned. For example:
+A single TXT records is returned. For example:
 
 ```text
 [...]
 Required outstanding validation records:
-        _cf-custom-hostname.api.example.com TXT -> 46BBC14D-D50A-409C-8DB5-F862CF5BA660
-        api.example.com TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
+        _acme-challenge.api.example.com. TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
 ```
 
-Add the records to your domains' DNS settings. Make sure to trim surrounding whitespace. Use a low TTL value so you can quickly change the records if you make a mistake.
+Add the record to your domains' DNS settings. Make sure to trim surrounding whitespace. Use a low TTL value so you can quickly change the records if you make a mistake.
 
 Some DNS registrars automatically append your domain name to the DNS entries being created. As such, creating a DNS record for `api.example.com` might instead create a record for `api.example.com.example.com`. In such cases, please remove the domain name from the records you're creating; as an example, you would create a TXT record for `api`, instead of `api.example.com`.
 
@@ -86,8 +85,7 @@ Some DNS registrars automatically append your domain name to the DNS entries bei
 Make sure you've configured all required DNS settings:
 
 - CNAME for your custom domain pointing to the Supabase project domain.
-- TXT record for `_cf-custom-hostname.<domain>`.
-- TXT record for `<domain>`.
+- TXT record for `_acme-challenge.<your-custom-domain>`.
 
 Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) command to begin the verification process of your domain. You may need to run this command a few times because DNS records take a while to propagate.
 

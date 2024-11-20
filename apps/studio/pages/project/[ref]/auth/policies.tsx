@@ -4,13 +4,11 @@ import { partition } from 'lodash'
 import { ExternalLink, Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -22,6 +20,7 @@ import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
 import { Button, Input } from 'ui'
+import { DocsButton } from 'components/ui/DocsButton'
 
 /**
  * Filter tables by table name and policy name
@@ -65,7 +64,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -135,37 +133,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               icon={<Search size={14} />}
             />
           </div>
-          <div className="flex items-center gap-x-2">
-            <Button type="default" icon={<ExternalLink strokeWidth={1.5} />} asChild>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security"
-              >
-                Documentation
-              </a>
-            </Button>
-
-            {isAiAssistantEnabled && (
-              <ButtonTooltip
-                type="primary"
-                disabled={!canCreatePolicies || schemaHasNoTables}
-                onClick={() => setShowPolicyAiEditor(true)}
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canCreatePolicies
-                      ? 'You need additional permissions to create RLS policies'
-                      : schemaHasNoTables
-                        ? `No table in schema ${schema} to create policies on`
-                        : undefined,
-                  },
-                }}
-              >
-                Create a new policy
-              </ButtonTooltip>
-            )}
-          </div>
+          <DocsButton href="https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security" />
         </div>
       </div>
 

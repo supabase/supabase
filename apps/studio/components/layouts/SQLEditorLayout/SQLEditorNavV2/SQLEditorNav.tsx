@@ -1,4 +1,4 @@
-import { ChevronRight, Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
+import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -31,18 +31,15 @@ import {
   useSnippets,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
+import { Separator, Skeleton, TreeView } from 'ui'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  Separator,
-  TreeView,
-} from 'ui'
+  InnerSideBarEmptyPanel,
+  InnerSideMenuCollapsible,
+  InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuSeparator,
+} from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
@@ -75,11 +72,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
-  const COLLAPSIBLE_TRIGGER_CLASS_NAMES =
-    'flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90'
-  const COLLAPSIBLE_ICON_CLASS_NAMES = 'text-foreground-light transition-transform duration-200'
-  const COLLASIBLE_HEADER_CLASS_NAMES = 'text-foreground-light font-mono text-sm uppercase'
-
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
   // =======================================================
@@ -97,7 +89,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = useFavoriteSnippets(projectRef as string)
+  const favoriteSnippets = useFavoriteSnippets(projectRef as string).filter((x) =>
+    searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
+  )
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
@@ -339,29 +333,82 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   return (
     <>
-      <Separator />
+      <InnerSideMenuSeparator />
+      {((numProjectSnippets === 0 && searchText.length === 0) || numProjectSnippets > 0) && (
+        <>
+          <InnerSideMenuCollapsible
+            open={showSharedSnippets}
+            onOpenChange={setShowSharedSnippets}
+            className="px-0"
+          >
+            <InnerSideMenuCollapsibleTrigger
+              title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
+            />
+            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
+              {numProjectSnippets === 0 ? (
+                <InnerSideBarEmptyPanel
+                  className="mx-2"
+                  title="No shared queries"
+                  description="Share queries with your team by right-clicking on the query."
+                />
+              ) : (
+                <TreeView
+                  data={projectSnippetsTreeState}
+                  aria-label="project-level-snippets"
+                  nodeRenderer={({ element, ...props }) => (
+                    <SQLEditorTreeViewItem
+                      {...props}
+                      element={element}
+                      onSelectDelete={() => {
+                        setShowDeleteModal(true)
+                        setSelectedSnippets([element.metadata as unknown as Snippet])
+                      }}
+                      onSelectRename={() => {
+                        setShowRenameModal(true)
+                        setSelectedSnippetToRename(element.metadata as Snippet)
+                      }}
+                      onSelectDownload={() => {
+                        setSelectedSnippetToDownload(element.metadata as Snippet)
+                      }}
+                      onSelectCopyPersonal={() => {
+                        onSelectCopyPersonal(element.metadata as Snippet)
+                      }}
+                      onSelectUnshare={() => {
+                        setSelectedSnippetToUnshare(element.metadata as Snippet)
+                      }}
+                    />
+                  )}
+                />
+              )}
+            </InnerSideMenuCollapsibleContent>
+          </InnerSideMenuCollapsible>
+          <InnerSideMenuSeparator />
+        </>
+      )}
 
       {((numFavoriteSnippets === 0 && searchText.length === 0) || numFavoriteSnippets > 0) && (
         <>
-          <Collapsible_Shadcn_ open={showFavouriteSnippets} onOpenChange={setShowFavouriteSnippets}>
-            <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
-              <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
-              <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
-                Favorites{numFavoriteSnippets > 0 && ` (${numFavoriteSnippets})`}
-              </span>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="pt-2">
+          <InnerSideMenuCollapsible
+            className="px-0"
+            open={showFavouriteSnippets}
+            onOpenChange={setShowFavouriteSnippets}
+          >
+            <InnerSideMenuCollapsibleTrigger
+              title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
+            />
+            <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
               {numFavoriteSnippets === 0 ? (
-                <div className="mx-4">
-                  <Alert_Shadcn_ className="p-3">
-                    <AlertTitle_Shadcn_ className="text-xs">No favorite queries</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="text-xs ">
+                <InnerSideBarEmptyPanel
+                  title="No favorite queries"
+                  className="mx-2"
+                  description={
+                    <>
                       Save a query to favorites for easy accessbility by clicking the{' '}
                       <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
                       icon.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </div>
+                    </>
+                  }
+                />
               ) : (
                 <TreeView
                   data={favoritesTreeState}
@@ -392,88 +439,51 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   )}
                 />
               )}
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
-          <Separator />
+            </InnerSideMenuCollapsibleContent>
+          </InnerSideMenuCollapsible>
+          <InnerSideMenuSeparator />
         </>
       )}
 
-      {((numProjectSnippets === 0 && searchText.length === 0) || numProjectSnippets > 0) && (
-        <>
-          <Collapsible_Shadcn_ open={showSharedSnippets} onOpenChange={setShowSharedSnippets}>
-            <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
-              <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
-              <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
-                Shared{numProjectSnippets > 0 && ` (${numProjectSnippets})`}
-              </span>
-            </CollapsibleTrigger_Shadcn_>
-            <CollapsibleContent_Shadcn_ className="pt-2">
-              {numProjectSnippets === 0 ? (
-                <div className="mx-4">
-                  <Alert_Shadcn_ className="p-3">
-                    <AlertTitle_Shadcn_ className="text-xs">No shared queries</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="text-xs ">
-                      Share queries with your team by right-clicking on the query.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </div>
-              ) : (
-                <TreeView
-                  data={projectSnippetsTreeState}
-                  aria-label="project-level-snippets"
-                  nodeRenderer={({ element, ...props }) => (
-                    <SQLEditorTreeViewItem
-                      {...props}
-                      element={element}
-                      onSelectDelete={() => {
-                        setShowDeleteModal(true)
-                        setSelectedSnippets([element.metadata as unknown as Snippet])
-                      }}
-                      onSelectRename={() => {
-                        setShowRenameModal(true)
-                        setSelectedSnippetToRename(element.metadata as Snippet)
-                      }}
-                      onSelectDownload={() => {
-                        setSelectedSnippetToDownload(element.metadata as Snippet)
-                      }}
-                      onSelectCopyPersonal={() => {
-                        onSelectCopyPersonal(element.metadata as Snippet)
-                      }}
-                      onSelectUnshare={() => {
-                        setSelectedSnippetToUnshare(element.metadata as Snippet)
-                      }}
-                    />
-                  )}
-                />
-              )}
-            </CollapsibleContent_Shadcn_>
-          </Collapsible_Shadcn_>
-          <Separator />
-        </>
-      )}
-
-      <Collapsible_Shadcn_ open={showPrivateSnippets} onOpenChange={setShowPrivateSnippets}>
-        <CollapsibleTrigger_Shadcn_ className={COLLAPSIBLE_TRIGGER_CLASS_NAMES}>
-          <ChevronRight size={16} className={COLLAPSIBLE_ICON_CLASS_NAMES} />
-          <span className={COLLASIBLE_HEADER_CLASS_NAMES}>
-            PRIVATE
-            {numPrivateSnippets > 0 && ` (${numPrivateSnippets})`}
-          </span>
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_ className="pt-2">
+      <InnerSideMenuCollapsible
+        open={showPrivateSnippets}
+        onOpenChange={setShowPrivateSnippets}
+        className="px-0"
+      >
+        <InnerSideMenuCollapsibleTrigger
+          title={`PRIVATE
+            ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
+        />
+        <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {!snapV2.loaded[projectRef as string] ? (
-            <div className="px-4">
-              <GenericSkeletonLoader />
-            </div>
+            <>
+              <div className="flex flex-row h-6 px-3 items-center gap-3">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-40 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-3 items-center gap-3">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-32 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-75">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-20 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-50">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-40 h-4" />
+              </div>
+              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-25">
+                <Skeleton className="h-4 w-5" />
+                <Skeleton className="w-20 h-4" />
+              </div>
+            </>
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
-            <div className="mx-4">
-              <Alert_Shadcn_ className="p-3">
-                <AlertTitle_Shadcn_ className="text-xs">No queries created yet</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="text-xs">
-                  Queries will be automatically saved once you start writing in the editor.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            </div>
+            <InnerSideBarEmptyPanel
+              className="mx-3 px-4"
+              title="No queries created yet"
+              description="Queries will be automatically saved once you start writing in the editor"
+            />
           ) : (
             <TreeView
               multiSelect
@@ -542,8 +552,8 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               )}
             />
           )}
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </InnerSideMenuCollapsibleContent>
+      </InnerSideMenuCollapsible>
 
       <Separator />
 
@@ -583,12 +593,12 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         }}
       >
         <ul className="text-sm text-foreground-light space-y-5">
-          <li className="flex gap-3">
-            <Eye />
+          <li className="flex gap-3 items-center">
+            <Eye size={16} />
             <span>Project members will have read-only access to this query.</span>
           </li>
-          <li className="flex gap-3">
-            <Unlock />
+          <li className="flex gap-3 items-center">
+            <Unlock size={16} />
             <span>Anyone will be able to duplicate it to their personal snippets.</span>
           </li>
         </ul>

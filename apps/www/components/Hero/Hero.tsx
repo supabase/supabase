@@ -1,11 +1,11 @@
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+
+import { Button } from 'ui'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 const Hero = () => {
   const router = useRouter()
@@ -16,7 +16,7 @@ const Hero = () => {
 
   return (
     <div className="relative -mt-[65px]">
-      <SectionContainer className="pt-8 md:pt-16 overflow-hidden">
+      <SectionContainer className="pt-8 pb-10 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
@@ -24,7 +24,7 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-foreground">Build in a weekend</span>
-                    <span className="text-brand block md:ml-0">Scale to billions</span>
+                    <span className="text-brand block md:ml-0">Scale to millions</span>
                   </h1>
                   <p className="pt-2 text-foreground my-3 text-sm sm:mt-5 lg:mb-0 sm:text-base lg:text-lg">
                     Supabase is an open source Firebase alternative.{' '}
@@ -43,13 +43,13 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default" icon={<BookOpen />}>
+                  <Button asChild size="medium" type="default">
                     <Link
-                      href="/docs"
-                      as="/docs"
-                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_documentation'])}
+                      href="/contact/sales"
+                      as="/contact/sales"
+                      onClick={() => sendTelemetryEvent(gaEvents['www_hp_hero_requestDemo'])}
                     >
-                      Documentation
+                      Request a demo
                     </Link>
                   </Button>
                 </div>

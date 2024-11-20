@@ -77,9 +77,13 @@ export const REFERENCES = {
     name: 'Kotlin',
     library: 'supabase-kt',
     libPath: 'kotlin',
-    versions: ['v2', 'v1'],
+    versions: ['v3', 'v2', 'v1'],
     icon: 'reference-kotlin',
     meta: {
+      v3: {
+        libId: 'reference_kotlin_v3',
+        specFile: 'supabase_kt_v3',
+      },
       v2: {
         libId: 'reference_kotlin_v2',
         specFile: 'supabase_kt_v2',
