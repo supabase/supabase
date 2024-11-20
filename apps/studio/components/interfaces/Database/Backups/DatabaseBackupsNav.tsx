@@ -6,7 +6,7 @@ import React from 'react'
 import { NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
-  active: string
+  active: 'pitr' | 'scheduled' | 'rtnp'
 }
 
 function DatabaseBackupsNav({ active }: Props) {
