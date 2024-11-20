@@ -17,16 +17,16 @@ const TicketPresence = (props: { className?: string }) => {
   useEffect(() => {
     // Listen to realtime presence
     if (!realtimeChannel && supabase) {
-      const lwxRoom = supabase?.channel('lwx_online', {
+      const lw13Room = supabase?.channel('lw13_online', {
         config: { broadcast: { self: true, ack: true } },
       })
 
-      setRealtimeChannel(lwxRoom)
+      setRealtimeChannel(lw13Room)
       const userStatus = {}
 
-      lwxRoom
+      lw13Room
         ?.on('presence', { event: 'sync' }, () => {
-          const newState = lwxRoom.presenceState()
+          const newState = lw13Room.presenceState()
           const users = [...Object.entries(newState).map(([_, value]) => value[0])]
           const uniqueUsrs = users.filter(onlyUnique)
           setOnlineUsers(uniqueUsrs)
@@ -35,7 +35,7 @@ const TicketPresence = (props: { className?: string }) => {
           if (status !== 'SUBSCRIBED') {
             return null
           }
-          await lwxRoom.track(userStatus)
+          await lw13Room.track(userStatus)
         })
     }
 
@@ -47,14 +47,13 @@ const TicketPresence = (props: { className?: string }) => {
   return (
     <div
       className={cn(
-        'text-foreground-lighter text-xs flex items-center transition-opacity',
+        'text-foreground-lighter text-xs flex items-center transition-opacity opacity-100',
         hasTicket && 'text-sm opacity-80',
         props.className
       )}
     >
       <Dot className="text-brand animate-pulse -ml-2" />
-      {onlineUsers.length} {isSingular ? 'person is' : 'people are'}{' '}
-      {hasTicket ? 'customizing' : 'generating'} their ticket
+      {onlineUsers.length} {isSingular ? 'person is' : 'people are'} online
     </div>
   )
 }

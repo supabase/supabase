@@ -15,6 +15,7 @@ import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
 
 import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
 import TicketSwagCtaBox from '~/components/LaunchWeek/13/Ticket/TicketSwagCtaBox'
+import TicketPresence from './TicketPresence'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
@@ -48,7 +49,7 @@ const TicketingFlow = () => {
         <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
           P
         </div>
-        Party Mode: {isPartyMode ? 'On' : 'Off'}
+        Party Mode: {isPartyMode ? 'On 🎉' : 'Off 😴'}
       </div>
     </Button>
   )
@@ -114,8 +115,14 @@ const TicketingFlow = () => {
                       <p className="text-foreground-lighter text-sm md:text-lg">
                         Join us for a week of new features and level up your development.
                       </p>
-                      <div>
+                      <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
                         <PartyModeButton />
+                        <TicketPresence
+                          className={cn(
+                            'opacity-0 invisible translate-y-1 transition-all',
+                            isPartyMode && 'opacity-80 visible translate-y-0'
+                          )}
+                        />
                       </div>
                     </div>
                   </div>
@@ -168,8 +175,14 @@ const TicketingFlow = () => {
                       firstName={FIRST_NAME!}
                       className="w-full"
                     />
-                    <div className="flex gap-4 items-center">
+                    <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
                       <PartyModeButton />
+                      <TicketPresence
+                        className={cn(
+                          'opacity-0 invisible translate-y-1 transition-all',
+                          isPartyMode && 'opacity-80 visible translate-y-0'
+                        )}
+                      />
                     </div>
                   </div>
                 </m.div>
