@@ -22,7 +22,6 @@
     "prettier:write": "prettier --write ."
   },
   "dependencies": {
-    "@aws-crypto/sha256-browser": "^3.0.0",
     "@dagrejs/dagre": "^1.0.4",
     "@graphiql/react": "^0.19.4",
     "@graphiql/toolkit": "^0.9.1",
@@ -52,7 +51,6 @@
     "ai": "^2.2.31",
     "ai-commands": "*",
     "awesome-debounce-promise": "^2.1.0",
-    "clsx": "^1.2.1",
     "common": "*",
     "common-tags": "^1.8.2",
     "config": "*",

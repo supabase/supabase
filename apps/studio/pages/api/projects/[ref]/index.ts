@@ -22,7 +22,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   const response = {
     ...DEFAULT_PROJECT,
     connectionString: '',
-    kpsVersion: 'kps-v1.0.0',
     restUrl: PROJECT_REST_URL,
   }
 

@@ -9,10 +9,7 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import {
-  getTableLikeFromTableEditor,
-  useTableEditorQuery,
-} from 'data/table-editor/table-editor-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -22,20 +19,17 @@ const TableEditorPage: NextPageWithLayout = () => {
   const id = _id ? Number(_id) : undefined
 
   const { project } = useProjectContext()
-  const { data, isLoading } = useTableEditorQuery({
+  const { data: selectedTable, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-  const selectedTable = getTableLikeFromTableEditor(data)
 
   return (
     <>
       <TableGridEditor
         isLoadingSelectedTable={isLoading}
         selectedTable={selectedTable}
-        entityType={data?.entity}
-        encryptedColumns={data?.encrypted_columns ?? undefined}
         theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs

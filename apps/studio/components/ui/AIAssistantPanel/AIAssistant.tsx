@@ -64,6 +64,7 @@ import { ContextBadge } from './ContextBadge'
 import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
 import { Message } from './Message'
 import { SchemasDropdownMenu } from './SchemasDropdownMenu'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 
 const ANIMATION_DURATION = 0.3
 
@@ -91,8 +92,8 @@ export const AIAssistant = ({
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const { aiAssistantPanel } = useAppStateSnapshot()
-  const { editor, entity } = aiAssistantPanel
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { editor, entity, tables: selectedTables } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -102,7 +103,6 @@ export const AIAssistant = ({
     SupportedAssistantEntities | ''
   >('')
   const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
-  const [selectedTables, setSelectedTables] = useState<{ schema: string; name: string }[]>([])
   const [contextHistory, setContextHistory] = useState<{
     [key: string]: { entity: string; schemas: string[]; tables: string[] }
   }>({})
@@ -120,6 +120,19 @@ export const AIAssistant = ({
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
+  const { data: policies } = useDatabasePoliciesQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: editor === 'rls-policies' }
+  )
+  const existingPolicies = (policies ?? [])
+    .filter((policy) =>
+      selectedTables.some((x) => policy.schema === x.schema && policy.table === x.name)
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: existingDefinition } = useEntityDefinitionQuery({
     id: entity?.id,
@@ -165,7 +178,12 @@ export const AIAssistant = ({
   } = useChat({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions, context: selectedDatabaseEntity, existingSql: existingDefinition },
+    body: {
+      entityDefinitions,
+      context: selectedDatabaseEntity,
+      existingSql: existingDefinition,
+      existingPolicies,
+    },
     onError: (error) => setAssistantError(JSON.parse(error.message).error),
   })
 
@@ -219,12 +237,14 @@ export const AIAssistant = ({
   const toggleEntity = ({ schema, name }: { schema: string; name: string }) => {
     const isExisting = selectedTables.find((x) => x.schema === schema && x.name === name)
     if (isExisting) {
-      setSelectedTables(selectedTables.filter((x) => !(x.schema === schema && x.name === name)))
+      setAiAssistantPanel({
+        tables: selectedTables.filter((x) => !(x.schema === schema && x.name === name)),
+      })
     } else {
       const newselectedTables = [...selectedTables, { schema, name }].sort(
         (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
       )
-      setSelectedTables(newselectedTables)
+      setAiAssistantPanel({ tables: newselectedTables })
       sendTelemetryEvent(TELEMETRY_ACTIONS.TABLE_CONTEXT_ADDED)
     }
   }
@@ -435,19 +455,28 @@ export const AIAssistant = ({
                   transition={{ duration: ANIMATION_DURATION }}
                 >
                   <p className="text-center text-base text-foreground-light">
-                    How can I help you
-                    {!!entityContext ? (
+                    {entity !== undefined && !!entityContext ? (
                       <>
-                        {' '}
-                        with{' '}
-                        <span className="text-foreground">
-                          {entityContext.id === 'rls-policies'
-                            ? entityContext.label
-                            : `Database ${entityContext.label}`}
-                        </span>
+                        Need help with updating this{' '}
+                        <span className="text-foreground">{entityContext.name}</span>
                       </>
                     ) : (
-                      ' today'
+                      <>
+                        How can I help you
+                        {!!entityContext ? (
+                          <>
+                            {' '}
+                            with{' '}
+                            <span className="text-foreground">
+                              {entityContext.id === 'rls-policies'
+                                ? entityContext.label
+                                : `Database ${entityContext.label}`}
+                            </span>
+                          </>
+                        ) : (
+                          ' today'
+                        )}
+                      </>
                     )}
                     ?
                   </p>
@@ -582,7 +611,7 @@ export const AIAssistant = ({
                       value={`${selectedSchemas.slice(0, 2).join(', ')}${selectedSchemas.length > 2 ? ` and ${selectedSchemas.length - 2} other${selectedSchemas.length > 3 ? 's' : ''}` : ''}`}
                       onRemove={() => {
                         setSelectedSchemas([])
-                        setSelectedTables([])
+                        setAiAssistantPanel({ tables: [] })
                       }}
                       tooltip={
                         selectedSchemas.length > 2 ? (
@@ -610,7 +639,7 @@ export const AIAssistant = ({
                         .join(
                           ', '
                         )}${selectedTables.length > 2 ? ` and ${selectedTables.length - 2} other${selectedTables.length > 3 ? 's' : ''}` : ''}`}
-                      onRemove={() => setSelectedTables([])}
+                      onRemove={() => setAiAssistantPanel({ tables: [] })}
                       tooltip={
                         selectedTables.length > 2 ? (
                           <>

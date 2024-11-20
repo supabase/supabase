@@ -129,8 +129,9 @@ const Connect = () => {
     return []
   }
 
-  const endpoint = settings?.app_config?.endpoint
-  const apiHost = canReadAPIKeys ? `https://${endpoint ?? '-'}` : ''
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
+  const apiHost = canReadAPIKeys ? `${protocol}://${endpoint ?? '-'}` : ''
   const apiUrl = canReadAPIKeys ? apiHost : null
 
   const { anonKey } = canReadAPIKeys ? getAPIKeys(settings) : { anonKey: null }

@@ -49,7 +49,7 @@ const EditWrapper = () => {
     connectionString: project?.connectionString,
   })
 
-  const wrappers = data?.result ?? []
+  const wrappers = data ?? []
   const foundWrapper = wrappers.find((w) => Number(w.id) === Number(id))
   // this call to useImmutableValue should be removed if the redirect after update is also removed
   const wrapper = useImmutableValue(foundWrapper)
