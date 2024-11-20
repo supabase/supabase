@@ -198,7 +198,7 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
         className="relative flex flex-grow bg-alternative min-h-0"
         autoSaveId="cron-jobs-layout"
       >
-        <div className="h-full flex flex-col w-full bg-200 pt-8">
+        <div className="h-full flex flex-col w-full bg-200">
           <div className="flex items-center gap-2 px-6">
             Jobs
             {jobState.jobId && (

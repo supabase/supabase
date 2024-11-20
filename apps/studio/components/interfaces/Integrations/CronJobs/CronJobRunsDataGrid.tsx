@@ -171,7 +171,7 @@ const CronJobRunsDataGrid = ({ updateJobState }: CronJobsDataGridProps) => {
         className="relative flex flex-grow bg-alternative min-h-0"
         autoSaveId="cron-jobs-layout"
       >
-        <div className="h-full flex flex-col w-full bg-200 pt-8">
+        <div className="h-full flex flex-col w-full bg-200">
           {/* turn this into some kind of proper tabs?  */}
           <div className="flex items-center px-6 justify-between h-7">
             <div className="flex items-center gap-2">
