@@ -22,10 +22,6 @@ export const GraphqlOverviewTab = () => {
     integration.requiredExtensions.includes(ext.name)
   )
 
-  if (!integration) {
-    return <div>Unsupported integration type.</div>
-  }
-
   return (
     <IntegrationOverviewTab
       integration={integration}

@@ -1,7 +1,6 @@
 import { parseAsString, useQueryState } from 'nuqs'
 
 import { useParams } from 'common'
-import { id } from 'common-tags'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { WrapperOverviewTab } from 'components/interfaces/Integrations/Wrappers/OverviewTab'
 import { WrappersTab } from 'components/interfaces/Integrations/Wrappers/WrappersTab'
@@ -12,6 +11,7 @@ import type { NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
 const Logs = () => {
+  const { id } = useParams()
   return (
     <div className="">
       <div className="px-10 bg-surface-100 flex items-center gap-2 py-2 border-b">
