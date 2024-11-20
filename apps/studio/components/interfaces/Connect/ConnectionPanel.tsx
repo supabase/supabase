@@ -1,8 +1,17 @@
 import { FileCode, X } from 'lucide-react'
-import { cn, CodeBlock, DIALOG_PADDING_X } from 'ui'
+import {
+  Button,
+  cn,
+  CodeBlock,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  DIALOG_PADDING_X,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConnectionParameters } from './ConnectionParameters'
 import { SessionIcon, TransactionIcon } from './pooler-icons-v2'
+import { ChevronRight } from 'lucide-react'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -182,6 +191,54 @@ export const ConnectionPanel = ({
                 )}
               </div>
             </div>
+
+            {ipv4Status.type === 'error' && (
+              <Collapsible_Shadcn_ className="group -space-y-px">
+                <CollapsibleTrigger_Shadcn_
+                  asChild
+                  className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+                >
+                  <Button
+                    type="default"
+                    size="tiny"
+                    className="text-foreground-lighter !bg-dash-sidebar"
+                    icon={
+                      <ChevronRight
+                        size={12}
+                        className={cn(
+                          'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                        )}
+                      />
+                    }
+                  >
+                    Some platforms are IPv4-only:
+                  </Button>
+                </CollapsibleTrigger_Shadcn_>
+                <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border px-3 py-2">
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-foreground-light max-w-xs">
+                      A few major platforms are IPv4-only and may not work with a Direct Connection:
+                    </p>
+                    <div className="flex gap-4">
+                      <div className="text-foreground text-xs">Retool</div>
+                      <div className="text-foreground text-xs">GitHub Actions</div>
+                      <div className="text-foreground text-xs">Vercel</div>
+                      <div className="text-foreground text-xs">Render</div>
+                    </div>
+                    <p className="text-xs text-foreground-lighter max-w-xs">
+                      If you wish to use a Direct Connection with these please purchase{' '}
+                      <a
+                        href={ipv4Status?.link?.url}
+                        className="text-xs text-light hover:text-foreground"
+                      >
+                        IPv4 support
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </CollapsibleContent_Shadcn_>
+              </Collapsible_Shadcn_>
+            )}
           </div>
         </div>
       </div>

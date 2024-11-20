@@ -229,7 +229,7 @@ export const DatabaseConnectionString = () => {
 
   return (
     <div className="flex flex-col">
-      <div className={cn('flex items-center gap-2', DIALOG_PADDING_X)}>
+      <div className={cn('flex items-center gap-3', DIALOG_PADDING_X)}>
         <div className="flex">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Type

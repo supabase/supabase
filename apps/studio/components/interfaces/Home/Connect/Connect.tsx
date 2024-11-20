@@ -191,7 +191,7 @@ const Connect = () => {
                   className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
                   <div className="flex justify-between">
-                    <div className="flex items-center gap-5">
+                    <div className="flex items-center gap-3">
                       <ConnectDropdown
                         state={selectedParent}
                         updateState={handleParentChange}
