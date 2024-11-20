@@ -98,7 +98,7 @@ export const ConnectionPanel = ({
 }: ConnectionPanelProps) => {
   return (
     <div className={cn('py-8', DIALOG_PADDING_X)}>
-      <div className="grid grid-cols-2 gap-20 w-full">
+      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
         <div className="flex flex-col">
           <h1 className="text-sm mb-2">{title}</h1>
           <p className="text-xs text-foreground-light mb-4">{description}</p>
