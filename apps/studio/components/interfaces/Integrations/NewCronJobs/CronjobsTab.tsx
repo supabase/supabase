@@ -27,13 +27,18 @@ export const CronjobsTab = () => {
     connectionString: project?.connectionString,
   })
 
-  if (isLoading) return <GenericSkeletonLoader />
+  if (isLoading)
+    return (
+      <div className="p-10">
+        <GenericSkeletonLoader />
+      </div>
+    )
 
   const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj.jobname.includes(searchQuery))
 
   return (
     <>
-      <div className="w-full space-y-4">
+      <div className="w-full space-y-4 p-10">
         {(cronJobs ?? []).length == 0 ? (
           <div
             className={

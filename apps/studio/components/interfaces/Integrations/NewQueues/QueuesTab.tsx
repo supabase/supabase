@@ -30,12 +30,22 @@ export const QueuesTab = () => {
 
   const [searchQuery, setSearchQuery] = useQueryState('search')
 
-  if (isLoading) return <GenericSkeletonLoader />
-  if (isError) return <AlertError error={error} subject="Failed to retrieve database queues" />
+  if (isLoading)
+    return (
+      <div className="p-10">
+        <GenericSkeletonLoader />
+      </div>
+    )
+  if (isError)
+    return (
+      <div className="p-10">
+        <AlertError error={error} subject="Failed to retrieve database queues" />
+      </div>
+    )
 
   return (
     <>
-      <div className="w-full space-y-4">
+      <div className="w-full space-y-4 p-10">
         {queues.length === 0 ? (
           <div
             className={

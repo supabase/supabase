@@ -1,6 +1,7 @@
 import { Paintbrush, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import DeleteQueue from 'components/interfaces/Integrations/Queues/SingleQueue/DeleteQueue'
 import PurgeQueue from 'components/interfaces/Integrations/Queues/SingleQueue/PurgeQueue'
 import { QUEUE_MESSAGE_TYPE } from 'components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
@@ -10,7 +11,6 @@ import { SendMessageModal } from 'components/interfaces/Integrations/Queues/Sing
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
 import { Button, LoadingLine, Separator } from 'ui'
-import { useParams } from 'common'
 
 export const QueueTab = () => {
   const { childId: queueName } = useParams()
@@ -37,7 +37,7 @@ export const QueueTab = () => {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col p-10">
       <div className="flex items-center justify-end gap-x-4 py-4 px-6 mb-0">
         <div className="flex gap-x-2">
           <Button

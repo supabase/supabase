@@ -42,7 +42,11 @@ export const WebhooksOverviewTab = () => {
   }
 
   if (isPermissionsLoaded && !canReadWebhooks) {
-    return <NoPermission isFullPage resourceText="view database webhooks" />
+    return (
+      <div className="p-10">
+        <NoPermission isFullPage resourceText="view database webhooks" />
+      </div>
+    )
   }
 
   if (!isSchemasLoaded) {

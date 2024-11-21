@@ -36,7 +36,7 @@ export const WebhooksListTab = () => {
   }
 
   return (
-    <>
+    <div className="p-10">
       <HooksList createHook={createHook} editHook={editHook} deleteHook={deleteHook} />
       <EditHookPanel
         visible={showCreateHookForm}
@@ -48,6 +48,6 @@ export const WebhooksListTab = () => {
         selectedHook={selectedHook}
         onClose={() => setShowDeleteHookForm(false)}
       />
-    </>
+    </div>
   )
 }
