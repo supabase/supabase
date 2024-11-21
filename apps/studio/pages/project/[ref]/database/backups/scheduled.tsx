@@ -1,10 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Info } from 'lucide-react'
 
+import { useParams } from 'common'
 import { BackupsList } from 'components/interfaces/Database'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
@@ -16,16 +16,9 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPe
 import type { NextPageWithLayout } from 'types'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref || 'default'
+  const { ref: projectRef } = useParams()
 
-  const {
-    data: backups,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useBackupsQuery({ projectRef: ref })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const isPitrEnabled = backups?.pitr_enabled
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -39,7 +32,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
           <div className="space-y-6">
             <FormHeader className="!mb-0" title="Database Backups" />
 
-            <DatabaseBackupsNav active="scheduled" projRef={ref} />
+            <DatabaseBackupsNav active="scheduled" />
             <div className="flex flex-col gap-y-4">
               {isLoading && <GenericSkeletonLoader />}
 

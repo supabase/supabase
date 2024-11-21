@@ -17,8 +17,8 @@ import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
+import { databaseKeys } from 'data/database/keys'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { sqlKeys } from 'data/sql/keys'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
@@ -113,7 +113,7 @@ export const AiAssistantPanel = () => {
       if (editor !== null) {
         switch (editor) {
           case 'functions':
-            await queryClient.invalidateQueries(sqlKeys.query(ref, ['functions-list']))
+            await queryClient.invalidateQueries(databaseKeys.databaseFunctions(ref))
             break
           case 'rls-policies':
             await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))

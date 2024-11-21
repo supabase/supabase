@@ -2,7 +2,6 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'sonner'
 
 import { del, handleError } from 'data/fetchers'
-import { sqlKeys } from 'data/sql/keys'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 import type { User } from './users-infinite-query'
@@ -41,7 +40,7 @@ export const useUserDeleteMutation = ({
 
         await Promise.all([
           queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-          queryClient.invalidateQueries(sqlKeys.query(projectRef, authKeys.usersCount(projectRef))),
+          queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
         ])
 
         await onSuccess?.(data, variables, context)

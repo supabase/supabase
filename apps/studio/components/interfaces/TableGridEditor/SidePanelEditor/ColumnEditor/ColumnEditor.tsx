@@ -35,6 +35,7 @@ import {
   generateColumnFieldFromPostgresColumn,
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
+  getPlaceholderText,
   validateFields,
 } from './ColumnEditor.utils'
 import ColumnForeignKey from './ColumnForeignKey'
@@ -74,6 +75,9 @@ const ColumnEditor = ({
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [columnFields, setColumnFields] = useState<ColumnField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  const [placeholder, setPlaceholder] = useState(
+    getPlaceholderText(columnFields?.format, columnFields?.name)
+  )
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -86,8 +90,7 @@ const ColumnEditor = ({
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedTable?.schema,
-    table: selectedTable?.name,
+    id: selectedTable?.id,
   })
   const primaryKey = (constraints ?? []).find(
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
@@ -130,6 +133,7 @@ const ColumnEditor = ({
     }
 
     const changedName = 'name' in changes && changes.name !== columnFields.name
+    const changedFormat = 'format' in changes && changes.format !== columnFields.format
 
     if (
       changedName &&
@@ -142,6 +146,12 @@ const ColumnEditor = ({
             col.source === columnFields?.name ? { ...col, source: changes.name! } : col
           ),
         }))
+      )
+    }
+
+    if (changedName || changedFormat) {
+      setPlaceholder(
+        getPlaceholderText(changes.format || columnFields.format, changes.name || columnFields.name)
       )
     }
 
@@ -343,7 +353,7 @@ const ColumnEditor = ({
           <Input
             label="CHECK Constraint"
             labelOptional="Optional"
-            placeholder={`e.g length(${columnFields?.name || 'column_name'}) < 500`}
+            placeholder={placeholder}
             type="text"
             value={columnFields?.check ?? ''}
             onChange={(event: any) => onUpdateField({ check: event.target.value })}

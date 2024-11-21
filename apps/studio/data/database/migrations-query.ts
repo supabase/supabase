@@ -1,5 +1,6 @@
-import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, ExecuteSqlError, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { databaseKeys } from './keys'
 
 export type DatabaseMigration = {
   version: string
@@ -7,7 +8,7 @@ export type DatabaseMigration = {
   statements?: string[]
 }
 
-export const getMigrationsQuery = () => {
+export const getMigrationsSql = () => {
   const sql = /* SQL */ `
     select
       *
@@ -23,29 +24,44 @@ export type MigrationsVariables = {
   connectionString?: string
 }
 
-export type MigrationsData = { result: DatabaseMigration[] }
+export async function getMigrations(
+  { projectRef, connectionString }: MigrationsVariables,
+  signal?: AbortSignal
+) {
+  const sql = getMigrationsSql()
+
+  try {
+    const { result } = await executeSql(
+      { projectRef, connectionString, sql, queryKey: ['migrations'] },
+      signal
+    )
+
+    return result as DatabaseMigration[]
+  } catch (error) {
+    if (
+      (error as ExecuteSqlError).message.includes(
+        'relation "supabase_migrations.schema_migrations" does not exist'
+      )
+    ) {
+      return []
+    }
+
+    throw error
+  }
+}
+
+export type MigrationsData = Awaited<ReturnType<typeof getMigrations>>
 export type MigrationsError = ExecuteSqlError
 
-export const useMigrationsQuery = <TData extends MigrationsData = MigrationsData>(
+export const useMigrationsQuery = <TData = MigrationsData>(
   { projectRef, connectionString }: MigrationsVariables,
-  options: UseQueryOptions<ExecuteSqlData, MigrationsError, TData> = {}
-) => {
-  return useExecuteSqlQuery(
+  { enabled = true, ...options }: UseQueryOptions<MigrationsData, MigrationsError, TData> = {}
+) =>
+  useQuery<MigrationsData, MigrationsError, TData>(
+    databaseKeys.migrations(projectRef),
+    ({ signal }) => getMigrations({ projectRef, connectionString }, signal),
     {
-      projectRef,
-      connectionString,
-      sql: getMigrationsQuery(),
-      queryKey: ['migrations'],
-      handleError: (error) => {
-        if (
-          error.message.includes('relation "supabase_migrations.schema_migrations" does not exist')
-        ) {
-          return { result: [] }
-        } else {
-          throw error
-        }
-      },
-    },
-    options
+      enabled: enabled && typeof projectRef !== 'undefined',
+      ...options,
+    }
   )
-}
