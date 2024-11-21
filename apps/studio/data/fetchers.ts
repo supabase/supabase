@@ -38,20 +38,9 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
 // Middleware
 client.use(
   {
-    // Middleware to update the request URL to remove /platform prefix on self-hosted
-    onRequest({ request }) {
-      let url = request.url
-      if (!IS_PLATFORM && url.startsWith('/platform')) {
-        url = url.replace('/platform', '')
-      }
-
-      return new Request(url, request)
-    },
-  },
-  {
     // Middleware to add authorization headers to the request
     async onRequest({ request }) {
-      const headers = await constructHeaders(request.headers)
+      const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
 
       return request
