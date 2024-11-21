@@ -8811,9 +8811,8 @@ export interface operations {
   OrgInvoicesController_getInvoicePaymentLink: {
     parameters: {
       path: {
-        /** @description Organization slug */
-        slug: string
         invoiceId: string
+        slug: string
       }
     }
     responses: {
