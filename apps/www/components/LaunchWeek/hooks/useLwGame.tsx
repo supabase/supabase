@@ -66,8 +66,6 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
 
         await fetch(`/api-v2/ticket-og?username=${user.username}&secret=true`)
       } else {
-        localStorage.setItem('lw13_secret', 'true')
-
         handleGithubSignIn()
       }
     }
@@ -92,6 +90,12 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
       handleClaimTicket(null)
     }
   }, [hasWon])
+
+  useEffect(() => {
+    if (user.secret) {
+      setValue(SUPA_SECRET_CODE)
+    }
+  }, [])
 
   useEffect(() => {
     if (!disabled) window.addEventListener('keydown', handleKeyDown)
