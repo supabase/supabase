@@ -131,7 +131,7 @@ export async function getStaticProps() {
     meetups?.map((meetup: any) => ({
       slug: 'string',
       type: 'casestudy',
-      title: `Launch Week 13 Meetup: ${meetup.city}`,
+      title: `Launch Week 13 Meetup: ${meetup.city}, ${meetup.country}`,
       date: meetup.start_at,
       description: '',
       formattedDate: 'string',
