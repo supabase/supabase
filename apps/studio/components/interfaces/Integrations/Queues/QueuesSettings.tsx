@@ -126,9 +126,9 @@ export const QueuesSettings = () => {
                               <code className="text-xs">read</code>,{' '}
                               <code className="text-xs">pop</code>,
                               <code className="text-xs">archive</code>, and
-                              <code className="text-xs">delete</code>, and they will be created in
-                              the <code className="text-xs">public</code> schema, where you can then
-                              call through any Supabase client library or PostgREST endpoint
+                              <code className="text-xs">delete</code>, and they will be created in a{' '}
+                              <code className="text-xs">queues_public</code> schema, where you can
+                              then call through any Supabase client library or PostgREST endpoint
                             </p>
                             <DocsButton
                               abbrev={false}
@@ -153,9 +153,9 @@ export const QueuesSettings = () => {
                               <code className="text-xs">pop</code>,
                               <code className="text-xs">archive</code>, and
                               <code className="text-xs">delete</code>, and they will be removed from
-                              the <code className="text-xs">public</code> schema. Ensure that these
-                              functions are not in use within your client applications before
-                              disabling.
+                              the <code className="text-xs">queues_public</code> schema, which will
+                              subsequently be dropped too. Ensure that these functions are not in
+                              use within your client applications before disabling.
                             </p>
                             <DocsButton
                               abbrev={false}

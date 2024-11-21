@@ -13,7 +13,9 @@ export type DatabaseQueueExposePostgrestVariables = {
 }
 
 const EXPOSE_QUEUES_TO_POSTGREST_SQL = minify(/* SQL */ `
-create or replace function public.pop(queue_name text)
+create schema if not exists queues_public;
+
+create or replace function queues_public.pop(queue_name text)
 returns setof pgmq.message_record
 language plpgsql
   set search_path = ''
@@ -27,9 +29,9 @@ begin
 end;
 $$;
 
-comment on function public.pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
+comment on function queues_public.pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
 
-create or replace function public.send(
+create or replace function queues_public.send(
   queue_name text,
   msg jsonb,
   sleep_seconds integer default 0  -- renamed from 'delay'
@@ -49,9 +51,9 @@ begin
 end;
 $$;
 
-comment on function public.send(queue_name text, msg jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
+comment on function queues_public.send(queue_name text, msg jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
 
-create or replace function public.send(
+create or replace function queues_public.send(
     queue_name text,
     msg jsonb,
     available_at timestamp with time zone  -- renamed from 'delay'
@@ -71,9 +73,9 @@ begin
 end;
 $$;
 
-comment on function public.send(queue_name text, msg jsonb, available_at timestamp with time zone) is 'Sends a message to the specified queue, making it available at the specified timestamp.';
+comment on function queues_public.send(queue_name text, msg jsonb, available_at timestamp with time zone) is 'Sends a message to the specified queue, making it available at the specified timestamp.';
 
-create or replace function public.send_batch(
+create or replace function queues_public.send_batch(
     queue_name text,
     msgs jsonb[],
     sleep_seconds integer default 0  -- renamed from 'delay'
@@ -93,9 +95,9 @@ begin
 end;
 $$;
 
-comment on function public.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
+comment on function queues_public.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
 
-create or replace function public.send_batch(
+create or replace function queues_public.send_batch(
     queue_name text,
     msgs jsonb[],
     available_at timestamp with time zone  -- renamed from 'delay'
@@ -115,9 +117,9 @@ begin
 end;
 $$;
 
-comment on function public.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone) is 'Sends a batch of messages to the specified queue, making them available at the specified timestamp.';
+comment on function queues_public.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone) is 'Sends a batch of messages to the specified queue, making them available at the specified timestamp.';
 
-create or replace function public.archive(
+create or replace function queues_public.archive(
     queue_name text,
     msg_id bigint
 )
@@ -134,9 +136,9 @@ begin
 end;
 $$;
 
-comment on function public.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function queues_public.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
-create or replace function public.archive(
+create or replace function queues_public.archive(
     queue_name text,
     msg_id bigint
 )
@@ -153,9 +155,9 @@ begin
 end;
 $$;
 
-comment on function public.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function queues_public.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
-create or replace function public.delete(
+create or replace function queues_public.delete(
     queue_name text,
     msg_id bigint
 )
@@ -172,9 +174,9 @@ begin
 end;
 $$;
 
-comment on function public.delete(queue_name text, msg_id bigint) is 'Permanently deletes a message from the specified queue.';
+comment on function queues_public.delete(queue_name text, msg_id bigint) is 'Permanently deletes a message from the specified queue.';
 
-create or replace function public.read(
+create or replace function queues_public.read(
     queue_name text,
     sleep_seconds integer,
     qty integer
@@ -194,21 +196,21 @@ begin
 end;
 $$;
 
-comment on function public.read(queue_name text, sleep_seconds integer, qty integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout) and conditional filtering.';
+comment on function queues_public.read(queue_name text, sleep_seconds integer, qty integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout) and conditional filtering.';
 
 -- Grant usage on schemas to roles
 grant usage on schema public to service_role, anon, authenticated;
 grant usage on schema pgmq to service_role, anon, authenticated;
 
 -- Grant execute permissions on wrapper functions to roles
-grant execute on function public.pop(text) to service_role, anon, authenticated;
-grant execute on function public.send(text, jsonb, integer) to service_role, anon, authenticated;
-grant execute on function public.send(text, jsonb, timestamp with time zone) to service_role, anon, authenticated;
-grant execute on function public.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
-grant execute on function public.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
-grant execute on function public.archive(text, bigint) to service_role, anon, authenticated;
-grant execute on function public.delete(text, bigint) to service_role, anon, authenticated;
-grant execute on function public.read(text, integer, integer) to service_role, anon, authenticated;
+grant execute on function queues_public.pop(text) to service_role, anon, authenticated;
+grant execute on function queues_public.send(text, jsonb, integer) to service_role, anon, authenticated;
+grant execute on function queues_public.send(text, jsonb, timestamp with time zone) to service_role, anon, authenticated;
+grant execute on function queues_public.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
+grant execute on function queues_public.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
+grant execute on function queues_public.archive(text, bigint) to service_role, anon, authenticated;
+grant execute on function queues_public.delete(text, bigint) to service_role, anon, authenticated;
+grant execute on function queues_public.read(text, integer, integer) to service_role, anon, authenticated;
 
 -- Grant execute permissions on inner pgmq functions to roles
 grant execute on function pgmq.pop(text) to service_role, anon, authenticated;
@@ -230,14 +232,14 @@ alter default privileges in schema pgmq grant all privileges on tables to servic
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
   drop function if exists 
-    public.pop(queue_name text),
-    public.send(queue_name text, msg jsonb, sleep_seconds integer),
-    public.send(queue_name text, msg jsonb, available_at timestamp with time zone),
-    public.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer),
-    public.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone),
-    public.archive(queue_name text, msg_id bigint),
-    public.delete(queue_name text, msg_id bigint),
-    public.read(queue_name text, sleep integer, qty integer)
+    queues_public.pop(queue_name text),
+    queues_public.send(queue_name text, msg jsonb, sleep_seconds integer),
+    queues_public.send(queue_name text, msg jsonb, available_at timestamp with time zone),
+    queues_public.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer),
+    queues_public.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone),
+    queues_public.archive(queue_name text, msg_id bigint),
+    queues_public.delete(queue_name text, msg_id bigint),
+    queues_public.read(queue_name text, sleep integer, qty integer)
   ;
 
   -- Revoke execute permissions on inner pgmq functions to roles
@@ -255,6 +257,8 @@ const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
 
   -- Ensure service_role has no permissions on future tables
   alter default privileges in schema pgmq revoke all privileges on tables from service_role;
+
+  drop schema if exists queues_public;
 `)
 
 export async function toggleQueuesExposurePostgrest({
