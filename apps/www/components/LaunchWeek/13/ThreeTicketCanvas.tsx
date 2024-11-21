@@ -1,12 +1,14 @@
 'use client'
 
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
-import { cn } from 'ui'
+import { cn, InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from 'ui'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
+import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
+import useLwGame from '../hooks/useLwGame'
 
 const ThreeTicketCanvas: React.FC<{
   username: string
@@ -21,24 +23,38 @@ const ThreeTicketCanvas: React.FC<{
 }) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
+  const inputRef = useRef(null)
+  const {
+    isGameMode,
+    setIsGameMode,
+    winningPhrase,
+    handleIndexCount,
+    setGameState,
+    value,
+    phraseLength,
+    REGEXP_ONLY_CHARS,
+  } = useLwGame(inputRef)
 
   const canvasRef = useRef<HTMLDivElement>(null)
   const ticketRef = useRef<THREE.Mesh | null>(null)
   const animationFrameRef = useRef<number>()
   const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
   const targetScale = useRef<number>(0)
+  const groupYRotation = useRef<number>(0)
   const isFlipped = useRef(false) // Tracks the flipped state
   const dragStartX = useRef<number | null>(null)
-  const dragDelta = useRef(0)
-  const isDragging = useRef(false)
-  const flipDelta = 100 // Threshold for flipping
+  const dragDelta = useRef<number>(0)
+  const isDragging = useRef<boolean>(false)
+  const currentValue = useRef<string>('')
+  const FLIP_DELTA = 20 // Threshold for flipping
+  const flipDirection = useRef<number>(0)
   const DISPLAY_NAME = username?.split(' ').reverse() || []
   const positionRight = ticketPosition === 'right'
   const isPlatinum = ticketType === 'platinum'
   const isSecret = ticketType === 'secret'
   const LINE_HEIGHT = 1.5
   const MIN_CANVAS_HEIGHT = 600
-  const MOUSE_DOWN_SCALE_VARIATION = 0.05
+  const MOUSE_DOWN_SCALE_VARIATION = 0.025
   const TICKET_FONT_PADDING_LEFT = -6.4
 
   const CONFIG = {
@@ -105,6 +121,14 @@ const ThreeTicketCanvas: React.FC<{
     const cameraDistance = 30
     camera.position.z = cameraDistance
 
+    // Add CSS3DRenderer for HTML elements
+    const cssRenderer = new CSS3DRenderer()
+    cssRenderer.setSize(window.innerWidth, window.innerHeight)
+    cssRenderer.domElement.style.position = 'absolute'
+    cssRenderer.domElement.style.top = '0'
+    cssRenderer.domElement.style.pointerEvents = 'none'
+    canvasRef.current.appendChild(cssRenderer.domElement)
+
     // Rest of your existing setup code (loader, materials, etc.)
     const gltfLoader = new GLTFLoader()
 
@@ -135,6 +159,7 @@ const ThreeTicketCanvas: React.FC<{
     ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
 
     gltfLoader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
+      // gltfLoader.load('/images/launchweek/13/ticket/3D-ticket-code.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
       ticket3DImport.rotation.x = Math.PI * 0.5
       ticket3DImport.traverse((child) => {
@@ -152,6 +177,14 @@ const ThreeTicketCanvas: React.FC<{
       camera.lookAt(ticket3DImport.position)
     })
 
+    // Add React component to the back of the ticket
+    const reactContainer = document.createElement('div')
+
+    const cssObject = new CSS3DObject(reactContainer)
+    cssObject.position.set(0, 0, -0.15) // Adjust to position on the back
+    cssObject.rotation.y = Math.PI
+    ticketGroup.add(cssObject)
+
     const textMaterial = new THREE.MeshStandardMaterial({
       color: CONFIG[ticketType].ticketForeground,
       metalness: 0.2,
@@ -164,6 +197,7 @@ const ThreeTicketCanvas: React.FC<{
     // Load Inter font
     fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
       DISPLAY_NAME.map((text, index) => {
+        // Front
         const textGeometry = new TextGeometry(text, {
           font,
           size: 1.1,
@@ -179,6 +213,20 @@ const ThreeTicketCanvas: React.FC<{
         textMesh.castShadow = true
         ticketGroup.add(textMesh)
       })
+
+      // Back
+      const backTextGeometry = new TextGeometry('Type the secret code', {
+        font,
+        size: 0.6,
+        height: 0.2,
+      })
+      const backTextMesh = new THREE.Mesh(backTextGeometry, textMaterial)
+      backTextMesh.updateMatrix()
+      backTextMesh.position.set(4.5, 2, -TEXT_Z_POSITION)
+      backTextMesh.rotation.y = Math.PI
+
+      backTextMesh.castShadow = true
+      ticketGroup.add(backTextMesh)
     })
 
     // Load mono font
@@ -194,6 +242,31 @@ const ThreeTicketCanvas: React.FC<{
         textMesh.position.set(line.position.x, line.position.y, line.position.z)
         textMesh.castShadow = true
         ticketGroup.add(textMesh)
+      })
+
+      // Back
+      winningPhrase.flat().map((letter, index) => {
+        const letterGeometry = new TextGeometry(letter.toUpperCase(), {
+          font,
+          size: 2.2,
+          height: 0.2,
+        })
+        const letterMaterial = new THREE.MeshStandardMaterial({
+          color: CONFIG[ticketType].ticketForeground,
+          metalness: 0.2,
+          roughness: 0.35,
+        })
+        const backTextMesh = new THREE.Mesh(letterGeometry, letterMaterial)
+        backTextMesh.updateMatrix()
+        backTextMesh.position.set(4.0 - index * 1.8, -2, -TEXT_Z_POSITION)
+        backTextMesh.rotation.y = Math.PI
+
+        backTextMesh.name = `letter-${index}`
+        backTextMesh.material.transparent = true
+        backTextMesh.material.opacity = 0.1
+
+        backTextMesh.castShadow = true
+        ticketGroup.add(backTextMesh)
       })
     })
 
@@ -240,20 +313,49 @@ const ThreeTicketCanvas: React.FC<{
       return { x, y }
     }
 
+    const handleKeyDown = () => {
+      currentValue.current.split('').map((_letter, index) => {
+        const letterToShow = ticketGroup.getObjectByName(`letter-${index}`)
+        letterToShow?.traverse((child) => {
+          if (child) {
+            // @ts-ignore
+            child.material.opacity = 1
+          }
+        })
+      })
+    }
+
     const animate = () => {
       // Smooth rotation
-      ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
-      ticketGroup.rotation.y +=
-        ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
+      if (!isDragging.current) {
+        ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
+        ticketGroup.rotation.y +=
+          ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
+      }
       if (ticketGroup.scale.x < targetScale.current) {
-        scale += 0.001
+        scale += 0.0025
       } else if (ticketGroup.scale.x > targetScale.current) {
-        scale -= 0.001
+        scale -= 0.0025
       } else {
         scale = targetScale.current
       }
+
       ticketGroup.scale.set(scale, scale, scale)
+      groupYRotation.current = ticketGroup.rotation.y
+
+      console.log('currrrrr', currentValue.current)
+      currentValue.current.split('').map((_letter, index) => {
+        const letterToShow = ticketGroup.getObjectByName(`letter-${index}`)
+        letterToShow?.traverse((child) => {
+          if (child) {
+            // @ts-ignore
+            child.material.opacity = 1
+          }
+        })
+      })
+
       renderer.render(scene, camera)
+      cssRenderer.render(scene, camera)
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
@@ -297,7 +399,9 @@ const ThreeTicketCanvas: React.FC<{
         const sensitivity = 0.002 * (1 - Math.min(distance / maxDistance, 1))
 
         // Update target rotation with distance-based sensitivity
-        targetRotation.current.y = deltaX * sensitivity + (isFlipped.current ? Math.PI : 0)
+        targetRotation.current.y =
+          deltaX * sensitivity +
+          (isFlipped.current ? (flipDirection.current < 0 ? -Math.PI : Math.PI) : 0)
         targetRotation.current.x = deltaY * sensitivity * 0.3
       }
     }
@@ -320,10 +424,12 @@ const ThreeTicketCanvas: React.FC<{
       isDragging.current = false
       targetScale.current -= MOUSE_DOWN_SCALE_VARIATION
 
-      if (Math.abs(dragDelta.current) > flipDelta) {
+      if (Math.abs(dragDelta.current) > FLIP_DELTA) {
         // Flip the ticket
         isFlipped.current = !isFlipped.current
-        // targetRotation.current.y += isFlipped.current ? Math.PI : -Math.PI
+        setIsGameMode(isFlipped.current)
+        const sign = Math.sign(dragDelta.current)
+        flipDirection.current = sign
       } else {
         // Reset rotation
         ticketGroup.rotation.y = targetRotation.current.y
@@ -338,6 +444,7 @@ const ThreeTicketCanvas: React.FC<{
     const resetRotation = () => {
       targetRotation.current = { x: 0, y: 0 }
       isFlipped.current = false
+      setIsGameMode(false)
     }
 
     // Handle window resize
@@ -385,7 +492,11 @@ const ThreeTicketCanvas: React.FC<{
       canvasRef.current?.removeChild(renderer.domElement)
       renderer.dispose()
     }
-  }, [username, isDarkTheme, ticketType, isFlipped.current])
+  }, [username, isDarkTheme, ticketType])
+
+  useEffect(() => {
+    currentValue.current = value
+  }, [value])
 
   return (
     <div
@@ -394,7 +505,42 @@ const ThreeTicketCanvas: React.FC<{
         className
       )}
     >
+      <div className="absolute left-4 top-2">
+        winning word: {winningPhrase}, current: {value}
+      </div>
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
+      {isGameMode && (
+        <InputOTP
+          ref={inputRef}
+          maxLength={phraseLength}
+          pattern={REGEXP_ONLY_CHARS}
+          autoFocus
+          containerClassName="!absolute opacity-0 invisible"
+          inputMode="text"
+          value={value}
+          spellCheck={false}
+          onComplete={() => setGameState('winner')}
+        >
+          {winningPhrase.map((word, w_idx) => (
+            <>
+              <InputOTPGroup key={`${word}-${word.join('')}-${w_idx}`}>
+                {word.map((_, c_idx) => {
+                  // index is sum of every letter of every previous word + index of current wo
+                  const currentIndex = handleIndexCount(w_idx, c_idx)
+                  return (
+                    <InputOTPSlot
+                      className="opacity-0"
+                      key={`otp-${currentIndex}`}
+                      index={currentIndex}
+                    />
+                  )
+                })}
+              </InputOTPGroup>
+              {/* {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />} */}
+            </>
+          ))}
+        </InputOTP>
+      )}
     </div>
   )
 }
