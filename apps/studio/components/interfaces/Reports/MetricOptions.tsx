@@ -1,7 +1,15 @@
-import { Home } from 'lucide-react'
+import { Home, Code } from 'lucide-react'
 
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { METRICS, METRIC_CATEGORIES } from 'lib/constants/metrics'
+import {
+  Command_Shadcn_,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+} from 'ui'
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuPortal,
@@ -9,17 +17,23 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from 'ui'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 
 interface MetricOptionsProps {
+  projectRef?: string
   config: any
   handleChartSelection: any
 }
 
-export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsProps) => {
+export const MetricOptions = ({ projectRef, config, handleChartSelection }: MetricOptionsProps) => {
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
   ])
+
+  const { data: snippets, isLoading, isError, isSuccess } = useSqlSnippetsQuery(projectRef)
+
+  console.log('snippets:', snippets, isLoading, isError, isSuccess)
 
   const metricCategories = Object.values(METRIC_CATEGORIES).filter(({ key }) => {
     if (key === 'api_auth') return authEnabled
@@ -27,31 +41,75 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
     return true
   })
 
-  return metricCategories.map((cat) => {
-    return (
-      <DropdownMenuSub key={cat.key}>
-        <DropdownMenuSubTrigger className="space-x-2">
-          {cat.icon ? cat.icon : <Home size={14} />}
-          <p>{cat.label}</p>
-        </DropdownMenuSubTrigger>
-        <DropdownMenuPortal>
-          <DropdownMenuSubContent>
-            {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
-              return (
-                <DropdownMenuCheckboxItem
-                  key={metric.key}
-                  checked={config.layout?.some((x: any) => x.attribute === metric.key)}
-                  onCheckedChange={(e) => handleChartSelection({ metric, value: e })}
-                >
-                  <div className="flex flex-col space-y-0">
-                    <span>{metric.label}</span>
-                  </div>
-                </DropdownMenuCheckboxItem>
-              )
-            })}
-          </DropdownMenuSubContent>
-        </DropdownMenuPortal>
-      </DropdownMenuSub>
-    )
-  })
+  return (
+    <>
+      {metricCategories.map((cat) => {
+        return (
+          <DropdownMenuSub key={cat.key}>
+            <DropdownMenuSubTrigger className="space-x-2">
+              {cat.icon ? cat.icon : <Home size={14} />}
+              <p>{cat.label}</p>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                {METRICS.filter((metric) => metric?.category?.key === cat.key).map((metric) => {
+                  return (
+                    <DropdownMenuCheckboxItem
+                      key={metric.key}
+                      checked={config.layout?.some((x: any) => x.attribute === metric.key)}
+                      onCheckedChange={(e) => handleChartSelection({ metric, value: e })}
+                    >
+                      <div className="flex flex-col space-y-0">
+                        <span>{metric.label}</span>
+                      </div>
+                    </DropdownMenuCheckboxItem>
+                  )
+                })}
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+        )
+      })}
+
+      {isSuccess && snippets && snippets.snippets.length > 0 && (
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="space-x-2">
+            <Code size={14} />
+            <p>SQL Snippets</p>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuPortal>
+            <DropdownMenuSubContent className="p-0">
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Search snippets..." autoFocus={true} />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    {snippets.snippets.map((snippet) => (
+                      <CommandItem_Shadcn_
+                        key={snippet.id}
+                        value={snippet.name}
+                        onSelect={() => {
+                          handleChartSelection({
+                            metric: {
+                              key: `snippet_${snippet.id}`,
+                              id: snippet.id,
+                              label: snippet.name,
+                              isSnippet: true,
+                            },
+                            value: true,
+                          })
+                        }}
+                      >
+                        {snippet.name}
+                      </CommandItem_Shadcn_>
+                    ))}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </DropdownMenuSubContent>
+          </DropdownMenuPortal>
+        </DropdownMenuSub>
+      )}
+    </>
+  )
 }
