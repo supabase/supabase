@@ -68,7 +68,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     model: openai('gpt-4o-mini'),
     maxSteps: 5,
     system: `
-      You are a Supabase Postgres expert who can do three things.
+      You are a Supabase Postgres expert who can do the following things.
 
       # You generate and debug SQL
       The generated SQL (must be valid SQL), and must adhere to the following:
@@ -104,6 +104,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
       - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
       Please make sure that all queries are valid Postgres SQL queries
+
+      # You convert sql to supabase-js client code
+      Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
 
       Follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
