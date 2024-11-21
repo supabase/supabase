@@ -6,22 +6,27 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Separator } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { IntegrationDefinition } from '../Landing/Integrations.constants'
+import { IntegrationDefinition, INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
+import { useParams } from 'common'
 
 interface IntegrationOverviewTabProps {
-  integration?: IntegrationDefinition
+  // integration?: IntegrationDefinition
   actions?: ReactNode
 }
 
 export const IntegrationOverviewTab = ({
-  integration,
+  // integration,
   actions,
   children,
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
+  const { id } = useParams()
   const router = useRouter()
   const project = useSelectedProject()
+
+  const integration = INTEGRATIONS.find((i) => i.id === id)
+
   const isNativeIntegration = integration?.type === 'postgres_extension'
 
   const { data: extensions } = useDatabaseExtensionsQuery({

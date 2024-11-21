@@ -7,6 +7,12 @@ import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.ty
 import { BASE_PATH } from 'lib/constants'
 import { cn } from 'ui'
 
+type Navigation = {
+  route: string
+  label: string
+  children?: Navigation[]
+}
+
 export type IntegrationDefinition = {
   id: string
   name: string
@@ -18,6 +24,7 @@ export type IntegrationDefinition = {
     name: string
     websiteUrl: string
   }
+  navigation?: Navigation[]
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension'; requiredExtensions: string[] }
@@ -62,6 +69,16 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       name: 'pgmq',
       websiteUrl: 'https://github.com/tembo-io/pgmq',
     },
+    navigation: [
+      {
+        route: '/queues',
+        label: 'Overview',
+      },
+      {
+        route: '/queues/queues',
+        label: 'Queues',
+      },
+    ],
   },
   {
     id: 'cron-jobs',
@@ -77,6 +94,16 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       name: 'pg_cron',
       websiteUrl: 'https://github.com/citusdata/pg_cron',
     },
+    navigation: [
+      {
+        route: '/cron-jobs',
+        label: 'Overview',
+      },
+      {
+        route: '/cron-jobs/cron-jobs',
+        label: 'Cron Jobs',
+      },
+    ],
   },
   {
     id: 'vault',
@@ -90,6 +117,20 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     description: 'Application level encryption for your project',
     docsUrl: 'https://supabase.com/docs',
     author: authorSupabase,
+    navigation: [
+      {
+        route: '/vault',
+        label: 'Overview',
+      },
+      {
+        route: '/vault/keys',
+        label: 'Keys',
+      },
+      {
+        route: '/vault/secrets',
+        label: 'Secrets',
+      },
+    ],
   },
   {
     id: 'webhooks',
@@ -102,6 +143,16 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       'Send real-time data from your database to another system when a table event occurs',
     docsUrl: 'https://supabase.com/docs',
     author: authorSupabase,
+    navigation: [
+      {
+        route: '/webhooks',
+        label: 'Overview',
+      },
+      {
+        route: '/webhooks/webhooks',
+        label: 'Webhooks',
+      },
+    ],
   },
   {
     id: 'graphiql',
@@ -120,6 +171,16 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     description: 'Run GraphQL queries through our interactive in-browser IDE',
     docsUrl: 'https://supabase.com/docs',
     author: authorSupabase,
+    navigation: [
+      {
+        route: '/graphiql',
+        label: 'Overview',
+      },
+      {
+        route: '/graphiql/graphiql',
+        label: 'GraphiQL',
+      },
+    ],
   },
 ] as const
 
@@ -135,6 +196,16 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     docsUrl: w.docsUrl,
     meta: w,
     author: authorSupabase,
+    navigation: [
+      {
+        route: `/${w.name}`,
+        label: 'Overview',
+      },
+      {
+        route: `/${w.name}/wrappers`,
+        label: 'Wrappers',
+      },
+    ],
   }
 })
 

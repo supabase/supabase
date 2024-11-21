@@ -6,6 +6,7 @@ import React, { forwardRef, ReactNode, useRef } from 'react'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useParams } from 'common'
 
 const MotionNavMenu = motion(NavMenu) as React.ComponentType<
   React.ComponentProps<typeof NavMenu> & MotionProps
@@ -18,23 +19,20 @@ const paddingRange = [40, 86]
 const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
 interface IntegrationTabsProps {
-  id: string
-  tabs: { id: string; label: string; content: ReactNode }[]
   scroll?: ReturnType<typeof useScroll>
   isSticky?: boolean
 }
 
 export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
-  ({ id, tabs, scroll, isSticky }, ref) => {
+  ({ scroll, isSticky }, ref) => {
+    const { id, pageId } = useParams()
+
     const navRef = useRef(null)
 
     // Get project context
     const { project } = useProjectContext()
     // Find the integration details based on ID
     const integration = INTEGRATIONS.find((i) => i.id === id)
-
-    // Get the selected tab from URL query
-    const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -46,6 +44,8 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
       : 0
 
     const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
+
+    const tabs = integration?.navigation ?? []
 
     return (
       <AnimatePresence>
@@ -85,8 +85,8 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
 
             {tabs.map((tab) => {
               return (
-                <NavMenuItem active={selectedTab === tab.id}>
-                  <Link href={`/project/${project?.ref}/integrations/${id}?tab=${tab.id}`}>
+                <NavMenuItem active={`/${id}${pageId ? `/${pageId}` : ''}` === tab.route}>
+                  <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
                     {tab.label}
                   </Link>
                 </NavMenuItem>
@@ -100,3 +100,5 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
     )
   }
 )
+
+IntegrationTabs.displayName = 'IntegrationTabs'
