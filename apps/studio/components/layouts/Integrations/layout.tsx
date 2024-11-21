@@ -142,7 +142,7 @@ const generateIntegrationsMenu = (
         name: integration.name,
         label: integration.beta ? 'Beta' : undefined,
         key: `integrations/${integration.id}`,
-        url: `/project/${projectRef}/integrations/${integration.id}`,
+        url: `/project/${projectRef}/integrations/${integration.id}/overview`,
         icon: (
           <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
             {integration.icon({ className: 'p-1' })}

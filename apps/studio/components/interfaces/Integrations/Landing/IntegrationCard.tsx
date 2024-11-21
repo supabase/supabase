@@ -43,7 +43,7 @@ export const IntegrationCard = ({
   const isNativeIntegration = type === 'postgres_extension'
 
   return (
-    <Link href={`/project/${project?.ref}/integrations/${id}`}>
+    <Link href={`/project/${project?.ref}/integrations/${id}/overview`}>
       <div className={INTEGRATION_CARD_STYLE}>
         <div className="w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
           {icon()}
