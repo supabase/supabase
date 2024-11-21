@@ -17,8 +17,8 @@ type PostTypes = {
   description: string
   url: string
   path: string
-  tags?: []
-  categories?: []
+  tags?: string[]
+  categories?: string[]
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean
