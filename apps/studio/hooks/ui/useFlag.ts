@@ -6,6 +6,7 @@ export function useFlag<T = boolean>(name: string) {
   const { project } = useProjectContext()
   const store: any = useContext(FlagContext)
 
+  // Temporary override as Fly projects are cant seem to upgrade their compute with the new disk UI
   if (name === 'diskAndComputeForm' && project?.cloud_provider === 'FLY') {
     return false
   }
