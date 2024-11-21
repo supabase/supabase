@@ -11,6 +11,6 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "openapi-typescript": "^6.7.4"
+    "openapi-typescript": "^7.4.3"
   }
 }

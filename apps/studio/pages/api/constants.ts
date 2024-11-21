@@ -1,6 +1,3 @@
-import { paths } from 'data/api'
-import { FilterKeys, MediaType, Success } from 'openapi-fetch'
-
 const PUBLIC_URL = new URL(process.env.SUPABASE_PUBLIC_URL || 'http://localhost:8000')
 
 // Use LOGFLARE_URL until analytics/v1/ routing is supported
@@ -20,24 +17,3 @@ export const DEFAULT_PROJECT = {
   region: 'local',
   inserted_at: '2021-08-02T06:40:40.646Z',
 }
-
-/**
- * Used for extractResponse
- */
-type FetchResponse<T> = {
-  data: T extends {
-    responses: any
-  }
-    ? NonNullable<FilterKeys<Success<T['responses']>, MediaType>>
-    : unknown
-  error?: never
-  response: Response
-}
-
-/**
- * Utility type to extract the type from a API definition in data/api file.
- */
-export type extractResponse<
-  path extends keyof paths,
-  method extends keyof paths[path],
-> = FetchResponse<paths[path][method]>['data']

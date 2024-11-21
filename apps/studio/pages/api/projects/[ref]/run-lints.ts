@@ -1,8 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from 'lib/api/apiWrapper'
-import { extractResponse } from 'pages/api/constants'
+import { paths } from 'api-types'
 import { constructHeaders } from 'lib/api/apiHelpers'
+import apiWrapper from 'lib/api/apiWrapper'
 import { post } from 'lib/common/fetch'
 import { PG_META_URL } from 'lib/constants'
 
@@ -20,7 +20,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type ResponseData = extractResponse<'/platform/projects/{ref}/run-lints', 'get'>
+type ResponseData =
+  paths['/platform/projects/{ref}/run-lints']['get']['responses']['200']['content']['application/json']
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const headers = constructHeaders(req.headers)

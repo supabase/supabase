@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
+import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
-import { extractResponse } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -17,7 +17,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type ResponseData = extractResponse<'/platform/organizations/{slug}/billing/subscription', 'get'>
+type ResponseData =
+  paths['/platform/organizations/{slug}/billing/subscription']['get']['responses']['200']['content']['application/json']
 
 const handleGet = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   const response: ResponseData = {

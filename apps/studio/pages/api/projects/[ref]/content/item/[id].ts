@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
 import type { UserContent } from 'types'
-import { extractResponse } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -23,7 +23,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type ResponseData = extractResponse<'/platform/projects/{ref}/content/item/{id}', 'get'>
+type ResponseData =
+  paths['/platform/projects/{ref}/content/item/{id}']['get']['responses']['200']['content']['application/json']
 
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   // Platform specific endpoint

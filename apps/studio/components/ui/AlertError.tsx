@@ -7,7 +7,7 @@ import { WarningIcon } from 'ui'
 export interface AlertErrorProps {
   projectRef?: string
   subject?: string
-  error?: ResponseError | null
+  error?: { message: string } | null
   className?: string
 }
 
