@@ -92,6 +92,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     form.setValue('allowSupportAccess', value === 'true')
   }
 
+  const Divider = () => {
+    return <div className="h-px w-[92%] bg-border mx-auto"></div>
+  }
+
   const FormSchema = z
     .object({
       organizationSlug: z.string().min(1, 'Please select an organization'),
@@ -698,53 +702,52 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
               </div>
             </div>
 
+            <div className="flex items-center justify-center text-sm -mb-5">
+              {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+                <FormField_Shadcn_
+                  name="allowSupportAccess"
+                  control={form.control}
+                  render={({ field }) => (
+                    <div className="flex items-center justify-start w-full pl-5">
+                      <Toggle
+                        id=""
+                        label="Allow temporary support access"
+                        descriptionText="This will help us answer questions specific to your project."
+                        checked={field.value}
+                        onChange={() => {
+                          const newValue = !field.value
+                          field.onChange(newValue)
+                          setSupportAccess(newValue)
+                          snap.setIsOptedInTelemetry(newValue)
+                          if (!newValue) sendReset()
+                        }}
+                        size="small"
+                      />
+                    </div>
+                  )}
+                />
+              )}
+            </div>
+
+            <Divider />
+
             <div className={cn(CONTAINER_CLASSES)}>
-              <div className="flex items-center space-x-1 justify-end block text-sm mb-2">
-                {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
-                  <FormField_Shadcn_
-                    name="allowSupportAccess"
-                    control={form.control}
-                    render={({ field }) => (
-                      <div className="flex items-center ">
-                        <Toggle
-                          id=""
-                          label="Allow Support Access"
-                          checked={field.value}
-                          onChange={() => {
-                            const newValue = !field.value
-                            field.onChange(newValue)
-                            setSupportAccess(newValue)
-                            snap.setIsOptedInTelemetry(newValue)
-                            if (!newValue) sendReset()
-                          }}
-                          className="flex-row-reverse"
-                          size="tiny"
-                        />
-                        <FormControl_Shadcn_></FormControl_Shadcn_>
-                      </div>
-                    )}
-                  />
-                )}
-              </div>
-              <div className="flex justify-end">
+              <div className="flex w-full -mt-3">
                 <Button
                   htmlType="submit"
                   size="small"
                   icon={<Mail />}
                   disabled={isSubmitting}
                   loading={isSubmitting}
+                  className="w-full"
                 >
                   Send support request
                 </Button>
               </div>
-              <div className="flex items-center space-x-1 justify-end block text-sm mt-4 mb-2">
+              <div className="flex items-center space-x-1 justify-center block text-sm mt-4">
                 <p className="text-foreground-light">We will contact you at</p>
                 <p className="text-foreground font-medium">{respondToEmail}</p>
-              </div>
-              <div className="flex items-center space-x-1 justify-end block text-sm mt-0 mb-0">
-                <p className="text-foreground-light">
-                  Please ensure you haven't blocked Hubspot in your emails
-                </p>
+                <p className="text-foreground-light">Make sure Hubspot is unblocked.</p>
               </div>
             </div>
           </>
