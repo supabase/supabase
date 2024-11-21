@@ -2,13 +2,11 @@ import { Search } from 'lucide-react'
 import { useState } from 'react'
 
 import AlertError from 'components/ui/AlertError'
+import NoSearchResults from 'components/ui/NoSearchResults'
 import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
-import { INTEGRATIONS } from './Integrations.constants'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
-import { Admonition } from 'ui-patterns'
-import NoSearchResults from 'components/ui/NoSearchResults'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 
@@ -16,19 +14,18 @@ export const AvailableIntegrations = () => {
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<IntegrationCategory>('all')
 
-  const {
-    installedIntegrations: ids,
-    error,
-    isError,
-    isLoading,
-    isSuccess,
-  } = useInstalledIntegrations()
+  const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
+    useInstalledIntegrations()
+
+  const installedIds = installedIntegrations.map((i) => i.id)
 
   // available integrations for install
   const integrationsByCategory =
     selectedCategory === 'all'
-      ? INTEGRATIONS.filter((i) => !ids.includes(i.id))
-      : INTEGRATIONS.filter((i) => !ids.includes(i.id) && i.type === selectedCategory)
+      ? availableIntegrations.filter((i) => !installedIds.includes(i.id))
+      : availableIntegrations.filter(
+          (i) => !installedIds.includes(i.id) && i.type === selectedCategory
+        )
   const filteredIntegrations = (
     search.length > 0
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))

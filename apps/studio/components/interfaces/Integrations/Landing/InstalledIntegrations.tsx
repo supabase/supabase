@@ -1,20 +1,9 @@
 import AlertError from 'components/ui/AlertError'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
-import { INTEGRATIONS } from './Integrations.constants'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 
 export const InstalledIntegrations = () => {
-  const {
-    installedIntegrations: ids,
-    error,
-    isLoading,
-    isSuccess,
-    isError,
-  } = useInstalledIntegrations()
-
-  const installedIntegrations = INTEGRATIONS.filter((i) => ids.includes(i.id)).sort((a, b) =>
-    a.name.localeCompare(b.name)
-  )
+  const { installedIntegrations, error, isLoading, isSuccess, isError } = useInstalledIntegrations()
 
   return (
     <div className="px-10 py-6 flex flex-col gap-y-5">

@@ -1,10 +1,7 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
 
-import {
-  IntegrationDefinition,
-  INTEGRATIONS,
-} from 'components/interfaces/Integrations/Landing/Integrations.constants'
+import { IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { Header } from 'components/layouts/Integrations/header'
 import ProjectLayout from 'components/layouts/ProjectLayout/ProjectLayout'
@@ -91,8 +88,7 @@ const IntegrationTopHeaderLayout = ({
   // construct the page url to be used to determine the active state for the sidebar
   const page = `${segments[3]}${segments[4] ? `/${segments[4]}` : ''}`
 
-  const { installedIntegrations } = useInstalledIntegrations()
-  const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
+  const { installedIntegrations: integrations } = useInstalledIntegrations()
 
   return (
     <ProjectLayout
@@ -116,8 +112,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   const page = router.pathname.split('/')[4]
   const project = useSelectedProject()
 
-  const { installedIntegrations } = useInstalledIntegrations()
-  const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
+  const { installedIntegrations: integrations } = useInstalledIntegrations()
 
   return (
     <ProjectLayout
