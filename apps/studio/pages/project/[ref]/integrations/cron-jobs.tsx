@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 
+import { IntegrationOverviewTab } from 'components/interfaces/Integrations/Integration/IntegrationOverviewTab'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { CronjobsTab } from 'components/interfaces/Integrations/NewCronJobs/CronjobsTab'
-import { CronjobsOverviewTab } from 'components/interfaces/Integrations/NewCronJobs/OverviewTab'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -29,7 +29,7 @@ const CronJobsPage: NextPageWithLayout = () => {
       {
         id: 'overview',
         label: 'Overview',
-        content: <CronjobsOverviewTab />,
+        content: <IntegrationOverviewTab integration={integration} />,
       },
       ...(pgCronExtensionInstalled
         ? [

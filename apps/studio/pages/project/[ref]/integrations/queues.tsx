@@ -1,8 +1,8 @@
 import { parseAsString, useQueryState } from 'nuqs'
 import { ReactNode, useMemo, useState } from 'react'
 
+import { IntegrationOverviewTab } from 'components/interfaces/Integrations/Integration/IntegrationOverviewTab'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
-import { QueuesOverviewTab } from 'components/interfaces/Integrations/NewQueues/OverviewTab'
 import { QueuesTab } from 'components/interfaces/Integrations/NewQueues/QueuesTab'
 import { QueueTab } from 'components/interfaces/Integrations/NewQueues/QueueTab'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
@@ -27,7 +27,7 @@ const QueuesPage: NextPageWithLayout = () => {
       {
         id: 'overview',
         label: 'Overview',
-        content: <QueuesOverviewTab />,
+        content: <IntegrationOverviewTab integration={integration} />,
       },
       {
         id: 'queues',

@@ -1,24 +1,49 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
-import { Badge, Separator } from 'ui'
+import { Markdown } from 'components/interfaces/Markdown'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Badge, Button, Separator } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { IntegrationDefinition } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
 
+interface IntegrationOverviewTabProps {
+  integration?: IntegrationDefinition
+  actions?: ReactNode
+}
+
 export const IntegrationOverviewTab = ({
   integration,
   actions,
   children,
-}: PropsWithChildren<{ integration: IntegrationDefinition; actions?: ReactNode }>) => {
+}: PropsWithChildren<IntegrationOverviewTabProps>) => {
   const router = useRouter()
-  const isNativeIntegration = integration.type === 'postgres_extension'
+  const project = useSelectedProject()
+  const isNativeIntegration = integration?.type === 'postgres_extension'
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const neededExtensions =
+    integration?.type === 'postgres_extension'
+      ? (extensions ?? []).filter((ext) =>
+          (integration?.requiredExtensions ?? []).includes(ext.name)
+        )
+      : []
+  const hasMissingExtensions = neededExtensions.some((x) => !x.installed_version)
+
+  if (!integration) {
+    return <div>Unsupported integration type</div>
+  }
 
   return (
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} />
-      {actions}
       {isNativeIntegration && (
         <div className="px-10 max-w-4xl">
           <Admonition
@@ -34,12 +59,25 @@ export const IntegrationOverviewTab = ({
               />
               <span>Native Integration</span>
             </Badge>
-            <p className="text-foreground-light">
-              This integration manages extensions directly in your Postgres database
-            </p>
+            <Markdown
+              className="max-w-full"
+              content={`This integration manages the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} extension
+              ${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
+              ${hasMissingExtensions ? 'Install these database extensions to use this integration in your project.' : ''}
+              `}
+            />
+            {hasMissingExtensions && (
+              <Button type="primary" className="w-min">
+                Enable{' '}
+                {integration.requiredExtensions.length === 1
+                  ? integration.requiredExtensions[0]
+                  : 'required extensions'}
+              </Button>
+            )}
           </Admonition>
         </div>
       )}
+      {!!actions && <div className="px-10 max-w-4xl">{actions}</div>}
       <MarkdownContent key={integration.id} integrationId={integration.id} />
       <Separator />
       {children}
