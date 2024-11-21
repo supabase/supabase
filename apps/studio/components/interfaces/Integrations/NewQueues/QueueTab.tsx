@@ -10,8 +10,10 @@ import { SendMessageModal } from 'components/interfaces/Integrations/Queues/Sing
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
 import { Button, LoadingLine, Separator } from 'ui'
+import { useParams } from 'common'
 
-export const QueueTab = ({ queueName }: { queueName: string }) => {
+export const QueueTab = () => {
+  const { childId: queueName } = useParams()
   const { project } = useProjectContext()
   const [sendMessageModalShown, setSendMessageModalShown] = useState(false)
   const [purgeQueueModalShown, setPurgeQueueModalShown] = useState(false)

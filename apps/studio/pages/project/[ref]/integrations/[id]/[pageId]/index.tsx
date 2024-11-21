@@ -1,8 +1,7 @@
 import { useParams } from 'common'
-import dynamic from 'next/dynamic'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
+import { IntegrationPageHandler } from 'pages/project/[ref]/integrations/[id]/IntegrationPageHandler'
 import { NextPageWithLayout } from 'types'
-import { IntegrationPageHandler } from '../IntegrationPageHandler'
 
 const IntegrationPage: NextPageWithLayout = () => {
   const { id, pageId } = useParams()

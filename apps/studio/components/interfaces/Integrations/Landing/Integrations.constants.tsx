@@ -10,6 +10,8 @@ import { cn } from 'ui'
 type Navigation = {
   route: string
   label: string
+  hasChild?: boolean
+  childIcon?: React.ReactNode
   children?: Navigation[]
 }
 
@@ -77,6 +79,10 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       {
         route: '/queues/queues',
         label: 'Queues',
+        hasChild: true,
+        childIcon: (
+          <Layers size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
+        ),
       },
     ],
   },

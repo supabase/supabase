@@ -7,6 +7,7 @@ import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integra
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useParams } from 'common'
+import { ChevronRight } from 'lucide-react'
 
 const MotionNavMenu = motion(NavMenu) as React.ComponentType<
   React.ComponentProps<typeof NavMenu> & MotionProps
@@ -25,7 +26,7 @@ interface IntegrationTabsProps {
 
 export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
   ({ scroll, isSticky }, ref) => {
-    const { id, pageId } = useParams()
+    const { id, pageId, childId } = useParams()
 
     const navRef = useRef(null)
 
@@ -85,11 +86,45 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
 
             {tabs.map((tab) => {
               return (
-                <NavMenuItem active={`/${id}${pageId ? `/${pageId}` : ''}` === tab.route}>
-                  <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
-                    {tab.label}
-                  </Link>
-                </NavMenuItem>
+                <div className="flex items-center gap-2">
+                  <NavMenuItem
+                    active={!childId && `/${id}${pageId ? `/${pageId}` : ''}` === tab.route}
+                  >
+                    <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
+                      {tab.label}
+                    </Link>
+                  </NavMenuItem>
+
+                  <AnimatePresence>
+                    {tab.hasChild && childId && (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.12, delay: 0.05 }}
+                          className="flex items-center"
+                        >
+                          <ChevronRight size={14} className="text-foreground-muted" />
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.12, delay: 0.1 }}
+                          className="flex items-center"
+                        >
+                          <NavMenuItem active={true} className="flex items-center gap-2">
+                            {tab.childIcon}
+                            <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
+                              {childId}
+                            </Link>
+                          </NavMenuItem>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
               )
             })}
           </MotionNavMenu>

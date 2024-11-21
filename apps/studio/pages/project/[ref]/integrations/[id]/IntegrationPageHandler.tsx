@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 
 // Loads pages in dynamically depending on the route
 export function IntegrationPageHandler() {
-  const { id, pageId } = useParams()
+  const { id, pageId, childId } = useParams()
 
   if (id?.includes('_wrapper')) {
     switch (pageId) {
@@ -25,6 +25,17 @@ export function IntegrationPageHandler() {
 
   switch (id) {
     case 'queues':
+      if (childId) {
+        return dynamic(
+          () =>
+            import('components/interfaces/Integrations/NewQueues/QueueTab').then(
+              (mod) => mod.QueueTab
+            ),
+          {
+            loading: () => <div>Loading Overview...</div>,
+          }
+        )
+      }
       switch (pageId) {
         case undefined:
           return dynamic(
