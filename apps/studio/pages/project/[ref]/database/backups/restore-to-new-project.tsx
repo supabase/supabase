@@ -393,7 +393,7 @@ const RestoreToNewProject = () => {
               <ul className="ml-4">
                 <li>Database schema (tables, views, procedures)</li>
                 <li>All data and indexes</li>
-                <li>Database roles and permissions</li>
+                <li>Database roles, permissions and users</li>
               </ul>
             </ul>
             <ul>
