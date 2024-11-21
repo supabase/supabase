@@ -58,7 +58,6 @@ export const getTools = ({
           ),
       }),
       execute: async ({ sql }) => {
-        console.log('converting sql:', sql)
         try {
           const statement = await processSql(sql)
           const { code } = await renderSupabaseJs(statement)
