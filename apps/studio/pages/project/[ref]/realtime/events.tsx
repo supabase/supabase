@@ -13,12 +13,13 @@ import type { NextPageWithLayout } from 'types'
 import SinglePublicationView from 'components/interfaces/Database/Publications/SinglePublication'
 import { Loading } from 'components/ui/Loading'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
+import Link from 'next/link'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
 // be consolidated somewhere else eventually for better UX
 
-const DatabasePublications: NextPageWithLayout = () => {
+const RealtimeEventFiltering: NextPageWithLayout = () => {
   const { project } = useProjectContext()
 
   const { data, isLoading } = useDatabasePublicationsQuery(
@@ -50,7 +51,10 @@ const DatabasePublications: NextPageWithLayout = () => {
         <div className="col-span-12">
           <div className="space-y-10">
             <div>
-              <FormHeader title="Events" description="Select which database events to be broadcasted" />
+              <FormHeader
+                title="Event filtering"
+                description="Select which database events to be broadcasted"
+              />
               <SinglePublicationView publicationName={'supabase_realtime'} />
             </div>
             <div>
@@ -67,20 +71,22 @@ const DatabasePublications: NextPageWithLayout = () => {
   ) : (
     <div className="storage-container flex flex-grow">
       <ProductEmptyState
-        title="Realtime is disabled"
+        title="Custom configuration detected"
         infoButtonLabel="About realtime"
         infoButtonUrl="https://supabase.com/docs/guides/realtime"
       >
         <p className="text-foreground-light text-sm">
-          Send and receive messages to connected clients.
+          The <code>supabase_realtime</code> publication cannot be found. Go to{' '}
+          <Link href={`/project/${project?.ref}/database/publications`}>database publications</Link>{' '}
+          to manage realtime events on custom publications.
         </p>
       </ProductEmptyState>
     </div>
   )
 }
 
-DatabasePublications.getLayout = (page) => (
-  <RealtimeLayout title="Publications">{page}</RealtimeLayout>
+RealtimeEventFiltering.getLayout = (page) => (
+  <RealtimeLayout title="Event filtering">{page}</RealtimeLayout>
 )
 
-export default DatabasePublications
+export default RealtimeEventFiltering

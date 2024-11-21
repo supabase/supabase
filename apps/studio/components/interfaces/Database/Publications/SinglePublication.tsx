@@ -16,7 +16,6 @@ import { AlertCircle } from 'lucide-react'
 interface PublicationEvent {
   event: string
   key: string
-  example: string
 }
 
 interface SinglePublicationViewProps {
@@ -50,10 +49,10 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const publicationEvents: PublicationEvent[] = [
-    { event: 'Insert', key: 'publish_insert', example: 'Adding a new todo "Buy groceries"' },
-    { event: 'Update', key: 'publish_update', example: 'Marking a todo as completed' },
-    { event: 'Delete', key: 'publish_delete', example: 'Deleting the "Buy groceries" todo' },
-    { event: 'Truncate', key: 'publish_truncate', example: 'Clearing all todos from the table' },
+    { event: 'Insert', key: 'publish_insert' },
+    { event: 'Update', key: 'publish_update' },
+    { event: 'Delete', key: 'publish_delete' },
+    { event: 'Truncate', key: 'publish_truncate' },
   ]
 
   const [toggleListenEventValue, setToggleListenEventValue] = useState<{
@@ -89,7 +88,6 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
       <Table
         head={[
           <Table.th key="header.event">Event Type</Table.th>,
-          <Table.th key="header.example">Example</Table.th>,
           <Table.th key="header.status">
             <span className="sr-only">Enabled</span>
           </Table.th>,
@@ -101,8 +99,7 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
                 key={i}
                 index={i}
                 columns={[
-                  { key: 'event', width: '25%' },
-                  { key: 'example', width: '50%' },
+                  { key: 'event', width: '50%' },
                   { key: 'status', isToggle: true, align: 'end' },
                 ]}
               />
@@ -111,7 +108,6 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
             publicationEvents.map((event) => (
               <Table.tr key={event.key} className="border-t">
                 <Table.td className="px-4 py-3">{event.event}</Table.td>
-                <Table.td className="px-4 py-3">{event.example}</Table.td>
                 <Table.td>
                   <div className="flex justify-end gap-2">
                     <Toggle
@@ -132,7 +128,7 @@ const SinglePublicationView = ({ publicationName }: SinglePublicationViewProps) 
             ))
           ) : (
             <Table.tr>
-              <Table.td colSpan={3}>No publication found</Table.td>
+              <Table.td colSpan={2}>No publication found</Table.td>
             </Table.tr>
           )
         }
