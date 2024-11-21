@@ -285,7 +285,7 @@ const RestoreToNewProject = () => {
       <Admonition type="default" title={`This project cannot be restored to a new project`}>
         <Markdown
           content={`This project was originally restored from another project. This is a temporary limitation. Please [contact us](/support/new?ref=${project?.ref}) if you need to restore a project to multiple other projects.  
-            [Go to original project](/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref})`}
+            [Go to original project](/dashboard/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''})`}
         />
       </Admonition>
     )
