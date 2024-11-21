@@ -1,5 +1,3 @@
-BigQuery is Google’s highly scalable, serverless data warehouse designed for analyzing large datasets using SQL queries. It excels in processing vast amounts of structured and semi-structured data, offering features like real-time analytics, built-in machine learning integration, and seamless scalability. Ideal for big data projects, BigQuery provides a pay-as-you-go model, making it cost-effective for diverse use cases such as business intelligence, data visualization, and predictive analytics.
+BigQuery is a completely serverless and cost-effective enterprise data warehouse that works across clouds and scales with your data, with BI, machine learning and AI built in.
 
-Supabase is an open-source backend-as-a-service platform that provides a Postgres database with built-in real-time subscriptions, authentication, and storage solutions. It simplifies app development by offering pre-configured APIs and tools that are easy to integrate with modern frameworks. Designed with developers in mind, Supabase combines the flexibility of a relational database with features often found in managed platforms like Firebase.
-
-Integrating Supabase with BigQuery can enable you to utilize Supabase’s real-time capabilities for application backends while leveraging BigQuery’s powerful analytics for large-scale data processing and insights.
+The BigQuery Wrapper allows you to read and write data from BigQuery within your Postgres database.
