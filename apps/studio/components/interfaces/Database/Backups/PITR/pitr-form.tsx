@@ -189,7 +189,7 @@ export function PITRForm({
             ) : (
               <div className="space-y-8 py-2">
                 <div className="space-y-1">
-                  <p className="text-sm text-foreground-light">Restore database to</p>
+                  <p className="text-sm text-foreground-light">Date to restore to</p>
                   <p className="text-3xl">
                     <span>{dayjs(selectedDate).format('DD MMM YYYY')}</span>
                     <span>
