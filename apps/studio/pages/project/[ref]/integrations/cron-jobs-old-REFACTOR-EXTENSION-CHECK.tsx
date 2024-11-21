@@ -21,6 +21,7 @@ const CronJobsPage: NextPageWithLayout = () => {
   })
   const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
+  // MOVE THIS CHECK INTO THE COMPONENT
   const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
   const pgCronExtensionInstalled = !!pgCronExtension?.installed_version
 

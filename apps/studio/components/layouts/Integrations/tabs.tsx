@@ -6,6 +6,8 @@ import React, { forwardRef, ReactNode, useRef } from 'react'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { cn, NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useParams } from 'common'
+import { ChevronRight } from 'lucide-react'
 
 const MotionNavMenu = motion(NavMenu) as React.ComponentType<
   React.ComponentProps<typeof NavMenu> & MotionProps
@@ -18,23 +20,20 @@ const paddingRange = [40, 86]
 const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
 interface IntegrationTabsProps {
-  id: string
-  tabs: { id: string; label: string; content: ReactNode }[]
   scroll?: ReturnType<typeof useScroll>
   isSticky?: boolean
 }
 
 export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
-  ({ id, tabs, scroll, isSticky }, ref) => {
+  ({ scroll, isSticky }, ref) => {
+    const { id, pageId, childId } = useParams()
+
     const navRef = useRef(null)
 
     // Get project context
     const { project } = useProjectContext()
     // Find the integration details based on ID
     const integration = INTEGRATIONS.find((i) => i.id === id)
-
-    // Get the selected tab from URL query
-    const [selectedTab] = useQueryState('tab', parseAsString.withDefault('overview'))
 
     const headerRef = useRef<HTMLDivElement>(null)
 
@@ -46,6 +45,8 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
       : 0
 
     const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
+
+    const tabs = integration?.navigation ?? []
 
     return (
       <AnimatePresence>
@@ -85,11 +86,45 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
 
             {tabs.map((tab) => {
               return (
-                <NavMenuItem active={selectedTab === tab.id}>
-                  <Link href={`/project/${project?.ref}/integrations/${id}?tab=${tab.id}`}>
-                    {tab.label}
-                  </Link>
-                </NavMenuItem>
+                <div className="flex items-center gap-2">
+                  <NavMenuItem
+                    active={!childId && `/${id}${pageId ? `/${pageId}` : ''}` === tab.route}
+                  >
+                    <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
+                      {tab.label}
+                    </Link>
+                  </NavMenuItem>
+
+                  <AnimatePresence>
+                    {tab.hasChild && childId && (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.12, delay: 0.05 }}
+                          className="flex items-center"
+                        >
+                          <ChevronRight size={14} className="text-foreground-muted" />
+                        </motion.div>
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.12, delay: 0.1 }}
+                          className="flex items-center"
+                        >
+                          <NavMenuItem active={true} className="flex items-center gap-2">
+                            {tab.childIcon}
+                            <Link href={`/project/${project?.ref}/integrations/${tab.route}`}>
+                              {childId}
+                            </Link>
+                          </NavMenuItem>
+                        </motion.div>
+                      </>
+                    )}
+                  </AnimatePresence>
+                </div>
               )
             })}
           </MotionNavMenu>
@@ -100,3 +135,5 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
     )
   }
 )
+
+IntegrationTabs.displayName = 'IntegrationTabs'

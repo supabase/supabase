@@ -2,7 +2,6 @@ import { AvailableIntegrations } from 'components/interfaces/Integrations/Landin
 import { InstalledIntegrations } from 'components/interfaces/Integrations/Landing/InstalledIntegrations'
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import type { NextPageWithLayout } from 'types'
-import { Separator } from 'ui'
 
 const IntegrationsPage: NextPageWithLayout = () => {
   return (

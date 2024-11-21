@@ -15,6 +15,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IntegrationTabs } from './tabs'
+import { useParams } from 'common'
 
 /**
  * Layout component for the Integrations section
@@ -37,12 +38,9 @@ const IntegrationsLayout = ({
  * Top level layout
  */
 const IntegrationTopHeaderLayout = ({
-  id,
-  tabs = [],
   ...props
 }: PropsWithChildren<{
   id?: string
-  tabs?: { id: string; label: string; content: ReactNode }[]
 }>) => {
   const project = useSelectedProject()
   const router = useRouter()
@@ -106,10 +104,8 @@ const IntegrationTopHeaderLayout = ({
         <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
       }
     >
-      <Header id={id} scroll={scroll} ref={headerRef} />
-      {id && tabs.length > 0 ? (
-        <IntegrationTabs id={id} tabs={tabs} scroll={scroll} isSticky={isSticky} />
-      ) : null}
+      <Header scroll={scroll} ref={headerRef} />
+      <IntegrationTabs scroll={scroll} isSticky={isSticky} />
       {props.children}
     </ProjectLayout>
   )

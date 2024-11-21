@@ -6,13 +6,14 @@ import { forwardRef, useRef } from 'react'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Badge, cn } from 'ui'
+import { useParams } from 'common'
 
 interface HeaderProps {
-  id?: string
   scroll?: ReturnType<typeof useScroll>
 }
 
-export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ id, scroll }, ref) => {
+export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) => {
+  const { id } = useParams()
   // Get project context
   const { project } = useProjectContext()
   // Find the integration details based on ID
