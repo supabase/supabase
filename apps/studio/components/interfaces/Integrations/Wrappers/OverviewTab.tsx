@@ -87,7 +87,6 @@ export const WrapperOverviewTab = () => {
 
   return (
     <IntegrationOverviewTab
-      integration={integration}
       actions={
         <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
           <ButtonTooltip

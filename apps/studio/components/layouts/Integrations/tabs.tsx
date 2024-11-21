@@ -1,7 +1,6 @@
 import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'framer-motion'
 import Link from 'next/link'
-import { parseAsString, useQueryState } from 'nuqs'
-import React, { forwardRef, ReactNode, useRef } from 'react'
+import React, { useRef } from 'react'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { cn, NavMenu, NavMenuItem } from 'ui'
@@ -24,8 +23,7 @@ interface IntegrationTabsProps {
   isSticky?: boolean
 }
 
-export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
-  ({ scroll, isSticky }, ref) => {
+export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
     const { id, pageId, childId } = useParams()
 
     const navRef = useRef(null)

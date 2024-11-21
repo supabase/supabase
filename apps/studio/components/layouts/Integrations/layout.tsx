@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
 import { IntegrationDefinition } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
@@ -12,18 +12,12 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IntegrationTabs } from './tabs'
-import { useParams } from 'common'
 
 /**
  * Layout component for the Integrations section
  * Handles scroll-based sticky header behavior and authentication
  */
-const IntegrationsLayout = ({
-  ...props
-}: PropsWithChildren<{
-  id?: string
-  tabs?: { id: string; label: string; content: ReactNode }[]
-}>) => {
+const IntegrationsLayout = ({ ...props }: PropsWithChildren) => {
   const layoutSidebar = useFlag('integrationLayoutSidebar')
   if (layoutSidebar) {
     return <IntegrationsLayoutSide {...props} />
@@ -34,11 +28,7 @@ const IntegrationsLayout = ({
 /**
  * Top level layout
  */
-const IntegrationTopHeaderLayout = ({
-  ...props
-}: PropsWithChildren<{
-  id?: string
-}>) => {
+const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
   const project = useSelectedProject()
   const router = useRouter()
   // Refs for the main scrollable area and header

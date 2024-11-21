@@ -1,23 +1,21 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren, ReactNode } from 'react'
 
+import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { Badge, Button, Separator } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { IntegrationDefinition, INTEGRATIONS } from '../Landing/Integrations.constants'
+import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
-import { useParams } from 'common'
 
 interface IntegrationOverviewTabProps {
-  // integration?: IntegrationDefinition
   actions?: ReactNode
 }
 
 export const IntegrationOverviewTab = ({
-  // integration,
   actions,
   children,
 }: PropsWithChildren<IntegrationOverviewTabProps>) => {
