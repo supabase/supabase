@@ -59,6 +59,29 @@ export function IntegrationPageHandler() {
           )
       }
       break
+    case 'webhooks':
+      switch (pageId) {
+        case undefined:
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Webhooks/OverviewTab').then(
+                (mod) => mod.WebhooksOverviewTab
+              ),
+            {
+              loading: () => <div>Loading Overview...</div>,
+            }
+          )
+        case 'webhooks':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Webhooks/ListTab').then(
+                (mod) => mod.WebhooksListTab
+              ),
+            {
+              loading: () => <div>Loading Overview...</div>,
+            }
+          )
+      }
     case 'cron-jobs':
       switch (pageId) {
         case undefined:
