@@ -3,7 +3,7 @@ import { useFlag } from 'hooks/ui/useFlag'
 import Link from 'next/link'
 import React from 'react'
 
-import { NavMenu, NavMenuItem } from 'ui'
+import { Badge, NavMenu, NavMenuItem } from 'ui'
 
 type Props = {
   active: 'pitr' | 'scheduled' | 'rtnp'
@@ -29,7 +29,14 @@ function DatabaseBackupsNav({ active }: Props) {
     {
       enabled: isCloneToNewProjectEnabled,
       id: 'rtnp',
-      label: 'Restore to new project',
+      label: (
+        <div className="flex items-center gap-1">
+          Restore to new project{' '}
+          <Badge size="small" className="!text-[10px] px-1 py-0">
+            New
+          </Badge>
+        </div>
+      ),
       href: `/project/${ref}/database/backups/restore-to-new-project`,
     },
   ] as const
