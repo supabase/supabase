@@ -39,6 +39,7 @@ import {
   getPoolerTld,
 } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
+import { Admonition } from 'ui-patterns'
 
 const CONNECTION_TYPES: {
   id: ConnectionType
@@ -307,7 +308,7 @@ export const DatabaseConnectionString = () => {
                 <StepLabel number={++stepNumber}>Choose type of connection</StepLabel>
               </div>
             )}
-            <div className="divide-y divide-border-muted">
+            <div className="divide-y divide-border-muted [&>div]:px-7 [&>div]:py-8">
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
@@ -320,13 +321,14 @@ export const DatabaseConnectionString = () => {
                 ipv4Status={{
                   type: !ipv4Addon ? 'error' : 'success',
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
+                  description: ipv4Addon && 'Connections are IPv4 proxied with IPv4 addon.',
                   link: !ipv4Addon
                     ? {
-                        text: 'Purchase IPv4 support',
+                        text: 'IPv4 addon',
                         url: `/project/${projectRef}/settings/addons?panel=ipv4`,
                       }
                     : {
-                        text: 'Update IPv4 settings',
+                        text: 'IPv4 settings',
                         url: `/project/${projectRef}/settings/addons?panel=ipv4`,
                       },
                 }}
@@ -347,7 +349,7 @@ export const DatabaseConnectionString = () => {
                 type="transaction"
                 title="Transaction pooler"
                 fileTitle={fileTitle}
-                description="Ideal for stateless applications like serverless functions where each interaction with the database is brief and isolated."
+                description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
@@ -355,7 +357,7 @@ export const DatabaseConnectionString = () => {
                   title: 'IPv4 compatible',
                   description: 'Transaction pooler connections are IPv4 proxied for free.',
                 }}
-                notice="Transaction pooler does not support prepared statements"
+                notice={['Does not support PREPARE statements']}
                 parameters={[
                   // prettier-ignore
                   { ...CONNECTION_PARAMETERS.host, value: `${projectRef}.pooler.supabase.${poolerTld}` },
@@ -369,13 +371,23 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
                 ]}
               />
+              <Admonition
+                type="warning"
+                title="Highly recommended to not use Session Pooler"
+                className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
+              >
+                <p className="text-sm text-foreground-lighter !mb-0">
+                  If you are using Session Pooler, we recommend switching to Direct Connection.
+                </p>
+              </Admonition>
+
               <ConnectionPanel
                 contentType={contentType}
                 lang={lang}
                 type="session"
                 title="Session pooler"
                 fileTitle={fileTitle}
-                description="Better suited for applications with longer-running sessions that need persistent state or session-based features."
+                description="Only recommended as an alternative to Direct Connection, when connecting via a IPv4 network."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{

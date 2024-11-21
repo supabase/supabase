@@ -154,7 +154,7 @@ const RECT_WIDTH = ICON_WIDTH * 0.67 // ~67% of total width
 const CIRCLE_Y = ICON_HEIGHT * 0.13 // 13% from top
 const CIRCLE_SPACING = ICON_WIDTH * 0.25 // 25% of width
 const CIRCLE_START_X = ICON_WIDTH * 0.25 // 25% from left
-const CIRCLE_RADIUS = ICON_WIDTH * 0.038 // ~3.8% of width
+const CIRCLE_RADIUS = ICON_WIDTH * 0.055 // ~3.8% of width
 
 // Static circle for SessionIcon
 const ConnectionDot = ({ index, isActive }: { index: number; isActive: boolean }) => (
@@ -381,6 +381,105 @@ export const SessionIcon = () => {
             isActive={bottomLineStates[index]}
           />
         </React.Fragment>
+      ))}
+    </div>
+  )
+}
+
+export const DirectConnectionIcon = () => {
+  const [dots, setDots] = useState([false, false, false])
+  const [lines, setLines] = useState([false, false, false])
+
+  useEffect(() => {
+    // Function to animate a single dot
+    const animateDot = (index: number) => {
+      setDots((prev) => {
+        const newState = [...prev]
+        newState[index] = true
+        return newState
+      })
+      setLines((prev) => {
+        const newState = [...prev]
+        newState[index] = true
+        return newState
+      })
+
+      // Clear after 2.5s
+      setTimeout(() => {
+        setDots((prev) => {
+          const newState = [...prev]
+          newState[index] = false
+          return newState
+        })
+        setLines((prev) => {
+          const newState = [...prev]
+          newState[index] = false
+          return newState
+        })
+      }, 2500)
+    }
+
+    // Initial staggered animation
+    // Start initial animations immediately with slight delays
+    setTimeout(() => animateDot(0), 100)
+    setTimeout(() => animateDot(1), 1500)
+    setTimeout(() => animateDot(2), 3000)
+
+    // Set up intervals for continuous animation
+    const intervals = [0, 1, 2].map((index) =>
+      setInterval(() => animateDot(index), Math.random() * 3000 + 8000)
+    )
+
+    return () => intervals.forEach(clearInterval)
+  }, [])
+
+  return (
+    <div style={{ position: 'relative', width: ICON_WIDTH, height: ICON_HEIGHT }}>
+      <svg width={ICON_WIDTH} height={ICON_HEIGHT} viewBox={`0 0 ${ICON_WIDTH} ${ICON_HEIGHT}`}>
+        {[0, 1, 2].map((index) => (
+          <React.Fragment key={index}>
+            <AnimatePresence>
+              {dots[index] && (
+                <motion.circle
+                  cx={CIRCLE_START_X + index * CIRCLE_SPACING}
+                  cy={CIRCLE_Y}
+                  r={CIRCLE_RADIUS}
+                  className={'fill-foreground'}
+                  initial={{
+                    scale: 0,
+                    x: [-8, -5, -2][index],
+                    y: -10,
+                  }}
+                  animate={{
+                    scale: 1,
+                    x: 0,
+                    y: 0,
+                  }}
+                  exit={{
+                    scale: 0,
+                    x: [8, 5, 2][index],
+                    y: -10,
+                  }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 500,
+                    damping: 30,
+                  }}
+                />
+              )}
+            </AnimatePresence>
+          </React.Fragment>
+        ))}
+        <BottomRect isActive={lines.some((state) => state)} />
+      </svg>
+      {[0, 1, 2].map((index) => (
+        <FlowingLine
+          key={index}
+          x={CIRCLE_START_X + index * CIRCLE_SPACING}
+          y1={TOP_LINE_START}
+          y2={BOTTOM_LINE_END}
+          isActive={lines[index]}
+        />
       ))}
     </div>
   )

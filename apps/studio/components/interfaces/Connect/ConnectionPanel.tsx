@@ -7,10 +7,11 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   DIALOG_PADDING_X,
+  WarningIcon,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConnectionParameters } from './ConnectionParameters'
-import { SessionIcon, TransactionIcon } from './pooler-icons-v2'
+import { DirectConnectionIcon, SessionIcon, TransactionIcon } from './pooler-icons-v2'
 import { ChevronRight } from 'lucide-react'
 
 interface ConnectionPanelProps {
@@ -25,7 +26,7 @@ interface ConnectionPanelProps {
     description?: string
     link?: { text: string; url: string }
   }
-  notice?: string
+  notice?: string[]
   parameters?: Array<{
     key: string
     value: string
@@ -106,140 +107,176 @@ export const ConnectionPanel = ({
   fileTitle,
 }: ConnectionPanelProps) => {
   return (
-    <div className={cn('py-8', DIALOG_PADDING_X)}>
-      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
-        <div className="flex flex-col">
-          <h1 className="text-sm mb-2">{title}</h1>
-          <p className="text-xs text-foreground-light mb-4">{description}</p>
-          <div className="flex flex-col -space-y-px">
-            {/* {contentType === 'input' ? ( */}
-            {false ? (
-              <Input
-                copy
-                readOnly
-                className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
+    <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
+      <div className="flex flex-col">
+        <h1 className="text-sm mb-2">{title}</h1>
+        <p className="text-sm text-foreground-light mb-4">{description}</p>
+        <div className="flex flex-col -space-y-px">
+          {/* {contentType === 'input' ? ( */}
+          {false ? (
+            <Input
+              copy
+              readOnly
+              className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
+              value={connectionString}
+              onCopy={onCopy}
+            />
+          ) : (
+            <>
+              {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
+              <CodeBlock
+                wrapperClassName={cn(
+                  '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
+                  fileTitle && '[&_pre]:rounded-t-none'
+                )}
+                language={lang}
                 value={connectionString}
-                onCopy={onCopy}
+                className="[&_code]:text-[12px] [&_code]:text-foreground"
+                hideLineNumbers
               />
-            ) : (
-              <>
-                {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
-                <CodeBlock
-                  wrapperClassName={cn(
-                    '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
-                    fileTitle && '[&_pre]:rounded-t-none'
-                  )}
-                  language={lang}
-                  value={connectionString}
-                  className="[&_code]:text-[12px] [&_code]:text-foreground"
-                  hideLineNumbers
-                />
-              </>
-            )}
-            {notice && (
-              <div className="border px-3 py-0.5 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
-                <span className="text-xs text-foreground-lighter">{notice}</span>
-              </div>
-            )}
-            {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
-          </div>
+            </>
+          )}
+          {notice && (
+            <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
+              {notice?.map((text: string) => (
+                <p key={text} className="text-xs text-foreground-lighter">
+                  {text}
+                </p>
+              ))}
+            </div>
+          )}
+          {parameters.length > 0 && <ConnectionParameters parameters={parameters} />}
         </div>
-        <div className="flex flex-col items-end">
-          <div className="flex flex-col -space-y-px w-full">
-            {type !== 'direct' && (
-              <>
-                <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                  <div className="absolute top-2 left-2.5">
-                    {type === 'transaction' ? <TransactionIcon /> : <SessionIcon />}
-                  </div>
-                  <div className="flex flex-col pl-[52px]">
-                    <span className="text-xs text-foreground">
-                      {type === 'transaction'
-                        ? 'Suitable for a large number of connected clients'
-                        : 'Not suitable if you have a large number of clients'}
-                    </span>
-                  </div>
+      </div>
+      <div className="flex flex-col items-end">
+        <div className="flex flex-col -space-y-px w-full">
+          {type !== 'session' && (
+            <>
+              <div className="relative border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
+                <div className="absolute top-2 left-2.5">
+                  {type === 'transaction' ? <TransactionIcon /> : <DirectConnectionIcon />}
                 </div>
-                <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
-                  <div className="flex flex-col pl-[52px]">
-                    <span className="text-xs text-foreground">
-                      {type === 'transaction'
-                        ? 'Pre-warmed connection pool to the database'
-                        : 'Connections from the pooler are not shared'}
-                    </span>
-                  </div>
+                <div className="flex flex-col pl-[52px]">
+                  <span className="text-xs text-foreground">
+                    {type === 'transaction'
+                      ? 'Suitable for a large number of connected clients'
+                      : 'Suitable for long-lived, persistent connections'}
+                  </span>
                 </div>
-              </>
-            )}
+              </div>
+              <div className="border border-muted px-5 flex items-center gap-3 py-3 first:rounded-t last:rounded-b h-[58px]">
+                <div className="flex flex-col pl-[52px]">
+                  <span className="text-xs text-foreground">
+                    {type === 'transaction'
+                      ? 'Pre-warmed connection pool to Postgres'
+                      : 'Each client has a dedicated connection to Postgres'}
+                  </span>
+                </div>
+              </div>
+            </>
+          )}
 
-            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
-              <div className="flex items-center gap-2">
-                <IPv4StatusIcon active={ipv4Status.type === 'success'} />
+          <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b">
+            <div className="flex items-center gap-2">
+              <IPv4StatusIcon active={ipv4Status.type === 'success'} />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-xs text-foreground">{ipv4Status.title}</span>
+              {ipv4Status.description && (
+                <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
+              )}
+              {/* {ipv4Status.type === 'success' && type !== 'transaction' && (
+                  <span className="text-xs text-foreground-lighter">
+                    Use Direct Connection if on a IPv6 network
+                  </span>
+                )} */}
+              {ipv4Status.type === 'error' && (
+                <span className="text-xs text-foreground-lighter">
+                  Use Session Pooler if on a IPv4 network or purchase IPv4 addon
+                </span>
+              )}
+              {ipv4Status.link && (
+                <div className="mt-2">
+                  <Button className="" type="default" size="tiny">
+                    <a
+                      href={ipv4Status.link.url}
+                      className="text-xs text-light hover:text-foreground"
+                    >
+                      {ipv4Status.link.text}
+                    </a>
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {type === 'session' && (
+            <div className="border border-muted px-5 flex gap-7 items-center py-3 first:rounded-t last:rounded-b bg-alternative/50">
+              <div className="flex w-6 h-6 rounded items-center justify-center gap-2 flex-shrink-0 bg-surface-100">
+                <WarningIcon />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-foreground">{ipv4Status.title}</span>
-                {ipv4Status.description && (
-                  <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
-                )}
-                {ipv4Status.link && (
-                  <a
-                    href={ipv4Status.link.url}
-                    className="text-xs text-light hover:text-foreground"
-                  >
-                    {ipv4Status.link.text}
-                  </a>
-                )}
+                <span className="text-xs text-foreground">Only use on a IPv4 network</span>
+                <span className="text-xs text-foreground-lighter">
+                  Use Direct Connection if connecting via a IPv6 network
+                </span>
               </div>
             </div>
+          )}
 
-            {ipv4Status.type === 'error' && (
-              <Collapsible_Shadcn_ className="group -space-y-px">
-                <CollapsibleTrigger_Shadcn_
-                  asChild
-                  className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+          {ipv4Status.type === 'error' && (
+            <Collapsible_Shadcn_ className="group -space-y-px">
+              <CollapsibleTrigger_Shadcn_
+                asChild
+                className="group/collapse w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-muted"
+              >
+                <Button
+                  type="default"
+                  size="tiny"
+                  className="text-foreground-lighter !bg-dash-sidebar"
+                  icon={
+                    <ChevronRight
+                      size={12}
+                      className={cn(
+                        'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
+                      )}
+                    />
+                  }
                 >
-                  <Button
-                    type="default"
-                    size="tiny"
-                    className="text-foreground-lighter !bg-dash-sidebar"
-                    icon={
-                      <ChevronRight
-                        size={12}
-                        className={cn(
-                          'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
-                        )}
-                      />
-                    }
-                  >
-                    Some platforms are IPv4-only:
-                  </Button>
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border px-3 py-2">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs text-foreground-light max-w-xs">
-                      A few major platforms are IPv4-only and may not work with a Direct Connection:
-                    </p>
-                    <div className="flex gap-4">
-                      <div className="text-foreground text-xs">Retool</div>
-                      <div className="text-foreground text-xs">GitHub Actions</div>
-                      <div className="text-foreground text-xs">Vercel</div>
-                      <div className="text-foreground text-xs">Render</div>
-                    </div>
-                    <p className="text-xs text-foreground-lighter max-w-xs">
-                      If you wish to use a Direct Connection with these please purchase{' '}
-                      <a
-                        href={ipv4Status?.link?.url}
-                        className="text-xs text-light hover:text-foreground"
-                      >
-                        IPv4 support
-                      </a>
-                      .
-                    </p>
+                  Some platforms are IPv4-only:
+                </Button>
+              </CollapsibleTrigger_Shadcn_>
+              <CollapsibleContent_Shadcn_ className="bg-dash-sidebar rounded-b border px-3 py-2">
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-foreground-light max-w-xs">
+                    A few major platforms are IPv4-only and may not work with a Direct Connection:
+                  </p>
+                  <div className="flex gap-4">
+                    <div className="text-foreground text-xs">Vercel</div>
+                    <div className="text-foreground text-xs">GitHub Actions</div>
+                    <div className="text-foreground text-xs">Render</div>
+                    <div className="text-foreground text-xs">Retool</div>
                   </div>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
-            )}
-          </div>
+                  <p className="text-xs text-foreground-lighter max-w-xs">
+                    If you wish to use a Direct Connection with these please purchase{' '}
+                    <a
+                      href={ipv4Status?.link?.url}
+                      className="text-xs text-light hover:text-foreground"
+                    >
+                      IPv4 support
+                    </a>
+                    .
+                  </p>
+                  <p className="text-xs text-foreground-lighter max-w-xs">
+                    You may also use the{' '}
+                    <span className="text-foreground-light">Session Pooler</span> or{' '}
+                    <span className="text-foreground-light">Transaction Pooler</span> if you are on
+                    a IPv4 network.
+                  </p>
+                </div>
+              </CollapsibleContent_Shadcn_>
+            </Collapsible_Shadcn_>
+          )}
         </div>
       </div>
     </div>

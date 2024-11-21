@@ -39,7 +39,7 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
     <Collapsible_Shadcn_ open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
       <CollapsibleTrigger_Shadcn_
         asChild
-        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light"
+        className="w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light px-3"
       >
         <Button
           type="default"
