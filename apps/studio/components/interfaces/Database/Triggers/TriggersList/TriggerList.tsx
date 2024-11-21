@@ -77,7 +77,7 @@ const TriggerList = ({
     <>
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
-          <Table.td className="space-x-2">
+          <Table.td className="space-x-2 max-w-[250px] truncate">
             <p title={x.name} className="truncate">
               {x.name}
             </p>
@@ -96,7 +96,7 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td>
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap truncate">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}
