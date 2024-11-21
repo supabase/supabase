@@ -8,17 +8,25 @@ export function IntegrationPageHandler() {
   if (id?.includes('_wrapper')) {
     switch (pageId) {
       case undefined:
-        return dynamic(() =>
-          import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
-            (mod) => mod.WrapperOverviewTab
-          )
+        return dynamic(
+          () =>
+            import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
+              (mod) => mod.WrapperOverviewTab
+            ),
+          {
+            loading: () => <div>Loading {id.replace('_wrapper', '')}...</div>,
+          }
         )
       case 'wrappers':
         console.log('found actual wrappers')
-        return dynamic(() =>
-          import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
-            (mod) => mod.WrappersTab
-          )
+        return dynamic(
+          () =>
+            import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
+              (mod) => mod.WrappersTab
+            ),
+          {
+            loading: () => <div>Loading {id.replace('_wrapper', '')} wrappers...</div>,
+          }
         )
     }
   }
@@ -32,7 +40,7 @@ export function IntegrationPageHandler() {
               (mod) => mod.QueueTab
             ),
           {
-            loading: () => <div>Loading Overview...</div>,
+            loading: () => <div>Loading {childId} Queue...</div>,
           }
         )
       }
@@ -44,7 +52,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.IntegrationOverviewTab
               ),
             {
-              loading: () => <div>Loading Overview...</div>,
+              loading: () => <div>Loading Qeueus...</div>,
             }
           )
         case 'queues':
@@ -54,7 +62,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.QueuesTab
               ),
             {
-              loading: () => <div>Loading Settings...</div>,
+              loading: () => <div>Loading Queues...</div>,
             }
           )
       }
@@ -68,7 +76,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.WebhooksOverviewTab
               ),
             {
-              loading: () => <div>Loading Overview...</div>,
+              loading: () => <div>Loading Webhooks...</div>,
             }
           )
         case 'webhooks':
@@ -78,7 +86,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.WebhooksListTab
               ),
             {
-              loading: () => <div>Loading Overview...</div>,
+              loading: () => <div>Loading Webhooks...</div>,
             }
           )
       }
@@ -91,7 +99,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.IntegrationOverviewTab
               ),
             {
-              loading: () => <div>Loading Overview...</div>,
+              loading: () => <div>Loading Cron Jobs...</div>,
             }
           )
         case 'cron-jobs':
@@ -101,7 +109,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.CronjobsTab
               ),
             {
-              loading: () => <div>Loading Schedule...</div>,
+              loading: () => <div>Loading Cron Jobs...</div>,
             }
           )
       }
@@ -139,7 +147,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.IntegrationOverviewTab
               ),
             {
-              loading: () => <div>Loading vault...</div>,
+              loading: () => <div>Loading Vault...</div>,
             }
           )
         case 'keys':
@@ -149,7 +157,7 @@ export function IntegrationPageHandler() {
                 (mod) => mod.EncryptionKeysManagement
               ),
             {
-              loading: () => <div>Loading vault...</div>,
+              loading: () => <div>Loading Vault...</div>,
             }
           )
         case 'secrets':
@@ -157,7 +165,7 @@ export function IntegrationPageHandler() {
             () =>
               import('components/interfaces/Settings/Vault').then((mod) => mod.SecretsManagement),
             {
-              loading: () => <div>Loading vault...</div>,
+              loading: () => <div>Loading Vault...</div>,
             }
           )
       }
