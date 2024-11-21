@@ -261,7 +261,7 @@ const RestoreToNewProject = () => {
               href="https://supabase.com/docs/guides/platform/backups"
             >
               in our docs
-            </Link>
+            </Link>.
           </>
         }
       />
