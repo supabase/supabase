@@ -1,18 +1,20 @@
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
+import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { forwardRef, useRef } from 'react'
 
+import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Badge, cn } from 'ui'
-import { useParams } from 'common'
 
 interface HeaderProps {
   scroll?: ReturnType<typeof useScroll>
 }
 
 export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) => {
+  const router = useRouter()
   const { id } = useParams()
   // Get project context
   const { project } = useProjectContext()
@@ -41,6 +43,10 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
   const iconSize = scroll ? useTransform(scroll?.scrollY!, scrollRange, sizeRange) : 32
 
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
+
+  if (!router?.isReady) {
+    return null
+  }
 
   return (
     <>
