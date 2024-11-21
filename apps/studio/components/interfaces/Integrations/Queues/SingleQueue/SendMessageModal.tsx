@@ -37,7 +37,7 @@ export type SendMessageForm = z.infer<typeof FormSchema>
 const FORM_ID = 'QUEUES_SEND_MESSAGE_FORM'
 
 export const SendMessageModal = ({ visible, onClose }: SendMessageModalProps) => {
-  const { name: queueName } = useParams()
+  const { childId: queueName } = useParams()
   const { project } = useProjectContext()
   const form = useForm<SendMessageForm>({
     resolver: zodResolver(FormSchema),
