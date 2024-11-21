@@ -371,15 +371,17 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction', description: 'Each transaction uses a different connection' },
                 ]}
               />
-              <Admonition
-                type="warning"
-                title="Highly recommended to not use Session Pooler"
-                className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
-              >
-                <p className="text-sm text-foreground-lighter !mb-0">
-                  If you are using Session Pooler, we recommend switching to Direct Connection.
-                </p>
-              </Admonition>
+              {ipv4Addon && (
+                <Admonition
+                  type="warning"
+                  title="Highly recommended to not use Session Pooler"
+                  className="[&>div]:gap-0 px-8 [&>svg]:left-7 border-0 border-b rounded-none border-border-muted !py-4 mb-0"
+                >
+                  <p className="text-sm text-foreground-lighter !mb-0">
+                    If you are using Session Pooler, we recommend switching to Direct Connection.
+                  </p>
+                </Admonition>
+              )}
 
               <ConnectionPanel
                 contentType={contentType}
