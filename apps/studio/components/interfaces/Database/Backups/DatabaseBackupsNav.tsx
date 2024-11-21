@@ -46,7 +46,7 @@ function DatabaseBackupsNav({ active }: Props) {
       {navMenuItems.map(
         (item) =>
           item.enabled && (
-            <NavMenuItem key={item.label} active={item.id === active}>
+            <NavMenuItem key={item.id} active={item.id === active}>
               <Link href={item.href}>{item.label}</Link>
             </NavMenuItem>
           )
