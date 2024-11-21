@@ -69,8 +69,10 @@ export const WrappersTab = () => {
     return (
       <Container>
         <div className=" w-full h-48 max-w-4xl">
-          <div className="border rounded-lg h-full flex items-center justify-center">
-            No wrappers are installed.
+          <div className="border rounded-lg h-full flex flex-col gap-y-2 items-center justify-center">
+            <p className="text-sm text-foreground-light">
+              No {integration.meta.label} wrappers have been installed
+            </p>
             <ButtonTooltip
               type="default"
               onClick={() => setCreateWrapperShown(true)}

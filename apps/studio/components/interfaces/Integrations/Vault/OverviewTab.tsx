@@ -28,6 +28,6 @@ export const VaultOverviewTab = () => {
       actions={neededExtensions.map((extension) => (
         <MissingExtensionAlert extension={extension} />
       ))}
-    ></IntegrationOverviewTab>
+    />
   )
 }

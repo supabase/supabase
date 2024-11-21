@@ -1,33 +1,49 @@
-import { IntegrationCard } from './IntegrationCard'
+import AlertError from 'components/ui/AlertError'
+import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { INTEGRATIONS } from './Integrations.constants'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 
 export const InstalledIntegrations = () => {
-  const { isLoading, installedIntegrations: ids } = useInstalledIntegrations()
+  const {
+    installedIntegrations: ids,
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useInstalledIntegrations()
 
-  const installedIntegrations = INTEGRATIONS.filter((i) => ids.includes(i.id))
-
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
-  if (installedIntegrations.length === 0) {
-    return (
-      <div className="px-9 w-full h-48 py-6">
-        <div className="border rounded-lg h-full">
-          Some placeholder image when no integrations are installed
-        </div>
-      </div>
-    )
-  }
+  const installedIntegrations = INTEGRATIONS.filter((i) => ids.includes(i.id)).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  )
 
   return (
-    <div className="px-9 py-6 flex flex-col gap-y-5">
+    <div className="px-10 py-6 flex flex-col gap-y-5">
       <h2>Installed integrations</h2>
-      <div className="flex flex-row flex-wrap gap-x-4 gap-y-3">
-        {installedIntegrations.map((i) => (
-          <IntegrationCard key={i.id} {...i} />
-        ))}
+      <div className="grid xl:grid-cols-3 2xl:grid-cols-4 gap-x-4 gap-y-3">
+        {isLoading &&
+          new Array(3)
+            .fill(0)
+            .map((_, idx) => <IntegrationLoadingCard key={`integration-loading-${idx}`} />)}
+        {isError && (
+          <AlertError
+            className="xl:col-span-3 2xl:col-span-4"
+            subject="Failed to retrieve installed integrations"
+            error={error}
+          />
+        )}
+        {isSuccess && (
+          <>
+            {installedIntegrations.length === 0 ? (
+              <div className="xl:col-span-3 2xl:col-span-4 w-full h-[110px] border rounded flex items-center justify-center">
+                {/* [Joshen] Not high priority imo - very low chance this state will be seen cause Vault is always installed */}
+                {/* Some placeholder image when no integrations are installed */}
+                <p className="text-sm text-foreground-light">No integrations installed yet</p>
+              </div>
+            ) : (
+              installedIntegrations.map((i) => <IntegrationCard key={i.id} {...i} />)
+            )}
+          </>
+        )}
       </div>
     </div>
   )

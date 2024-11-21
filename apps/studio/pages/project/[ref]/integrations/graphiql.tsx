@@ -9,11 +9,7 @@ const tabs = [
   {
     id: 'overview',
     label: 'Overview',
-    content: (
-      <div className="p-9">
-        <GraphqlOverviewTab />
-      </div>
-    ),
+    content: <GraphqlOverviewTab />,
   },
   {
     id: 'graphiql',

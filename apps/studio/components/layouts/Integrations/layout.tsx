@@ -1,4 +1,6 @@
-import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
+
 import {
   IntegrationDefinition,
   INTEGRATIONS,
@@ -12,8 +14,6 @@ import { useScroll } from 'framer-motion'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useRouter } from 'next/router'
-import { PropsWithChildren, ReactNode, useEffect, useRef, useState } from 'react'
 import { IntegrationTabs } from './tabs'
 
 /**
@@ -116,11 +116,9 @@ const IntegrationTopHeaderLayout = ({
 }
 
 const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
-  const { id } = useParams()
-  const project = useSelectedProject()
-
   const router = useRouter()
   const page = router.pathname.split('/')[4]
+  const project = useSelectedProject()
 
   const { installedIntegrations } = useInstalledIntegrations()
   const integrations = INTEGRATIONS.filter((i) => installedIntegrations.includes(i.id))
@@ -161,10 +159,11 @@ const generateIntegrationsMenu = (
       title: 'Installed Integrations',
       items: integrations.map((integration) => ({
         name: integration.name,
+        label: integration.beta ? 'Beta' : undefined,
         key: `integrations/${integration.id}`,
         url: `/project/${projectRef}/integrations/${integration.id}`,
         icon: (
-          <div className="relative w-6 h-6 bg-white border rounded">
+          <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
             {integration.icon({ className: 'p-1' })}
           </div>
         ),

@@ -1,6 +1,7 @@
 import { Book } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+
 import { cn } from 'ui'
 import { IntegrationDefinition } from '../Landing/Integrations.constants'
 
@@ -10,12 +11,13 @@ interface BuiltBySectionProps extends ComponentPropsWithoutRef<'div'> {
 
 export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>(
   ({ integration, className, ...props }, ref) => {
-    const { name, docsUrl, websiteUrl } = integration?.author ?? {}
+    const { docsUrl } = integration
+    const { name, websiteUrl } = integration?.author ?? {}
 
     if (!name && !docsUrl && !websiteUrl) return null
 
     return (
-      <div ref={ref} className={cn('flex items-center gap-10 mx-10', className)} {...props}>
+      <div ref={ref} className={cn('flex items-center gap-10 px-10', className)} {...props}>
         {name && (
           <div>
             <div className="text-foreground-lighter font-mono text-xs mb-1">BUILT BY</div>
@@ -32,7 +34,11 @@ export const BuiltBySection = forwardRef<ElementRef<'div'>, BuiltBySectionProps>
               className="text-foreground-light hover:text-foreground text-sm flex items-center gap-2"
             >
               <Book size={16} />
-              {name} Docs
+              {docsUrl.includes('supabase.com/docs')
+                ? 'Supabase Docs'
+                : docsUrl.includes('github.com')
+                  ? 'GitHub Docs'
+                  : 'Documentation'}
             </Link>
           </div>
         )}

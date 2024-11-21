@@ -132,7 +132,6 @@ export const EditWrapperSheet = ({
             const encryptedOptions = wrapperMeta.server.options.filter((option) => option.encrypted)
 
             const onClosePanel = () => {
-              console.log('ello', hasChanges)
               if (hasChanges) {
                 setIsClosing(true)
               } else {

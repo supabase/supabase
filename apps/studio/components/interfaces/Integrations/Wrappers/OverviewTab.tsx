@@ -37,7 +37,7 @@ export const WrapperOverviewTab = () => {
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   if (integration?.type !== 'wrapper') {
-    return <div>Unsupported integration type.</div>
+    return <p className="text-sm text-foreground-light">Unsupported integration type</p>
   }
 
   const wrapperMeta = integration.meta

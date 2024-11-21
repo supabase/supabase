@@ -5,15 +5,14 @@ import { forwardRef, useRef } from 'react'
 
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
-export const Header = forwardRef<
-  HTMLDivElement,
-  {
-    id?: string
-    scroll?: ReturnType<typeof useScroll>
-  }
->(({ id, scroll }, ref) => {
+interface HeaderProps {
+  id?: string
+  scroll?: ReturnType<typeof useScroll>
+}
+
+export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ id, scroll }, ref) => {
   // Get project context
   const { project } = useProjectContext()
   // Find the integration details based on ID
@@ -89,7 +88,7 @@ export const Header = forwardRef<
                       layout
                       key="integrations-text"
                       transition={layoutTransition}
-                      className="text-foreground text-xl"
+                      className="text-foreground text-xl !p-0"
                       style={{
                         padding: iconPadding,
                       }}
@@ -101,7 +100,7 @@ export const Header = forwardRef<
                       layout
                       key="integrations-text"
                       transition={layoutTransition}
-                      className="text-xs text-foreground-light hover:text-foreground"
+                      className="text-xs text-foreground-light hover:text-foreground !p-0"
                     >
                       <Link href={`/project/${project?.ref}/integrations`}>Integrations</Link>
                     </motion.span>
@@ -151,13 +150,17 @@ export const Header = forwardRef<
                       animate={{ opacity: 1, height: 'auto', minHeight: 32 }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.2 }}
-                      className=""
                     >
                       <div className="flex-col justify-start items-start flex">
-                        <div className="text-foreground text-sm">{integration.name}</div>
-                        <div className="text-foreground-light text-xs">
-                          {integration.description}
+                        <div className="text-foreground text-sm flex items-center gap-x-2">
+                          <span>{integration.name}</span>
+                          {integration.beta && (
+                            <Badge variant="warning" className="py-0 px-1.5">
+                              Beta
+                            </Badge>
+                          )}
                         </div>
+                        <p className="text-foreground-light text-xs">{integration.description}</p>
                       </div>
                     </motion.div>
                   </motion.div>

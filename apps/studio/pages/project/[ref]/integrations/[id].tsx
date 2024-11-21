@@ -37,6 +37,7 @@ const Logs = () => {
         </div>
       </div>
       <div className="">
+        {/* [TODO] Populate with actual logs */}
         {[...Array(100)].map((_, i) => (
           <div key={i} className="px-10 py-0.5 font-mono text-sm hover:bg-surface-100/50">
             <div className="flex items-center gap-2 text-foreground-light">
@@ -72,11 +73,12 @@ const tabs = [
     label: 'Wrappers',
     content: <WrappersTab />,
   },
-  {
-    id: 'logs',
-    label: 'Logs',
-    content: <Logs />,
-  },
+  // [Joshen] Hiding for now, will implement after LW13
+  // {
+  //   id: 'logs',
+  //   label: 'Logs',
+  //   content: <Logs />,
+  // },
 ]
 
 const WrapperPage: NextPageWithLayout = () => {

@@ -1,6 +1,7 @@
-import { Markdown } from 'components/interfaces/Markdown'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+
+import { Markdown } from 'components/interfaces/Markdown'
 import { cn } from 'ui'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
@@ -16,6 +17,9 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
   }, [integrationId])
 
   const displayContent = isExpanded ? content : content.slice(0, CHAR_LIMIT)
+  const supportExpanding = content.length > CHAR_LIMIT || (content.match(/\n/g) || []).length > 1
+
+  if (displayContent.length === 0) return null
 
   return (
     <div className="px-10">
@@ -31,12 +35,13 @@ export const MarkdownContent = ({ integrationId }: { integrationId: string }) =>
         {!isExpanded && (
           <div
             className={cn(
-              'bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background-200 to-transparent',
+              'bottom-0 left-0 right-0 h-24',
+              supportExpanding && 'bg-gradient-to-t from-background-200 to-transparent',
               !isExpanded ? 'absolute' : 'relative'
             )}
           />
         )}
-        {content.length > CHAR_LIMIT && (
+        {supportExpanding && (
           <div className={cn('bottom-0 z-10', !isExpanded ? 'absolute' : 'relative mt-3')}>
             <button
               className="text-foreground-light hover:text-foreground underline text-sm"

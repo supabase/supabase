@@ -8,7 +8,6 @@ const IntegrationsPage: NextPageWithLayout = () => {
   return (
     <div>
       <InstalledIntegrations />
-      <Separator />
       <AvailableIntegrations />
     </div>
   )

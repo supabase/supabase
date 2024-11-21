@@ -9,17 +9,13 @@ const tabs = [
   {
     id: 'overview',
     label: 'Overview',
-    content: (
-      <div className="p-9">
-        <WebhooksOverviewTab />
-      </div>
-    ),
+    content: <WebhooksOverviewTab />,
   },
   {
     id: 'webhooks',
     label: 'Webhooks',
     content: (
-      <div className="p-9">
+      <div className="p-10">
         <WebhooksListTab />
       </div>
     ),

@@ -27,17 +27,13 @@ const QueuesPage: NextPageWithLayout = () => {
       {
         id: 'overview',
         label: 'Overview',
-        content: (
-          <div className="p-9">
-            <QueuesOverviewTab />
-          </div>
-        ),
+        content: <QueuesOverviewTab />,
       },
       {
         id: 'queues',
         label: 'Queues',
         content: (
-          <div className="p-9">
+          <div className="p-10">
             <QueuesTab />
           </div>
         ),

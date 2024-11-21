@@ -29,11 +29,7 @@ const CronJobsPage: NextPageWithLayout = () => {
       {
         id: 'overview',
         label: 'Overview',
-        content: (
-          <div className="p-9">
-            <CronjobsOverviewTab />
-          </div>
-        ),
+        content: <CronjobsOverviewTab />,
       },
       ...(pgCronExtensionInstalled
         ? [
@@ -41,7 +37,7 @@ const CronJobsPage: NextPageWithLayout = () => {
               id: 'cronjobs',
               label: 'Cron jobs',
               content: (
-                <div className="p-9">
+                <div className="p-10">
                   <CronjobsTab />
                 </div>
               ),

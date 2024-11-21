@@ -7,16 +7,35 @@ import { INTEGRATIONS } from './Integrations.constants'
 
 export const useInstalledIntegrations = () => {
   const project = useSelectedProject()
-  const { data, isLoading: isFDWLoading } = useFDWsQuery({
+
+  const {
+    data,
+    error: fdwError,
+    isError: isErrorFDWs,
+    isLoading: isFDWLoading,
+    isSuccess: isSuccessFDWs,
+  } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: extensions, isLoading: isExtensionsLoading } = useDatabaseExtensionsQuery({
+  const {
+    data: extensions,
+    error: extensionsError,
+    isError: isErrorExtensions,
+    isLoading: isExtensionsLoading,
+    isSuccess: isSuccessExtensions,
+  } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery({
+  const {
+    data: schemas,
+    error: schemasError,
+    isError: isErrorSchemas,
+    isLoading: isSchemasLoading,
+    isSuccess: isSuccessSchemas,
+  } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -42,11 +61,17 @@ export const useInstalledIntegrations = () => {
     return false
   }).map((i) => i.id)
 
+  const error = fdwError || extensionsError || schemasError
   const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
+  const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
+  const isSuccess = isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
 
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? [] : installedIntegrationsIds,
+    error,
+    isError,
     isLoading,
+    isSuccess,
   }
 }

@@ -1,33 +1,75 @@
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Badge, cn } from 'ui'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
 
 type IntegrationCardProps = IntegrationDefinition & {}
 
-export const IntegrationCard = ({ id, name, icon, description }: IntegrationCardProps) => {
+const INTEGRATION_CARD_STYLE = cn(
+  'w-full h-full pl-5 pr-6 py-3 bg-surface-100 hover:bg-surface-200 hover:border-strong',
+  'border border-border gap-3 rounded-md inline-flex ease-out duration-200 transition-all'
+)
+
+export const IntegrationLoadingCard = () => {
+  return (
+    <div className={cn(INTEGRATION_CARD_STYLE, 'h-[110px]')}>
+      <div className="w-10 h-10 relative">
+        <ShimmeringLoader className="w-full h-full bg-white border rounded-md" />
+      </div>
+      <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
+        <div className="flex-col justify-start items-start gap-y-1 flex">
+          <ShimmeringLoader className="w-20 py-2.5" />
+          <ShimmeringLoader className="w-56 py-2.5" />
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export const IntegrationCard = ({
+  id,
+  beta,
+  type,
+  name,
+  icon,
+  description,
+}: IntegrationCardProps) => {
+  const router = useRouter()
   const { project } = useProjectContext()
+
+  const isNativeIntegration = type === 'postgres_extension'
 
   return (
     <Link href={`/project/${project?.ref}/integrations/${id}`}>
-      <div
-        className={cn([
-          'w-80 h-28 pl-5 pr-6 py-3 bg-surface-100 hover:bg-surface-200 hover:border-strong ',
-          'border border-border gap-3 rounded-md',
-          'inline-flex ease-out duration-200 transition-all',
-        ])}
-      >
-        <div className="w-10 h-10 relative">
-          <div className="w-full h-full bg-white border rounded-md" />
+      <div className={INTEGRATION_CARD_STYLE}>
+        <div className="w-10 h-10 relative bg-white border rounded-md flex items-center justify-center">
           {icon()}
         </div>
-        <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-0">
-          <div className="flex-col justify-start items-start gap-0 flex">
-            <div className="text-foreground text-sm">{name}</div>
-            <div className="text-foreground-light text-xs">{description}</div>
+        <div className="grow basis-0 w-full flex flex-col justify-between items-start gap-y-2">
+          <div className="flex-col justify-start items-start gap-y-0.5 flex">
+            <div className="flex items-center gap-x-2">
+              <p className="text-foreground text-sm">{name}</p>
+              {beta && (
+                <Badge variant="warning" className="py-0 px-1.5">
+                  Beta
+                </Badge>
+              )}
+            </div>
+            <p className="text-foreground-light text-xs">{description}</p>
           </div>
-          <Badge className="bg-surface-400">Official</Badge>
+          <Badge className="bg-opacity-100 bg-surface-300 flex items-center gap-x-1.5">
+            {isNativeIntegration && (
+              <img
+                alt="Supabase"
+                src={`${router.basePath}/img/supabase-logo.svg`}
+                className=" h-2.5 cursor-pointer rounded"
+              />
+            )}
+            <span>{isNativeIntegration ? 'Native Integration' : 'Official'}</span>
+          </Badge>
         </div>
       </div>
     </Link>

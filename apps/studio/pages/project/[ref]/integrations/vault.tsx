@@ -9,17 +9,13 @@ const tabs = [
   {
     id: 'overview',
     label: 'Overview',
-    content: (
-      <div className="p-9">
-        <VaultOverviewTab />
-      </div>
-    ),
+    content: <VaultOverviewTab />,
   },
   {
     id: 'keys',
     label: 'Encryption Keys',
     content: (
-      <div className="p-9">
+      <div className="p-10">
         <EncryptionKeysManagement />
       </div>
     ),
@@ -28,7 +24,7 @@ const tabs = [
     id: 'secrets',
     label: 'Secrets Management',
     content: (
-      <div className="p-9">
+      <div className="p-10">
         <SecretsManagement />
       </div>
     ),
