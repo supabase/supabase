@@ -1,8 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
 import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
@@ -107,16 +106,23 @@ export async function getOrgDailyStats(
   if (!startDate) throw new Error('Start date is required')
   if (!endDate) throw new Error('Start date is required')
 
-  let endpoint = `${API_URL}/organizations/${orgSlug}/daily-stats?metric=${metric}&startDate=${encodeURIComponent(
-    startDate
-  )}&endDate=${encodeURIComponent(endDate)}`
+  const { data, error } = await get('/platform/organizations/{slug}/daily-stats', {
+    params: {
+      path: { slug: orgSlug },
+      query: {
+        metric,
+        startDate,
+        endDate,
+        interval,
+        projectRef,
+      },
+    },
+    signal,
+  })
 
-  if (interval) endpoint += `&interval=${interval}`
-  if (projectRef) endpoint += `&projectRef=${projectRef}`
+  if (error) handleError(error)
 
-  const data = await get(endpoint, { signal })
-  if (data.error) throw data.error
-  return data as AnalyticsData
+  return data as unknown as AnalyticsData
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>

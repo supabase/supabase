@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { isResponseOk, post } from 'lib/common/fetch'
+import { constructHeaders } from 'data/fetchers'
 import { BASE_PATH } from 'lib/constants'
-import type { ResponseError } from 'types'
+import { ResponseError } from 'types'
 
 export type SqlDebugResponse = {
   solution: string
@@ -17,17 +17,27 @@ export type SqlDebugVariables = {
 }
 
 export async function debugSql({ errorMessage, sql, entityDefinitions }: SqlDebugVariables) {
-  const response = await post<SqlDebugResponse>(BASE_PATH + '/api/ai/sql/debug', {
-    errorMessage,
-    sql,
-    entityDefinitions,
+  const headers = await constructHeaders({ 'Content-Type': 'application/json' })
+  const response = await fetch(`${BASE_PATH}/api/ai/sql/debug`, {
+    headers,
+    method: 'POST',
+    body: JSON.stringify({
+      errorMessage,
+      sql,
+      entityDefinitions,
+    }),
   })
+  let body: any
 
-  if (!isResponseOk(response)) {
-    throw response.error
+  try {
+    body = await response.json()
+  } catch {}
+
+  if (!response.ok) {
+    throw new ResponseError(body?.message, response.status)
   }
 
-  return response
+  return body as SqlDebugResponse
 }
 
 type SqlDebugData = Awaited<ReturnType<typeof debugSql>>

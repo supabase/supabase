@@ -1,7 +1,6 @@
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { get, handleError } from 'data/fetchers'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -23,20 +22,21 @@ export async function getJwtSecretUpdatingStatus(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`${API_URL}/props/project/${projectRef}/jwt-secret-update-status`, {
+  const { data, error } = await get('/platform/props/project/{ref}/jwt-secret-update-status', {
+    params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  const meta = response?.jwtSecretUpdateStatus?.meta
+  if (error) handleError(error)
+
+  // @ts-expect-error `meta` was previously used and I'm not sure if the api has been updated
+  const meta = data.jwtSecretUpdateStatus.meta ?? data.jwtSecretUpdateStatus
 
   return {
-    changeTrackingId: meta?.change_tracking_id,
-    jwtSecretUpdateError: meta?.error,
-    jwtSecretUpdateProgress: meta?.progress,
-    jwtSecretUpdateStatus: meta?.status,
+    changeTrackingId: meta.change_tracking_id,
+    jwtSecretUpdateError: meta.error,
+    jwtSecretUpdateProgress: meta.progress,
+    jwtSecretUpdateStatus: meta.status,
   } as JwtSecretUpdatingStatusResponse
 }
 
