@@ -37,8 +37,10 @@ export async function constructHeaders(
 }
 
 export const get: typeof _get = async (url, init) => {
+  // @ts-ignore
   const headers = await constructHeaders(init?.headers)
 
+  // @ts-ignore
   return await _get(url, {
     ...init,
     headers,
@@ -46,8 +48,10 @@ export const get: typeof _get = async (url, init) => {
 }
 
 export const post: typeof _post = async (url, init) => {
+  // @ts-ignore
   const headers = await constructHeaders(init?.headers)
 
+  // @ts-ignore
   return await _post(url, {
     credentials: 'include',
     ...init,
@@ -56,8 +60,10 @@ export const post: typeof _post = async (url, init) => {
 }
 
 export const unauthedAllowedPost: typeof _post = async (url, init) => {
+  // @ts-ignore
   const headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
 
+  // @ts-ignore
   return await _post(url, {
     credentials: 'include',
     ...init,
