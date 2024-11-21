@@ -38,24 +38,6 @@ const authorSupabase = {
   websiteUrl: 'https://supabase.com',
 }
 
-type WrapperLabel = (typeof WRAPPERS)[number]['label']
-
-export const WRAPPER_HANDLERS: Record<WrapperLabel, string> = {
-  Stripe: 'Payment processing and subscription management',
-  Firebase: 'Backend-as-a-Service with real-time database',
-  S3: 'Cloud object storage service',
-  ClickHouse: 'Column-oriented analytics database',
-  BigQuery: 'Serverless data warehouse and analytics',
-  Airtable: 'No-code database and spreadsheet platform',
-  Logflare: 'Log management and analytics service',
-  Auth0: 'Identity and access management platform',
-  Cognito: 'AWS user authentication and authorization',
-  'Microsoft SQL Server': 'Microsoft SQL Server database',
-  Redis: 'In-memory data structure store',
-  Paddle: 'Subscription billing and payments platform',
-  Snowflake: 'Cloud data warehouse platform',
-} as const
-
 const supabaseIntegrations: IntegrationDefinition[] = [
   {
     id: 'queues',
@@ -198,7 +180,7 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     icon: ({ className, ...props } = {}) => (
       <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
     ),
-    description: WRAPPER_HANDLERS[w.label] || 'No description',
+    description: w.description,
     docsUrl: w.docsUrl,
     meta: w,
     author: authorSupabase,
