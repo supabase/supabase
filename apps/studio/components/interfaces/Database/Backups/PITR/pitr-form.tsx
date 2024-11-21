@@ -111,7 +111,7 @@ export function PITRForm({
                   side: 'bottom',
                   text: !isWithinRange
                     ? 'Selected date is out of range where backups are available'
-                    : null,
+                    : undefined,
                 },
               }}
             >
