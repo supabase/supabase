@@ -237,8 +237,7 @@ const RestoreToNewProject = () => {
         title="Restore to new project is not available for this database version"
       >
         <Markdown
-          content={`
-            Restore to new project is only available for Postgres 15 and above.  
+          content={`Restore to new project is only available for Postgres 15 and above.  
             Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
             to upgrade your database version.
           `}
@@ -310,11 +309,8 @@ const RestoreToNewProject = () => {
     return (
       <Admonition type="destructive" title="Failed to restore to new project">
         <Markdown
-          content="
-            The new project failed to be created.
-            <br />
-            [Contact support](/support/new?category=dashboard_bug)
-          `}"
+          content="The new project failed to be created.  
+            [Contact support](/support/new?category=dashboard_bug)"
         />
       </Admonition>
     )
@@ -324,8 +320,7 @@ const RestoreToNewProject = () => {
     return (
       <Admonition type="default" title="Restoration completed">
         <Markdown
-          content={`
-            The new project has been created. A project can only be restored to another project once.
+          content={`The new project has been created. A project can only be restored to another project once.
             [Go to new project](/project/${lastClone?.target_project.ref})
           `}
         />
@@ -355,22 +350,16 @@ const RestoreToNewProject = () => {
     !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
   ) {
     return (
-      <>
-        <Admonition
-          type="default"
-          title="No backups found"
-          description={'PITR is enabled, but no backups were found. Check again in a few minutes.'}
-        />
-      </>
+      <Admonition
+        type="default"
+        title="No backups found"
+        description={'PITR is enabled, but no backups were found. Check again in a few minutes.'}
+      />
     )
   }
 
   if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
-    return (
-      <>
-        <BackupsEmpty />
-      </>
-    )
+    return <BackupsEmpty />
   }
 
   return (

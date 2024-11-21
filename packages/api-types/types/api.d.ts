@@ -340,6 +340,10 @@ export interface paths {
     /** Gets invoice with the given invoice ID */
     get: operations['OrgInvoicesController_getInvoice']
   }
+  '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link': {
+    /** Gets the payment link to manually pay the given invoice */
+    get: operations['OrgInvoicesController_getInvoicePaymentLink']
+  }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     /** Gets the upcoming invoice */
     get: operations['OrgInvoicesController_getUpcomingInvoice']
@@ -3016,7 +3020,7 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
     }
-    CreateOrganizationBodyV1: {
+    CreateOrganizationV1Dto: {
       name: string
     }
     CreatePolicyBody: {
@@ -4101,6 +4105,9 @@ export interface components {
       subscription: string | null
       subtotal: number
     }
+    InvoicePaymentLinkResponse: {
+      redirectUrl: string
+    }
     JoinResponse: {
       billing_email: string
       id: number
@@ -5018,6 +5025,10 @@ export interface components {
         | 'unsupported_reg_types'
         | 'auth_otp_long_expiry'
         | 'auth_otp_short_length'
+        | 'ssl_not_enforced'
+        | 'network_restrictions_not_set'
+        | 'password_requirements_min_length'
+        | 'pitr_not_enabled'
       remediation: Record<string, never>
       title: string
     }
@@ -6807,10 +6818,21 @@ export interface components {
       slug: string
       verify_jwt?: boolean
     }
-    V1CreateProjectBody: {
+    V1CreateProjectBodyDto: {
       /** @description Database password */
       db_pass: string
-      desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      /** @enum {string} */
+      desired_instance_size?:
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
       /**
        * @deprecated
        * @description This field is deprecated and is ignored in this request
@@ -6823,14 +6845,16 @@ export interface components {
       /**
        * @deprecated
        * @description Subscription Plan is now set on organization level and is ignored in this request
-       * @example free
        * @enum {string}
        */
       plan?: 'free' | 'pro'
-      postgres_engine?: components['schemas']['PostgresEngine']
+      /**
+       * @description Postgres engine version. If not provided, the latest version will be used.
+       * @enum {string}
+       */
+      postgres_engine?: '15'
       /**
        * @description Region you want your server to reside in
-       * @example us-east-1
        * @enum {string}
        */
       region:
@@ -6852,8 +6876,13 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
-      release_channel?: components['schemas']['ReleaseChannel']
       /**
+       * @description Release channel. If not provided, GA will be used.
+       * @enum {string}
+       */
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      /**
+       * Format: uri
        * @description Template URL used to create the project from the CLI.
        * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
        */
@@ -6916,7 +6945,42 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      database?: components['schemas']['V1DatabaseResponse']
+      /** @description Id of your project */
+      id: string
+      /** @description Name of your project */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INACTIVE'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
+    }
+    V1ProjectWithDatabaseResponse: {
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      database: components['schemas']['V1DatabaseResponse']
       /** @description Id of your project */
       id: string
       /** @description Name of your project */
@@ -8773,6 +8837,29 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve invoice */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets the payment link to manually pay the given invoice */
+  OrgInvoicesController_getInvoicePaymentLink: {
+    parameters: {
+      path: {
+        invoiceId: string
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvoicePaymentLinkResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve invoice payment link */
       500: {
         content: never
       }
@@ -15805,7 +15892,7 @@ export interface operations {
   'v1-create-an-organization': {
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateOrganizationBodyV1']
+        'application/json': components['schemas']['CreateOrganizationV1Dto']
       }
     }
     responses: {
@@ -15858,7 +15945,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse'][]
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse'][]
         }
       }
     }
@@ -15867,7 +15954,7 @@ export interface operations {
   'v1-create-a-project': {
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1CreateProjectBody']
+        'application/json': components['schemas']['V1CreateProjectBodyDto']
       }
     }
     responses: {
@@ -15889,7 +15976,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['V1ProjectResponse']
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse']
         }
       }
       /** @description Failed to retrieve project */
@@ -17313,7 +17400,7 @@ export interface operations {
   'v1-get-a-snippet': {
     parameters: {
       path: {
-        id: string
+        id: Record<string, never>
       }
     }
     responses: {
