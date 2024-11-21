@@ -1,10 +1,11 @@
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
 import { lintKeys } from 'data/lint/keys'
-import { sqlKeys } from 'data/sql/keys'
+import { tableEditorKeys } from 'data/table-editor/keys'
 import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
@@ -38,7 +39,10 @@ export async function updateTable({
   })
 
   if (error) handleError(error)
-  return data
+
+  // [Alaister] we have to manually cast the data to PostgresTable
+  // because the API types are slightly wrong
+  return data as PostgresTable
 }
 
 type TableUpdateData = Awaited<ReturnType<typeof updateTable>>
@@ -59,7 +63,7 @@ export const useTableUpdateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, schema, id } = variables
         await Promise.all([
-          queryClient.invalidateQueries(sqlKeys.query(projectRef, ['table-editor', id])),
+          queryClient.invalidateQueries(tableEditorKeys.tableEditor(projectRef, id)),
           queryClient.invalidateQueries(tableKeys.list(projectRef, schema)),
           queryClient.invalidateQueries(lintKeys.lint(projectRef)),
         ])

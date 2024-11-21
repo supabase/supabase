@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -11,6 +12,7 @@ import { toast } from 'sonner'
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { MAX_WIDTH_CLASSES, PADDING_CLASSES, ScaffoldContainer } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import {
   useDiskAttributesQuery,
   useRemainingDurationForDiskAttributeUpdate,
@@ -23,9 +25,11 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { AddonVariantId } from 'data/subscriptions/types'
+import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { PROJECT_STATUS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { GB, PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   cn,
@@ -35,9 +39,11 @@ import {
   Form_Shadcn_,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
-import { mapComputeSizeNameToAddonVariantId, showMicroUpgrade } from './DiskManagement.utils'
+import { DiskManagementMessage } from './DiskManagement.types'
+import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
 import { ComputeSizeField } from './fields/ComputeSizeField'
@@ -53,7 +59,6 @@ import {
 } from './ui/DiskManagement.constants'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
-import { DiskManagementMessage } from './DiskManagement.types'
 
 export function DiskManagementForm() {
   const {
@@ -64,6 +69,14 @@ export function DiskManagementForm() {
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const diskAndComputeForm = useFlag('diskAndComputeForm')
+
+  const { data: resourceWarnings } = useResourceWarningsQuery()
+  const projectResourceWarnings = (resourceWarnings ?? [])?.find(
+    (warning) => warning.project === project?.ref
+  )
+  const isReadOnlyMode = projectResourceWarnings?.is_readonly_mode_enabled
 
   /**
    * Permissions
@@ -86,18 +99,8 @@ export function DiskManagementForm() {
   /**
    * Fetch form data
    */
-  const {
-    data: databases,
-    // isLoading: isReadReplicasLoading,
-    // error: readReplicasError,
-    isSuccess: isReadReplicasSuccess,
-  } = useReadReplicasQuery({ projectRef })
-  const {
-    data,
-    // isLoading: isDiskAttributesLoading,
-    // error: diskAttributesError,
-    isSuccess: isDiskAttributesSuccess,
-  } = useDiskAttributesQuery(
+  const { data: databases, isSuccess: isReadReplicasSuccess } = useReadReplicasQuery({ projectRef })
+  const { data, isSuccess: isDiskAttributesSuccess } = useDiskAttributesQuery(
     { projectRef },
     {
       refetchInterval,
@@ -127,7 +130,7 @@ export function DiskManagementForm() {
     useRemainingDurationForDiskAttributeUpdate({
       projectRef,
     })
-  const { isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
+  const { data: diskUtil, isSuccess: isDiskUtilizationSuccess } = useDiskUtilizationQuery({
     projectRef,
   })
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
@@ -173,6 +176,9 @@ export function DiskManagementForm() {
   const isPlanUpgradeRequired = subscription?.plan.id === 'free'
 
   const { formState } = form
+  const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
+  const totalSize = formState.defaultValues?.totalSize || 0
+  const usedPercentage = (usedSize / totalSize) * 100
 
   const isFlyArchitecture = project?.cloud_provider === 'FLY'
 
@@ -184,14 +190,6 @@ export function DiskManagementForm() {
     isFlyArchitecture
 
   const disableComputeInputs = isPlanUpgradeRequired
-
-  useEffect(() => {
-    // Initialize field values properly when data has been loaded, preserving any user changes
-    if (isSuccess) {
-      form.reset(defaultValues, {})
-    }
-  }, [isSuccess])
-
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
   const isProjectResizing = project?.status === PROJECT_STATUS.RESIZING
   const isProjectRequestingDiskChanges = isRequestingChanges && !isProjectResizing
@@ -260,6 +258,20 @@ export function DiskManagementForm() {
     }
   }
 
+  useEffect(() => {
+    // Initialize field values properly when data has been loaded, preserving any user changes
+    if (isSuccess) {
+      form.reset(defaultValues, {})
+    }
+  }, [isSuccess])
+
+  // Redirect logic incase disk and compute feature is not live yet
+  useEffect(() => {
+    if (diskAndComputeForm !== undefined && !diskAndComputeForm && projectRef) {
+      router.push(`/project/${projectRef}/settings/addons?panel=computeInstance`)
+    }
+  }, [diskAndComputeForm, projectRef, router])
+
   return (
     <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-8">
@@ -300,7 +312,6 @@ export function DiskManagementForm() {
           <Separator />
           <ComputeSizeField form={form} disabled={disableComputeInputs} />
           <Separator />
-          <DiskCountdownRadial />
           <SpendCapDisabledSection />
           <NoticeBar
             type="default"
@@ -310,6 +321,35 @@ export function DiskManagementForm() {
           />
           {!isFlyArchitecture && (
             <>
+              <div className="flex flex-col gap-y-3">
+                <DiskCountdownRadial />
+                {!isReadOnlyMode && usedPercentage >= 90 && isWithinCooldownWindow && (
+                  <Admonition
+                    type="destructive"
+                    title="Database size is currently over 90% of disk size"
+                    description="Your project will enter read-only mode once you reach 95% of the disk space to prevent your database from exceeding the disk limitations"
+                  >
+                    <DocsButton
+                      abbrev={false}
+                      className="mt-2"
+                      href="https://supabase.com/docs/guides/platform/database-size#read-only-mode"
+                    />
+                  </Admonition>
+                )}
+                {isReadOnlyMode && (
+                  <Admonition
+                    type="destructive"
+                    title="Project is currently in read-only mode"
+                    description="You will need to manually override read-only mode and reduce the database size to below 95% of the disk size"
+                  >
+                    <DocsButton
+                      abbrev={false}
+                      className="mt-2"
+                      href="https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode"
+                    />
+                  </Admonition>
+                )}
+              </div>
               <DiskSizeField
                 form={form}
                 disableInput={disableDiskInputs}
@@ -336,7 +376,12 @@ export function DiskManagementForm() {
                     strokeWidth={1}
                   />
                 </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="data-[state=open]:border flex flex-col gap-8 px-8 py-8 transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <CollapsibleContent_Shadcn_
+                  className={cn(
+                    'flex flex-col gap-8 px-8 py-8 transition-all',
+                    'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  )}
+                >
                   <StorageTypeField form={form} disableInput={disableDiskInputs} />
                   <NoticeBar
                     type="default"

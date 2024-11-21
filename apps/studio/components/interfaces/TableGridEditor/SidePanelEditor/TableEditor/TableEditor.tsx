@@ -124,8 +124,7 @@ const TableEditor = ({
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: table?.schema,
-    table: table?.name,
+    id: table?.id,
   })
   const primaryKey = (constraints ?? []).find(
     (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
@@ -320,6 +319,7 @@ const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
+              className="mt-2"
               href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>
@@ -337,6 +337,7 @@ const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
+              className="mt-2"
               href="https://supabase.com/docs/guides/auth/row-level-security"
             />
           </Admonition>

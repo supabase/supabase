@@ -53,6 +53,8 @@ Some settings can only be modified by a superuser. Supabase pre-enables the [`su
 | `auto_explain.log_min_duration`      | Logs query plans taking longer than this duration.                                                                                                           |
 | `auto_explain.log_nested_statements` | Log nested statements' plans.                                                                                                                                |
 | `log_min_messages`                   | Minimum severity level of messages to log.                                                                                                                   |
+| `pg_net.ttl`                         | Sets how long the [pg_net extension](/docs/guides/database/extensions/pg_net) saves responses                                                                |
+| `pg_net.batch_size`                  | Sets how many requests the [pg_net extension](/docs/guides/database/extensions/pg_net) can make per second                                                   |
 | `pgaudit.*`                          | Configures the [PGAudit extension](https://supabase.com/docs/guides/database/extensions/pgaudit). The `log_parameter` is still restricted to protect secrets |
 | `pgrst.*`                            | [`PostgREST` settings](https://docs.postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled)                                             |
 | `plan_filter.*`                      | Configures the [pg_plan_filter extension](https://supabase.com/docs/guides/database/extensions/pg_plan_filter)                                               |
