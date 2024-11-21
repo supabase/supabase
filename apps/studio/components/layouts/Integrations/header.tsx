@@ -31,7 +31,7 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
   // Output range: The Y position range for the icon (e.g., 0 to 150px movement)
   const iconYRange = [0, headerRef.current?.offsetHeight ? headerRef.current.offsetHeight / 2 : 64] // Change 150 to set the end Y position of the icon
   // Output range: The size range for the icon container
-  const sizeRange = [32, 24] // From 24px (scrolled) to 32px (top)
+  const sizeRange = [32, 20] // From 24px (scrolled) to 32px (top)
   // Output range: The padding range for the image
   const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
@@ -59,9 +59,6 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                 layout
                 transition={layoutTransition}
                 className="px-10 flex flex-col gap-5"
-                //   animate={{
-                //     paddingTop: isIntegrationsHome ? '20px' : '0px',
-                //   }}
               >
                 {/* Navigation link back to integrations landing */}
                 <div className="flex items-center gap-0.5">
@@ -120,8 +117,6 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                     className="flex items-center gap-4"
                   >
                     {/* Integration icon */}
-
-                    {/* {!isSticky && ( */}
                     <motion.div
                       initial={{ opacity: 1, y: 0 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -129,12 +124,14 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       transition={{ duration: 0.2 }}
                       layoutId="integration-icon"
                       className={
-                        'relative bg-white border border-muted rounded z-[3] flex items-center justify-center'
+                        'relative bg-white border border-muted rounded z-[3] flex flex-shrink-0 items-center justify-center'
                       }
                       style={{
                         y: iconY, // Controlled by scrollY (0 to 128px)
                         width: iconSize,
                         height: iconSize,
+                        minWidth: iconSize,
+                        minHeight: iconSize,
                       }}
                     >
                       {integration.icon({
@@ -143,7 +140,6 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                         },
                       })}
                     </motion.div>
-                    {/* )} */}
 
                     {/* Integration name and description */}
                     <motion.div

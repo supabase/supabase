@@ -71,16 +71,18 @@ export const IntegrationTabs = forwardRef<HTMLDivElement, IntegrationTabsProps>(
             {isSticky && (
               <motion.div
                 layoutId="integration-icon"
-                className="w-6 h-6 relative"
+                className="w-[20px] h-[20px] relative bg-white rounded"
                 transition={{ duration: 0 }}
               >
-                <div
+                {/* <div
                   className={cn(
                     'w-full h-full border border-muted rounded transition-all',
-                    iconPadding.get() === 1.5 ? 'bg' : 'bg-white'
+                    'bg-white'
                   )}
-                />
-                {integration?.icon({ style: { padding: iconPadding.get() } })}
+                /> */}
+                {integration?.icon({
+                  style: { padding: iconPadding.get() },
+                })}
               </motion.div>
             )}
 
