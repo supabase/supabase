@@ -1,6 +1,7 @@
 import { ChevronRight, List, Timer } from 'lucide-react'
 import { useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import { motion } from 'framer-motion'
 
 import { SimpleCodeBlock } from '@ui/components/SimpleCodeBlock'
 import { useParams } from 'common'
@@ -62,7 +63,7 @@ const CronJobRunsDataGrid = ({ updateJobState }: CronJobsDataGridProps) => {
     {
       id: 'runid',
       name: 'RunID',
-      minWidth: 100,
+      minWidth: 60,
       value: (row: CronJobRun) => (
         <div className="flex items-center gap-1.5">
           <h3 className="text-xs">{row.runid}</h3>
@@ -179,10 +180,15 @@ const CronJobRunsDataGrid = ({ updateJobState }: CronJobsDataGridProps) => {
               {currentJobState && (
                 <>
                   <ChevronRight size={12} className="text-muted-foreground" />
-                  <span className="flex items-center gap-1">
+                  <motion.span
+                    initial={{ x: 10, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="flex items-center gap-1"
+                  >
                     <Timer size={14} className="text-muted-foreground" />
                     {currentJobState?.jobname}
-                  </span>
+                  </motion.span>
                 </>
               )}
             </div>

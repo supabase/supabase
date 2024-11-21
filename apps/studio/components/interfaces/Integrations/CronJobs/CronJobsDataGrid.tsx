@@ -21,9 +21,10 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet'
-import { computeNextRunFromCurrentTime } from './CronJobs.utils'
+import { computeNextRunFromCurrentTime, parseCronJobCommand } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
 import DeleteCronJob from './DeleteCronJob'
+import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 
 interface CronJobsDataGridProps {
   jobState: { jobId: string; selectedJob: CronJob | null }
@@ -83,15 +84,24 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
       minWidth: 120,
       value: (row: CronJob) => <div className="text-xs">{row.schedule}</div>,
     },
-    {
-      id: 'next_run',
-      name: 'Next Run',
-      minWidth: 150,
-      value: (row: CronJob) => (
-        <div className="text-xs">{computeNextRunFromCurrentTime(row.schedule, currentTime)}</div>
-      ),
-    },
 
+    {
+      id: 'type',
+      name: 'Type',
+      minWidth: 70,
+      value: (row: CronJob) => {
+        const cronJobType = parseCronJobCommand(row.command).type
+        const definition = CRONJOB_DEFINITIONS.find((def) => def.value === cronJobType)
+        return (
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <div className="text-xs">{definition?.icon}</div>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_>{definition?.label || cronJobType}</TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
+        )
+      },
+    },
     {
       id: 'command',
       name: 'Command',
@@ -124,11 +134,20 @@ const CronJobsDataGrid = ({ jobState, updateJobState }: CronJobsDataGridProps) =
       name: 'Status',
       minWidth: 100,
       value: (row: CronJob) => (
-        <Badge variant={row.active ? 'default' : 'secondary'}>
+        <Badge variant={row.active ? 'success' : 'secondary'}>
           {row.active ? 'Active' : 'Inactive'}
         </Badge>
       ),
     },
+    {
+      id: 'next_run',
+      name: 'Next Run',
+      minWidth: 150,
+      value: (row: CronJob) => (
+        <div className="text-xs">{computeNextRunFromCurrentTime(row.schedule, currentTime)}</div>
+      ),
+    },
+
     {
       id: 'edit',
       name: '',
