@@ -168,10 +168,12 @@ export function PITRForm({
                 </div>
               )}
             />
-            <div className="flex items-center space-x-2">
-              <div className="border w-4 h-4 border-stronger bg-overlay-hover" />
-              <p className="text-xs text-foreground-light">Point in time back up available</p>
-            </div>
+            {availableDates.length > 1 && (
+              <div className="flex items-center space-x-2">
+                <div className="border w-4 h-4 border-stronger bg-overlay-hover" />
+                <p className="text-xs text-foreground-light">Point in time back up available</p>
+              </div>
+            )}
           </div>
 
           <div className="w-2/3">
