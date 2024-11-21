@@ -1,19 +1,27 @@
 import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
 import Image from 'next/image'
-import { ReactNode } from 'react'
+import { ComponentType, ReactNode } from 'react'
 
 import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
 import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
+import dynamic from 'next/dynamic'
 import { cn } from 'ui'
 
-type Navigation = {
+export type Navigation = {
   route: string
   label: string
   hasChild?: boolean
   childIcon?: React.ReactNode
   children?: Navigation[]
 }
+
+const Loading = () => (
+  <div className="p-10">
+    <GenericSkeletonLoader />
+  </div>
+)
 
 export type IntegrationDefinition = {
   id: string
@@ -27,6 +35,11 @@ export type IntegrationDefinition = {
     websiteUrl: string
   }
   navigation?: Navigation[]
+  navigate: (
+    id: string,
+    pageId: string | undefined,
+    childId: string | undefined
+  ) => ComponentType<{}> | null
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension'; requiredExtensions: string[] }
@@ -55,11 +68,11 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     },
     navigation: [
       {
-        route: '/queues',
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: '/queues/queues',
+        route: 'queues',
         label: 'Queues',
         hasChild: true,
         childIcon: (
@@ -67,6 +80,42 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         ),
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      if (childId) {
+        return dynamic(
+          () =>
+            import('components/interfaces/Integrations/NewQueues/QueueTab').then(
+              (mod) => mod.QueueTab
+            ),
+          {
+            loading: Loading,
+          }
+        )
+      }
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
+                (mod) => mod.IntegrationOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'queues':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/NewQueues/QueuesTab').then(
+                (mod) => mod.QueuesTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   },
   {
     id: 'cron-jobs',
@@ -84,14 +133,39 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     },
     navigation: [
       {
-        route: '/cron-jobs',
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: '/cron-jobs/cron-jobs',
+        route: 'cron-jobs',
         label: 'Cron Jobs',
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
+                (mod) => mod.IntegrationOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'cron-jobs':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/NewCronJobs/CronjobsTab').then(
+                (mod) => mod.CronjobsTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   },
   {
     id: 'vault',
@@ -107,18 +181,51 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     author: authorSupabase,
     navigation: [
       {
-        route: '/vault',
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: '/vault/keys',
+        route: 'keys',
         label: 'Keys',
       },
       {
-        route: '/vault/secrets',
+        route: 'secrets',
         label: 'Secrets',
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
+                (mod) => mod.IntegrationOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'keys':
+          return dynamic(
+            () =>
+              import('components/interfaces/Settings/Vault').then(
+                (mod) => mod.EncryptionKeysManagement
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'secrets':
+          return dynamic(
+            () =>
+              import('components/interfaces/Settings/Vault').then((mod) => mod.SecretsManagement),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   },
   {
     id: 'webhooks',
@@ -133,14 +240,39 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     author: authorSupabase,
     navigation: [
       {
-        route: '/webhooks',
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: '/webhooks/webhooks',
+        route: 'webhooks',
         label: 'Webhooks',
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Webhooks/OverviewTab').then(
+                (mod) => mod.WebhooksOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'webhooks':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Webhooks/ListTab').then(
+                (mod) => mod.WebhooksListTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   },
   {
     id: 'graphiql',
@@ -161,14 +293,39 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     author: authorSupabase,
     navigation: [
       {
-        route: '/graphiql',
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: '/graphiql/graphiql',
+        route: 'graphiql',
         label: 'GraphiQL',
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
+                (mod) => mod.IntegrationOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'graphiql':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
+                (mod) => mod.GraphiQLTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   },
 ] as const
 
@@ -186,14 +343,39 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     author: authorSupabase,
     navigation: [
       {
-        route: `/${w.name}`,
+        route: `overview`,
         label: 'Overview',
       },
       {
-        route: `/${w.name}/wrappers`,
+        route: `wrappers`,
         label: 'Wrappers',
       },
     ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
+                (mod) => mod.WrapperOverviewTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+        case 'wrappers':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
+                (mod) => mod.WrappersTab
+              ),
+            {
+              loading: Loading,
+            }
+          )
+      }
+      return null
+    },
   }
 })
 
