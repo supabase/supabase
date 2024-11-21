@@ -1,9 +1,14 @@
 import { useContext } from 'react'
-
 import FlagContext from 'components/ui/Flag/FlagContext'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export function useFlag<T = boolean>(name: string) {
+  const { project } = useProjectContext()
   const store: any = useContext(FlagContext)
+
+  if (name === 'diskAndComputeForm' && project?.cloud_provider === 'FLY') {
+    return false
+  }
 
   const isObjectEmpty = (objectName: Object) => {
     return Object.keys(objectName).length === 0
