@@ -46,7 +46,7 @@ info:
       description: Analytics settings.
     - id: experimental
       title: Experimental
-      description: Settings in alpha testings submitted to changes or removal at anytime.
+      description: Settings in alpha testing, subject to changes or removal at any time.
     - id: local
       title: Local Development
       description: Local Development settings.
