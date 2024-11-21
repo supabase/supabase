@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { useKey } from 'react-use'
 import { useCommandMenuOpen } from 'ui-patterns'
+import useLwGame from '../hooks/useLwGame'
 
 const useLWPartyMode = (disabled?: boolean) => {
   const [isPartyMode, setIsPartyMode] = useState<boolean>(true)
 
   const isCommandMenuOpen = useCommandMenuOpen()
-  const enableTrigger = !disabled && !isCommandMenuOpen
+  const { isGameMode } = useLwGame()
+  const enableTrigger = !disabled && !isCommandMenuOpen && !isGameMode
 
   useKey('p', () => enableTrigger && setIsPartyMode(!isPartyMode), {}, [
     isPartyMode,
     isCommandMenuOpen,
+    isGameMode,
   ])
 
-  useKey('Escape', () => setIsPartyMode(false), {}, [isPartyMode])
+  useKey('Escape', () => !isGameMode && setIsPartyMode(false), {}, [isPartyMode, isGameMode])
 
   return { isPartyMode, setIsPartyMode }
 }

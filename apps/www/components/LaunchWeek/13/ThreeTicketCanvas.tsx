@@ -7,9 +7,8 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
-import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
-import useLwGame from '../hooks/useLwGame'
 import { useKey } from 'react-use'
+import useLwGame, { VALID_KEYS } from '../hooks/useLwGame'
 
 const ThreeTicketCanvas: React.FC<{
   username: string
@@ -25,6 +24,18 @@ const ThreeTicketCanvas: React.FC<{
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
   const inputRef = useRef(null)
+  const canvasRef = useRef<HTMLDivElement>(null)
+  const ticketRef = useRef<THREE.Mesh | null>(null)
+  const animationFrameRef = useRef<number>()
+  const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+  const targetScale = useRef<number>(0)
+  const groupYRotation = useRef<number>(0)
+  const isFlipped = useRef(false)
+  const dragStartX = useRef<number | null>(null)
+  const dragDelta = useRef<number>(0)
+  const isDragging = useRef<boolean>(false)
+  const currentValue = useRef<string>('')
+  const flipDirection = useRef<number>(0)
   const {
     isGameMode,
     setIsGameMode,
@@ -34,32 +45,30 @@ const ThreeTicketCanvas: React.FC<{
     value,
     phraseLength,
     REGEXP_ONLY_CHARS,
-    hasWon,
-    handleClaimTicket,
   } = useLwGame(inputRef)
 
-  const canvasRef = useRef<HTMLDivElement>(null)
-  const ticketRef = useRef<THREE.Mesh | null>(null)
-  const animationFrameRef = useRef<number>()
-  const targetRotation = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
-  const targetScale = useRef<number>(0)
-  const groupYRotation = useRef<number>(0)
-  const isFlipped = useRef(false) // Tracks the flipped state
-  const dragStartX = useRef<number | null>(null)
-  const dragDelta = useRef<number>(0)
-  const isDragging = useRef<boolean>(false)
-  const currentValue = useRef<string>('')
-  const FLIP_DELTA = 20 // Threshold for flipping
-  const flipDirection = useRef<number>(0)
-  const DISPLAY_NAME = username?.split(' ').reverse() || []
-  const positionRight = ticketPosition === 'right'
-  const isPlatinum = ticketType === 'platinum'
-  const isSecret = ticketType === 'secret'
-  const LINE_HEIGHT = 1.5
   const MIN_CANVAS_HEIGHT = 600
-  const MOUSE_DOWN_SCALE_VARIATION = 0.025
+  const FLIP_DELTA = 20 // Swipe px threshold for flipping
+  const LINE_HEIGHT = 1.5
+  const SCALE_VARIATION_ON_INTERACTION = 0.025
   const TICKET_FONT_PADDING_LEFT = -6.4
-
+  const DISPLAY_NAME = username?.split(' ').reverse() || []
+  const ALIGN_RIGHT = ticketPosition === 'right'
+  const IS_PLATINUM = ticketType === 'platinum'
+  const IS_SECRET = ticketType === 'secret'
+  const TEXT_Z_POSITION = 0
+  const FOOTER_CONTENT = [
+    {
+      text: 'LAUNCH WEEK 13',
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: TEXT_Z_POSITION },
+      size: 0.63,
+    },
+    {
+      text: '2-6 DEC / 7AM PT',
+      position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: TEXT_Z_POSITION },
+      size: 0.55,
+    },
+  ]
   const CONFIG = {
     regular: {
       ticketColor: isDarkTheme ? 0xf3f3f3 : 0x121212,
@@ -80,21 +89,6 @@ const ThreeTicketCanvas: React.FC<{
   const getTicketXPosition = (width: number, isRight: boolean) =>
     isDesktop(width) ? (isRight ? 5 : -5) : 0
 
-  const TEXT_Z_POSITION = 0
-
-  const FOOTER_CONTENT = [
-    {
-      text: 'LAUNCH WEEK 13',
-      position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: TEXT_Z_POSITION },
-      size: 0.63,
-    },
-    {
-      text: '2-6 DEC / 7AM PT',
-      position: { x: TICKET_FONT_PADDING_LEFT, y: -7.7, z: TEXT_Z_POSITION },
-      size: 0.55,
-    },
-  ]
-
   useKey('Escape', () => {
     resetRotation()
   })
@@ -105,12 +99,6 @@ const ThreeTicketCanvas: React.FC<{
     isFlipped.current = false
     setIsGameMode(false)
   }
-
-  useEffect(() => {
-    if (hasWon) {
-      handleClaimTicket(null)
-    }
-  }, [hasWon])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -141,18 +129,10 @@ const ThreeTicketCanvas: React.FC<{
     const cameraDistance = 30
     camera.position.z = cameraDistance
 
-    // Add CSS3DRenderer for HTML elements
-    const cssRenderer = new CSS3DRenderer()
-    cssRenderer.setSize(window.innerWidth, window.innerHeight)
-    cssRenderer.domElement.style.position = 'absolute'
-    cssRenderer.domElement.style.top = '0'
-    cssRenderer.domElement.style.pointerEvents = 'none'
-    canvasRef.current.appendChild(cssRenderer.domElement)
-
     // Rest of your existing setup code (loader, materials, etc.)
     const gltfLoader = new GLTFLoader()
 
-    // Texture from Freepik: https://www.freepik.com/free-photo/golden-wall-background_1213228.htm
+    // Texture credits to Freepik: https://www.freepik.com/free-photo/golden-wall-background_1213228.htm
     const metalTexture = new THREE.TextureLoader().load(
       '/images/launchweek/13/ticket/metal-texture.jpg'
     )
@@ -162,13 +142,13 @@ const ThreeTicketCanvas: React.FC<{
 
     const metalMaterial = new THREE.MeshStandardMaterial({
       color: CONFIG[ticketType].ticketColor,
-      map: isSecret ? goldTexture : isPlatinum ? metalTexture : undefined,
-      bumpMap: isSecret ? goldTexture : isPlatinum ? metalTexture : undefined,
-      metalnessMap: isSecret ? goldTexture : metalTexture,
-      roughnessMap: isSecret ? goldTexture : metalTexture,
-      metalness: isSecret ? 1 : isPlatinum ? 0.9 : isDarkTheme ? 0.2 : 0.9,
-      roughness: isSecret ? 0.1 : isPlatinum ? 0.12 : isDarkTheme ? 0.2 : 0.5,
-      bumpScale: isSecret ? 0.85 : isPlatinum ? 0.45 : undefined,
+      map: IS_SECRET ? goldTexture : IS_PLATINUM ? metalTexture : undefined,
+      bumpMap: IS_SECRET ? goldTexture : IS_PLATINUM ? metalTexture : undefined,
+      metalnessMap: IS_SECRET ? goldTexture : metalTexture,
+      roughnessMap: IS_SECRET ? goldTexture : metalTexture,
+      metalness: IS_SECRET ? 1 : IS_PLATINUM ? 0.9 : isDarkTheme ? 0.2 : 0.9,
+      roughness: IS_SECRET ? 0.1 : IS_PLATINUM ? 0.12 : isDarkTheme ? 0.2 : 0.5,
+      bumpScale: IS_SECRET ? 0.85 : IS_PLATINUM ? 0.45 : undefined,
     })
 
     // Load Ticket model, fonts and textures
@@ -176,7 +156,7 @@ const ThreeTicketCanvas: React.FC<{
     const ticketGroup = new THREE.Group()
     const ticketScale = getTicketScale(window.innerWidth)
     ticketGroup.scale.set(ticketScale, ticketScale, ticketScale)
-    ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
+    ticketGroup.position.x = getTicketXPosition(window.innerWidth, ALIGN_RIGHT)
 
     gltfLoader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
       // gltfLoader.load('/images/launchweek/13/ticket/3D-ticket-code.glb', (gltf) => {
@@ -196,14 +176,6 @@ const ThreeTicketCanvas: React.FC<{
       ticketRef.current = ticket3DImport
       camera.lookAt(ticket3DImport.position)
     })
-
-    // Add React component to the back of the ticket
-    const reactContainer = document.createElement('div')
-
-    const cssObject = new CSS3DObject(reactContainer)
-    cssObject.position.set(0, 0, -0.15) // Adjust to position on the back
-    cssObject.rotation.y = Math.PI
-    ticketGroup.add(cssObject)
 
     const textMaterial = new THREE.MeshStandardMaterial({
       color: CONFIG[ticketType].ticketForeground,
@@ -299,14 +271,14 @@ const ThreeTicketCanvas: React.FC<{
       texture.mapping = THREE.EquirectangularReflectionMapping
       scene.environment = texture
       metalMaterial.envMap = texture
-      metalMaterial.envMapIntensity = isSecret ? (isDarkTheme ? 3.2 : 2.2) : isDarkTheme ? 3 : 0.5
+      metalMaterial.envMapIntensity = IS_SECRET ? (isDarkTheme ? 3.2 : 2.2) : isDarkTheme ? 3 : 0.5
       metalMaterial.blending = THREE.NormalBlending
     })
 
     // Lights
     const ambientLight = new THREE.AmbientLight(
       0xffffff,
-      isSecret ? (isDarkTheme ? 3 : 2) : isPlatinum ? (isDarkTheme ? 10 : 8) : 2
+      IS_SECRET ? (isDarkTheme ? 3 : 2) : IS_PLATINUM ? (isDarkTheme ? 10 : 8) : 2
     )
     scene.add(ambientLight)
 
@@ -367,7 +339,6 @@ const ThreeTicketCanvas: React.FC<{
       handleKeyDown()
 
       renderer.render(scene, camera)
-      cssRenderer.render(scene, camera)
       animationFrameRef.current = requestAnimationFrame(animate)
     }
 
@@ -426,7 +397,7 @@ const ThreeTicketCanvas: React.FC<{
     const handlePointerDown = (clientX: number) => {
       isDragging.current = true
       dragStartX.current = clientX
-      targetScale.current += MOUSE_DOWN_SCALE_VARIATION
+      targetScale.current += SCALE_VARIATION_ON_INTERACTION
     }
 
     const handleMouseUp = () => handlePointerUp()
@@ -434,7 +405,7 @@ const ThreeTicketCanvas: React.FC<{
     const handlePointerUp = () => {
       if (!isDragging.current) return
       isDragging.current = false
-      targetScale.current -= MOUSE_DOWN_SCALE_VARIATION
+      targetScale.current -= SCALE_VARIATION_ON_INTERACTION
 
       if (Math.abs(dragDelta.current) > FLIP_DELTA) {
         // Flip the ticket
@@ -455,7 +426,7 @@ const ThreeTicketCanvas: React.FC<{
     // Handle window resize
     const handleResize = () => {
       const newWidth = calculateDesktopWidth()
-      ticketGroup.position.x = getTicketXPosition(window.innerWidth, positionRight)
+      ticketGroup.position.x = getTicketXPosition(window.innerWidth, ALIGN_RIGHT)
       const tickeScale = getTicketScale(window.innerWidth)
       ticketGroup.scale.set(tickeScale, tickeScale, tickeScale)
       camera.aspect =
@@ -468,16 +439,30 @@ const ThreeTicketCanvas: React.FC<{
       )
     }
 
+    function onKeyDown(event: KeyboardEvent) {
+      if (isGameMode) return
+      const newKey = event.key.toLocaleLowerCase()
+
+      if (!(event.metaKey || event.ctrlKey) && VALID_KEYS.includes(newKey)) {
+        targetScale.current += SCALE_VARIATION_ON_INTERACTION
+      }
+
+      setTimeout(() => {
+        targetScale.current = getTicketScale(window.innerWidth)
+      }, 100)
+    }
+
     // Event listeners
     window.addEventListener('resize', handleResize)
     window.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mouseup', handleMouseUp)
     window.addEventListener('mousemove', handleMouseMove)
-    window.addEventListener('mouseout', resetRotation)
+    // window.addEventListener('mouseout', resetRotation)
     window.addEventListener('touchmove', handleTouchMove)
     window.addEventListener('touchstart', handleTouchStart)
     window.addEventListener('touchend', handleTouchEnd)
     window.addEventListener('touchcancel', resetRotation)
+    window.addEventListener('keydown', onKeyDown)
 
     // Cleanup
     return () => {
@@ -485,11 +470,12 @@ const ThreeTicketCanvas: React.FC<{
       window.removeEventListener('mousedown', handleMouseDown)
       window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseout', resetRotation)
+      // window.removeEventListener('mouseout', resetRotation)
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('touchend', handleTouchEnd)
       window.removeEventListener('touchcancel', resetRotation)
+      window.removeEventListener('keydown', onKeyDown)
 
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current)
