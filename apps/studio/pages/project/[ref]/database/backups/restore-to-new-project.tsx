@@ -372,7 +372,7 @@ const RestoreToNewProject = () => {
               This process will create a new project and restore your database to it.
             </DialogDescription>
           </DialogHeader>
-          <DialogSection className="border-t prose pb-6 space-y-4 text-sm">
+          <DialogSection className="prose pb-6 space-y-4 text-sm">
             <ul className="space-y-2">
               <li>
                 Project organization will stay the same: <code>{organization?.name}</code>
