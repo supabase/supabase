@@ -5,11 +5,12 @@ import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Badge, Button, Separator } from 'ui'
+import { Badge, Separator } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { BuiltBySection } from './BuildBySection'
 import { MarkdownContent } from './MarkdownContent'
+import { MissingExtensionAlert } from './MissingExtensionAlert'
 
 interface IntegrationOverviewTabProps {
   actions?: ReactNode
@@ -64,19 +65,17 @@ export const IntegrationOverviewTab = ({
             </Badge>
             <Markdown
               className="max-w-full"
-              content={`This integration manages the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} extension
-              ${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
+              content={`This integration manages the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
+              extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
               ${hasMissingExtensions ? 'Install these database extensions to use this integration in your project.' : ''}
               `}
             />
-            {hasMissingExtensions && (
-              <Button type="primary" className="w-min">
-                Enable{' '}
-                {integration.requiredExtensions.length === 1
-                  ? integration.requiredExtensions[0]
-                  : 'required extensions'}
-              </Button>
-            )}
+
+            <div className="flex flex-row gap-x-2">
+              {neededExtensions.map((extension) => (
+                <MissingExtensionAlert key={extension.name} extension={extension} />
+              ))}
+            </div>
           </Admonition>
         </div>
       )}
