@@ -82,8 +82,8 @@ const TriggerList = ({
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
             <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild className="cursor-default">
-                <span className="truncate max-w-48 inline-block">{x.name}</span>
+              <TooltipTrigger_Shadcn_ className="cursor-default truncate max-w-48 inline-block">
+                {x.name}
               </TooltipTrigger_Shadcn_>
               <TooltipContent_Shadcn_ side="bottom" align="center">
                 {x.name}
