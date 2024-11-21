@@ -9,6 +9,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js'
 import useLwGame from '../hooks/useLwGame'
+import { useKey } from 'react-use'
 
 const ThreeTicketCanvas: React.FC<{
   username: string
@@ -33,6 +34,8 @@ const ThreeTicketCanvas: React.FC<{
     value,
     phraseLength,
     REGEXP_ONLY_CHARS,
+    hasWon,
+    handleClaimTicket,
   } = useLwGame(inputRef)
 
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -83,7 +86,7 @@ const ThreeTicketCanvas: React.FC<{
     {
       text: 'LAUNCH WEEK 13',
       position: { x: TICKET_FONT_PADDING_LEFT, y: -6.8, z: TEXT_Z_POSITION },
-      size: 0.59,
+      size: 0.63,
     },
     {
       text: '2-6 DEC / 7AM PT',
@@ -91,6 +94,23 @@ const ThreeTicketCanvas: React.FC<{
       size: 0.55,
     },
   ]
+
+  useKey('Escape', () => {
+    resetRotation()
+  })
+
+  // Reset handler with smooth transition
+  const resetRotation = () => {
+    targetRotation.current = { x: 0, y: 0 }
+    isFlipped.current = false
+    setIsGameMode(false)
+  }
+
+  useEffect(() => {
+    if (hasWon) {
+      handleClaimTicket(null)
+    }
+  }, [hasWon])
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -231,6 +251,7 @@ const ThreeTicketCanvas: React.FC<{
 
     // Load mono font
     fontLoader.load('/images/launchweek/13/ticket/SourceCodePro_Regular.json', (font) => {
+      // Front
       FOOTER_CONTENT.map((line) => {
         const textGeometry = new TextGeometry(line.text, {
           font,
@@ -263,7 +284,7 @@ const ThreeTicketCanvas: React.FC<{
 
         backTextMesh.name = `letter-${index}`
         backTextMesh.material.transparent = true
-        backTextMesh.material.opacity = 0.1
+        backTextMesh.material.opacity = 0
 
         backTextMesh.castShadow = true
         ticketGroup.add(backTextMesh)
@@ -343,16 +364,7 @@ const ThreeTicketCanvas: React.FC<{
       ticketGroup.scale.set(scale, scale, scale)
       groupYRotation.current = ticketGroup.rotation.y
 
-      console.log('currrrrr', currentValue.current)
-      currentValue.current.split('').map((_letter, index) => {
-        const letterToShow = ticketGroup.getObjectByName(`letter-${index}`)
-        letterToShow?.traverse((child) => {
-          if (child) {
-            // @ts-ignore
-            child.material.opacity = 1
-          }
-        })
-      })
+      handleKeyDown()
 
       renderer.render(scene, camera)
       cssRenderer.render(scene, camera)
@@ -440,13 +452,6 @@ const ThreeTicketCanvas: React.FC<{
       dragDelta.current = 0
     }
 
-    // Reset handler with smooth transition
-    const resetRotation = () => {
-      targetRotation.current = { x: 0, y: 0 }
-      isFlipped.current = false
-      setIsGameMode(false)
-    }
-
     // Handle window resize
     const handleResize = () => {
       const newWidth = calculateDesktopWidth()
@@ -505,9 +510,6 @@ const ThreeTicketCanvas: React.FC<{
         className
       )}
     >
-      <div className="absolute left-4 top-2">
-        winning word: {winningPhrase}, current: {value}
-      </div>
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
       {isGameMode && (
         <InputOTP
@@ -536,7 +538,7 @@ const ThreeTicketCanvas: React.FC<{
                   )
                 })}
               </InputOTPGroup>
-              {/* {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />} */}
+              {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />}
             </>
           ))}
         </InputOTP>

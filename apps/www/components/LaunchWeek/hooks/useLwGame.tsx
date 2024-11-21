@@ -46,7 +46,7 @@ const useLwGame = (inputRef: RefObject<HTMLInputElement>, disabled?: boolean) =>
   const [isGameMode, setIsGameMode] = useState(false)
   const { supabase, userData: user } = useConfData()
   // ======== SECRET CODE ========
-  const phrase = 'SHIP'
+  const phrase = 'ship'
   // ======== SECRET CODE ========
   const winningPhrase = phrase?.split('_').map((word) => word.split(''))
   const phraseLength = phrase?.replaceAll('_', '').split('').length
@@ -75,6 +75,7 @@ const useLwGame = (inputRef: RefObject<HTMLInputElement>, disabled?: boolean) =>
     const valueAtPhraseIndex = phrase?.replaceAll('_', '').split('')[parseInt(index!)]
     const isMatch = valueAtPhraseIndex === newKey
 
+    console.log('YOO', newKey, valueAtPhraseIndex, isMatch)
     if (isMatch) {
       setValue(value + newKey)
     }
@@ -98,7 +99,7 @@ const useLwGame = (inputRef: RefObject<HTMLInputElement>, disabled?: boolean) =>
     })
   }
   const handleClaimTicket = async (e: any) => {
-    e.preventDefault()
+    e?.preventDefault()
 
     setGameState('loading')
 
@@ -141,6 +142,7 @@ const useLwGame = (inputRef: RefObject<HTMLInputElement>, disabled?: boolean) =>
     setIsGameMode,
     gameState,
     setGameState,
+    handleClaimTicket,
     value,
     hasKeyDown,
     hasWon,
