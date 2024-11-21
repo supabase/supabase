@@ -13,8 +13,6 @@ import { motion } from 'framer-motion'
 import styles from '~/styles/customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
-import EventCallout from '../components/EventCallout'
-import { useBreakpoint } from 'common'
 
 export async function getStaticProps() {
   const allPostsData = getSortedPosts({ directory: '_customers' })
@@ -33,7 +31,6 @@ export async function getStaticProps() {
 
 function CustomerStoriesPage(props: any) {
   const { basePath } = useRouter()
-  const isMobile = useBreakpoint(768)
 
   const meta = {
     title: 'Customer Stories | Supabase',
@@ -88,7 +85,6 @@ function CustomerStoriesPage(props: any) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
-                <EventCallout size={isMobile ? 'tiny' : 'small'} className="mb-4 lg:mb-8 -mt-4" />
                 <h1 className="text-foreground mb-3 text-3xl">Customer stories</h1>
                 <h2 className="text-foreground-light text-base sm:text-xl">
                   Discover case studies on how Supabase is being used around the world to quickly

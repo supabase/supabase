@@ -112,6 +112,7 @@ export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelec
         (enabled &&
           typeof projectRef !== 'undefined' &&
           typeof query !== 'undefined' &&
+          query !== undefined &&
           (query.startsWith('select') || query.startsWith('SELECT'))) ||
         query.trim().toLowerCase().startsWith('with pgrst_source'),
       ...options,

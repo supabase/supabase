@@ -17,6 +17,7 @@ export default async function ReferencePage({
 }: {
   params: { slug: Array<string> }
 }) {
+  console.log("Generating reference page for '%o'", slug)
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
     notFound()
   }
@@ -38,6 +39,7 @@ export default async function ReferencePage({
 
     return <ClientSdkReferencePage sdkId={sdkId} libVersion={version} />
   } else if (isCliReference) {
+    console.log('Returning CLI reference page: %o', parsedPath)
     return <CliReferencePage />
   } else if (isApiReference) {
     return <ApiReferencePage />

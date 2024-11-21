@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.200.3
+  version: 1.223.10
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1128,6 +1128,10 @@ commands:
         name: --config <strings>
         description: Config overrides specified as a 'key=value' pair
         default_value: '[]'
+      - id: no-restart
+        name: --no-restart
+        description: Do not restart the database after updating config.
+        default_value: 'false'
       - id: replace-existing-overrides
         name: --replace-existing-overrides
         description: |
@@ -1721,6 +1725,7 @@ commands:
       - supabase-inspect-db-long-running-queries
       - supabase-inspect-db-outliers
       - supabase-inspect-db-replication-slots
+      - supabase-inspect-db-role-configs
       - supabase-inspect-db-role-connections
       - supabase-inspect-db-seq-scans
       - supabase-inspect-db-table-index-sizes
@@ -2041,6 +2046,28 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db role-connections
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Inspect the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Inspect the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Inspect the local database.
+        default_value: 'false'
+  - id: supabase-inspect-db-role-configs
+    title: supabase inspect db role-configs
+    summary: |
+      Show configuration settings for database roles when they have been modified
+    tags: []
+    links: []
+    usage: supabase inspect db role-configs
     subcommands: []
     flags:
       - id: db-url
@@ -2878,7 +2905,7 @@ commands:
 
       Requires the local development stack to be started by running `supabase start`.
 
-      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql` by default, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
+      Recreates the local Postgres container and applies all local migrations found in `supabase/migrations` directory. If test data is defined in `supabase/seed.sql`, it will be seeded after the migrations are run. Any other data or schema changes made during local development will be discarded.
 
       Note that since Postgres roles are cluster level entities, those changes will persist between resets. In order to reset custom roles, you need to restart the local development stack.
     examples:
@@ -2976,7 +3003,7 @@ commands:
         default_value: 'false'
       - id: include-seed
         name: --include-seed
-        description: Include seed data from supabase/seed.sql.
+        description: Include seed data from your config.
         default_value: 'false'
       - id: linked
         name: --linked
@@ -3327,6 +3354,27 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
+  - id: supabase-config
+    title: supabase config
+    summary: Manage Supabase project configurations
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-config-push
+    flags: []
+  - id: supabase-config-push
+    title: supabase config push
+    summary: Pushes local config.toml to the linked project
+    tags: []
+    links: []
+    usage: supabase config push
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell

@@ -31,7 +31,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
   }, [project])
 
   const testProjectConnection = async () => {
-    const result = await pingPostgrest(project.ref, { kpsVersion: project.kpsVersion })
+    const result = await pingPostgrest(project.ref)
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')

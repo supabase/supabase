@@ -1,17 +1,26 @@
-import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
+import { QueryClient, useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import type { Entity } from './entity-type-query'
+import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
   projectRef?: string
-  schema?: string
+  schemas?: string[]
   search?: string
   limit?: number
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
   filterTypes?: string[]
 } & Pick<ExecuteSqlVariables, 'connectionString'>
+
+export interface Entity {
+  id: number
+  schema: string
+  name: string
+  type: ENTITY_TYPE
+  comment: string | null
+  rls_enabled: boolean
+}
 
 export type EntityTypesResponse = {
   data: {
@@ -24,12 +33,12 @@ export async function getEntityTypes(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     page = 0,
     sort = 'alphabetical',
-    filterTypes,
+    filterTypes = Object.values(ENTITY_TYPE),
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -57,7 +66,7 @@ export async function getEntityTypes(
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
       where
-        c.relkind in (${filterTypes === undefined ? `'r', 'v', 'm', 'f', 'p'` : filterTypes.map((x) => `'${x}'`).join(', ')})
+        c.relkind in (${filterTypes.map((x) => `'${x}'`).join(', ')})
         and not pg_is_other_temp_schema(nc.oid)
         and (
           pg_has_role(c.relowner, 'USAGE')
@@ -67,7 +76,7 @@ export async function getEntityTypes(
           )
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
-        and nc.nspname = '${schema}'
+        and nc.nspname in (${schemas.map((x) => `'${x}'`)})
         ${search ? `and c.relname ilike '%${search}%'` : ''}
       order by ${innerOrderBy}
       limit ${limit}
@@ -96,7 +105,7 @@ export async function getEntityTypes(
       projectRef,
       connectionString,
       sql,
-      queryKey: ['public', 'entity-types'],
+      queryKey: ['entity-types', ...schemas, page],
     },
     signal
   )
@@ -111,7 +120,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   {
     projectRef,
     connectionString,
-    schema = 'public',
+    schemas = ['public'],
     search,
     limit = 100,
     sort,
@@ -123,15 +132,23 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   }: UseInfiniteQueryOptions<EntityTypesData, EntityTypesError, TData> = {}
 ) =>
   useInfiniteQuery<EntityTypesData, EntityTypesError, TData>(
-    entityTypeKeys.list(projectRef, { schema, search, sort, limit, filterTypes }),
+    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
     ({ signal, pageParam }) =>
       getEntityTypes(
-        { projectRef, connectionString, schema, search, limit, page: pageParam, sort, filterTypes },
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
         signal
       ),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      staleTime: 0,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit
@@ -146,3 +163,34 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       ...options,
     }
   )
+
+export function prefetchEntityTypes(
+  client: QueryClient,
+  {
+    projectRef,
+    connectionString,
+    schemas = ['public'],
+    search,
+    limit = 100,
+    sort,
+    filterTypes,
+  }: Omit<EntityTypesVariables, 'page'>
+) {
+  return client.prefetchInfiniteQuery(
+    entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    ({ signal, pageParam }) =>
+      getEntityTypes(
+        {
+          projectRef,
+          connectionString,
+          schemas,
+          search,
+          limit,
+          page: pageParam,
+          sort,
+          filterTypes,
+        },
+        signal
+      )
+  )
+}

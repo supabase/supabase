@@ -86,7 +86,7 @@ const WrapperDropdown = ({ buttonText = 'Add wrapper', align = 'end' }: WrapperD
                     onSelect={() => {
                       setOpen(false)
                       router.push(
-                        `/project/${ref}/database/wrappers/new?type=${wrapper.name.toLowerCase()}`
+                        `/project/${ref}/integrations/wrappers/new?type=${wrapper.name.toLowerCase()}`
                       )
                     }}
                     className="gap-2 cursor-pointer"

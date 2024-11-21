@@ -1,4 +1,4 @@
-import { ChevronsDown, Search } from 'lucide-react'
+import { ChevronRight, ChevronsDown, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
@@ -11,6 +11,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
   Input_Shadcn_,
+  Skeleton,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -18,11 +19,33 @@ import {
 } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
 
+const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<'span'>>(
+  (props, ref) => {
+    const { className, ...restProps } = props
+    return (
+      <span
+        ref={ref}
+        {...restProps}
+        className={cn(
+          'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide group-hover:not-disabled:text-foreground',
+          className
+        )}
+      />
+    )
+  }
+)
+
 const InnerSideMenuCollapsible = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_>
 >(({ ...props }, ref) => {
-  return <Collapsible_Shadcn_ {...props} className={cn('w-full px-2', props.className)} />
+  return (
+    <Collapsible_Shadcn_
+      ref={ref}
+      {...props}
+      className={cn('w-full px-2 group', props.className)}
+    />
+  )
 })
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
@@ -31,19 +54,18 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <CollapsibleTrigger_Shadcn_
-      disabled
       ref={ref}
       {...props}
       className={cn(
-        'w-full flex gap-1 items-center group px-3 text-xs font-normal font-mono uppercase text-lighter tracking-wide',
+        'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide',
         props.className
       )}
     >
-      {/* <ChevronRight
+      <ChevronRight
         className="transition-all text-foreground-muted group-data-[state=open]:rotate-90"
         size={16}
         strokeWidth={1.5}
-      /> */}
+      />
       <span className="group-hover:not-disabled:text-foreground">{props.title}</span>
     </CollapsibleTrigger_Shadcn_>
   )
@@ -55,8 +77,9 @@ const InnerSideMenuCollapsibleContent = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <CollapsibleContent_Shadcn_
+      ref={ref}
       {...props}
-      className={cn('w-full data-[state=open]:pt-1 flex flex-col gap-2', props.className)}
+      className={cn('w-full flex flex-col gap-0', props.className)}
     />
   )
 })
@@ -91,6 +114,17 @@ const InnerSideMenuItem = forwardRef<
     />
   )
 })
+
+function InnerSideMenuItemLoading({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof Skeleton>) {
+  return (
+    <div className="py-0.5 h-7">
+      <Skeleton {...props} className={cn('h-full w-full bg-surface-200', className)} />
+    </div>
+  )
+}
 
 const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(
   (props, ref) => {
@@ -189,7 +223,7 @@ const InnerSideBarEmptyPanel = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<'div'> & {
     title: string
-    description?: string
+    description?: string | React.ReactNode
     illustration?: React.ReactNode
     actions?: React.ReactNode
   }
@@ -199,7 +233,7 @@ const InnerSideBarEmptyPanel = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-3 py-4',
+        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
         props.className
       )}
     >
@@ -217,14 +251,16 @@ const InnerSideBarEmptyPanel = forwardRef<
 
 export {
   InnerSideBarEmptyPanel,
+  InnerSideBarFilters,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
   InnerSideBarShimmeringLoaders,
+  InnerSideBarTitle,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
+  InnerSideMenuItemLoading,
   InnerSideMenuSeparator,
 }
