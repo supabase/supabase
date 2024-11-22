@@ -63,7 +63,6 @@ const SortableTab = ({
 }) => {
   const router = useRouter()
   const currentSchema = (router.query.schema as string) || 'public'
-  const store = getTabsStore()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
@@ -74,19 +73,6 @@ const SortableTab = ({
     transition,
     zIndex: isDragging ? 1 : 0,
   }
-
-  const snapV2 = useSqlEditorV2StateSnapshot()
-
-  // For SQL tabs, get the snippet from the SQL editor state
-  // This ensures tab labels stay in sync with snippet names
-  const sqlSnippet =
-    tab.type === 'sql' && tab.metadata?.sqlId ? snapV2.snippets[tab.metadata.sqlId]?.snippet : null
-
-  // Check if we have tables from multiple schemas
-  // Used to determine if we need to show schema names in table labels
-  const hasMultipleSchemas = openTabs
-    .filter((t) => t.type === 'table')
-    .some((t) => t.metadata?.schema !== openTabs[0]?.metadata?.schema)
 
   // Update schema visibility check to include URL param comparison
   const shouldShowSchema = useMemo(() => {

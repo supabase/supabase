@@ -2,6 +2,9 @@ import { proxy, subscribe } from 'valtio'
 import { ReactNode } from 'react'
 import { nanoid } from 'nanoid'
 import { addRecentItem } from './recent-items'
+import { NextRouter, Router } from 'next/router'
+import { useEditorType } from 'components/layouts/editors/editors-layout.hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 
 export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function' | 'new'
 
@@ -160,7 +163,7 @@ export const removeNewTab = () => {
   }
 }
 
-export const handleTabNavigation = (id: string, router: any) => {
+export const handleTabNavigation = (id: string, router: NextRouter) => {
   const tab = tabsStore.tabsMap[id]
   if (!tab) return
 
@@ -200,23 +203,50 @@ export const handleTabNavigation = (id: string, router: any) => {
   }
 }
 
-export const handleTabClose = (id: string, router: any, onClose?: (id: string) => void) => {
+export const handleTabClose = (id: string, router: NextRouter, onClose?: (id: string) => void) => {
   const currentTab = tabsStore.tabsMap[id]
   const newTabs = tabsStore.openTabs.filter((tabId) => tabId !== id)
-  const nextTabId = newTabs[newTabs.length - 1]
-  const nextTab = nextTabId ? tabsStore.tabsMap[nextTabId] : null
 
-  // Update store first
-  tabsStore.openTabs = newTabs
-  tabsStore.activeTab = nextTabId ?? null
-  delete tabsStore.tabsMap[id]
+  // Find if there are any tabs left of the same type
+  const hasTabsOfSameType = newTabs.some((tabId) => {
+    const tab = tabsStore.tabsMap[tabId]
+    return tab?.type === currentTab.type
+  })
 
-  // Then handle navigation based on next tab
-  if (nextTab) {
-    handleTabNavigation(nextTab.id, router)
+  if (!hasTabsOfSameType) {
+    // If no tabs of same type, go to the home of the current section
+    switch (currentTab.type) {
+      case 'sql':
+        router.push(`/project/${router.query.ref}/sql`)
+        break
+      case 'table':
+        router.push(`/project/${router.query.ref}/editor`)
+        break
+      case 'schema':
+      case 'view':
+      case 'function':
+      case 'new':
+        router.push(`/project/${router.query.ref}/explorer`)
+        break
+      default:
+        router.push(`/project/${router.query.ref}/editor`)
+    }
   } else {
-    router.push(`/project/${router.query.ref}/explorer`)
+    // Find next tab of the same type
+    const nextTabId = newTabs.find((tabId) => {
+      const tab = tabsStore.tabsMap[tabId]
+      return tab?.type === currentTab.type
+    })
+
+    if (nextTabId) {
+      tabsStore.activeTab = nextTabId
+      handleTabNavigation(nextTabId, router)
+    }
   }
+
+  // Update store
+  tabsStore.openTabs = newTabs
+  delete tabsStore.tabsMap[id]
 
   onClose?.(id)
 }

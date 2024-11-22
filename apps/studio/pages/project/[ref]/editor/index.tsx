@@ -4,14 +4,25 @@ import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEdit
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useRouter } from 'next/router'
+import { getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
+  const store = getTabsStore()
   const router = useRouter()
 
   const onTableCreated = (table: { id: number }) => {
     router.push(`/project/${projectRef}/editor/${table.id}`)
+  }
+
+  // handle redirect to last table tab
+  const lastTabId = store.openTabs.filter((id) => store.tabsMap[id]?.type === 'table').pop()
+  if (lastTabId) {
+    const lastTab = store.tabsMap[lastTabId]
+    if (lastTab) {
+      router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
+    }
   }
 
   return (

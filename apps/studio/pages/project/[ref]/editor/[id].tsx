@@ -1,9 +1,7 @@
-import { useEffect } from 'react'
-import { addTab, getTabsStore } from 'state/tabs'
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
-import { ExplorerLayout } from 'components/layouts/explorer/layout'
+import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
@@ -11,17 +9,16 @@ import {
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { addTab, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
-import { useFlag } from 'hooks/ui/useFlag'
-import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
-import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
-  const store = getTabsStore('explorer')
+  const store = getTabsStore()
 
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({

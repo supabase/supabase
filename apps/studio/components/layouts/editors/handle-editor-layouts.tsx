@@ -9,15 +9,11 @@ import { useEditorType } from './editors-layout.hooks'
 // These are loaded only when needed
 const ExplorerLayout = dynamic(
   () => import('../explorer/layout').then((mod) => mod.ExplorerLayout),
-  {
-    ssr: false,
-  }
+  { ssr: false }
 )
-
 const TableEditorLayout = dynamic(() => import('../TableEditorLayout/TableEditorLayout'), {
   ssr: false,
 })
-
 const SQLEditorLayout = dynamic(() => import('../SQLEditorLayout/SQLEditorLayout'), {
   ssr: false,
 })
@@ -42,15 +38,12 @@ export const HandleEditorLayouts = ({
 
   return (
     <ProjectContextFromParamsProvider>
-      <Suspense fallback={<></>}>
+      <Suspense fallback={null}>
         {projectExplorer ? (
-          // New explorer layout when feature flag is enabled
           <ExplorerLayout>{children}</ExplorerLayout>
         ) : editor === 'table-editor' ? (
-          // Legacy table editor layout
           <TableEditorLayout>{children}</TableEditorLayout>
         ) : (
-          // Legacy SQL editor layout
           <SQLEditorLayout title="SQL Editor">{children}</SQLEditorLayout>
         )}
       </Suspense>
