@@ -1,39 +1,25 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { TabIcon } from 'components/explorer/tabs/TabIcon'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useActionKey } from 'hooks/useActionKey'
-import {
-  CirclePlus,
-  Eye,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Plus,
-  Table2,
-  Workflow,
-  X,
-} from 'lucide-react'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   getTabsStore,
-  makeTabPermanent,
-  openNewContentTab,
-  removeTab,
-  type Tab,
-  type TabType,
-  handleTabNavigation,
   handleTabClose,
   handleTabDragEnd,
+  handleTabNavigation,
+  makeTabPermanent,
+  type Tab,
 } from 'state/tabs'
-import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
-import { sidebarState } from './sidebar-state'
-import { TabIcon } from 'components/explorer/tabs/TabIcon'
-import { CollapseButton } from './collapse-button'
 import { useEditorType } from '../editors/editors-layout.hooks'
-import { useFlag } from 'hooks/ui/useFlag'
+import { CollapseButton } from './collapse-button'
+import { sidebarState } from './sidebar-state'
 
 interface TabsProps {
   storeKey: string
