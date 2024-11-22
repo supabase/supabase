@@ -1,0 +1,92 @@
+---
+title: 'Create a Cron Job'
+---
+
+Create a Cron Job from the [Integrations section](/dashboard/project/_/integrations/cron-jobs) section of the Dashboard.
+
+## Create a Cron Job
+
+1. Go to the [Cron Jobs](/dashboard/project/_/integrations/cron-jobs) tab in the Integrations section.
+1. Click `Create a new cron job`.
+1. Name your Cron Job.
+1. Give your Cron Job a schedule.
+1. Pick a SQL snippet, function, or HTTP request to execute whenever the Cron Job runs.
+1. Click `Create cron job`.
+
+## Examples
+
+Here are some example use cases for Cron Jobs:
+
+### Delete old data
+
+Create a Cron Job with the following SQL snippet:
+
+```sql
+delete from events
+  where event_time < now() - interval '1 week';
+```
+
+### Run a vacuum
+
+Create a Cron Job with the following SQL snippet:
+
+```sql
+vacuum;
+```
+
+### Call a stored procedure
+
+To use a stored procedure, create a Cron Job with a SQL snippet to call it:
+
+```sql
+call my_procedure();
+```
+
+## Manage Cron Jobs with SQL
+
+Cron Jobs are managed using the [`pg_cron`](https://github.com/citusdata/pg_cron) extension, which provides a `cron.schedule` function. Call this function to manually create a Cron Job:
+
+```sql
+select cron.schedule (
+    'job_name', -- name of the Cron Job
+    '30 3 * * 6', -- job schedule
+    $$ delete from events where event_time < now() - interval '1 week' $$ -- SQL to execute
+);
+```
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Cron syntax"
+      id="item-1"
+    >
+
+      ```
+      ┌───────────── min (0 - 59)
+      │ ┌────────────── hour (0 - 23)
+      │ │ ┌─────────────── day of month (1 - 31)
+      │ │ │ ┌──────────────── month (1 - 12)
+      │ │ │ │ ┌───────────────── day of week (0 - 6) (0 to 6 are Sunday to
+      │ │ │ │ │                  Saturday, or use names; 7 is also Sunday)
+      │ │ │ │ │
+      │ │ │ │ │
+      * * * * *
+     ```
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+## Caution: Scheduling system maintenance
+
+Be extremely careful when setting up `pg_cron` jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
+
+Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.
