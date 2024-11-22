@@ -45,6 +45,7 @@ const ThreeTicketCanvas: React.FC<{
     value,
     phraseLength,
     REGEXP_ONLY_CHARS,
+    hasWon,
   } = useLwGame(inputRef)
 
   const MIN_CANVAS_HEIGHT = 600
@@ -410,7 +411,7 @@ const ThreeTicketCanvas: React.FC<{
       if (Math.abs(dragDelta.current) > FLIP_DELTA) {
         // Flip the ticket
         isFlipped.current = !isFlipped.current
-        setIsGameMode(isFlipped.current)
+        !hasWon && setIsGameMode(isFlipped.current)
         const sign = Math.sign(dragDelta.current)
         flipDirection.current = sign
       } else {
@@ -492,7 +493,7 @@ const ThreeTicketCanvas: React.FC<{
   return (
     <div
       className={cn(
-        'w-screen absolute inset-0 lg:h-full flex justify-end items-center overflow-hidden pointer-events-none',
+        'w-screen absolute inset-0 lg:h-full lg:min-h-full flex justify-end items-center overflow-hidden pointer-events-none',
         className
       )}
     >

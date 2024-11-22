@@ -92,15 +92,10 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
   }, [hasWon])
 
   useEffect(() => {
-    if (!!inputRef?.current && isGameMode) {
+    if (!!inputRef?.current && isGameMode && !hasWon) {
       inputRef?.current?.focus()
-      console.log('FOCUS!', inputRef?.current)
-
-      inputRef.current.style.opacity = '1 !important'
-      inputRef.current.style.visibility = 'true'
-      inputRef.current.className = 'visible opacity-100'
     }
-  }, [isGameMode])
+  }, [isGameMode, hasWon])
 
   useEffect(() => {
     if (user.secret) {

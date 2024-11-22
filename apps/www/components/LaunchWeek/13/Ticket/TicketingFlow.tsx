@@ -96,7 +96,7 @@ const TicketingFlow = () => {
                   animate={animate}
                   exit={exit}
                   className={cn(
-                    'w-full lg:min-h-[600px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
+                    'w-full lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
                     !hasTicket && 'opacity-100 visible'
                   )}
                 >
