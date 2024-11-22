@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -13,6 +12,7 @@ import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { passwordStrength } from 'lib/helpers'
+import { generateStrongPassword } from 'lib/project'
 import {
   Button,
   Dialog,
@@ -82,8 +82,6 @@ export const CreateNewProjectDialog = ({
     onSuccess: () => {
       toast.success('Restoration process started')
       onCloneSuccess()
-      // refetchCloneStatus()
-      // setShowNewProjectDialog(false)
     },
   })
 
@@ -97,13 +95,8 @@ export const CreateNewProjectDialog = ({
     setPasswordStrengthMessage(message)
   }
 
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
-
+  const generatePassword = () => {
+    const password = generateStrongPassword()
     form.setValue('password', password)
     delayedCheckPasswordStrength(password)
   }
@@ -186,7 +179,7 @@ export const CreateNewProjectDialog = ({
                             passwordStrengthScore={passwordStrengthScore}
                             password={field.value}
                             passwordStrengthMessage={passwordStrengthMessage}
-                            generateStrongPassword={generateStrongPassword}
+                            generateStrongPassword={generatePassword}
                           />
                         }
                       />
