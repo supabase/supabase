@@ -66,10 +66,9 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debounceValidateSpam = useCallback(debounce(validateSpam, 1000), [])
-  const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
+  const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 1.5)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -231,6 +230,7 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                           options={{ wordWrap: 'on', contextmenu: false }}
                           value={bodyValue}
                         />
+
                         <SpamValidation validationResult={validationResult} />
                       </TabsContent_Shadcn_>
                       <TabsContent_Shadcn_ value="preview">
