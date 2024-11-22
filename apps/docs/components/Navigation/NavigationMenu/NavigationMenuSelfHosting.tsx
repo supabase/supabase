@@ -14,7 +14,6 @@ import {
 } from './NavigationMenuSelfHosting.client'
 import { NavigationMenuGuideListWrapper } from './NavigationMenuGuideList'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function navigationMenuFromSpec(spec: any): NavMenuSection {
   return {
     name: spec.info.title,
