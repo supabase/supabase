@@ -21,16 +21,19 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
+import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -45,8 +48,6 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { Markdown } from 'components/interfaces/Markdown'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 
 export interface EntityListItemProps {
   id: number
@@ -109,29 +110,23 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
-      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
           <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
           { id: toastId }
         )
       }
 
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
-        )
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,
@@ -168,30 +163,24 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
 
-      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
           <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
           { id: toastId }
         )
       }
 
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
-        )
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,

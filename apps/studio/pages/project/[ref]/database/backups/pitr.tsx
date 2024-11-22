@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { AlertCircle } from 'lucide-react'
 
+import { useParams } from 'common'
 import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
@@ -15,21 +17,17 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
-import { AlertCircle } from 'lucide-react'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
-  const ref = project?.ref ?? 'default'
-
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
             <FormHeader className="!mb-0" title="Database Backups" />
-            <DatabaseBackupsNav active="pitr" projRef={ref} />
+            <DatabaseBackupsNav active="pitr" />
             <div className="space-y-8">
               <PITR />
             </div>
@@ -45,17 +43,10 @@ DatabasePhysicalBackups.getLayout = (page) => (
 )
 
 const PITR = () => {
+  const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
-  const {
-    data: backups,
-    error,
-    isLoading,
-    isError,
-    isSuccess,
-  } = useBackupsQuery({
-    projectRef: project?.ref,
-  })
+  const { data: backups, error, isLoading, isError, isSuccess } = useBackupsQuery({ projectRef })
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
 

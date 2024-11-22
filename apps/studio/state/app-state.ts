@@ -1,6 +1,8 @@
+import { proxy, snapshot, useSnapshot } from 'valtio'
+
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
 
 const EMPTY_DASHBOARD_HISTORY: {
   sql?: string
@@ -24,6 +26,7 @@ type AiAssistantPanelType = {
   content?: string
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
+  tables: { schema: string; name: string }[]
 }
 
 export const appState = proxy({
@@ -56,7 +59,7 @@ export const appState = proxy({
   setIsOptedInTelemetry: (value: boolean | null) => {
     appState.isOptedInTelemetry = value === null ? false : value
     if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
   showEnableBranchingModal: false,
@@ -110,9 +113,11 @@ export const appState = proxy({
     editor: null,
     content: '',
     entity: undefined,
+    tables: [],
   } as AiAssistantPanelType,
-  setAiAssistantPanel: (value: AiAssistantPanelType) => {
+  setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
+
     appState.aiAssistantPanel = {
       ...appState.aiAssistantPanel,
       content: hasEntityChanged ? '' : appState.aiAssistantPanel.content,

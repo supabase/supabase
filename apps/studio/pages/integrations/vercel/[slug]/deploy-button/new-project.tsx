@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
@@ -21,6 +20,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROVIDERS } from 'lib/constants'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import passwordStrength from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
 import { AWS_REGIONS } from 'shared-data'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
@@ -117,13 +117,8 @@ const CreateProject = () => {
     setPasswordStrengthMessage(message)
   }
 
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
-
+  function generatePassword() {
+    const password = generateStrongPassword()
     setDbPass(password)
     delayedCheckPasswordStrength(password)
   }
@@ -245,7 +240,7 @@ const CreateProject = () => {
               passwordStrengthScore={passwordStrengthScore}
               password={dbPass}
               passwordStrengthMessage={passwordStrengthMessage}
-              generateStrongPassword={generateStrongPassword}
+              generateStrongPassword={generatePassword}
             />
           }
         />

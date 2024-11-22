@@ -1,10 +1,9 @@
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { ReactNode } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
+import { DocsButton } from '../DocsButton'
 
 const FormHeader = ({
   title,
@@ -30,13 +29,7 @@ const FormHeader = ({
         {description && <Markdown content={description} className="max-w-full" />}
       </div>
       <div className="flex items-center gap-x-2">
-        {docsUrl !== undefined && (
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link href={docsUrl} target="_blank" rel="noreferrer">
-              Documentation
-            </Link>
-          </Button>
-        )}
+        {docsUrl !== undefined && <DocsButton href={docsUrl} />}
         {actions}
       </div>
     </div>

@@ -131,8 +131,15 @@ export function LogDrains({
           <TableBody>
             {logDrains?.map((drain) => (
               <TableRow key={drain.id}>
-                <TableCell className="font-medium">{drain.name}</TableCell>
-                <TableCell>{drain.description}</TableCell>
+                <TableCell className="font-medium truncate max-w-72" title={drain.name}>
+                  {drain.name}
+                </TableCell>
+                <TableCell
+                  className="text-foreground-light truncate max-w-72"
+                  title={drain.description}
+                >
+                  {drain.description}
+                </TableCell>
                 <TableCell className="text-right font-mono">{drain.type}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
@@ -180,7 +187,7 @@ export function LogDrains({
             }}
             onCancel={() => setIsDeleteModalOpen(false)}
           >
-            <div className="text-foreground-light">
+            <div className="text-foreground-light text-sm">
               <p>
                 Are you sure you want to delete{' '}
                 <span className="text-foreground">{selectedLogDrain?.name}</span>?

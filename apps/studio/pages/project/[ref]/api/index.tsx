@@ -37,10 +37,12 @@ const DocView = () => {
 
   const refreshDocs = async () => await refetch()
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}`
-      : `https://${settings?.app_config?.endpoint ?? '-'}`
+      : `${protocol}://${hostEndpoint ?? '-'}`
 
   const { paths } = jsonSchema || {}
   const PAGE_KEY: any = resource || rpc || page || 'index'

@@ -420,6 +420,9 @@ const uiConfig = ui({
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
     plugin(motionSafeTransition),
+    function ({ addVariant }) {
+      addVariant('not-disabled', '&:not(:disabled)')
+    },
   ],
 })
 
