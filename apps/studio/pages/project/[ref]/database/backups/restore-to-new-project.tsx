@@ -26,8 +26,9 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -56,6 +57,8 @@ const RestoreToNewProject = () => {
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isFreePlan = subscription?.plan?.id === 'free'
+
+  const { data: projects } = useProjectsQuery()
 
   const {
     data: cloneBackups,
@@ -94,6 +97,9 @@ const RestoreToNewProject = () => {
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
 
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
+  const clonedProject = projects?.find(
+    (p) => p.ref === cloneStatus?.clones?.[0]?.target_project.ref
+  )
 
   if (isLoading) {
     return <GenericSkeletonLoader />
@@ -114,6 +120,7 @@ const RestoreToNewProject = () => {
         title="Restore to new project is not available for this database version"
       >
         <Markdown
+          className="max-w-full"
           content={`Restore to new project is only available for Postgres 15 and above.  
             Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
             to upgrade your database version.
@@ -151,20 +158,26 @@ const RestoreToNewProject = () => {
       <UpgradeToPro
         buttonText="Upgrade"
         primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText={
-          'To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled.'
-        }
+        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
       />
     )
   }
 
   if (IS_CLONED_PROJECT) {
     return (
-      <Admonition type="default" title={`This project cannot be restored to a new project`}>
+      <Admonition type="default" title="This project cannot be restored to a new project">
         <Markdown
-          content={`This project was originally restored from another project. This is a temporary limitation. Please [contact us](/support/new?ref=${project?.ref}) if you need to restore a project to multiple other projects.  
-            [Go to original project](/dashboard/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''})`}
+          className="max-w-full [&>p]:!leading-normal"
+          content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
+          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
+        <Button asChild type="default">
+          <Link
+            href={`/dashboard/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}
+          >
+            Go to original project
+          </Link>
+        </Button>
       </Admonition>
     )
   }
@@ -186,10 +199,16 @@ const RestoreToNewProject = () => {
   if (lastClone?.status === 'FAILED') {
     return (
       <Admonition type="destructive" title="Failed to restore to new project">
-        <Markdown
-          content="The new project failed to be created.  
-            [Contact support](/support/new?category=dashboard_bug)"
-        />
+        <Markdown content="Sorry! The new project failed to be created, please reach out to support for assistance." />
+        <Button asChild type="default">
+          <Link
+            target="_blank"
+            rel="noreferrer noopener"
+            href={`/support/new?category=dashboard_bug&subject=Failed%20to%20restore%20to%20new%20project&message=Target%20project%20reference:%20${clonedProject?.ref ?? 'unknown'}`}
+          >
+            Contact support
+          </Link>
+        </Button>
       </Admonition>
     )
   }
@@ -198,10 +217,12 @@ const RestoreToNewProject = () => {
     return (
       <Admonition type="default" title="Restoration completed">
         <Markdown
-          content={`The new project has been created. A project can only be restored to another project once.
-            [Go to new project](/project/${lastClone?.target_project.ref})
-          `}
+          className="max-w-full"
+          content={`The new project${!!clonedProject ? ` ${clonedProject.name}` : ''} has been created. A project can only be restored to another project once.`}
         />
+        <Button asChild type="default">
+          <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
+        </Button>
       </Admonition>
     )
   }
@@ -212,11 +233,13 @@ const RestoreToNewProject = () => {
         <Loader2 className="animate-spin" />
         <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
         <AlertDescription_Shadcn_>
-          The new project is being created.
-          <br />
-          <Link className="underline" href={`/project/${lastClone?.target_project.ref}`}>
-            Go to new project
-          </Link>
+          <p>
+            The new project{!!clonedProject ? ` ${clonedProject.name}` : ''} is currently being
+            created
+          </p>
+          <Button asChild type="default" className="mt-2">
+            <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
+          </Button>
         </AlertDescription_Shadcn_>
       </Alert_Shadcn_>
     )
@@ -231,7 +254,7 @@ const RestoreToNewProject = () => {
       <Admonition
         type="default"
         title="No backups found"
-        description={'PITR is enabled, but no backups were found. Check again in a few minutes.'}
+        description="PITR is enabled, but no backups were found. Check again in a few minutes."
       />
     )
   }
