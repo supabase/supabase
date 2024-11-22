@@ -1,5 +1,5 @@
 alter table public.meetups
-add column timezone TEXT;
+add column timezone text;
 
 alter table public.meetups
-rename column title to city;
+add column city text;
