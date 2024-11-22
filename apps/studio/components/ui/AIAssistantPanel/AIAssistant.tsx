@@ -127,10 +127,6 @@ export const AIAssistant = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
     },
-
-    onError: (error) => {
-      console.log('error:', JSON.stringify(error))
-    },
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')

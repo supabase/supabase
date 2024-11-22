@@ -13,7 +13,7 @@ export enum TELEMETRY_VALUES {
   /**
    * Track whenever a prompt is submitted to the AI (excluding debug prompts)
    * @context AI Assistant V2
-   * @purpose Indication of engagement with the feature, aid in prioritising efforts into the assistant itself
+   * @purpose Indication of engagement with the feature, aid in prioritizing efforts into the assistant itself
    */
   PROMPT_SUBMITTED = 'prompt-submitted',
   /**
@@ -25,7 +25,7 @@ export enum TELEMETRY_VALUES {
   /**
    * Track running a SQL suggestion from AI Assistant
    * @context AI Assistant V2
-   * @purpose Indication of usefulness of AI assistant response, aid in prioritising tweak of Assistant prompts to adjust output quality
+   * @purpose Indication of usefulness of AI assistant response, aid in prioritizing tweak of Assistant prompts to adjust output quality
    * @details Broken down into "select" or "mutation", and for the latter further broken down to the type of query (e.g "functions" or "rls-policies", default to unknown otherwise)
    * */
   RAN_SQL_SUGGESTION = 'ran-sql-suggestion',

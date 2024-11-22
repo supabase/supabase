@@ -103,9 +103,6 @@ export const AiAssistantPanel = ({
       existingSql,
       entityDefinitions: entityDefinitions,
     },
-    onError: (error) => {
-      console.log('Boom: ', error)
-    },
   })
   const messages = useMemo(() => {
     const merged = [...chatMessages.map((m) => ({ ...m, isDebug: false }))]
