@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Link } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -42,68 +42,69 @@ export const WrapperOverviewTab = () => {
 
   const wrapperMeta = integration.meta
   const wrappersExtension = data?.find((ext) => ext.name === 'wrappers')
+  const isWrappersExtensionInstalled = !!wrappersExtension?.installed_version
   const hasRequiredVersion =
     (wrappersExtension?.installed_version ?? '') >= (wrapperMeta?.minimumExtensionVersion ?? '')
   const databaseNeedsUpgrading =
     wrappersExtension?.installed_version !== wrappersExtension?.default_version
 
-  if (!hasRequiredVersion) {
-    return (
-      <Alert_Shadcn_ variant="warning">
-        <WarningIcon />
-        <AlertTitle_Shadcn_>
-          Your extension version is outdated for this wrapper.
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
-          <p>
-            The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
-            {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
-            disabling and enabling the <code className="text-xs">wrappers</code> extension to create
-            this wrapper.
-          </p>
-          <p className="text-warning">
-            Warning: Before reinstalling the wrapper extension, you must first remove all existing
-            wrappers. Afterward, you can recreate the wrappers.
-          </p>
-        </AlertDescription_Shadcn_>
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Button asChild type="default">
-            <Link
-              href={
-                databaseNeedsUpgrading
-                  ? `/project/${project?.ref}/settings/infrastructure`
-                  : `/project/${project?.ref}/database/extensions?filter=wrappers`
-              }
-            >
-              {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
-            </Link>
-          </Button>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
-    )
-  }
-
   return (
     <IntegrationOverviewTab
       actions={
-        <div className="py-3 px-5 border rounded-md">
-          <ButtonTooltip
-            type="default"
-            onClick={() => setCreateWrapperShown(true)}
-            disabled={!canCreateWrapper}
-            tooltip={{
-              content: {
-                text: !canCreateWrapper
-                  ? 'You need additional permissions to create a foreign data wrapper'
-                  : undefined,
-              },
-            }}
-          >
-            Add new wrapper
-          </ButtonTooltip>
-        </div>
+        isWrappersExtensionInstalled && !hasRequiredVersion ? (
+          <div className="">
+            <Alert_Shadcn_ variant="warning">
+              <WarningIcon />
+              <AlertTitle_Shadcn_>
+                Your extension version is outdated for this wrapper.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-y-2">
+                <p>
+                  The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
+                  {wrapperMeta.minimumExtensionVersion}. You have version{' '}
+                  {wrappersExtension?.installed_version} installed. Please{' '}
+                  {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
+                  disabling and enabling the <code className="text-xs">wrappers</code> extension to
+                  create this wrapper.
+                </p>
+                <p className="text-warning">
+                  Warning: Before reinstalling the wrapper extension, you must first remove all
+                  existing wrappers. Afterward, you can recreate the wrappers.
+                </p>
+              </AlertDescription_Shadcn_>
+              <AlertDescription_Shadcn_ className="mt-3">
+                <Button asChild type="default">
+                  <Link
+                    href={
+                      databaseNeedsUpgrading
+                        ? `/project/${project?.ref}/settings/infrastructure`
+                        : `/project/${project?.ref}/database/extensions?filter=wrappers`
+                    }
+                  >
+                    {databaseNeedsUpgrading ? 'Upgrade database' : 'View wrappers extension'}
+                  </Link>
+                </Button>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          </div>
+        ) : (
+          <div className="py-3 px-5 border rounded-md">
+            <ButtonTooltip
+              type="default"
+              onClick={() => setCreateWrapperShown(true)}
+              disabled={!canCreateWrapper}
+              tooltip={{
+                content: {
+                  text: !canCreateWrapper
+                    ? 'You need additional permissions to create a foreign data wrapper'
+                    : undefined,
+                },
+              }}
+            >
+              Add new wrapper
+            </ButtonTooltip>
+          </div>
+        )
       }
     >
       <div className="mx-10 flex flex-col gap-5">
