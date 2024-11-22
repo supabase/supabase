@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
 import { formatWrapperTables } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge, Sheet, SheetContent, SheetTrigger, TableCell, TableRow } from 'ui'
+import { Badge, Sheet, SheetContent, TableCell, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { EditWrapperSheet } from './EditWrapperSheet'
 
@@ -23,7 +24,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   const [editWrapperShown, setEditWrapperShown] = useState(false)
   const [isClosingEditWrapper, setisClosingEditWrapper] = useState(false)
-  const [selectedWrapper, setSelectedWrapper] = useState<FDW | null>(null)
+  const [deleteWrapperShown, setDeleteWrapperShown] = useState(false)
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
@@ -99,42 +100,27 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           ))}
         </TableCell>
         <TableCell className="space-x-2">
-          <Sheet>
-            <SheetTrigger asChild>
-              <ButtonTooltip
-                disabled={!canManageWrappers}
-                type="default"
-                icon={<Edit strokeWidth={1.5} />}
-                className="px-1.5"
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: !canManageWrappers
-                      ? 'You need additional permissions to edit wrappers'
-                      : 'Edit wrapper',
-                  },
-                }}
-              />
-            </SheetTrigger>
-            <SheetContent size="default" tabIndex={undefined}>
-              <EditWrapperSheet
-                wrapper={wrapper!}
-                wrapperMeta={integration.meta}
-                onClose={() => {
-                  setEditWrapperShown(false)
-                  setisClosingEditWrapper(false)
-                }}
-                isClosing={isClosingEditWrapper}
-                setIsClosing={setisClosingEditWrapper}
-              />
-            </SheetContent>
-          </Sheet>
+          <ButtonTooltip
+            disabled={!canManageWrappers}
+            type="default"
+            icon={<Edit strokeWidth={1.5} />}
+            className="px-1.5"
+            onClick={() => setEditWrapperShown(true)}
+            tooltip={{
+              content: {
+                side: 'bottom',
+                text: !canManageWrappers
+                  ? 'You need additional permissions to edit wrappers'
+                  : 'Edit wrapper',
+              },
+            }}
+          />
           <ButtonTooltip
             type="default"
             disabled={!canManageWrappers}
             icon={<Trash strokeWidth={1.5} />}
             className="px-1.5"
-            // onClick={() => onSelectDelete(wrapper)}
+            onClick={() => setDeleteWrapperShown(true)}
             tooltip={{
               content: {
                 side: 'bottom',
@@ -146,11 +132,26 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           />
         </TableCell>
       </TableRow>
-      {/* // below modal needds refactoring to not use selectedWrapper */}
-      {/* <DeleteWrapperModal
-        selectedWrapper={selectedWrapperForDelete}
-        onClose={() => setSelectedWrapperForDelete(null)}
-      /> */}
+      <Sheet open={editWrapperShown} onOpenChange={() => setisClosingEditWrapper(true)}>
+        <SheetContent size="default" tabIndex={undefined}>
+          <EditWrapperSheet
+            wrapper={wrapper}
+            wrapperMeta={integration.meta}
+            onClose={() => {
+              setEditWrapperShown(false)
+              setisClosingEditWrapper(false)
+            }}
+            isClosing={isClosingEditWrapper}
+            setIsClosing={setisClosingEditWrapper}
+          />
+        </SheetContent>
+      </Sheet>
+      {deleteWrapperShown && (
+        <DeleteWrapperModal
+          selectedWrapper={wrapper}
+          onClose={() => setDeleteWrapperShown(false)}
+        />
+      )}
     </>
   )
 }
