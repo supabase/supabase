@@ -150,15 +150,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            if (isAssistantV2Enabled) {
-              setAiAssistantPanel({
-                open: true,
-                initialInput: `Help me create an RLS policy for the table ${table} on the ${schema} schema`,
-              })
-            } else {
-              setSelectedTable(table)
-              setShowPolicyAiEditor(true)
-            }
+            setSelectedTable(table)
+            setShowPolicyAiEditor(true)
           }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)
