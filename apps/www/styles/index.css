@@ -704,10 +704,6 @@ launch week
   transition-timing-function: linear;
 }
 
-/* .lw8-particle-handle {
-  @apply text-xs bg-black flex items-center justify-center rounded-full py-1 px-2 [&>div]:!relative;
-} */
-
 /* dat.GUI */
 
 .dg.ac {

@@ -505,7 +505,10 @@ const ThreeTicketCanvas: React.FC<{
           pattern={REGEXP_ONLY_CHARS}
           autoFocus
           // containerClassName="!absolute opacity-0 invisible"
-          containerClassName="!absolute flex justify-center w-full inset-0 top-auto bottom-[15%] lw13-game-input lg:!invisible lg:!opacity-0"
+          containerClassName={cn(
+            '!absolute flex justify-center w-full inset-0 top-auto bottom-[15%] lg:!invisible lg:!opacity-0',
+            !hasWon && 'lw13-game-input'
+          )}
           inputMode="text"
           value={value}
           spellCheck={false}
