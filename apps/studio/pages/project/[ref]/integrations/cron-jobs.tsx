@@ -61,8 +61,8 @@ const CronJobsPage: NextPageWithLayout = () => {
                     onClick={() => {
                       sendEvent({
                         category: 'cron_jobs',
-                        action: 'open_create_cron_job_sheet',
-                        label: 'open_create_cron_job_sheet',
+                        action: 'create_cron_job_clicked',
+                        label: 'user clicked create cron job button',
                       })
                       setCreateCronJobSheetShown({
                         jobname: '',

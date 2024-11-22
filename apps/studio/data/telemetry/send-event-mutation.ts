@@ -14,6 +14,7 @@ export type SendEventVariables = {
   category: string
   label: string
   value?: string
+  properties?: Record<string, any>
 }
 
 type SendEventPayload = any

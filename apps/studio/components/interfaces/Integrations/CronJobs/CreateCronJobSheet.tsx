@@ -195,8 +195,10 @@ export const CreateCronJobSheet = ({
     // We should allow sending custom properties with events
     sendEvent({
       category: 'cron_jobs',
-      action: isEditing ? 'update_cron_job' : 'create_cron_job',
-      label: isEditing ? '_' : '_',
+      action: isEditing ? 'update_cron_job_clicked' : 'create_cron_job_clicked',
+      label: isEditing
+        ? 'user clicked update cron job button'
+        : 'user clicked create cron job button',
       properties: {
         cron_job_type: values.type,
         cron_job_schedule: schedule,

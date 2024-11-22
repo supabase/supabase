@@ -88,8 +88,8 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                       onClick={() => {
                         sendEvent({
                           category: 'cron_jobs',
-                          action: 'view_previous_runs',
-                          label: 'cron_job_viewed',
+                          action: 'view_previous_runs_clicked',
+                          label: 'user clicked view previous runs button',
                         })
                       }}
                     >
@@ -101,8 +101,8 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         category: 'cron_jobs',
-                        action: 'delete_cron_job',
-                        label: 'cron_job_deleted',
+                        action: 'delete_cron_job_clicked',
+                        label: 'user clicked delete cron job button',
                       })
                       onDeleteCronJob(job)
                     }}
