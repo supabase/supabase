@@ -127,6 +127,7 @@ const TableEditorMenu = () => {
               icon={<Edit2 />}
               className="w-[26px]"
               onClick={snap.onAddTable}
+              aria-label="New table"
             />
           </div>
         </div>
