@@ -1,12 +1,14 @@
 import { useContext } from 'react'
-
 import FlagContext from 'components/ui/Flag/FlagContext'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 export function useFlag<T = boolean>(name: string) {
+  const project = useSelectedProject()
   const store: any = useContext(FlagContext)
 
-  if (name === 'connectDialogUpdate') {
-    return true
+  // Temporary override as Fly projects are cant seem to upgrade their compute with the new disk UI
+  if (name === 'diskAndComputeForm' && project?.cloud_provider === 'FLY') {
+    return false
   }
 
   const isObjectEmpty = (objectName: Object) => {
