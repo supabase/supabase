@@ -1,8 +1,11 @@
 import { useParams } from 'common'
 import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
+import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
 import { useRouter } from 'next/router'
 import { getTabsStore } from 'state/tabs'
@@ -36,7 +39,9 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <HandleEditorLayouts>{page}</HandleEditorLayouts>
+    <EditorBaseLayout productMenu={<TableEditorMenu />}>
+      <TableEditorLayout>{page}</TableEditorLayout>
+    </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
 )
 

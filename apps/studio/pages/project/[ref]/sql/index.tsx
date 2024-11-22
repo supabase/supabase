@@ -1,6 +1,9 @@
 import { useParams } from 'common'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
 import { useRouter } from 'next/router'
 import { getTabsStore } from 'state/tabs'
@@ -31,7 +34,9 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <HandleEditorLayouts>{page}</HandleEditorLayouts>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
 )
 

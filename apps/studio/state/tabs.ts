@@ -223,7 +223,10 @@ export const handleTabClose = (
     tabsStore.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
   }
 
-  if (!nextTabId) {
+  if (nextTabId) {
+    tabsStore.activeTab = nextTabId
+    handleTabNavigation(nextTabId, router)
+  } else {
     // If no tabs of same type, go to the home of the current section
     switch (currentTab.type) {
       case 'sql':
@@ -235,11 +238,6 @@ export const handleTabClose = (
       default:
         router.push(`/project/${router.query.ref}/editor`)
     }
-  }
-
-  if (nextTabId) {
-    tabsStore.activeTab = nextTabId
-    handleTabNavigation(nextTabId, router)
   }
 
   onClose?.(id)

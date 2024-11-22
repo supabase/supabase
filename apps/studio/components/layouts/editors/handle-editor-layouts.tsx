@@ -4,19 +4,22 @@ import dynamic from 'next/dynamic'
 import { JSXElementConstructor, ReactElement, Suspense } from 'react'
 import { ProjectContextFromParamsProvider } from '../ProjectLayout/ProjectContext'
 import { useEditorType } from './editors-layout.hooks'
+// import ExplorerLayout from '../explorer/layout'
+import TableEditorLayout from '../TableEditorLayout/TableEditorLayout'
+import SQLEditorLayout from '../SQLEditorLayout/SQLEditorLayout'
 
 // Dynamically import layouts to reduce initial bundle size
 // These are loaded only when needed
-const ExplorerLayout = dynamic(
-  () => import('../explorer/layout').then((mod) => mod.ExplorerLayout),
-  { ssr: false }
-)
-const TableEditorLayout = dynamic(() => import('../TableEditorLayout/TableEditorLayout'), {
-  ssr: false,
-})
-const SQLEditorLayout = dynamic(() => import('../SQLEditorLayout/SQLEditorLayout'), {
-  ssr: false,
-})
+// const ExplorerLayout = dynamic(
+//   () => import('../explorer/layout').then((mod) => mod.ExplorerLayout),
+//   { ssr: false }
+// )
+// const TableEditorLayout = dynamic(() => import('../TableEditorLayout/TableEditorLayout'), {
+//   ssr: false,
+// })
+// const SQLEditorLayout = dynamic(() => import('../SQLEditorLayout/SQLEditorLayout'), {
+//   ssr: false,
+// })
 
 /**
  * HandleEditorLayouts is responsible for rendering the appropriate layout based on:
@@ -37,16 +40,15 @@ export const HandleEditorLayouts = ({
   const projectExplorer = useFlag('projectExplorer')
 
   return (
-    <ProjectContextFromParamsProvider>
-      <Suspense fallback={null}>
-        {projectExplorer ? (
-          <ExplorerLayout>{children}</ExplorerLayout>
-        ) : editor === 'table' ? (
-          <TableEditorLayout>{children}</TableEditorLayout>
-        ) : (
-          <SQLEditorLayout title="SQL Editor">{children}</SQLEditorLayout>
-        )}
-      </Suspense>
-    </ProjectContextFromParamsProvider>
+    <>
+      {projectExplorer ? (
+        <> </>
+      ) : // <ExplorerLayout>{children}</ExplorerLayout>
+      editor === 'table' ? (
+        <TableEditorLayout>{children}</TableEditorLayout>
+      ) : (
+        <SQLEditorLayout title="SQL Editor">{children}</SQLEditorLayout>
+      )}
+    </>
   )
 }

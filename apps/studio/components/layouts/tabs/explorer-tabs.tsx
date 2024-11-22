@@ -1,39 +1,24 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { TabIcon } from 'components/explorer/tabs/TabIcon'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useActionKey } from 'hooks/useActionKey'
-import {
-  CirclePlus,
-  Eye,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Plus,
-  Table2,
-  Workflow,
-  X,
-} from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   getTabsStore,
-  makeTabPermanent,
-  openNewContentTab,
-  removeTab,
-  type Tab,
-  type TabType,
-  handleTabNavigation,
   handleTabClose,
   handleTabDragEnd,
+  handleTabNavigation,
+  makeTabPermanent,
+  type Tab,
 } from 'state/tabs'
-import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
-import { sidebarState } from './sidebar-state'
-import { TabIcon } from 'components/explorer/tabs/TabIcon'
-import { CollapseButton } from './collapse-button'
 import { useEditorType } from '../editors/editors-layout.hooks'
-import { useFlag } from 'hooks/ui/useFlag'
+import { CollapseButton } from './collapse-button'
+import { sidebarState } from './sidebar-state'
 
 interface TabsProps {
   storeKey: string
@@ -53,13 +38,11 @@ const SortableTab = ({
   index,
   openTabs,
   onClose,
-  storeKey,
 }: {
   tab: Tab
   index: number
   openTabs: Tab[]
   onClose: (id: string) => void
-  storeKey: string
 }) => {
   const router = useRouter()
   const currentSchema = (router.query.schema as string) || 'public'
@@ -88,9 +71,6 @@ const SortableTab = ({
 
     return false
   }, [openTabs, currentSchema, tab.type])
-
-  // Create a motion version of TabsTrigger while preserving all functionality
-  const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
@@ -139,16 +119,13 @@ const SortableTab = ({
         </span>
         <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
       </TabsTrigger_Shadcn_>
-      {index < openTabs.length && (
-        <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
-      )}
+      {/* {index < openTabs.length - 1 && <div role="separator" className="h-full w-px bg-border" />} */}
     </div>
   )
 }
 
-export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
+export function ExplorerTabs({ onClose }: TabsProps) {
   const editor = useEditorType()
-  const projectExplorer = useFlag('projectExplorer')
   const router = useRouter()
   const store = getTabsStore()
   const tabs = useSnapshot(store)
@@ -163,8 +140,6 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   const regularTabs = openTabs.filter((tab) => {
     return tab.type === editor
   })
-
-  const newTab = openTabs.find((tab) => tab.type === 'new')
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -207,11 +182,10 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
             {regularTabs.map((tab, index) => (
               <SortableTab
                 key={tab.id}
-                tab={tab}
                 index={index}
+                tab={tab}
                 openTabs={openTabs}
                 onClose={() => handleClose(tab.id)}
-                storeKey={storeKey}
               />
             ))}
           </SortableContext>

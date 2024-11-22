@@ -1,12 +1,15 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
-import { ExplorerLayout } from 'components/layouts/explorer/layout'
+
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -27,7 +30,7 @@ import type { NextPageWithLayout } from 'types'
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref, content } = useParams()
+  const { id, ref } = useParams()
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
@@ -191,7 +194,9 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <HandleEditorLayouts>{page}</HandleEditorLayouts>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
 )
 

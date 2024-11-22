@@ -21,18 +21,20 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <EditorBaseLayout
-      product="Table Editor"
-      productMenu={<TableEditorMenu />}
-      isBlocking={false}
-      resizableSidebar
-    >
+    // <EditorBaseLayout
+    //   product="Table Editor"
+    //   productMenu={<TableEditorMenu />}
+    //   isBlocking={false}
+    //   resizableSidebar
+    // >
+    <>
       {children}
       <OngoingQueriesPanel
         visible={showOngoingQueries}
         onClose={() => setShowOngoingQueries(false)}
       />
-    </EditorBaseLayout>
+    </>
+    // </EditorBaseLayout>
   )
 }
 

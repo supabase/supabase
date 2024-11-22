@@ -1,11 +1,14 @@
 import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
+import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
@@ -19,6 +22,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const store = getTabsStore()
+
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -78,7 +82,9 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <HandleEditorLayouts>{page}</HandleEditorLayouts>
+    <EditorBaseLayout productMenu={<TableEditorMenu />}>
+      <TableEditorLayout>{page}</TableEditorLayout>
+    </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
 )
 
