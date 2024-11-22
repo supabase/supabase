@@ -13,6 +13,7 @@ class MyDocument extends Document {
     return (
       <Html lang="en">
         <Head>
+          <script src="https://unpkg.com/react-scan/dist/auto.global.js" async></script>
           {/* Workaround for https://github.com/suren-atoyan/monaco-react/issues/272 */}
           <link
             rel="stylesheet"

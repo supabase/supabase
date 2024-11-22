@@ -1,97 +1,99 @@
-const { withSentryConfig } = require('@sentry/nextjs')
+const { withSentryConfig } = require('@sentry/nextjs');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-})
+});
 
 // Required for nextjs standalone build
-const path = require('path')
+const path = require('path');
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL
   ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
-  : ''
-const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : ''
+  : '';
+const SUPABASE_URL = process.env.SUPABASE_URL ? new URL(process.env.SUPABASE_URL).origin : '';
 const GOTRUE_URL = process.env.NEXT_PUBLIC_GOTRUE_URL
   ? new URL(process.env.NEXT_PUBLIC_GOTRUE_URL).origin
-  : ''
-const SUPABASE_PROJECTS_URL = 'https://*.supabase.co'
-const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
+  : '';
+const SUPABASE_PROJECTS_URL = 'https://*.supabase.co';
+const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co';
 
 // construct the URL for the Websocket Local URLs
-let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
+let SUPABASE_LOCAL_PROJECTS_URL_WS = '';
 if (SUPABASE_URL) {
-  const url = new URL(SUPABASE_URL)
-  const wsUrl = `${url.hostname}:${url.port}`
-  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
+  const url = new URL(SUPABASE_URL);
+  const wsUrl = `${url.hostname}:${url.port}`;
+  SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`;
 }
 
 // Needed to test docs search in local dev
 const SUPABASE_DOCS_PROJECT_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin
-  : ''
+  : '';
 
-const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red'
-const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red'
-const SUPABASE_COM_URL = 'https://supabase.com'
-const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com'
-const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com'
-const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com'
-const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com'
-const CONFIGCAT_URL = 'https://cdn-global.configcat.com'
-const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com'
-const STRIPE_JS_URL = 'https://js.stripe.com'
-const STRIPE_NETWORK_URL = 'https://*.stripe.network'
-const CLOUDFLARE_URL = 'https://www.cloudflare.com'
-const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one'
-const VERCEL_URL = 'https://vercel.com'
-const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com'
-const GITHUB_API_URL = 'https://api.github.com'
-const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com'
-const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com'
-const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com'
-const VERCEL_LIVE_URL = 'https://vercel.live'
+const SUPABASE_STAGING_PROJECTS_URL = 'https://*.supabase.red';
+const SUPABASE_STAGING_PROJECTS_URL_WS = 'wss://*.supabase.red';
+const SUPABASE_COM_URL = 'https://supabase.com';
+const CLOUDFLARE_CDN_URL = 'https://cdnjs.cloudflare.com';
+const HCAPTCHA_SUBDOMAINS_URL = 'https://*.hcaptcha.com';
+const HCAPTCHA_ASSET_URL = 'https://newassets.hcaptcha.com';
+const HCAPTCHA_JS_URL = 'https://js.hcaptcha.com';
+const CONFIGCAT_URL = 'https://cdn-global.configcat.com';
+const STRIPE_SUBDOMAINS_URL = 'https://*.stripe.com';
+const STRIPE_JS_URL = 'https://js.stripe.com';
+const STRIPE_NETWORK_URL = 'https://*.stripe.network';
+const CLOUDFLARE_URL = 'https://www.cloudflare.com';
+const ONE_ONE_ONE_ONE_URL = 'https://one.one.one.one';
+const VERCEL_URL = 'https://vercel.com';
+const VERCEL_INSIGHTS_URL = 'https://*.vercel-insights.com';
+const GITHUB_API_URL = 'https://api.github.com';
+const GITHUB_USER_CONTENT_URL = 'https://raw.githubusercontent.com';
+const GITHUB_USER_AVATAR_URL = 'https://avatars.githubusercontent.com';
+const GOOGLE_USER_AVATAR_URL = 'https://lh3.googleusercontent.com';
+const VERCEL_LIVE_URL = 'https://vercel.live';
 // used by vercel live preview
-const PUSHER_URL = 'https://*.pusher.com'
-const PUSHER_URL_WS = 'wss://*.pusher.com'
+const PUSHER_URL = 'https://*.pusher.com';
+const PUSHER_URL_WS = 'wss://*.pusher.com';
 
-const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`
-const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL}`
-const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`
-const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`
-const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
-const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
+const DEFAULT_SRC_URLS = `${API_URL} ${SUPABASE_URL} ${GOTRUE_URL} ${SUPABASE_LOCAL_PROJECTS_URL_WS} ${SUPABASE_PROJECTS_URL} ${SUPABASE_PROJECTS_URL_WS} ${HCAPTCHA_SUBDOMAINS_URL} ${CONFIGCAT_URL} ${STRIPE_SUBDOMAINS_URL} ${STRIPE_NETWORK_URL} ${CLOUDFLARE_URL} ${ONE_ONE_ONE_ONE_URL} ${VERCEL_INSIGHTS_URL} ${GITHUB_API_URL} ${GITHUB_USER_CONTENT_URL}`;
+const UNPKG_URL = 'https://unpkg.com';
+
+const SCRIPT_SRC_URLS = `${CLOUDFLARE_CDN_URL} ${HCAPTCHA_JS_URL} ${STRIPE_JS_URL} ${UNPKG_URL}`;
+const FRAME_SRC_URLS = `${HCAPTCHA_ASSET_URL} ${STRIPE_JS_URL}`;
+const IMG_SRC_URLS = `${SUPABASE_URL} ${SUPABASE_COM_URL} ${SUPABASE_PROJECTS_URL} ${GITHUB_USER_AVATAR_URL} ${GOOGLE_USER_AVATAR_URL}`;
+const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`;
+const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`;
 
 const csp = [
   ...(process.env.VERCEL_ENV === 'preview' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]
+      `default-src 'self' ${DEFAULT_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${SUPABASE_STAGING_PROJECTS_URL_WS} ${VERCEL_LIVE_URL} ${PUSHER_URL_WS} ${SUPABASE_DOCS_PROJECT_URL};`,
+      `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+      `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `img-src 'self' blob: data: ${IMG_SRC_URLS} ${SUPABASE_STAGING_PROJECTS_URL} ${VERCEL_URL};`,
+      `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `worker-src 'self' blob: data:;`,
+    ]
     : [
-        `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS};`,
-        `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
-        `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
-        `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
-        `worker-src 'self' blob: data:;`,
-      ]),
+      `default-src 'self' ${DEFAULT_SRC_URLS} ${PUSHER_URL_WS};`,
+      `script-src 'self' 'unsafe-eval' 'unsafe-inline' ${SCRIPT_SRC_URLS} ${VERCEL_LIVE_URL} ${PUSHER_URL};`,
+      `frame-src 'self' ${FRAME_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `img-src 'self' blob: data: ${IMG_SRC_URLS} ;`,
+      `style-src 'self' 'unsafe-inline' ${STYLE_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `font-src 'self' ${FONT_SRC_URLS} ${VERCEL_LIVE_URL};`,
+      `worker-src 'self' blob: data:;`,
+    ]),
   `object-src 'none';`,
   `base-uri 'self';`,
   `form-action 'self';`,
   `frame-ancestors 'none';`,
   `block-all-mixed-content;`,
   ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? [`upgrade-insecure-requests;`]
+    process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+    ? [ `upgrade-insecure-requests;` ]
     : []),
-].join(' ')
+].join(' ');
 
 /**
  * @type {import('next').NextConfig}
@@ -110,87 +112,87 @@ const nextConfig = {
         destination: `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : process.env.NEXT_PUBLIC_SITE_URL}${process.env.NEXT_PUBLIC_BASE_PATH}/.well-known/vercel/flags`,
         basePath: false,
       },
-    ]
+    ];
   },
   async redirects() {
     return [
       ...(process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
         ? [
-            {
-              source: '/',
-              has: [
-                {
-                  type: 'query',
-                  key: 'next',
-                  value: 'new-project',
-                },
-              ],
-              destination: '/new/new-project',
-              permanent: false,
-            },
-            {
-              source: '/',
-              destination: '/projects',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/sign-up',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/sign-in',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/sign-in',
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            has: [
+              {
+                type: 'query',
+                key: 'next',
+                value: 'new-project',
+              },
+            ],
+            destination: '/new/new-project',
+            permanent: false,
+          },
+          {
+            source: '/',
+            destination: '/projects',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/sign-up',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/sign-in',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/sign-in',
+            permanent: false,
+          },
+        ]
         : [
-            {
-              source: '/',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/register',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signup',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/signin',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/login',
-              destination: '/project/default',
-              permanent: false,
-            },
-            {
-              source: '/log-in',
-              destination: '/project/default',
-              permanent: false,
-            },
-          ]),
+          {
+            source: '/',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/register',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signup',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/signin',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/login',
+            destination: '/project/default',
+            permanent: false,
+          },
+          {
+            source: '/log-in',
+            destination: '/project/default',
+            permanent: false,
+          },
+        ]),
       {
         source: '/project/:ref/auth',
         destination: '/project/:ref/auth/users',
@@ -431,15 +433,15 @@ const nextConfig = {
       },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
-            {
-              source: '/',
-              destination: process.env.NEXT_PUBLIC_BASE_PATH,
-              basePath: false,
-              permanent: false,
-            },
-          ]
+          {
+            source: '/',
+            destination: process.env.NEXT_PUBLIC_BASE_PATH,
+            basePath: false,
+            permanent: false,
+          },
+        ]
         : []),
-    ]
+    ];
   },
   async headers() {
     return [
@@ -475,13 +477,13 @@ const nextConfig = {
       },
       {
         source: '/img/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [ { key: 'cache-control', value: 'max-age=2592000' } ],
       },
       {
         source: '/fonts/:slug*',
-        headers: [{ key: 'cache-control', value: 'max-age=2592000' }],
+        headers: [ { key: 'cache-control', value: 'max-age=2592000' } ],
       },
-    ]
+    ];
   },
   images: {
     // to make Vercel avatars work without issue. Vercel uses SVGs for users who don't have set avatars.
@@ -526,14 +528,14 @@ const nextConfig = {
     config.module?.rules
       .find((rule) => rule.oneOf)
       .oneOf.forEach((rule) => {
-        if (rule.issuer?.and?.[0]?.toString().includes('_app')) {
-          const and = rule.issuer.and
-          rule.issuer.or = [/[\\/]node_modules[\\/]monaco-editor[\\/]/, { and }]
-          delete rule.issuer.and
+        if (rule.issuer?.and?.[ 0 ]?.toString().includes('_app')) {
+          const and = rule.issuer.and;
+          rule.issuer.or = [ /[\\/]node_modules[\\/]monaco-editor[\\/]/, { and } ];
+          delete rule.issuer.and;
         }
-      })
+      });
 
-    return config
+    return config;
   },
   onDemandEntries: {
     maxInactiveAge: 24 * 60 * 60 * 1000,
@@ -548,7 +550,7 @@ const nextConfig = {
     // We are already running linting via GH action, this will skip linting during production build on Vercel
     ignoreDuringBuilds: true,
   },
-}
+};
 
 // module.exports = withBundleAnalyzer(nextConfig)
 // Make sure adding Sentry options is the last code to run before exporting, to
@@ -556,35 +558,35 @@ const nextConfig = {
 module.exports =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
     ? withSentryConfig(withBundleAnalyzer(nextConfig), {
-        silent: true,
+      silent: true,
 
-        // For all available options, see:
-        // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
+      // For all available options, see:
+      // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
-        // Upload a larger set of source maps for prettier stack traces (increases build time)
-        widenClientFileUpload: true,
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
 
-        // Automatically annotate React components to show their full name in breadcrumbs and session replay
-        reactComponentAnnotation: {
-          enabled: true,
-        },
+      // Automatically annotate React components to show their full name in breadcrumbs and session replay
+      reactComponentAnnotation: {
+        enabled: true,
+      },
 
-        // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
-        // This can increase your server load as well as your hosting bill.
-        // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
-        // side errors will fail.
-        tunnelRoute: '/monitoring',
+      // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
+      // This can increase your server load as well as your hosting bill.
+      // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
+      // side errors will fail.
+      tunnelRoute: '/monitoring',
 
-        // Hides source maps from generated client bundles
-        hideSourceMaps: true,
+      // Hides source maps from generated client bundles
+      hideSourceMaps: true,
 
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        disableLogger: true,
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
 
-        // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
-        // See the following for more information:
-        // https://docs.sentry.io/product/crons/
-        // https://vercel.com/docs/cron-jobs
-        automaticVercelMonitors: true,
-      })
-    : nextConfig
+      // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
+      // See the following for more information:
+      // https://docs.sentry.io/product/crons/
+      // https://vercel.com/docs/cron-jobs
+      automaticVercelMonitors: true,
+    })
+    : nextConfig;
