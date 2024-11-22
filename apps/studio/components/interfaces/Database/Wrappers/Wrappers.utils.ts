@@ -99,6 +99,7 @@ export const formatWrapperTables = (
     return {
       ...options,
       index,
+      id: table.id,
       columns: table.columns,
       is_new_schema: false,
       schema: table.schema,
