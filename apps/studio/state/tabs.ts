@@ -212,16 +212,9 @@ export const handleTabClose = (
   const currentTabs = Object.values(tabsStore.tabsMap).filter((tab) => tab.id !== id)
   const nextTabId = currentTabs.filter((tab) => tab.type === editor)[0]?.id
 
-  // Find if there are any tabs left of the same type
-  const hasTabsOfSameType = currentTabs.some((tab) => {
-    const foundTab = tabsStore.tabsMap[tab.id]
-    return tab?.type === foundTab.type
-  })
-
-  // console.log('Current Tab:', currentTab)
-  // console.log('Current Tabs:', currentTabs)
-  // console.log('Next Tab ID:', nextTabId)
-  // console.log('Has Tabs of Same Type:', hasTabsOfSameType)
+  console.log('Current Tab:', currentTab)
+  console.log('Current Tabs:', currentTabs)
+  console.log('Next Tab ID:', nextTabId)
 
   delete tabsStore.tabsMap[id]
   if (currentTab) {
@@ -230,7 +223,7 @@ export const handleTabClose = (
     tabsStore.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
   }
 
-  if (!hasTabsOfSameType) {
+  if (!nextTabId) {
     // If no tabs of same type, go to the home of the current section
     switch (currentTab.type) {
       case 'sql':
