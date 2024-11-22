@@ -34,17 +34,14 @@ export type IntegrationDefinition = {
     name: string
     websiteUrl: string
   }
+  requiredExtensions: string[]
   navigation?: Navigation[]
   navigate: (
     id: string,
     pageId: string | undefined,
     childId: string | undefined
   ) => ComponentType<{}> | null
-} & (
-  | { type: 'wrapper'; meta: WrapperMeta }
-  | { type: 'postgres_extension'; requiredExtensions: string[] }
-  | { type: 'custom' }
-)
+} & ({ type: 'wrapper'; meta: WrapperMeta } | { type: 'postgres_extension' } | { type: 'custom' })
 
 const authorSupabase = {
   name: 'Supabase',
@@ -238,6 +235,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       'Send real-time data from your database to another system when a table event occurs',
     docsUrl: 'https://supabase.com/docs',
     author: authorSupabase,
+    requiredExtensions: [],
     navigation: [
       {
         route: 'overview',
@@ -337,6 +335,7 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     icon: ({ className, ...props } = {}) => (
       <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
     ),
+    requiredExtensions: ['wrappers', 'supabase_vault'],
     description: w.description,
     docsUrl: w.docsUrl,
     meta: w,

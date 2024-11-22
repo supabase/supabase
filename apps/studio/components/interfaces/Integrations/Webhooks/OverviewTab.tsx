@@ -9,7 +9,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 
 export const WebhooksOverviewTab = () => {
@@ -61,34 +61,32 @@ export const WebhooksOverviewTab = () => {
     <IntegrationOverviewTab
       actions={
         isSchemasLoaded && isHooksEnabled ? null : (
-          <div className="px-10">
-            <Alert_Shadcn_ variant="warning">
-              <WarningIcon />
-              <AlertTitle_Shadcn_>Enable database webhooks on your project</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="flex gap-2 flex-col">
-                <span>
-                  Database Webhooks can be used to trigger serverless functions or send requests to
-                  an HTTP endpoint.
-                </span>
-                <ButtonTooltip
-                  className="w-fit"
-                  onClick={() => enableHooksForProject()}
-                  disabled={!isPermissionsLoaded || isEnablingHooks}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      text:
-                        isPermissionsLoaded && !isEnablingHooks
-                          ? 'You need additional permissions to enable webhooks'
-                          : undefined,
-                    },
-                  }}
-                >
-                  Enable webhooks
-                </ButtonTooltip>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          </div>
+          <Admonition
+            showIcon={false}
+            type="default"
+            title="Enable database webhooks on your project"
+          >
+            <p>
+              Database Webhooks can be used to trigger serverless functions or send requests to an
+              HTTP endpoint
+            </p>
+            <ButtonTooltip
+              className="w-fit"
+              onClick={() => enableHooksForProject()}
+              disabled={!isPermissionsLoaded || isEnablingHooks}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text:
+                    isPermissionsLoaded && !canReadWebhooks
+                      ? 'You need additional permissions to enable webhooks'
+                      : undefined,
+                },
+              }}
+            >
+              Enable webhooks
+            </ButtonTooltip>
+          </Admonition>
         )
       }
     />

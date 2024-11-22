@@ -27,11 +27,6 @@ export const WrappersTab = () => {
   })
 
   const wrappers = data ?? []
-
-  if (isLoading) {
-    return <div>Loading</div>
-  }
-
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   if (!integration || integration.type !== 'wrapper') {

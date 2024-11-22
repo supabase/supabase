@@ -26,19 +26,17 @@ export const IntegrationOverviewTab = ({
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
-  const isDatabaseExtension = integration?.type === 'postgres_extension'
+  const dependsOnExtension = (integration?.requiredExtensions ?? []).length > 0
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const neededExtensions =
-    integration?.type === 'postgres_extension'
-      ? (extensions ?? []).filter((ext) =>
-          (integration?.requiredExtensions ?? []).includes(ext.name)
-        )
-      : []
+  const neededExtensions = (extensions ?? []).filter((ext) =>
+    (integration?.requiredExtensions ?? []).includes(ext.name)
+  )
+
   const hasMissingExtensions = neededExtensions.some((x) => !x.installed_version)
 
   if (!integration) {
@@ -48,7 +46,7 @@ export const IntegrationOverviewTab = ({
   return (
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} />
-      {isDatabaseExtension && (
+      {dependsOnExtension && (
         <div className="px-10 max-w-4xl">
           <Admonition
             showIcon={false}
@@ -65,7 +63,7 @@ export const IntegrationOverviewTab = ({
             </Badge>
             <Markdown
               className="max-w-full"
-              content={`This integration manages the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
+              content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
               extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
               ${hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extensions to use ${integration.name} in your project.` : ''}
               `}
@@ -79,7 +77,7 @@ export const IntegrationOverviewTab = ({
           </Admonition>
         </div>
       )}
-      {!!actions && <div className="px-10 max-w-4xl">{actions}</div>}
+      {!!actions && !hasMissingExtensions && <div className="px-10 max-w-4xl">{actions}</div>}
       <MarkdownContent key={integration.id} integrationId={integration.id} />
       <Separator />
       {children}
