@@ -10,7 +10,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { Badge, cn } from 'ui'
 
 interface HeaderProps {
-  scroll?: ReturnType<typeof useScroll>
+  scroll: ReturnType<typeof useScroll>
 }
 
 export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) => {
@@ -38,9 +38,9 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
   const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
   // Map scrollY to the icon's Y position
-  const iconY = scroll ? useTransform(scroll?.scrollY!, scrollRange, iconYRange) : 0
+  const iconY = useTransform(scroll?.scrollY!, scrollRange, iconYRange)
 
-  const iconSize = scroll ? useTransform(scroll?.scrollY!, scrollRange, sizeRange) : 32
+  const iconSize = useTransform(scroll?.scrollY!, scrollRange, sizeRange)
 
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
 

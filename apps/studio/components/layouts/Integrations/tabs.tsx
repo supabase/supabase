@@ -18,17 +18,14 @@ const paddingRange = [40, 86]
 const iconPaddingRange = [3, 1.5] // From 1.5px (scrolled) to 4px (top)
 
 interface IntegrationTabsProps {
-  scroll?: ReturnType<typeof useScroll>
+  scroll: ReturnType<typeof useScroll>
   isSticky?: boolean
 }
 
 export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
-  const { id, pageId, childId } = useParams()
-
   const navRef = useRef(null)
-
-  // Get project context
   const { project } = useProjectContext()
+  const { id, pageId, childId } = useParams()
 
   const { installedIntegrations } = useInstalledIntegrations()
   // Find the integration details based on ID
@@ -38,25 +35,16 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
 
   // Input range: The scrollY range for triggering the animation (e.g., 0 to 200px of scroll)
   const scrollRange = [40, headerRef.current?.offsetHeight ?? 128]
-
-  const navInnerLeftPaddingX = scroll
-    ? useTransform(scroll?.scrollY!, scrollRange, paddingRange)
-    : 0
-
+  const navInnerLeftPaddingX = useTransform(scroll?.scrollY!, scrollRange, paddingRange)
   const iconPadding = useTransform(scroll?.scrollY!, scrollRange, iconPaddingRange)
-
-  if (!integration) {
-    return null
-  }
 
   const installedIntegration = installedIntegrations?.find((i) => i.id === id)
 
-  let tabs = integration.navigation || []
+  const tabs = installedIntegration
+    ? integration?.navigation ?? []
+    : (integration?.navigation ?? []).filter((tab) => tab.route === 'overview')
 
-  // Only show the overview tab if the integration is not installed or loading
-  if (!installedIntegration) {
-    tabs = tabs.filter((tab) => tab.route === 'overview')
-  }
+  if (!integration) return null
 
   return (
     <AnimatePresence>
@@ -76,7 +64,7 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
           transition={{ duration: 0.2 }}
           className="px-10 [&_ul]:items-center bg-200"
           aria-label="Integration menu"
-          style={{ paddingLeft: !isSticky ? (navInnerLeftPaddingX as number) : 40 }}
+          style={{ paddingLeft: !isSticky ? (navInnerLeftPaddingX as unknown as number) : 40 }}
         >
           {isSticky && (
             <motion.div
