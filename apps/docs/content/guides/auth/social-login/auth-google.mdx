@@ -439,6 +439,8 @@ Unlike the OAuth flow which requires the use of a web browser, the native Sign i
 
 When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
+By default, Supabase Auth implements nonce validation during the authentication flow. This can be disabled in production under `Authentication > Providers > Google > Skip Nonce Check` in the Dashboard, or when developing locally by setting `auth.external.<provider>.skip_nonce_check`. Only disable this if your client libraries cannot properly handle nonce verification.
+
 When working with Expo, you can use the [`react-native-google-signin/google-signin` library](https://github.com/react-native-google-signin/google-signin#expo-installation) library to obtain an ID token that you can pass to supabase-js [`signInWithIdToken` method](/docs/reference/javascript/auth-signinwithidtoken).
 
 Follow the [Expo installation docs](https://react-native-google-signin.github.io/docs/setting-up/expo) for installation and configuration instructions. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
