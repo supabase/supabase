@@ -27,19 +27,12 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   Separator,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import {
-  constructConnStringSyntax,
-  getConnectionStrings,
-  getPoolerTld,
-} from './DatabaseSettings.utils'
-import examples, { Example } from './DirectConnectionExamples'
 import { Admonition } from 'ui-patterns'
+import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
+import { getConnectionStrings, getPoolerTld } from './DatabaseSettings.utils'
+import examples, { Example } from './DirectConnectionExamples'
 
 const CONNECTION_TYPES: {
   id: ConnectionType
@@ -182,6 +175,9 @@ export const DatabaseConnectionString = () => {
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? getPoolerTld(poolingConfiguration?.connectionString)
       : 'com'
+
+  // @mildtomato - Possible reintroduce later
+  //
   // const poolerConnStringSyntax =
   //   isSuccessPoolingInfo && poolingConfiguration !== undefined
   //     ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
@@ -194,7 +190,6 @@ export const DatabaseConnectionString = () => {
   //         portNumber: `[5432 or 6543]`,
   //       })
   //     : []
-
   // useEffect(() => {
   //   // if (poolingConfiguration?.pool_mode === 'session') {
   //   //   setPoolingMode(poolingConfiguration.pool_mode)
@@ -435,6 +430,7 @@ export const DatabaseConnectionString = () => {
         </div>
       )}
 
+      {/* Possibly reintroduce later - @mildtomato */}
       {/* <Separator />
         <Collapsible_Shadcn_ className={cn('px-8 pt-5', selectedTab === 'python' && 'pb-5')}>
           <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
