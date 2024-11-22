@@ -106,6 +106,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
+  const TelemetryContainer = useMemo(
+    // eslint-disable-next-line react/display-name
+    () => (props: any) => {
+      return IS_PLATFORM ? <PageTelemetry>{props.children}</PageTelemetry> : <>{props.children}</>
+    },
+    []
+  )
+
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     Sentry.withScope(function (scope) {
       scope.setTag('globalErrorBoundary', true)
@@ -131,7 +139,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-                <PageTelemetry>
+                <TelemetryContainer>
                   <TooltipProvider>
                     <RouteValidationWrapper>
                       <ThemeProvider
@@ -157,7 +165,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       </ThemeProvider>
                     </RouteValidationWrapper>
                   </TooltipProvider>
-                </PageTelemetry>
+                </TelemetryContainer>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}

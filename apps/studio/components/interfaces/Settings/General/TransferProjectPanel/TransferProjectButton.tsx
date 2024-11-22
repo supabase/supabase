@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
+import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Loader, Shield, Users, Wrench } from 'lucide-react'
 import { Alert, Button, InfoIcon, Listbox, Loading, Modal } from 'ui'
 
 const TransferProjectButton = () => {
@@ -113,19 +113,8 @@ const TransferProjectButton = () => {
         <Modal.Content className="text-foreground-light">
           <p className="text-sm">
             To transfer projects, the owner must be a member of both the source and target
-            organizations. For further information see our{' '}
-            <Link
-              href="https://supabase.com/docs/guides/platform/project-transfer"
-              className="text-brand hover:underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-            .
+            organizations. Consider the following before transferring your project:
           </p>
-
-          <p className="mt-6 text-sm">Transferring considerations:</p>
 
           <ul className="mt-4 space-y-5 text-sm">
             <li className="flex gap-4">
@@ -167,8 +156,16 @@ const TransferProjectButton = () => {
               </div>
             </li>
           </ul>
+
+          <DocsButton
+            abbrev={false}
+            className="mt-6"
+            href="https://supabase.com/docs/guides/platform/project-transfer"
+          />
         </Modal.Content>
+
         <Modal.Separator />
+
         <Modal.Content>
           {organizations && (
             <div className="space-y-2">
@@ -204,67 +201,69 @@ const TransferProjectButton = () => {
           )}
         </Modal.Content>
 
-        <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
-          <Modal.Content>
-            <div className="space-y-2">
-              {transferPreviewData && transferPreviewData.warnings.length > 0 && (
-                <Alert
-                  withIcon
-                  variant="warning"
-                  title="Warnings for project transfer"
-                  className="mt-3"
-                >
-                  <div className="space-y-1">
-                    {transferPreviewData.warnings.map((warning) => (
-                      <p key={warning.key}>{warning.message}</p>
-                    ))}
-                  </div>
-                </Alert>
-              )}
-              {transferPreviewData && transferPreviewData.errors.length > 0 && (
-                <Alert withIcon variant="danger" title="Project cannot be transferred">
-                  <div className="space-y-1">
-                    {transferPreviewData.errors.map((error) => (
-                      <p key={error.key}>{error.message}</p>
-                    ))}
-                  </div>
-                  {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
-                    <div className="space-y-2">
-                      <p className="text-sm text-foreground-light">
-                        These members have reached their maximum limits for the number of active
-                        Free plan projects within organizations where they are an administrator or
-                        owner:
-                      </p>
-                      <ul className="pl-5 text-sm list-disc text-foreground-light">
-                        {(transferPreviewData.members_exceeding_free_project_limit || []).map(
-                          (member, idx: number) => (
-                            <li key={`member-${idx}`}>
-                              {member.name} (Limit: {member.limit} free projects)
-                            </li>
-                          )
-                        )}
-                      </ul>
-                      <p className="text-sm text-foreground-light">
-                        These members will need to either delete, pause, or upgrade one or more of
-                        their projects before you can downgrade this project.
-                      </p>
+        {selectedOrg !== undefined && (
+          <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
+            <Modal.Content>
+              <div className="space-y-2">
+                {transferPreviewData && transferPreviewData.warnings.length > 0 && (
+                  <Alert
+                    withIcon
+                    variant="warning"
+                    title="Warnings for project transfer"
+                    className="mt-3"
+                  >
+                    <div className="space-y-1">
+                      {transferPreviewData.warnings.map((warning) => (
+                        <p key={warning.key}>{warning.message}</p>
+                      ))}
                     </div>
-                  )}
-                </Alert>
-              )}
-              {transferPreviewError && !transferError && (
-                <Alert withIcon variant="danger" title="Project cannot be transferred">
-                  <p>{transferPreviewError.message}</p>
-                </Alert>
-              )}
-              {transferError && (
-                <Alert withIcon variant="danger" title="Project cannot be transferred">
-                  <p>{transferError.message}</p>
-                </Alert>
-              )}
-            </div>
-          </Modal.Content>
-        </Loading>
+                  </Alert>
+                )}
+                {transferPreviewData && transferPreviewData.errors.length > 0 && (
+                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                    <div className="space-y-1">
+                      {transferPreviewData.errors.map((error) => (
+                        <p key={error.key}>{error.message}</p>
+                      ))}
+                    </div>
+                    {transferPreviewData.members_exceeding_free_project_limit.length > 0 && (
+                      <div className="space-y-2">
+                        <p className="text-sm text-foreground-light">
+                          These members have reached their maximum limits for the number of active
+                          Free plan projects within organizations where they are an administrator or
+                          owner:
+                        </p>
+                        <ul className="pl-5 text-sm list-disc text-foreground-light">
+                          {(transferPreviewData.members_exceeding_free_project_limit || []).map(
+                            (member, idx: number) => (
+                              <li key={`member-${idx}`}>
+                                {member.name} (Limit: {member.limit} free projects)
+                              </li>
+                            )
+                          )}
+                        </ul>
+                        <p className="text-sm text-foreground-light">
+                          These members will need to either delete, pause, or upgrade one or more of
+                          their projects before you can downgrade this project.
+                        </p>
+                      </div>
+                    )}
+                  </Alert>
+                )}
+                {transferPreviewError && !transferError && (
+                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                    <p>{transferPreviewError.message}</p>
+                  </Alert>
+                )}
+                {transferError && (
+                  <Alert withIcon variant="danger" title="Project cannot be transferred">
+                    <p>{transferError.message}</p>
+                  </Alert>
+                )}
+              </div>
+            </Modal.Content>
+          </Loading>
+        )}
       </Modal>
     </>
   )

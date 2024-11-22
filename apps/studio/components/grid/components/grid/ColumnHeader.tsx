@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { XYCoord } from 'dnd-core'
 import { ArrowRight, Key, Link, Lock } from 'lucide-react'
 import { useEffect, useRef } from 'react'
@@ -6,6 +5,7 @@ import { useDrag, useDrop } from 'react-dnd'
 
 import { getForeignKeyCascadeAction } from 'components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
+import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 import { useDispatch, useTrackedState } from '../../store/Store'
 import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
@@ -126,50 +126,30 @@ export function ColumnHeader<R>({
         <div className="sb-grid-column-header__inner">
           {renderColumnIcon(columnType, { name: column.name as string, foreignKey })}
           {isPrimaryKey && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
                 <div className="sb-grid-column-header__inner__primary-key">
                   <Key size={14} strokeWidth={2} />
                 </div>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">Primary key</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" className="font-normal">
+                Primary key
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
           <span className="sb-grid-column-header__inner__name" title={hoverValue}>
             {column.name}
           </span>
           <span className="sb-grid-column-header__inner__format">{columnFormat}</span>
           {isEncrypted && (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
                 <Lock size={14} strokeWidth={2} />
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">Encrypted column</span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" className="font-normal">
+                Encrypted column
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
         </div>
         <ColumnMenu column={column} isEncrypted={isEncrypted} />
@@ -185,40 +165,36 @@ function renderColumnIcon(
   const { name, foreignKey } = columnMeta
   switch (type) {
     case 'foreign_key':
+      // [Joshen] Look into this separately but this should be a hover card instead
       return (
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_>
             <Link size={14} strokeWidth={2} />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <div>
-                  <p className="text-xs text-foreground-light">Foreign key relation:</p>
-                  <div className="flex items-center space-x-1">
-                    <p className="text-xs text-foreground">{name}</p>
-                    <ArrowRight size={14} strokeWidth={1.5} />
-                    <p className="text-xs text-foreground">
-                      {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
-                      {foreignKey?.targetColumnName}
-                    </p>
-                  </div>
-                  {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
-                    <p className="text-xs text-foreground mt-1">
-                      On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
-                    </p>
-                  )}
-                </div>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">
+            <div className="font-normal">
+              <p className="text-xs text-foreground-light">Foreign key relation:</p>
+              <div className="flex items-center space-x-1">
+                <p className="text-xs !text-foreground">{name}</p>
+                <ArrowRight size={14} strokeWidth={1.5} className="!text-foreground-light" />
+                <p className="text-xs !text-foreground">
+                  {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
+                  {foreignKey?.targetColumnName}
+                </p>
               </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+              {foreignKey?.updateAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                <p className="text-xs !text-foreground mt-1">
+                  On update: {getForeignKeyCascadeAction(foreignKey?.updateAction)}
+                </p>
+              )}
+              {foreignKey?.deletionAction !== FOREIGN_KEY_CASCADE_ACTION.NO_ACTION && (
+                <p className="text-xs !text-foreground mt-1">
+                  On delete: {getForeignKeyCascadeAction(foreignKey?.deletionAction)}
+                </p>
+              )}
+            </div>
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       )
     default:
       return null

@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
 import { getSortedPosts } from '~/lib/posts'
+import supabase from '~/lib/supabase'
 
 import { cn } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -121,10 +122,38 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
 }
 
 export async function getStaticProps() {
-  const allEvents = getSortedPosts({
+  const { data: meetups, error } = await supabase
+    .from('meetups')
+    .select('id, city, country, link, start_at, timezone, launch_week')
+
+  if (error) console.log('meetups error: ', error)
+
+  const meetupEvents: BlogPost[] =
+    meetups?.map((meetup: any) => ({
+      slug: '',
+      type: 'event',
+      title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
+      date: meetup.start_at,
+      description: '',
+      thumb: '',
+      path: '',
+      url: meetup.link ?? '',
+      tags: ['meetup', 'launch-week'],
+      categories: ['meetup'],
+      timezone: meetup.timezone ?? 'America/Los_Angeles',
+      disable_page_build: true,
+      link: {
+        href: meetup.link ?? '#',
+        target: '_blank',
+      },
+    })) ?? []
+
+  const staticEvents = getSortedPosts({
     directory: '_events',
     runner: '** EVENTS PAGE **',
   }) as BlogPost[]
+
+  const allEvents = [...staticEvents, ...meetupEvents]
   const upcomingEvents = allEvents.filter((event: BlogPost) => new Date(event.date!) >= new Date())
   const onDemandEvents = allEvents.filter(
     (event: BlogPost) => new Date(event.date!) < new Date() && event.onDemand === true

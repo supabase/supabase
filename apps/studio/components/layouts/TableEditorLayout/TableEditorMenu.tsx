@@ -12,10 +12,10 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -41,7 +41,8 @@ import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
 const TableEditorMenu = () => {
-  const { id } = useParams()
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
@@ -96,13 +97,17 @@ const TableEditorMenu = () => {
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
 
-  const { data: selectedTable } = useTable(id !== undefined ? Number(id) : undefined)
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
 
   useEffect(() => {
-    if (selectedTable) {
+    if (selectedTable?.schema) {
       setSelectedSchema(selectedTable.schema)
     }
-  }, [selectedTable])
+  }, [selectedTable?.schema])
 
   return (
     <>

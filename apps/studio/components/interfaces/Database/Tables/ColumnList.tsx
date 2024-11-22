@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
@@ -7,13 +6,15 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
@@ -36,10 +37,24 @@ const ColumnList = ({
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
-  const { id, ref } = useParams()
+  const { id: _id, ref } = useParams()
+  const id = _id ? Number(_id) : undefined
+
+  const { project } = useProjectContext()
+  const {
+    data: selectedTable,
+    error,
+    isError,
+    isLoading,
+    isSuccess,
+  } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
   const [filterString, setFilterString] = useState<string>('')
-  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
-  const isTableEntity = 'live_rows_estimate' in ((selectedTable as PostgresTable) || {})
+  const isTableEntity = isTableLike(selectedTable)
 
   const columns =
     (filterString.length === 0

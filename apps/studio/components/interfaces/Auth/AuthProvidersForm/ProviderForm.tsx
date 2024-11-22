@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { DocsButton } from 'components/ui/DocsButton'
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
@@ -27,6 +28,7 @@ import {
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
+import { Markdown } from 'components/interfaces/Markdown'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -110,7 +112,9 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   }
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const apiUrl = `https://${settings?.app_config?.endpoint}`
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint
+  const apiUrl = `${protocol}://${endpoint}`
 
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
@@ -278,19 +282,16 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                             : `${apiUrl}/auth/v1/callback`
                         }
                         descriptionText={
-                          <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>
-                            {provider.misc.helper}
-                          </ReactMarkdown>
+                          <Markdown
+                            content={provider.misc.helper}
+                            className="text-foreground-lighter"
+                          />
                         }
                       />
                     </>
                   )}
                   <div className="flex items-center justify-between">
-                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                      <Link href={provider.link} target="_blank" rel="noreferrer">
-                        Documentation
-                      </Link>
-                    </Button>
+                    <DocsButton href={provider.link} />
                     <div className="flex items-center gap-x-3">
                       <Button
                         type="default"

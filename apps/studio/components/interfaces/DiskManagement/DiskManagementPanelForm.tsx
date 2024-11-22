@@ -1,15 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ExternalLink, HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
+import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -22,6 +23,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { GB } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -43,38 +45,40 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
-import BillingChangeBadge from './BillingChangeBadge'
-import { DiskCountdownRadial } from './DiskCountdownRadial'
-import {
-  COMPUTE_SIZE_MAX_IOPS,
-  COMPUTE_SIZE_MAX_THROUGHPUT,
-  DiskType,
-  IOPS_RANGE,
-  PLAN_DETAILS,
-  THROUGHPUT_RANGE,
-} from './DiskManagement.constants'
+import { Markdown } from '../Markdown'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
-import { getDiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import {
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  DiskType,
+  IOPS_RANGE,
+  PLAN_DETAILS,
+  THROUGHPUT_RANGE,
+} from './ui/DiskManagement.constants'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
-} from './DiskManagementReadReplicas'
-import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
-import { Admonition } from 'ui-patterns'
-import { Markdown } from '../Markdown'
+} from './ui/DiskManagementReadReplicas'
+import { NoticeBar } from './ui/NoticeBar'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementPanelForm() {
   const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
@@ -128,10 +132,10 @@ export function DiskManagementPanelForm() {
     (x: { type: string }) => x.type === 'compute_instance'
   )?.variant
   const maxIopsBasedOnCompute =
-    COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
+    COMPUTE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
-    COMPUTE_SIZE_MAX_THROUGHPUT[
-      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_THROUGHPUT
+    COMPUTE_MAX_THROUGHPUT[
+      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_THROUGHPUT
     ]
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -162,10 +166,10 @@ export function DiskManagementPanelForm() {
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
+    computeSize: undefined,
   }
-  const DiskStorageSchema = getDiskStorageSchema(size_gb)
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(DiskStorageSchema),
+    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -265,6 +269,30 @@ export function DiskManagementPanelForm() {
 
     return () => clearInterval(timer)
   }, [remainingTime])
+
+  if (diskAndComputeFormEnabled) {
+    return (
+      <div id="disk-management">
+        <FormHeader
+          title="Disk Management"
+          docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+        />
+        <NoticeBar
+          visible={true}
+          type="default"
+          title="Disk Management has moved"
+          description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
+          actions={
+            <Button type="default" asChild>
+              <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                Go to Compute and Disk
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    )
+  }
 
   if (planId === 'free') {
     return (
@@ -634,13 +662,10 @@ export function DiskManagementPanelForm() {
                                 />
                               }
                             >
-                              <div className="flex items-center gap-x-2">
-                                <Button asChild type="default" icon={<ExternalLink />}>
-                                  <Link href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size">
-                                    Documentation
-                                  </Link>
-                                </Button>
-                              </div>
+                              <DocsButton
+                                abbrev={false}
+                                href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size"
+                              />
                             </Admonition>
                           )}
                         </>
@@ -705,18 +730,13 @@ export function DiskManagementPanelForm() {
                     </FormItemLayout>
                   )}
                 />
-                <div className="grid grid-cols-12 gap-3">
+                <div className="grid grid-cols-12 gap-10">
                   {/* You can add additional content in the remaining 4 columns if needed */}
                   <div className="col-span-4">
                     {/* Additional content or information can go here */}
                   </div>
                   <div className="col-span-8 space-y-6 mt-6">
-                    <DiskSpaceBar
-                      showNewBar={form.formState.dirtyFields.totalSize !== undefined}
-                      totalSize={size_gb}
-                      usedSize={mainDiskUsed}
-                      newTotalSize={watchedTotalSize}
-                    />
+                    <DiskSpaceBar form={form} />
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
                       totalSize={size_gb * 1.25}
@@ -744,10 +764,10 @@ export function DiskManagementPanelForm() {
                 </CardContent>
               </Card>
             ) : (
-              <DiskCountdownRadial remainingTime={remainingTime} />
+              <DiskCountdownRadial />
             )}
 
-            {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
+            <SpendCapDisabledSection />
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
@@ -765,9 +785,10 @@ export function DiskManagementPanelForm() {
                     form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}
-                    isWithinCooldown={disableInput}
+                    disabled={disableInput}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
+                    buttonSize={'tiny'}
                   />
                 </div>
               </CardContent>

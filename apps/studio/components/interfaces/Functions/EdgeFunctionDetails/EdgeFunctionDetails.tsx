@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import dayjs from 'dayjs'
 import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import Link from 'next/link'
@@ -29,6 +28,7 @@ import {
   Input,
   Modal,
   Toggle,
+  cn,
 } from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
@@ -56,11 +56,12 @@ const EdgeFunctionDetails = () => {
   const { anonKey } = getAPIKeys(settings)
   const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint ?? ''
   const functionUrl =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
-      : `https://${endpoint}/functions/v1/${selectedFunction?.slug}`
+      : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
@@ -180,7 +181,7 @@ const EdgeFunctionDetails = () => {
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
-                            <span className={clsx(hasImportMap ? 'text-brand' : 'text-amber-900')}>
+                            <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
                               {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function

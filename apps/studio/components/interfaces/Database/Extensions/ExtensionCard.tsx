@@ -10,8 +10,10 @@ import { DatabaseExtension } from 'data/database-extensions/database-extensions-
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { extensions } from 'shared-data'
 import { Button, cn, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import EnableExtensionModal from './EnableExtensionModal'
+import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
 
 interface ExtensionCardProps {
   extension: DatabaseExtension
@@ -166,9 +168,16 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
         onCancel={() => setIsDisableModalOpen(false)}
         onConfirm={() => onConfirmDisable()}
       >
-        <p className="text-sm text-foreground-light">
-          Are you sure you want to turn OFF the "{extension.name}" extension?
-        </p>
+        <div className="flex flex-col gap-y-3">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to turn OFF the "{extension.name}" extension?
+          </p>
+          {EXTENSION_DISABLE_WARNINGS[extension.name] && (
+            <Admonition type="warning" className="m-0">
+              {EXTENSION_DISABLE_WARNINGS[extension.name]}
+            </Admonition>
+          )}
+        </div>
       </ConfirmationModal>
     </>
   )

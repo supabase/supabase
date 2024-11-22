@@ -18,6 +18,7 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
+  FormLabel_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -33,7 +34,13 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
+import {
+  buildCronQuery,
+  buildHttpRequestCommand,
+  cronPattern,
+  secondsPattern,
+  parseCronJobCommand,
+} from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
@@ -66,7 +73,7 @@ const httpRequestSchema = z.object({
     .string()
     .trim()
     .min(1, 'Please provide a URL')
-    .regex(urlRegex, 'Please provide a valid URL')
+    .regex(urlRegex(), 'Please provide a valid URL')
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
@@ -90,13 +97,18 @@ const FormSchema = z.object({
     .trim()
     .min(1)
     .refine((value) => {
-      try {
-        CronToString(value)
-      } catch {
-        return false
+      if (cronPattern.test(value)) {
+        try {
+          CronToString(value)
+          return true
+        } catch {
+          return false
+        }
+      } else if (secondsPattern.test(value)) {
+        return true
       }
-      return true
-    }, 'The schedule needs to be in a Cron format.'),
+      return false
+    }, 'The schedule needs to be in a valid Cron format or specify seconds like "x seconds".'),
   values: z.discriminatedUnion('type', [
     edgeFunctionSchema,
     httpRequestSchema,
@@ -131,7 +143,7 @@ export const CreateCronJobSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '',
+      schedule: selectedCronJob?.schedule || '*/5 * * * *',
       values: cronJobValues,
     },
   })
@@ -228,10 +240,14 @@ export const CreateCronJobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
+
+                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs absolute top-0 right-0 ">
+                        Cron jobs cannot be renamed once created
+                      </FormLabel_Shadcn_>
                     </FormItemLayout>
                   )}
                 />

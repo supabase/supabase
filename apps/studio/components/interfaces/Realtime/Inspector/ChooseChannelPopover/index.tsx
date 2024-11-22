@@ -20,6 +20,7 @@ import {
   Switch,
 } from 'ui'
 import { RealtimeConfig } from '../useRealtimeMessages'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface ChooseChannelPopoverProps {
   config: RealtimeConfig
@@ -154,15 +155,11 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                     )}
                   />
 
-                  <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      href="https://supabase.com/docs/guides/realtime/authorization"
-                    >
-                      Documentation
-                    </a>
-                  </Button>
+                  <DocsButton
+                    abbrev={false}
+                    className="w-min"
+                    href="https://supabase.com/docs/guides/realtime/authorization"
+                  />
                 </form>
               </Form_Shadcn_>
             </>

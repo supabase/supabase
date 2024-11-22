@@ -22,12 +22,12 @@ import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mu
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { useDatabaseReport } from 'data/reports/database-report-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import type { NextPageWithLayout } from 'types'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -59,7 +59,7 @@ const DatabaseUsage = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const databaseSizeBytes = data?.result[0].db_size ?? 0
+  const databaseSizeBytes = data ?? 0
   const currentDiskSize = project?.volumeSizeGb ?? 0
 
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)

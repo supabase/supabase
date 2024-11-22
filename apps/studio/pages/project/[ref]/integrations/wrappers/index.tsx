@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ExternalLink } from 'lucide-react'
 
 import { Wrappers } from 'components/interfaces/Database'
 import WrappersDropdown from 'components/interfaces/Database/Wrappers/WrappersDropdown'
@@ -11,13 +10,13 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from 'types'
-import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 const DatabaseWrappers: NextPageWithLayout = () => {
@@ -53,16 +52,10 @@ const DatabaseWrappers: NextPageWithLayout = () => {
           />
         </ScaffoldSectionContent>
         <ScaffoldSectionDetail className="xl:!col-span-4 flex items-center justify-end gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-            <a
-              target="_blank"
-              rel="noreferrer"
-              className="no-underline"
-              href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
-            >
-              Documentation
-            </a>
-          </Button>
+          <DocsButton
+            className="no-underline"
+            href="https://supabase.com/docs/guides/database/extensions/wrappers/overview"
+          />
           {isWrappersEnabled && <WrappersDropdown />}
         </ScaffoldSectionDetail>
 

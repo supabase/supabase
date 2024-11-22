@@ -76,7 +76,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(urlRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),

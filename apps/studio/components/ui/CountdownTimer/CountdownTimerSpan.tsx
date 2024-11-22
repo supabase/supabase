@@ -17,25 +17,27 @@ const CountdownTimerSpan = ({ seconds }: CountdownTimerSpanProps) => {
   const formatValue = (value: number) => value.toString().padStart(2, '0')
 
   return (
-    <span className="text-foreground text-sm font-mono">
-      <MotionNumber
-        format={formatConfig}
-        value={formatValue(hours)}
-        transition={transitionConfig}
-      />
-      hr
-      <MotionNumber
-        format={formatConfig}
-        value={formatValue(minutes)}
-        transition={transitionConfig}
-      />
-      m
-      <MotionNumber
-        format={formatConfig}
-        value={formatValue(remainingSeconds)}
-        transition={transitionConfig}
-      />
-      s
+    <span className="inline-flex gap-2">
+      <span className="text-foreground-lighter text-sm p-0">Time remaining: </span>
+      <span className="text-foreground text-sm font-mono flex items-center gap-0">
+        <MotionNumber
+          format={formatConfig}
+          value={formatValue(hours)}
+          transition={transitionConfig}
+        />
+        hr
+        <MotionNumber
+          format={formatConfig}
+          value={formatValue(minutes)}
+          transition={transitionConfig}
+        />
+        m
+        <MotionNumber
+          format={formatConfig}
+          value={formatValue(remainingSeconds)}
+          transition={transitionConfig}
+        />
+      </span>
     </span>
   )
 }
