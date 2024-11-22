@@ -45,7 +45,7 @@ export const useInstalledIntegrations = () => {
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
 
-  const wrappers = useMemo(() => data?.result || EMPTY_ARR, [data?.result])
+  const wrappers = useMemo(() => data || EMPTY_ARR, [data])
 
   const installedIntegrations = useMemo(() => {
     return INTEGRATIONS.filter((i) => {

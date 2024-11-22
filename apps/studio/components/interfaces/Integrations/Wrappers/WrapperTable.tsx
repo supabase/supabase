@@ -23,7 +23,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const { project } = useProjectContext()
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
-  const { data, isLoading } = useFDWsQuery({
+  const { data } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -36,7 +36,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     )
   }
 
-  const wrappers = data?.result.filter((x) => x.handler === integration.meta.handlerName) || []
+  const wrappers = (data ?? []).filter((x) => x.handler === integration.meta.handlerName) || []
 
   return (
     <Card className="max-w-5xl">
