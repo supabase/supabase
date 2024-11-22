@@ -16,7 +16,7 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
+import { ArrowRight, Plus, PlusCircle, Save, Settings } from 'lucide-react'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
@@ -82,6 +82,8 @@ const Reports = () => {
     let _original = JSON.parse(JSON.stringify(currentReport?.content))
 
     if (!_original || !_config) return
+
+    console.log('_config', _config, _original, JSON.stringify(_config) == JSON.stringify(_original))
 
     /*
      * Check if the dates are a fixed custom date range
@@ -155,7 +157,8 @@ const Reports = () => {
       y,
       w: DEFAULT_CHART_COLUMN_COUNT,
       h: DEFAULT_CHART_ROW_COUNT,
-      id: uuidv4(),
+      id: metric.id || uuidv4(),
+      isSnippet: !!metric.isSnippet,
       attribute: metric.key,
       label: metric.label,
       provider: metric.provider,
@@ -165,14 +168,26 @@ const Reports = () => {
       ...config,
       layout: [...current],
     })
+
+    // Scroll closest overflow-auto container to bottom
+    setTimeout(() => {
+      const element = document.querySelector('.relative.mb-16.max-w-7xl')
+      const scrollableParent = element?.closest('main')
+      if (scrollableParent) {
+        scrollableParent.scrollTo({
+          top: scrollableParent.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    }, 100)
   }
 
   function popChart({ metric }: any) {
-    const { key } = metric
+    const { key, id } = metric
     const current = [...config.layout]
 
     const foundIndex = current.findIndex((x: any, i: number) => {
-      if (x.attribute === key) {
+      if (x.attribute === key || x.id === id) {
         return x
       }
     })
@@ -184,12 +199,16 @@ const Reports = () => {
   }
 
   useEffect(() => {
-    if (currentReport !== undefined) setConfig(currentReport?.content)
+    if (currentReport !== undefined) {
+      setConfig(structuredClone(currentReport?.content))
+    }
   }, [currentReport])
 
-  useEffect(() => {
+  const handleSetConfig = (payload: any) => {
+    console.log('config set!', payload, currentReport)
+    setConfig(payload)
     checkEditState()
-  }, [config])
+  }
 
   if (isLoading) {
     return <Loading />
@@ -200,7 +219,7 @@ const Reports = () => {
   }
 
   return (
-    <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
+    <div className="flex flex-col" style={{ maxHeight: '100%' }}>
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
@@ -226,7 +245,7 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <div className="mb-4 flex items-center justify-between space-x-3">
+      <div className="mb-4 flex items-center justify-between space-x-3 sticky top-0 py-3 bg-surface-75 z-20">
         <div className="flex items-center space-x-3">
           <DateRangePicker
             onChange={handleDateRangePicker}
@@ -254,12 +273,16 @@ const Reports = () => {
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<Settings size={14} />}>
-                  <span>Add / Remove charts</span>
+                <Button type="default" icon={<Plus size={14} />}>
+                  <span>Add block</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="end">
-                <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                <MetricOptions
+                  projectRef={ref}
+                  config={config}
+                  handleChartSelection={handleChartSelection}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -275,10 +298,10 @@ const Reports = () => {
                 },
               }}
             >
-              Add / Remove charts
+              Add block
             </ButtonTooltip>
           )}
-          <DatabaseSelector />
+          <DatabaseSelector condensed />
         </div>
       </div>
 
@@ -294,7 +317,11 @@ const Reports = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="center">
-                <MetricOptions config={config} handleChartSelection={handleChartSelection} />
+                <MetricOptions
+                  projectRef={ref}
+                  config={config}
+                  handleChartSelection={handleChartSelection}
+                />
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
@@ -311,7 +338,7 @@ const Reports = () => {
               editableReport={config}
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
-              setEditableReport={setConfig}
+              setEditableReport={handleSetConfig}
             />
           )}
         </div>

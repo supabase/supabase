@@ -113,8 +113,8 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
       resizable: true,
       parent: undefined,
       level: 0,
-      width: columnWidth,
-      minWidth: MIN_COLUMN_WIDTH,
+      flex: 1,
+      minWidth: columnWidth,
       maxWidth: undefined,
       draggable: false,
       frozen: false,
@@ -130,7 +130,7 @@ const Results = ({ rows }: { rows: readonly any[] }) => {
       <DataGrid
         columns={columns}
         rows={rows}
-        className="h-full flex-grow border-t-0"
+        className="h-full flex-grow border-t-0 w-full"
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={setCellPosition}
       />

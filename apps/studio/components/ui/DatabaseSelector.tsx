@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
+import { Database, Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -30,12 +30,14 @@ interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
   onSelectId?: (id: string) => void // Optional callback
+  condensed?: boolean
 }
 
 const DatabaseSelector = ({
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
+  condensed = false,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -66,25 +68,36 @@ const DatabaseSelector = ({
               'pr-2',
               variant === 'connected-on-right' && 'rounded-r-none',
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
-              variant === 'connected-on-both' && 'rounded-none border-x-0'
+              variant === 'connected-on-both' && 'rounded-none border-x-0',
+              condensed && 'px-2'
             )}
-            icon={isLoading && <Loader2 className="animate-spin" />}
+            icon={
+              isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : condensed ? (
+                <Database size={16} />
+              ) : undefined
+            }
             iconRight={<ChevronDown className="text-foreground-light" strokeWidth={2} size={12} />}
           >
-            <span className="text-foreground-muted mr-1">source</span>
-            {selectedAdditionalOption ? (
-              <span>{selectedAdditionalOption.name}</span>
-            ) : (
+            {!condensed && (
               <>
-                <span className="capitalize">
-                  {isLoading || selectedDatabase?.identifier === projectRef
-                    ? 'Primary database'
-                    : 'Read replica'}
-                </span>{' '}
-                {isSuccess && selectedDatabase?.identifier !== projectRef && (
-                  <span>
-                    ({selectedDatabaseRegion} - {formattedDatabaseId})
-                  </span>
+                <span className="text-foreground-muted mr-1">source</span>
+                {selectedAdditionalOption ? (
+                  <span>{selectedAdditionalOption.name}</span>
+                ) : (
+                  <>
+                    <span className="capitalize">
+                      {isLoading || selectedDatabase?.identifier === projectRef
+                        ? 'Primary database'
+                        : 'Read replica'}
+                    </span>{' '}
+                    {isSuccess && selectedDatabase?.identifier !== projectRef && (
+                      <span>
+                        ({selectedDatabaseRegion} - {formattedDatabaseId})
+                      </span>
+                    )}
+                  </>
                 )}
               </>
             )}

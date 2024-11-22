@@ -1,9 +1,11 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useState } from 'react'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { PropsWithChildren } from 'react'
+import { Loader2 } from 'lucide-react'
+import { WarningIcon } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { CartesianGrid, Bar, BarChart, XAxis, YAxis } from 'recharts'
+import dayjs from 'dayjs'
 
-import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
@@ -13,9 +15,8 @@ import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
 } from 'data/analytics/project-daily-stats-query'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
+import { Activity } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui'
 import type { ChartData } from './ChartHandler.types'
 
 interface ChartHandlerProps {
@@ -27,13 +28,10 @@ interface ChartHandlerProps {
   endDate: string
   interval: string
   customDateFormat?: string
-  defaultChartStyle?: 'bar' | 'line'
-  hideChartType?: boolean
   data?: ChartData
   isLoading?: boolean
   format?: string
   highlightedValue?: string | number
-  onBarClick?: (v: any) => void
 }
 
 /**
@@ -54,19 +52,15 @@ const ChartHandler = ({
   interval,
   customDateFormat,
   children = null,
-  defaultChartStyle = 'bar',
-  hideChartType = false,
   data,
   isLoading,
   format,
   highlightedValue,
-  onBarClick,
 }: PropsWithChildren<ChartHandlerProps>) => {
   const router = useRouter()
   const { ref } = router.query
 
   const state = useDatabaseSelectorStateSnapshot()
-  const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
 
   const databaseIdentifier = state.selectedDatabaseId
 
@@ -119,6 +113,8 @@ const ChartHandler = ({
     'maximum' in chartData
   const shouldHighlightTotalGroupedValue = chartData !== undefined && 'totalGrouped' in chartData
 
+  console.log('chart data:', chartData)
+
   const _highlightedValue =
     highlightedValue !== undefined
       ? highlightedValue
@@ -149,47 +145,40 @@ const ChartHandler = ({
   }
 
   return (
-    <div className="h-full w-full">
-      <div className="absolute right-6 z-50 flex justify-between">
-        {!hideChartType && (
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                type="default"
-                className="px-1.5"
-                icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
-                onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
-              />
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="left" align="center">
-              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
-        )}
-        {children}
+    <div className="h-full flex flex-col">
+      <div className="flex justify-between px-5 py-4 items-center z-10 border-b">
+        <div>
+          <h3 className="text-sm text-foreground-light">{label}</h3>
+          <div>
+            {chartData?.format === '%'
+              ? `${_highlightedValue.toFixed(1)}%`
+              : _highlightedValue?.toLocaleString()}
+          </div>
+        </div>
+        <div className="flex gap-2">{children}</div>
       </div>
-      {chartStyle === 'bar' ? (
-        <BarChart
-          YAxisProps={{ width: 1 }}
-          data={(chartData?.data ?? []) as any}
-          format={format || chartData?.format}
-          xAxisKey={'period_start'}
-          yAxisKey={attribute}
-          highlightedValue={_highlightedValue}
-          title={label}
-          customDateFormat={customDateFormat}
-        />
-      ) : (
-        <AreaChart
-          data={(chartData?.data ?? []) as any}
-          format={format || chartData?.format}
-          xAxisKey="period_start"
-          yAxisKey={attribute}
-          highlightedValue={_highlightedValue}
-          title={label}
-          customDateFormat={customDateFormat}
-        />
-      )}
+      <div className="flex-1 p-2 relative">
+        <ChartContainer config={{}} className="aspect-auto h-full">
+          <BarChart accessibilityLayer data={chartData?.data ?? []}>
+            <CartesianGrid vertical={false} />
+            {/* <XAxis
+              dataKey="period_start"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => dayjs(value).format(customDateFormat || 'MMM D YYYY')}
+            />
+            <YAxis
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.toLocaleString()}
+            /> */}
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Bar dataKey={attribute} fill="var(--chart-1)" radius={4} />
+          </BarChart>
+        </ChartContainer>
+      </div>
     </div>
   )
 }
