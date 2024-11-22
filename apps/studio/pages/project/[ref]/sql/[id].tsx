@@ -112,9 +112,9 @@ const SqlEditor: NextPageWithLayout = () => {
     if (pgInfoRef.current === null) {
       pgInfoRef.current = {}
     }
-    pgInfoRef.current.tableColumns = tableColumns?.result
+    pgInfoRef.current.tableColumns = tableColumns
     pgInfoRef.current.schemas = schemas
-    pgInfoRef.current.keywords = keywords?.result
+    pgInfoRef.current.keywords = keywords
     pgInfoRef.current.functions = functions
   }
 

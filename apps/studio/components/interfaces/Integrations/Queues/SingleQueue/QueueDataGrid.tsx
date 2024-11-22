@@ -6,17 +6,18 @@ import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import { Badge, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
 
 interface QueueDataGridProps {
   isLoading: boolean
   messages: PostgresQueueMessage[]
+  showMessageModal: () => void
   fetchNextPage: () => void
 }
 
-function isAtBottom({ currentTarget }: React.UIEvent<HTMLDivElement>): boolean {
+function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
   return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
 }
 
@@ -123,6 +124,7 @@ const columns = messagesCols.map((col) => {
 export const QueueMessagesDataGrid = ({
   isLoading,
   messages,
+  showMessageModal,
   fetchNextPage,
 }: QueueDataGridProps) => {
   const gridRef = useRef<DataGridHandle>(null)
@@ -188,6 +190,9 @@ export const QueueMessagesDataGrid = ({
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
+                <Button className="mt-2" onClick={() => showMessageModal()}>
+                  Add message
+                </Button>
               </div>
             </div>
           ),
