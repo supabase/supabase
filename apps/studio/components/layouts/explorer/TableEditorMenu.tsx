@@ -1,12 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { Edit2, Filter, Plus, Pointer, Workflow } from 'lucide-react'
+import { Edit2, Filter, Pointer } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
@@ -19,9 +18,6 @@ import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
   Checkbox_Shadcn_,
   Label_Shadcn_,
@@ -29,9 +25,6 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   Skeleton,
-  TreeViewItemVariant,
-  TrewViewItemVariant,
-  cn,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -39,12 +32,11 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import Link from 'next/link'
 import { SchemaButton } from './schema-button'
+import { TableMenuEmptyState } from './TableMenuEmptyState'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -287,49 +279,13 @@ const TableEditorMenu = () => {
               </div>
             </div>
           )}
-          {/* <InnerSideBarShimmeringLoaders />} */}
-
           {isError && (
             <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
           )}
-
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <InnerSideBarEmptyPanel
-                  className="mx-4 relative overflow-hidden"
-                  title="No tables or views"
-                  description="Any tables or views you create will be listed here."
-                >
-                  <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed w-60 bg-dash-sidebar h-content -mb-4 mt-3 pointer-events-none">
-                    <div className="relative h-content">
-                      <div className="absolute inset-0 pointer-events-none z-10">
-                        <div className="absolute inset-0 bg-gradient-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent from-50% to-100% to-background-surface-100 dark:to-background-surface-75" />
-                      </div>
-                      <div className="absolute left-[150px] bottom-[21px] text-foreground-muted z-10 pointer-events-none">
-                        <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />
-                      </div>
-                      {[...Array(4)].map((_, i) => (
-                        <div className="border-l pointer-events-none">
-                          <EntityListItem
-                            isActive={i === 2}
-                            key={-(i + 1)}
-                            item={{
-                              rls_enabled: false,
-                              id: -(i + 1),
-                              name: `example_table_${i + 1}`,
-                              type: i % 2 === 0 ? ENTITY_TYPE.TABLE : ENTITY_TYPE.VIEW,
-                              comment: null,
-                              schema: selectedSchema,
-                            }}
-                            id={-(i + 1)}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </InnerSideBarEmptyPanel>
+                <TableMenuEmptyState />
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
@@ -346,7 +302,7 @@ const TableEditorMenu = () => {
                     ItemComponent={EntityListItem}
                     itemProps={{
                       projectRef: project?.ref!,
-                      id: Number(id),
+                      id: id ?? '',
                       isLocked,
                     }}
                     getItemSize={() => 28}

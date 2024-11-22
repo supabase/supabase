@@ -511,9 +511,11 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                     <div className="border-l pointer-events-none">
                       <TreeViewItem
                         isSelected={i === 2}
-                        key={-(i + 1)}
-                        id={-(i + 1)}
-                        name={`example_query_${i + 1}`}
+                        key={`dummy-${i + 1}`}
+                        id={`dummy-${i + 1}`}
+                        name={`dummy_query_${i + 1}`}
+                        level={1}
+                        xPadding={0}
                       />
                     </div>
                   ))}

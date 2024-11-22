@@ -1,14 +1,8 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import type { NextPageWithLayout } from 'types'
-import { ExplorerLayout } from 'components/layouts/explorer/layout'
-
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { ExplorerLayout } from 'components/layouts/explorer/layout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -19,8 +13,12 @@ import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
-import { addTab, getTabsStore } from 'state/tabs'
+import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { addTab } from 'state/tabs'
+import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -187,10 +185,6 @@ const SqlEditor: NextPageWithLayout = () => {
   return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => (
-  <ExplorerLayout title="SQL" hideTabs={false}>
-    {page}
-  </ExplorerLayout>
-)
+SqlEditor.getLayout = (page) => <ExplorerLayout hideTabs={false}>{page}</ExplorerLayout>
 
 export default SqlEditor
