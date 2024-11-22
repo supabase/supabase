@@ -789,3 +789,15 @@ launch week
     transform: translate(12px, 0);
   }
 }
+
+.lw13-game-input {
+  visibility: none;
+  opacity: 0;
+}
+
+@media (hover: none) {
+  .lw13-game-input {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+}

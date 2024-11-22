@@ -116,7 +116,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           <CanvasSingleMode />
           <ThreeTicketCanvas
             username={DISPLAY_NAME ?? ''}
-            className="relative -mt-56 -mb-20 lg:my-0 lg:absolute"
+            className="relative -mt-40 -mb-20 lg:my-0 lg:absolute"
             ticketPosition="left"
             ticketType={ticketType}
           />

@@ -1,7 +1,3 @@
-import { RefObject, useEffect, useState } from 'react'
-import { SITE_ORIGIN } from '~/lib/constants'
-import useConfData from './use-conf-data'
-
 // ============================================
 // ============ 🏆 SECRET CODE 🏆 ==============
 // ============================================
@@ -11,6 +7,10 @@ const SUPA_SECRET_CODE = 'ship'
 // ============================================
 // == TYPE IT IN WHEN THE TICKET IS FLIPPED ===
 // ============================================
+
+import { RefObject, useEffect, useState } from 'react'
+import { SITE_ORIGIN } from '~/lib/constants'
+import useConfData from './use-conf-data'
 
 const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) => {
   const { supabase, userData: user } = useConfData()
@@ -90,6 +90,17 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
       handleClaimTicket(null)
     }
   }, [hasWon])
+
+  useEffect(() => {
+    if (!!inputRef?.current && isGameMode) {
+      inputRef?.current?.focus()
+      console.log('FOCUS!', inputRef?.current)
+
+      inputRef.current.style.opacity = '1 !important'
+      inputRef.current.style.visibility = 'true'
+      inputRef.current.className = 'visible opacity-100'
+    }
+  }, [isGameMode])
 
   useEffect(() => {
     if (user.secret) {

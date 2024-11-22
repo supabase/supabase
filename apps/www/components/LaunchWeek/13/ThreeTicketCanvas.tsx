@@ -503,7 +503,8 @@ const ThreeTicketCanvas: React.FC<{
           maxLength={phraseLength}
           pattern={REGEXP_ONLY_CHARS}
           autoFocus
-          containerClassName="!absolute opacity-0 invisible"
+          // containerClassName="!absolute opacity-0 invisible"
+          containerClassName="!absolute flex justify-center w-full inset-0 top-auto bottom-[15%] lw13-game-input lg:!invisible lg:!opacity-0"
           inputMode="text"
           value={value}
           spellCheck={false}
@@ -515,13 +516,7 @@ const ThreeTicketCanvas: React.FC<{
                 {word.map((_, c_idx) => {
                   // index is sum of every letter of every previous word + index of current wo
                   const currentIndex = handleIndexCount(w_idx, c_idx)
-                  return (
-                    <InputOTPSlot
-                      className="opacity-0"
-                      key={`otp-${currentIndex}`}
-                      index={currentIndex}
-                    />
-                  )
+                  return <InputOTPSlot key={`otp-${currentIndex}`} index={currentIndex} />
                 })}
               </InputOTPGroup>
               {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />}
