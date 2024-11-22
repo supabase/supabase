@@ -54,6 +54,8 @@ import { Loader2 } from 'lucide-react'
 import { PITRForm } from 'components/interfaces/Database/Backups/PITR/pitr-form'
 import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 import { Markdown } from 'components/interfaces/Markdown'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -82,6 +84,7 @@ const RestoreToNewProject = () => {
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isFreePlan = subscription?.plan?.id === 'free'
+  const isOrioleDb = useIsOrioleDb()
 
   const {
     data: cloneBackups,
@@ -215,6 +218,18 @@ const RestoreToNewProject = () => {
           <p className="font-mono text-right text-brand">${additionalMonthlySpend.priceMonthly}</p>
         </div>
       </div>
+    )
+  }
+
+  if (isOrioleDb) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to new projects are not available for OrioleDB"
+        description="OrioleDB is currently in preview and projects created are strictly ephemeral with no database backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+      </Admonition>
     )
   }
 
