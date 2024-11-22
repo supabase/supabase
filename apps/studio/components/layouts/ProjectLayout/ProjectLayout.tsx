@@ -136,10 +136,8 @@ const ProjectLayout = ({
         </Head>
         <div className="flex flex-col h-screen">
           {!hideHeader && <LayoutHeader />}
-
           <div className="flex flex-1 overflow-hidden">
             {!hideIconBar && <NavigationBar />}
-
             <AnimatePresence initial={false}>
               <ResizablePanelGroup
                 className="flex flex-1"
@@ -192,7 +190,6 @@ const ProjectLayout = ({
                     )}
                   </ResizablePanel>
                 )}
-
                 {showProductMenu && productMenu && sidebar.isOpen && (
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
