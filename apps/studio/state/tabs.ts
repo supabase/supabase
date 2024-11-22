@@ -45,11 +45,10 @@ export const tabsStore = proxy<TabsStateMap>({})
 
 // Helper to get/create state for a specific ref
 export const getTabsStore = (ref: string | undefined): TabsState => {
-  if (!ref) return defaultState
+  if (!ref) return proxy(defaultState)
   if (!tabsStore[ref]) {
-    // Load from localStorage or use default
     const stored = localStorage.getItem(getStorageKey(ref))
-    tabsStore[ref] = stored ? JSON.parse(stored) : defaultState
+    tabsStore[ref] = proxy(stored ? JSON.parse(stored) : { ...defaultState })
   }
   return tabsStore[ref]
 }

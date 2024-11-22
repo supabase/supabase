@@ -1,17 +1,18 @@
-import { useRouter } from 'next/router'
+import { useParams } from 'common'
 import { SchemaGraph } from 'components/interfaces/Database/Schemas/SchemaGraph'
 import { ExplorerLayout } from 'components/layouts/explorer/layout'
-import { ReactFlowProvider } from 'reactflow'
-import type { NextPageWithLayout } from 'types'
-import { getTabsStore, addTab } from 'state/tabs'
-import { useEffect } from 'react'
-import { FileJson2 } from 'lucide-react'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import { ReactFlowProvider } from 'reactflow'
+import { addTab, getTabsStore } from 'state/tabs'
+import type { NextPageWithLayout } from 'types'
 
 const SchemasPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const { ref } = useParams()
   const schema = router.query.schema as string
-  const store = getTabsStore('explorer')
+  const store = getTabsStore(ref)
 
   useEffect(() => {
     if (schema) {

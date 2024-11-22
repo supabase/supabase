@@ -356,7 +356,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   data={projectSnippetsTreeState}
                   aria-label="project-level-snippets"
                   nodeRenderer={({ element, ...props }) => {
-                    const tabsStore = getTabsStore(projectRef as string)
+                    const tabsStore = getTabsStore(projectRef)
                     const isOpened = Object.values(tabsStore.tabsMap).some(
                       (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
                     )
@@ -421,7 +421,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   data={favoritesTreeState}
                   aria-label="favorite-snippets"
                   nodeRenderer={({ element, ...props }) => {
-                    const tabsStore = getTabsStore(projectRef as string)
+                    const tabsStore = getTabsStore(projectRef)
                     const isOpened = Object.values(tabsStore.tabsMap).some(
                       (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
                     )
@@ -532,7 +532,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
               aria-label="private-snippets"
               expandedIds={defaultExpandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
-                const tabsStore = getTabsStore(projectRef as string)
+                const tabsStore = getTabsStore(projectRef)
                 const isOpened = Object.values(tabsStore.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.id || tab.id === element.id
                 )
