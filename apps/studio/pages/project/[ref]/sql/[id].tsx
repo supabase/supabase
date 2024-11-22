@@ -1,6 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ExplorerLayout } from 'components/layouts/explorer/layout'
 import {
   ProjectContextFromParamsProvider,
@@ -174,7 +175,7 @@ const SqlEditor: NextPageWithLayout = () => {
     const tabId = `sql-${id}`
     const snippet = snippets.find((s) => s.id === id)
 
-    addTab('explorer', {
+    addTab({
       id: tabId,
       type: 'sql',
       label: snippet?.name || 'Untitled Query',
@@ -190,7 +191,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <ExplorerLayout>{page}</ExplorerLayout>
+    <HandleEditorLayouts>{page}</HandleEditorLayouts>
   </ProjectContextFromParamsProvider>
 )
 

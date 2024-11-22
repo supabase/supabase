@@ -1,4 +1,4 @@
-import { proxy } from 'valtio'
+import { proxy, subscribe } from 'valtio'
 import { ReactNode } from 'react'
 import { nanoid } from 'nanoid'
 import { addRecentItem } from './recent-items'
@@ -26,7 +26,7 @@ interface TabsState {
   previewTabId?: string
 }
 
-type TabStore = ReturnType<typeof proxy<TabsState>>
+const STORAGE_KEY = 'supabase_studio_tabs'
 
 const defaultState: TabsState = {
   openTabs: [],
@@ -34,26 +34,43 @@ const defaultState: TabsState = {
   tabsMap: {},
 }
 
-const tabsStoreMap = new Map<string, TabStore>()
+const loadInitialState = (): TabsState => {
+  if (typeof window === 'undefined') return defaultState
 
-export const getTabsStore = (key: string): TabStore => {
-  if (!tabsStoreMap.has(key)) {
-    tabsStoreMap.set(key, proxy<TabsState>(defaultState))
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (!stored) return defaultState
+
+  try {
+    return JSON.parse(stored)
+  } catch (error) {
+    console.error('Failed to parse tabs from localStorage:', error)
+    return defaultState
   }
-  return tabsStoreMap.get(key)!
 }
 
-export const addTab = (storeKey: string, tab: Tab) => {
-  const store = getTabsStore(storeKey)
+export const tabsStore = proxy<TabsState>(loadInitialState())
 
+if (typeof window !== 'undefined') {
+  subscribe(tabsStore, () => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tabsStore))
+    } catch (error) {
+      console.error('Failed to save tabs to localStorage:', error)
+    }
+  })
+}
+
+export const getTabsStore = () => tabsStore
+
+export const addTab = (tab: Tab) => {
   // If tab exists and is active, don't do anything
-  if (store.tabsMap[tab.id] && store.activeTab === tab.id) {
+  if (tabsStore.tabsMap[tab.id] && tabsStore.activeTab === tab.id) {
     return
   }
 
   // If tab exists but isn't active, just make it active
-  if (store.tabsMap[tab.id]) {
-    store.activeTab = tab.id
+  if (tabsStore.tabsMap[tab.id]) {
+    tabsStore.activeTab = tab.id
     // Add to recent items when switching to existing tab
     if (!tab.isPreview && tab.type !== 'new') {
       addRecentItem(tab)
@@ -63,9 +80,9 @@ export const addTab = (storeKey: string, tab: Tab) => {
 
   // If this tab should be permanent, add it normally
   if (tab.isPreview === false) {
-    store.openTabs = [...store.openTabs, tab.id]
-    store.tabsMap[tab.id] = tab
-    store.activeTab = tab.id
+    tabsStore.openTabs = [...tabsStore.openTabs, tab.id]
+    tabsStore.tabsMap[tab.id] = tab
+    tabsStore.activeTab = tab.id
     // Add to recent items when creating permanent tab
     if (tab.type !== 'new') {
       addRecentItem(tab)
@@ -74,43 +91,41 @@ export const addTab = (storeKey: string, tab: Tab) => {
   }
 
   // Remove any existing preview tab
-  if (store.previewTabId) {
-    store.openTabs = store.openTabs.filter((id) => id !== store.previewTabId)
-    delete store.tabsMap[store.previewTabId]
+  if (tabsStore.previewTabId) {
+    tabsStore.openTabs = tabsStore.openTabs.filter((id) => id !== tabsStore.previewTabId)
+    delete tabsStore.tabsMap[tabsStore.previewTabId]
   }
 
   // Add new preview tab
-  store.tabsMap[tab.id] = { ...tab, isPreview: true }
-  store.openTabs = [...store.openTabs, tab.id]
-  store.previewTabId = tab.id
-  store.activeTab = tab.id
+  tabsStore.tabsMap[tab.id] = { ...tab, isPreview: true }
+  tabsStore.openTabs = [...tabsStore.openTabs, tab.id]
+  tabsStore.previewTabId = tab.id
+  tabsStore.activeTab = tab.id
 }
 
-export const removeTab = (storeKey: string, id: string) => {
-  const store = getTabsStore(storeKey)
-  const idx = store.openTabs.indexOf(id)
-  store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
-  delete store.tabsMap[id]
+export const removeTab = (id: string) => {
+  const idx = tabsStore.openTabs.indexOf(id)
+  tabsStore.openTabs = tabsStore.openTabs.filter((tabId) => tabId !== id)
+  delete tabsStore.tabsMap[id]
 
-  if (id === store.activeTab) {
-    store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
+  if (id === tabsStore.activeTab) {
+    tabsStore.activeTab = tabsStore.openTabs[idx - 1] || tabsStore.openTabs[idx + 1] || null
   }
 }
 
-export const reorderTabs = (storeKey: string, oldIndex: number, newIndex: number) => {
-  const newOpenTabs = [...getTabsStore(storeKey).openTabs]
+export const reorderTabs = (oldIndex: number, newIndex: number) => {
+  const newOpenTabs = [...tabsStore.openTabs]
   const [removedTab] = newOpenTabs.splice(oldIndex, 1)
   newOpenTabs.splice(newIndex, 0, removedTab)
-  getTabsStore(storeKey).openTabs = newOpenTabs
+  tabsStore.openTabs = newOpenTabs
 }
 
-export const makeTabPermanent = (storeKey: string, tabId: string) => {
-  const store = getTabsStore(storeKey)
-  const tab = store.tabsMap[tabId]
+export const makeTabPermanent = (tabId: string) => {
+  const tab = tabsStore.tabsMap[tabId]
 
   if (tab?.isPreview) {
     tab.isPreview = false
-    store.previewTabId = undefined
+    tabsStore.previewTabId = undefined
     // Add to recent items when preview tab becomes permanent
     if (tab.type !== 'new') {
       addRecentItem(tab)
@@ -118,16 +133,15 @@ export const makeTabPermanent = (storeKey: string, tabId: string) => {
   }
 }
 
-export const makeActiveTabPermanent = (storeKey: string) => {
-  const store = getTabsStore(storeKey)
-  if (store.activeTab && store.tabsMap[store.activeTab]?.isPreview) {
-    makeTabPermanent(storeKey, store.activeTab)
+export const makeActiveTabPermanent = () => {
+  if (tabsStore.activeTab && tabsStore.tabsMap[tabsStore.activeTab]?.isPreview) {
+    makeTabPermanent(tabsStore.activeTab)
     return true
   }
   return false
 }
 
-export const openNewContentTab = (storeKey: string) => {
+export const openNewContentTab = () => {
   const tab: Tab = {
     id: `new-${nanoid()}`,
     type: 'new',
@@ -136,23 +150,21 @@ export const openNewContentTab = (storeKey: string) => {
     isPreview: false,
   }
 
-  addTab(storeKey, tab)
+  addTab(tab)
 }
 
-export const removeNewTab = (storeKey: string) => {
-  const store = getTabsStore(storeKey)
-  const newTab = Object.values(store.tabsMap).find((tab) => tab.type === 'new')
+export const removeNewTab = () => {
+  const newTab = Object.values(tabsStore.tabsMap).find((tab) => tab.type === 'new')
   if (newTab) {
-    removeTab(storeKey, newTab.id)
+    removeTab(newTab.id)
   }
 }
 
-export const handleTabNavigation = (storeKey: string, id: string, router: any) => {
-  const store = getTabsStore(storeKey)
-  const tab = store.tabsMap[id]
+export const handleTabNavigation = (id: string, router: any) => {
+  const tab = tabsStore.tabsMap[id]
   if (!tab) return
 
-  store.activeTab = id
+  tabsStore.activeTab = id
 
   // Add to recent items when navigating to a non-preview, non-new tab
   if (!tab.isPreview && tab.type !== 'new') {
@@ -188,26 +200,20 @@ export const handleTabNavigation = (storeKey: string, id: string, router: any) =
   }
 }
 
-export const handleTabClose = (
-  storeKey: string,
-  id: string,
-  router: any,
-  onClose?: (id: string) => void
-) => {
-  const store = getTabsStore(storeKey)
-  const currentTab = store.tabsMap[id]
-  const newTabs = store.openTabs.filter((tabId) => tabId !== id)
+export const handleTabClose = (id: string, router: any, onClose?: (id: string) => void) => {
+  const currentTab = tabsStore.tabsMap[id]
+  const newTabs = tabsStore.openTabs.filter((tabId) => tabId !== id)
   const nextTabId = newTabs[newTabs.length - 1]
-  const nextTab = nextTabId ? store.tabsMap[nextTabId] : null
+  const nextTab = nextTabId ? tabsStore.tabsMap[nextTabId] : null
 
   // Update store first
-  store.openTabs = newTabs
-  store.activeTab = nextTabId ?? null
-  delete store.tabsMap[id]
+  tabsStore.openTabs = newTabs
+  tabsStore.activeTab = nextTabId ?? null
+  delete tabsStore.tabsMap[id]
 
   // Then handle navigation based on next tab
   if (nextTab) {
-    handleTabNavigation(storeKey, nextTab.id, router)
+    handleTabNavigation(nextTab.id, router)
   } else {
     router.push(`/project/${router.query.ref}/explorer`)
   }
@@ -216,28 +222,25 @@ export const handleTabClose = (
 }
 
 export const handleTabDragEnd = (
-  storeKey: string,
   oldIndex: number,
   newIndex: number,
   tabId: string,
   router: any
 ) => {
-  const store = getTabsStore(storeKey)
-
   // Make permanent if needed
-  const draggedTab = store.tabsMap[tabId]
+  const draggedTab = tabsStore.tabsMap[tabId]
   if (draggedTab?.isPreview) {
-    makeTabPermanent(storeKey, tabId)
+    makeTabPermanent(tabId)
   }
 
   // Reorder tabs
-  const newOpenTabs = [...store.openTabs]
+  const newOpenTabs = [...tabsStore.openTabs]
   newOpenTabs.splice(oldIndex, 1)
   newOpenTabs.splice(newIndex, 0, tabId)
 
-  store.openTabs = newOpenTabs
-  store.activeTab = tabId
+  tabsStore.openTabs = newOpenTabs
+  tabsStore.activeTab = tabId
 
   // Handle navigation
-  handleTabNavigation(storeKey, tabId, router)
+  handleTabNavigation(tabId, router)
 }

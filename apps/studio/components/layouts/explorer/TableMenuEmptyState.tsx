@@ -11,11 +11,11 @@ export const TableMenuEmptyState = () => {
 
   return (
     <InnerSideBarEmptyPanel
-      className="mx-4 relative overflow-hidden"
       title="No tables or views"
       description="Any tables or views you create will be listed here."
+      className="mx-4"
     >
-      <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed w-60 bg-dash-sidebar h-content -mb-4 mt-3 pointer-events-none">
+      <div className="top-0 left-6 flex flex-col opacity-50 cursor-not-allowed bg-dash-sidebar h-content -mb-7 pointer-events-none scale-75">
         <div className="relative h-content">
           <div className="absolute inset-0 pointer-events-none z-10">
             <div className="absolute inset-0 bg-gradient-to-t from-transparent from-80% to-100% to-background-surface-100 dark:to-background-surface-75" />

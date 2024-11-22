@@ -32,6 +32,8 @@ import { useSnapshot } from 'valtio'
 import { sidebarState } from './sidebar-state'
 import { TabIcon } from 'components/explorer/tabs/TabIcon'
 import { CollapseButton } from './collapse-button'
+import { useEditorType } from '../editors/editors-layout.hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface TabsProps {
   storeKey: string
@@ -61,7 +63,7 @@ const SortableTab = ({
 }) => {
   const router = useRouter()
   const currentSchema = (router.query.schema as string) || 'public'
-  const store = getTabsStore(storeKey)
+  const store = getTabsStore()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
@@ -108,7 +110,7 @@ const SortableTab = ({
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
       <TabsTrigger_Shadcn_
         value={tab.id}
-        onDoubleClick={() => makeTabPermanent(storeKey, tab.id)}
+        onDoubleClick={() => makeTabPermanent(tab.id)}
         className={cn(
           'flex items-center gap-2 px-3 text-xs',
           'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -159,8 +161,10 @@ const SortableTab = ({
 }
 
 export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
+  const editor = useEditorType()
+  const projectExplorer = useFlag('projectExplorer')
   const router = useRouter()
-  const store = getTabsStore(storeKey)
+  const store = getTabsStore()
   const tabs = useSnapshot(store)
   const sidebar = useSnapshot(sidebarState)
   const sensors = useSensors(useSensor(PointerSensor))
@@ -171,7 +175,18 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     .filter((tab) => tab !== undefined) as Tab[]
 
   // Separate new tab from regular tabs
-  const regularTabs = openTabs.filter((tab) => tab.type !== 'new')
+  const regularTabs = openTabs.filter((tab) => {
+    if (!projectExplorer) {
+      // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
+      return (
+        tab.type !== 'new' &&
+        ((editor === 'sql-editor' && tab.type === 'sql') ||
+          (editor === 'table-editor' && tab.type === 'table'))
+      )
+    }
+    return tab.type !== 'new'
+  })
+
   const newTab = openTabs.find((tab) => tab.type === 'new')
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -182,20 +197,20 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(storeKey, oldIndex, newIndex, active.id.toString(), router)
+      handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(storeKey, id, router, onClose)
+    handleTabClose(id, router, onClose)
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(storeKey, id, router)
+    handleTabNavigation(id, router)
   }
 
   const handleNewClick = () => {
-    openNewContentTab(storeKey)
+    openNewContentTab()
     router.push(`/project/${router.query.ref}/explorer/new`)
   }
 

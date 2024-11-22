@@ -1,10 +1,8 @@
 import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 import { withAuth } from 'hooks/misc/withAuth'
-import { ReactNode, useMemo, useState } from 'react'
-import ProjectLayout from '../ProjectLayout/ProjectLayout'
+import { ReactNode, useState } from 'react'
+import { EditorBaseLayout } from '../editors/editor-base-layout'
 import { SQLEditorMenu } from './SQLEditorMenu'
-import TableEditorMenu from '../TableEditorLayout/TableEditorMenu'
-import { Separator } from 'ui'
 
 export interface SQLEditorLayoutProps {
   title: string
@@ -13,25 +11,17 @@ export interface SQLEditorLayoutProps {
 
 const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
-  const productMenu = useMemo(
-    () => (
-      <>
-        <TableEditorMenu />
-        <Separator />
+
+  return (
+    <EditorBaseLayout
+      title={title || 'SQL'}
+      product="SQL Editor"
+      productMenu={
         <SQLEditorMenu
           key="sql-editor-menu"
           onViewOngoingQueries={() => setShowOngoingQueries(true)}
         />
-      </>
-    ),
-    []
-  )
-
-  return (
-    <ProjectLayout
-      title={title || 'SQL'}
-      product="SQL Editor"
-      productMenu={productMenu}
+      }
       isBlocking={false}
       resizableSidebar
     >
@@ -40,7 +30,7 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
         visible={showOngoingQueries}
         onClose={() => setShowOngoingQueries(false)}
       />
-    </ProjectLayout>
+    </EditorBaseLayout>
   )
 }
 

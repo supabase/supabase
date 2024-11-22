@@ -12,6 +12,9 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import type { NextPageWithLayout } from 'types'
+import { useFlag } from 'hooks/ui/useFlag'
+import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
+import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -38,7 +41,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       const tabId = `table-${selectedTable.schema}-${selectedTable.name}`
 
       if (!store.tabsMap[tabId]) {
-        addTab(projectRef, {
+        addTab({
           id: tabId,
           type: 'table',
           label: selectedTable.name,
@@ -79,7 +82,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <ExplorerLayout>{page}</ExplorerLayout>
+    <HandleEditorLayouts>{page}</HandleEditorLayouts>
   </ProjectContextFromParamsProvider>
 )
 

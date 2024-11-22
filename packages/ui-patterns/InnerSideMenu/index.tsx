@@ -237,7 +237,7 @@ const InnerSideBarEmptyPanel = forwardRef<
         props.className
       )}
     >
-      <div className="flex flex-col gap-y-1 items-center justify-center">
+      <div className="w-full flex flex-col gap-y-1 items-center">
         {illustration}
         {title && <p className="text-xs text-foreground-light">{title}</p>}
         {description && (
