@@ -9,7 +9,7 @@ name: supabase
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20241014-c083b3b
+    image: supabase/studio:20241106-f29003e
     restart: unless-stopped
     healthcheck:
       test:
@@ -77,7 +77,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.158.1
+    image: supabase/gotrue:v2.164.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -119,6 +119,10 @@ services:
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+
+      # Uncomment to bypass nonce check in ID Token flow. Commonly set to true when using Google Sign In on mobile.
+      # GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: true
+    
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
@@ -302,7 +306,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.59.0
+    image: supabase/edge-runtime:v1.62.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -367,7 +371,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.1.78
+    image: supabase/postgres:15.6.1.139
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s

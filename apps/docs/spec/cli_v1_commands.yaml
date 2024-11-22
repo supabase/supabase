@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.223.7
+  version: 1.223.10
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -3354,6 +3354,27 @@ commands:
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.
         default_value: 'false'
+  - id: supabase-config
+    title: supabase config
+    summary: Manage Supabase project configurations
+    tags:
+      - management-api
+    links: []
+    subcommands:
+      - supabase-config-push
+    flags: []
+  - id: supabase-config-push
+    title: supabase config push
+    summary: Pushes local config.toml to the linked project
+    tags: []
+    links: []
+    usage: supabase config push
+    subcommands: []
+    flags:
+      - id: project-ref
+        name: --project-ref <string>
+        description: Project ref of the Supabase project.
+        default_value: ''
   - id: supabase-completion
     title: supabase completion
     summary: Generate the autocompletion script for the specified shell
