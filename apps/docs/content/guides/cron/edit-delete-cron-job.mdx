@@ -1,0 +1,47 @@
+---
+title: 'Edit or delete a Cron Job'
+---
+
+You can alter your Cron Jobs from the [Cron Jobs](/dashboard/project/_/integrations/cron-jobs) tab in the Integrations section of the dashboard.
+
+## Edit a Cron Job
+
+1. Locate your Cron Job in the [Cron Jobs](/dashboard/project/_integrations/cron-jobs) view.
+1. Expand the options menu and select `Edit cron job`.
+1. Review and edit the Cron Job settings, then click `Save job`.
+
+## Disable a Cron Job
+
+You can disable a Cron Job without deleting it. This is useful if you might want to use it again in the future.
+
+1. Locate your Cron Job in the [Cron Jobs](/dashboard/project/_integrations/cron-jobs) view.
+2. Toggle the `Active` toggle.
+
+## Delete a Cron Job
+
+Permanently delete a Cron Job to remove it entirely:
+
+1. Locate your Cron Job in the [Cron Jobs](/dashboard/project/_integrations/cron-jobs) view.
+1. Expand the options menu and select `Delete job`.
+1. Review and edit the Cron Job settings, then click `Save job`.
+
+## Manage your Cron Jobs using SQL
+
+You can also use SQL to manage your Cron Jobs. For example, to edit a job:
+
+```sql
+cron.alter_job(
+  job_id bigint,
+  schedule text default null,
+  command text default null,
+  database text default null,
+  username text default null,
+  active boolean default null
+)
+```
+
+To unschedule a job:
+
+```sql
+select cron.unschedule('job-name');
+```
