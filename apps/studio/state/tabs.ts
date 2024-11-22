@@ -212,9 +212,9 @@ export const handleTabClose = (
   const currentTabs = Object.values(tabsStore.tabsMap).filter((tab) => tab.id !== id)
   const nextTabId = currentTabs.filter((tab) => tab.type === editor)[0]?.id
 
-  console.log('Current Tab:', currentTab)
-  console.log('Current Tabs:', currentTabs)
-  console.log('Next Tab ID:', nextTabId)
+  // console.log('Current Tab:', currentTab)
+  // console.log('Current Tabs:', currentTabs)
+  // console.log('Next Tab ID:', nextTabId)
 
   delete tabsStore.tabsMap[id]
   if (currentTab) {
