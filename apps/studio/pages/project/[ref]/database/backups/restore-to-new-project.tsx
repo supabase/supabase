@@ -88,7 +88,11 @@ const RestoreToNewProject = () => {
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
-  const { data: cloneStatus, isLoading: cloneStatusLoading } = useCloneStatusQuery(
+  const {
+    data: cloneStatus,
+    refetch: refetchCloneStatus,
+    isLoading: cloneStatusLoading,
+  } = useCloneStatusQuery(
     {
       projectRef: project?.ref,
     },
@@ -287,6 +291,7 @@ const RestoreToNewProject = () => {
         recoveryTimeTarget={recoveryTimeTarget}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
+          refetchCloneStatus()
           setRefetchInterval(5000)
           setShowNewProjectDialog(false)
         }}
