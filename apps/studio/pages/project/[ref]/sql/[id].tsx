@@ -2,7 +2,10 @@ import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { ExplorerLayout } from 'components/layouts/explorer/layout'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -185,6 +188,10 @@ const SqlEditor: NextPageWithLayout = () => {
   return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <ExplorerLayout hideTabs={false}>{page}</ExplorerLayout>
+SqlEditor.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>
+    <ExplorerLayout>{page}</ExplorerLayout>
+  </ProjectContextFromParamsProvider>
+)
 
 export default SqlEditor

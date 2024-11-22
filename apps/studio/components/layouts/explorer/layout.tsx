@@ -3,7 +3,7 @@ import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQuer
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
-import { ReactNode, useMemo, useState } from 'react'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 import { Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { useSnapshot } from 'valtio'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
@@ -11,40 +11,18 @@ import { ExplorerTabs } from '../tabs/explorer-tabs'
 import { sidebarState } from '../tabs/sidebar-state'
 import { SQLEditorMenu } from './SQLEditorMenu'
 import TableEditorMenu from './TableEditorMenu'
+import { CollapseButton } from '../tabs/collapse-button'
+import { useParams } from 'common'
+import { usePathname } from 'next/navigation'
 
 export interface ExplorerLayoutProps {
   children: ReactNode
   hideTabs?: boolean
 }
 
-function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
-  const sidebar = useSnapshot(sidebarState)
-  return (
-    <button
-      className={cn(
-        'flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0',
-        !hideTabs && 'border-r'
-      )}
-      onClick={() => (sidebarState.isOpen = !sidebar.isOpen)}
-    >
-      {sidebar.isOpen ? (
-        <PanelLeftClose
-          size={16}
-          strokeWidth={1.5}
-          className="text-foreground-lighter hover:text-foreground-light"
-        />
-      ) : (
-        <PanelLeftOpen
-          size={16}
-          strokeWidth={1.5}
-          className="text-foreground-lighter hover:text-foreground-light"
-        />
-      )}
-    </button>
-  )
-}
-
-export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutProps) => {
+export const ExplorerLayout = ({ children }: ExplorerLayoutProps) => {
+  const { ref } = useParams()
+  const pathname = usePathname()
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
 
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -64,8 +42,7 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
           />
         </ResizablePanel>
         <ResizableHandle />
-
-        <div className="p-4 border-t sticky bottom-0 bg-studio">
+        <div className="p-4 sticky bottom-0 bg-studio">
           <Button block type="default" onClick={() => setShowOngoingQueries(true)}>
             View running queries
           </Button>
@@ -82,6 +59,8 @@ export const ExplorerLayout = ({ children, hideTabs = false }: ExplorerLayoutPro
       </ProjectLayoutWithAuth>
     )
   }
+
+  const hideTabs = pathname === `/project/${ref}/explorer`
 
   return (
     <ProjectLayoutWithAuth

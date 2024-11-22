@@ -1,39 +1,37 @@
 import { useParams } from 'common'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-import { useSnapshot } from 'valtio'
-import { motion } from 'framer-motion'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useActionKey } from 'hooks/useActionKey'
+import { PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { useSnapshot } from 'valtio'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { sidebarState } from '../tabs/sidebar-state'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
-import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
+import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizingState } from './ResizingState'
-import { sidebarState } from '../tabs/sidebar-state'
-import { useActionKey } from 'hooks/useActionKey'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -119,6 +117,10 @@ const ProjectLayout = ({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [actionKey, sidebar.isOpen])
 
+  const MotionResizablePanel = motion(ResizablePanel)
+
+  const resizableHandleRef = useRef<ImperativePanelHandle>(null)
+
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -142,33 +144,62 @@ const ProjectLayout = ({
           <div className="flex flex-1 overflow-hidden">
             {!hideIconBar && <NavigationBar />}
 
-            <ResizablePanelGroup
-              className="flex flex-1"
-              direction="horizontal"
-              autoSaveId="project-layout"
-            >
-              <ResizablePanel
-                id="panel-left"
-                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                  hidden: !showProductMenu || !productMenu || !sidebar.isOpen,
-                })}
-                defaultSize={0}
+            <AnimatePresence initial={false}>
+              <ResizablePanelGroup
+                className="flex flex-1"
+                direction="horizontal"
+                autoSaveId="project-layout"
               >
-                <MenuBarWrapper
-                  isLoading={isLoading}
-                  isBlocking={isBlocking}
-                  productMenu={productMenu}
+                <ResizablePanel
+                  order={1}
+                  id="panel-left"
+                  className={cn(
+                    'transition-all duration-[120ms]',
+                    sidebar.isOpen
+                      ? resizableSidebar
+                        ? 'min-w-64 max-w-[32rem]'
+                        : 'min-w-64 max-w-64'
+                      : 'w-0 flex-shrink-0 max-w-0'
+                  )}
                 >
-                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                </MenuBarWrapper>
-              </ResizablePanel>
-              <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu || !sidebar.isOpen })}
-                withHandle
-                disabled={resizableSidebar ? false : true}
-              />
-              <ResizablePanel>{children}</ResizablePanel>
-            </ResizablePanelGroup>
+                  {sidebar.isOpen && (
+                    <>
+                      <motion.div
+                        initial={{
+                          width: 0,
+                          opacity: 0,
+                          height: '100%',
+                        }}
+                        animate={{
+                          width: 'auto',
+                          opacity: 1,
+                          height: '100%',
+                        }}
+                        exit={{
+                          width: 0,
+                          opacity: 0,
+                          height: '100%',
+                        }}
+                        className="h-full"
+                        transition={{ duration: 0.12 }}
+                      >
+                        <MenuBarWrapper
+                          isLoading={isLoading}
+                          isBlocking={isBlocking}
+                          productMenu={productMenu}
+                        >
+                          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                        </MenuBarWrapper>
+                      </motion.div>
+                    </>
+                  )}
+                </ResizablePanel>
+                {sidebar.isOpen && (
+                  <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+                )}
+                <ResizablePanel order={2}>{children}</ResizablePanel>
+              </ResizablePanelGroup>
+            </AnimatePresence>
           </div>
         </div>
 
@@ -199,22 +230,8 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
-  const actionKey = useActionKey()
-  const sidebar = useSnapshot(sidebarState)
 
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
-
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key.toLowerCase() === 'b' && (event.metaKey || event.ctrlKey)) {
-        event.preventDefault()
-        sidebarState.isOpen = !sidebar.isOpen
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [sidebar.isOpen])
 
   if (!isBlocking) {
     return children

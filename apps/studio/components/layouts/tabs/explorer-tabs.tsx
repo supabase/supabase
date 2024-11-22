@@ -31,6 +31,7 @@ import { cn, SQL_ICON, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } fro
 import { useSnapshot } from 'valtio'
 import { sidebarState } from './sidebar-state'
 import { TabIcon } from 'components/explorer/tabs/TabIcon'
+import { CollapseButton } from './collapse-button'
 
 interface TabsProps {
   storeKey: string
@@ -208,24 +209,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
       className="w-full"
     >
       <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center">
-        <button
-          className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-r"
-          onClick={() => (sidebarState.isOpen = !sidebar.isOpen)}
-        >
-          {sidebar.isOpen ? (
-            <PanelLeftClose
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
-          ) : (
-            <PanelLeftOpen
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
-          )}
-        </button>
+        <CollapseButton hideTabs={sidebar.isOpen} />
 
         {/* Draggable regular tabs */}
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
