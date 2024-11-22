@@ -20,6 +20,7 @@ import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { CollapseButton } from './collapse-button'
 import { sidebarState } from './sidebar-state'
+import { useParams } from 'common'
 
 interface TabsProps {
   storeKey: string
@@ -48,6 +49,7 @@ const SortableTab = ({
   storeKey: string
 }) => {
   const router = useRouter()
+  const { ref } = useParams()
   const currentSchema = (router.query.schema as string) || 'public'
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -82,7 +84,7 @@ const SortableTab = ({
     <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
       <TabsTrigger_Shadcn_
         value={tab.id}
-        onDoubleClick={() => makeTabPermanent(tab.id)}
+        onDoubleClick={() => makeTabPermanent(ref, tab.id)}
         className={cn(
           'flex items-center gap-2 px-3 text-xs',
           'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -133,10 +135,10 @@ const SortableTab = ({
 }
 
 export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
+  const { ref } = useParams()
   const editor = useEditorType()
-  const projectExplorer = useFlag('projectExplorer')
   const router = useRouter()
-  const store = getTabsStore()
+  const store = getTabsStore(ref)
   const tabs = useSnapshot(store)
   const sidebar = useSnapshot(sidebarState)
   const sensors = useSensors(useSensor(PointerSensor))
@@ -161,16 +163,16 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     const newIndex = tabs.openTabs.indexOf(over.id.toString())
 
     if (oldIndex !== newIndex) {
-      handleTabDragEnd(oldIndex, newIndex, active.id.toString(), router)
+      handleTabDragEnd(ref, oldIndex, newIndex, active.id.toString(), router)
     }
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(id, router, onClose, editor)
+    handleTabClose(ref, id, router, onClose, editor)
   }
 
   const handleTabChange = (id: string) => {
-    handleTabNavigation(id, router)
+    handleTabNavigation(ref, id, router)
   }
 
   const hasNewTab = router.pathname.includes('/new') // Object.values(tabs.tabsMap).some((tab) => tab.type === 'new')

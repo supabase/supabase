@@ -9,7 +9,6 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { BarChart2, Box, Search, Table2, X, Upload, BaggageClaim, BookOpen } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +22,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
+import { useParams } from 'common'
 
 dayjs.extend(relativeTime)
 
@@ -172,11 +172,11 @@ function RecentItems() {
 
 export function NewTab() {
   const router = useRouter()
+  const { ref } = useParams()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { isInUse: isPostgresInUse, isLoading: isLoadingCheckingPostgres } = usePostgresInUse()
-  const { ref } = router.query
 
   const [isLoading, setIsLoading] = useState(true)
   const [input, setInput] = useState('')
@@ -199,7 +199,7 @@ export function NewTab() {
         sql: '',
       })
       snapV2.addSnippet({ projectRef: ref as string, snippet })
-      removeNewTab()
+      removeNewTab(ref)
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)

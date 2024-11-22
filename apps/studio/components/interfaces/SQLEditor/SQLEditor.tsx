@@ -673,7 +673,7 @@ const SQLEditor = () => {
         className="flex h-full"
         direction="horizontal"
         autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_PANEL_SPLIT_SIZE}
-        onClick={() => makeActiveTabPermanent('explorer')}
+        onClick={() => makeActiveTabPermanent(project?.ref)}
       >
         <ResizablePanel minSize={30}>
           <ResizablePanelGroup

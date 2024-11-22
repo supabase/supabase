@@ -27,7 +27,12 @@ interface TabsState {
   previewTabId?: string
 }
 
+interface TabsStateMap {
+  [ref: string]: TabsState
+}
+
 const STORAGE_KEY = 'supabase_studio_tabs'
+const getStorageKey = (ref: string) => `${STORAGE_KEY}_${ref}`
 
 const defaultState: TabsState = {
   openTabs: [],
@@ -35,44 +40,45 @@ const defaultState: TabsState = {
   tabsMap: {},
 }
 
-const loadInitialState = (): TabsState => {
-  if (typeof window === 'undefined') return defaultState
+// Store now holds states for multiple refs
+export const tabsStore = proxy<TabsStateMap>({})
 
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (!stored) return defaultState
-
-  try {
-    return JSON.parse(stored)
-  } catch (error) {
-    console.error('Failed to parse tabs from localStorage:', error)
-    return defaultState
+// Helper to get/create state for a specific ref
+export const getTabsStore = (ref: string | undefined): TabsState => {
+  if (!ref) return defaultState
+  if (!tabsStore[ref]) {
+    // Load from localStorage or use default
+    const stored = localStorage.getItem(getStorageKey(ref))
+    tabsStore[ref] = stored ? JSON.parse(stored) : defaultState
   }
+  return tabsStore[ref]
 }
 
-export const tabsStore = proxy<TabsState>(loadInitialState())
-
+// Subscribe to changes for each ref
 if (typeof window !== 'undefined') {
   subscribe(tabsStore, () => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(tabsStore))
-    } catch (error) {
-      console.error('Failed to save tabs to localStorage:', error)
-    }
+    Object.entries(tabsStore).forEach(([ref, state]) => {
+      try {
+        localStorage.setItem(getStorageKey(ref), JSON.stringify(state))
+      } catch (error) {
+        console.error('Failed to save tabs to localStorage:', error)
+      }
+    })
   })
 }
 
-export const getTabsStore = () => tabsStore
+export const addTab = (ref: string | undefined, tab: Tab) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
 
-export const addTab = (tab: Tab) => {
   // If tab exists and is active, don't do anything
-  if (tabsStore.tabsMap[tab.id] && tabsStore.activeTab === tab.id) {
+  if (store.tabsMap[tab.id] && store.activeTab === tab.id) {
     return
   }
 
   // If tab exists but isn't active, just make it active
-  if (tabsStore.tabsMap[tab.id]) {
-    tabsStore.activeTab = tab.id
-    // Add to recent items when switching to existing tab
+  if (store.tabsMap[tab.id]) {
+    store.activeTab = tab.id
     if (!tab.isPreview && tab.type !== 'new') {
       addRecentItem(tab)
     }
@@ -81,9 +87,9 @@ export const addTab = (tab: Tab) => {
 
   // If this tab should be permanent, add it normally
   if (tab.isPreview === false) {
-    tabsStore.openTabs = [...tabsStore.openTabs, tab.id]
-    tabsStore.tabsMap[tab.id] = tab
-    tabsStore.activeTab = tab.id
+    store.openTabs = [...store.openTabs, tab.id]
+    store.tabsMap[tab.id] = tab
+    store.activeTab = tab.id
     // Add to recent items when creating permanent tab
     if (tab.type !== 'new') {
       addRecentItem(tab)
@@ -92,41 +98,46 @@ export const addTab = (tab: Tab) => {
   }
 
   // Remove any existing preview tab
-  if (tabsStore.previewTabId) {
-    tabsStore.openTabs = tabsStore.openTabs.filter((id) => id !== tabsStore.previewTabId)
-    delete tabsStore.tabsMap[tabsStore.previewTabId]
+  if (store.previewTabId) {
+    store.openTabs = store.openTabs.filter((id) => id !== store.previewTabId)
+    delete store.tabsMap[store.previewTabId]
   }
 
   // Add new preview tab
-  tabsStore.tabsMap[tab.id] = { ...tab, isPreview: true }
-  tabsStore.openTabs = [...tabsStore.openTabs, tab.id]
-  tabsStore.previewTabId = tab.id
-  tabsStore.activeTab = tab.id
+  store.tabsMap[tab.id] = { ...tab, isPreview: true }
+  store.openTabs = [...store.openTabs, tab.id]
+  store.previewTabId = tab.id
+  store.activeTab = tab.id
 }
 
-export const removeTab = (id: string) => {
-  const idx = tabsStore.openTabs.indexOf(id)
-  tabsStore.openTabs = tabsStore.openTabs.filter((tabId) => tabId !== id)
-  delete tabsStore.tabsMap[id]
+export const removeTab = (ref: string | undefined, id: string) => {
+  const store = getTabsStore(ref)
+  const idx = store.openTabs.indexOf(id)
+  store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
+  delete store.tabsMap[id]
 
-  if (id === tabsStore.activeTab) {
-    tabsStore.activeTab = tabsStore.openTabs[idx - 1] || tabsStore.openTabs[idx + 1] || null
+  if (id === store.activeTab) {
+    store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
   }
 }
 
-export const reorderTabs = (oldIndex: number, newIndex: number) => {
-  const newOpenTabs = [...tabsStore.openTabs]
+export const reorderTabs = (ref: string | undefined, oldIndex: number, newIndex: number) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  const newOpenTabs = [...store.openTabs]
   const [removedTab] = newOpenTabs.splice(oldIndex, 1)
   newOpenTabs.splice(newIndex, 0, removedTab)
-  tabsStore.openTabs = newOpenTabs
+  store.openTabs = newOpenTabs
 }
 
-export const makeTabPermanent = (tabId: string) => {
-  const tab = tabsStore.tabsMap[tabId]
+export const makeTabPermanent = (ref: string | undefined, tabId: string) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  const tab = store.tabsMap[tabId]
 
   if (tab?.isPreview) {
     tab.isPreview = false
-    tabsStore.previewTabId = undefined
+    store.previewTabId = undefined
     // Add to recent items when preview tab becomes permanent
     if (tab.type !== 'new') {
       addRecentItem(tab)
@@ -134,15 +145,19 @@ export const makeTabPermanent = (tabId: string) => {
   }
 }
 
-export const makeActiveTabPermanent = () => {
-  if (tabsStore.activeTab && tabsStore.tabsMap[tabsStore.activeTab]?.isPreview) {
-    makeTabPermanent(tabsStore.activeTab)
+export const makeActiveTabPermanent = (ref?: string) => {
+  if (!ref) return false
+  const store = getTabsStore(ref)
+
+  if (store.activeTab && store.tabsMap[store.activeTab]?.isPreview) {
+    makeTabPermanent(ref, store.activeTab)
     return true
   }
   return false
 }
 
-export const openNewContentTab = () => {
+export const openNewContentTab = (ref: string) => {
+  const store = getTabsStore(ref)
   const tab: Tab = {
     id: `new-${nanoid()}`,
     type: 'new',
@@ -151,21 +166,25 @@ export const openNewContentTab = () => {
     isPreview: false,
   }
 
-  addTab(tab)
+  addTab(ref, tab)
 }
 
-export const removeNewTab = () => {
-  const newTab = Object.values(tabsStore.tabsMap).find((tab) => tab.type === 'new')
+export const removeNewTab = (ref: string | undefined) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  const newTab = Object.values(store.tabsMap).find((tab) => tab.type === 'new')
   if (newTab) {
-    removeTab(newTab.id)
+    removeTab(ref, newTab.id)
   }
 }
 
-export const handleTabNavigation = (id: string, router: NextRouter) => {
-  const tab = tabsStore.tabsMap[id]
+export const handleTabNavigation = (ref: string | undefined, id: string, router: NextRouter) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  const tab = store.tabsMap[id]
   if (!tab) return
 
-  tabsStore.activeTab = id
+  store.activeTab = id
 
   // Add to recent items when navigating to a non-preview, non-new tab
   if (!tab.isPreview && tab.type !== 'new') {
@@ -202,30 +221,33 @@ export const handleTabNavigation = (id: string, router: NextRouter) => {
 }
 
 export const handleTabClose = (
+  ref: string | undefined,
   id: string,
   router: NextRouter,
   onClose?: (id: string) => void,
   editor?: 'sql' | 'table'
 ) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
   // tabs without the one we're closing
-  const currentTab = tabsStore.tabsMap[id]
-  const currentTabs = Object.values(tabsStore.tabsMap).filter((tab) => tab.id !== id)
+  const currentTab = store.tabsMap[id]
+  const currentTabs = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
   const nextTabId = currentTabs.filter((tab) => tab.type === editor)[0]?.id
 
   // console.log('Current Tab:', currentTab)
   // console.log('Current Tabs:', currentTabs)
   // console.log('Next Tab ID:', nextTabId)
 
-  delete tabsStore.tabsMap[id]
+  delete store.tabsMap[id]
   if (currentTab) {
     // Update store
     // If the tab being removed is logged in the store, update the open tabs
-    tabsStore.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
+    store.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
   }
 
   if (nextTabId) {
-    tabsStore.activeTab = nextTabId
-    handleTabNavigation(nextTabId, router)
+    store.activeTab = nextTabId
+    handleTabNavigation(ref, nextTabId, router)
   } else {
     // If no tabs of same type, go to the home of the current section
     switch (currentTab.type) {
@@ -244,25 +266,28 @@ export const handleTabClose = (
 }
 
 export const handleTabDragEnd = (
+  ref: string | undefined,
   oldIndex: number,
   newIndex: number,
   tabId: string,
   router: any
 ) => {
+  if (!ref) return
+  const store = getTabsStore(ref)
   // Make permanent if needed
-  const draggedTab = tabsStore.tabsMap[tabId]
+  const draggedTab = store.tabsMap[tabId]
   if (draggedTab?.isPreview) {
-    makeTabPermanent(tabId)
+    makeTabPermanent(ref, tabId)
   }
 
   // Reorder tabs
-  const newOpenTabs = [...tabsStore.openTabs]
+  const newOpenTabs = [...store.openTabs]
   newOpenTabs.splice(oldIndex, 1)
   newOpenTabs.splice(newIndex, 0, tabId)
 
-  tabsStore.openTabs = newOpenTabs
-  tabsStore.activeTab = tabId
+  store.openTabs = newOpenTabs
+  store.activeTab = tabId
 
   // Handle navigation
-  handleTabNavigation(tabId, router)
+  handleTabNavigation(ref, tabId, router)
 }

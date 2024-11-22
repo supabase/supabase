@@ -288,6 +288,7 @@ const TableEditorMenu = () => {
                 <div className="flex flex-1 flex-grow" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
+                    // @ts-expect-error
                     ItemComponent={EntityListItem}
                     itemProps={{
                       projectRef: project?.ref!,

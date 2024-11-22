@@ -6,6 +6,6 @@ const SqlEditorWelcome: NextPageWithLayout = () => {
   return <SQLQuickstarts />
 }
 
-SqlEditorWelcome.getLayout = (page) => <SQLEditorLayout title="Quickstarts">{page}</SQLEditorLayout>
+SqlEditorWelcome.getLayout = (page) => <SQLEditorLayout>{page}</SQLEditorLayout>
 
 export default SqlEditorWelcome

@@ -21,7 +21,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
-  const store = getTabsStore()
+  const store = getTabsStore(projectRef)
 
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
@@ -41,7 +41,7 @@ const TableEditorPage: NextPageWithLayout = () => {
       const tabId = `table-${selectedTable.schema}-${selectedTable.name}`
 
       if (!store.tabsMap[tabId]) {
-        addTab({
+        addTab(projectRef, {
           id: tabId,
           type: 'table',
           label: selectedTable.name,

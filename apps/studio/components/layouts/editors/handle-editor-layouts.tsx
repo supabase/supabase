@@ -47,7 +47,7 @@ export const HandleEditorLayouts = ({
       editor === 'table' ? (
         <TableEditorLayout>{children}</TableEditorLayout>
       ) : (
-        <SQLEditorLayout title="SQL Editor">{children}</SQLEditorLayout>
+        <SQLEditorLayout>{children}</SQLEditorLayout>
       )}
     </>
   )

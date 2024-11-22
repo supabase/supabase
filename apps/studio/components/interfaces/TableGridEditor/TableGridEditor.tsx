@@ -213,7 +213,7 @@ const TableGridEditor = ({
   return (
     <div
       onClick={() => {
-        makeActiveTabPermanent('explorer')
+        makeActiveTabPermanent(project?.ref)
       }}
       className="h-full"
     >

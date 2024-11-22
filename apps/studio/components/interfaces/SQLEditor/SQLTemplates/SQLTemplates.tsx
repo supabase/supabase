@@ -51,7 +51,7 @@ const SQLTemplates = () => {
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
 
-      const store = getTabsStore('explorer')
+      const store = getTabsStore(ref)
       const tabId = `sql-${snippet.id}`
       store.openTabs = [...store.openTabs, tabId]
       store.tabsMap[tabId] = {

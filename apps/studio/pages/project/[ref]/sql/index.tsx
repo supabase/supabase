@@ -11,7 +11,7 @@ import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
-  const store = getTabsStore()
+  const store = getTabsStore(projectRef)
   const router = useRouter()
 
   // handle redirect to last table tab
