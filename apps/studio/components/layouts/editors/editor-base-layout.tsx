@@ -23,7 +23,7 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
     pathname === `/project/${ref}/sql`
 
   return (
-    <ProjectLayoutWithAuth {...props}>
+    <ProjectLayoutWithAuth resizableSidebar={true} {...props}>
       <div className="flex flex-col h-full">
         <div
           className={cn(

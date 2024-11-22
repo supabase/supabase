@@ -1,16 +1,20 @@
-import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
+import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorLayout'
+import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
 import type { NextPageWithLayout } from 'types'
 
-const SqlEditorNewPage: NextPageWithLayout = () => {
+const EditorNewPage: NextPageWithLayout = () => {
   return <NewTab />
 }
 
-SqlEditorNewPage.getLayout = (page) => (
+EditorNewPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <HandleEditorLayouts>{page}</HandleEditorLayouts>
+    <EditorBaseLayout productMenu={<TableEditorMenu />}>
+      <TableEditorLayout>{page}</TableEditorLayout>
+    </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
 )
 
-export default SqlEditorNewPage
+export default EditorNewPage
