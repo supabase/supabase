@@ -170,3 +170,24 @@ export function computeNextRunFromCurrentTime(schedule: string, currentTime: Dat
     return 'Invalid schedule format'
   }
 }
+
+export function getScheduleMessage(scheduleString: string, schedule: string) {
+  if (!scheduleString) {
+    return 'Enter a valid cron expression above'
+  }
+
+  if (secondsPattern.test(schedule)) {
+    return `The cron will be run every ${schedule}`
+  }
+
+  if (scheduleString.includes('Invalid cron expression')) {
+    return scheduleString
+  }
+
+  const readableSchedule = scheduleString
+    .split(' ')
+    .map((s, i) => (i === 0 ? s.toLowerCase() : s))
+    .join(' ')
+
+  return `The cron will be run ${readableSchedule}.`
+}

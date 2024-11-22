@@ -27,7 +27,7 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
 import CronSyntaxChart from './CronSyntaxChart'
-import { secondsPattern } from './CronJobs.utils'
+import { getScheduleMessage, secondsPattern } from './CronJobs.utils'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -44,7 +44,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
   const [scheduleString, setScheduleString] = useState('')
-  console.log('supportsSeconds scheduleSection', supportsSeconds)
+
   const PRESETS = [
     { name: 'Every minute', expression: '* * * * *' },
     { name: 'Every 5 minutes', expression: '*/5 * * * *' },
@@ -235,20 +235,8 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   <span className="text-sm text-foreground-light flex items-center gap-2">
                     {isGeneratingCron ? (
                       <LoadingDots />
-                    ) : scheduleString === '' ? ( // set a min length before showing invalid message
-                      'Enter a valid cron expression above'
-                    ) : scheduleString.includes('Invalid cron expression') ? (
-                      'Invalid cron expression'
                     ) : (
-                      <>
-                        The cron will be run{' '}
-                        {secondsPattern.test(schedule)
-                          ? 'every ' + schedule
-                          : scheduleString
-                              .split(' ')
-                              .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                              .join(' ') + '.'}
-                      </>
+                      getScheduleMessage(scheduleString, schedule)
                     )}
                   </span>
                 )}
