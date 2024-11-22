@@ -58,6 +58,12 @@ const RestoreToNewProject = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isFreePlan = subscription?.plan?.id === 'free'
 
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+  const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
+  const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
+
   const { data: projects } = useProjectsQuery()
 
   const {
@@ -82,18 +88,20 @@ const RestoreToNewProject = () => {
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
-  const {
-    data: cloneStatus,
-    refetch: refetchCloneStatus,
-    isLoading: cloneStatusLoading,
-  } = useCloneStatusQuery({
-    projectRef: project?.ref,
-  })
+  const { data: cloneStatus, isLoading: cloneStatusLoading } = useCloneStatusQuery(
+    {
+      projectRef: project?.ref,
+    },
+    {
+      refetchInterval,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
+        if (!hasTransientState) setRefetchInterval(false)
+      },
+    }
+  )
   const lastClone = cloneStatus?.clones?.[cloneStatus?.clones.length - 1]
-  const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
-  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false)
-  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
-  const [recoveryTimeTarget, setRecoveryTimeTarget] = useState<number | null>(null)
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
 
   const isLoading = !isPermissionsLoaded || cloneBackupsLoading || cloneStatusLoading
@@ -279,7 +287,7 @@ const RestoreToNewProject = () => {
         recoveryTimeTarget={recoveryTimeTarget}
         onOpenChange={setShowNewProjectDialog}
         onCloneSuccess={() => {
-          refetchCloneStatus()
+          setRefetchInterval(5000)
           setShowNewProjectDialog(false)
         }}
       />
