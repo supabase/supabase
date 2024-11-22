@@ -26,7 +26,7 @@ export const WrappersTab = () => {
     connectionString: project?.connectionString,
   })
 
-  const wrappers = data?.result || []
+  const wrappers = data ?? []
 
   if (isLoading) {
     return <div>Loading</div>

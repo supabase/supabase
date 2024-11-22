@@ -25,7 +25,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       connectionString: selectedProject?.connectionString,
     },
     {
-      staleTime: 30 * 1000, // 60 seconds, talk with Oli whether this is ok to call every minute
+      staleTime: 30 * 1000, // 30 seconds, talk with Oli whether this is ok to call every minute
     }
   )
 
