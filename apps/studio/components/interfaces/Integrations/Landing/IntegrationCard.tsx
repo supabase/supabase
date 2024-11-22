@@ -28,14 +28,7 @@ export const IntegrationLoadingCard = () => {
   )
 }
 
-export const IntegrationCard = ({
-  id,
-  beta,
-  type,
-  name,
-  icon,
-  description,
-}: IntegrationCardProps) => {
+export const IntegrationCard = ({ id, beta, name, icon, description }: IntegrationCardProps) => {
   const { project } = useProjectContext()
 
   return (

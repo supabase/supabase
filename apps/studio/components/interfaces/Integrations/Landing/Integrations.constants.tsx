@@ -58,7 +58,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     requiredExtensions: ['pgmq'],
     name: `Queues`,
     icon: ({ className, ...props } = {}) => (
-      <Layers className={cn('inset-0 p-2 text-background w-full h-full', className)} {...props} />
+      <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Lightweight message queue in Postgres',
     docsUrl: 'https://github.com/tembo-io/pgmq',
@@ -123,7 +123,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     requiredExtensions: ['pg_cron'],
     name: `Cron Jobs`,
     icon: ({ className, ...props } = {}) => (
-      <Clock5 className={cn('inset-0 p-2 text-background w-full h-full', className)} {...props} />
+      <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Schedule and automate tasks to run maintenance routines at specified intervals.',
     docsUrl: 'https://github.com/citusdata/pg_cron',
@@ -174,7 +174,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     name: `Vault`,
     beta: true,
     icon: ({ className, ...props } = {}) => (
-      <Vault className={cn('inset-0 p-2 text-background w-full h-full', className)} {...props} />
+      <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
     docsUrl: 'https://supabase.com/docs',
@@ -232,7 +232,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     type: 'custom' as const,
     name: `Webhooks`,
     icon: ({ className, ...props } = {}) => (
-      <Webhook className={cn('inset-0 p-2 text-background w-full h-full', className)} {...props} />
+      <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',

@@ -7,6 +7,7 @@ import { Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import { Admonition } from 'ui-patterns'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 
@@ -87,6 +88,18 @@ export const AvailableIntegrations = () => {
               onResetFilter={() => setSearch('')}
             />
           )}
+          {isSuccess &&
+            selectedCategory !== 'all' &&
+            search.length === 0 &&
+            filteredIntegrations.length === 0 && (
+              <Admonition
+                showIcon={false}
+                className="xl:col-span-3 2xl:col-span-4"
+                type="default"
+                title="All integrations in this category are currently in use"
+                description="Manage your installed integrations in the section above"
+              />
+            )}
         </div>
       </div>
     </>
