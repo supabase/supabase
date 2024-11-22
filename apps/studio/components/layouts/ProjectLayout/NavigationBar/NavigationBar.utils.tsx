@@ -48,7 +48,7 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
             icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: !IS_PLATFORM
               ? `/project/${ref}/sql/1`
-              : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql/new`),
+              : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
           },
         ]),
   ]

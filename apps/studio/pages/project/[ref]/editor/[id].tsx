@@ -19,7 +19,6 @@ const TableEditorPage: NextPageWithLayout = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
   const store = getTabsStore()
-
   const { project } = useProjectContext()
   const { data: selectedTable, isLoading } = useTableEditorQuery({
     projectRef: project?.ref,

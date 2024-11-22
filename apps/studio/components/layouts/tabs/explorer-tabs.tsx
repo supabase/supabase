@@ -154,7 +154,6 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   const tabs = useSnapshot(store)
   const sidebar = useSnapshot(sidebarState)
   const sensors = useSensors(useSensor(PointerSensor))
-  const actionKey = useActionKey()
 
   const openTabs = tabs.openTabs
     .map((id) => tabs.tabsMap[id])
@@ -162,15 +161,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
 
   // Separate new tab from regular tabs
   const regularTabs = openTabs.filter((tab) => {
-    if (!projectExplorer) {
-      // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
-      return (
-        tab.type !== 'new' &&
-        ((editor === 'sql-editor' && tab.type === 'sql') ||
-          (editor === 'table-editor' && tab.type === 'table'))
-      )
-    }
-    return tab.type !== 'new'
+    return tab.type === editor
   })
 
   const newTab = openTabs.find((tab) => tab.type === 'new')
@@ -188,24 +179,19 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(id, router, onClose)
+    handleTabClose(id, router, onClose, editor)
   }
 
   const handleTabChange = (id: string) => {
     handleTabNavigation(id, router)
   }
 
-  const handleNewClick = () => {
-    openNewContentTab()
-    router.push(`/project/${router.query.ref}/explorer/new`)
-  }
-
-  const hasNewTab = Object.values(tabs.tabsMap).some((tab) => tab.type === 'new')
+  const hasNewTab = router.pathname.includes('/new') // Object.values(tabs.tabsMap).some((tab) => tab.type === 'new')
   const isOnNewPage = router.pathname.endsWith('/explorer/new')
 
   return (
     <Tabs_Shadcn_
-      value={tabs.activeTab ?? undefined}
+      value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
       onValueChange={handleTabChange}
       className="w-full"
     >
@@ -224,7 +210,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
                 tab={tab}
                 index={index}
                 openTabs={openTabs}
-                onClose={handleClose}
+                onClose={() => handleClose(tab.id)}
                 storeKey={storeKey}
               />
             ))}
@@ -232,10 +218,10 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
         </DndContext>
 
         {/* Non-draggable new tab */}
-        {newTab && (
+        {hasNewTab && (
           <>
             <TabsTrigger_Shadcn_
-              value={newTab.id}
+              value={'new'}
               className={cn(
                 'flex items-center gap-2 px-3 text-xs',
                 'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -244,16 +230,16 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
-              <TabIcon type={newTab.type} />
+              <TabIcon type={'new'} />
               <div className="flex items-center gap-0">
-                <span>{newTab.type === 'schema' ? 'schema' : newTab.label || 'Untitled'}</span>
+                <span>New</span>
               </div>
               <span
                 role="button"
                 onClick={(e) => {
                   e.preventDefault()
                   e.stopPropagation()
-                  handleClose(newTab.id)
+                  handleClose('new')
                 }}
                 className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
                 onMouseDown={(e) => e.stopPropagation()}
@@ -266,18 +252,28 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
           </>
         )}
 
-        {!isOnNewPage && !hasNewTab && (
-          <button
-            className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-l"
-            onClick={handleNewClick}
-          >
-            <Plus
-              size={16}
-              strokeWidth={1.5}
-              className="text-foreground-lighter hover:text-foreground-light"
-            />
-          </button>
-        )}
+        <AnimatePresence initial={false}>
+          {!isOnNewPage && !hasNewTab && (
+            <motion.button
+              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-l"
+              onClick={() =>
+                router.push(
+                  `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
+                )
+              }
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              <Plus
+                size={16}
+                strokeWidth={1.5}
+                className="text-foreground-lighter hover:text-foreground-light"
+              />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </TabsList_Shadcn_>
     </Tabs_Shadcn_>
   )

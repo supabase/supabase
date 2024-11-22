@@ -53,15 +53,12 @@ export const usePostgresInUse = () => {
     schema: 'public',
   })
 
-  console.log('Schemas:', schemas)
-  console.log('Tables:', tables)
-
   // Debug what we're getting
-  console.log('Tables query result:', {
-    isLoadingTables,
-    tableCount: tables?.length,
-    firstFewTables: tables?.slice(0, 3),
-  })
+  // console.log('Tables query result:', {
+  //   isLoadingTables,
+  //   tableCount: tables?.length,
+  //   firstFewTables: tables?.slice(0, 3),
+  // })
 
   // Check if any schemas exist other than 'public'
   const hasCustomSchemas = (schemas ?? []).some((schema) => !DEFAULT_SCHEMAS.includes(schema.name))

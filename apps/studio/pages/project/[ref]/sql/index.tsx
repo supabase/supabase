@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
-import SidePanelEditor from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { NewTab } from 'components/layouts/tabs/new-tab'
@@ -13,23 +11,20 @@ const TableEditorPage: NextPageWithLayout = () => {
   const store = getTabsStore()
   const router = useRouter()
 
-  const onTableCreated = (table: { id: number }) => {
-    router.push(`/project/${projectRef}/editor/${table.id}`)
-  }
-
   // handle redirect to last table tab
-  const lastTabId = store.openTabs.filter((id) => store.tabsMap[id]?.type === 'table').pop()
+  const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
+
+  console.log('lastTabId in SQL id', lastTabId)
   if (lastTabId) {
     const lastTab = store.tabsMap[lastTabId]
     if (lastTab) {
-      router.push(`/project/${projectRef}/editor/${lastTab.metadata?.tableId}`)
+      router.push(`/project/${projectRef}/sql/${lastTab.id.replace('sql-', '')}`)
     }
   }
 
   return (
     <>
       <NewTab />
-      <SidePanelEditor onTableCreated={onTableCreated} />
     </>
   )
 }

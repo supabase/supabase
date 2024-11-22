@@ -1,10 +1,8 @@
-import { proxy, subscribe } from 'valtio'
-import { ReactNode } from 'react'
 import { nanoid } from 'nanoid'
+import { NextRouter } from 'next/router'
+import { ReactNode } from 'react'
+import { proxy, subscribe } from 'valtio'
 import { addRecentItem } from './recent-items'
-import { NextRouter, Router } from 'next/router'
-import { useEditorType } from 'components/layouts/editors/editors-layout.hooks'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function' | 'new'
 
@@ -203,15 +201,34 @@ export const handleTabNavigation = (id: string, router: NextRouter) => {
   }
 }
 
-export const handleTabClose = (id: string, router: NextRouter, onClose?: (id: string) => void) => {
+export const handleTabClose = (
+  id: string,
+  router: NextRouter,
+  onClose?: (id: string) => void,
+  editor?: 'sql' | 'table'
+) => {
+  // tabs without the one we're closing
   const currentTab = tabsStore.tabsMap[id]
-  const newTabs = tabsStore.openTabs.filter((tabId) => tabId !== id)
+  const currentTabs = Object.values(tabsStore.tabsMap).filter((tab) => tab.id !== id)
+  const nextTabId = currentTabs.filter((tab) => tab.type === editor)[0]?.id
 
   // Find if there are any tabs left of the same type
-  const hasTabsOfSameType = newTabs.some((tabId) => {
-    const tab = tabsStore.tabsMap[tabId]
-    return tab?.type === currentTab.type
+  const hasTabsOfSameType = currentTabs.some((tab) => {
+    const foundTab = tabsStore.tabsMap[tab.id]
+    return tab?.type === foundTab.type
   })
+
+  // console.log('Current Tab:', currentTab)
+  // console.log('Current Tabs:', currentTabs)
+  // console.log('Next Tab ID:', nextTabId)
+  // console.log('Has Tabs of Same Type:', hasTabsOfSameType)
+
+  delete tabsStore.tabsMap[id]
+  if (currentTab) {
+    // Update store
+    // If the tab being removed is logged in the store, update the open tabs
+    tabsStore.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
+  }
 
   if (!hasTabsOfSameType) {
     // If no tabs of same type, go to the home of the current section
@@ -222,31 +239,15 @@ export const handleTabClose = (id: string, router: NextRouter, onClose?: (id: st
       case 'table':
         router.push(`/project/${router.query.ref}/editor`)
         break
-      case 'schema':
-      case 'view':
-      case 'function':
-      case 'new':
-        router.push(`/project/${router.query.ref}/explorer`)
-        break
       default:
         router.push(`/project/${router.query.ref}/editor`)
     }
-  } else {
-    // Find next tab of the same type
-    const nextTabId = newTabs.find((tabId) => {
-      const tab = tabsStore.tabsMap[tabId]
-      return tab?.type === currentTab.type
-    })
-
-    if (nextTabId) {
-      tabsStore.activeTab = nextTabId
-      handleTabNavigation(nextTabId, router)
-    }
   }
 
-  // Update store
-  tabsStore.openTabs = newTabs
-  delete tabsStore.tabsMap[id]
+  if (nextTabId) {
+    tabsStore.activeTab = nextTabId
+    handleTabNavigation(nextTabId, router)
+  }
 
   onClose?.(id)
 }

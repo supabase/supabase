@@ -9,6 +9,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import { BarChart2, Box, Search, Table2, X, Upload, BaggageClaim, BookOpen } from 'lucide-react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -21,6 +22,7 @@ import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
+import { useEditorType } from '../editors/editors-layout.hooks'
 
 dayjs.extend(relativeTime)
 
@@ -95,9 +97,15 @@ function AssistantChatDemo({ value, setValueState, onSubmit }: AssistantChatDemo
 function RecentItems() {
   const recentItemsSnap = useSnapshot(recentItemsStore)
   const router = useRouter()
+  const editor = useEditorType()
   const { ref } = router.query
 
   if (!recentItemsSnap?.items || !ref) return null
+
+  // Filter items based on editor type
+  const filteredItems = recentItemsSnap.items.filter((item) => item.type === editor)
+
+  if (filteredItems.length === 0) return null
 
   return (
     <div className="flex flex-col gap-0">
@@ -121,7 +129,7 @@ function RecentItems() {
       ) : (
         <AnimatePresence>
           <div className="grid grid-cols-1 gap-12 gap-y-0">
-            {recentItemsSnap.items.map((item: RecentItem, index: number) => (
+            {filteredItems.map((item: RecentItem, index: number) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0 }}
@@ -192,7 +200,7 @@ export function NewTab() {
         sql: '',
       })
       snapV2.addSnippet({ projectRef: ref as string, snippet })
-      removeNewTab('explorer')
+      removeNewTab()
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)

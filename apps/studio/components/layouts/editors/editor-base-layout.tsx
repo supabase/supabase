@@ -17,7 +17,10 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
   const pathname = usePathname()
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
 
-  const hideTabs = pathname === `/project/${ref}/explorer`
+  const hideTabs =
+    pathname === `/project/${ref}/explorer` ||
+    pathname === `/project/${ref}/editor` ||
+    pathname === `/project/${ref}/sql`
 
   return (
     <ProjectLayoutWithAuth {...props}>

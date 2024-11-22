@@ -122,12 +122,12 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.functions = functions
   }
 
-  useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
-      if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
-    }
-  }, [id, snippets, content])
+  // useEffect(() => {
+  //   if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
+  //     const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+  //     if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
+  //   }
+  // }, [id, snippets, content])
 
   // Enable pgsql format
   useEffect(() => {
