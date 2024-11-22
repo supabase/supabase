@@ -37,7 +37,7 @@ export const QueueTab = () => {
   }
 
   return (
-    <div className="h-full flex flex-col p-10">
+    <div className="h-full flex flex-col">
       <div className="flex items-center justify-end gap-x-4 py-4 px-6 mb-0">
         <div className="flex gap-x-2">
           <Button
