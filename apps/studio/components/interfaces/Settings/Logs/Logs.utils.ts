@@ -211,6 +211,9 @@ limit ${limit}
   ${orderBy}
   limit ${limit}
   `
+
+    case 'cron_job_run_details':
+      return `select status, start_time, end_time, jobid from ${table} ${where} ${orderBy} limit ${limit}`
   }
 }
 

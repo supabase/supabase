@@ -1,9 +1,9 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
-import { ArrowUpRight } from 'lucide-react'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -27,6 +27,7 @@ export const generateSettingsMenu = (
   const storageEnabled = features?.storage ?? true
   const warehouseEnabled = features?.warehouse ?? false
   const logDrainsEnabled = features?.logDrains ?? false
+  const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
     {
@@ -38,7 +39,7 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM && features?.diskAndCompute
+        ...(IS_PLATFORM && newDiskComputeEnabled
           ? [
               {
                 name: 'Compute and Disk',

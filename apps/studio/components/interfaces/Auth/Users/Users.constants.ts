@@ -3,7 +3,12 @@ import { PROVIDER_PHONE, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidatio
 
 export const PROVIDER_FILTER_OPTIONS = PROVIDERS_SCHEMAS.map((provider) => ({
   name: provider.title,
-  value: provider.title.toLowerCase(),
+  value:
+    provider.title === 'Slack (OIDC)'
+      ? 'slack_oidc'
+      : provider.title === 'LinkedIn (OIDC)'
+        ? 'linkedin_oidc'
+        : provider.title.toLowerCase(),
   icon: `${BASE_PATH}/img/icons/${provider.misc.iconKey}.svg`,
   iconClass: provider.title === 'GitHub' ? 'dark:invert' : '',
 })).concat(
