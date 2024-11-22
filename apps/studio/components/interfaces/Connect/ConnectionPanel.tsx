@@ -1,18 +1,17 @@
-import { FileCode, X } from 'lucide-react'
+import { ChevronRight, FileCode, X } from 'lucide-react'
 import {
   Button,
   cn,
   CodeBlock,
+  CodeBlockLang,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
-  DIALOG_PADDING_X,
   WarningIcon,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConnectionParameters } from './ConnectionParameters'
-import { DirectConnectionIcon, SessionIcon, TransactionIcon } from './pooler-icons-v2'
-import { ChevronRight } from 'lucide-react'
+import { DirectConnectionIcon, TransactionIcon } from './pooler-icons-v2'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -33,7 +32,7 @@ interface ConnectionPanelProps {
     description?: string
   }>
   contentType?: 'input' | 'code'
-  lang?: string
+  lang?: CodeBlockLang
   fileTitle?: string
 }
 
