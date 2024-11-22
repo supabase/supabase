@@ -124,29 +124,28 @@ function Events({ events: allEvents, onDemandEvents, categories }: Props) {
 export async function getStaticProps() {
   const { data: meetups, error } = await supabase
     .from('meetups')
-    .select('id, city, country, start_at, timezone')
-    .eq('launch_week', 'lw13')
+    .select('id, city, country, link, start_at, timezone, launch_week')
+
+  if (error) console.log('meetups error: ', error)
 
   const meetupEvents: BlogPost[] =
     meetups?.map((meetup: any) => ({
-      slug: 'string',
-      type: 'casestudy',
-      title: `Launch Week 13 Meetup: ${meetup.city}, ${meetup.country}`,
+      slug: '',
+      type: 'event',
+      title: `Launch Week ${meetup.launch_week.slice(2)} Meetup: ${meetup.city}, ${meetup.country}`,
       date: meetup.start_at,
       description: '',
-      formattedDate: 'string',
-      excerpt: '',
-      ogImage: {
-        url: 'string',
-      },
-      thumb: 'string',
-      image: 'string',
-      path: 'string',
+      thumb: '',
+      path: '',
       url: meetup.link ?? '',
-      tags: [],
-      categories: ['meetup', 'launch_week'],
-      timezone: meetup.timezone ?? '',
+      tags: ['meetup', 'launch-week'],
+      categories: ['meetup'],
+      timezone: meetup.timezone ?? 'America/Los_Angeles',
       disable_page_build: true,
+      link: {
+        href: meetup.link ?? '#',
+        target: '_blank',
+      },
     })) ?? []
 
   const staticEvents = getSortedPosts({
