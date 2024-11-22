@@ -43,10 +43,9 @@ const itemVariants: Variants = {
 }
 
 const containerVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    y: 0,
     transition: {
       type: 'spring',
       stiffness: 600,
@@ -215,7 +214,7 @@ export function NewTab() {
   return (
     <LayoutGroup>
       <div className="flex h-full w-full">
-        <motion.div className="flex-1" initial="hidden" animate="show" variants={containerVariants}>
+        <motion.div className="flex-1" initial={false} animate="show" variants={containerVariants}>
           <div className="bg-surface-100 p-6 h-full overflow-y-auto py-12">
             <div className="mx-auto max-w-2xl space-y-6">
               {/* Action Cards */}

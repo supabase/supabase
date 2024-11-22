@@ -161,11 +161,8 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
 
   // Separate new tab from regular tabs
   const regularTabs = openTabs.filter((tab) => {
-    if (!projectExplorer) {
-      // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
-      return tab.type !== 'new' && (tab.type === editor || tab.type === 'table')
-    }
-    return tab.type !== 'new'
+    // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
+    return tab.type === editor
   })
 
   const newTab = openTabs.find((tab) => tab.type === 'new')
@@ -259,7 +256,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
         <AnimatePresence initial={false}>
           {!isOnNewPage && !hasNewTab && (
             <motion.button
-              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-l"
+              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0"
               onClick={() =>
                 router.push(
                   `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
