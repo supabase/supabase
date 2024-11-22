@@ -2,13 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { formatWrapperTables } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useState } from 'react'
 import { Badge, Sheet, SheetContent, SheetTrigger, TableCell, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { EditWrapperSheet } from './EditWrapperSheet'
@@ -28,7 +28,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
   if (!integration || integration.type !== 'wrapper') {
-    return <div>A wrapper with this id doesn't exist</div>
+    return <p className="text-foreground-lighter text-sm">A wrapper with this ID does not exist</p>
   }
 
   const serverOptions = Object.fromEntries(
@@ -43,8 +43,8 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   return (
     <>
-      <TableRow key={wrapper.id} className="">
-        <TableCell className="space-y-3 align-top !py-3">
+      <TableRow>
+        <TableCell className="space-y-3 align-top !py-3 min-w-80">
           {wrapper.name}
 
           {visibleMetadata.map((metadata) => (
@@ -58,15 +58,16 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           ))}
         </TableCell>
 
-        <TableCell className="space-y-2 !py-5">
+        <TableCell className="space-y-2">
           {_tables?.map((table) => {
             const target = table.table ?? table.object
 
             return (
               <div key={table.id} className="flex items-center -space-x-3">
-                {/* <IconFirestore size={16} /> */}
                 <Badge className="bg-surface-300 bg-opacity-100 pr-1 gap-2 z-[1] font-mono text-[0.75rem] h-6 text-foreground">
-                  <div className="relative w-3 h-3">{integration.icon()}</div>
+                  <div className="relative w-3 h-3 flex items-center justify-center">
+                    {integration.icon({ className: 'p-0' })}
+                  </div>
                   {target}{' '}
                   <ChevronRight
                     size={12}

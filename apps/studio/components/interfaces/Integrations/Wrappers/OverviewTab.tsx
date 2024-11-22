@@ -88,7 +88,7 @@ export const WrapperOverviewTab = () => {
   return (
     <IntegrationOverviewTab
       actions={
-        <div className="mx-10 py-3 px-5 border rounded-md max-w-3xl">
+        <div className="py-3 px-5 border rounded-md">
           <ButtonTooltip
             type="default"
             onClick={() => setCreateWrapperShown(true)}
@@ -112,7 +112,7 @@ export const WrapperOverviewTab = () => {
       </div>
       <Separator />
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
+        <SheetContent size="lg" tabIndex={undefined}>
           <CreateWrapperSheet
             wrapperMeta={integration.meta}
             onClose={() => {

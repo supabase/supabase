@@ -343,11 +343,11 @@ const wrapperIntegrations: IntegrationDefinition[] = WRAPPERS.map((w) => {
     author: authorSupabase,
     navigation: [
       {
-        route: `overview`,
+        route: 'overview',
         label: 'Overview',
       },
       {
-        route: `wrappers`,
+        route: 'wrappers',
         label: 'Wrappers',
       },
     ],

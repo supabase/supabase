@@ -1,17 +1,15 @@
 import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'framer-motion'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
-import React, { useRef } from 'react'
+import { ComponentProps, ComponentType, useRef } from 'react'
 
 import { useParams } from 'common'
 import { INTEGRATIONS } from 'components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstalledIntegrations } from 'components/interfaces/Integrations/Landing/useInstalledIntegrations'
-import { ChevronRight } from 'lucide-react'
 import { NavMenu, NavMenuItem } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
-const MotionNavMenu = motion(NavMenu) as React.ComponentType<
-  React.ComponentProps<typeof NavMenu> & MotionProps
->
+const MotionNavMenu = motion(NavMenu) as ComponentType<ComponentProps<typeof NavMenu> & MotionProps>
 
 // Output range: The padding range for the nav (from compact to expanded)
 const paddingRange = [40, 86]
@@ -32,7 +30,7 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
   // Get project context
   const { project } = useProjectContext()
 
-  const { installedIntegrations, isSuccess } = useInstalledIntegrations()
+  const { installedIntegrations } = useInstalledIntegrations()
   // Find the integration details based on ID
   const integration = INTEGRATIONS.find((i) => i.id === id)
 

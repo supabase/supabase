@@ -96,13 +96,13 @@ export const CreateWrapperSheet = ({
     <>
       <div className="flex flex-col h-full" tabIndex={-1}>
         <SheetHeader>
-          <SheetTitle>Create a {wrapperMeta.label} Wrapper</SheetTitle>
+          <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
         </SheetHeader>
         <Form
           id={FORM_ID}
           initialValues={initialValues}
           onSubmit={onSubmit}
-          className="overflow-auto flex-grow"
+          className="flex-grow flex flex-col"
         >
           {({ handleReset, values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -122,110 +122,113 @@ export const CreateWrapperSheet = ({
 
             return (
               <>
-                <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="wrapper_name"
-                      label="Wrapper Name"
-                      error={formErrors.wrapper_name}
-                      descriptionText={
-                        (values?.wrapper_name ?? '').length > 0 ? (
-                          <>
-                            Your wrapper's server name will be{' '}
-                            <code className="text-xs">{values.wrapper_name}_server</code>
-                          </>
-                        ) : (
-                          ''
-                        )
-                      }
-                    />
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
-                >
-                  <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options
-                      .filter((option) => !option.hidden)
-                      .map((option) => (
-                        <InputField
-                          key={option.name}
-                          option={option}
-                          loading={false}
-                          error={formErrors[option.name]}
-                        />
-                      ))}
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={
-                    <FormSectionLabel>
-                      <p>Foreign Tables</p>
-                      <p className="text-foreground-light mt-2 w-[90%]">
-                        You can query your data from these foreign tables after the wrapper is
-                        created
-                      </p>
-                    </FormSectionLabel>
-                  }
-                >
-                  <FormSectionContent loading={false}>
-                    {newTables.length === 0 ? (
-                      <div className="flex justify-end translate-y-4">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {newTables.map((table, i) => (
-                          <div
-                            key={`${table.schema_name}.${table.table_name}`}
-                            className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                          >
-                            <div>
-                              <p className="text-sm">
-                                {table.schema_name}.{table.table_name}
-                              </p>
-                              <p className="text-sm text-foreground-light">
-                                Columns:{' '}
-                                {table.columns.map((column: any) => column.name).join(', ')}
-                              </p>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Edit />}
-                                onClick={() => {
-                                  setIsEditingTable(true)
-                                  setSelectedTableToEdit({ ...table, tableIndex: i })
-                                }}
-                              />
-                              <Button
-                                type="default"
-                                className="px-1"
-                                icon={<Trash />}
-                                onClick={() => {
-                                  setNewTables((prev) => prev.filter((_, j) => j !== i))
-                                }}
-                              />
-                            </div>
-                          </div>
+                <div className="flex-grow overflow-y-auto">
+                  <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="wrapper_name"
+                        label="Wrapper Name"
+                        error={formErrors.wrapper_name}
+                        descriptionText={
+                          (values?.wrapper_name ?? '').length > 0 ? (
+                            <>
+                              Your wrapper's server name will be{' '}
+                              <code className="text-xs">{values.wrapper_name}_server</code>
+                            </>
+                          ) : (
+                            ''
+                          )
+                        }
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+                  >
+                    <FormSectionContent loading={false}>
+                      {wrapperMeta.server.options
+                        .filter((option) => !option.hidden)
+                        .map((option) => (
+                          <InputField
+                            key={option.name}
+                            option={option}
+                            loading={false}
+                            error={formErrors[option.name]}
+                          />
                         ))}
-                      </div>
-                    )}
-                    {newTables.length > 0 && (
-                      <div className="flex justify-end">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    )}
-                    {newTables.length === 0 && formErrors.tables && (
-                      <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
-                    )}
-                  </FormSectionContent>
-                </FormSection>
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={
+                      <FormSectionLabel>
+                        <p>Foreign Tables</p>
+                        <p className="text-foreground-light mt-2 w-[90%]">
+                          You can query your data from these foreign tables after the wrapper is
+                          created
+                        </p>
+                      </FormSectionLabel>
+                    }
+                  >
+                    <FormSectionContent loading={false}>
+                      {newTables.length === 0 ? (
+                        <div className="flex justify-end translate-y-4">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {newTables.map((table, i) => (
+                            <div
+                              key={`${table.schema_name}.${table.table_name}`}
+                              className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                            >
+                              <div>
+                                <p className="text-sm">
+                                  {table.schema_name}.{table.table_name}
+                                </p>
+                                <p className="text-sm text-foreground-light">
+                                  Columns:{' '}
+                                  {table.columns.map((column: any) => column.name).join(', ')}
+                                </p>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<Edit />}
+                                  onClick={() => {
+                                    setIsEditingTable(true)
+                                    setSelectedTableToEdit({ ...table, tableIndex: i })
+                                  }}
+                                />
+                                <Button
+                                  type="default"
+                                  className="px-1"
+                                  icon={<Trash />}
+                                  onClick={() => {
+                                    setNewTables((prev) => prev.filter((_, j) => j !== i))
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {newTables.length > 0 && (
+                        <div className="flex justify-end">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      )}
+                      {newTables.length === 0 && formErrors.tables && (
+                        <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
+                      )}
+                    </FormSectionContent>
+                  </FormSection>
+                </div>
+
                 <SheetFooter>
                   <Button
                     size="tiny"

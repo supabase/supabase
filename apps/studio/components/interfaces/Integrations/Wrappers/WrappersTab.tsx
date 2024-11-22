@@ -16,9 +16,6 @@ import { WrapperTable } from './WrapperTable'
 export const WrappersTab = () => {
   const { id } = useParams()
   const { project } = useProjectContext()
-  const [editWrapperShown, setEditWrapperShown] = useState(false)
-  const [isClosingEditWrapper, setisClosingEditWrapper] = useState(false)
-  const [selectedWrapper, setSelectedWrapper] = useState<FDW | null>(null)
   const [selectedWrapperForDelete, setSelectedWrapperForDelete] = useState<FDW | null>(null)
   const [createWrapperShown, setCreateWrapperShown] = useState(false)
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
@@ -50,7 +47,7 @@ export const WrappersTab = () => {
     <div className="w-full mx-10 py-10 ">
       {props.children}
       <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
+        <SheetContent size="lg" tabIndex={undefined}>
           <CreateWrapperSheet
             wrapperMeta={integration.meta}
             onClose={() => {

@@ -26,7 +26,7 @@ export const IntegrationOverviewTab = ({
 
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
-  const isNativeIntegration = integration?.type === 'postgres_extension'
+  const isDatabaseExtension = integration?.type === 'postgres_extension'
 
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
@@ -48,7 +48,7 @@ export const IntegrationOverviewTab = ({
   return (
     <div className="flex flex-col gap-8 py-10">
       <BuiltBySection integration={integration} />
-      {isNativeIntegration && (
+      {isDatabaseExtension && (
         <div className="px-10 max-w-4xl">
           <Admonition
             showIcon={false}
@@ -61,13 +61,13 @@ export const IntegrationOverviewTab = ({
                 src={`${router.basePath}/img/supabase-logo.svg`}
                 className=" h-2.5 cursor-pointer rounded"
               />
-              <span>Native Integration</span>
+              <span>Database Extension</span>
             </Badge>
             <Markdown
               className="max-w-full"
               content={`This integration manages the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
               extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
-              ${hasMissingExtensions ? 'Install these database extensions to use this integration in your project.' : ''}
+              ${hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extensions to use ${integration.name} in your project.` : ''}
               `}
             />
 

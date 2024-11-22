@@ -29,7 +29,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   })
 
   if (!integration || integration.type !== 'wrapper') {
-    return <div>The referenced id doesn't correspond to a wrapper integration.</div>
+    return (
+      <p className="text-foreground-light text-sm">
+        The referenced ID doesn't correspond to a wrapper integration
+      </p>
+    )
   }
 
   const wrappers = data?.result.filter((x) => x.handler === integration.meta.handlerName) || []
@@ -38,7 +42,10 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
     <Card className="max-w-5xl">
       <CardContent className="p-0 pb-3">
         <Table className="">
-          <TableCaption className="text-xs">A list of {integration?.name}s.</TableCaption>
+          <TableCaption className="text-xs">
+            {wrappers.length} {integration?.name}
+            {wrappers.length > 1 ? 's' : ''} created
+          </TableCaption>
           <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:py-2">
             <TableRow className="rounded">
               <TableHead className="w-[220px]">Name</TableHead>

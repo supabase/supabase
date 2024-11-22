@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { Badge, cn } from 'ui'
@@ -37,10 +36,7 @@ export const IntegrationCard = ({
   icon,
   description,
 }: IntegrationCardProps) => {
-  const router = useRouter()
   const { project } = useProjectContext()
-
-  const isNativeIntegration = type === 'postgres_extension'
 
   return (
     <Link href={`/project/${project?.ref}/integrations/${id}/overview`}>
@@ -61,14 +57,7 @@ export const IntegrationCard = ({
             <p className="text-foreground-light text-xs">{description}</p>
           </div>
           <Badge className="bg-opacity-100 bg-surface-300 flex items-center gap-x-1.5">
-            {isNativeIntegration && (
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className=" h-2.5 cursor-pointer rounded"
-              />
-            )}
-            <span>{isNativeIntegration ? 'Native Integration' : 'Official'}</span>
+            <span>Official</span>
           </Badge>
         </div>
       </div>
