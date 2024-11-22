@@ -117,10 +117,6 @@ const ProjectLayout = ({
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [actionKey, sidebar.isOpen])
 
-  const MotionResizablePanel = motion(ResizablePanel)
-
-  const resizableHandleRef = useRef<ImperativePanelHandle>(null)
-
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -150,51 +146,54 @@ const ProjectLayout = ({
                 direction="horizontal"
                 autoSaveId="project-layout"
               >
-                <ResizablePanel
-                  order={1}
-                  id="panel-left"
-                  className={cn(
-                    'transition-all duration-[120ms]',
-                    sidebar.isOpen
-                      ? resizableSidebar
-                        ? 'min-w-64 max-w-[32rem]'
-                        : 'min-w-64 max-w-64'
-                      : 'w-0 flex-shrink-0 max-w-0'
-                  )}
-                >
-                  {sidebar.isOpen && (
-                    <>
-                      <motion.div
-                        initial={{
-                          width: 0,
-                          opacity: 0,
-                          height: '100%',
-                        }}
-                        animate={{
-                          width: 'auto',
-                          opacity: 1,
-                          height: '100%',
-                        }}
-                        exit={{
-                          width: 0,
-                          opacity: 0,
-                          height: '100%',
-                        }}
-                        className="h-full"
-                        transition={{ duration: 0.12 }}
-                      >
-                        <MenuBarWrapper
-                          isLoading={isLoading}
-                          isBlocking={isBlocking}
-                          productMenu={productMenu}
+                {showProductMenu && productMenu && (
+                  <ResizablePanel
+                    order={1}
+                    id="panel-left"
+                    className={cn(
+                      'transition-all duration-[120ms]',
+                      sidebar.isOpen
+                        ? resizableSidebar
+                          ? 'min-w-64 max-w-[32rem]'
+                          : 'min-w-64 max-w-64'
+                        : 'w-0 flex-shrink-0 max-w-0'
+                    )}
+                  >
+                    {sidebar.isOpen && (
+                      <>
+                        <motion.div
+                          initial={{
+                            width: 0,
+                            opacity: 0,
+                            height: '100%',
+                          }}
+                          animate={{
+                            width: 'auto',
+                            opacity: 1,
+                            height: '100%',
+                          }}
+                          exit={{
+                            width: 0,
+                            opacity: 0,
+                            height: '100%',
+                          }}
+                          className="h-full"
+                          transition={{ duration: 0.12 }}
                         >
-                          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                        </MenuBarWrapper>
-                      </motion.div>
-                    </>
-                  )}
-                </ResizablePanel>
-                {sidebar.isOpen && (
+                          <MenuBarWrapper
+                            isLoading={isLoading}
+                            isBlocking={isBlocking}
+                            productMenu={productMenu}
+                          >
+                            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                          </MenuBarWrapper>
+                        </motion.div>
+                      </>
+                    )}
+                  </ResizablePanel>
+                )}
+
+                {showProductMenu && productMenu && sidebar.isOpen && (
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
                 <ResizablePanel order={2}>{children}</ResizablePanel>

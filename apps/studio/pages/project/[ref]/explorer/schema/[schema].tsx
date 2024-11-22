@@ -6,6 +6,7 @@ import type { NextPageWithLayout } from 'types'
 import { getTabsStore, addTab } from 'state/tabs'
 import { useEffect } from 'react'
 import { FileJson2 } from 'lucide-react'
+import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const SchemasPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -40,6 +41,10 @@ const SchemasPage: NextPageWithLayout = () => {
   )
 }
 
-SchemasPage.getLayout = (page) => <ExplorerLayout>{page}</ExplorerLayout>
+SchemasPage.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>
+    <ExplorerLayout>{page}</ExplorerLayout>
+  </ProjectContextFromParamsProvider>
+)
 
 export default SchemasPage
