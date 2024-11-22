@@ -23,6 +23,7 @@ import {
 } from 'ui'
 import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
+import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -112,8 +113,10 @@ const PolicyRow = ({
                 <DropdownMenuItem
                   className="space-x-2"
                   onClick={() => {
+                    const sql = generatePolicyCreateSQL(policy)
                     setAiAssistantPanel({
                       open: true,
+                      sqlSnippets: [sql],
                       initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
                     })
                   }}
