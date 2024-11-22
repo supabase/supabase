@@ -1,28 +1,21 @@
+import { DiskManagementPanelForm } from 'components/interfaces/DiskManagement/DiskManagementPanelForm'
 import {
   ConnectionPooling,
   DatabaseSettings,
   NetworkRestrictions,
 } from 'components/interfaces/Settings/Database'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import type { NextPageWithLayout } from 'types'
-
-import { DiskManagementPanelForm } from 'components/interfaces/DiskManagement/DiskManagementPanelForm'
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
-import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Button } from 'ui'
-import { Plug } from 'lucide-react'
-import { Pointer } from 'lucide-react'
-import { GitBranch } from 'lucide-react'
-import { ChevronsDownUp } from 'lucide-react'
-import { ChevronsUpDown } from 'lucide-react'
-import { ConnectionStringMoved } from './connection-string-moved'
+import { useFlag } from 'hooks/ui/useFlag'
+import type { NextPageWithLayout } from 'types'
+import { ConnectionStringMoved } from '../../../../components/interfaces/Settings/Database/connection-string-moved'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
