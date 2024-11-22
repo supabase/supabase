@@ -20,6 +20,7 @@ import {
   Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 interface CronJobCardProps {
   job: CronJob
@@ -36,6 +37,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
   const { ref } = useParams()
   const { project: selectedProject } = useProjectContext()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
   // original schedule when cronstrue throws
@@ -83,12 +85,28 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <DropdownMenuItem asChild>
                     <Link
                       href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
+                      onClick={() => {
+                        sendEvent({
+                          category: 'cron_jobs',
+                          action: 'view_previous_runs',
+                          label: 'cron_job_viewed',
+                        })
+                      }}
                     >
                       View previous runs
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onDeleteCronJob(job)}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      sendEvent({
+                        category: 'cron_jobs',
+                        action: 'delete_cron_job',
+                        label: 'cron_job_deleted',
+                      })
+                      onDeleteCronJob(job)
+                    }}
+                  >
                     Delete cron job
                   </DropdownMenuItem>
                 </DropdownMenuContent>

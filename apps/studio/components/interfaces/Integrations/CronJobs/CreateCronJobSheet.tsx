@@ -4,6 +4,7 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -131,6 +132,7 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const canToggleExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -190,6 +192,16 @@ export const CreateCronJobSheet = ({
 
     const query = buildCronQuery(name, schedule, command)
 
+    // We should allow sending custom properties with events
+    sendEvent({
+      category: 'cron_jobs',
+      action: isEditing ? 'update_cron_job' : 'create_cron_job',
+      label: isEditing ? '_' : '_',
+      properties: {
+        cron_job_type: values.type,
+        cron_job_schedule: schedule,
+      },
+    })
     upsertCronJob(
       {
         projectRef: project!.ref,

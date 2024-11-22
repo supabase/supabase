@@ -14,6 +14,7 @@ import { CronJobsDisabledState } from '../../../../components/interfaces/Integra
 
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
 import { Sheet, SheetContent } from 'ui'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 const CronJobsPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -21,6 +22,8 @@ const CronJobsPage: NextPageWithLayout = () => {
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useState<
     Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'> | undefined
   >()
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const { isError, refetch } = useCronJobsQuery({
     projectRef: project?.ref,
@@ -55,14 +58,19 @@ const CronJobsPage: NextPageWithLayout = () => {
                   <DocsButton href="https://supabase.com/docs/guides/database/extensions/pg_cron" />
                   <Button
                     type="primary"
-                    onClick={() =>
+                    onClick={() => {
+                      sendEvent({
+                        category: 'cron_jobs',
+                        action: 'open_create_cron_job_sheet',
+                        label: 'open_create_cron_job_sheet',
+                      })
                       setCreateCronJobSheetShown({
                         jobname: '',
                         schedule: '',
                         command: '',
                         active: true,
                       })
-                    }
+                    }}
                   >
                     Create a new cron job
                   </Button>
