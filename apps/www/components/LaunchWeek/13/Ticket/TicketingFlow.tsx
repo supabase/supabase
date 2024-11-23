@@ -146,35 +146,54 @@ const TicketingFlow = () => {
                       className="[&_*]:leading-4 text-foreground-lighter -my-6"
                       size="large"
                     />
-                    {hasPlatinumTicket ? (
-                      <div>
-                        {hasSecretTicket ? (
-                          <p className="text-2xl mb-1">Got the secret ticket, {FIRST_NAME}!</p>
+                    <div className="flex flex-col gap-1 max-w-sm">
+                      {/* Header */}
+                      <div className="text-2xl">
+                        {hasPlatinumTicket ? (
+                          hasSecretTicket ? (
+                            <p>Got the secret ticket, {FIRST_NAME}!</p>
+                          ) : (
+                            <p>Thanks for sharing, {FIRST_NAME}!</p>
+                          )
+                        ) : winningChances !== 2 ? (
+                          <>
+                            {hasSecretTicket && <p>You found a secret ticket</p>}
+                            {!hasSecretTicket && <p>You're in, {FIRST_NAME}!</p>}
+                          </>
                         ) : (
-                          <p className="text-2xl mb-1">Thanks for sharing, {FIRST_NAME}!</p>
+                          <p>Almost there, {FIRST_NAME}!</p>
                         )}
                       </div>
-                    ) : winningChances !== 2 ? (
-                      <div>
-                        {hasSecretTicket && (
-                          <p className="text-2xl mb-1">You found a secret ticket</p>
-                        )}
-                        {!hasSecretTicket && (
-                          <p className="text-2xl mb-1">You're in, {FIRST_NAME}!</p>
+                      {/* Paragraph */}
+                      <div className="flex flex-col gap-2 text-foreground-lighter text-sm xl:text-base">
+                        {hasPlatinumTicket ? (
+                          <div>
+                            {hasSecretTicket ? (
+                              <p>
+                                Share your secret ticket to boost your chances of winning
+                                limited-edition swag.
+                              </p>
+                            ) : (
+                              <p>
+                                Follow Launch Week 13 announcements to find out if you're a lucky
+                                winner.
+                              </p>
+                            )}
+                          </div>
+                        ) : winningChances !== 2 ? (
+                          <p>
+                            Share your ticket to increase your chances of winning limited-edition
+                            swag.
+                          </p>
+                        ) : (
+                          <p>
+                            Now share on {!userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
+                            increase your chances of winning limited-edition swag.
+                          </p>
                         )}
                       </div>
-                    ) : (
-                      <div>
-                        <p className="text-2xl mb-1">Almost there, {FIRST_NAME}!</p>
-                      </div>
-                    )}
-                    <TicketSwagCtaBox
-                      hasSecretTicket={hasSecretTicket!}
-                      hasPlatinumTicket={hasPlatinumTicket!}
-                      userData={userData}
-                      firstName={FIRST_NAME!}
-                      className="w-full"
-                    />
+                    </div>
+                    <TicketSwagCtaBox className="w-full" />
                     <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
                       <PartyModeButton />
                       <TicketPresence

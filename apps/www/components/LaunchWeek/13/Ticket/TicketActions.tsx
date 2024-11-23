@@ -4,9 +4,8 @@ import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button, cn } from 'ui'
+import { Button } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import { useParams } from '~/hooks/useParams'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
 
 export default function TicketActions() {
@@ -26,8 +25,6 @@ export default function TicketActions() {
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}&text=${encodedText}`
   const downloadUrl = `/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
-  const params = useParams()
-  const sharePage = !!params.username
   const TICKETS_TABLE = 'tickets'
 
   useEffect(() => {
@@ -78,7 +75,7 @@ export default function TicketActions() {
 
   return (
     <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto !cursor-none">
-      <Button
+      {/* <Button
         type="secondary"
         size={isLessThanMd ? 'tiny' : 'small'}
         className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50 flex-grow !cursor-none"
@@ -86,7 +83,7 @@ export default function TicketActions() {
         icon={<Check strokeWidth={2} />}
       >
         Ticket claimed
-      </Button>
+      </Button> */}
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
