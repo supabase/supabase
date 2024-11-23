@@ -20,7 +20,7 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
 
   const phraseLength = SUPA_SECRET_CODE?.replaceAll('_', '').split('').length
   const winningPhrase = SUPA_SECRET_CODE?.split('_').map((word) => word.split(''))
-  const hasWon = gameState === 'winner'
+  const hasWon = user.secret || gameState === 'winner'
 
   const handleKeyDown = (event: KeyboardEvent) => {
     if (!inputRef?.current) return
@@ -86,16 +86,17 @@ const useLwGame = (inputRef?: RefObject<HTMLInputElement>, disabled?: boolean) =
 
   // Trigger secret ticket when word is typed correctly
   useEffect(() => {
-    if (hasWon) {
+    if (gameState === 'winner') {
       handleClaimTicket(null)
     }
-  }, [hasWon])
+  }, [gameState])
 
   useEffect(() => {
-    if (!!inputRef?.current && isGameMode && !hasWon) {
+    if (hasWon || disabled) return
+    if (!!inputRef?.current && isGameMode) {
       inputRef?.current?.focus()
     }
-  }, [isGameMode, hasWon])
+  }, [isGameMode, hasWon, disabled])
 
   useEffect(() => {
     if (user.secret) {

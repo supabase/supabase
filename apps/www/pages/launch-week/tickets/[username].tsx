@@ -119,6 +119,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             className="relative -mt-40 -mb-20 lg:my-0 lg:absolute"
             ticketPosition="left"
             ticketType={ticketType}
+            sharePage={true}
           />
         </DefaultLayout>
       </ConfDataContext.Provider>

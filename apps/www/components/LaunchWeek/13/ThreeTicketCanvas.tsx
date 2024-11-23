@@ -8,6 +8,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry.js'
 import { useKey } from 'react-use'
+import useConfData from '../hooks/use-conf-data'
 import useLwGame, { VALID_KEYS } from '../hooks/useLwGame'
 
 const ThreeTicketCanvas: React.FC<{
@@ -15,12 +16,15 @@ const ThreeTicketCanvas: React.FC<{
   className?: string
   ticketType?: 'regular' | 'platinum' | 'secret'
   ticketPosition?: 'left' | 'right'
+  sharePage?: boolean
 }> = ({
   username = 'Francesco Sansalvadore',
   className,
   ticketType = 'regular',
   ticketPosition = 'right',
+  sharePage = false,
 }) => {
+  const { userData } = useConfData()
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
   const inputRef = useRef(null)
@@ -208,18 +212,20 @@ const ThreeTicketCanvas: React.FC<{
       })
 
       // Back
-      const backTextGeometry = new TextGeometry('Type the secret code', {
-        font,
-        size: 0.6,
-        height: 0.2,
-      })
-      const backTextMesh = new THREE.Mesh(backTextGeometry, textMaterial)
-      backTextMesh.updateMatrix()
-      backTextMesh.position.set(4.5, 2, -TEXT_Z_POSITION)
-      backTextMesh.rotation.y = Math.PI
+      if (!sharePage) {
+        const backTextGeometry = new TextGeometry('Type the secret code', {
+          font,
+          size: 0.6,
+          height: 0.2,
+        })
+        const backTextMesh = new THREE.Mesh(backTextGeometry, textMaterial)
+        backTextMesh.updateMatrix()
+        backTextMesh.position.set(4.5, 2, -TEXT_Z_POSITION)
+        backTextMesh.rotation.y = Math.PI
 
-      backTextMesh.castShadow = true
-      ticketGroup.add(backTextMesh)
+        backTextMesh.castShadow = true
+        ticketGroup.add(backTextMesh)
+      }
     })
 
     // Load mono font
@@ -239,29 +245,31 @@ const ThreeTicketCanvas: React.FC<{
       })
 
       // Back
-      winningPhrase.flat().map((letter, index) => {
-        const letterGeometry = new TextGeometry(letter.toUpperCase(), {
-          font,
-          size: 2.2,
-          height: 0.2,
-        })
-        const letterMaterial = new THREE.MeshStandardMaterial({
-          color: CONFIG[ticketType].ticketForeground,
-          metalness: 0.2,
-          roughness: 0.35,
-        })
-        const backTextMesh = new THREE.Mesh(letterGeometry, letterMaterial)
-        backTextMesh.updateMatrix()
-        backTextMesh.position.set(4.0 - index * 1.8, -2, -TEXT_Z_POSITION)
-        backTextMesh.rotation.y = Math.PI
+      if (!sharePage) {
+        winningPhrase.flat().map((letter, index) => {
+          const letterGeometry = new TextGeometry(letter.toUpperCase(), {
+            font,
+            size: 2.2,
+            height: 0.2,
+          })
+          const letterMaterial = new THREE.MeshStandardMaterial({
+            color: CONFIG[ticketType].ticketForeground,
+            metalness: 0.2,
+            roughness: 0.35,
+          })
+          const backTextMesh = new THREE.Mesh(letterGeometry, letterMaterial)
+          backTextMesh.updateMatrix()
+          backTextMesh.position.set(4.0 - index * 1.8, -2, -TEXT_Z_POSITION)
+          backTextMesh.rotation.y = Math.PI
 
-        backTextMesh.name = `letter-${index}`
-        backTextMesh.material.transparent = true
-        backTextMesh.material.opacity = 0
+          backTextMesh.name = `letter-${index}`
+          backTextMesh.material.transparent = true
+          backTextMesh.material.opacity = 0
 
-        backTextMesh.castShadow = true
-        ticketGroup.add(backTextMesh)
-      })
+          backTextMesh.castShadow = true
+          ticketGroup.add(backTextMesh)
+        })
+      }
     })
 
     ticketGroup.updateMatrix()
@@ -402,7 +410,10 @@ const ThreeTicketCanvas: React.FC<{
     }
 
     const handleMouseUp = () => handlePointerUp()
-    const handleTouchEnd = () => handlePointerUp()
+    const handleTouchEnd = () => {
+      handlePointerUp()
+      handlePointerUp()
+    }
     const handlePointerUp = () => {
       if (!isDragging.current) return
       isDragging.current = false
@@ -411,7 +422,7 @@ const ThreeTicketCanvas: React.FC<{
       if (Math.abs(dragDelta.current) > FLIP_DELTA) {
         // Flip the ticket
         isFlipped.current = !isFlipped.current
-        !hasWon && setIsGameMode(isFlipped.current)
+        !userData.secret && setIsGameMode(isFlipped.current)
         const sign = Math.sign(dragDelta.current)
         flipDirection.current = sign
       } else {
@@ -498,7 +509,7 @@ const ThreeTicketCanvas: React.FC<{
       )}
     >
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
-      {isGameMode && (
+      {isGameMode && !hasWon && (
         <InputOTP
           ref={inputRef}
           maxLength={phraseLength}
@@ -520,7 +531,13 @@ const ThreeTicketCanvas: React.FC<{
                 {word.map((_, c_idx) => {
                   // index is sum of every letter of every previous word + index of current wo
                   const currentIndex = handleIndexCount(w_idx, c_idx)
-                  return <InputOTPSlot key={`otp-${currentIndex}`} index={currentIndex} />
+                  return (
+                    <InputOTPSlot
+                      key={`otp-${currentIndex}`}
+                      index={currentIndex}
+                      className="text-base"
+                    />
+                  )
                 })}
               </InputOTPGroup>
               {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />}
