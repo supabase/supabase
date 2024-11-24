@@ -329,7 +329,7 @@ export const AIAssistant = ({
                 })}
               </div>
               {renderedMessages}
-              {last(messages)?.role === 'user' && (
+              {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                   <span>Thinking</span>
                   <div className="flex gap-1">
