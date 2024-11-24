@@ -90,16 +90,16 @@ const WrapperTableEditor = ({
               onValueChange={(value) => setSelectedTableIndex(value)}
             >
               <SelectTrigger_Shadcn_ className="mt-0">
-                <SelectValue_Shadcn_>
+                <SelectValue_Shadcn_ placeholder="---">
                   {selectedTableIndex
                     ? tables[selectedTableIndex as unknown as number].label
-                    : 'Select a value'}
+                    : '---'}
                 </SelectValue_Shadcn_>
               </SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
                 {tables.map((table, i) => {
                   return (
-                    <SelectItem_Shadcn_ key={String(i)} value={String(i)}>
+                    <SelectItem_Shadcn_ key={String(i)} value={String(i)} className="max-w-[380px]">
                       <div className="space-y-1">
                         <p>{table.label}</p>
                         <p className="text-foreground-lighter">{table.description}</p>
