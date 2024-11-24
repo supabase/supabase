@@ -410,21 +410,21 @@ const ThreeTicketCanvas: React.FC<{
     }
 
     const handleMouseUp = () => handlePointerUp()
-    const handleTouchEnd = () => {
-      handlePointerUp()
-      handlePointerUp()
-    }
+    const handleTouchEnd = () => handlePointerUp()
+
     const handlePointerUp = () => {
       if (!isDragging.current) return
       isDragging.current = false
       targetScale.current -= SCALE_VARIATION_ON_INTERACTION
 
+      // Detect swipe gesture
       if (Math.abs(dragDelta.current) > FLIP_DELTA) {
         // Flip the ticket
         isFlipped.current = !isFlipped.current
-        !userData.secret && setIsGameMode(isFlipped.current)
+        if (!userData.secret) setIsGameMode(isFlipped.current)
         const sign = Math.sign(dragDelta.current)
         flipDirection.current = sign
+        targetRotation.current.y += sign * Math.PI // Add full flip
       } else {
         // Reset rotation
         ticketGroup.rotation.y = targetRotation.current.y
