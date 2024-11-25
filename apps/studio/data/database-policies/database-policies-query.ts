@@ -14,11 +14,12 @@ export type DatabasePoliciesVariables = {
 
 export async function getDatabasePolicies(
   { projectRef, connectionString, schema }: DatabasePoliciesVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   const { data, error } = await get('/platform/pg-meta/{ref}/policies', {
