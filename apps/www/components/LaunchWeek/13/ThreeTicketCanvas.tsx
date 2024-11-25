@@ -54,7 +54,7 @@ const ThreeTicketCanvas: React.FC<{
 
   const MIN_CANVAS_HEIGHT = 600
   const FLIP_DELTA = 20 // Swipe px threshold for flipping
-  const LINE_HEIGHT = 1.5
+  const LINE_HEIGHT = 1.6
   const SCALE_VARIATION_ON_INTERACTION = 0.025
   const TICKET_FONT_PADDING_LEFT = -6.4
   const DISPLAY_NAME = username?.split(' ').reverse() || []
