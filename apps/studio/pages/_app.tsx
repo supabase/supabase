@@ -156,7 +156,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                                 <StudioCommandMenu />
                                 <GenerateSql />
                                 <FeaturePreviewModal />
-                                <AiAssistantPanel />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                             <SonnerToaster position="top-right" />
