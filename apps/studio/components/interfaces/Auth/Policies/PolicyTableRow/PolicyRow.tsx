@@ -118,6 +118,14 @@ const PolicyRow = ({
                       open: true,
                       sqlSnippets: [sql],
                       initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                      suggestions: {
+                        title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
+                        prompts: [
+                          'Tell me how I can improve this policy...',
+                          'Duplicate this policy for another table...',
+                          'Add extra conditions to this policy...',
+                        ],
+                      },
                     })
                   }}
                 >
