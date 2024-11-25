@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -13,7 +13,10 @@ import {
   FormPanelFooter,
 } from 'components/ui/Forms/FormPanel'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useDatabaseQueueToggleExposeMutation } from 'data/database-queues/database-queues-toggle-postgrest-mutation'
+import {
+  QUEUES_SCHEMA,
+  useDatabaseQueueToggleExposeMutation,
+} from 'data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
@@ -26,16 +29,18 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 // [Joshen] Not convinced with the UI and layout but getting the functionality out first
 
 export const QueuesSettings = () => {
   const project = useSelectedProject()
-  // [Joshen] To double check the actual permissions checking
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
+  const [isToggling, setIsToggling] = useState(false)
 
   const formSchema = z.object({ enable: z.boolean() })
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,31 +49,79 @@ export const QueuesSettings = () => {
     defaultValues: { enable: false },
   })
   const { formState } = form
+  const { enable } = form.watch()
 
-  const { data: isExposed, isSuccess } = useQueuesExposePostgrestStatusQuery({
+  const { data: config, error: configError } = useProjectPostgrestConfigQuery({
+    projectRef: project?.ref,
+  })
+  const {
+    data: isExposed,
+    isSuccess,
+    isLoading,
+  } = useQueuesExposePostgrestStatusQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+  const schemas = config?.db_schema.replace(/ /g, '').split(',') ?? []
 
-  const { mutate: toggleExposeQueuePostgrest, isLoading: isToggling } =
-    useDatabaseQueueToggleExposeMutation({
-      onSuccess: (_, values) => {
+  const { mutate: updatePostgrestConfig } = useProjectPostgrestConfigUpdateMutation({
+    onSuccess: () => {
+      if (enable) {
+        toast.success('Queues can now be managed through client libraries or PostgREST endpoints!')
+      } else {
+        toast.success(
+          'Queues can no longer be managed through client libraries or PostgREST endpoints'
+        )
+      }
+      setIsToggling(false)
+      form.reset({ enable })
+    },
+    onError: (error) => {
+      setIsToggling(false)
+      toast.error(`Failed to toggle queue exposure via PostgREST: ${error.message}`)
+    },
+  })
+
+  const { mutate: toggleExposeQueuePostgrest } = useDatabaseQueueToggleExposeMutation({
+    onSuccess: (_, values) => {
+      if (project && config) {
         if (values.enable) {
-          toast.success(
-            'Queues can now be managed through client libraries or PostgREST endpoints!'
-          )
+          const updatedSchemas = schemas.concat([QUEUES_SCHEMA])
+          updatePostgrestConfig({
+            projectRef: project?.ref,
+            dbSchema: updatedSchemas.join(', '),
+            maxRows: config.max_rows,
+            dbExtraSearchPath: config.db_extra_search_path,
+            dbPool: config.db_pool,
+          })
         } else {
-          toast.success(
-            'Queues can no longer be managed through client libraries or PostgREST endpoints'
-          )
+          const updatedSchemas = schemas.filter((x) => x !== QUEUES_SCHEMA)
+          updatePostgrestConfig({
+            projectRef: project?.ref,
+            dbSchema: updatedSchemas.join(', '),
+            maxRows: config.max_rows,
+            dbExtraSearchPath: config.db_extra_search_path,
+            dbPool: config.db_pool,
+          })
         }
-        form.reset({ enable: values.enable })
-      },
-    })
+      }
+      form.reset({ enable: values.enable })
+    },
+    onError: (error) => {
+      setIsToggling(false)
+      toast.error(`Failed to toggle queue exposure via PostgREST: ${error.message}`)
+    },
+  })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!project) return console.error('Project is required')
+    if (configError) {
+      return toast.error(
+        `Failed to toggle queue exposure via PostgREST: Unable to retrieve PostgREST configuration (${configError.message})`
+      )
+    }
 
+    setIsToggling(true)
     toggleExposeQueuePostgrest({
       projectRef: project.ref,
       connectionString: project.connectionString,
@@ -107,7 +160,7 @@ export const QueuesSettings = () => {
                         <Switch
                           name="enable"
                           size="large"
-                          disabled={!canUpdatePostgrestConfig}
+                          disabled={isLoading || !canUpdatePostgrestConfig}
                           checked={field.value}
                           onCheckedChange={(value) => field.onChange(value)}
                         />

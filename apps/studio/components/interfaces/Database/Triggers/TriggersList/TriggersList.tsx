@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Button, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
@@ -15,8 +15,8 @@ import { useDatabaseTriggersQuery } from 'data/database-triggers/database-trigge
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Search } from 'lucide-react'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { Button, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
 
@@ -40,7 +40,7 @@ const TriggersList = ({
     connectionString: project?.connectionString,
   })
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)

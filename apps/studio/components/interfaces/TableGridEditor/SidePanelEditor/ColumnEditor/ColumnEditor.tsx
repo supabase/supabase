@@ -17,7 +17,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import type { Dictionary } from 'types'
 import { Button, Checkbox, Input, SidePanel, Toggle } from 'ui'
 import ActionBar from '../ActionBar'
@@ -84,7 +84,7 @@ const ColumnEditor = ({
     connectionString: project?.connectionString,
   })
   const enumTypes = (types ?? []).filter(
-    (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
+    (type) => !PROTECTED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
   )
 
   const { data: constraints } = useTableConstraintsQuery({

@@ -13,7 +13,7 @@ import { DatabaseIndex, useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { AlertCircle, Search, Trash } from 'lucide-react'
 import { Button, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -64,7 +64,7 @@ const Indexes = () => {
   })
 
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)

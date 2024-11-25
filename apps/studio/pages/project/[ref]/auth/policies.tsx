@@ -1,7 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
@@ -9,6 +9,7 @@ import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -17,10 +18,9 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { NextPageWithLayout } from 'types'
-import { Button, Input } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
+import { Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -75,7 +75,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
   const [protectedSchemas] = partition(
     schemas,
-    (schema) => schema?.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    (schema) => schema?.name !== 'realtime' && PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)

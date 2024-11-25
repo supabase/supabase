@@ -13,7 +13,7 @@ import {
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
@@ -53,7 +53,7 @@ const EnumeratedTypes = () => {
       : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
   const protectedSchemas = (schemas ?? []).filter((schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
