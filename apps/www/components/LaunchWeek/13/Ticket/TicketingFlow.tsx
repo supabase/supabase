@@ -1,5 +1,7 @@
 import React from 'react'
+import Link from 'next/link'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { Calendar } from 'lucide-react'
 import { Button, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
@@ -43,7 +45,7 @@ const TicketingFlow = () => {
       size="small"
       onClick={() => setIsPartyMode(!isPartyMode)}
       type="default"
-      className="sm:pl-1 pointer-events-auto cursor-none"
+      className="sm:pl-1 pointer-events-auto"
     >
       <div className="flex items-center">
         <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
@@ -198,8 +200,26 @@ const TicketingFlow = () => {
                       </div>
                     </div>
                     <TicketSwagCtaBox className="w-full" />
-                    <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
-                      <PartyModeButton />
+                    <div className="flex flex-col gap-4 mt-2 md:mt-0 items-center lg:items-start">
+                      <div className="flex flex-row gap-2 md:item-center">
+                        <PartyModeButton />
+                        <Button
+                          size="small"
+                          type="default"
+                          className="sm:pl-1 pointer-events-auto"
+                          asChild
+                        >
+                          <Link
+                            href="/events?category=meetup"
+                            className="[&>span]:flex w-full [&>span]:items-center"
+                          >
+                            <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
+                              <Calendar strokeWidth={2} className="w-3 h-3 text-foreground-light" />
+                            </div>
+                            <span>Meetups</span>
+                          </Link>
+                        </Button>
+                      </div>
                       <TicketPresence
                         className={cn(
                           'opacity-0 invisible translate-y-1 transition-all',

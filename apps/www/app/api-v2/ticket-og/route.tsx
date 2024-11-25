@@ -97,7 +97,7 @@ export async function GET(req: Request, res: Response) {
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
     const USERNAME_LEFT = 400
-    const USERNAME_BOTTOM = 60
+    const USERNAME_BOTTOM = 100
     const USERNAME_WIDTH = 400
     const DISPLAY_NAME = name || username
 
