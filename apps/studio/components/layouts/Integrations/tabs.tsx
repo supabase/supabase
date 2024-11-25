@@ -48,19 +48,8 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
 
   return (
     <AnimatePresence>
-      {/* <motion.div
-           layout
-           transition={layoutTransition}
-           initial={{ opacity: 0, height: 0 }}
-           animate={{ opacity: 1, height: 'auto' }}
-           exit={{ opacity: 0, height: 0 }}
-           className="sticky top-0 z-50 bg-background border-b"
-         > */}
       <div className="sticky top-[0px] z-[1] bg-dash-sidebar" ref={navRef}>
         <MotionNavMenu
-          //   initial={{ opacity: 1, height: 0 }}
-          //   animate={{ opacity: 1, height: 'auto' }}
-          //   exit={{ opacity: 1, height: 0 }}
           transition={{ duration: 0.2 }}
           className="px-10 [&_ul]:items-center bg-200"
           aria-label="Integration menu"
@@ -72,12 +61,6 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
               className="w-[20px] h-[20px] relative bg-white rounded"
               transition={{ duration: 0 }}
             >
-              {/* <div
-                className={cn(
-                  'w-full h-full border border-muted rounded transition-all',
-                    'bg-white'
-                )}
-                /> */}
               {integration?.icon({
                 style: { padding: iconPadding.get() },
               })}
@@ -125,9 +108,7 @@ export const IntegrationTabs = ({ scroll, isSticky }: IntegrationTabsProps) => {
             )
           })}
         </MotionNavMenu>
-        {/* <motion.div className="h-[10px] bg-red-900 origin-left" style={{ scaleX }} /> */}
       </div>
-      {/* </motion.div> */}
     </AnimatePresence>
   )
 }

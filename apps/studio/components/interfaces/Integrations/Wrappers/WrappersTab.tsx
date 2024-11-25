@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import { HTMLProps, ReactNode, useCallback, useState } from 'react'
 
 import { useParams } from 'common'
 import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
@@ -21,7 +21,7 @@ export const WrappersTab = () => {
   const [isClosingCreateWrapper, setisClosingCreateWrapper] = useState(false)
   const canCreateWrapper = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'wrappers')
 
-  const { data, isLoading } = useFDWsQuery({
+  const { data } = useFDWsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -29,33 +29,39 @@ export const WrappersTab = () => {
   const wrappers = data ?? []
   const integration = INTEGRATIONS.find((i) => i.id === id)
 
+  // this contains a collection of all wrapper instances for the wrapper type
+  const createdWrappers =
+    integration?.type === 'wrapper'
+      ? wrappers.filter((w) => wrapperMetaComparator(integration.meta, w))
+      : []
+
+  const Container = useCallback(
+    ({ ...props }: { children: ReactNode } & HTMLProps<HTMLDivElement>) => (
+      <div className="w-full mx-10 py-10 ">
+        {props.children}
+        <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
+          <SheetContent size="lg" tabIndex={undefined}>
+            {integration?.type === 'wrapper' && (
+              <CreateWrapperSheet
+                wrapperMeta={integration.meta}
+                onClose={() => {
+                  setCreateWrapperShown(false)
+                  setisClosingCreateWrapper(false)
+                }}
+                isClosing={isClosingCreateWrapper}
+                setIsClosing={setisClosingCreateWrapper}
+              />
+            )}
+          </SheetContent>
+        </Sheet>
+      </div>
+    ),
+    [createWrapperShown, integration, isClosingCreateWrapper]
+  )
+
   if (!integration || integration.type !== 'wrapper') {
     return <div>Missing integration.</div>
   }
-
-  // this contains a collection of all wrapper instances for the wrapper type
-  const createdWrappers = wrappers.filter((w) => wrapperMetaComparator(integration.meta, w))
-
-  const Container = ({
-    ...props
-  }: { children: React.ReactNode } & React.HTMLProps<HTMLDivElement>) => (
-    <div className="w-full mx-10 py-10 ">
-      {props.children}
-      <Sheet open={!!createWrapperShown} onOpenChange={() => setisClosingCreateWrapper(true)}>
-        <SheetContent size="lg" tabIndex={undefined}>
-          <CreateWrapperSheet
-            wrapperMeta={integration.meta}
-            onClose={() => {
-              setCreateWrapperShown(false)
-              setisClosingCreateWrapper(false)
-            }}
-            isClosing={isClosingCreateWrapper}
-            setIsClosing={setisClosingCreateWrapper}
-          />
-        </SheetContent>
-      </Sheet>
-    </div>
-  )
 
   if (createdWrappers.length === 0) {
     return (
@@ -86,7 +92,7 @@ export const WrappersTab = () => {
   }
 
   return (
-    <Container className="">
+    <Container>
       <WrapperTable />
       {selectedWrapperForDelete && (
         <DeleteWrapperModal

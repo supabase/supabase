@@ -30,8 +30,8 @@ export const WebhooksOverviewTab = () => {
   const isPermissionsLoaded = usePermissionsLoaded()
 
   const { mutate: enableHooks, isLoading: isEnablingHooks } = useHooksEnableMutation({
-    onSuccess: () => {
-      refetch()
+    onSuccess: async () => {
+      await refetch()
       toast.success('Successfully enabled webhooks')
     },
   })

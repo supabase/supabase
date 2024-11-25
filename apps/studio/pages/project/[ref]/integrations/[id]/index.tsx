@@ -4,7 +4,7 @@ import { useInstalledIntegrations } from 'components/interfaces/Integrations/Lan
 import IntegrationsLayout from 'components/layouts/Integrations/layout'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useRouter } from 'next/compat/router'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { NextPageWithLayout } from 'types'
 
 const IntegrationPage: NextPageWithLayout = () => {
@@ -28,17 +28,20 @@ const IntegrationPage: NextPageWithLayout = () => {
     [integration, id, pageId, childId]
   )
 
+  useEffect(() => {
+    // if the integration is not installed, redirect to the overview page
+    if (router && !installation && pageId !== 'overview') {
+      router.replace(`/project/${ref}/integrations/${id}/overview`)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router, installation, pageId])
+
   if (!router?.isReady || isIntegrationsLoading) {
     return (
       <div className="px-10 py-6">
         <GenericSkeletonLoader />
       </div>
     )
-  }
-
-  // if the integration is not installed, redirect to the overview page
-  if (!installation && pageId !== 'overview') {
-    router.replace(`/project/${ref}/integrations/${id}/overview`)
   }
 
   if (!id || !integration) {
