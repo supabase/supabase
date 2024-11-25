@@ -108,13 +108,12 @@ export const EditWrapperSheet = ({
   return (
     <>
       <div className="flex flex-col h-full" tabIndex={-1}>
-        <SheetHeader>
-          <SheetTitle>
-            Edit {wrapperMeta.label} wrapper: {wrapper.name}
-          </SheetTitle>
-        </SheetHeader>
-
-        <Form id={FORM_ID} initialValues={initialValues} onSubmit={onSubmit}>
+        <Form
+          id={FORM_ID}
+          initialValues={initialValues}
+          onSubmit={onSubmit}
+          className="h-full flex flex-col"
+        >
           {({ values, initialValues, resetForm }: any) => {
             // [Alaister] although this "technically" is breaking the rules of React hooks
             // it won't error because the hooks are always rendered in the same order
@@ -189,120 +188,127 @@ export const EditWrapperSheet = ({
 
             return (
               <>
-                <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
-                  <FormSectionContent loading={false}>
-                    <Input
-                      id="wrapper_name"
-                      label="Wrapper Name"
-                      error={formErrors.wrapper_name}
-                      descriptionText={
-                        values.wrapper_name !== initialValues.wrapper_name ? (
-                          <>
-                            Your wrapper's server name will be updated to{' '}
-                            <code className="text-xs">{values.wrapper_name}_server</code>
-                          </>
-                        ) : (
-                          <>
-                            Your wrapper's server name is{' '}
-                            <code className="text-xs">{values.wrapper_name}_server</code>
-                          </>
-                        )
-                      }
-                    />
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
-                >
-                  <FormSectionContent loading={false}>
-                    {wrapperMeta.server.options
-                      .filter((option) => !option.hidden)
-                      .map((option) => (
-                        <InputField
-                          key={option.name}
-                          option={option}
-                          loading={option.encrypted ? loadingSecrets : false}
-                          error={formErrors[option.name]}
-                        />
-                      ))}
-                  </FormSectionContent>
-                </FormSection>
-                <FormSection
-                  header={
-                    <FormSectionLabel>
-                      <p>Foreign Tables</p>
-                      <p className="text-foreground-light mt-2 w-[90%]">
-                        You can query your data from these foreign tables after the wrapper is
-                        created
-                      </p>
-                    </FormSectionLabel>
-                  }
-                >
-                  <FormSectionContent loading={false}>
-                    {wrapperTables.length === 0 ? (
-                      <div className="flex justify-end translate-y-4">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {wrapperTables.map((table, i) => {
-                          const target = table?.table ?? table.object
-
-                          return (
-                            <div
-                              key={`${table.schema_name}.${table.table_name}`}
-                              className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
-                            >
-                              <div>
-                                <p className="text-sm">
-                                  {table.schema_name}.{table.table_name}{' '}
-                                </p>
-                                <p className="text-sm text-foreground-light mt-1">
-                                  Target: {target}
-                                </p>
-                                <p className="text-sm text-foreground-light">
-                                  Columns:{' '}
-                                  {table.columns.map((column: any) => column.name).join(', ')}
-                                </p>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <Button
-                                  type="default"
-                                  className="px-1"
-                                  icon={<Edit />}
-                                  onClick={() => {
-                                    setIsEditingTable(true)
-                                    setSelectedTableToEdit({ ...table, tableIndex: i })
-                                  }}
-                                />
-                                <Button
-                                  type="default"
-                                  className="px-1"
-                                  icon={<Trash />}
-                                  onClick={() => {
-                                    setWrapperTables((prev) => prev.filter((_, j) => j !== i))
-                                  }}
-                                />
-                              </div>
-                            </div>
+                <SheetHeader>
+                  <SheetTitle>
+                    Edit {wrapperMeta.label} wrapper: {wrapper.name}
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex-grow overflow-y-auto">
+                  <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      <Input
+                        id="wrapper_name"
+                        label="Wrapper Name"
+                        error={formErrors.wrapper_name}
+                        descriptionText={
+                          values.wrapper_name !== initialValues.wrapper_name ? (
+                            <>
+                              Your wrapper's server name will be updated to{' '}
+                              <code className="text-xs">{values.wrapper_name}_server</code>
+                            </>
+                          ) : (
+                            <>
+                              Your wrapper's server name is{' '}
+                              <code className="text-xs">{values.wrapper_name}_server</code>
+                            </>
                           )
-                        })}
-                      </div>
-                    )}
-                    {wrapperTables.length > 0 && (
-                      <div className="flex justify-end">
-                        <Button type="default" onClick={() => setIsEditingTable(true)}>
-                          Add foreign table
-                        </Button>
-                      </div>
-                    )}
-                    {wrapperTables.length === 0 && formErrors.tables && (
-                      <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
-                    )}
-                  </FormSectionContent>
-                </FormSection>
+                        }
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+                  >
+                    <FormSectionContent loading={false}>
+                      {wrapperMeta.server.options
+                        .filter((option) => !option.hidden)
+                        .map((option) => (
+                          <InputField
+                            key={option.name}
+                            option={option}
+                            loading={option.encrypted ? loadingSecrets : false}
+                            error={formErrors[option.name]}
+                          />
+                        ))}
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection
+                    header={
+                      <FormSectionLabel>
+                        <p>Foreign Tables</p>
+                        <p className="text-foreground-light mt-2 w-[90%]">
+                          You can query your data from these foreign tables after the wrapper is
+                          created
+                        </p>
+                      </FormSectionLabel>
+                    }
+                  >
+                    <FormSectionContent loading={false}>
+                      {wrapperTables.length === 0 ? (
+                        <div className="flex justify-end translate-y-4">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {wrapperTables.map((table, i) => {
+                            const target = table?.table ?? table.object
+
+                            return (
+                              <div
+                                key={`${table.schema_name}.${table.table_name}`}
+                                className="flex items-center justify-between px-4 py-2 border rounded-md border-control"
+                              >
+                                <div>
+                                  <p className="text-sm">
+                                    {table.schema_name}.{table.table_name}{' '}
+                                  </p>
+                                  <p className="text-sm text-foreground-light mt-1">
+                                    Target: {target}
+                                  </p>
+                                  <p className="text-sm text-foreground-light">
+                                    Columns:{' '}
+                                    {table.columns.map((column: any) => column.name).join(', ')}
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Button
+                                    type="default"
+                                    className="px-1"
+                                    icon={<Edit />}
+                                    onClick={() => {
+                                      setIsEditingTable(true)
+                                      setSelectedTableToEdit({ ...table, tableIndex: i })
+                                    }}
+                                  />
+                                  <Button
+                                    type="default"
+                                    className="px-1"
+                                    icon={<Trash />}
+                                    onClick={() => {
+                                      setWrapperTables((prev) => prev.filter((_, j) => j !== i))
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                      {wrapperTables.length > 0 && (
+                        <div className="flex justify-end">
+                          <Button type="default" onClick={() => setIsEditingTable(true)}>
+                            Add foreign table
+                          </Button>
+                        </div>
+                      )}
+                      {wrapperTables.length === 0 && formErrors.tables && (
+                        <p className="text-sm text-right text-red-900">{formErrors.tables}</p>
+                      )}
+                    </FormSectionContent>
+                  </FormSection>
+                </div>
                 <SheetFooter>
                   <Button
                     size="tiny"
@@ -321,7 +327,7 @@ export const EditWrapperSheet = ({
                     disabled={isSaving}
                     loading={isSaving}
                   >
-                    Create wrapper
+                    Save wrapper
                   </Button>
                 </SheetFooter>
               </>

@@ -94,15 +94,12 @@ export const CreateWrapperSheet = ({
 
   return (
     <>
-      <div className="flex flex-col h-full" tabIndex={-1}>
-        <SheetHeader>
-          <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
-        </SheetHeader>
+      <div className="h-full" tabIndex={-1}>
         <Form
           id={FORM_ID}
           initialValues={initialValues}
           onSubmit={onSubmit}
-          className="flex-grow flex flex-col"
+          className="flex-grow flex flex-col h-full"
         >
           {({ handleReset, values, initialValues }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -122,6 +119,9 @@ export const CreateWrapperSheet = ({
 
             return (
               <>
+                <SheetHeader>
+                  <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
+                </SheetHeader>
                 <div className="flex-grow overflow-y-auto">
                   <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
