@@ -9,6 +9,8 @@ import Image from 'next/image'
 import aiSpace from 'public/images/ai/ai-space.jpg'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import Link from 'next/link'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
@@ -545,6 +547,8 @@ ORDER BY hour;`}
 
 function Assistant() {
   const [incomingMessages, setIncomingMessages] = useState<Message[]>([])
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
   const meta_title = 'AI | Supabase'
   const meta_description = 'Build AI-powered applications with Supabase'
   const router = useRouter()
@@ -589,6 +593,23 @@ function Assistant() {
                   Generate, run and debug queries, chart your data, create functions or policies.
                   The assistant is here to help.
                 </p>
+                {!isUserLoading && (
+                  <>
+                    {isLoggedIn ? (
+                      <Link href="/dashboard/projects" passHref legacyBehavior>
+                        <Button iconRight={<ArrowRight />} type="primary" size={'large'}>
+                          Dashboard
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                        <Button iconRight={<ArrowRight />} type="primary" size={'large'}>
+                          Start your project
+                        </Button>
+                      </Link>
+                    )}
+                  </>
+                )}
               </div>
 
               {/* Grid of secondary buttons */}
