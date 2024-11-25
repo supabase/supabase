@@ -3,8 +3,9 @@ import { NextRouter } from 'next/router'
 import { ReactNode } from 'react'
 import { proxy, subscribe } from 'valtio'
 import { addRecentItem } from './recent-items'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
-export type TabType = 'table' | 'schema' | 'sql' | 'view' | 'function' | 'new'
+export type TabType = ENTITY_TYPE | 'sql' | 'schema' | 'new'
 
 export interface Tab {
   id: string
@@ -195,23 +196,17 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
       const schema = (router.query.schema as string) || 'public'
       router.push(`/project/${router.query.ref}/sql/${tab.metadata?.sqlId}?schema=${schema}`)
       break
-    case 'table':
+    case 'r':
+    case 'v':
+    case 'm':
+    case 'f':
+    case 'p':
       router.push(
         `/project/${router.query.ref}/editor/${tab.metadata?.tableId}?schema=${tab.metadata?.schema}`
       )
       break
     case 'schema':
       router.push(`/project/${router.query.ref}/explorer/schema/${tab.metadata?.schema}`)
-      break
-    case 'view':
-      router.push(
-        `/project/${router.query.ref}/explorer/views/${tab.metadata?.schema}/${tab.metadata?.name}`
-      )
-      break
-    case 'function':
-      router.push(
-        `/project/${router.query.ref}/explorer/functions/${tab.metadata?.schema}/${tab.metadata?.name}`
-      )
       break
     case 'new':
       router.push(`/project/${router.query.ref}/explorer/new`)
@@ -223,15 +218,20 @@ export const handleTabClose = (
   ref: string | undefined,
   id: string,
   router: NextRouter,
-  onClose?: (id: string) => void,
-  editor?: 'sql' | 'table'
+  editor: 'sql' | 'table',
+  onClose?: (id: string) => void
 ) => {
   if (!ref) return
   const store = getTabsStore(ref)
   // tabs without the one we're closing
   const currentTab = store.tabsMap[id]
   const currentTabs = Object.values(store.tabsMap).filter((tab) => tab.id !== id)
-  const nextTabId = currentTabs.filter((tab) => tab.type === editor)[0]?.id
+
+  const nextTabId = currentTabs.filter((tab) => {
+    // tab.type === editor
+
+    return editorEntityTypes[editor]?.includes(tab.type)
+  })[0]?.id
 
   // console.log('Current Tab:', currentTab)
   // console.log('Current Tabs:', currentTabs)
@@ -259,7 +259,7 @@ export const handleTabClose = (
       case 'sql':
         router.push(`/project/${router.query.ref}/sql`)
         break
-      case 'table':
+      case 'r' || 'v' || 'm' || 'f' || 'p':
         router.push(`/project/${router.query.ref}/editor`)
         break
       default:
@@ -296,8 +296,25 @@ export const handleTabDragEnd = (
   // Handle navigation
   handleTabNavigation(ref, tabId, router)
 }
+
 type CreateTabIdParams = {
-  table: {
+  r: {
+    schema: string
+    name: string
+  }
+  v: {
+    schema: string
+    name: string
+  }
+  m: {
+    schema: string
+    name: string
+  }
+  f: {
+    schema: string
+    name: string
+  }
+  p: {
     schema: string
     name: string
   }
@@ -314,8 +331,16 @@ type CreateTabIdParams = {
 
 export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
   switch (type) {
-    case 'table':
-      return `table-${(params as CreateTabIdParams['table']).schema}-${(params as CreateTabIdParams['table']).name}`
+    case 'r':
+      return `r-${(params as CreateTabIdParams['r']).schema}-${(params as CreateTabIdParams['r']).name}`
+    case 'v':
+      return `v-${(params as CreateTabIdParams['v']).schema}-${(params as CreateTabIdParams['v']).name}`
+    case 'm':
+      return `m-${(params as CreateTabIdParams['m']).schema}-${(params as CreateTabIdParams['m']).name}`
+    case 'f':
+      return `f-${(params as CreateTabIdParams['f']).schema}-${(params as CreateTabIdParams['f']).name}`
+    case 'p':
+      return `p-${(params as CreateTabIdParams['p']).schema}-${(params as CreateTabIdParams['p']).name}`
     case 'sql':
       return `sql-${(params as CreateTabIdParams['sql']).id}`
     case 'schema':
@@ -323,4 +348,9 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
     default:
       return ''
   }
+}
+
+export const editorEntityTypes = {
+  table: ['r', 'v', 'm', 'f', 'p', 'schema'],
+  sql: ['sql'],
 }

@@ -37,12 +37,15 @@ const TableEditorPage: NextPageWithLayout = () => {
    */
   useEffect(() => {
     if (selectedTable && projectRef) {
-      const tabId = createTabId('table', { schema: selectedTable.schema, name: selectedTable.name })
+      const tabId = createTabId(selectedTable.entity_type, {
+        schema: selectedTable.schema,
+        name: selectedTable.name,
+      })
 
       if (!store.tabsMap[tabId]) {
         addTab(projectRef, {
           id: tabId,
-          type: 'table',
+          type: selectedTable.entity_type,
           label: selectedTable.name,
           metadata: {
             schema: selectedTable.schema,

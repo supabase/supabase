@@ -51,6 +51,7 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { getTabsStore, createTabId, makeTabPermanent } from 'state/tabs'
 import { useSnapshot } from 'valtio'
+import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
 
 export interface EntityListItemProps {
   id: number | string
@@ -70,7 +71,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
-  const tabId = createTabId('table', {
+  const tabId = createTabId(entity.type, {
     schema: selectedSchema,
     name: entity.name,
   })
@@ -78,6 +79,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const tabStore = getTabsStore(projectRef)
   const isPreview = tabStore.previewTabId === tabId
   const isActive = _isActive ?? Number(id) === entity.id
+  const tabsStore = getTabsStore(projectRef)
+  const tabs = useSnapshot(tabsStore)
+  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -278,11 +282,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     return null
   }
 
-  const tabsStore = getTabsStore(projectRef)
-  const tabs = useSnapshot(tabsStore)
-
-  const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
-
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -300,7 +299,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       )}
       onDoubleClick={(e) => {
         e.preventDefault()
-        const tabId = createTabId('table', {
+        const tabId = createTabId(entity.type, {
           schema: selectedSchema,
           name: entity.name,
         })
@@ -311,41 +310,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="min-w-4" asChild>
-            {entity.type === ENTITY_TYPE.TABLE ? (
-              <Table2
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : entity.type === ENTITY_TYPE.VIEW ? (
-              <Eye
-                size={15}
-                strokeWidth={1.5}
-                className={cn(
-                  'text-foreground-muted group-hover:text-foreground-lighter',
-                  isActive && 'text-foreground-lighter',
-                  'transition-colors'
-                )}
-              />
-            ) : (
-              <div
-                className={cn(
-                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                    'text-foreground-light bg-border-stronger'
-                )}
-              >
-                {Object.entries(ENTITY_TYPE)
-                  .find(([, value]) => value === entity.type)?.[0]?.[0]
-                  ?.toUpperCase()}
-              </div>
-            )}
+            <EntityTypeIcon type={entity.type} />
           </Tooltip.Trigger>
           <Tooltip.Portal>
             <Tooltip.Content

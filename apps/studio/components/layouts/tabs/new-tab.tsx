@@ -1,4 +1,5 @@
-import { TabIcon } from 'components/explorer/tabs/TabIcon'
+import { useParams } from 'common'
+import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { usePostgresInUse } from 'data/database/postgres-in-use-query'
@@ -7,7 +8,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, LayoutGroup, motion, Variants } from 'framer-motion'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
-import { BarChart2, Box, Search, Table2, X, Upload, BaggageClaim, BookOpen } from 'lucide-react'
+import { BaggageClaim, BarChart2, BookOpen, Box, Search, Table2, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -15,14 +16,14 @@ import { toast } from 'sonner'
 import type { RecentItem } from 'state/recent-items'
 import { recentItemsStore } from 'state/recent-items'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { removeNewTab } from 'state/tabs'
+import { editorEntityTypes, removeNewTab } from 'state/tabs'
 import { Badge, Button, Card, cn, Separator, Skeleton, SQL_ICON } from 'ui'
 import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
-import { useParams } from 'common'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 dayjs.extend(relativeTime)
 
@@ -102,9 +103,11 @@ function RecentItems() {
   if (!recentItemsSnap?.items || !ref) return null
 
   // Filter items based on editor type
-  const filteredItems = recentItemsSnap.items.filter((item) => item.type === editor)
+  const filteredItems = recentItemsSnap.items.filter((item) =>
+    editorEntityTypes[editor].includes(item.type)
+  )
 
-  if (filteredItems.length === 0) return null
+  console.log('filteredItems', filteredItems)
 
   return (
     <div className="flex flex-col gap-0">
@@ -114,12 +117,7 @@ function RecentItems() {
           initial={false}
           className="flex flex-col items-center justify-center p-8 text-center"
         >
-          <TabIcon
-            type="table"
-            size={21}
-            strokeWidth={2}
-            className="text-foreground-lighter mb-2"
-          />
+          <EntityTypeIcon type={'r' as ENTITY_TYPE} />
           <p className="text-sm text-foreground-lighter">No recent items yet</p>
           <p className="text-xs text-foreground-light">
             Items will appear here as you browse through your project
@@ -140,14 +138,18 @@ function RecentItems() {
                   href={`/project/${ref}/${
                     item.type === 'sql'
                       ? `sql/${item.metadata?.sqlId}`
-                      : item.type === 'table'
+                      : item.type === 'r' ||
+                          item.type === 'v' ||
+                          item.type === 'm' ||
+                          item.type === 'f' ||
+                          item.type === 'p'
                         ? `editor/${item.metadata?.tableId}?schema=${item.metadata?.schema}`
                         : `explorer/${item.type}/${item.metadata?.schema}/${item.metadata?.name}`
                   }`}
                   className="flex items-center gap-4 rounded-lg bg-surface-100 py-2 transition-colors hover:bg-surface-200"
                 >
                   <div className="flex h-6 w-6 items-center justify-center rounded bg-surface-100 border">
-                    <TabIcon type={item.type} />
+                    <EntityTypeIcon type={item.type} />
                   </div>
                   <div className="flex flex-1 gap-5 items-center">
                     <span className="text-sm text-foreground">

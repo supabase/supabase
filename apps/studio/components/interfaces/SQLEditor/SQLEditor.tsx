@@ -709,7 +709,7 @@ const SQLEditor = () => {
           </AISchemaSuggestionPopover>
         )}
         <ResizablePanel maxSize={70}>
-          <div className="flex-grow overflow-y-auto border-b h-full">
+          <div className="flex-grow overflow-y-auto border-b h-full bg-dash-sidebar dark:bg-surface-100">
             {!isAiOpen && (
               <motion.button
                 layoutId="ask-ai-input-icon"

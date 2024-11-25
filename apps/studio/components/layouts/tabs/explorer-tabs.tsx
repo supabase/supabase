@@ -21,6 +21,7 @@ import { useEditorType } from '../editors/editors-layout.hooks'
 import { CollapseButton } from './collapse-button'
 import { sidebarState } from './sidebar-state'
 import { useParams } from 'common'
+import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
 
 interface TabsProps {
   storeKey: string
@@ -66,9 +67,9 @@ const SortableTab = ({
   const shouldShowSchema = useMemo(() => {
     // For both table and schema tabs, show schema if:
     // Any tab has a different schema than the current schema parameter
-    if (tab.type === 'table' || tab.type === 'schema') {
+    if (tab.type === 'r' || tab.type === 'schema') {
       const anyTabHasDifferentSchema = openTabs
-        .filter((t) => t.type === 'table' || t.type === 'schema')
+        .filter((t) => t.type === 'r' || t.type === 'schema')
         .some((t) => t.metadata?.schema !== currentSchema)
 
       return anyTabHasDifferentSchema
@@ -78,7 +79,7 @@ const SortableTab = ({
   }, [openTabs, currentSchema, tab.type])
 
   // Create a motion version of TabsTrigger while preserving all functionality
-  const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
 
   return (
     <div
@@ -100,7 +101,8 @@ const SortableTab = ({
         )}
         {...listeners}
       >
-        <TabIcon type={tab.type} />
+        {/* <TabIcon type={tab.type} /> */}
+        <EntityTypeIcon type={tab.type} />
         <div className="flex items-center gap-0">
           <AnimatePresence mode="popLayout" initial>
             {shouldShowSchema && (
@@ -152,13 +154,16 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     .map((id) => tabs.tabsMap[id])
     .filter((tab) => tab !== undefined) as Tab[]
 
+  const entityTypes = {
+    table: ['r', 'v', 'm', 'f', 'p', 'schema'],
+    sql: ['sql'],
+  }
+
   // Separate new tab from regular tabs
   const regularTabs = openTabs.filter((tab) => {
     // Filter by editor type - only show SQL tabs for SQL editor and table tabs for table editor
-    return tab.type === editor
+    return entityTypes[editor]?.includes(tab.type)
   })
-
-  const newTab = openTabs.find((tab) => tab.type === 'new')
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
@@ -173,7 +178,7 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(ref, id, router, onClose, editor)
+    handleTabClose(ref, id, router, editor, onClose)
   }
 
   const handleTabChange = (id: string) => {

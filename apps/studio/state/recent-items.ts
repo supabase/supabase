@@ -81,20 +81,14 @@ export const addRecentItem = (tab: Tab) => {
     switch (recentItem.type) {
       case 'sql':
         return existingItem.metadata?.sqlId !== recentItem.metadata?.sqlId
-      case 'table':
+      case 'r':
+      case 'v':
+      case 'm':
+      case 'f':
+      case 'p':
         return existingItem.metadata?.tableId !== recentItem.metadata?.tableId
       case 'schema':
         return existingItem.metadata?.schema !== recentItem.metadata?.schema
-      case 'view':
-        return !(
-          existingItem.metadata?.schema === recentItem.metadata?.schema &&
-          existingItem.metadata?.name === recentItem.metadata?.name
-        )
-      case 'function':
-        return !(
-          existingItem.metadata?.schema === recentItem.metadata?.schema &&
-          existingItem.metadata?.name === recentItem.metadata?.name
-        )
       default:
         return true
     }

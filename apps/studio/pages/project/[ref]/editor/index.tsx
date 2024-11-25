@@ -8,7 +8,7 @@ import TableEditorLayout from 'components/layouts/TableEditorLayout/TableEditorL
 import TableEditorMenu from 'components/layouts/TableEditorLayout/TableEditorMenu'
 import { NewTab } from 'components/layouts/tabs/new-tab'
 import { useRouter } from 'next/router'
-import { getTabsStore } from 'state/tabs'
+import { editorEntityTypes, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -21,7 +21,9 @@ const TableEditorPage: NextPageWithLayout = () => {
   }
 
   // handle redirect to last table tab
-  const lastTabId = store.openTabs.filter((id) => store.tabsMap[id]?.type === 'table').pop()
+  const lastTabId = store.openTabs
+    .filter((id) => editorEntityTypes.table.includes(store.tabsMap[id]?.type))
+    .pop()
   if (lastTabId) {
     const lastTab = store.tabsMap[lastTabId]
     if (lastTab) {

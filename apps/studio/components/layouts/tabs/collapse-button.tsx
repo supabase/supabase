@@ -8,12 +8,8 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
   const sidebar = useSnapshot(sidebarState)
 
   useEffect(() => {
-    console.log('Component mounted, adding event listener') // Check if this runs
-
     function handleKeyDown(event: KeyboardEvent) {
-      console.log('event', event)
       if (event.key.toLowerCase() === 'b' && (event.metaKey || event.ctrlKey)) {
-        console.log('event.key', event.key)
         event.preventDefault()
         sidebarState.isOpen = !sidebarState.isOpen
       }
@@ -21,7 +17,6 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => {
-      console.log('Component unmounting, removing listener') // Check cleanup
       window.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
