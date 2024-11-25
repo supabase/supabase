@@ -82,7 +82,7 @@ const PlanUpdateSidePanel = () => {
         setSelectedTier(undefined)
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-        setShowUpgradeSurvey(true)
+        if (planMeta?.change_type === 'upgrade') setShowUpgradeSurvey(true)
       },
       onError: (error) => {
         toast.error(`Unable to update subscription: ${error.message}`)

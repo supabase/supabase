@@ -5,13 +5,13 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
-import { FunctionsAssistantPreview } from './FunctionsAssistantPreview'
+import { AssistantV2Preview } from './AssistantV2Preview'
 
 export const FEATURE_PREVIEWS = [
   {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT,
-    name: 'Database Functions Assistant',
-    content: <FunctionsAssistantPreview />,
+    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2,
+    name: 'Supabase AI Assistant V2',
+    content: <AssistantV2Preview />,
     discussionsUrl: undefined,
     isNew: true,
   },
@@ -86,7 +86,7 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
 }
 
-export const useIsDatabaseFunctionsAssistantEnabled = () => {
+export const useIsAssistantV2Enabled = () => {
   const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2]
 }
