@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import {
   AvailableColumn,
   WrapperMeta,
-} from 'components/interfaces/Database/Wrappers/Wrappers.types'
+} from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
