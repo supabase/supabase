@@ -96,7 +96,7 @@ const GridResize = ({
       layout={editableReport}
       onLayoutChange={(layout) => onLayoutChange(layout)}
       rowHeight={60}
-      cols={{ lg: LAYOUT_COLUMN_COUNT, md: 2, sm: 1 }}
+      cols={{ lg: LAYOUT_COLUMN_COUNT, md: 2, sm: 1, xs: 1, xxs: 1 }}
       containerPadding={[0, 0]}
       compactType="vertical"
       resizeHandles={['sw', 'se']}
