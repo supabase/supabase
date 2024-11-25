@@ -52,8 +52,8 @@ const welcomeMessages = [
           </g>
         </svg>
         <p>
-          Welcome Product Hunter! 👋 Thanks for checking out Supabase AI. Let me show you what I can
-          do!
+          Welcome Product Hunter! 👋 Thanks for checking out the Supabase assistant. Let me show you
+          what I can do!
         </p>
       </div>
     ),
@@ -111,13 +111,13 @@ LIMIT 12;`}
     label: 'Recent Orders',
     messages: [
       {
-        id: '1',
+        id: '3',
         role: 'user' as const,
         content: 'Show me the most recent orders',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '4',
         role: 'assistant' as const,
         content: 'Here are the 5 most recent orders:',
         createdAt: new Date(),
@@ -168,13 +168,13 @@ LIMIT 5;`}
     label: 'Revenue by Category',
     messages: [
       {
-        id: '1',
+        id: '5',
         role: 'user' as const,
         content: 'What are our top performing product categories?',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '6',
         role: 'assistant' as const,
         content: 'Here is the revenue breakdown by product category:',
         createdAt: new Date(),
@@ -211,13 +211,13 @@ ORDER BY revenue DESC;`}
     label: 'Active Users',
     messages: [
       {
-        id: '1',
+        id: '7',
         role: 'user' as const,
         content: 'Show me our currently active users',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '8',
         role: 'assistant' as const,
         content: 'Here are the currently active users:',
         createdAt: new Date(),
@@ -260,13 +260,13 @@ ORDER BY last_login DESC;`}
     label: 'Storage Usage',
     messages: [
       {
-        id: '1',
+        id: '9',
         role: 'user' as const,
         content: 'What is our current storage usage?',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '10',
         role: 'assistant' as const,
         content: 'Here is the storage usage by table:',
         createdAt: new Date(),
@@ -309,13 +309,13 @@ ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;`}
     label: 'Daily Page Views',
     messages: [
       {
-        id: '1',
+        id: '11',
         role: 'user' as const,
         content: 'Show me daily page views for the last 2 weeks',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '12',
         role: 'assistant' as const,
         content: 'Here are the daily page views:',
         createdAt: new Date(),
@@ -356,13 +356,13 @@ ORDER BY day;`}
     label: 'Failed Logins',
     messages: [
       {
-        id: '1',
+        id: '13',
         role: 'user' as const,
         content: 'Show me recent failed login attempts',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '14',
         role: 'assistant' as const,
         content: 'Here are the recent failed login attempts:',
         createdAt: new Date(),
@@ -416,7 +416,7 @@ LIMIT 5;`}
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '15',
         role: 'assistant' as const,
         content: 'Here is the distribution of error types:',
         createdAt: new Date(),
@@ -458,7 +458,7 @@ ORDER BY error_count DESC;`}
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '16',
         role: 'assistant' as const,
         content: 'Here are the current database performance metrics:',
         createdAt: new Date(),
@@ -500,13 +500,13 @@ WHERE datname = current_database();`}
     label: 'API Usage Trends',
     messages: [
       {
-        id: '1',
+        id: '17',
         role: 'user' as const,
         content: 'Show me API usage trends over time',
         createdAt: new Date(),
       },
       {
-        id: '2',
+        id: '18',
         role: 'assistant' as const,
         content: 'Here are the API usage trends:',
         createdAt: new Date(),
