@@ -260,12 +260,10 @@ const ThreeTicketCanvas: React.FC<{
           backTextMesh.updateMatrix()
           backTextMesh.position.set(3.9 - index * 1.8, -2, -TEXT_Z_POSITION)
           backTextMesh.rotation.y = Math.PI
-
           backTextMesh.name = `letter-${index}`
           backTextMesh.material.transparent = true
           backTextMesh.material.opacity = 0
 
-          // backTextMesh.castShadow = true
           ticketGroup.add(backTextMesh)
         })
       }
@@ -281,18 +279,17 @@ const ThreeTicketCanvas: React.FC<{
       metalMaterial.envMap = texture
       metalMaterial.envMapIntensity = IS_SECRET
         ? isDarkTheme
-          ? 1.2
-          : 0.8
+          ? 1.4
+          : 0.9
         : isDarkTheme
           ? 2.8
           : 0.75
-      // metalMaterial.blending = THREE.NormalBlending
     })
 
     // Lights
     const ambientLight = new THREE.AmbientLight(
       0xffffff,
-      IS_SECRET ? (isDarkTheme ? 1.2 : 1.2) : IS_PLATINUM ? (isDarkTheme ? 1.7 : 3.2) : 2
+      IS_SECRET ? (isDarkTheme ? 1.3 : 1.2) : IS_PLATINUM ? (isDarkTheme ? 1.7 : 3.2) : 2
     )
     scene.add(ambientLight)
 

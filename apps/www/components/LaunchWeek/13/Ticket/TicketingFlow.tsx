@@ -141,7 +141,7 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full flex-1 lg:min-h-[400px] lg:pl-10 h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
+                  className="w-full flex-1 lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
                   <div className="order-first lg:h-full w-full max-w-md xl:max-w-xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
                     <CountdownComponent

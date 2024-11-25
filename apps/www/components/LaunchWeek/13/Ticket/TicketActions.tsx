@@ -75,15 +75,6 @@ export default function TicketActions() {
 
   return (
     <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto !cursor-none">
-      {/* <Button
-        type="secondary"
-        size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] opacity-50 flex-grow !cursor-none"
-        disabled
-        icon={<Check strokeWidth={2} />}
-      >
-        Ticket claimed
-      </Button> */}
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
