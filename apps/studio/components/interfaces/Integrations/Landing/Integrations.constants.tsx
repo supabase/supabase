@@ -139,15 +139,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             }
           )
         case 'cron-jobs':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewCronJobs/CronjobsTab').then(
-                (mod) => mod.CronjobsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return dynamic(() => import('../CronJobs/CronjobsTab').then((mod) => mod.CronjobsTab), {
+            loading: Loading,
+          })
       }
       return null
     },
