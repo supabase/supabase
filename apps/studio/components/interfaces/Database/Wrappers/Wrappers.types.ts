@@ -3,6 +3,8 @@ export type WrapperMeta = {
   handlerName: string
   validatorName: string
   icon: string
+  /** Short description (one-sentence) used in lists of integrations  */
+  description: string
   extensionName: string
   label: string
   server: Server

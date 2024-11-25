@@ -18,7 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionListProps {
   schema: string
@@ -37,8 +37,8 @@ const FunctionList = ({
 }: FunctionListProps) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
-  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
   const { setAiAssistantPanel } = useAppStateSnapshot()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -113,7 +113,7 @@ const FunctionList = ({
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         side="left"
-                        className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+                        className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
                       >
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
@@ -128,11 +128,24 @@ const FunctionList = ({
                           <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
-                        {enableAssistantV2 && (
+                        {isAssistantV2Enabled && (
                           <DropdownMenuItem
                             className="space-x-2"
                             onClick={() => {
-                              setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
+                              setAiAssistantPanel({
+                                open: true,
+                                initialInput: 'Update this function to do...',
+                                suggestions: {
+                                  title:
+                                    'I can help you make a change to this function, here are a few example prompts to get you started:',
+                                  prompts: [
+                                    'Rename this function to ...',
+                                    'Modify this function so that it ...',
+                                    'Add a trigger for this function that calls it when ...',
+                                  ],
+                                },
+                                sqlSnippets: [x.complete_statement],
+                              })
                             }}
                           >
                             <Edit size={14} />

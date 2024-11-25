@@ -1,14 +1,16 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { ExternalLink, Search } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
 
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
@@ -18,9 +20,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { Button, Input } from 'ui'
-import { DocsButton } from 'components/ui/DocsButton'
+import { Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -64,6 +66,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -99,9 +103,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
-  const schemaHasNoTables = (tables ?? []).length === 0
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -113,8 +115,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <SchemaSelector
-              className="w-[260px]"
-              size="small"
+              className="w-[180px]"
+              size="tiny"
               showError={false}
               selectedSchemaName={schema}
               onSelectSchema={(schema) => {
@@ -122,9 +124,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               }}
             />
             <Input
-              size="small"
+              size="tiny"
               placeholder="Filter tables and policies"
-              className="block w-64 text-sm placeholder-border-muted"
+              className="block w-52 text-sm placeholder-border-muted"
               value={searchString || ''}
               onChange={(e) => {
                 const str = e.target.value
@@ -148,8 +150,8 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           hasTables={tables.length > 0}
           isLocked={isLocked}
           onSelectCreatePolicy={(table: string) => {
-            setShowPolicyAiEditor(true)
             setSelectedTable(table)
+            setShowPolicyAiEditor(true)
           }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)
