@@ -5,6 +5,7 @@ import minify from 'pg-minify'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { databaseKeys } from 'data/database/keys'
 
 export type DatabaseQueueExposePostgrestVariables = {
   projectRef: string
@@ -304,6 +305,8 @@ export const useDatabaseQueueToggleExposeMutation = ({
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
       await queryClient.invalidateQueries(databaseQueuesKeys.exposePostgrestStatus(projectRef))
+      // [Joshen] Schemas can be invalidated without waiting
+      queryClient.invalidateQueries(databaseKeys.schemas(projectRef))
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
