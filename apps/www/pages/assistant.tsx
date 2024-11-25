@@ -703,8 +703,8 @@ function Assistant() {
                   Chat with Postgres
                 </h1>
                 <p className="p text-lg mt-4">
-                  Generate, run and debug queries, chart your data, create functions or policies.
-                  The assistant is here to help.
+                  Generate, run and debug queries, chart your data, create functions, policies and
+                  more. The assistant is here to help.
                 </p>
                 {!isUserLoading && (
                   <>
