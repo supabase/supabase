@@ -105,7 +105,6 @@ export const QueuesSettings = () => {
           })
         }
       }
-      form.reset({ enable: values.enable })
     },
     onError: (error) => {
       setIsToggling(false)

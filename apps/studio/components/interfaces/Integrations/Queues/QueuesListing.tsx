@@ -40,8 +40,7 @@ export const QueuesListing = () => {
   })
 
   const pgmqExtension = (extensions ?? []).find((ext) => ext.name === 'pgmq')
-  // TODO: Change this to true for local development to work
-  const pgmqExtensionInstalled = true // pgmqExtension?.installed_version
+  const pgmqExtensionInstalled = Boolean(pgmqExtension?.installed_version)
 
   useEffect(() => {
     // refetch the queues after the pgmq extension has been installed
