@@ -100,7 +100,7 @@ const TicketingFlow = () => {
                     'justify-items-end'
                   )}
                 >
-                  <div className="h-full flex flex-col justify-center gap-2 md:gap-6 grow">
+                  <div className="h-full max-w-xs md:max-w-none flex flex-col justify-center gap-2 md:gap-6">
                     <CountdownComponent
                       date={LW13_LAUNCH_DATE}
                       showCard={false}
@@ -112,7 +112,7 @@ const TicketingFlow = () => {
                         <h2 className="text-foreground uppercase tracking-wider text-2xl">
                           Launch Week 13
                         </h2>
-                        <p className="text-foreground-lighter uppercase tracking-wider text-2xl">
+                        <p className="text-foreground-lighter uppercase tracking-wider text-xl md:text-2xl">
                           {LW13_DATE}
                         </p>
                       </div>
@@ -130,7 +130,7 @@ const TicketingFlow = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="h-full min-h-[400px] aspect-[0.8/1] rounded-lg border border-dashed border-strong flex items-center justify-center bg-surface-75/25 backdrop-blur-sm">
+                  <div className="h-full min-h-[400px] aspect-[0.8/1] rounded-lg border border-dashed border-strong flex items-center justify-center bg-surface-75/25 backdrop-blur-xl">
                     <TicketForm />
                   </div>
                 </m.div>
