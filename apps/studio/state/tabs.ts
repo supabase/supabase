@@ -244,6 +244,12 @@ export const handleTabClose = (
     store.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
   }
 
+  if (store.previewTabId) {
+    if (store.previewTabId === id) {
+      store.previewTabId = undefined
+    }
+  }
+
   if (nextTabId) {
     store.activeTab = nextTabId
     handleTabNavigation(ref, nextTabId, router)
