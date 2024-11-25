@@ -9,7 +9,7 @@ import { getColor } from './randomColor'
 import { Coordinates } from './types'
 
 const GRID_SIZE = 100
-const CELL_SIZE = 40
+const CELL_SIZE = 20
 const CANVAS_WIDTH = 1800
 const CANVAS_HEIGHT = 1600
 const HOVER_DURATION = 100
@@ -88,7 +88,7 @@ export default function InteractiveGridSingle() {
   const drawGrid = useCallback(
     (ctx: CanvasRenderingContext2D, currentTime: number) => {
       ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-      ctx.lineWidth = 0.2
+      ctx.lineWidth = 0.15
       ctx.strokeStyle = INTERACTIVE_GRID_COLORS(isDarkTheme).GRID_STROKE
 
       for (let x = 0; x < GRID_SIZE; x++) {
