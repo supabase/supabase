@@ -49,7 +49,7 @@ import {
   TreeViewItemVariant,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { getTabsStore } from 'state/tabs'
+import { getTabsStore, createTabId, makeTabPermanent } from 'state/tabs'
 import { useSnapshot } from 'valtio'
 
 export interface EntityListItemProps {
@@ -70,6 +70,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  const tabId = createTabId('table', {
+    schema: selectedSchema,
+    name: entity.name,
+  })
+
+  const tabStore = getTabsStore(projectRef)
+  const isPreview = tabStore.previewTabId === tabId
   const isActive = _isActive ?? Number(id) === entity.id
 
   const { data: lints = [] } = useProjectLintsQuery({
@@ -283,10 +290,25 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
       role="button"
       aria-label={`View ${entity.name}`}
-      className={cn(TreeViewItemVariant({ isSelected: isActive, isOpened }), 'px-4')}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive && !isPreview,
+          isOpened: isOpened && !isPreview,
+          isPreview,
+        }),
+        'px-4'
+      )}
+      onDoubleClick={(e) => {
+        e.preventDefault()
+        const tabId = createTabId('table', {
+          schema: selectedSchema,
+          name: entity.name,
+        })
+        makeTabPermanent(projectRef, tabId)
+      }}
     >
       <>
-        {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
           <Tooltip.Trigger className="min-w-4" asChild>
             {entity.type === ENTITY_TYPE.TABLE ? (

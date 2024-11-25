@@ -2,7 +2,6 @@ import { useParams } from 'common/hooks'
 import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
@@ -13,7 +12,7 @@ import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { addTab, getTabsStore } from 'state/tabs'
+import { addTab, createTabId, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
@@ -38,7 +37,7 @@ const TableEditorPage: NextPageWithLayout = () => {
    */
   useEffect(() => {
     if (selectedTable && projectRef) {
-      const tabId = `table-${selectedTable.schema}-${selectedTable.name}`
+      const tabId = createTabId('table', { schema: selectedTable.schema, name: selectedTable.name })
 
       if (!store.tabsMap[tabId]) {
         addTab(projectRef, {

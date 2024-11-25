@@ -22,7 +22,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { addTab } from 'state/tabs'
+import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -173,7 +173,7 @@ const SqlEditor: NextPageWithLayout = () => {
   useEffect(() => {
     if (!router.isReady || !id || id === 'new') return
 
-    const tabId = `sql-${id}`
+    const tabId = createTabId('sql', { id })
     const snippet = snippets.find((s) => s.id === id)
 
     addTab(ref, {

@@ -5,7 +5,7 @@ import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayo
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { ReactFlowProvider } from 'reactflow'
-import { addTab, getTabsStore } from 'state/tabs'
+import { addTab, createTabId, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SchemasPage: NextPageWithLayout = () => {
@@ -16,7 +16,7 @@ const SchemasPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (schema) {
-      const tabId = `schema-${schema}`
+      const tabId = createTabId('schema', { schema })
 
       if (!store.tabsMap[tabId]) {
         addTab('explorer', {

@@ -24,6 +24,10 @@ export const TreeViewItemVariant = cva(
         true: 'bg-control',
         false: '',
       },
+      isPreview: {
+        true: 'bg-control',
+        false: '',
+      },
     },
   }
 )

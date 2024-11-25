@@ -290,3 +290,31 @@ export const handleTabDragEnd = (
   // Handle navigation
   handleTabNavigation(ref, tabId, router)
 }
+type CreateTabIdParams = {
+  table: {
+    schema: string
+    name: string
+  }
+  sql: {
+    id: string
+  }
+  schema: {
+    schema: string
+  }
+  view: never
+  function: never
+  new: never
+}
+
+export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
+  switch (type) {
+    case 'table':
+      return `table-${(params as CreateTabIdParams['table']).schema}-${(params as CreateTabIdParams['table']).name}`
+    case 'sql':
+      return `sql-${(params as CreateTabIdParams['sql']).id}`
+    case 'schema':
+      return `schema-${(params as CreateTabIdParams['schema']).schema}`
+    default:
+      return ''
+  }
+}
