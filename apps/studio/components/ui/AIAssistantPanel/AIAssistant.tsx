@@ -40,6 +40,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
+import { useParams } from 'common/hooks'
+import { useSearchParamsShallow } from 'common/hooks'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -74,6 +76,8 @@ export const AIAssistant = ({
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
+  const params = useParams()
+  const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
@@ -102,6 +106,9 @@ export const AIAssistant = ({
     schema: 'public',
   })
 
+  const currentTable = tables?.find((t) => t.id.toString() === params?.id)
+  const currentSchema = searchParams?.get('schema') ?? 'public'
+
   const { mutate: sendEvent } = useSendEventMutation()
   const sendTelemetryEvent = (value: string) => {
     sendEvent({
@@ -126,6 +133,8 @@ export const AIAssistant = ({
       includeSchemaMetadata,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      schema: currentSchema,
+      table: currentTable?.name,
     },
   })
 
