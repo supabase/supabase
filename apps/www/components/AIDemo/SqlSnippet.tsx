@@ -88,7 +88,7 @@ export const SqlSnippet = ({
   const ResultsDisplay = () => {
     if (resultType === 'chart') {
       return (
-        <div className="p-5 border-t border-t-muted">
+        <div className="p-5 border-t border-t-muted -mx-8">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
               data={results}
@@ -103,10 +103,14 @@ export const SqlSnippet = ({
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
-                minTickGap={32}
+                minTickGap={16}
+                padding={{ left: 24, right: 24 }}
               />
-              <ChartTooltip content={<ChartTooltipContent className="w-[150px]" />} />
-              <Bar dataKey="value" fill="hsl(var(--brand-500) / var(--tw-bg-opacity))" />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent className="w-[150px]" />}
+              />
+              <Bar dataKey="value" fill="hsl(var(--brand-default))" />
             </BarChart>
           </ChartContainer>
         </div>

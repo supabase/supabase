@@ -2,10 +2,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button, Input } from 'ui'
-import { SqlSnippet } from './SqlSnippet'
 import { AiIconAnimation, cn } from 'ui'
 import errorGif from 'public/images/ai/error.gif'
 import Image from 'next/image'
+import styles from './assistant.module.css'
 
 interface DemoMessage {
   id: string
@@ -116,7 +116,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
   }
 
   return (
-    <div className="w-full shadow-2xl relative h-full bg border border-foreground-light/10 rounded-lg overflow-hidden">
+    <div className="w-full shadow-2xl relative h-full bg border border-text-light/25 rounded-md overflow-hidden">
       <div className="absolute inset-0 flex flex-col">
         {/* Header */}
         <div className="z-30 border-b border-b-muted flex items-center gap-x-3 px-5 h-[46px]">
@@ -212,15 +212,19 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
             </motion.div>
           )}
         </AnimatePresence>
-        <form onSubmit={handleSubmit} className="p-5 pt-0">
-          <Input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type a message..."
-            className="w-full [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0 focus:outline-none"
-          />
-        </form>
+        <div className="p-5 pt-0 relative z-10">
+          <form onSubmit={handleSubmit} className={cn('rounded-md', styles['border-gradient'])}>
+            <Input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Query anything..."
+              className={cn(
+                'w-full bg-background-muted rounded-md [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0 focus:outline-none'
+              )}
+            />
+          </form>
+        </div>
       </div>
     </div>
   )

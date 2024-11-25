@@ -13,16 +13,24 @@ import { useRouter } from 'next/router'
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
 
+interface Message {
+  id: string
+  role: 'user' | 'assistant'
+  content: string | JSX.Element
+  createdAt: Date
+  render?: JSX.Element
+}
+
 const welcomeMessages = [
   {
     id: 'ph-1',
-    role: 'user',
+    role: 'user' as const,
     content: 'I have come from ProductHunt. Show me the goods!',
     createdAt: new Date(),
   },
   {
     id: 'ph-2',
-    role: 'assistant',
+    role: 'assistant' as const,
     content: (
       <div className="flex gap-4">
         <svg
@@ -59,13 +67,13 @@ const demoQueries = [
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me user signups over the past 12 months',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here is a chart showing user growth by month:',
         createdAt: new Date(),
         render: (
@@ -104,13 +112,13 @@ LIMIT 12;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me the most recent orders',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the 5 most recent orders:',
         createdAt: new Date(),
         render: (
@@ -161,13 +169,13 @@ LIMIT 5;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'What are our top performing product categories?',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here is the revenue breakdown by product category:',
         createdAt: new Date(),
         render: (
@@ -204,13 +212,13 @@ ORDER BY revenue DESC;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me our currently active users',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the currently active users:',
         createdAt: new Date(),
         render: (
@@ -253,13 +261,13 @@ ORDER BY last_login DESC;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'What is our current storage usage?',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here is the storage usage by table:',
         createdAt: new Date(),
         render: (
@@ -302,13 +310,13 @@ ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me daily page views for the last 2 weeks',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the daily page views:',
         createdAt: new Date(),
         render: (
@@ -349,13 +357,13 @@ ORDER BY day;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me recent failed login attempts',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the recent failed login attempts:',
         createdAt: new Date(),
         render: (
@@ -403,13 +411,13 @@ LIMIT 5;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me the distribution of error types',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here is the distribution of error types:',
         createdAt: new Date(),
         render: (
@@ -445,13 +453,13 @@ ORDER BY error_count DESC;`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me database performance metrics',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the current database performance metrics:',
         createdAt: new Date(),
         render: (
@@ -493,13 +501,13 @@ WHERE datname = current_database();`}
     messages: [
       {
         id: '1',
-        role: 'user',
+        role: 'user' as const,
         content: 'Show me API usage trends over time',
         createdAt: new Date(),
       },
       {
         id: '2',
-        role: 'assistant',
+        role: 'assistant' as const,
         content: 'Here are the API usage trends:',
         createdAt: new Date(),
         render: (
@@ -535,8 +543,8 @@ ORDER BY hour;`}
   },
 ]
 
-function AI() {
-  const [incomingMessages, setIncomingMessages] = useState([])
+function Assistant() {
+  const [incomingMessages, setIncomingMessages] = useState<Message[]>([])
   const meta_title = 'AI | Supabase'
   const meta_description = 'Build AI-powered applications with Supabase'
   const router = useRouter()
@@ -548,7 +556,7 @@ function AI() {
         const isFromProductHunt = query.ref === 'producthunt'
         const initialMessages = isFromProductHunt
           ? [...welcomeMessages, ...demoQueries[0].messages]
-          : demoQueries[0].messages
+          : demoQueries[Math.floor(Math.random() * demoQueries.length)].messages
 
         setIncomingMessages(initialMessages)
       }, 3000)
@@ -573,22 +581,19 @@ function AI() {
             {/* Left Column */}
             <div className="col-span-12 lg:col-span-6 relative z-10">
               {/* Main content */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <h1 className="text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
-                  PostgreSQL made simple
+                  Chat with your database
                 </h1>
                 <p className="p text-lg mt-4">
                   Generate, run and debug queries, chart your data, create functions or policies.
                   The assistant is here to help.
                 </p>
-                <Button className="mt-2" size="large" iconRight={<ArrowRight />}>
-                  Read the docs
-                </Button>
               </div>
 
               {/* Grid of secondary buttons */}
               <div>
-                <h2 className="font-mono text-foreground-muted text-sm mb-2">Or try me</h2>
+                <h2 className="font-mono text-foreground-muted text-sm mb-4">Try me</h2>
                 <div className="flex flex-wrap gap-2">
                   <motion.div
                     initial="hidden"
@@ -633,7 +638,7 @@ function AI() {
                 <Image
                   src={aiSpace}
                   alt="Supabase AI is like talking to your data"
-                  className="z-0 pointer-events-none mix-blend-darken dark:mix-blend-lighten invert dark:invert-0  absolute left-1/2 -translate-x-1/2 -bottom-96 w-[1400px] max-w-none opacity-25"
+                  className="z-0 pointer-events-none mix-blend-darken dark:mix-blend-lighten invert dark:invert-0  absolute left-1/2 -translate-x-1/2 -bottom-96 w-[1400px] max-w-none opacity-15"
                 />
               </motion.div>
               <motion.div
@@ -666,4 +671,4 @@ function AI() {
   )
 }
 
-export default AI
+export default Assistant
