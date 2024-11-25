@@ -49,10 +49,10 @@ const HooksList = ({ createHook = noop, editHook = noop, deleteHook = noop }: Ho
       <div className="flex items-center justify-between">
         <Input
           placeholder="Search for a webhook"
-          size="small"
+          size="tiny"
           icon={<Search size="14" />}
           value={filterString}
-          className="w-64"
+          className="w-52"
           onChange={(e) => setFilterString(e.target.value)}
         />
         <div className="flex items-center gap-x-2">

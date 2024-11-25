@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
@@ -12,6 +13,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import AppLayout from '../AppLayout/AppLayout'
@@ -31,6 +33,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { AiAssistantPanel } from 'components/interfaces/SQLEditor/AiAssistantPanel'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -93,6 +96,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const organizationName = selectedOrganization?.name
 
     const navLayoutV2 = useFlag('navigationLayoutV2')
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open } = aiAssistantPanel
+
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+
 
     const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
     const showProductMenu = selectedProject
@@ -105,31 +113,47 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    return (
-      <AppLayout>
-        <ProjectContextProvider projectRef={projectRef}>
-          <Head>
-            <title>
-              {title
-                ? `${title} | Supabase`
-                : selectedTable
-                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                  : projectName
-                    ? `${projectName} | ${organizationName} | Supabase`
-                    : organizationName
-                      ? `${organizationName} | Supabase`
-                      : 'Supabase'}
-            </title>
-            <meta name="description" content="Supabase Studio" />
-          </Head>
-          <div className="flex h-full">
-            {/* Left-most navigation side bar to access products */}
-            {!hideIconBar && <NavigationBar />}
-            {/* Product menu bar */}
-            <ResizablePanelGroup
-              className="flex h-full"
-              direction="horizontal"
-              autoSaveId="project-layout"
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.metaKey && e.code === 'KeyI') setAiAssistantPanel({ open: !open })
+    }
+    if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssistantV2Enabled, open])
+
+  return (
+    <AppLayout>
+      <ProjectContextProvider projectRef={projectRef}>
+        <Head>
+          <title>
+            {title
+              ? `${title} | Supabase`
+              : selectedTable
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
+          </title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+        <div className="flex h-full">
+          {/* Left-most navigation side bar to access products */}
+          {!hideIconBar && <NavigationBar />}
+          {/* Product menu bar */}
+          <ResizablePanelGroup
+            className="flex h-full"
+            direction="horizontal"
+            autoSaveId="project-layout"
+          >
+            <ResizablePanel
+              id="panel-left"
+              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
+                hidden: !showProductMenu || !productMenu,
+              })}
+              defaultSize={0} // forces panel to smallest width possible, at w-64
             >
               <ResizablePanel
                 id="panel-left"
@@ -138,41 +162,55 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 })}
                 defaultSize={0} // forces panel to smallest width possible, at w-64
               >
-                <MenuBarWrapper
-                  isLoading={isLoading}
-                  isBlocking={isBlocking}
-                  productMenu={productMenu}
-                >
-                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                </MenuBarWrapper>
-              </ResizablePanel>
-              <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu })}
-                withHandle
-                disabled={resizableSidebar ? false : true}
-              />
-              <ResizablePanel id="panel-right" className="h-full flex flex-col">
-                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+              </MenuBarWrapper>
+            </ResizablePanel>
+            <ResizableHandle
+              className={cn({ hidden: !showProductMenu || !productMenu })}
+              withHandle
+              disabled={resizableSidebar ? false : true}
+            />
+            <ResizablePanel id="panel-right" className="h-full flex flex-col">
+              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+              <ResizablePanelGroup
+                className="h-full w-full overflow-x-hidden flex-1"
+                direction="horizontal"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel id="panel-content" className=" w-full min-w-[600px]">
                 <main
                   className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                   ref={ref}
                 >
-                  {showPausedState ? (
-                    <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                      <div className="w-full">
-                        <ProjectPausedState product={product} />
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                      <ResourceExhaustionWarningBanner />
-                      {children}
-                    </ContentWrapper>
-                  )}
-                </main>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {aiAssistantPanel.open && (
+                  <>
+                    <ResizableHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      className="min-w-[400px] max-w-[500px] bg 2xl:max-w-[600px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                    >
+                      <AiAssistantPanel />
+                    </ResizablePanel>
+                  </>
+                )}
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </div>
 
           <EnableBranchingModal />
           <AISettingsModal />

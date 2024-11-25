@@ -94,8 +94,8 @@ const EncryptionKeysManagement = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
-              className="w-64 input-clear"
-              size="small"
+              className="w-52 input-clear"
+              size="tiny"
               placeholder="Search by name or ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
@@ -116,7 +116,7 @@ const EncryptionKeysManagement = () => {
               }
             />
             <div className="w-44">
-              <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
+              <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"
                   className="max-w-[180px]"

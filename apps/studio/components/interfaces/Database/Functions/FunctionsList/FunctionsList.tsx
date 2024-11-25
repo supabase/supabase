@@ -5,7 +5,7 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -38,7 +38,7 @@ const FunctionsList = ({
   const { search } = useParams()
   const { project } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const enableFunctionsAssistant = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -104,10 +104,10 @@ const FunctionsList = ({
       ) : (
         <div className="w-full space-y-4">
           <div className="flex items-center justify-between gap-2 flex-wrap">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center gap-x-2">
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={(schema) => {
@@ -119,10 +119,10 @@ const FunctionsList = ({
               />
               <Input
                 placeholder="Search for a function"
-                size="small"
+                size="tiny"
                 icon={<Search size={14} />}
                 value={filterString}
-                className="w-64"
+                className="w-52"
                 onChange={(e) => setFilterString(e.target.value)}
               />
             </div>
@@ -144,7 +144,7 @@ const FunctionsList = ({
                   >
                     Create a new function
                   </ButtonTooltip>
-                  {enableFunctionsAssistant && (
+                  {isAssistantV2Enabled && (
                     <ButtonTooltip
                       type="default"
                       disabled={!canCreateFunctions}
@@ -155,8 +155,7 @@ const FunctionsList = ({
                       onClick={() =>
                         setAiAssistantPanel({
                           open: true,
-                          editor: 'functions',
-                          entity: undefined,
+                          initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
                         })
                       }
                       tooltip={{
