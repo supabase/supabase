@@ -17,13 +17,28 @@ import type { RecentItem } from 'state/recent-items'
 import { recentItemsStore } from 'state/recent-items'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { editorEntityTypes, removeNewTab } from 'state/tabs'
-import { Badge, Button, Card, cn, Separator, Skeleton, SQL_ICON } from 'ui'
+import {
+  Badge,
+  Button,
+  Card,
+  cn,
+  Separator,
+  Skeleton,
+  SQL_ICON,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { AssistantChatForm } from 'ui-patterns/AssistantChat'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { v4 as uuidv4 } from 'uuid'
 import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { ActionCard } from './actions-card'
+import { partition } from 'lodash'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
 dayjs.extend(relativeTime)
 
@@ -103,9 +118,9 @@ function RecentItems() {
   if (!recentItemsSnap?.items || !ref) return null
 
   // Filter items based on editor type
-  const filteredItems = recentItemsSnap.items.filter((item) =>
-    editorEntityTypes[editor].includes(item.type)
-  )
+  const filteredItems = recentItemsSnap.items
+    .filter((item) => editorEntityTypes[editor].includes(item.type))
+    .sort((a, b) => b.timestamp - a.timestamp)
 
   console.log('filteredItems', filteredItems)
 
@@ -176,6 +191,7 @@ export function NewTab() {
   const router = useRouter()
   const { ref } = useParams()
   const { profile } = useProfile()
+  const editor = useEditorType()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { isInUse: isPostgresInUse, isLoading: isLoadingCheckingPostgres } = usePostgresInUse()
@@ -213,11 +229,14 @@ export function NewTab() {
     return () => clearTimeout(timer)
   }, [])
 
+  const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
+  const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
+
   return (
     <LayoutGroup>
       <div className="flex h-full w-full">
         <motion.div className="flex-1" initial={false} animate="show" variants={containerVariants}>
-          <div className="bg-surface-100 p-6 h-full overflow-y-auto py-12">
+          <div className="bg-surface-100 h-full overflow-y-auto py-12">
             <div className="mx-auto max-w-2xl space-y-6">
               {/* Action Cards */}
               <div className="flex flex-wrap gap-5">
@@ -230,19 +249,19 @@ export function NewTab() {
                         bgColor: 'bg-blue-500',
                         isBeta: false,
                       },
-                      {
-                        icon: (
-                          <SQL_ICON
-                            className={cn('fill-foreground', 'w-4 h-4')}
-                            strokeWidth={1.5}
-                          />
-                        ),
-                        title: 'Write SQL',
-                        description: 'Create tables and load data with SQL',
-                        bgColor: 'bg-alternative',
-                        isBeta: false,
-                        onClick: handleNewQuery,
-                      },
+                      // {
+                      //   icon: (
+                      //     <SQL_ICON
+                      //       className={cn('fill-foreground', 'w-4 h-4')}
+                      //       strokeWidth={1.5}
+                      //     />
+                      //   ),
+                      //   title: 'Write SQL',
+                      //   description: 'Create tables and load data with SQL',
+                      //   bgColor: 'bg-alternative',
+                      //   isBeta: false,
+                      //   onClick: handleNewQuery,
+                      // },
                       {
                         icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
                         title: 'Upload CSV',
@@ -251,19 +270,19 @@ export function NewTab() {
                         isBeta: false,
                         onClick: handleNewQuery,
                       },
-                      {
-                        icon: (
-                          <SQL_ICON
-                            className={cn('fill-foreground', 'w-4 h-4')}
-                            strokeWidth={1.5}
-                          />
-                        ),
-                        title: 'Write SQL',
-                        description: 'Create tables and load data with SQL',
-                        bgColor: 'bg-alternative',
-                        isBeta: false,
-                        onClick: handleNewQuery,
-                      },
+                      // {
+                      //   icon: (
+                      //     <SQL_ICON
+                      //       className={cn('fill-foreground', 'w-4 h-4')}
+                      //       strokeWidth={1.5}
+                      //     />
+                      //   ),
+                      //   title: 'Write SQL',
+                      //   description: 'Create tables and load data with SQL',
+                      //   bgColor: 'bg-alternative',
+                      //   isBeta: false,
+                      //   onClick: handleNewQuery,
+                      // },
                     ]
                   : [
                       {
@@ -274,49 +293,36 @@ export function NewTab() {
                         isBeta: false,
                       },
                       {
-                        icon: (
-                          <SQL_ICON
-                            className={cn('fill-foreground', 'w-4 h-4')}
-                            strokeWidth={1.5}
-                          />
-                        ),
-                        title: 'New Query',
-                        description: 'Execute SQL queries',
-                        bgColor: 'bg-violet-500',
+                        icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                        title: 'Upload CSV',
+                        description: 'Import data from CSV files',
+                        bgColor: 'bg-green-500',
                         isBeta: false,
                         onClick: handleNewQuery,
                       },
-                      {
-                        icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
-                        title: 'New Report',
-                        description: 'Create data visualizations',
-                        bgColor: 'bg-orange-500',
-                        isBeta: true,
-                      },
+                      // {
+                      //   icon: (
+                      //     <SQL_ICON
+                      //       className={cn('fill-foreground', 'w-4 h-4')}
+                      //       strokeWidth={1.5}
+                      //     />
+                      //   ),
+                      //   title: 'New Query',
+                      //   description: 'Execute SQL queries',
+                      //   bgColor: 'bg-violet-500',
+                      //   isBeta: false,
+                      //   onClick: handleNewQuery,
+                      // },
+                      // {
+                      //   icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
+                      //   title: 'New Report',
+                      //   description: 'Create data visualizations',
+                      //   bgColor: 'bg-orange-500',
+                      //   isBeta: true,
+                      // },
                     ]
                 ).map((item, i) => (
-                  <Card
-                    key={`recent-item-${i}`}
-                    className="grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
-                    onClick={item.onClick}
-                  >
-                    <div className={`relative flex items-center gap-3`}>
-                      {item.isBeta && (
-                        <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
-                          Coming soon
-                        </Badge>
-                      )}
-                      <div
-                        className={`rounded-full ${item.bgColor} w-8 h-8 flex items-center justify-center`}
-                      >
-                        {item.icon}
-                      </div>
-                      <div className="flex flex-col gap-0">
-                        <h3 className="text-sm text-foreground mb-0">{item.title}</h3>
-                        <p className="text-xs text-foreground-light">{item.description}</p>
-                      </div>
-                    </div>
-                  </Card>
+                  <ActionCard key={`action-card-${i}`} {...item} />
                 ))}
               </div>
 
@@ -363,12 +369,12 @@ export function NewTab() {
               {isPostgresInUse && (
                 <>
                   {/* Search Bar */}
-                  <div className="relative">
+                  {/* <div className="relative">
                     <Input
                       placeholder="Search all files"
                       icon={<Search size={14} className="text-foreground-light" />}
                     />
-                  </div>
+                  </div> */}
 
                   {/* Recent Files */}
                   <div className="space-y-4">
@@ -461,6 +467,50 @@ export function NewTab() {
                 />
               </motion.div>
             </div>
+            {editor === 'sql' && (
+              <div className="flex flex-col gap-4 mx-auto py-10">
+                <Tabs_Shadcn_ defaultValue="templates">
+                  <TabsList_Shadcn_ className="mx-auto justify-center gap-5">
+                    <TabsTrigger_Shadcn_ value="templates">Templates</TabsTrigger_Shadcn_>
+                    <TabsTrigger_Shadcn_ value="quickstarts">Quickstarts</TabsTrigger_Shadcn_>
+                  </TabsList_Shadcn_>
+                  <TabsContent_Shadcn_ value="templates" className="max-w-5xl mx-auto py-5">
+                    <div className="grid grid-cols-3 gap-4">
+                      {templates.map((item, i) => (
+                        <ActionCard
+                          bgColor="bg-alternative"
+                          key={`action-card-${i}`}
+                          {...item}
+                          icon={
+                            <SQL_ICON
+                              className={cn('fill-foreground', 'w-4 h-4')}
+                              strokeWidth={1.5}
+                            />
+                          }
+                        />
+                      ))}
+                    </div>
+                  </TabsContent_Shadcn_>
+                  <TabsContent_Shadcn_ value="quickstarts" className="max-w-5xl mx-auto py-5">
+                    <div className="grid grid-cols-3 gap-4">
+                      {quickstarts.map((item, i) => (
+                        <ActionCard
+                          bgColor="bg-alternative"
+                          key={`action-card-${i}`}
+                          {...item}
+                          icon={
+                            <SQL_ICON
+                              className={cn('fill-foreground', 'w-4 h-4')}
+                              strokeWidth={1.5}
+                            />
+                          }
+                        />
+                      ))}
+                    </div>
+                  </TabsContent_Shadcn_>
+                </Tabs_Shadcn_>
+              </div>
+            )}
           </div>
         </motion.div>
         {showRightPanel && (

@@ -66,6 +66,16 @@ if (typeof window !== 'undefined') {
 }
 
 export const addRecentItem = (tab: Tab) => {
+  // First check if item with same ID already exists
+  const existingItem = recentItemsStore.items.find((item) => item.id === tab.id)
+
+  if (existingItem) {
+    // If it exists, just update its timestamp
+    existingItem.timestamp = Date.now()
+    return
+  }
+
+  // If it doesn't exist, create and add new item
   const recentItem: RecentItem = {
     id: tab.id,
     type: tab.type,
@@ -94,8 +104,7 @@ export const addRecentItem = (tab: Tab) => {
     }
   })
 
-  // Add new item at the start
-  recentItemsStore.items = [recentItem, ...recentItemsStore.items].slice(0, MAX_RECENT_ITEMS)
+  recentItemsStore.items.unshift(recentItem)
 }
 
 export const clearRecentItems = () => {
