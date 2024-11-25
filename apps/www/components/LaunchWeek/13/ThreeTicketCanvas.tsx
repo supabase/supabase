@@ -164,7 +164,6 @@ const ThreeTicketCanvas: React.FC<{
     ticketGroup.position.x = getTicketXPosition(window.innerWidth, ALIGN_RIGHT)
 
     gltfLoader.load('/images/launchweek/13/ticket/3D-ticket.glb', (gltf) => {
-      // gltfLoader.load('/images/launchweek/13/ticket/3D-ticket-code.glb', (gltf) => {
       ticket3DImport = gltf.scene.children[0] as THREE.Mesh
       ticket3DImport.rotation.x = Math.PI * 0.5
       ticket3DImport.traverse((child) => {
@@ -192,13 +191,13 @@ const ThreeTicketCanvas: React.FC<{
     const fontLoader = new FontLoader()
 
     // Load Inter font
-    fontLoader.load('/images/launchweek/13/ticket/Inter_Regular.json', (font) => {
+    fontLoader.load('/images/launchweek/13/ticket/Murecho_Regular.json', (font) => {
       DISPLAY_NAME.map((text, index) => {
         // Front
         const textGeometry = new TextGeometry(text, {
           font,
-          size: 1.1,
-          height: 0.2,
+          size: 1.2,
+          depth: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
@@ -216,11 +215,11 @@ const ThreeTicketCanvas: React.FC<{
         const backTextGeometry = new TextGeometry('Type the secret code', {
           font,
           size: 0.6,
-          height: 0.2,
+          depth: 0.2,
         })
         const backTextMesh = new THREE.Mesh(backTextGeometry, textMaterial)
         backTextMesh.updateMatrix()
-        backTextMesh.position.set(4.5, 2, -TEXT_Z_POSITION)
+        backTextMesh.position.set(4.0, 2, -TEXT_Z_POSITION)
         backTextMesh.rotation.y = Math.PI
 
         backTextMesh.castShadow = true
@@ -235,7 +234,7 @@ const ThreeTicketCanvas: React.FC<{
         const textGeometry = new TextGeometry(line.text, {
           font,
           size: line.size,
-          height: 0.2,
+          depth: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
@@ -250,7 +249,7 @@ const ThreeTicketCanvas: React.FC<{
           const letterGeometry = new TextGeometry(letter.toUpperCase(), {
             font,
             size: 2.2,
-            height: 0.2,
+            depth: 0.2,
           })
           const letterMaterial = new THREE.MeshStandardMaterial({
             color: CONFIG[ticketType].ticketForeground,
@@ -259,7 +258,7 @@ const ThreeTicketCanvas: React.FC<{
           })
           const backTextMesh = new THREE.Mesh(letterGeometry, letterMaterial)
           backTextMesh.updateMatrix()
-          backTextMesh.position.set(4.0 - index * 1.8, -2, -TEXT_Z_POSITION)
+          backTextMesh.position.set(3.9 - index * 1.8, -2, -TEXT_Z_POSITION)
           backTextMesh.rotation.y = Math.PI
 
           backTextMesh.name = `letter-${index}`
@@ -330,9 +329,9 @@ const ThreeTicketCanvas: React.FC<{
     const animate = () => {
       // Smooth rotation
       if (!isDragging.current) {
-        ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.25
+        ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.18
         ticketGroup.rotation.y +=
-          ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.25
+          ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.18
       }
       if (ticketGroup.scale.x < targetScale.current) {
         scale += 0.0025
