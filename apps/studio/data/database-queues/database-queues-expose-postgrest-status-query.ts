@@ -3,6 +3,7 @@ import minify from 'pg-minify'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
+import { QUEUES_SCHEMA } from './database-queues-toggle-postgrest-mutation'
 import { databaseQueuesKeys } from './keys'
 
 export type DatabaseQueuesVariables = {
@@ -15,7 +16,7 @@ const queueSqlQuery = minify(/**SQL */ `
   SELECT (count(*) = 8) as exists
   FROM pg_proc p
   JOIN pg_namespace n ON p.pronamespace = n.oid
-  WHERE n.nspname = 'queues_public'
+  WHERE n.nspname = '${QUEUES_SCHEMA}'
   AND (
       (p.proname = 'pop' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text') OR
       (p.proname = 'send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, msg jsonb, sleep_seconds integer') OR
