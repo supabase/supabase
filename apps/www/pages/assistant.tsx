@@ -543,6 +543,173 @@ ORDER BY hour;`}
       },
     ],
   },
+  {
+    label: 'Create Function',
+    messages: [
+      {
+        id: '19',
+        role: 'user' as const,
+        content: 'Help me create a function to calculate user points',
+        createdAt: new Date(),
+      },
+      {
+        id: '20',
+        role: 'assistant' as const,
+        content: "Here's a Postgres function that calculates user points based on their activity:",
+        createdAt: new Date(),
+        render: (
+          <SqlSnippet
+            id="create-function"
+            title="Create User Points Function"
+            sql={`CREATE OR REPLACE FUNCTION calculate_user_points(user_id UUID)
+RETURNS INTEGER AS $$
+DECLARE
+  total_points INTEGER;
+BEGIN
+  SELECT 
+    COALESCE(
+      (SELECT COUNT(*) * 10 FROM posts WHERE author_id = user_id) + -- 10 points per post
+      (SELECT COUNT(*) * 5 FROM comments WHERE user_id = user_id) + -- 5 points per comment
+      (SELECT COUNT(*) * 2 FROM post_likes WHERE user_id = user_id), -- 2 points per like
+      0
+    ) INTO total_points;
+    
+  RETURN total_points;
+END;
+$$ LANGUAGE plpgsql;`}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    label: 'RLS Policy',
+    messages: [
+      {
+        id: '21',
+        role: 'user' as const,
+        content: 'Show me how to create an RLS policy for a team members table',
+        createdAt: new Date(),
+      },
+      {
+        id: '22',
+        role: 'assistant' as const,
+        content:
+          "Here's an RLS policy that allows team members to only see other members in their team:",
+        createdAt: new Date(),
+        render: (
+          <SqlSnippet
+            id="rls-policy"
+            title="Team Members RLS Policy"
+            sql={`-- Enable RLS on the table
+ALTER TABLE team_members ENABLE ROW LEVEL SECURITY;
+
+-- Create policy for viewing team members
+CREATE POLICY view_team_members ON team_members
+FOR SELECT
+USING (
+  team_id IN (
+    -- User can see members of teams they belong to
+    SELECT team_id 
+    FROM team_members 
+    WHERE user_id = auth.uid()
+  )
+  OR 
+  -- Team admins can see all members
+  EXISTS (
+    SELECT 1 
+    FROM team_admins 
+    WHERE user_id = auth.uid() 
+    AND team_id = team_members.team_id
+  )
+);`}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    label: 'SQL to Supabase-js',
+    messages: [
+      {
+        id: '23',
+        role: 'user' as const,
+        content: 'How do I query all projects?',
+        createdAt: new Date(),
+      },
+      {
+        id: '24',
+        role: 'assistant' as const,
+        content: "Here's the SQL query to get all projects:",
+        createdAt: new Date(),
+        render: (
+          <SqlSnippet
+            id="projects-sql"
+            title="Get All Projects SQL"
+            sql={`SELECT 
+  p.id,
+  p.name,
+  p.description,
+  p.created_at,
+  u.email as owner_email
+FROM projects p
+JOIN users u ON p.owner_id = u.id
+WHERE p.is_active = true
+ORDER BY p.created_at DESC;`}
+            mockData={{
+              rows: [
+                {
+                  id: 1,
+                  name: 'Project A',
+                  description: 'First project',
+                  created_at: '2024-01-15T10:00:00Z',
+                  owner_email: 'user@example.com',
+                },
+                {
+                  id: 2,
+                  name: 'Project B',
+                  description: 'Second project',
+                  created_at: '2024-01-14T10:00:00Z',
+                  owner_email: 'user2@example.com',
+                },
+              ],
+            }}
+          />
+        ),
+      },
+      {
+        id: '25',
+        role: 'user' as const,
+        content: 'Can you show me how to do this with the Supabase client?',
+        createdAt: new Date(),
+      },
+      {
+        id: '26',
+        role: 'assistant' as const,
+        content: "Here's how to perform the same query using the Supabase JavaScript client:",
+        createdAt: new Date(),
+        render: (
+          <SqlSnippet
+            id="projects-js"
+            title="Get All Projects with Supabase Client"
+            sql={`const { data: projects, error } = await supabase
+  .from('projects')
+  .select(\`
+    id,
+    name,
+    description,
+    created_at,
+    owner_id (
+      email
+    )
+  \`)
+  .eq('is_active', true)
+  .order('created_at', { ascending: false })`}
+          />
+        ),
+      },
+    ],
+  },
 ]
 
 function Assistant() {

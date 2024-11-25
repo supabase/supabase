@@ -58,7 +58,7 @@ export const SqlSnippet = ({
   resultType = 'table',
   mockData,
 }: SqlSnippetProps) => {
-  const [showCode, setShowCode] = useState(false)
+  const [showCode, setShowCode] = useState(!mockData)
   const [isExecuting, setIsExecuting] = useState(false)
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any>(null)
@@ -70,13 +70,15 @@ export const SqlSnippet = ({
     // Simulate SQL execution delay
     setTimeout(() => {
       setIsExecuting(false)
-      setShowResults(true)
-      // Use provided mock data or default mock data
-      setResults(
-        resultType === 'chart'
-          ? mockData || MOCK_CHART_DATA
-          : mockData?.rows || MOCK_TABLE_DATA.rows
-      )
+      if (mockData) {
+        setShowResults(true)
+        // Use provided mock data or default mock data
+        setResults(
+          resultType === 'chart'
+            ? mockData || MOCK_CHART_DATA
+            : mockData?.rows || MOCK_TABLE_DATA.rows
+        )
+      }
     }, 1000)
   }
 
