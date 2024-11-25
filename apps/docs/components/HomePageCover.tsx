@@ -19,7 +19,7 @@ function AiPrompt({ className }: { className?: string }) {
         'transition-colors',
         className
       )}
-      href="#"
+      href="/guides/getting-started/ai-prompts"
     >
       <Sparkles size={14} />
       Start with Supabase AI prompts
