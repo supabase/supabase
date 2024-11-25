@@ -1,36 +1,37 @@
 import { useParams } from 'common'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
-
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { useActionKey } from 'hooks/useActionKey'
+import { PROJECT_STATUS } from 'lib/constants'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { useSnapshot } from 'valtio'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { sidebarState } from '../tabs/sidebar-state'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
-import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
+import { ResizingState } from './ResizingState'
 import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ResizingState } from './ResizingState'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -101,6 +102,21 @@ const ProjectLayout = ({
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
 
+  const sidebar = useSnapshot(sidebarState)
+  const actionKey = useActionKey()
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isActionKeyPressed = e.key === actionKey?.[1]
+      if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
+        e.preventDefault()
+        sidebarState.isOpen = !sidebar.isOpen
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [actionKey, sidebar.isOpen])
+
   return (
     <AppLayout>
       <ProjectContextProvider projectRef={projectRef}>
@@ -118,53 +134,69 @@ const ProjectLayout = ({
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex h-full">
-          {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
-          {/* Product menu bar */}
-          <ResizablePanelGroup
-            className="flex h-full"
-            direction="horizontal"
-            autoSaveId="project-layout"
-          >
-            <ResizablePanel
-              id="panel-left"
-              className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                hidden: !showProductMenu || !productMenu,
-              })}
-              defaultSize={0} // forces panel to smallest width possible, at w-64
-            >
-              <MenuBarWrapper
-                isLoading={isLoading}
-                isBlocking={isBlocking}
-                productMenu={productMenu}
+        <div className="flex flex-col h-screen">
+          {!hideHeader && <LayoutHeader />}
+          <div className="flex flex-1 overflow-hidden">
+            {!hideIconBar && <NavigationBar />}
+            <AnimatePresence initial={false}>
+              <ResizablePanelGroup
+                className="flex flex-1"
+                direction="horizontal"
+                autoSaveId="project-layout"
               >
-                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-              </MenuBarWrapper>
-            </ResizablePanel>
-            <ResizableHandle
-              className={cn({ hidden: !showProductMenu || !productMenu })}
-              withHandle
-              disabled={resizableSidebar ? false : true}
-            />
-            <ResizablePanel id="panel-right" className="h-full flex flex-col">
-              {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                    <div className="w-full">
-                      <ProjectPausedState product={product} />
-                    </div>
-                  </div>
-                ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                    <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
+                {showProductMenu && productMenu && (
+                  <ResizablePanel
+                    order={1}
+                    id="panel-left"
+                    className={cn(
+                      'transition-all duration-[120ms]',
+                      sidebar.isOpen
+                        ? resizableSidebar
+                          ? 'min-w-64 max-w-[32rem]'
+                          : 'min-w-64 max-w-64'
+                        : 'w-0 flex-shrink-0 max-w-0'
+                    )}
+                  >
+                    {sidebar.isOpen && (
+                      <>
+                        <motion.div
+                          initial={{
+                            width: 0,
+                            opacity: 0,
+                            height: '100%',
+                          }}
+                          animate={{
+                            width: 'auto',
+                            opacity: 1,
+                            height: '100%',
+                          }}
+                          exit={{
+                            width: 0,
+                            opacity: 0,
+                            height: '100%',
+                          }}
+                          className="h-full"
+                          transition={{ duration: 0.12 }}
+                        >
+                          <MenuBarWrapper
+                            isLoading={isLoading}
+                            isBlocking={isBlocking}
+                            productMenu={productMenu}
+                          >
+                            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                          </MenuBarWrapper>
+                        </motion.div>
+                      </>
+                    )}
+                  </ResizablePanel>
                 )}
-              </main>
-            </ResizablePanel>
-          </ResizablePanelGroup>
+                {showProductMenu && productMenu && sidebar.isOpen && (
+                  <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+                )}
+                <ResizablePanel order={2}>{children}</ResizablePanel>
+              </ResizablePanelGroup>
+            </AnimatePresence>
+          </div>
         </div>
 
         <EnableBranchingModal />
@@ -194,6 +226,7 @@ const MenuBarWrapper = ({
 }: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
+
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
   if (!isBlocking) {

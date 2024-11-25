@@ -29,7 +29,7 @@ import {
 import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
 
 interface SQLEditorMenuProps {
-  onViewOngoingQueries: () => void
+  onViewOngoingQueries?: () => void
 }
 
 export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {

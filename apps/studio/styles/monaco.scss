@@ -13,10 +13,16 @@
   border: 0 !important;
 }
 
+[data-theme='dark'] .monaco-editor,
+[data-theme='dark'] .monaco-diff-editor {
+  --vscode-editor-background: hsl(var(--background-surface-100)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-surface-100)) !important;
+  color-scheme: dark;
+}
 .monaco-editor,
 .monaco-diff-editor {
-  --vscode-editor-background: hsl(var(--background-surface-200)) !important;
-  --vscode-editorGutter-background: hsl(var(--background-surface-200)) !important;
+  --vscode-editor-background: hsl(var(--background-dash-sidebar)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-dash-sidebar)) !important;
 }
 
 .gutter {

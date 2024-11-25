@@ -244,7 +244,7 @@ const NavigationBar = () => {
         }}
       >
         <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
+          {/* {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="mx-2 flex items-center h-[40px]"
@@ -256,7 +256,7 @@ const NavigationBar = () => {
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
             </Link>
-          )}
+          )} */}
           <NavigationIconLink
             isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
             route={{

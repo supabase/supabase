@@ -13,6 +13,7 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+import { getTabsStore } from 'state/tabs'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -49,6 +50,18 @@ const SQLTemplates = () => {
       })
       snapV2.addSnippet({ projectRef: ref, snippet })
       snapV2.addNeedsSaving(snippet.id)
+
+      const store = getTabsStore(ref)
+      const tabId = `sql-${snippet.id}`
+      store.openTabs = [...store.openTabs, tabId]
+      store.tabsMap[tabId] = {
+        id: tabId,
+        type: 'sql',
+        // Remove the label since we'll derive it dynamically
+        metadata: { sqlId: snippet.id },
+      }
+      store.activeTab = tabId
+
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)
