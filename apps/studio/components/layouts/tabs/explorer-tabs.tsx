@@ -81,7 +81,12 @@ const SortableTab = ({
   const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} className="flex items-center h-10">
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className="flex items-center h-10 first-of-type:border-l"
+    >
       <TabsTrigger_Shadcn_
         value={tab.id}
         onDoubleClick={() => makeTabPermanent(ref, tab.id)}
