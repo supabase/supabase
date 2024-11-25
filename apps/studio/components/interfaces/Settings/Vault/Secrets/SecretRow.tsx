@@ -16,8 +16,8 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { Edit3, Eye, EyeOff, Key, Loader, MoreVertical, Trash } from 'lucide-react'
 import type { VaultSecret } from 'types'
-import { Key, Loader, Eye, EyeOff, MoreVertical, Edit3, Trash } from 'lucide-react'
 
 interface SecretRowProps {
   secret: VaultSecret
@@ -65,7 +65,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             className="text-foreground-light transition group-hover:text-brand"
           />
           <Link
-            href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}
+            href={`/project/${ref}/integrations/vault/keys?search=${secret.key_id}`}
             className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
             title={secret.key_id}
           >

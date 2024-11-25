@@ -25,7 +25,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       connectionString: selectedProject?.connectionString,
     },
     {
-      staleTime: 30 * 1000, // 60 seconds, talk with Oli whether this is ok to call every minute
+      staleTime: 30 * 1000, // 30 seconds, talk with Oli whether this is ok to call every minute
     }
   )
 
@@ -37,7 +37,6 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       onClick={() => {
         router.push(`/project/${selectedProject?.ref}/integrations/queues/${queue.queue_name}`)
       }}
-      className="hover:"
     >
       <Table.td className="truncate">
         <p title={queue.queue_name}>{queue.queue_name}</p>

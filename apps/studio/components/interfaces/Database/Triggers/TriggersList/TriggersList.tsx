@@ -89,18 +89,18 @@ const TriggersList = ({
         <div className="space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
             <SchemaSelector
-              className="w-[260px]"
-              size="small"
+              className="w-[180px]"
+              size="tiny"
               showError={false}
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
             <Input
               placeholder="Search for a trigger"
-              size="small"
+              size="tiny"
               icon={<Search size="14" />}
               value={filterString}
-              className="w-64"
+              className="w-52"
               onChange={(e) => setFilterString(e.target.value)}
             />
             {!isLocked && (

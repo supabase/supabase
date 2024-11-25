@@ -63,16 +63,16 @@ const EnumeratedTypes = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <SchemaSelector
-            className="w-[260px]"
-            size="small"
+            className="w-[180px]"
+            size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
             onSelectSchema={setSelectedSchema}
           />
           <Input
-            size="small"
+            size="tiny"
             value={search}
-            className="w-64"
+            className="w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
             icon={<Search size={14} />}

@@ -36,6 +36,7 @@ import {
 } from 'data/privileges/table-privileges-grant-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { toast } from 'sonner'
+import { isEqual } from 'lodash'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 type Privileges = { select?: boolean; insert?: boolean; update?: boolean; delete?: boolean }
@@ -43,7 +44,7 @@ type Privileges = { select?: boolean; insert?: boolean; update?: boolean; delete
 interface QueueSettingsProps {}
 
 export const QueueSettings = ({}: QueueSettingsProps) => {
-  const { name } = useParams()
+  const { childId: name } = useParams()
   const project = useSelectedProject()
 
   const [open, setOpen] = useState(false)
@@ -83,6 +84,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
   const onSaveConfiguration = async () => {
     if (!project) return console.error('Project is required')
     if (!queueTable) return console.error('Unable to find queue table')
+    if (!archiveTable) return console.error('Unable to find archive table')
 
     setIsSaving(true)
     const revoke: { role: string; action: string }[] = []
@@ -101,7 +103,23 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       })
     })
 
-    // [Joshen TODO] Clarifying on what to do for the archive table
+    const rolesBeingGrantedPerms = [...new Set(grant.map((x) => x.role))]
+    const rolesBeingRevokedPerms = [...new Set(revoke.map((x) => x.role))]
+
+    const rolesNoLongerHavingPerms = rolesBeingRevokedPerms.filter((x) => {
+      const existingPrivileges = queuePrivileges?.privileges
+        .filter((y) => x === y.grantee)
+        .map((y) => y.privilege_type)
+      const privilegesGettingRevoked = revoke
+        .filter((y) => y.role === x)
+        .map((y) => y.action.toUpperCase())
+      const privilegesGettingGranted = grant.filter((y) => y.role === x)
+      return (
+        privilegesGettingGranted.length === 0 &&
+        isEqual(existingPrivileges, privilegesGettingRevoked)
+      )
+    })
+
     try {
       await Promise.all([
         ...(revoke.length > 0
@@ -117,6 +135,20 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
               }),
             ]
           : []),
+        // Revoke insert on archive table only if role no longer has ANY perms on the queue table
+        ...(rolesNoLongerHavingPerms.length > 0
+          ? [
+              revokePrivilege({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                revokes: rolesNoLongerHavingPerms.map((x) => ({
+                  grantee: x,
+                  privilege_type: 'INSERT',
+                  relation_id: archiveTable.id,
+                })),
+              }),
+            ]
+          : []),
         ...(grant.length > 0
           ? [
               grantPrivilege({
@@ -127,6 +159,16 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                   privilege_type: x.action.toUpperCase(),
                   relation_id: queueTable.id,
                 })) as TablePrivilegesGrant[],
+              }),
+              // Just grant insert on archive table as long as we're granting any perms to the queue table for the role
+              grantPrivilege({
+                projectRef: project.ref,
+                connectionString: project.connectionString,
+                grants: rolesBeingGrantedPerms.map((x) => ({
+                  grantee: x,
+                  privilege_type: 'INSERT',
+                  relation_id: archiveTable.id,
+                })),
               }),
             ]
           : []),

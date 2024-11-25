@@ -5,9 +5,6 @@ export const databaseQueuesKeys = {
   getMessagesInfinite: (projectRef: string | undefined, queueName: string, options?: object) =>
     ['projects', projectRef, 'queue-messages', queueName, options].filter(Boolean),
   list: (projectRef: string | undefined) => ['projects', projectRef, 'queues'] as const,
-  // invalidating queues.list will also invalidate queues.metrics
-  // [Joshen TODO] I changed this to not ^ behave that way -> cause deleting a queue will
-  // cause this unnecessary invalidation, JFYI -> can remove this comment once informed Ivan
   metrics: (projectRef: string | undefined, queueName: string) =>
     ['projects', projectRef, 'queue-metrics', queueName] as const,
   exposePostgrestStatus: (projectRef: string | undefined) =>

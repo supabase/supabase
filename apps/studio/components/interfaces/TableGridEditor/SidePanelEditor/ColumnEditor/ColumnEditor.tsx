@@ -264,6 +264,7 @@ const ColumnEditor = ({
           <ColumnType
             showRecommendation
             value={columnFields?.format ?? ''}
+            layout="vertical"
             enumTypes={enumTypes}
             error={errors.format}
             description={
@@ -322,7 +323,13 @@ const ColumnEditor = ({
             column={columnFields}
             relations={fkRelations}
             closePanel={closePanel}
-            onUpdateColumnType={(format: string) => onUpdateField({ format })}
+            onUpdateColumnType={(format: string) => {
+              if (format[0] === '_') {
+                onUpdateField({ format: format.slice(1), isArray: true, isIdentity: false })
+              } else {
+                onUpdateField({ format })
+              }
+            }}
             onUpdateFkRelations={setFkRelations}
           />
         </FormSectionContent>
