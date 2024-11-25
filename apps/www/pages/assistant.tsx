@@ -680,7 +680,7 @@ function Assistant() {
                     ease: 'easeInOut',
                     delay: 2,
                   }}
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-background-muted/25 to-transparent transform -skew-x-12 z-10"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
                 />
                 <AIDemoPanel incomingMessages={incomingMessages} />
               </motion.div>
