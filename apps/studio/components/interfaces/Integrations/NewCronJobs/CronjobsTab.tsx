@@ -63,7 +63,7 @@ export const CronjobsTab = () => {
           <div className="w-full space-y-4">
             <div className="flex items-center justify-between flex-wrap">
               <Input
-                placeholder="Search for a queue"
+                placeholder="Search for a job"
                 size="small"
                 icon={<Search size={14} />}
                 value={searchQuery || ''}
