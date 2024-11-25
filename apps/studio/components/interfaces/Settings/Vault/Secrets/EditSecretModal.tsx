@@ -109,25 +109,33 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         onSubmit={onUpdateSecret}
       >
         {({ isSubmitting, resetForm }: any) => {
-          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
-          // using react hook form instead
-          // eslint-disable-next-line react-hooks/rules-of-hooks
-          const { isLoading: isLoadingSecretValue } = useVaultSecretDecryptedValueQuery(
+          const {
+            data,
+            isLoading: isLoadingSecretValue,
+            isSuccess: isSuccessSecretValue,
+            // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
+            // using react hook form instead
+            // eslint-disable-next-line react-hooks/rules-of-hooks
+          } = useVaultSecretDecryptedValueQuery(
             {
               projectRef: project?.ref!,
               id: selectedSecret?.id!,
               connectionString: project?.connectionString,
             },
-            {
-              enabled: !!(project?.ref && selectedSecret?.id),
-              onSuccess: (res) => {
-                resetForm({
-                  values: { ...INITIAL_VALUES, secret: res },
-                  initialValues: { ...INITIAL_VALUES, secret: res },
-                })
-              },
-            }
+            { enabled: !!(project?.ref && selectedSecret?.id) }
           )
+
+          // [Joshen] JFYI this is breaking rules of hooks, will be fixed once we move to
+          // using react hook form instead
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          useEffect(() => {
+            if (selectedSecret !== undefined && isSuccessSecretValue) {
+              resetForm({
+                values: { ...INITIAL_VALUES, secret: data },
+                initialValues: { ...INITIAL_VALUES, secret: data },
+              })
+            }
+          }, [selectedSecret, isSuccessSecretValue])
 
           return isLoadingSecretValue ? (
             <Modal.Content>

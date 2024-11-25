@@ -3,8 +3,8 @@ import { useCallback } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
-import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
+import { IntegrationConnectionItem } from 'components/interfaces/Integrations/VercelGithub/IntegrationConnection'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldContainer,

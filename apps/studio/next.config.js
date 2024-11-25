@@ -533,6 +533,12 @@ const nextConfig = {
         }
       })
 
+    // .md files to be loaded as raw text
+    config.module.rules.push({
+      test: /\.md$/,
+      type: 'asset/source',
+    })
+
     return config
   },
   onDemandEntries: {
