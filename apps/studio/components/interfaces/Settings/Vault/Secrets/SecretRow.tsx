@@ -65,7 +65,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
             className="text-foreground-light transition group-hover:text-brand"
           />
           <Link
-            href={`/project/${ref}/settings/vault/keys?id=${secret.key_id}`}
+            href={`/project/${ref}/settings/vault/keys?search=${secret.key_id}`}
             className="text-foreground-light font-mono text-xs cursor-pointer transition group-hover:text-brand"
             title={secret.key_id}
           >

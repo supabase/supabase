@@ -19,7 +19,7 @@ import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
 const DEFAULT_KEY_NAME = 'No description provided'
 
 const EncryptionKeysManagement = () => {
-  const { id } = useParams()
+  const { search } = useParams()
   const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
@@ -29,8 +29,8 @@ const EncryptionKeysManagement = () => {
   const canManageKeys = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   useEffect(() => {
-    if (id !== undefined) setSearchValue(id)
-  }, [id])
+    if (search !== undefined) setSearchValue(search)
+  }, [search])
 
   const { data, isLoading } = usePgSodiumKeysQuery({
     projectRef: project?.ref,
