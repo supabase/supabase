@@ -2,8 +2,6 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { HTMLProps, ReactNode, useCallback, useState } from 'react'
 
 import { useParams } from 'common'
-import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
-import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
@@ -12,6 +10,8 @@ import { Sheet, SheetContent } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WrapperTable } from './WrapperTable'
+import DeleteWrapperModal from './DeleteWrapperModal'
+import { wrapperMetaComparator } from './Wrappers.utils'
 
 export const WrappersTab = () => {
   const { id } = useParams()

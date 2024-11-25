@@ -16,7 +16,7 @@ import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
 import SecretRow from './SecretRow'
 
-const SecretsManagement = () => {
+export const SecretsManagement = () => {
   const { search } = useParams()
   const { project } = useProjectContext()
 
@@ -190,5 +190,3 @@ const SecretsManagement = () => {
     </>
   )
 }
-
-export default SecretsManagement

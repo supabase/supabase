@@ -5,14 +5,14 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import DeleteWrapperModal from 'components/interfaces/Database/Wrappers/DeleteWrapperModal'
-import { formatWrapperTables } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Badge, Sheet, SheetContent, TableCell, TableRow } from 'ui'
 import { INTEGRATIONS } from '../Landing/Integrations.constants'
+import DeleteWrapperModal from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
+import { formatWrapperTables } from './Wrappers.utils'
 
 interface WrapperRowProps {
   wrapper: FDW
