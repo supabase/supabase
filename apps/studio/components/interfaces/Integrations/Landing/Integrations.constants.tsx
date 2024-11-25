@@ -2,12 +2,12 @@ import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
-import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import dynamic from 'next/dynamic'
 import { cn } from 'ui'
+import { WRAPPERS } from '../Wrappers/Wrappers.constants'
+import { WrapperMeta } from '../Wrappers/Wrappers.types'
 
 export type Navigation = {
   route: string
