@@ -164,6 +164,12 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/edge-functions-logs`,
       items: [],
     },
+    {
+      name: 'Cron Jobs',
+      key: 'cron-logs',
+      url: `/project/${ref}/logs/cron-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {

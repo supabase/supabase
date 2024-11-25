@@ -21,6 +21,7 @@ import { formatCurrency } from 'lib/helpers'
 import { Button } from 'ui'
 import CurrentPaymentMethod from '../BillingSettings/PaymentMethods/CurrentPaymentMethod'
 import { FileText, Download, ChevronLeft, ChevronRight } from 'lucide-react'
+import InvoicePayButton from './InvoicePayButton'
 
 const PAGE_LIMIT = 10
 
@@ -152,15 +153,7 @@ const InvoicesSettings = () => {
                                 InvoiceStatus.OPEN,
                                 InvoiceStatus.ISSUED,
                               ].includes(x.status as InvoiceStatus) && (
-                                <Button asChild>
-                                  <Link
-                                    href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                  >
-                                    Pay Now
-                                  </Link>
-                                </Button>
+                                <InvoicePayButton slug={slug} invoiceId={x.id} />
                               )}
 
                             <Button
