@@ -35,7 +35,9 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
     <Table.tr
       key={queue.queue_name}
       onClick={() => {
-        router.push(`/project/${selectedProject?.ref}/integrations/queues/${queue.queue_name}`)
+        router.push(
+          `/project/${selectedProject?.ref}/integrations/queues/queues/${queue.queue_name}`
+        )
       }}
     >
       <Table.td className="truncate">
