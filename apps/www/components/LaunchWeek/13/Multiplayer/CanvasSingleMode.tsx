@@ -190,7 +190,7 @@ export default function InteractiveGridSingle() {
   }, [supabase])
 
   return (
-    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen cursor-none">
+    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
@@ -201,7 +201,7 @@ export default function InteractiveGridSingle() {
       />
 
       {/* Current user cursor */}
-      <Cursor
+      {/* <Cursor
         x={mousePosition?.x}
         y={mousePosition?.y}
         color={getColor('brand').bg}
@@ -209,7 +209,7 @@ export default function InteractiveGridSingle() {
         message={''}
         isTyping={false}
         isCurrentUser={true}
-      />
+      /> */}
     </div>
   )
 }

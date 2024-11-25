@@ -507,7 +507,7 @@ const ThreeTicketCanvas: React.FC<{
         className
       )}
     >
-      <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
+      <div ref={canvasRef} className="w-full lg:h-full" />
       {isGameMode && !hasWon && !sharePage && (
         <InputOTP
           ref={inputRef}

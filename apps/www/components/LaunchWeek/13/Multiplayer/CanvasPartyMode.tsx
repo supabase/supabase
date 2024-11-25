@@ -16,7 +16,7 @@ import { cloneDeep, throttle } from 'lodash'
 import Cursor from './Cursor'
 
 export const GRID_SIZE = 100
-export const CELL_SIZE = 35
+export const CELL_SIZE = 40
 export const CANVAS_WIDTH = 1800
 export const CANVAS_HEIGHT = 1600
 export const HOVER_DURATION = 100
@@ -327,7 +327,7 @@ export default function InteractiveGrid() {
   }, [hoveredCells, setCellHovered, userData])
 
   return (
-    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen cursor-none">
+    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
@@ -338,7 +338,7 @@ export default function InteractiveGrid() {
       />
 
       {/* Current user cursor */}
-      <Cursor
+      {/* <Cursor
         key={userId}
         x={mousePosition?.x}
         y={mousePosition?.y}
@@ -347,7 +347,7 @@ export default function InteractiveGrid() {
         message={''}
         isTyping={false}
         isCurrentUser={true}
-      />
+      /> */}
 
       {/* Online users cursors */}
       {Object.entries(users).reduce((acc, [userId, data]) => {

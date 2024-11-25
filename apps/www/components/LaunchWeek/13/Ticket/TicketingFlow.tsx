@@ -45,7 +45,7 @@ const TicketingFlow = () => {
       size="small"
       onClick={() => setIsPartyMode(!isPartyMode)}
       type="default"
-      className="sm:pl-1 pointer-events-auto cursor-none"
+      className="sm:pl-1 pointer-events-auto"
     >
       <div className="flex items-center">
         <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
@@ -206,7 +206,7 @@ const TicketingFlow = () => {
                         <Button
                           size="small"
                           type="default"
-                          className="sm:pl-1 pointer-events-auto cursor-none"
+                          className="sm:pl-1 pointer-events-auto"
                           asChild
                         >
                           <Link

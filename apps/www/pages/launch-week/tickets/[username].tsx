@@ -101,7 +101,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                         <Button type="primary" asChild size="small">
                           <Link
                             href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
-                            className="pointer-events-auto !cursor-none"
+                            className="pointer-events-auto"
                           >
                             Claim your ticket
                           </Link>
