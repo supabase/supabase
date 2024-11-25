@@ -217,7 +217,7 @@ export const ConnectionPanel = ({
               <div className="flex flex-col">
                 <span className="text-xs text-foreground">Only use on a IPv4 network</span>
                 <span className="text-xs text-foreground-lighter">
-                  Use Direct Connection if connecting via a IPv6 network
+                  Use Direct Connection if connecting via an IPv6 network
                 </span>
               </div>
             </div>

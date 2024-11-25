@@ -384,7 +384,7 @@ export const DatabaseConnectionString = () => {
                 type="session"
                 title="Session pooler"
                 fileTitle={fileTitle}
-                description="Only recommended as an alternative to Direct Connection, when connecting via a IPv4 network."
+                description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
                 onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
