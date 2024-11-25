@@ -2,12 +2,12 @@ import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
-import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import dynamic from 'next/dynamic'
 import { cn } from 'ui'
+import { WRAPPERS } from '../Wrappers/Wrappers.constants'
+import { WrapperMeta } from '../Wrappers/Wrappers.types'
 
 export type Navigation = {
   route: string
@@ -79,15 +79,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(
-          () =>
-            import('components/interfaces/Integrations/NewQueues/QueueTab').then(
-              (mod) => mod.QueueTab
-            ),
-          {
-            loading: Loading,
-          }
-        )
+        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+          loading: Loading,
+        })
       }
       switch (pageId) {
         case 'overview':
@@ -101,15 +95,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             }
           )
         case 'queues':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewQueues/QueuesTab').then(
-                (mod) => mod.QueuesTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return dynamic(() => import('../Queues/QueuesTab').then((mod) => mod.QueuesTab), {
+            loading: Loading,
+          })
       }
       return null
     },
@@ -151,15 +139,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             }
           )
         case 'cron-jobs':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewCronJobs/CronjobsTab').then(
-                (mod) => mod.CronjobsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return dynamic(() => import('../CronJobs/CronJobsTab').then((mod) => mod.CronjobsTab), {
+            loading: Loading,
+          })
       }
       return null
     },
@@ -205,7 +187,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         case 'keys':
           return dynamic(
             () =>
-              import('components/interfaces/Settings/Vault').then(
+              import('../Vault/Keys/EncryptionKeysManagement').then(
                 (mod) => mod.EncryptionKeysManagement
               ),
             {
@@ -214,8 +196,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
           )
         case 'secrets':
           return dynamic(
-            () =>
-              import('components/interfaces/Settings/Vault').then((mod) => mod.SecretsManagement),
+            () => import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
             {
               loading: Loading,
             }
