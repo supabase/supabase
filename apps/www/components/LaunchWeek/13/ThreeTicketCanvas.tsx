@@ -330,9 +330,9 @@ const ThreeTicketCanvas: React.FC<{
     const animate = () => {
       // Smooth rotation
       if (!isDragging.current) {
-        ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.1
+        ticketGroup.rotation.x += (targetRotation.current.x - ticketGroup.rotation.x) * 0.25
         ticketGroup.rotation.y +=
-          ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.1
+          ticketYIdleRotation + (targetRotation.current.y - ticketGroup.rotation.y) * 0.25
       }
       if (ticketGroup.scale.x < targetScale.current) {
         scale += 0.0025
