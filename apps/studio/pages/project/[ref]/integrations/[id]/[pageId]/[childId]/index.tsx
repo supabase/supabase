@@ -30,11 +30,16 @@ const IntegrationPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     // if the integration is not installed, redirect to the overview page
-    if (router && !installation && pageId !== 'overview') {
+    if (
+      router &&
+      router?.isReady &&
+      !isIntegrationsLoading &&
+      !installation &&
+      pageId !== 'overview'
+    ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, installation, pageId])
+  }, [installation, isIntegrationsLoading, pageId, router])
 
   if (!router?.isReady || isIntegrationsLoading) {
     return (
