@@ -57,6 +57,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
+  const tabStore = getTabsStore(projectRef)
 
   const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
@@ -338,7 +339,6 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   return (
     <>
-      <InnerSideMenuSeparator />
       {((numProjectSnippets === 0 && searchText.length === 0) || numProjectSnippets > 0) && (
         <>
           <InnerSideMenuCollapsible
@@ -364,10 +364,17 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                     const isOpened = Object.values(tabs.tabsMap).some(
                       (tab) => tab.metadata?.sqlId === element.metadata?.id
                     )
+                    const tabId = createTabId('sql', {
+                      id: element?.metadata?.id as unknown as Snippet['id'],
+                    })
+                    const isPreview = tabStore.previewTabId === tabId
+                    const isActive = !isPreview && element.metadata?.id === id
                     return (
                       <SQLEditorTreeViewItem
                         {...props}
-                        isOpened={isOpened}
+                        isOpened={isOpened && !isPreview}
+                        isSelected={isActive}
+                        isPreview={isPreview}
                         element={element}
                         onSelectDelete={() => {
                           setShowDeleteModal(true)
@@ -435,10 +442,17 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                     const isOpened = Object.values(tabs.tabsMap).some(
                       (tab) => tab.metadata?.sqlId === element.metadata?.id
                     )
+                    const tabId = createTabId('sql', {
+                      id: element?.metadata?.id as unknown as Snippet['id'],
+                    })
+                    const isPreview = tabStore.previewTabId === tabId
+                    const isActive = !isPreview && element.metadata?.id === id
                     return (
                       <SQLEditorTreeViewItem
                         {...props}
-                        isOpened={isOpened}
+                        isOpened={isOpened && !isPreview}
+                        isSelected={!isPreview && isOpened}
+                        isPreview={isPreview}
                         element={element}
                         onSelectDelete={() => {
                           setShowDeleteModal(true)
@@ -528,13 +542,20 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                 const isOpened = Object.values(tabs.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.metadata?.id
                 )
+                const tabId = createTabId('sql', {
+                  id: element?.metadata?.id as unknown as Snippet['id'],
+                })
+                const isPreview = tabStore.previewTabId === tabId
+                const isActive = !isPreview && element.metadata?.id === id
 
                 return (
                   <SQLEditorTreeViewItem
                     {...props}
                     element={element}
                     isMultiSelected={selectedSnippets.length > 1}
-                    isOpened={isOpened}
+                    isOpened={isOpened && !isPreview}
+                    isSelected={isActive}
+                    isPreview={isPreview}
                     status={props.isBranch ? snapV2.folders[element.id].status : 'idle'}
                     onMultiSelect={onMultiSelect}
                     onSelectCreate={() => {

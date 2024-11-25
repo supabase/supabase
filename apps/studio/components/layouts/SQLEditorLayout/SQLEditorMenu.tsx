@@ -124,7 +124,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           </DropdownMenu>
         </div>
 
-        <div className="px-2">
+        {/* <div className="px-2">
           <InnerSideMenuItem
             title="Templates"
             isActive={router.asPath === `/project/${ref}/sql/templates`}
@@ -139,7 +139,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           >
             Quickstarts
           </InnerSideMenuItem>
-        </div>
+        </div> */}
 
         <SQLEditorNavV2 searchText={searchText} />
       </div>

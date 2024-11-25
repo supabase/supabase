@@ -104,7 +104,8 @@ export const SQLEditorTreeViewItem = ({
             level={level}
             isExpanded={isExpanded}
             isBranch={isBranch}
-            isSelected={isSelected || id === element.id}
+            isSelected={isSelected}
+            isPreview={props.isPreview}
             isEditing={isEditing}
             isLoading={isFetching || isSaving}
             onEditSubmit={(value) => {

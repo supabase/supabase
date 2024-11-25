@@ -25,7 +25,7 @@ export const TreeViewItemVariant = cva(
         false: '',
       },
       isPreview: {
-        true: 'bg-control',
+        true: 'bg-control text-foreground',
         false: '',
       },
     },
@@ -41,6 +41,8 @@ const TreeViewItem = forwardRef<
     isExpanded?: boolean
     /** Specifies if the item is opened somewhere */
     isOpened?: boolean
+    /** Specifies if the item is a preview */
+    isPreview?: boolean
     /** Specifies if the item is a branch */
     isBranch?: boolean
     /** The padding for each level of the item */
@@ -69,6 +71,7 @@ const TreeViewItem = forwardRef<
       isOpened = false,
       isBranch = false,
       isSelected = false,
+      isPreview = false,
       isLoading = false,
       xPadding = 16,
       name = '',
@@ -119,7 +122,7 @@ const TreeViewItem = forwardRef<
         aria-selected={isSelected}
         aria-expanded={!isEditing && isExpanded}
         {...props}
-        className={cn(TreeViewItemVariant({ isSelected, isOpened }))}
+        className={cn(TreeViewItemVariant({ isSelected, isOpened, isPreview }))}
         style={{
           paddingLeft:
             level === 1 && !isBranch
