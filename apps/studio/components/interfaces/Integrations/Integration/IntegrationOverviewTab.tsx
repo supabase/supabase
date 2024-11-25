@@ -65,7 +65,7 @@ export const IntegrationOverviewTab = ({
               className="max-w-full"
               content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
               extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
-              ${hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extensions to use ${integration.name} in your project.` : ''}
+              ${hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extension${integration.requiredExtensions.length > 1 ? 's' : ''} to use ${integration.name} in your project.` : ''}
               `}
             />
 
