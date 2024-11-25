@@ -17,7 +17,7 @@ const TicketPresence = (props: { className?: string }) => {
   useEffect(() => {
     // Listen to realtime presence
     if (!realtimeChannel && supabase) {
-      const lw13Room = supabase?.channel('lw13_online', {
+      const lw13Room = supabase?.channel('lw13_rooms', {
         config: { broadcast: { self: true, ack: true } },
       })
 
