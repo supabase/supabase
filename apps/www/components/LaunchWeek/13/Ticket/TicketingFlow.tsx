@@ -59,7 +59,6 @@ const TicketingFlow = () => {
       <SectionContainer className="relative h-full lg:min-h-[calc(100dvh-65px)] flex-1 pointer-events-none">
         <div className="relative z-10 flex items-center h-full">
           <h1 className="sr-only">Supabase Launch Week 13 | {LW13_DATE}</h1>
-
           <LazyMotion features={domAnimation}>
             <AnimatePresence mode="wait" key={ticketState}>
               {isLoading && (
@@ -96,11 +95,12 @@ const TicketingFlow = () => {
                   animate={animate}
                   exit={exit}
                   className={cn(
-                    'w-full lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 opacity-0 invisible',
-                    !hasTicket && 'opacity-100 visible'
+                    'mx-auto lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 xl:gap-12 opacity-0 invisible',
+                    !hasTicket && 'opacity-100 visible',
+                    'justify-items-end'
                   )}
                 >
-                  <div className="h-full max-w-xs flex flex-col justify-center gap-2 md:gap-6">
+                  <div className="h-full max-w-xs md:max-w-none flex flex-col justify-center gap-2 md:gap-6">
                     <CountdownComponent
                       date={LW13_LAUNCH_DATE}
                       showCard={false}
@@ -108,11 +108,15 @@ const TicketingFlow = () => {
                       size="large"
                     />
                     <div className="flex flex-col gap-2 md:gap-6">
-                      <div className="flex flex-col flex-wrap uppercase text-2xl tracking-wider">
-                        <h2 className="text-foreground">Launch Week 13</h2>
-                        <p className="text-foreground-lighter text-base">{LW13_DATE}</p>
+                      <div className="flex flex-col flex-wrap gap-0">
+                        <h2 className="text-foreground uppercase tracking-wider text-2xl">
+                          Launch Week 13
+                        </h2>
+                        <p className="text-foreground-lighter uppercase tracking-wider text-xl md:text-2xl">
+                          {LW13_DATE}
+                        </p>
                       </div>
-                      <p className="text-foreground-lighter text-sm md:text-lg">
+                      <p className="text-foreground-lighter text-sm">
                         Join us for a week of new features and level up your development.
                       </p>
                       <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
@@ -126,7 +130,7 @@ const TicketingFlow = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="h-full mx-auto min-h-[400px] aspect-[0.8/1] rounded-lg border-2 border-dashed border-strong flex items-center justify-center bg-surface-75/80 backdrop-blur-sm">
+                  <div className="h-full min-h-[400px] aspect-[0.8/1] rounded-lg border border-dashed border-strong flex items-center justify-center bg-surface-75/25 backdrop-blur-xl">
                     <TicketForm />
                   </div>
                 </m.div>
