@@ -92,7 +92,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
@@ -148,13 +147,21 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               direction="horizontal"
               autoSaveId="project-layout"
             >
-              <MenuBarWrapper
-                isLoading={isLoading}
-                isBlocking={isBlocking}
-                productMenu={productMenu}
+              <ResizablePanel
+                id="panel-left"
+                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
+                  hidden: !showProductMenu || !productMenu,
+                })}
+                defaultSize={0} // forces panel to smallest width possible, at w-64
               >
-                <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-              </MenuBarWrapper>
+                <MenuBarWrapper
+                  isLoading={isLoading}
+                  isBlocking={isBlocking}
+                  productMenu={productMenu}
+                >
+                  <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                </MenuBarWrapper>
+              </ResizablePanel>
               <ResizableHandle
                 className={cn({ hidden: !showProductMenu || !productMenu })}
                 withHandle
