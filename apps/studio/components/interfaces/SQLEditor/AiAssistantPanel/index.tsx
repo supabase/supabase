@@ -94,13 +94,13 @@ export const AiAssistantPanel = ({
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const {
     messages: chatMessages,
-    append,
     isLoading,
+    append,
   } = useChat({
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     body: {
-      existingSql: existingSql,
+      existingSql,
       entityDefinitions: entityDefinitions,
     },
   })

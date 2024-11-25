@@ -109,17 +109,17 @@ const Indexes = () => {
             )}
             {isSuccessSchemas && (
               <SchemaSelector
-                className="w-[260px]"
-                size="small"
+                className="w-[180px]"
+                size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
                 onSelectSchema={setSelectedSchema}
               />
             )}
             <Input
-              size="small"
+              size="tiny"
               value={search}
-              className="w-64"
+              className="w-52"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<Search size={14} />}

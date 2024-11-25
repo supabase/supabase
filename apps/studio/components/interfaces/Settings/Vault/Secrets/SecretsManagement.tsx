@@ -60,8 +60,8 @@ const SecretsManagement = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Input
-              className="w-64"
-              size="small"
+              className="w-52"
+              size="tiny"
               placeholder="Search by name or key ID"
               value={searchValue}
               onChange={(event) => setSearchValue(event.target.value)}
@@ -82,7 +82,7 @@ const SecretsManagement = () => {
               }
             />
             <div className="w-44">
-              <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
+              <Listbox size="tiny" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="updated_at"
                   className="max-w-[180px]"

@@ -31,6 +31,9 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizingState } from './ResizingState'
+import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -85,10 +88,14 @@ const ProjectLayout = ({
   const { ref: projectRef } = useParams()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open } = aiAssistantPanel
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+
+  const projectName = selectedProject?.name
+  const organizationName = selectedOrganization?.name
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const showProductMenu = selectedProject
@@ -100,6 +107,15 @@ const ProjectLayout = ({
   const ignorePausedState =
     router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
   const showPausedState = isPaused && !ignorePausedState
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.metaKey && e.code === 'KeyI') setAiAssistantPanel({ open: !open })
+    }
+    if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAssistantV2Enabled, open])
 
   return (
     <AppLayout>
@@ -149,20 +165,39 @@ const ProjectLayout = ({
             />
             <ResizablePanel id="panel-right" className="h-full flex flex-col">
               {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
-                {showPausedState ? (
-                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                    <div className="w-full">
-                      <ProjectPausedState product={product} />
-                    </div>
-                  </div>
-                ) : (
-                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                    <ResourceExhaustionWarningBanner />
-                    {children}
-                  </ContentWrapper>
+              <ResizablePanelGroup
+                className="h-full w-full overflow-x-hidden flex-1"
+                direction="horizontal"
+                autoSaveId="project-layout-content"
+              >
+                <ResizablePanel id="panel-content" className=" w-full min-w-[600px]">
+                  <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
+                    {showPausedState ? (
+                      <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                        <div className="w-full">
+                          <ProjectPausedState product={product} />
+                        </div>
+                      </div>
+                    ) : (
+                      <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                        <ResourceExhaustionWarningBanner />
+                        {children}
+                      </ContentWrapper>
+                    )}
+                  </main>
+                </ResizablePanel>
+                {aiAssistantPanel.open && (
+                  <>
+                    <ResizableHandle />
+                    <ResizablePanel
+                      id="panel-assistant"
+                      className="min-w-[400px] max-w-[500px] bg 2xl:max-w-[600px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                    >
+                      <AiAssistantPanel />
+                    </ResizablePanel>
+                  </>
                 )}
-              </main>
+              </ResizablePanelGroup>
             </ResizablePanel>
           </ResizablePanelGroup>
         </div>
