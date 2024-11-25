@@ -7,14 +7,15 @@ import { useTheme } from 'next-themes'
 import Cursor from './Cursor'
 import { getColor } from './randomColor'
 import { Coordinates } from './types'
-
-const GRID_SIZE = 100
-const CELL_SIZE = 35
-const CANVAS_WIDTH = 1800
-const CANVAS_HEIGHT = 1600
-const HOVER_DURATION = 100
-const FADE_DURATION = 300
-const Y_THRESHOLD = 65
+import {
+  HOVER_DURATION,
+  CANVAS_WIDTH,
+  CANVAS_HEIGHT,
+  GRID_SIZE,
+  CELL_SIZE,
+  FADE_DURATION,
+  Y_THRESHOLD,
+} from './CanvasPartyMode'
 
 interface CellState {
   isHovered: boolean

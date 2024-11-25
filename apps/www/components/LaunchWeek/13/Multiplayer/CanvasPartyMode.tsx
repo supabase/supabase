@@ -15,28 +15,17 @@ import { Coordinates, Payload, User } from './types'
 import { cloneDeep, throttle } from 'lodash'
 import Cursor from './Cursor'
 
-/**
- * [x] multiplayer cursors
- * [x] show own cursor
- * [x] show own trail
- * [x] show other users cursors
- * [x] brand color for current user
- * [x] gray for online users
- * [x] offset cursor position by scroll offset Y
- * [ ] hide own cursor on touch devices
- */
-
-const GRID_SIZE = 100
-const CELL_SIZE = 35
-const CANVAS_WIDTH = 1800
-const CANVAS_HEIGHT = 1600
-const HOVER_DURATION = 100
-const FADE_DURATION = 300
+export const GRID_SIZE = 100
+export const CELL_SIZE = 35
+export const CANVAS_WIDTH = 1800
+export const CANVAS_HEIGHT = 1600
+export const HOVER_DURATION = 100
+export const FADE_DURATION = 300
 
 const MAX_ROOM_USERS = 50
 const MAX_EVENTS_PER_SECOND = 10
-const X_THRESHOLD = 25
-const Y_THRESHOLD = 65
+export const X_THRESHOLD = 25
+export const Y_THRESHOLD = 65
 
 interface CellState {
   isHovered: boolean
@@ -110,7 +99,7 @@ export default function InteractiveGrid() {
         Client is joining 'rooms' channel to examine existing rooms and their users
         and then the channel is removed once a room is selected
       */
-      roomChannel = supabase?.channel('rooms')!
+      roomChannel = supabase?.channel('lw13_rooms')!
 
       roomChannel
         .on(REALTIME_LISTEN_TYPES.PRESENCE, { event: REALTIME_PRESENCE_LISTEN_EVENTS.SYNC }, () => {
@@ -133,7 +122,7 @@ export default function InteractiveGrid() {
         .subscribe()
     } else {
       // When user has been placed in a room
-      roomChannel = supabase?.channel('rooms', { config: { presence: { key: roomId } } })!
+      roomChannel = supabase?.channel('lw13_rooms', { config: { presence: { key: roomId } } })!
       roomChannel.on(
         REALTIME_LISTEN_TYPES.PRESENCE,
         { event: REALTIME_PRESENCE_LISTEN_EVENTS.SYNC },
