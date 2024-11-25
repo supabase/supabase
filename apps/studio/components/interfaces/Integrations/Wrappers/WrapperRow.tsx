@@ -59,7 +59,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           ))}
         </TableCell>
 
-        <TableCell className="space-y-2">
+        <TableCell className="space-y-2 !p-4">
           {_tables?.map((table) => {
             const target = table.table ?? table.object
 
