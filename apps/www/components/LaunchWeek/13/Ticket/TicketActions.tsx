@@ -13,7 +13,6 @@ export default function TicketActions() {
   const { resolvedTheme } = useTheme()
   const { userData, supabase } = useConfData()
   const { platinum, username, metadata, secret: hasSecretTicket } = userData
-  const { isPartyMode } = useLWPartyMode()
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()

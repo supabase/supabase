@@ -5,7 +5,7 @@ import useLwGame from '../hooks/useLwGame'
 import useConfData from '../hooks/use-conf-data'
 
 const useLWPartyMode = (disabled?: boolean) => {
-  const [isPartyMode, setIsPartyMode] = useState<boolean>(false)
+  const [isPartyMode, setIsPartyMode] = useState<boolean>(true)
   const { ticketState } = useConfData()
 
   const isCommandMenuOpen = useCommandMenuOpen()
