@@ -18,7 +18,7 @@ import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
-const EncryptionKeysManagement = () => {
+export const EncryptionKeysManagement = () => {
   const { search } = useParams()
   const { project } = useProjectContext()
 
@@ -324,5 +324,3 @@ const EncryptionKeysManagement = () => {
     </>
   )
 }
-
-export default EncryptionKeysManagement
