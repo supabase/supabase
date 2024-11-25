@@ -162,6 +162,8 @@ export const ForeignKeySelector = ({
       const targetType =
         tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
 
+      console.log({ sourceColumn })
+
       // [Joshen] Doing this way so that its more readable
       // If either source or target not selected yet, thats okay
       if (source === '' || target === '') {
