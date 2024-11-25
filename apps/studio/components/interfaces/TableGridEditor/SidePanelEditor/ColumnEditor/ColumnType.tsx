@@ -49,6 +49,7 @@ interface ColumnTypeProps {
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  layout?: 'horizontal' | 'vertical'
   description?: ReactNode
   showRecommendation?: boolean
   onOptionSelect: (value: string) => void
@@ -57,9 +58,9 @@ interface ColumnTypeProps {
 const ColumnType = ({
   value,
   enumTypes = [],
-  error,
   disabled = false,
   showLabel = true,
+  layout = 'horizontal',
   description,
   showRecommendation = false,
   onOptionSelect = noop,
@@ -115,8 +116,8 @@ const ColumnType = ({
             readOnly
             disabled
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
+            layout={showLabel ? layout : undefined}
+            className="md:gap-x-0 [&>div>div]:text-left"
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
