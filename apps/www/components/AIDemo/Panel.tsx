@@ -116,7 +116,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
   }
 
   return (
-    <div className="w-full shadow-2xl relative h-full bg border border-muted rounded-lg overflow-hidden">
+    <div className="w-full shadow-2xl relative h-full bg border border-foreground-light/10 rounded-lg overflow-hidden">
       <div className="absolute inset-0 flex flex-col">
         {/* Header */}
         <div className="z-30 border-b border-b-muted flex items-center gap-x-3 px-5 h-[46px]">
@@ -137,7 +137,10 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
         </div>
 
         {/* Messages */}
-        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-8 flex flex-col">
+        <div
+          ref={scrollContainerRef}
+          className="flex-1 overflow-y-auto p-8 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        >
           {messages.map((message, index) => (
             <>
               {index === 0 && (

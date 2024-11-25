@@ -633,7 +633,7 @@ function AI() {
                 <Image
                   src={aiSpace}
                   alt="Supabase AI is like talking to your data"
-                  className="z-0 pointer-events-none mix-blend-lighten absolute left-1/2 -translate-x-1/2 -bottom-96 w-[1400px] max-w-none opacity-25"
+                  className="z-0 pointer-events-none mix-blend-darken dark:mix-blend-lighten invert dark:invert-0  absolute left-1/2 -translate-x-1/2 -bottom-96 w-[1400px] max-w-none opacity-25"
                 />
               </motion.div>
               <motion.div
