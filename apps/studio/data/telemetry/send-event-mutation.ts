@@ -10,10 +10,15 @@ import type { ResponseError } from 'types'
 type SendEvent = components['schemas']['TelemetryEventBodyV2']
 
 export type SendEventVariables = {
+  /** Defines the name of the event, refer to TELEMETRY_EVENTS in lib/constants */
   action: string
-  category: string
-  label: string
+  /** These are all under the event's properties (customizable on the FE) */
+  /** value: refer to TELEMETRY_VALUES in lib/constants */
   value?: string
+  /** label: secondary tag to the event for further identification */
+  label?: string
+  /** To deprecate - seems unnecessary */
+  category?: string
 }
 
 type SendEventPayload = any

@@ -1,5 +1,5 @@
-import { InsertCode, ReplaceCode } from 'icons'
-import { Check, Copy } from 'lucide-react'
+import { InsertCode } from 'icons'
+import { Check, Copy, Edit } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
 import {
@@ -74,11 +74,11 @@ export const MessagePre = ({ onDiff, children, className }: MessagePreProps) => 
                 })
               }}
             >
-              <InsertCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
+              <Edit className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
             </Button>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom" className="font-sans">
-            Insert code
+            Edit
           </TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
 
