@@ -113,7 +113,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/NewQueues/QueuesSettings').then(
+              import('components/interfaces/Integrations/Queues/QueuesSettings').then(
                 (mod) => mod.QueuesSettings
               ),
             { loading: Loading }

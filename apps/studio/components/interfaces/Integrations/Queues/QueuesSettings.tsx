@@ -133,7 +133,7 @@ export const QueuesSettings = () => {
   }, [isSuccess])
 
   return (
-    <div className="w-full flex flex-col gap-y-4">
+    <div className="w-full flex flex-col gap-y-4 p-10">
       <FormHeader
         className="mb-0"
         title="Settings"
