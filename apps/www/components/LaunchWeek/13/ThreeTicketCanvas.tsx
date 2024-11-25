@@ -80,7 +80,7 @@ const ThreeTicketCanvas: React.FC<{
       ticketForeground: isDarkTheme ? 0x171717 : 0xffffff,
     },
     platinum: {
-      ticketColor: isDarkTheme ? 0x9ea1a1 : 0xf3f3f3,
+      ticketColor: isDarkTheme ? 0x9ea1a1 : 0x9ea1a1,
       ticketForeground: 0x0f0f0f,
     },
     secret: {
@@ -150,10 +150,10 @@ const ThreeTicketCanvas: React.FC<{
       map: IS_SECRET ? goldTexture : IS_PLATINUM ? metalTexture : undefined,
       bumpMap: IS_SECRET ? goldTexture : IS_PLATINUM ? metalTexture : undefined,
       metalnessMap: IS_SECRET ? goldTexture : metalTexture,
-      roughnessMap: IS_SECRET ? goldTexture : metalTexture,
-      metalness: IS_SECRET ? 1 : IS_PLATINUM ? 0.9 : isDarkTheme ? 0.2 : 0.9,
-      roughness: IS_SECRET ? 0.1 : IS_PLATINUM ? 0.12 : isDarkTheme ? 0.2 : 0.5,
-      bumpScale: IS_SECRET ? 0.85 : IS_PLATINUM ? 0.45 : undefined,
+      // roughnessMap: IS_SECRET ? goldTexture : metalTexture,
+      metalness: IS_SECRET ? 0.8 : IS_PLATINUM ? 0.8 : isDarkTheme ? 0.2 : 0.9,
+      roughness: IS_SECRET ? 0.12 : IS_PLATINUM ? 0.12 : isDarkTheme ? 0.2 : 0.5,
+      bumpScale: IS_SECRET ? 0.02 : IS_PLATINUM ? 0.0045 : undefined,
     })
 
     // Load Ticket model, fonts and textures
@@ -265,7 +265,7 @@ const ThreeTicketCanvas: React.FC<{
           backTextMesh.material.transparent = true
           backTextMesh.material.opacity = 0
 
-          backTextMesh.castShadow = true
+          // backTextMesh.castShadow = true
           ticketGroup.add(backTextMesh)
         })
       }
@@ -279,25 +279,28 @@ const ThreeTicketCanvas: React.FC<{
       texture.mapping = THREE.EquirectangularReflectionMapping
       scene.environment = texture
       metalMaterial.envMap = texture
-      metalMaterial.envMapIntensity = IS_SECRET ? (isDarkTheme ? 3.2 : 2.2) : isDarkTheme ? 3 : 0.5
-      metalMaterial.blending = THREE.NormalBlending
+      metalMaterial.envMapIntensity = IS_SECRET
+        ? isDarkTheme
+          ? 1.2
+          : 0.8
+        : isDarkTheme
+          ? 2.8
+          : 0.75
+      // metalMaterial.blending = THREE.NormalBlending
     })
 
     // Lights
     const ambientLight = new THREE.AmbientLight(
       0xffffff,
-      IS_SECRET ? (isDarkTheme ? 3 : 2) : IS_PLATINUM ? (isDarkTheme ? 10 : 8) : 2
+      IS_SECRET ? (isDarkTheme ? 1.2 : 1.2) : IS_PLATINUM ? (isDarkTheme ? 1.7 : 3.2) : 2
     )
     scene.add(ambientLight)
 
-    const spotLight = new THREE.SpotLight(0xffffff, isDarkTheme ? 20 : 4)
+    const spotLight = new THREE.SpotLight(0xffffff, isDarkTheme ? 0.8 : 0.2)
     spotLight.position.z = ticketGroup.position.z + 4
     spotLight.position.x = ticketGroup.position.x + 10
     spotLight.angle = (Math.PI / 2) * 0.5
     spotLight.castShadow = true
-    spotLight.shadow.mapSize.set(1024, 1024)
-    spotLight.shadow.camera.near = 5
-    spotLight.shadow.camera.far = 15
     spotLight.lookAt(ticketGroup.position)
     scene.add(spotLight)
 
