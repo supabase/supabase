@@ -670,216 +670,184 @@ const SQLEditor = () => {
       </ConfirmationModal>
 
       <ResizablePanelGroup
-        className="flex h-full"
-        direction="horizontal"
-        autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_PANEL_SPLIT_SIZE}
-        onClick={() => makeActiveTabPermanent(project?.ref)}
+        className="relative"
+        direction="vertical"
+        autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
       >
-        <ResizablePanel minSize={30}>
-          <ResizablePanelGroup
-            className="relative"
-            direction="vertical"
-            autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
+        {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
+          <AISchemaSuggestionPopover
+            onClickSettings={() => {
+              appSnap.setShowAiSettingsModal(true)
+            }}
           >
-            {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
-              <AISchemaSuggestionPopover
-                onClickSettings={() => {
-                  appSnap.setShowAiSettingsModal(true)
-                }}
+            {isDiffOpen && (
+              <motion.div
+                key="ask-ai-input-container"
+                layoutId="ask-ai-input-container"
+                variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
+                initial={isFirstRender ? 'visible' : 'hidden'}
+                animate="visible"
+                className={cn(
+                  'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
+                  'bg-brand-200 border-b border-brand-400  !shadow-none'
+                )}
               >
+                {debugSolution && (
+                  <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
+                    {debugSolution}
+                  </div>
+                )}
+                <DiffActionBar
+                  loading={isAcceptDiffLoading}
+                  selectedDiffType={selectedDiffType || DiffType.Modification}
+                  onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
+                  onAccept={acceptAiHandler}
+                  onCancel={discardAiHandler}
+                />
+              </motion.div>
+            )}
+          </AISchemaSuggestionPopover>
+        )}
+        <ResizablePanel maxSize={70}>
+          <div className="flex-grow overflow-y-auto border-b h-full">
+            {!isAiOpen && (
+              <motion.button
+                layoutId="ask-ai-input-icon"
+                transition={{ duration: 0.1 }}
+                onClick={() => aiPanelRef.current?.expand()}
+                className={cn(
+                  'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
+                )}
+              >
+                <AiIconAnimation loading={false} allowHoverEffect />
+              </motion.button>
+            )}
+
+            {isLoading ? (
+              <div className="flex h-full w-full items-center justify-center">
+                <Loader2 className="animate-spin text-brand" />
+              </div>
+            ) : (
+              <>
                 {isDiffOpen && (
                   <motion.div
-                    key="ask-ai-input-container"
-                    layoutId="ask-ai-input-container"
-                    variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                    initial={isFirstRender ? 'visible' : 'hidden'}
+                    className="w-full h-full"
+                    variants={{
+                      visible: { opacity: 1, filter: 'blur(0px)' },
+                      hidden: { opacity: 0, filter: 'blur(10px)' },
+                    }}
+                    initial="hidden"
                     animate="visible"
-                    className={cn(
-                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                      'bg-brand-200 border-b border-brand-400  !shadow-none'
-                    )}
                   >
-                    {debugSolution && (
-                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
-                        {debugSolution}
-                      </div>
-                    )}
-                    <DiffActionBar
-                      loading={isAcceptDiffLoading}
-                      selectedDiffType={selectedDiffType || DiffType.Modification}
-                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                      onAccept={acceptAiHandler}
-                      onCancel={discardAiHandler}
+                    <DiffEditor
+                      theme="supabase"
+                      language="pgsql"
+                      original={defaultSqlDiff.original}
+                      modified={defaultSqlDiff.modified}
+                      onMount={(editor) => {
+                        diffEditorRef.current = editor
+                      }}
+                      options={{ fontSize: 13 }}
                     />
                   </motion.div>
                 )}
-              </AISchemaSuggestionPopover>
+                <motion.div
+                  key={id}
+                  variants={{
+                    visible: { opacity: 1, filter: 'blur(0px)' },
+                    hidden: { opacity: 0, filter: 'blur(10px)' },
+                  }}
+                  initial="hidden"
+                  animate={isDiffOpen ? 'hidden' : 'visible'}
+                  className="w-full h-full"
+                >
+                  <MonacoEditor
+                    autoFocus
+                    id={id}
+                    editorRef={editorRef}
+                    monacoRef={monacoRef}
+                    executeQuery={executeQuery}
+                    onHasSelection={setHasSelection}
+                  />
+                </motion.div>
+              </>
             )}
-            <ResizablePanel maxSize={70}>
-              <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAiOpen && (
-                  <motion.button
-                    layoutId="ask-ai-input-icon"
-                    transition={{ duration: 0.1 }}
-                    onClick={() => aiPanelRef.current?.expand()}
-                    className={cn(
-                      'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
-                    )}
-                  >
-                    <AiIconAnimation loading={false} allowHoverEffect />
-                  </motion.button>
-                )}
-
-                {isLoading ? (
-                  <div className="flex h-full w-full items-center justify-center">
-                    <Loader2 className="animate-spin text-brand" />
-                  </div>
-                ) : (
-                  <>
-                    {isDiffOpen && (
-                      <motion.div
-                        className="w-full h-full"
-                        variants={{
-                          visible: { opacity: 1, filter: 'blur(0px)' },
-                          hidden: { opacity: 0, filter: 'blur(10px)' },
-                        }}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <DiffEditor
-                          theme="supabase"
-                          language="pgsql"
-                          original={defaultSqlDiff.original}
-                          modified={defaultSqlDiff.modified}
-                          onMount={(editor) => {
-                            diffEditorRef.current = editor
-                          }}
-                          options={{ fontSize: 13 }}
-                        />
-                      </motion.div>
-                    )}
-                    <motion.div
-                      key={id}
-                      variants={{
-                        visible: { opacity: 1, filter: 'blur(0px)' },
-                        hidden: { opacity: 0, filter: 'blur(10px)' },
-                      }}
-                      initial="hidden"
-                      animate={isDiffOpen ? 'hidden' : 'visible'}
-                      className="w-full h-full"
-                    >
-                      <MonacoEditor
-                        autoFocus
-                        id={id}
-                        editorRef={editorRef}
-                        monacoRef={monacoRef}
-                        executeQuery={executeQuery}
-                        onHasSelection={setHasSelection}
-                      />
-                    </motion.div>
-                  </>
-                )}
-              </div>
-            </ResizablePanel>
-
-            <ResizableHandle withHandle />
-
-            <ResizablePanel maxSize={70}>
-              {isLoading ? (
-                <div className="flex h-full w-full items-center justify-center">
-                  <Loader2 className="animate-spin text-brand" />
-                </div>
-              ) : (
-                <UtilityPanel
-                  id={id}
-                  isExecuting={isExecuting}
-                  isDisabled={isDiffOpen}
-                  isDebugging={isDebugSqlLoading}
-                  hasSelection={hasSelection}
-                  prettifyQuery={prettifyQuery}
-                  executeQuery={executeQuery}
-                  onDebug={onDebug}
-                />
-              )}
-            </ResizablePanel>
-
-            <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
-              {results?.rows !== undefined && !isExecuting && (
-                <GridFooter className="flex items-center justify-between gap-2">
-                  <Tooltip_Shadcn_>
-                    <TooltipTrigger_Shadcn_>
-                      <p className="text-xs">
-                        <span className="text-foreground">
-                          {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                        </span>
-                        <span className="text-foreground-lighter ml-1">
-                          {results.autoLimit !== undefined &&
-                            ` (Limited to only ${results.autoLimit} rows)`}
-                        </span>
-                      </p>
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="max-w-xs">
-                      <p className="flex flex-col gap-y-1">
-                        <span>
-                          Results are automatically limited to preserve browser performance, in
-                          particular if your query returns an exceptionally large number of rows.
-                        </span>
-
-                        <span className="text-foreground-light">
-                          You may change or remove this limit from the dropdown on the right
-                        </span>
-                      </p>
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
-                  {results.autoLimit !== undefined && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button type="default" iconRight={<ChevronUp size={14} />}>
-                          Limit results to:{' '}
-                          {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-40" align="end">
-                        <DropdownMenuRadioGroup
-                          value={snapV2.limit.toString()}
-                          onValueChange={(val) => snapV2.setLimit(Number(val))}
-                        >
-                          {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                            <DropdownMenuRadioItem
-                              key={option.label}
-                              value={option.value.toString()}
-                            >
-                              {option.label}
-                            </DropdownMenuRadioItem>
-                          ))}
-                        </DropdownMenuRadioGroup>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </GridFooter>
-              )}
-            </ResizablePanel>
-          </ResizablePanelGroup>
+          </div>
         </ResizablePanel>
 
         <ResizableHandle withHandle />
 
-        <ResizablePanel
-          ref={aiPanelRef}
-          collapsible
-          collapsedSize={0}
-          minSize={31}
-          maxSize={40}
-          onCollapse={() => setIsAiOpen(false)}
-          onExpand={() => setIsAiOpen(true)}
-        >
-          <AiAssistantPanel
-            selectedMessage={selectedMessage}
-            existingSql={editorRef.current?.getValue() || ''}
-            includeSchemaMetadata={includeSchemaMetadata}
-            onDiff={updateEditorWithCheckForDiff}
-            onClose={() => aiPanelRef.current?.collapse()}
-          />
+        <ResizablePanel maxSize={70}>
+          {isLoading ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <Loader2 className="animate-spin text-brand" />
+            </div>
+          ) : (
+            <UtilityPanel
+              id={id}
+              isExecuting={isExecuting}
+              isDisabled={isDiffOpen}
+              isDebugging={isDebugSqlLoading}
+              hasSelection={hasSelection}
+              prettifyQuery={prettifyQuery}
+              executeQuery={executeQuery}
+              onDebug={onDebug}
+            />
+          )}
+        </ResizablePanel>
+
+        <ResizablePanel maxSize={10} minSize={10} className="max-h-9">
+          {results?.rows !== undefined && !isExecuting && (
+            <GridFooter className="flex items-center justify-between gap-2">
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_>
+                  <p className="text-xs">
+                    <span className="text-foreground">
+                      {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                    </span>
+                    <span className="text-foreground-lighter ml-1">
+                      {results.autoLimit !== undefined &&
+                        ` (Limited to only ${results.autoLimit} rows)`}
+                    </span>
+                  </p>
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ className="max-w-xs">
+                  <p className="flex flex-col gap-y-1">
+                    <span>
+                      Results are automatically limited to preserve browser performance, in
+                      particular if your query returns an exceptionally large number of rows.
+                    </span>
+
+                    <span className="text-foreground-light">
+                      You may change or remove this limit from the dropdown on the right
+                    </span>
+                  </p>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+              {results.autoLimit !== undefined && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button type="default" iconRight={<ChevronUp size={14} />}>
+                      Limit results to:{' '}
+                      {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-40" align="end">
+                    <DropdownMenuRadioGroup
+                      value={snapV2.limit.toString()}
+                      onValueChange={(val) => snapV2.setLimit(Number(val))}
+                    >
+                      {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                        <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                          {option.label}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </GridFooter>
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
     </>
