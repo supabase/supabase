@@ -273,6 +273,13 @@ export const AIAssistant = ({
     }
   }, [messages, isChatLoading, setAiAssistantPanel])
 
+  // Remove suggestions if sqlSnippets were removed
+  useEffect(() => {
+    if (!sqlSnippets || sqlSnippets.length === 0) {
+      setAiAssistantPanel({ suggestions: undefined })
+    }
+  }, [sqlSnippets, suggestions, setAiAssistantPanel])
+
   if (isLoadingTables) {
     return (
       <div className="h-full w-full flex justify-center items-center">
@@ -372,7 +379,7 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts.map((prompt) => (
+                {suggestions?.prompts?.map((prompt) => (
                   <Button
                     size="small"
                     icon={<FileText strokeWidth={1.5} size={16} />}
