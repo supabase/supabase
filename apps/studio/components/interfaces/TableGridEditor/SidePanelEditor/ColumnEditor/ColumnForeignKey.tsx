@@ -44,7 +44,12 @@ const ColumnForeignKey = ({
     id,
   })
   const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
-    return { id: c.id, name: c.name, format: column.format, isNewColumn: false }
+    return {
+      id: c.id,
+      name: c.name,
+      format: c.format || column.format,
+      isNewColumn: false,
+    }
   })
 
   const getRelationStatus = (fk: ForeignKey) => {

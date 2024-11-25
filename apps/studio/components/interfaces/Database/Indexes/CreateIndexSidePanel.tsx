@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -347,8 +347,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     {INDEX_TYPES.map((index, i) => (
-                      <>
-                        <SelectItem_Shadcn_ key={index.name} value={index.value}>
+                      <Fragment key={index.name}>
+                        <SelectItem_Shadcn_ value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -362,7 +362,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           </div>
                         </SelectItem_Shadcn_>
                         {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
-                      </>
+                      </Fragment>
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
