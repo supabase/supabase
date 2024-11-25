@@ -587,7 +587,7 @@ function Assistant() {
               {/* Main content */}
               <div className="mb-6">
                 <h1 className="text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
-                  Chat with your database
+                  Chat with Postgres
                 </h1>
                 <p className="p text-lg mt-4">
                   Generate, run and debug queries, chart your data, create functions or policies.
