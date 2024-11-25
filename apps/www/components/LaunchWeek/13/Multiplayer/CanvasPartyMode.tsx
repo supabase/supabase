@@ -61,6 +61,7 @@ export default function InteractiveGrid() {
   const [users, setUsers] = useState<{ [key: string]: User }>({})
 
   const setMousePosition = (coordinates: Coordinates) => {
+    // if (!mousePositionRef.current) return
     mousePositionRef.current = coordinates
     _setMousePosition(coordinates)
   }
@@ -144,7 +145,7 @@ export default function InteractiveGrid() {
   }, [supabase, roomId])
 
   useEffect(() => {
-    if (!roomId || !isInitialStateSynced) return
+    // if (!roomId || !isInitialStateSynced) return
 
     let messageChannel: RealtimeChannel
     let setMouseEvent: (e: MouseEvent) => void = () => {}
@@ -179,28 +180,28 @@ export default function InteractiveGrid() {
       }
     )
 
-    messageChannel.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
-      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
-        // Lodash throttle will be removed once realtime-js client throttles on the channel level
-        const sendMouseBroadcast = throttle(({ x, y }) => {
-          messageChannel
-            .send({
-              type: 'broadcast',
-              event: 'POS',
-              payload: { user_id: userId, x, y },
-            })
-            .catch(() => {})
-        }, 1000 / MAX_EVENTS_PER_SECOND)
+    messageChannel?.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
+      // Lodash throttle will be removed once realtime-js client throttles on the channel level
+      const sendMouseBroadcast = throttle(({ x, y }) => {
+        messageChannel
+          .send({
+            type: 'broadcast',
+            event: 'POS',
+            payload: { user_id: userId, x, y },
+          })
+          .catch(() => {})
+      }, 1000 / MAX_EVENTS_PER_SECOND)
 
-        setMouseEvent = (e: MouseEvent) => {
-          const top = window.pageYOffset || document.documentElement.scrollTop
-          const [x, y] = [e.clientX, e.clientY - Y_THRESHOLD + top]
+      setMouseEvent = (e: MouseEvent) => {
+        const top = window.pageYOffset || document.documentElement.scrollTop
+        const [x, y] = [e.clientX, e.clientY - Y_THRESHOLD + top]
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
           sendMouseBroadcast({ x, y })
-          setMousePosition({ x, y })
         }
-
-        window.addEventListener('mousemove', setMouseEvent)
+        setMousePosition({ x, y })
       }
+
+      window.addEventListener('mousemove', setMouseEvent)
     })
 
     return () => {

@@ -58,7 +58,7 @@ export const LW13_LAUNCH_DATE = '2024-12-02T07:00:00.000-07:00'
 export const LW13_LAUNCH_DATE_END = '2024-12-16T23:59:59.000-07:00'
 export const LW13_TITLE = 'Launch Week 13'
 export const TWEET_TEXT =
-  'Just claimed my @supabase Launch Week 13 ticket. \nJoin me and stay tuned for all the announcements! \n#launchweek'
-export const TWEET_TEXT_PLATINUM = `Just conquered a platinum @supabase ticket for Launch Week 13. Share twice to get one! \n#launchweek`
+  'Launch Week 13 is just around the corner at @supabase. \nClaim your ticket and stay tuned for all the announcements! \n#launchweek'
+export const TWEET_TEXT_PLATINUM = `Just conquered a platinum @supabase Launch Week 13 ticket. Share twice to get one! \n#launchweek`
 export const TWEET_TEXT_SECRET = `Found the secret golden ticket for @supabase's Launch Week 13. \nCan you find it? \n#launchweek`
 export const SITE_NAME = 'Supabase'
