@@ -197,7 +197,7 @@ const ThreeTicketCanvas: React.FC<{
         const textGeometry = new TextGeometry(text, {
           font,
           size: 1.2,
-          depth: 0.2,
+          height: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
@@ -215,7 +215,7 @@ const ThreeTicketCanvas: React.FC<{
         const backTextGeometry = new TextGeometry('Type the secret code', {
           font,
           size: 0.6,
-          depth: 0.2,
+          height: 0.2,
         })
         const backTextMesh = new THREE.Mesh(backTextGeometry, textMaterial)
         backTextMesh.updateMatrix()
@@ -234,7 +234,7 @@ const ThreeTicketCanvas: React.FC<{
         const textGeometry = new TextGeometry(line.text, {
           font,
           size: line.size,
-          depth: 0.2,
+          height: 0.2,
         })
         const textMesh = new THREE.Mesh(textGeometry, textMaterial)
         textMesh.updateMatrix()
@@ -249,7 +249,7 @@ const ThreeTicketCanvas: React.FC<{
           const letterGeometry = new TextGeometry(letter.toUpperCase(), {
             font,
             size: 2.2,
-            depth: 0.2,
+            height: 0.2,
           })
           const letterMaterial = new THREE.MeshStandardMaterial({
             color: CONFIG[ticketType].ticketForeground,
@@ -508,15 +508,14 @@ const ThreeTicketCanvas: React.FC<{
       )}
     >
       <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
-      {isGameMode && !hasWon && (
+      {isGameMode && !hasWon && !sharePage && (
         <InputOTP
           ref={inputRef}
           maxLength={phraseLength}
           pattern={REGEXP_ONLY_CHARS}
           autoFocus
-          // containerClassName="!absolute opacity-0 invisible"
           containerClassName={cn(
-            '!absolute flex justify-center w-full inset-0 top-auto bottom-[15%] lg:!invisible lg:!opacity-0',
+            '!absolute flex justify-center w-full inset-0 bottom-[33%] top-auto lg:!invisible lg:!opacity-0',
             !hasWon && 'lw13-game-input'
           )}
           inputMode="text"
@@ -534,7 +533,7 @@ const ThreeTicketCanvas: React.FC<{
                     <InputOTPSlot
                       key={`otp-${currentIndex}`}
                       index={currentIndex}
-                      className="text-base"
+                      className="!text-base bg-background"
                     />
                   )
                 })}
