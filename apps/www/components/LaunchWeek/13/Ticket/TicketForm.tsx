@@ -3,13 +3,16 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { SITE_ORIGIN } from '~/lib/constants'
 import { Button } from 'ui'
-import { CheckCircle } from 'lucide-react'
+import { useKey } from 'react-use'
 
+import { useCommandMenuOpen } from 'ui-patterns'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
+import { useTheme } from 'next-themes'
 
 type FormState = 'default' | 'loading' | 'error'
 
 export default function TicketForm() {
+  const { resolvedTheme } = useTheme()
   const [formState, setFormState] = useState<FormState>('default')
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
     SupabaseClient['channel']
@@ -31,10 +34,11 @@ export default function TicketForm() {
           .from('tickets')
           .insert({
             user_id: userId,
-            launch_week: 'lw12',
+            launch_week: 'lw13',
             email,
             name,
             username,
+            metadata: { theme: resolvedTheme },
             referred_by: router.query?.referral ?? null,
           })
           .select()
@@ -56,9 +60,10 @@ export default function TicketForm() {
     const { data } = await supabase
       .from('tickets_view')
       .select('*')
-      .eq('launch_week', 'lw12')
+      .eq('launch_week', 'lw13')
       .eq('username', username)
       .single()
+      .throwOnError()
 
     if (data) setUserData(data)
 
@@ -106,6 +111,9 @@ export default function TicketForm() {
     }
   }, [session])
 
+  const isCommandMenuOpen = useCommandMenuOpen()
+  useKey('t', () => !isCommandMenuOpen && handleGithubSignIn(), {}, [isCommandMenuOpen])
+
   async function handleGithubSignIn() {
     if (formState !== 'default') {
       setFormState('default')
@@ -141,15 +149,21 @@ export default function TicketForm() {
       </Button>
     </div>
   ) : (
-    <div className="flex flex-col gap-10 items-start justify-center relative z-20">
+    <div className="flex flex-col gap-10 items-start justify-center relative z-20 pointer-events-auto">
       <Button
         size="small"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
-        iconLeft={session && <CheckCircle />}
         loading={formState === 'loading'}
+        type="default"
+        className="sm:pl-1 cursor-none"
       >
-        Claim your ticket
+        <div className="flex items-center">
+          <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
+            T
+          </div>
+          Claim Ticket
+        </div>
       </Button>
     </div>
   )
