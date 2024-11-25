@@ -12,6 +12,10 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IntegrationTabs } from './tabs'
+import { Menu, Separator } from 'ui'
+import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import AlertError from 'components/ui/AlertError'
 
 /**
  * Layout component for the Integrations section
@@ -78,7 +82,25 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
   // construct the page url to be used to determine the active state for the sidebar
   const page = `${segments[3]}${segments[4] ? `/${segments[4]}` : ''}`
 
-  const { installedIntegrations: integrations } = useInstalledIntegrations()
+  const {
+    installedIntegrations: integrations,
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useInstalledIntegrations()
+  const installedIntegrationItems = integrations.map((integration) => ({
+    name: integration.name,
+    label: integration.beta ? 'Beta' : undefined,
+    key: `integrations/${integration.id}`,
+    url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
+    icon: (
+      <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
+        {integration.icon({ className: 'p-1' })}
+      </div>
+    ),
+    items: [],
+  }))
 
   return (
     <ProjectLayout
@@ -87,7 +109,41 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
       product="Integrations"
       isBlocking={false}
       productMenu={
-        <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
+        <>
+          <ProductMenu page={page} menu={generateIntegrationsMenu({ projectRef: project?.ref })} />
+          <Separator />
+          <div className="p-6">
+            <Menu.Group
+              title={
+                <div className="flex flex-col space-y-2 uppercase font-mono">
+                  <span>Installed integrations</span>
+                </div>
+              }
+            />
+            {isLoading && <GenericSkeletonLoader />}
+            {isError && (
+              <AlertError
+                showIcon={false}
+                error={error}
+                subject="Failed to retrieve installed integrations"
+              />
+            )}
+            {isSuccess && (
+              <div>
+                {installedIntegrationItems.map((item) => (
+                  <ProductMenuItem
+                    key={item.key}
+                    url={item.url}
+                    name={item.name}
+                    icon={item.icon}
+                    isActive={page === item.key}
+                    label={item.label}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       }
     >
       <Header scroll={scroll} ref={headerRef} />
@@ -102,14 +158,66 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   const page = router.pathname.split('/')[4]
   const project = useSelectedProject()
 
-  const { installedIntegrations: integrations } = useInstalledIntegrations()
+  const {
+    installedIntegrations: integrations,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useInstalledIntegrations()
+  const installedIntegrationItems = integrations.map((integration) => ({
+    name: integration.name,
+    label: integration.beta ? 'Beta' : undefined,
+    key: `integrations/${integration.id}`,
+    url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
+    icon: (
+      <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
+        {integration.icon({ className: 'p-1' })}
+      </div>
+    ),
+    items: [],
+  }))
 
   return (
     <ProjectLayout
       isLoading={false}
       product="Integrations"
       productMenu={
-        <ProductMenu page={page} menu={generateIntegrationsMenu(integrations, project?.ref)} />
+        <>
+          <ProductMenu page={page} menu={generateIntegrationsMenu({ projectRef: project?.ref })} />
+          <Separator />
+          <div className="p-6">
+            <Menu.Group
+              title={
+                <div className="flex flex-col space-y-2 uppercase font-mono">
+                  <span>Installed integrations</span>
+                </div>
+              }
+            />
+            {isLoading && <GenericSkeletonLoader />}
+            {isError && (
+              <AlertError
+                showIcon={false}
+                error={error}
+                subject="Failed to retrieve installed integrations"
+              />
+            )}
+            {isSuccess && (
+              <div>
+                {installedIntegrationItems.map((item) => (
+                  <ProductMenuItem
+                    key={item.key}
+                    url={item.url}
+                    name={item.name}
+                    icon={item.icon}
+                    isActive={page === item.key}
+                    label={item.label}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       }
     >
       {props.children}
@@ -120,10 +228,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
 // Wrap component with authentication HOC before exporting
 export default withAuth(IntegrationsLayout)
 
-const generateIntegrationsMenu = (
-  integrations: IntegrationDefinition[],
-  projectRef?: string
-): ProductMenuGroup[] => {
+const generateIntegrationsMenu = ({ projectRef }: { projectRef?: string }): ProductMenuGroup[] => {
   return [
     {
       title: 'All Integrations',
@@ -136,42 +241,5 @@ const generateIntegrationsMenu = (
         },
       ],
     },
-    {
-      title: 'Installed Integrations',
-      items: integrations.map((integration) => ({
-        name: integration.name,
-        label: integration.beta ? 'Beta' : undefined,
-        key: `integrations/${integration.id}`,
-        url: `/project/${projectRef}/integrations/${integration.id}/overview`,
-        icon: (
-          <div className="relative w-6 h-6 bg-white border rounded flex items-center justify-center">
-            {integration.icon({ className: 'p-1' })}
-          </div>
-        ),
-        items: [],
-      })),
-    },
-    // integrationId
-    //   ? {
-    //       title: 'Pages',
-    //       items: [
-    //         {
-    //           name: 'Overview',
-    //           key: 'settings',
-    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=overview`,
-    //         },
-    //         {
-    //           name: 'Wrappers',
-    //           key: 'settings',
-    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=wrappers`,
-    //         },
-    //         {
-    //           name: 'Logs',
-    //           key: 'settings',
-    //           url: `/project/${projectRef}/integrations/${integrationId}?tab=logs`,
-    //         },
-    //       ],
-    //     }
-    //   : undefined,
   ].filter(Boolean)
 }
