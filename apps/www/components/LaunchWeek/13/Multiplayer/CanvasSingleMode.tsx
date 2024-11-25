@@ -9,7 +9,7 @@ import { getColor } from './randomColor'
 import { Coordinates } from './types'
 
 const GRID_SIZE = 100
-const CELL_SIZE = 30
+const CELL_SIZE = 35
 const CANVAS_WIDTH = 1800
 const CANVAS_HEIGHT = 1600
 const HOVER_DURATION = 100
