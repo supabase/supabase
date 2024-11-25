@@ -222,7 +222,9 @@ export const SqlCard = ({
                   className="w-7 h-7"
                   icon={<Code size={14} />}
                   onClick={() => setShowCode(!showCode)}
-                  tooltip={{ content: { side: 'bottom', text: 'Show query' } }}
+                  tooltip={{
+                    content: { side: 'bottom', text: showCode ? 'Hide query' : 'Show query' },
+                  }}
                 />
 
                 {!isInSQLEditor || isInNewSnippet ? (
@@ -314,7 +316,7 @@ export const SqlCard = ({
           value={sql}
           language="sql"
           className={cn(
-            'max-w-full max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
+            'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
           )}
         />
