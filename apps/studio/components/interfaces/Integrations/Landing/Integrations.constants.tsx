@@ -79,15 +79,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(
-          () =>
-            import('components/interfaces/Integrations/NewQueues/QueueTab').then(
-              (mod) => mod.QueueTab
-            ),
-          {
-            loading: Loading,
-          }
-        )
+        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+          loading: Loading,
+        })
       }
       switch (pageId) {
         case 'overview':
@@ -101,15 +95,9 @@ const supabaseIntegrations: IntegrationDefinition[] = [
             }
           )
         case 'queues':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewQueues/QueuesTab').then(
-                (mod) => mod.QueuesTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+          return dynamic(() => import('../Queues/QueuesTab').then((mod) => mod.QueuesTab), {
+            loading: Loading,
+          })
       }
       return null
     },
