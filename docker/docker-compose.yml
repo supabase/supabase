@@ -17,9 +17,9 @@ services:
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+          "require('http').get('http://studio:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
         ]
-      timeout: 5s
+      timeout: 10s
       interval: 5s
       retries: 3
     depends_on:
@@ -92,7 +92,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:9999/health"
+          "http://auth:9999/health"
         ]
       timeout: 5s
       interval: 5s
@@ -203,7 +203,7 @@ services:
           "/dev/null",
           "-H",
           "Authorization: Bearer ${ANON_KEY}",
-          "http://localhost:4000/api/tenants/realtime-dev/health"
+          "http://realtime:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
       interval: 5s
@@ -246,7 +246,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:5000/status"
+          "http://storage:5000/status"
         ]
       timeout: 5s
       interval: 5s
@@ -330,7 +330,7 @@ services:
     container_name: supabase-analytics
     image: supabase/logflare:1.4.0
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:4000/health" ]
+      test: [ "CMD", "curl", "http://analytics:4000/health" ]
       timeout: 5s
       interval: 5s
       retries: 10
