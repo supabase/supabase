@@ -196,15 +196,12 @@ export const QueuesSettings = () => {
                         label="Expose Queues via PostgREST"
                         description={
                           <>
-                            <p>
-                              When enabled, you will be able to use any Supabase client library or
-                              PostgREST endpoints to manage your queues
+                            <p className="max-w-2xl">
+                              When enabled, you will be able to use the following functions from the{' '}
+                              <code className="text-xs">{QUEUES_SCHEMA}</code> schema to manage your
+                              queues via any Supabase client library or PostgREST endpoints:
                             </p>
-                            <p className="mt-1">
-                              The following database functions will be available to use from the{' '}
-                              <code className="text-xs">{QUEUES_SCHEMA}</code> schema:
-                            </p>
-                            <p>
+                            <p className="mt-2">
                               <code className="text-xs">queue_send</code>,{' '}
                               <code className="text-xs">queue_send_batch</code>,{' '}
                               <code className="text-xs">queue_read</code>,{' '}
@@ -268,8 +265,8 @@ export const QueuesSettings = () => {
                           </p>
                           <p className="text-foreground-light">
                             Database functions will be created in the{' '}
-                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling,
-                            where you can then call through any Supabase client library or PostgREST
+                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling.
+                            Call these functions via any Supabase client library or PostgREST
                             endpoint to manage your queues. Permissions on individual queues can
                             also be further managed through privileges and row level security (RLS).
                           </p>

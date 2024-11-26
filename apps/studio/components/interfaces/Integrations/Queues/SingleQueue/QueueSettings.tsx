@@ -1,9 +1,22 @@
+import { isEqual } from 'lodash'
 import { Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import {
+  TablePrivilegesGrant,
+  useTablePrivilegesGrantMutation,
+} from 'data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
+import {
+  TablePrivilegesRevoke,
+  useTablePrivilegesRevokeMutation,
+} from 'data/privileges/table-privileges-revoke-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Button,
@@ -24,19 +37,6 @@ import {
   TableRow,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import AlertError from 'components/ui/AlertError'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  useTablePrivilegesRevokeMutation,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import {
-  TablePrivilegesGrant,
-  useTablePrivilegesGrantMutation,
-} from 'data/privileges/table-privileges-grant-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { toast } from 'sonner'
-import { isEqual } from 'lodash'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 type Privileges = { select?: boolean; insert?: boolean; update?: boolean; delete?: boolean }
@@ -197,7 +197,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
   }
 
   useEffect(() => {
-    if (isSuccessPrivileges && queuePrivileges) {
+    if (open && isSuccessPrivileges && queuePrivileges) {
       const initialState = queuePrivileges.privileges.reduce((a, b) => {
         return {
           ...a,
@@ -206,7 +206,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       }, {})
       setPrivileges(initialState)
     }
-  }, [isSuccessPrivileges])
+  }, [open, isSuccessPrivileges])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -216,7 +216,6 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           className="px-1.5"
           icon={<Settings />}
           title="Settings"
-          // onClick={() => setOpen(true)}
           tooltip={{ content: { side: 'bottom', text: 'Queue settings' } }}
         />
       </SheetTrigger>
