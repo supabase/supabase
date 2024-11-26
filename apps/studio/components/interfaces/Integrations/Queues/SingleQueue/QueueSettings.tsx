@@ -216,7 +216,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           className="px-1.5"
           icon={<Settings />}
           title="Settings"
-          onClick={() => setOpen(true)}
+          // onClick={() => setOpen(true)}
           tooltip={{ content: { side: 'bottom', text: 'Queue settings' } }}
         />
       </SheetTrigger>

@@ -27,6 +27,9 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { Markdown } from 'components/interfaces/Markdown'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -74,6 +77,12 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )
+  const { project } = useProjectContext()
+
+  const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
 
@@ -86,7 +95,6 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
     },
   })
 
-  const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
   const { enableRls } = form.watch()
 
@@ -315,7 +323,18 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                     </FormItemLayout>
                   )}
                 />
-                {enableRls ? (
+                {!isExposed ? (
+                  <Admonition
+                    type="default"
+                    title="Row Level Security for queues is only relevant if exposure through PostgREST has been enabled"
+                  >
+                    <Markdown
+                      className="[&>p]:!leading-normal"
+                      content={`You may opt to manage your queues via any Supabase client libraries or PostgREST
+                      endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
+                    />
+                  </Admonition>
+                ) : enableRls ? (
                   <Admonition
                     type="default"
                     title="Policies are required to manage queues"

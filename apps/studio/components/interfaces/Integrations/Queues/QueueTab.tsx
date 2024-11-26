@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { Lock, Paintbrush, PlusCircle, Trash2 } from 'lucide-react'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -11,9 +11,14 @@ import { QueueMessagesDataGrid } from 'components/interfaces/Integrations/Queues
 import { QueueFilters } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueFilters'
 import { QueueSettings } from 'components/interfaces/Integrations/Queues/SingleQueue/QueueSettings'
 import { SendMessageModal } from 'components/interfaces/Integrations/Queues/SingleQueue/SendMessageModal'
+import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useQueueMessagesInfiniteQuery } from 'data/database-queues/database-queue-messages-infinite-query'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
 import {
   Button,
   cn,
@@ -23,12 +28,8 @@ import {
   PopoverTrigger_Shadcn_,
   Separator,
 } from 'ui'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -121,76 +122,76 @@ export const QueueTab = () => {
 
           <Separator orientation="vertical" className="h-[26px]" />
 
-          {isExposed && (
+          {isLoadingTables ? (
+            <ShimmeringLoader className="w-[123px]" />
+          ) : isRlsEnabled ? (
             <>
-              {isLoadingTables ? (
-                <ShimmeringLoader className="w-[123px]" />
-              ) : isRlsEnabled ? (
-                <>
-                  {queuePolicies.length === 0 ? (
-                    <ButtonTooltip
-                      asChild
-                      type="default"
-                      className="group"
-                      icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          className: 'w-[280px]',
-                          text: 'RLS is enabled for this queue, but no policies are set. Queue will not be accessible.',
-                        },
-                      }}
-                    >
-                      <Link
-                        passHref
-                        href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
-                      >
-                        Add RLS policy
-                      </Link>
-                    </ButtonTooltip>
-                  ) : (
-                    <Button
-                      asChild
-                      type="default"
-                      className="group"
-                      icon={
-                        <div
-                          className={cn(
-                            'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
-                            queuePolicies.length > 9 ? ' px-1' : 'w-[16px]'
-                          )}
-                        >
-                          <span className="text-[11px] text-foreground font-mono text-center">
-                            {queuePolicies.length}
-                          </span>
-                        </div>
-                      }
-                    >
-                      <Link
-                        passHref
-                        href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
-                      >
-                        Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
-                      </Link>
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <Popover_Shadcn_
-                  modal={false}
-                  open={openRlsPopover}
-                  onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
+              {queuePolicies.length === 0 ? (
+                <ButtonTooltip
+                  asChild
+                  type="default"
+                  className="group"
+                  icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      className: 'w-[280px]',
+                      text: 'RLS is enabled for this queue, but no policies are set. Queue will not be accessible.',
+                    },
+                  }}
                 >
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
-                      RLS disabled
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
-                    <h3 className="text-xs flex items-center gap-x-2">
-                      <Lock size={14} /> Row Level Security (RLS)
-                    </h3>
-                    <div className="grid gap-2 mt-2 text-foreground-light text-xs">
+                  <Link
+                    passHref
+                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                  >
+                    Add RLS policy
+                  </Link>
+                </ButtonTooltip>
+              ) : (
+                <Button
+                  asChild
+                  type="default"
+                  className="group"
+                  icon={
+                    <div
+                      className={cn(
+                        'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                        queuePolicies.length > 9 ? ' px-1' : 'w-[16px]'
+                      )}
+                    >
+                      <span className="text-[11px] text-foreground font-mono text-center">
+                        {queuePolicies.length}
+                      </span>
+                    </div>
+                  }
+                >
+                  <Link
+                    passHref
+                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                  >
+                    Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
+                  </Link>
+                </Button>
+              )}
+            </>
+          ) : (
+            <Popover_Shadcn_
+              modal={false}
+              open={openRlsPopover}
+              onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
+            >
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type={isExposed ? 'warning' : 'default'} icon={<Lock strokeWidth={1.5} />}>
+                  RLS disabled
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+                <h3 className="text-xs flex items-center gap-x-2">
+                  <Lock size={14} /> Row Level Security (RLS)
+                </h3>
+                <div className="grid gap-2 mt-2 text-foreground-light text-xs">
+                  {isExposed ? (
+                    <>
                       <p>
                         You can restrict and control who can manage this queue using Row Level
                         Security.
@@ -204,11 +205,19 @@ export const QueueTab = () => {
                           Enable RLS for this queue
                         </Button>
                       </div>
-                    </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
-              )}
-            </>
+                    </>
+                  ) : (
+                    <Markdown
+                      className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                      content={`
+RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
+
+You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
+                    />
+                  )}
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           )}
 
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
