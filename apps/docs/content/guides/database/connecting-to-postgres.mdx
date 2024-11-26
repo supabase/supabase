@@ -17,37 +17,32 @@ How you connect to your database depends on where you're connecting from:
 
 <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-6   not-prose">
   <NavData data="ormQuickstarts">
-    {(data) => (data.items?.map((quickstart) => (
-        <Link
-          key={quickstart.url}
-          href={quickstart.url}
-          passHref
-        >
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
           <GlassPanel
             key={quickstart.name}
             title={quickstart.name}
             className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
           />
         </Link>
-    )))}
+      ))
+    }
   </NavData>
   <NavData data="guiQuickstarts">
-    {(data) => (data.items?.map((quickstart) => (
-        <Link
-          key={quickstart.url}
-          href={quickstart.url}
-          passHref
-        >
+    {(data) =>
+      data.items?.map((quickstart) => (
+        <Link key={quickstart.url} href={quickstart.url} passHref>
           <GlassPanel
             key={quickstart.name}
             title={quickstart.name}
             className="[&>div]:p-2 flex justify-center [&_p]:text-foreground-light"
           />
         </Link>
-    )))}
+      ))
+    }
   </NavData>
 </div>
-
 
 ## Data APIs and client libraries
 
