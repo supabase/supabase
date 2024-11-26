@@ -164,12 +164,12 @@ export const QueuesSettings = () => {
                             <code className="text-xs">{QUEUES_SCHEMA}</code> schema:
                           </p>
                           <p>
-                            <code className="text-xs">send</code>,{' '}
-                            <code className="text-xs">send_batch</code>,{' '}
-                            <code className="text-xs">read</code>,{' '}
-                            <code className="text-xs">pop</code>,
-                            <code className="text-xs">archive</code>, and
-                            <code className="text-xs">delete</code>
+                            <code className="text-xs">queue_send</code>,{' '}
+                            <code className="text-xs">queue_send_batch</code>,{' '}
+                            <code className="text-xs">queue_read</code>,{' '}
+                            <code className="text-xs">queue_pop</code>,
+                            <code className="text-xs">queue_archive</code>, and
+                            <code className="text-xs">queue_delete</code>
                           </p>
                         </>
                       }
@@ -190,43 +190,27 @@ export const QueuesSettings = () => {
                           Queues will be managed through the{' '}
                           <code className="text-xs">{QUEUES_SCHEMA}</code> schema
                         </p>
-                        <div className="flex flex-col gap-y-2 text-foreground-light">
-                          <p>
-                            Database functions will be created in the{' '}
-                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling,
-                            where you can then call through any Supabase client library or PostgREST
-                            endpoint to manage your queues. Permissions on individual queues can
-                            also be further managed through privileges and row level security (RLS).
-                          </p>
-                        </div>
+                        <p className="text-foreground-light">
+                          Database functions will be created in the{' '}
+                          <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling,
+                          where you can then call through any Supabase client library or PostgREST
+                          endpoint to manage your queues. Permissions on individual queues can also
+                          be further managed through privileges and row level security (RLS).
+                        </p>
                       </Admonition>
                     )}
                     {formState.dirtyFields.enable && field.value === false && (
-                      <Admonition
-                        type="warning"
-                        className="mt-2"
-                        title="Database functions for managing queues will be removed upon disabling"
-                        description={
-                          <>
-                            <p>
-                              These functions include <code className="text-xs">send</code>,{' '}
-                              <code className="text-xs">send_batch</code>,{' '}
-                              <code className="text-xs">read</code>,{' '}
-                              <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and
-                              <code className="text-xs">delete</code>, and they will be removed from
-                              the <code className="text-xs">queues_public</code> schema, which will
-                              subsequently be dropped too. Ensure that these functions are not in
-                              use within your client applications before disabling.
-                            </p>
-                            <DocsButton
-                              abbrev={false}
-                              className="mt-2"
-                              href="https://supabase.com/docs"
-                            />
-                          </>
-                        }
-                      />
+                      <Admonition type="warning" className="mt-2">
+                        <p>
+                          The <code className="text-xs">{QUEUES_SCHEMA}</code> schema will be
+                          removed once disabled
+                        </p>
+                        <p className="text-foreground-light">
+                          Ensure that the database functions from the{' '}
+                          <code className="text-xs">{QUEUES_SCHEMA}</code> schema are not in use
+                          within your client applications before disabling.
+                        </p>
+                      </Admonition>
                     )}
                   </FormItem_Shadcn_>
                 )}

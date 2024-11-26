@@ -28,6 +28,7 @@ import { useDatabasePoliciesQuery } from 'data/database-policies/database-polici
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 
 export const QueueTab = () => {
   const { childId: queueName, ref } = useParams()
@@ -54,6 +55,11 @@ export const QueueTab = () => {
     schema: 'pgmq',
   })
   const queuePolicies = (policies ?? []).filter((policy) => policy.table === `q_${queueName}`)
+
+  const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data, error, isLoading, fetchNextPage, isFetching } = useQueueMessagesInfiniteQuery(
     {
@@ -112,89 +118,94 @@ export const QueueTab = () => {
 
           <Separator orientation="vertical" className="h-[26px]" />
 
-          {isLoadingTables ? (
-            <ShimmeringLoader className="w-[123px]" />
-          ) : isRlsEnabled ? (
+          {isExposed && (
             <>
-              {queuePolicies.length === 0 ? (
-                <ButtonTooltip
-                  asChild
-                  type="default"
-                  className="group"
-                  icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
-                  tooltip={{
-                    content: {
-                      side: 'bottom',
-                      className: 'w-[280px]',
-                      text: 'RLS is enabled for this queue, but no policies are set. Queue will not be accessible.',
-                    },
-                  }}
-                >
-                  <Link
-                    passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
-                  >
-                    Add RLS policy
-                  </Link>
-                </ButtonTooltip>
-              ) : (
-                <Button
-                  asChild
-                  type="default"
-                  className="group"
-                  icon={
-                    <div
-                      className={cn(
-                        'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
-                        queuePolicies.length > 9 ? ' px-1' : 'w-[16px]'
-                      )}
+              {isLoadingTables ? (
+                <ShimmeringLoader className="w-[123px]" />
+              ) : isRlsEnabled ? (
+                <>
+                  {queuePolicies.length === 0 ? (
+                    <ButtonTooltip
+                      asChild
+                      type="default"
+                      className="group"
+                      icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          className: 'w-[280px]',
+                          text: 'RLS is enabled for this queue, but no policies are set. Queue will not be accessible.',
+                        },
+                      }}
                     >
-                      <span className="text-[11px] text-foreground font-mono text-center">
-                        {queuePolicies.length}
-                      </span>
-                    </div>
-                  }
+                      <Link
+                        passHref
+                        href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                      >
+                        Add RLS policy
+                      </Link>
+                    </ButtonTooltip>
+                  ) : (
+                    <Button
+                      asChild
+                      type="default"
+                      className="group"
+                      icon={
+                        <div
+                          className={cn(
+                            'flex items-center justify-center rounded-full bg-border-stronger h-[16px]',
+                            queuePolicies.length > 9 ? ' px-1' : 'w-[16px]'
+                          )}
+                        >
+                          <span className="text-[11px] text-foreground font-mono text-center">
+                            {queuePolicies.length}
+                          </span>
+                        </div>
+                      }
+                    >
+                      <Link
+                        passHref
+                        href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
+                      >
+                        Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
+                      </Link>
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <Popover_Shadcn_
+                  modal={false}
+                  open={openRlsPopover}
+                  onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
                 >
-                  <Link
-                    passHref
-                    href={`/project/${ref}/auth/policies?search=${queueTable?.id}&schema=pgmq`}
-                  >
-                    Auth {queuePolicies.length > 1 ? 'policies' : 'policy'}
-                  </Link>
-                </Button>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
+                      RLS disabled
+                    </Button>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
+                    <h3 className="text-xs flex items-center gap-x-2">
+                      <Lock size={14} /> Row Level Security (RLS)
+                    </h3>
+                    <div className="grid gap-2 mt-2 text-foreground-light text-xs">
+                      <p>
+                        You can restrict and control who can manage this queue using Row Level
+                        Security.
+                      </p>
+                      <p>With RLS enabled, anonymous users will not have access to this queue.</p>
+                      <div className="mt-2">
+                        <Button
+                          type="default"
+                          onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                        >
+                          Enable RLS for this queue
+                        </Button>
+                      </div>
+                    </div>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
               )}
             </>
-          ) : (
-            <Popover_Shadcn_
-              modal={false}
-              open={openRlsPopover}
-              onOpenChange={() => setOpenRlsPopover(!openRlsPopover)}
-            >
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="warning" icon={<Lock strokeWidth={1.5} />}>
-                  RLS disabled
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-80 text-sm" align="end">
-                <h3 className="text-xs flex items-center gap-x-2">
-                  <Lock size={14} /> Row Level Security (RLS)
-                </h3>
-                <div className="grid gap-2 mt-2 text-foreground-light text-xs">
-                  <p>
-                    You can restrict and control who can manage this queue using Row Level Security.
-                  </p>
-                  <p>With RLS enabled, anonymous users will not have access to this queue.</p>
-                  <div className="mt-2">
-                    <Button
-                      type="default"
-                      onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
-                    >
-                      Enable RLS for this queue
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
           )}
 
           <Button type="primary" onClick={() => setSendMessageModalShown(true)}>
