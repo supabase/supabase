@@ -63,12 +63,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/cron',
             level: 'cron',
           },
-          // {
-          //   label: 'Queues',
-          //   icon: 'queue',
-          //   href: '/guides/queues',
-          //   level: 'queue',
-          // },
+          {
+            label: 'Queues',
+            icon: 'queue',
+            href: '/guides/queue',
+            level: 'queue',
+          },
         ],
       ],
     },
@@ -1128,6 +1128,17 @@ export const cron: NavMenuConstant = {
     { name: 'Install', url: '/guides/cron/install' },
     { name: 'Create Cron Job', url: '/guides/cron/create-cron-job' },
     { name: 'Edit or delete Cron Job', url: '/guides/cron/edit-delete-cron-job' },
+  ],
+}
+
+export const queue: NavMenuConstant = {
+  icon: 'queue',
+  title: 'Queues',
+  url: '/guides/queue',
+  items: [
+    { name: 'Overview', url: '/guides/queue' },
+    { name: 'Quickstart', url: '/guides/queue/quickstart' },
+    { name: 'API', url: '/guides/queue/api' },
   ],
 }
 

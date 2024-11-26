@@ -79,12 +79,12 @@ const postgresIntegrations = [
     href: '/guides/cron',
     description: 'Schedule, manage, and monitor jobs',
   },
-  // {
-  //   title: 'Queues',
-  //   icon: 'queue',
-  //   href: '/guides/queue',
-  //   description: 'Postgres-native pull queues',
-  // },
+  {
+    title: 'Queues',
+    icon: 'queue',
+    href: '/guides/queue',
+    description: 'Postgres-native pull queues',
+  },
 ]
 
 const selfHostingOptions = [

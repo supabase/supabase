@@ -16,6 +16,7 @@ enum MenuId {
   Storage = 'storage',
   Ai = 'ai',
   Cron = 'cron',
+  Queue = 'queue',
   Platform = 'platform',
   Deployment = 'deployment',
   MonitoringTroubleshooting = 'monitoring_troubleshooting',
@@ -76,6 +77,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.Graphql,
+    type: 'guide',
+  },
+  {
+    id: MenuId.Queue,
     type: 'guide',
   },
   {

@@ -1,0 +1,149 @@
+---
+title: Supabase Queues Quickstart
+subtitle: 'Learn how to use Supabase Queues to enqueue and read messages.'
+---
+
+This guide shows the basic guide on how to get started with Supabase Queues, for additional methods and functionality, see our [Supabase Queues API documentation](/docs/guides/queue/api).
+
+## Concepts
+
+Supabase Queues consists of two main components: Pull Queues and Messages.
+
+## Pull Queue
+
+A pull queue is a message storage and delivery system where consumers actively request messages when they're ready to process them - similar to checking a mailbox for new mail rather than having it delivered directly to your desk. Our pull queues do not contain order or priority.
+
+## Message
+
+A message in a pull queue is a package of data that is stored until a consumer explicitly requests and processes it, like a task waiting in a to-do list until someone checks and completes it.
+
+# Enable Queues
+
+To get started with Supabase Queues, open up your project side panel, navigate to the [Integrations page](/dashboard/project/_/integrations), and select Queues.
+
+<Image
+  alt="Supabase Dashboard integrations page, showing the Queues integration"
+  src={{
+    dark: '/docs/img/queue-quickstart-install.png',
+    light: '/docs/img/queue-quickstart-install.png',
+  }}
+/>
+
+On the Queues page:
+
+- Click **_Create a queue_**
+- Name your queue e.g. “foo”
+- Select your queue type e.g. “Basic Queue”
+
+<Image
+  alt="Create a Queue from the Supabase Dashboard"
+  src={{
+    dark: '/docs/img/queue-quickstart-create.png',
+    light: '/docs/img/queue-quickstart-create.png',
+  }}
+  zoomable
+  className="max-w-lg !mx-auto"
+/>
+
+### What happens when you create a queue?
+
+Every new queue creates two tables in the `pgmq` schema. Those tables are `pgmq.q_<queue_name>` to store the enqueued messages, and `pgmq.a_<queue_name>` to store any archived messages.
+
+By default, queues are not exposed over Data APIs and are only accessible via SQL. To enable Data APIs. navigate to Settings for the Queues integration and toggle “Expose Queues via PostgREST”. Once enabled, Supabase creates and exposes a `pmgq_public` schema containing wrappers to an API-safe subset of `pgmq`'s functionality.
+
+<Image
+  alt="Screenshot of Queues settings with toggle to expose to PostgREST"
+  src={{
+    dark: '/docs/img/queue-quickstart-settings.png',
+    light: '/docs/img/queue-quickstart-settings.png',
+  }}
+/>
+
+### RLS
+
+For security purposes, row level security (RLS) is required on all queues if Data APIs are enabled. That means you’ll want to create an RLS policy for any queues you intend to interact with over APIs, exactly as you would for tables exposed over APIs.
+
+<Image
+  alt="Screenshot of creating an RLS policy from the Queues settings"
+  src={{
+    dark: '/docs/img/queue-quickstart-rls.png',
+    light: '/docs/img/queue-quickstart-rls.png',
+  }}
+/>
+
+### Queue Permissions
+
+Beyond RLS policies, click the settings icon for a queue to configure which roles should have access to each queue. For example, if anonymous users should be able to enqueue messages and authenticated users can fully manipulate messages the permissions for the anon and authenticated roles could be set as shown below. The postgres and service_role roles receive permissions by default and should remain enabled.
+
+The permissions required for each API method are
+
+| **Operation** | **Minimum Permissions** |
+| ------------- | ----------------------- |
+| send          | Select, Insert          |
+| send_batch    | Select, Insert          |
+| read          | Select, Update          |
+| pop           | Select, Update          |
+| archive       | Select, Delete          |
+| delete        | Select, Delete          |
+
+<Image
+  alt="Screenshot of configuring role access from the Queues settings"
+  src={{
+    dark: '/docs/img/queue-quickstart-roles.png',
+    light: '/docs/img/queue-quickstart-roles.png',
+  }}
+/>
+
+### Reading and Writing Messages
+
+Once your queue is configured, you add messages to or read messages from your queue.
+
+Here’s an example in Typescript:
+
+```jsx
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "supabaseURL";
+const supabaseKey = "supabaseKey";
+
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+const QueuesTest: React.FC = () => {
+
+	//Add a message to your queue
+  const sendToQueue = async () => {
+    const result = await supabase.rpc("send", {
+      queue_name: "foo",
+      msg: '{"hello": "world"}',
+      delay: 30,
+    });
+    console.log(result);
+  };
+
+	//Read a message from your queue
+  const popFromQueue = async () => {
+    const result = await supabase.rpc("pop", { queue_name: "foo" });
+    console.log(result);
+  };
+
+  return (
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">Queue Test Component</h2>
+      <button
+        onClick={sendToQueue}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mr-4"
+      >
+        Add Message
+      </button>
+      <button
+        onClick={popFromQueue}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Pop Message
+      </button>
+    </div>
+  );
+};
+
+export default QueuesTest;
+```
