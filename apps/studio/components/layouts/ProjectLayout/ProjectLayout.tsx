@@ -198,7 +198,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       <ResizableHandle />
                       <ResizablePanel
                         id="panel-assistant"
-                        className="min-w-[400px] max-w-[500px] bg 2xl:max-w-[600px] xl:relative xl:top-0 absolute right-0 top-[48px] bottom-0"
+                        className={cn(
+                          'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
+                          'min-w-[400px] max-w-[500px]',
+                          '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                        )}
                       >
                         <AiAssistantPanel />
                       </ResizablePanel>
