@@ -4,6 +4,7 @@ import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import type { Dashboards, LogSqlSnippets, Owner, SqlSnippets } from 'types'
 import { contentKeys } from './keys'
+import { createTabId, getTabsStore, removeTabs } from 'state/tabs'
 
 export type ContentBase = {
   id: string
@@ -56,6 +57,16 @@ export async function getContent(
   if (!response) {
     throw new Error('Content not found')
   }
+
+  // handle local tabs
+  const currentContentIds = response.data
+    .filter((content: Content) => content.type === 'sql')
+    .map((content: Content) => createTabId('sql', { id: content.id }))
+  // checks IDs against localstorage state
+  const tabsStore = getTabsStore(projectRef)
+  const tabIds = tabsStore.openTabs.filter((id: string) => !currentContentIds.includes(id))
+  // attempts to remove tabs that are no longer in the response
+  removeTabs(projectRef, tabIds)
 
   return {
     content: response.data,

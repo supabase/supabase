@@ -1,5 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import {
@@ -169,23 +170,27 @@ const SqlEditor: NextPageWithLayout = () => {
     }
   }, [isPgInfoReady])
 
+  const { flags } = useFeaturePreviewContext()
+  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
   // Watch for route changes
   useEffect(() => {
-    if (!router.isReady || !id || id === 'new') return
+    if (isSqlEditorTabsEnabled) {
+      if (!router.isReady || !id || id === 'new') return
 
-    const tabId = createTabId('sql', { id })
-    const snippet = snippets.find((s) => s.id === id)
+      const tabId = createTabId('sql', { id })
+      const snippet = snippets.find((s) => s.id === id)
 
-    addTab(ref, {
-      id: tabId,
-      type: 'sql',
-      label: snippet?.name || 'Untitled Query',
-      metadata: {
-        sqlId: id,
-        name: snippet?.name,
-      },
-    })
-  }, [router.isReady, id, snippets])
+      addTab(ref, {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: {
+          sqlId: id,
+          name: snippet?.name,
+        },
+      })
+    }
+  }, [router.isReady, id, snippets, isSqlEditorTabsEnabled])
 
   return <SQLEditor />
 }

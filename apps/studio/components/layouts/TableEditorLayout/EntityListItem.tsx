@@ -52,6 +52,8 @@ import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { getTabsStore, createTabId, makeTabPermanent } from 'state/tabs'
 import { useSnapshot } from 'valtio'
 import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface EntityListItemProps {
   id: number | string
@@ -71,13 +73,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
 
+  // tabs preview flag logic
+  const { flags } = useFeaturePreviewContext()
+  const isTableEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
   const tabId = createTabId(entity.type, {
     schema: selectedSchema,
     name: entity.name,
   })
-
   const tabStore = getTabsStore(projectRef)
-  const isPreview = tabStore.previewTabId === tabId
+  const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
+  // end of tabs preview logic
+
   const isActive = _isActive ?? Number(id) === entity.id
   const tabsStore = getTabsStore(projectRef)
   const tabs = useSnapshot(tabsStore)

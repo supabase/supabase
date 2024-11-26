@@ -122,6 +122,15 @@ export const removeTab = (ref: string | undefined, id: string) => {
   }
 }
 
+export const removeTabs = (ref: string | undefined, ids: string[]) => {
+  if (!ref) return
+  if (!ids.length) return
+
+  ids.forEach((id) => {
+    removeTab(ref, id)
+  })
+}
+
 export const reorderTabs = (ref: string | undefined, oldIndex: number, newIndex: number) => {
   if (!ref) return
   const store = getTabsStore(ref)

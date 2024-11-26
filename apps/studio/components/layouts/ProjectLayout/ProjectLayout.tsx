@@ -8,7 +8,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useActionKey } from 'hooks/useActionKey'
-import { PROJECT_STATUS } from 'lib/constants'
+import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef } from 'react'
@@ -32,6 +32,8 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { useEditorType } from '../editors/editors-layout.hooks'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -89,7 +91,14 @@ const ProjectLayout = ({
   const projectName = selectedProject?.name
   const organizationName = selectedOrganization?.name
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  // tabs preview flag logic
+  const editor = useEditorType()
+  const { flags } = useFeaturePreviewContext()
+  const tableEditorTabsEnabled =
+    editor === 'table' && !flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+  const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
+  // end of tabs preview flag logic
 
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
   const showProductMenu = selectedProject
@@ -116,6 +125,8 @@ const ProjectLayout = ({
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [actionKey, sidebar.isOpen])
+
+  const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
 
   return (
     <AppLayout>
@@ -150,14 +161,14 @@ const ProjectLayout = ({
                     id="panel-left"
                     className={cn(
                       'transition-all duration-[120ms]',
-                      sidebar.isOpen
+                      sideBarIsOpen
                         ? resizableSidebar
                           ? 'min-w-64 max-w-[32rem]'
                           : 'min-w-64 max-w-64'
                         : 'w-0 flex-shrink-0 max-w-0'
                     )}
                   >
-                    {sidebar.isOpen && (
+                    {sideBarIsOpen && (
                       <>
                         <motion.div
                           initial={{
@@ -190,7 +201,7 @@ const ProjectLayout = ({
                     )}
                   </ResizablePanel>
                 )}
-                {showProductMenu && productMenu && sidebar.isOpen && (
+                {showProductMenu && productMenu && sideBarIsOpen && (
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
                 <ResizablePanel order={2}>{children}</ResizablePanel>
