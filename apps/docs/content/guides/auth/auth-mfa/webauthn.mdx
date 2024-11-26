@@ -225,10 +225,11 @@ const { data: factor, error } = await supabase.auth.mfa.verify({
 ```
 
 Note that you do not have to specify a `factorId` parameter. Unlike MFA (Phone) and MFA (TOTP), authentication via the WebAuthn factor does not depend on the specific factor in use. Auth will check the assertion against all verified factors owned by the user, as well as the existing WebAuthn session, and make a decision on authentication based on the information given.
+Ensure that developers complete authentication within five seconds as there is a default timeout of five seconds for both `enroll` and `verify` calls.
 
 ### Factor Selection
 
-Build an intermediary page to allow users to select between factor types:
+Build an intermediary page to allow users to select between factor types. Here's an example page which showcases how to switch between TOTP and WebAuthn factors.
 
 ```tsx
 function MFASelectionPage() {
@@ -239,12 +240,8 @@ function MFASelectionPage() {
     if (selectedMethod === 'totp') {
       // Navigate to TOTP page
       console.log('Navigate to /mfa-totp')
-    } else if (selectedMethod === 'passkey') {
-      // Navigate to passkey page
+    } else if (selectedMethod === 'webauthn') {
       console.log('Navigate to /mfa-webauthn')
-    } else if (selectedMethod === 'phone') {
-      // Navigate to phone verification page
-      console.log('Navigate to /mfa-phone')
     }
   }
 
@@ -278,28 +275,15 @@ function MFASelectionPage() {
             <input
               type="radio"
               value="passkey"
-              checked={selectedMethod === 'passkey'}
+              checked={selectedMethod === 'webauthn'}
               onChange={(e) => setSelectedMethod(e.target.value)}
             />
             <div>
-              <div>Passkey or security key</div>
+              <div>Security key</div>
               <div>
                 Authenticate using your fingerprint, face, or PIN on your mobile device, computer or
                 FIDO2 security key.
               </div>
-            </div>
-          </label>
-
-          <label>
-            <input
-              type="radio"
-              value="phone"
-              checked={selectedMethod === 'phone'}
-              onChange={(e) => setSelectedMethod(e.target.value)}
-            />
-            <div>
-              <div>Phone verification</div>
-              <div>Authenticate using a code sent to your phone via SMS.</div>
             </div>
           </label>
         </div>
@@ -325,11 +309,9 @@ function MFASelectionPage() {
     </div>
   )
 }
-
-export default MFASelectionPage
 ```
 
-Let the user pick their preferred authentication method and redirect the user to choose between factors or complete verification.
+Let the user pick their preferred authentication method and redirect the user to authenticate based on the factor they have selected.
 
 ## Factor Management
 
@@ -337,17 +319,54 @@ As WebAuthn encompasses Platform and Roaming Authenticators, developers may wish
 
 ```ts
 import aaguids from './aaguids.json' with { type: 'json' }
+...
 
-const { data, error } = await supabase.auth.mfa.listFactors()
+const WebAuthnFactors = ({ supabase }) => {
+  const [factors, setFactors] = useState([]);
+  const [error, setError] = useState(null);
 
-const provider_name = aaguids[data.webauthn.webauthn_aaguid]?.name || 'Unknown'
+  useEffect(() => {
+    const fetchFactors = async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      setFactors(data.webauthn);
+    };
+
+    fetchFactors();
+  }, [supabase]);
+
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h2>WebAuthn Factors</h2>
+      {factors.length > 0 ? (
+        <ul>
+          {factors.map(factor => (
+            <li key={factor.id}>
+              {factor.friendly_name && (
+                <>Name: {factor.friendly_name}<br /></>
+              )}
+              Provider: {aaguids[factor.webauthn_aaguid]?.name || 'Unknown'}
+              <br />
+              Status: {factor.status}
+              <br />
+              Created: {new Date(factor.created_at).toLocaleString()}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No WebAuthn factors registered</p>
+      )}
+    </div>
+  );
+};
 ```
 
 You can confirm that the mapping is accurate by using the helper site [on this page](https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/?combined)
-
-## Timeouts
-
-There is a default timeout of five seconds for `enroll` and `verify` calls.
 
 ## Local Development
 
