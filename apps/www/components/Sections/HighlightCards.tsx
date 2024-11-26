@@ -12,9 +12,15 @@ interface Highlight {
   paragraph: string | React.ReactNode
 }
 
-const HighlightCards = ({ highlights }: { highlights: Highlight[] }) => {
+const HighlightCards = ({
+  highlights,
+  className,
+}: {
+  highlights: Highlight[]
+  className?: string
+}) => {
   return (
-    <SectionContainer>
+    <SectionContainer className={className}>
       <LazyMotion features={domAnimation}>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {highlights.map((highlight, i) => (
@@ -45,16 +51,18 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       animate={isInView ? animate : initial}
     >
       <Panel hasShimmer innerClassName="flex flex-col !bg-alternative">
-        <div className="relative w-full aspect-[1.35/1] mb-4">
-          <div
-            className="absolute inset-0 w-full h-full z-10"
-            style={{
-              background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
-            }}
-          />
-          {highlight.image && <Img isHovered={isHovered} />}
-          {highlight.svg && highlight.svg}
-        </div>
+        {(highlight.image || highlight.svg) && (
+          <div className="relative w-full aspect-[1.35/1] mb-4">
+            <div
+              className="absolute inset-0 w-full h-full z-10"
+              style={{
+                background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
+              }}
+            />
+            {highlight.image && <Img isHovered={isHovered} />}
+            {highlight.svg && highlight.svg}
+          </div>
+        )}
         <div className="p-8">
           <h3 className="text-lg text-foreground mb-2">{highlight.title}</h3>
           <p className="text-foreground-lighter">{highlight.paragraph}</p>

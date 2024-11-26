@@ -7,11 +7,11 @@ import DefaultLayout from '~/components/Layouts/Default'
 
 import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
-import vectorPageData from '~/data/products/vector/pageData'
-import ProductsNav from '~/components/Products/ProductsNav'
-import { PRODUCT_NAMES } from 'shared-data/products'
+import vectorPageData from '~/data/products/modules/vector'
+import ModulesNav from '~/components/Modules/ModulesNav'
+import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
 
-const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
+const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
 const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
 const UseCasesSection = dynamic(() => import('~/components/Sections/UseCasesSection'))
@@ -47,8 +47,8 @@ function VectorPage() {
         }}
       />
       <DefaultLayout className="!bg-alternative">
-        <ProductsNav activePage={PRODUCT_NAMES.VECTOR} />
-        <ProductHeaderCentered {...pageData.heroSection} />
+        <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} />
+        <ProductModulesHeader {...pageData.heroSection} />
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
