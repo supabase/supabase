@@ -21,7 +21,6 @@ import {
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
-import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -117,7 +116,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       })
       if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }
@@ -171,7 +170,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
       if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }
