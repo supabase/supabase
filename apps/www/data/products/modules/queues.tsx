@@ -1,8 +1,9 @@
 import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default () => ({
-  metaTitle: 'Supabase Queues | Schedule and automate tasks',
-  metaDescription: 'Schedule and automate tasks at scale',
+  metaTitle: 'Supabase Queues | Native pull queues without headache',
+  metaDescription:
+    'Manage queues without maintaining additional infrastructure with native PostgreSQL-based message queue system.',
   url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
   docsUrl: '/docs/guides/queues',
   heroSection: {
