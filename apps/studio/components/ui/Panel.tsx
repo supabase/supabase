@@ -1,6 +1,5 @@
 import { Megaphone } from 'lucide-react'
 import { forwardRef, PropsWithChildren, ReactNode } from 'react'
-import ReactMarkdown from 'react-markdown'
 import { Badge, Button, Loading, cn } from 'ui'
 
 interface PanelProps {
