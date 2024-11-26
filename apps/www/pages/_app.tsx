@@ -19,6 +19,7 @@ import { useEffect } from 'react'
 import { SonnerToaster, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
+import { IntlProvider } from 'react-intl'
 
 import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
@@ -27,8 +28,17 @@ import MetaFaviconsPagesRouter, {
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
-import supabase from '~/lib/supabase'
+// import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import enLocale from '~/i18n/en.json';
+import esLocale from '~/i18n/es.json';
+
+const DEFAULT_LOCALE = 'en'
+
+const locales: Record<string, Record<string, any>> = {
+  en: enLocale,
+  es: esLocale,
+};
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -120,42 +130,48 @@ export default function App({ Component, pageProps }: AppProps) {
     themeColor = 'FFFFFF'
   }
 
+  const locale = router.locale || DEFAULT_LOCALE
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <MetaFaviconsPagesRouter
-        applicationName={applicationName}
-        route={faviconRoute}
-        themeColor={themeColor}
-        includeManifest
-        includeMsApplicationConfig
-        includeRssXmlFeed
-      />
-      <DefaultSeo
-        title={site_title}
-        description={DEFAULT_META_DESCRIPTION}
-        openGraph={{
-          type: 'website',
-          url: 'https://supabase.com/',
-          site_name: 'Supabase',
-          images: [
-            {
-              url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
-              width: 800,
-              height: 600,
-              alt: 'Supabase Og Image',
-            },
-          ],
-        }}
-        twitter={{
-          handle: '@supabase',
-          site: '@supabase',
-          cardType: 'summary_large_image',
-        }}
-      />
-      <SessionContextProvider supabaseClient={supabase}>
+      <IntlProvider
+        locale={locale}
+        messages={locales[locale as keyof typeof locales]}
+        defaultLocale={DEFAULT_LOCALE}
+      >
+        <MetaFaviconsPagesRouter
+          applicationName={applicationName}
+          route={faviconRoute}
+          themeColor={themeColor}
+          includeManifest
+          includeMsApplicationConfig
+          includeRssXmlFeed
+        />
+        <DefaultSeo
+          title={site_title}
+          description={DEFAULT_META_DESCRIPTION}
+          openGraph={{
+            type: 'website',
+            url: 'https://supabase.com/',
+            site_name: 'Supabase',
+            images: [
+              {
+                url: `https://supabase.com${basePath}/images/og/supabase-og.png`,
+                width: 800,
+                height: 600,
+                alt: 'Supabase Og Image',
+              },
+            ],
+          }}
+          twitter={{
+            handle: '@supabase',
+            site: '@supabase',
+            cardType: 'summary_large_image',
+          }}
+        />
         <AuthProvider>
           <ThemeProvider
             themes={themes.map((theme) => theme.value)}
@@ -170,7 +186,7 @@ export default function App({ Component, pageProps }: AppProps) {
             </CommandProvider>
           </ThemeProvider>
         </AuthProvider>
-      </SessionContextProvider>
+      </IntlProvider>
     </>
   )
 }

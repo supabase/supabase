@@ -17,28 +17,26 @@ import {
   UserX,
 } from 'lucide-react'
 import RequestADemoForm from '../../components/Forms/RequestADemoForm'
+import { IntlShape, FormattedMessage } from 'react-intl'
 
-export default {
+export default ({ intl }: { intl: IntlShape }) => ({
   metadata: {
-    metaTitle: 'Supabase for Enterprise',
-    metaDescription:
-      'Leading enterprises use Supabase to build faster, better, and more scalable products.',
+    metaTitle: intl.formatMessage({ id: 'enterprise.metadata.title' }),
+    metaDescription: intl.formatMessage({ id: 'enterprise.metadata.description' }),
   },
   heroSection: {
     id: 'hero',
-    title: 'Supabase for Enterprise',
+    title: intl.formatMessage({ id: 'enterprise.heroSection.title.label' }),
     h1: (
-      <>
-        Innovative Enterprises
-        <span className="block">use Supabase</span>
-      </>
+      <FormattedMessage
+        id="enterprise.heroSection.title.text"
+        values={{
+          br: () => <br />,
+        }}
+      />
     ),
     subheader: [
-      <>
-        Leading enterprises use Supabase to build faster, better, and more scalable products. From
-        GitHub to PwC, innovative companies trust Supabase to drive their digital transformation
-        strategy.
-      </>,
+      <FormattedMessage id="enterprise.heroSection.subheader" />,
     ],
     image: <RequestADemoForm />,
     logos: [
@@ -54,74 +52,73 @@ export default {
   },
   'use-cases': {
     id: 'use-cases',
-    label: <>Build with Supabase</>,
-    heading: <>Stay on the forefront</>,
+    label: intl.formatMessage({ id: 'enterprise.useCases.label' }),
+    heading: intl.formatMessage({ id: 'enterprise.useCases.heading' }),
     stories: [
       {
         icon: '/images/customers/logos/light/mozilla.png',
         url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
         target: '_blank',
-        heading: 'Mozilla use Supabase for GenAI and RAG',
+        heading: intl.formatMessage({ id: 'enterprise.useCases.stories.0.heading' }),
         subheading: (
-          <>
-            We store embeddings in a PostgreSQL database, hosted by Supabase, to perform a{' '}
-            <span className="text-foreground">
-              similarity search to identify the most relevant sections within the MDN
-            </span>
-            .
-          </>
+          <FormattedMessage
+            id="enterprise.useCases.stories.0.subheading"
+            values={{
+              highlight: (chunks: React.ReactNode) => <span className="text-foreground">{chunks}</span>,
+            }}
+          />
         ),
       },
       {
         icon: '/images/customers/logos/light/epsilon3.png',
         url: '/customers/epsilon3',
-        heading: 'Epsilon3 use Supabase to build software for NASA',
+        heading: intl.formatMessage({ id: 'enterprise.useCases.stories.1.heading' }),
         subheading: (
-          <>
-            <span className="text-foreground">
-              Billion dollar missions need to run reliably and securely
-            </span>
-            . We use Supabase because they give us an open-source scalable back-end built by
-            database experts that we can self-host.
-          </>
+          <FormattedMessage
+            id="enterprise.useCases.stories.1.subheading"
+            values={{
+              highlight: (chunks: React.ReactNode) => <span className="text-foreground">{chunks}</span>,
+            }}
+          />
         ),
       },
       {
         icon: '/images/customers/logos/light/pebblely.png',
         url: '/customers/pebblely',
-        heading: 'Pebblely use Supabase to scale to millions of users.',
+        heading: intl.formatMessage({ id: 'enterprise.useCases.stories.2.heading' }),
         subheading: (
-          <>
-            It streamlined the database, the API, and authentication.{' '}
-            <span className="text-foreground">Everything was up and running in two days</span>. It
-            is easy to get started and provides all the solutions we require as we continue to grow.
-          </>
+          <FormattedMessage
+            id="enterprise.useCases.stories.2.subheading"
+            values={{
+              highlight: (chunks: React.ReactNode) => <span className="text-foreground">{chunks}</span>,
+            }}
+          />
         ),
       },
     ],
     highlights: [
       {
         icon: LineChart,
-        heading: '100x scale',
-        subheading: 'Maergo handled 100x their highest sustained traffic with Supabase.',
+        heading: intl.formatMessage({ id: 'enterprise.highlights.0.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.highlights.0.subheading' }),
         url: '/customers/maergo',
       },
       {
         icon: DollarSign,
-        heading: '83% cost reduction',
-        subheading: 'Shotgun reduced costs by 83% by migrating to Supabase.',
+        heading: intl.formatMessage({ id: 'enterprise.highlights.1.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.highlights.1.subheading' }),
         url: '/customers/shotgun',
       },
       {
         icon: Timer,
-        heading: '20% faster dev',
-        subheading: 'Voypost enjoyed a 20% faster development process.',
+        heading: intl.formatMessage({ id: 'enterprise.highlights.2.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.highlights.2.subheading' }),
         url: '/customers/voypost',
       },
       {
         icon: Scale,
-        heading: 'GDPR compliance',
-        subheading: 'Markprompt use Supabase to build GDPR-compliant AI chatbots.',
+        heading: intl.formatMessage({ id: 'enterprise.highlights.3.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.highlights.3.subheading' }),
         url: '/customers/markprompt',
       },
     ],
@@ -129,112 +126,104 @@ export default {
   performance: {
     id: 'performance',
     heading: (
-      <>
-        Top performance,
-        <br /> at any scale
-      </>
+      <FormattedMessage
+        id="enterprise.performance.heading"
+        values={{
+          br: () => <br />,
+        }}
+      />
     ),
-    subheading:
-      "Supabase ensures optimal database performance at any scale, so you can focus on innovating and growing without worrying about infrastructure limitations—whether you're handling high-traffic applications, complex queries, or massive data volumes.",
+    subheading: <FormattedMessage id="enterprise.performance.subheading" />,
     highlights: [
       {
-        heading: 'Databases managed',
+        heading: intl.formatMessage({ id: 'enterprise.performance.highlights.0.heading' }),
         subheading: '1,000,000+',
       },
       {
-        heading: 'Databases launched daily',
+        heading: intl.formatMessage({ id: 'enterprise.performance.highlights.1.heading' }),
         subheading: '3,500+',
       },
     ],
   },
   security: {
     id: 'security',
-    label: 'Security',
-    heading: <>Trusted for medical records, missions to the moon, and everything in between</>,
-    subheading:
-      'Keep your data secure with SOC 2, HIPAA, and GDPR compliance. Your customers’ data is encrypted at rest and in transit, with built-in tools for monitoring and managing security threats.',
+    label: intl.formatMessage({ id: 'enterprise.security.label' }),
+    heading: intl.formatMessage({ id: 'enterprise.security.heading' }),
+    subheading: intl.formatMessage({ id: 'enterprise.security.subheading' }),
     cta: {
-      label: 'Learn more about Security',
+      label: intl.formatMessage({ id: 'enterprise.security.cta.label' }),
       url: '/security',
     },
     features: [
       {
         icon: ShieldCheck,
-        heading: 'SOC 2 Type II certified',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.0.heading' }),
       },
       {
         icon: Activity,
-        heading: 'HIPAA compliant',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.1.heading' }),
       },
       {
         icon: ShieldAlert,
-        heading: 'DDoS Protection',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.2.heading' }),
       },
       {
         icon: Lock,
-        heading: 'Multi-factor Authentication',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.3.heading' }),
       },
       {
         icon: ClipboardCheck,
-        heading: 'Vulnerability Management',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.4.heading' }),
       },
       {
         icon: Users,
-        heading: 'Role-based access control',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.5.heading' }),
       },
       {
         icon: LayoutList,
-        heading: 'Database Audit Logs',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.6.heading' }),
       },
       {
         icon: Lightbulb,
-        heading: 'Security Advisors',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.7.heading' }),
       },
       {
         icon: FolderLock,
-        heading: 'Encrypted Storage',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.8.heading' }),
       },
       {
         icon: UserX,
-        heading: 'Network restrictions',
+        heading: intl.formatMessage({ id: 'enterprise.security.features.9.heading' }),
       },
     ],
   },
   support: {
     id: 'support',
-    label: 'Support',
-    heading: (
-      <>
-        Get expert help,
-        <br /> whenever you need it
-      </>
-    ),
+    label: intl.formatMessage({ id: 'enterprise.support.label' }),
+    heading: <FormattedMessage id="enterprise.support.heading" />,
     features: [
       {
         icon: Globe2,
-        heading: 'Global Support, 24/7',
-        subheading:
-          'Our team has 100% global coverage. No matter where you are, we’re always available to resolve issues and keep your operations running smoothly.',
+        heading: intl.formatMessage({ id: 'enterprise.support.features.0.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.support.features.0.subheading' }),
       },
       {
         icon: Users,
-        heading: 'Dedicated team of experts',
-        subheading:
-          'Get direct access to talented engineers. From onboarding to optimizations, our expert team is here to provide personalized, hands-on support whenever you need it.',
+        heading: intl.formatMessage({ id: 'enterprise.support.features.1.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.support.features.1.subheading' }),
       },
       {
         icon: ArrowLeftRight,
-        heading: 'Migration & Success Support',
-        subheading:
-          'Our team ensures a smooth transition to Supabase while guiding you with best practices for scaling. We’re dedicated to your long-term success, every step of the way.',
+        heading: intl.formatMessage({ id: 'enterprise.support.features.2.heading' }),
+        subheading: intl.formatMessage({ id: 'enterprise.support.features.2.subheading' }),
       },
     ],
   },
   quote: {
     id: 'quote',
     quote: {
-      text: 'Supabase powers prototyping for fast-moving teams such as GitHub Next.',
-      author: 'Idan Gazit',
+      text: intl.formatMessage({ id: 'enterprise.quote.text' }),
+      author: intl.formatMessage({ id: 'enterprise.quote.author' }),
       logo: (
         <svg
           width="91"
@@ -273,19 +262,12 @@ export default {
           />
         </svg>
       ),
-      role: 'Senior Director of Research, GitHub Next',
+      role: intl.formatMessage({ id: 'enterprise.quote.role' }),
     },
   },
   'request-a-demo': {
     id: 'request-a-demo',
-    heading: 'Request a demo',
-    subheading:
-      'We can take your requirements and show you how Supabase can help you achieve your goals.',
-    quote: {
-      text: 'Supabase powers prototyping for fast-moving teams such as GitHub Next.',
-      author: '',
-      logo: '',
-      company: 'GitHub',
-    },
+    heading: intl.formatMessage({ id: 'enterprise.requestDemo.heading' }),
+    subheading: intl.formatMessage({ id: 'enterprise.requestDemo.subheading' }),
   },
-}
+});

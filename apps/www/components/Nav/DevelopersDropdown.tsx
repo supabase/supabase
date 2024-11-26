@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' assert { type: 'json' }
+// import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' assert { type: 'json' }
 
 type LinkProps = {
   text: string
@@ -49,7 +49,7 @@ const DevelopersDropdown = () => (
           <span>Blog</span>
           <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
         </Link>
-        <ul className="flex flex-col gap-5">
+        {/* <ul className="flex flex-col gap-5">
           {blogPosts?.map((post) => (
             <li key={post.title}>
               <Link
@@ -65,7 +65,7 @@ const DevelopersDropdown = () => (
               </Link>
             </li>
           ))}
-        </ul>
+        </ul> */}
       </div>
     </div>
   </div>
