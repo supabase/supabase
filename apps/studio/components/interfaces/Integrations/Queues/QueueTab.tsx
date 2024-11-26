@@ -197,23 +197,31 @@ export const QueueTab = () => {
                         Security.
                       </p>
                       <p>With RLS enabled, anonymous users will not have access to this queue.</p>
-                      <div className="mt-2">
-                        <Button
-                          type="default"
-                          onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
-                        >
-                          Enable RLS for this queue
-                        </Button>
-                      </div>
+                      <Button
+                        type="default"
+                        className="w-min"
+                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                      >
+                        Enable RLS for this queue
+                      </Button>
                     </>
                   ) : (
-                    <Markdown
-                      className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
-                      content={`
+                    <>
+                      <Markdown
+                        className="[&>p]:!leading-normal text-xs [&>p]:!m-0 flex flex-col gap-y-2"
+                        content={`
 RLS for queues is only relevant if exposure through PostgREST has been enabled, in which you can restrict and control who can manage this queue using Row Level Security.
 
 You may opt to manage your queues via any Supabase client libraries or PostgREST endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
-                    />
+                      />
+                      <Button
+                        type="default"
+                        className="w-min"
+                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                      >
+                        Enable RLS for this queue
+                      </Button>
+                    </>
                   )}
                 </div>
               </PopoverContent_Shadcn_>

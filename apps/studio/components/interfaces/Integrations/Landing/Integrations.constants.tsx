@@ -91,8 +91,8 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+                (mod) => mod.QueuesOverviewTab
               ),
             { loading: Loading }
           )
