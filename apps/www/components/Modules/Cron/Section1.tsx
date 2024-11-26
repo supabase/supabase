@@ -1,7 +1,7 @@
 import React, { FC } from 'react'
 import type { LucideIcon } from 'lucide-react'
 
-import { TextLink } from 'ui'
+import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Props {
@@ -10,7 +10,8 @@ interface Props {
   heading: string | JSX.Element
   subheading: string | JSX.Element
   features?: FeatureProps[]
-  cta: {
+  className?: string
+  cta?: {
     label: string
     url: string
   }
@@ -31,18 +32,18 @@ const CronSection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
-      className="flex flex-col xl:flex-row justify-between gap-4 md:gap-8"
+      className={cn('flex flex-col xl:flex-row justify-between gap-4 md:gap-8', props.className)}
     >
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>
-        <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
+        {props.cta && (
+          <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
+        )}
       </div>
       <ul className="w-full h-[300px] flex-grow grid grid-cols-2 sm:grid-cols-2 gap-4 md:gap-x-20 xl:grid-cols-2 border border-muted rounded-lg bg-surface-100">
-        {/* {props.features.map((feature) => (
-          <FeatureItem feature={feature} key={feature.heading} />
-        ))} */}
+        {props.features?.map((feature) => <FeatureItem feature={feature} key={feature.heading} />)}
       </ul>
     </SectionContainer>
   )

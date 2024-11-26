@@ -56,16 +56,41 @@ export default () => ({
       </div>
     ),
   },
-  apiSection: {
+  section1: {
     id: 'api',
     label: 'API',
     heading: <>Lorem ipsum dolor sit</>,
     subheading:
-      'Keep your data secure with SOC 2, HIPAA, and GDPR compliance. Your customers’ data is encrypted at rest and in transit, with built-in tools for monitoring and managing security threats.',
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
     cta: {
       label: 'Start scheduling',
       url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
     },
+    // features: [
+    //   {
+    //     icon: ShieldCheck,
+    //     heading: 'SOC 2 Type II certified',
+    //   },
+    //   {
+    //     icon: Activity,
+    //     heading: 'HIPAA compliant',
+    //   },
+    //   {
+    //     icon: ShieldAlert,
+    //     heading: 'DDoS Protection',
+    //   },
+    // ],
+  },
+  section2: {
+    id: 'UI',
+    label: 'UI',
+    heading: <>Lorem ipsum dolor sit</>,
+    subheading:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
+    // cta: {
+    //   label: 'Start scheduling',
+    //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+    // },
     // features: [
     //   {
     //     icon: ShieldCheck,

@@ -11,7 +11,8 @@ import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
-const CronContentSection = dynamic(() => import('~/components/Modules/Cron/Section'))
+const Section1 = dynamic(() => import('~/components/Modules/Cron/Section1'))
+const Section2 = dynamic(() => import('~/components/Modules/Cron/Section2'))
 const CenteredImage = dynamic(() => import('~/components/Sections/CenteredImage'))
 
 function CronPage() {
@@ -40,7 +41,8 @@ function CronPage() {
         <ProductModulesHeader {...pageData.heroSection} />
         <CenteredImage {...pageData.centeredImage} />
         <HighlightCards {...(pageData.highlightsSection as any)} />
-        <CronContentSection {...pageData.apiSection} />
+        <Section1 {...pageData.section1} />
+        <Section2 {...pageData.section2} className="!pt-0" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
