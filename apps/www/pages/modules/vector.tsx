@@ -9,7 +9,7 @@ import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import vectorPageData from '~/data/products/modules/vector'
 import ModulesNav from '~/components/Modules/ModulesNav'
-import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
+import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
@@ -25,10 +25,9 @@ function VectorPage() {
   // base path for images
   const isXs = useBreakpoint(640)
   const { basePath } = useRouter()
-  const meta_title = 'Supabase Vector | The Postgres Vector database.'
-  const meta_description =
-    'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.'
   const pageData = vectorPageData(isXs)
+  const meta_title = pageData.metaTitle
+  const meta_description = pageData.metaDescription
 
   return (
     <>
@@ -46,8 +45,8 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative">
-        <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} />
+      <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
+        <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
@@ -62,7 +61,7 @@ function VectorPage() {
         </div>
         <div className="bg-background">
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
-          <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
+          <ProductsCta currentProduct={PRODUCT_MODULES_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>
     </>

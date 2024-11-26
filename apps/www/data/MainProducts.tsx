@@ -1,5 +1,10 @@
-import { products } from 'shared-data'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { products, PRODUCT_MODULES } from 'shared-data'
+import {
+  PRODUCT_MODULES_NAMES,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_NAMES,
+  PRODUCT_SHORTNAMES,
+} from 'shared-data/products'
 
 export type ProductType = {
   [key: string]: {
@@ -74,9 +79,9 @@ const MainProducts: ProductType = {
     label: '',
     url: '/realtime',
   },
-  [PRODUCT_SHORTNAMES.VECTOR]: {
-    name: PRODUCT_NAMES.VECTOR,
-    icon: products.vector.icon[24],
+  [PRODUCT_MODULES_SHORTNAMES.VECTOR]: {
+    name: PRODUCT_MODULES_NAMES.VECTOR,
+    icon: PRODUCT_MODULES.vector.icon[24],
     description: (
       <>
         Integrate your favorite ML-models to{' '}

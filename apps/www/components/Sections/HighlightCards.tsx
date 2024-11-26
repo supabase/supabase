@@ -38,7 +38,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
   const isInView = useInView(ref, { once: true })
 
   const initial = INITIAL_BOTTOM
-  const animate = getAnimation({ delay: 0.4 + index * 0.1 })
+  const animate = getAnimation({})
 
   const Img: any = highlight.image
 
@@ -49,6 +49,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
+      className="will-change-transform"
     >
       <Panel hasShimmer innerClassName="flex flex-col !bg-alternative">
         {(highlight.image || highlight.svg) && (

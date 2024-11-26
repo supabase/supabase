@@ -39,8 +39,8 @@ const ProductDropdown = () => {
               ))}
           </ul>
           <div className="flex flex-col gap-4 w-[250px]">
-            <div className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground">
-              Postgres Integrations
+            <div className="group flex items-center gap-1 text-foreground-lighter text-xs uppercase tracking-widest font-mono">
+              Modules
             </div>
             <ul className="flex flex-col gap-4">
               {Object.values(ProductModulesData).map((productModule) => (

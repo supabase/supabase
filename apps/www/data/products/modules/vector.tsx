@@ -5,11 +5,12 @@ import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
 import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import classNames from 'classnames'
 
 export default (isMobile?: boolean) => ({
-  metaTitle: '',
-  metaDescription: '',
+  metaTitle: 'Supabase Vector | The Postgres Vector database.',
+  metaDescription:
+    'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.',
+  docsUrl: '/docs/guides/ai',
   heroSection: {
     announcement: {
       url: 'https://youtu.be/qw4PrtyvJI0?t=10584',

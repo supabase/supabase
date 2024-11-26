@@ -102,21 +102,21 @@ const ProductModulesHeader = (props: Types) => (
         </div>
         <div className="w-full sm:w-auto flex flex-col items-stretch sm:flex-row pt-2 sm:items-center gap-2">
           {props.cta && (
-            <Button size="medium" className="text-white" asChild>
+            <Button size="small" className="text-white" asChild>
               <Link href={props.cta.link} as={props.cta.link}>
                 {props.cta.label ?? 'Start for free'}
               </Link>
             </Button>
           )}
           {props.video && (
-            <Button type="default" size="medium" icon={<PlayCircle />} asChild>
+            <Button type="default" size="small" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>
             </Button>
           )}
           {props.secondaryCta && (
-            <Button type="default" size="medium" asChild>
+            <Button type="default" size="small" asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>

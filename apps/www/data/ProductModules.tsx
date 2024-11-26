@@ -32,19 +32,6 @@ const ProductModules: ProductType = {
     label: '',
     url: '/modules/cron-jobs',
   },
-  // [PRODUCT_MODULES_SHORTNAMES.QUEUES]: {
-  //   name: PRODUCT_MODULES_NAMES.QUEUES,
-  //   icon: PRODUCT_MODULES.queues.icon[24],
-  //   description: (
-  //     <>
-  //       Native Postgres queuing solution for dedicated message queues with the simplicity of SQL and
-  //       zero additional infrastructure
-  //     </>
-  //   ),
-  //   description_short: 'Native pull queues without headache',
-  //   label: '',
-  //   url: '/modules/queues',
-  // },
 }
 
 export default ProductModules
