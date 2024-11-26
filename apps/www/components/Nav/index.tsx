@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button, buttonVariants, cn } from 'ui'
+import { Announcement, Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,6 +14,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
+import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 
 import ScrollProgress from '~/components/ScrollProgress'
 import { getMenu } from '~/data/nav'
@@ -65,9 +66,6 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      {/* <Announcement>
-        Uncomment to show announcement banner
-      </Announcement> */}
       <div
         className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}

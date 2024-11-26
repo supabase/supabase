@@ -3,10 +3,12 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
-import { useFlag } from 'hooks/ui/useFlag'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
@@ -36,10 +38,17 @@ const FeaturePreviewModal = () => {
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
     sendEvent({
-      category: 'ui_feature_previews',
-      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
+      action: TELEMETRY_EVENTS.FEATURE_PREVIEWS,
       label: selectedFeatureKey,
+      value: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
     })
+
+    if (
+      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2 &&
+      isSelectedFeatureEnabled
+    ) {
+      snap.setAiAssistantPanel({ open: false })
+    }
   }
 
   function handleCloseFeaturePreviewModal() {

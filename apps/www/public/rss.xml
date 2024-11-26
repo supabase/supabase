@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 30 Oct 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 13 Nov 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-dynamic-functions</guid>
+  <title>Executing Dynamic JavaScript Code on Supabase with Edge Functions</title>
+  <link>https://supabase.com/blog/supabase-dynamic-functions</link>
+  <description>Learn how to execute dynamic JavaScript code on Supabase using Edge Functions.</description>
+  <pubDate>Wed, 13 Nov 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-clickhouse-partnership</guid>
   <title>ClickHouse Partnership, improved Postgres Replication, and Disk Management</title>
   <link>https://supabase.com/blog/supabase-clickhouse-partnership</link>

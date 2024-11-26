@@ -42,7 +42,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-studio;
+  @apply bg-studio relative;
   @apply text-foreground;
   height: 100%;
   padding: 0;
