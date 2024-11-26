@@ -30,7 +30,7 @@ const Announcement = ({
   className,
   children,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
-  const [hidden, setHidden] = useState(false)
+  const [hidden, setHidden] = useState(true)
 
   const pathname = usePathname()
   const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
@@ -44,8 +44,12 @@ const Announcement = ({
   // window.localStorage is kept inside useEffect
   // to prevent error
   useEffect(function () {
+    if (window.localStorage.getItem(announcementKey) === 'hidden') {
+      setHidden(true)
+    }
+
     if (!window.localStorage.getItem(announcementKey)) {
-      return setHidden(false)
+      setHidden(false)
     }
   }, [])
 
@@ -56,7 +60,6 @@ const Announcement = ({
     return setHidden(true)
   }
 
-  // Always show if on LW section
   if (!isLaunchWeekSection && hidden) {
     return null
   } else {

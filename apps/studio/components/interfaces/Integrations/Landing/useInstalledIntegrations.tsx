@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 
-import { wrapperMetaComparator } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from 'lib/void'
+import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
 import { INTEGRATIONS } from './Integrations.constants'
 
 export const useInstalledIntegrations = () => {

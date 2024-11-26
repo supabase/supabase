@@ -1,15 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   Badge,
   Button,
@@ -37,7 +33,7 @@ export interface CreateQueueSheetProps {
 }
 
 const normalQueueSchema = z.object({
-  type: z.literal('normal'),
+  type: z.literal('basic'),
 })
 
 const partitionedQueueSchema = z.object({
@@ -69,20 +65,21 @@ export type QueueType = CreateQueueForm['values']
 const FORM_ID = 'create-queue-sidepanel'
 
 export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQueueSheetProps) => {
-  const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+  // This is for enabling pg_partman extension which will be used for partitioned queues (3rd kind of queue)
+  // const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
 
-  const canToggleExtensions = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
-  )
+  // const canToggleExtensions = useCheckPermissions(
+  //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
+  //   'extensions'
+  // )
 
   const form = useForm<CreateQueueForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
       values: {
-        type: 'normal',
+        type: 'basic',
       },
     },
   })
@@ -329,13 +326,13 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
           lost.
         </p>
       </ConfirmationModal>
-      {pgPartmanExtension && (
+      {/* {pgPartmanExtension && (
         <EnableExtensionModal
           visible={showEnableExtensionModal}
           extension={pgPartmanExtension}
           onCancel={() => setShowEnableExtensionModal(false)}
         />
-      )}
+      )} */}
     </>
   )
 }
