@@ -82,8 +82,6 @@ const TriggerList = ({
     )
   }
 
-  console.log('triggers:', _triggers)
-
   return (
     <>
       {_triggers.map((x: any) => (
