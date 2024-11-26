@@ -338,8 +338,8 @@ export const getQueuePolicyTemplates = (): PolicyTemplate[] => {
       name: 'Allow anon and authenticated to access messages from queue',
       description:
         'Base policy to ensure that anon and authenticated can only access appropriate rows. USING and CHECK statements will need to be adjusted accordingly',
-      definition: 'true -- To adjust accordingly',
-      check: 'true -- To adjust accordingly',
+      definition: 'true',
+      check: 'true',
       command: 'ALL',
       roles: ['anon', 'authenticated'],
     },
