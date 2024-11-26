@@ -804,6 +804,7 @@ const SQLEditor = () => {
                     >
                       <MonacoEditor
                         autoFocus
+                        autoComplete={true}
                         id={id}
                         editorRef={editorRef}
                         monacoRef={monacoRef}
