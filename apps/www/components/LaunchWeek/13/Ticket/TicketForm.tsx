@@ -156,7 +156,7 @@ export default function TicketForm() {
         onClick={handleGithubSignIn}
         loading={formState === 'loading'}
         type="default"
-        className="sm:pl-1 cursor-none"
+        className="sm:pl-1"
       >
         <div className="flex items-center">
           <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
