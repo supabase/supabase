@@ -1,4 +1,4 @@
-import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
+import { Clock5, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
@@ -124,9 +124,18 @@ const supabaseIntegrations: IntegrationDefinition[] = [
       {
         route: 'cron-jobs',
         label: 'Cron Jobs',
+        hasChild: true,
+        childIcon: (
+          <Timer size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
+        ),
       },
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      if (childId) {
+        return dynamic(() => import('../CronJobs/CronJobTab').then((mod) => mod.CronJobTab), {
+          loading: Loading,
+        })
+      }
       switch (pageId) {
         case 'overview':
           return dynamic(

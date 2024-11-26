@@ -26,7 +26,6 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
   if (isLoading)
     return (
       <div className="p-10">
@@ -81,7 +80,7 @@ export const CronjobsTab = () => {
                   })
                 }
               >
-                Create a queue
+                Create a cron job
               </Button>
             </div>
             {filteredCronJobs.length === 0 ? (
@@ -94,6 +93,10 @@ export const CronjobsTab = () => {
                 <p className="text-sm text-foreground-light">
                   Your search for "{searchQuery}" did not return any results
                 </p>
+              </div>
+            ) : isLoading ? (
+              <div className="p-10">
+                <GenericSkeletonLoader />
               </div>
             ) : (
               filteredCronJobs.map((job) => (
