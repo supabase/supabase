@@ -1,5 +1,5 @@
-import { SnippetDetail } from 'data/content/sql-folders-query'
 import { removeCommentsFromSql } from 'lib/helpers'
+import type { SnippetWithContent } from 'state/sql-editor-v2'
 import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
@@ -52,7 +52,7 @@ export const createSqlSnippetSkeletonV2 = ({
   owner_id: number
   project_id: number
   folder_id?: string
-}): SnippetDetail => {
+}): SnippetWithContent => {
   return {
     ...NEW_SQL_SNIPPET_SKELETON,
     id,

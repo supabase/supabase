@@ -243,7 +243,7 @@ const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
       formatQuery(
         {
@@ -283,7 +283,7 @@ const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -414,12 +414,14 @@ const SQLEditor = () => {
       if (isAssistantV2Enabled) {
         appSnap.setAiAssistantPanel({
           open: true,
-          sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+          sqlSnippets: [
+            snippet.snippet.content?.sql.replace(sqlAiDisclaimerComment, '').trim() ?? '',
+          ],
           initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
         })
       } else {
         const { solution, sql } = await debugSql({
-          sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+          sql: snippet.snippet.content?.sql.replace(sqlAiDisclaimerComment, '').trim() ?? '',
           errorMessage: result.error.message,
           entityDefinitions,
         })
@@ -433,7 +435,7 @@ const SQLEditor = () => {
           })
         setDebugSolution(solution)
         setSourceSqlDiff({
-          original: snippet.snippet.content.sql,
+          original: snippet.snippet.content?.sql ?? '',
           modified: formattedSql,
         })
         setSelectedDiffType(DiffType.Modification)
@@ -745,7 +747,7 @@ const SQLEditor = () => {
                           : undefined
                         const sql = snippet
                           ? (selectedValue || editorRef.current?.getValue()) ??
-                            snippet.snippet.content.sql
+                            snippet.snippet.content?.sql
                           : selectedValue || editorRef.current?.getValue()
 
                         appSnap.setAiAssistantPanel({

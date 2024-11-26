@@ -83,7 +83,7 @@ const UtilityPanel = ({
       return DEFAULT_CHART_CONFIG
     }
 
-    if (!snippet.content.chart) {
+    if (!snippet.content?.chart) {
       return DEFAULT_CHART_CONFIG
     }
 

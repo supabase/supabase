@@ -17,7 +17,7 @@ import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -37,21 +37,21 @@ const SqlEditor: NextPageWithLayout = () => {
     true
   )
 
-  useContentIdQuery(
+  const { data } = useContentIdQuery(
     { projectRef: ref, id },
     {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
       enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
-      onSuccess: (data) => {
-        snapV2.addSnippet({ projectRef: ref as string, snippet: data })
-      },
-      onError: () => {
-        // [Joshen] Thinking if we need some error handler - it'll error out here when a new snippet is created from quickstart/templates
-      },
     }
   )
+
+  useEffect(() => {
+    if (ref && data) {
+      snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+    }
+  }, [ref, data])
 
   async function formatPgsql(value: string) {
     try {

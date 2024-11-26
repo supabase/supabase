@@ -8,7 +8,7 @@ import { Snippet } from 'data/content/sql-folders-query'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { SnippetWithContent, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 
@@ -57,7 +57,9 @@ const RenameQueryModal = ({
     } else {
       try {
         const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-        titleSql({ sql: content.sql })
+        if ('sql' in content) {
+          titleSql({ sql: content.sql })
+        }
       } catch (error) {
         toast.error('Unable to generate title based on query contents')
       }
@@ -80,7 +82,8 @@ const RenameQueryModal = ({
       if (!('content' in snippet)) {
         // [Joshen] I feel like there's definitely some optimization we can do here but will involve changes to API
         const snippet = await getContentById({ projectRef: ref, id })
-        snapV2.addSnippet({ projectRef: ref, snippet })
+
+        snapV2.addSnippet({ projectRef: ref, snippet: snippet as SnippetWithContent })
       }
       snapV2.renameSnippet({ id, name: nameInput, description: descriptionInput })
 

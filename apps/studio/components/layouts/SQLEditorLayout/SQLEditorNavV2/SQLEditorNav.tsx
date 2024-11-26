@@ -1,6 +1,6 @@
 import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -15,18 +15,16 @@ import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import {
   Snippet,
-  SnippetDetail,
   SnippetFolder,
   getSQLSnippetFolders,
   useSQLSnippetFoldersQuery,
 } from 'data/content/sql-folders-query'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
 import {
-  useFavoriteSnippets,
+  SnippetWithContent,
   useSnippetFolders,
   useSnippets,
   useSqlEditorV2StateSnapshot,
@@ -54,7 +52,11 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
   const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
+  useEffect(() => {
+    snapV2.setOrder(sort)
+  }, [sort])
 
   const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
@@ -77,28 +79,37 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =======================================================
   const snippets = useSnippets(projectRef as string)
   const folders = useSnippetFolders(projectRef as string)
-  const contents = snippets.filter((x) =>
-    searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
+  const contents = useMemo(
+    () =>
+      snippets.filter((x) =>
+        searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
+      ),
+    [searchText, snippets]
   )
   const snippet = snapV2.snippets[id as string]?.snippet
 
-  const privateSnippets = contents.filter((snippet) => snippet.visibility === 'user')
+  const privateSnippets = useMemo(
+    () => contents.filter((snippet) => snippet.visibility === 'user' && !snippet.favorite),
+    [contents]
+  )
   const numPrivateSnippets = snapV2.privateSnippetCount[projectRef as string]
   const privateSnippetsTreeState =
     folders.length === 0 && snippets.length === 0
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = useFavoriteSnippets(projectRef as string).filter((x) =>
-    searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
-  )
+  const favoriteSnippets = useMemo(() => contents.filter((snippet) => snippet.favorite), [contents])
+
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
     numFavoriteSnippets === 0
       ? [ROOT_NODE]
-      : formatFolderResponseForTreeView({ contents: favoriteSnippets as any })
+      : formatFolderResponseForTreeView({ contents: favoriteSnippets })
 
-  const projectSnippets = contents.filter((snippet) => snippet.visibility === 'project')
+  const projectSnippets = useMemo(
+    () => contents.filter((snippet) => snippet.visibility === 'project'),
+    [contents]
+  )
   const numProjectSnippets = projectSnippets.length
   const projectSnippetsTreeState =
     numProjectSnippets === 0
@@ -109,27 +120,36 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // [Joshen] React Queries
   // =================================
 
-  useSQLSnippetFoldersQuery(
+  const { isLoading, data } = useSQLSnippetFoldersQuery(
     { projectRef },
     {
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      onSuccess: (data) => {
-        if (projectRef !== undefined) {
-          snapV2.initializeRemoteSnippets({ projectRef, data, sort })
-        }
-      },
     }
   )
 
-  useSqlSnippetsQuery(projectRef, {
-    onSuccess(data) {
-      if (projectRef !== undefined) {
-        const favoriteSnippets = data.snippets.filter((snippet) => snippet.content.favorite)
-        snapV2.initializeFavoriteSnippets({ projectRef, snippets: favoriteSnippets })
-      }
-    },
-  })
+  useEffect(() => {
+    if (projectRef === undefined) return
+
+    data?.pages.forEach((page) => {
+      page.contents?.forEach((snippet) => {
+        snapV2.addSnippet({ projectRef, snippet })
+      })
+
+      page.folders?.forEach((folder) => {
+        snapV2.addFolder({ projectRef, folder })
+      })
+    })
+  }, [data, projectRef])
+
+  // useSqlSnippetsQuery(projectRef, {
+  //   onSuccess(data) {
+  //     if (projectRef !== undefined) {
+  //       const favoriteSnippets = data.snippets.filter((snippet) => snippet.content.favorite)
+  //       snapV2.initializeFavoriteSnippets({ projectRef, snippets: favoriteSnippets })
+  //     }
+  //   },
+  // })
 
   useContentCountQuery(
     { projectRef, type: 'sql' },
@@ -222,19 +242,21 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     }
   }
 
-  const onSelectCopyPersonal = async (snippet: Snippet) => {
+  const onSelectCopyPersonal = async (snippet: SnippetWithContent) => {
     if (!profile) return console.error('Profile is required')
     if (!project) return console.error('Project is required')
     if (!projectRef) return console.error('Project ref is required')
     if (!id) return console.error('Snippet ID is required')
 
     let sql: string = ''
-    if (!('content' in snippet)) {
+    if (snippet.content && snippet.content.sql) {
+      sql = snippet.content.sql
+    } else {
       // Fetch the content first
       const { content } = await getContentById({ projectRef, id: snippet.id })
-      sql = content.sql
-    } else {
-      sql = (snippet as SnippetDetail).content.sql
+      if ('sql' in content) {
+        sql = content.sql
+      }
     }
 
     const snippetCopy = createSqlSnippetSkeletonV2({
@@ -455,7 +477,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
             ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
         />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-          {!snapV2.loaded[projectRef as string] ? (
+          {isLoading ? (
             <>
               <div className="flex flex-row h-6 px-3 items-center gap-3">
                 <Skeleton className="h-4 w-5" />
