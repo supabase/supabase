@@ -31,7 +31,7 @@ export const NoProjectsOnPaidOrgInfo = ({ organization }: NoProjectsOnPaidOrgInf
         <div className="!max-w-full prose text-sm">
           The monthly fees for the paid plan still apply. To cancel your subscription, head over to
           your{' '}
-          <Link href={`/dashboard/org/${organization?.slug}/billing`}>
+          <Link href={`/org/${organization?.slug}/billing`}>
             organization billing settings
           </Link>
         </div>
