@@ -11,6 +11,7 @@ import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { getQueryClient } from 'data/query-client'
 import { getContentById } from 'data/content/content-id-query'
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -76,6 +77,9 @@ export const sqlEditorState = proxy({
   // For handling renaming folder failed
   lastUpdatedFolderName: '',
 
+  // For Assistant to render diffing into the editor
+  diffContent: undefined as undefined | { sql: string; diffType: DiffType },
+
   get allFolderNames() {
     return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
   },
@@ -120,6 +124,9 @@ export const sqlEditorState = proxy({
       }
     })
   },
+
+  setDiffContent: (sql: string, diffType: DiffType) =>
+    (sqlEditorState.diffContent = { sql, diffType }),
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
 

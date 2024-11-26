@@ -13,6 +13,8 @@ import { cn } from 'ui'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
+import { useAppStateSnapshot } from 'state/app-state'
 
 export type MonacoEditorProps = {
   id: string
@@ -38,6 +40,9 @@ const MonacoEditor = ({
   const { ref, content } = useParams()
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
@@ -68,6 +73,25 @@ const MonacoEditor = ({
         executeQueryRef.current()
       },
     })
+
+    if (isAssistantV2Enabled) {
+      editor.addAction({
+        id: 'explain-code',
+        label: 'Explain Code',
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 1,
+        run: () => {
+          const selectedValue = (editorRef?.current as any)
+            .getModel()
+            .getValueInRange((editorRef?.current as any)?.getSelection())
+          setAiAssistantPanel({
+            open: true,
+            sqlSnippets: [selectedValue],
+            initialInput: 'Can you explain this section to me in more detail?',
+          })
+        },
+      })
+    }
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =

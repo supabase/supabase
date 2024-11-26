@@ -1,37 +1,20 @@
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
-import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
-import { LW12_DATE, LW12_TITLE, LW_URL, SITE_ORIGIN } from '~/lib/constants'
+import { LW13_DATE, LW13_TITLE, LW_URL, SITE_ORIGIN } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { Meetup } from '~/components/LaunchWeek/12/LWMeetups'
-import LWStickyNav from '~/components/LaunchWeek/12/Releases/LWStickyNav'
-import LWHeader from '~/components/LaunchWeek/12/Releases/LWHeader'
-import MainStage from '~/components/LaunchWeek/12/Releases/MainStage'
+import TicketingFlow from '~/components/LaunchWeek/13/Ticket/TicketingFlow'
 
-const BuildStage = dynamic(() => import('~/components/LaunchWeek/12/Releases/BuildStage'))
-const CTABanner = dynamic(() => import('~/components/CTABanner'))
-const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/12/LaunchWeekPrizeSection')
-)
-const LW12Meetups = dynamic(() => import('~/components/LaunchWeek/12/LWMeetups'))
-
-interface Props {
-  meetups?: Meetup[]
-}
-
-export default function LaunchWeekIndex({ meetups }: Props) {
+export default function LaunchWeekIndex() {
   const { query } = useRouter()
 
-  const TITLE = `${LW12_TITLE} | ${LW12_DATE}`
+  const TITLE = `${LW13_TITLE} | 2-6 Dec / 7am PT`
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/12/lw12-og.png?lw=12`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/13/lw13-og.png`
 
   const ticketNumber = query.ticketNumber?.toString()
   const [session, setSession] = useState<Session | null>(null)
@@ -99,35 +82,10 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout>
-          <LWStickyNav />
-          <LWHeader />
-          <MainStage className="relative z-10" />
-          <BuildStage />
-          <SectionContainer id="meetups" className="scroll-mt-[60px] lw-nav-anchor">
-            <LW12Meetups meetups={meetups} />
-          </SectionContainer>
-          <SectionContainer className="!pt-8 scroll-mt-[60px] lw-nav-anchor" id="awards">
-            <LaunchWeekPrizeSection />
-          </SectionContainer>
-          <CTABanner />
+        <DefaultLayout className="lg:h-[calc(100dvh-65px)] min-h-[calc(100vh)] md:min-h-[calc(100vh-65px)] overflow-hidden">
+          <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!
-    .from('meetups')
-    .select('*')
-    .eq('launch_week', 'lw12')
-    .neq('is_published', false)
-    .order('start_at')
-
-  return {
-    props: {
-      meetups,
-    },
-  }
 }
