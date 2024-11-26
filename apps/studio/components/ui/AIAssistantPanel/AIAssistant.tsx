@@ -42,6 +42,8 @@ import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
 import { useParams } from 'common/hooks'
 import { useSearchParamsShallow } from 'common/hooks'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useRouter } from 'next/router'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -73,16 +75,18 @@ export const AIAssistant = ({
   className,
   onResetConversation,
 }: AIAssistantProps) => {
+  const router = useRouter()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
-  const params = useParams()
+  const { id: entityId } = useParams()
   const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const { snippets } = useSqlEditorV2StateSnapshot()
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { initialInput, sqlSnippets, suggestions } = aiAssistantPanel
+  const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -97,6 +101,10 @@ export const AIAssistant = ({
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
+  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const snippet = snippets[entityId ?? '']
+  const snippetContent = snippet?.snippet?.content?.sql
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -106,7 +114,7 @@ export const AIAssistant = ({
     schema: 'public',
   })
 
-  const currentTable = tables?.find((t) => t.id.toString() === params?.id)
+  const currentTable = tables?.find((t) => t.id.toString() === entityId)
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
@@ -279,6 +287,13 @@ export const AIAssistant = ({
       setAiAssistantPanel({ suggestions: undefined })
     }
   }, [sqlSnippets, suggestions, setAiAssistantPanel])
+
+  useEffect(() => {
+    if (open && isInSQLEditor && !!snippetContent) {
+      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isInSQLEditor, snippetContent])
 
   if (isLoadingTables) {
     return (
