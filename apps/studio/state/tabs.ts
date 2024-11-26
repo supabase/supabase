@@ -8,19 +8,21 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 // Define the type of tabs available in the application
 export type TabType = ENTITY_TYPE | 'sql' | 'schema' | 'new'
 
-// Interface representing a single tab
 export interface Tab {
-  id: string
-  type: TabType
-  label?: string
-  icon?: ReactNode
+  id: string // Unique identifier for the tab
+  type: TabType // Type of the tab, which can be an entity type or specific string values
+  label?: string // Optional label for the tab, displayed to the user
+  icon?: ReactNode // Optional icon associated with the tab
   metadata?: {
-    schema?: string
-    name?: string
-    tableId?: number
-    sqlId?: string
+    // Optional metadata related to the tab
+    schema?: string // Optional schema name associated with the tab
+    name?: string // Optional name of the entity represented by the tab
+    tableId?: number // Optional ID of the table associated with the tab
+    sqlId?: string // Optional ID of the SQL query associated with the tab
   }
-  isPreview?: boolean
+  isPreview?: boolean // Optional flag indicating if the tab is in preview mode
+  createdAt?: Date // Optional timestamp for when the tab was created
+  updatedAt?: Date // Optional timestamp for when the tab was last updated
 }
 
 // Interface representing the state of tabs
@@ -269,8 +271,10 @@ export const handleTabClose = (
     store.openTabs = [...currentTabs.map((tab) => tab.id).filter((id) => id !== currentTab.id)]
   }
 
+  // Check if there is a preview tab and if it matches the tab being closed
   if (store.previewTabId) {
     if (store.previewTabId === id) {
+      // remove the preview tab if it matches the tab being closed
       store.previewTabId = undefined
     }
   }
