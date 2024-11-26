@@ -349,6 +349,16 @@ export const gettingstarted: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'AI Prompts',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/getting-started/ai-prompts',
+        },
+      ],
+    },
   ],
 }
 
