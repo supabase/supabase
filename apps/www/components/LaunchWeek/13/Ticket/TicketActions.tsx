@@ -4,9 +4,10 @@ import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
-import { Button } from 'ui'
+import { Button, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { LW_URL, TWEET_TEXT, TWEET_TEXT_PLATINUM, TWEET_TEXT_SECRET } from '~/lib/constants'
+import useLWPartyMode from '../useLWPartyMode'
 
 export default function TicketActions() {
   const { resolvedTheme } = useTheme()
@@ -74,13 +75,13 @@ export default function TicketActions() {
   }
 
   return (
-    <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto !cursor-none">
+    <div className="flex flex-row flex-wrap justify-start w-full gap-2 pointer-events-auto">
       <Button
         onClick={() => handleShare('twitter')}
         type={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow !cursor-none"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
         asChild
       >
         <Link href={tweetUrl} target="_blank">
@@ -92,7 +93,7 @@ export default function TicketActions() {
         type={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
-        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow !cursor-none"
+        className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-grow"
         asChild
       >
         <Link href={linkedInUrl} target="_blank">

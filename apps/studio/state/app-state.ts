@@ -22,7 +22,7 @@ export type CommonDatabaseEntity = {
 
 export type SuggestionsType = {
   title: string
-  prompts: string[]
+  prompts?: string[]
 }
 
 type AiAssistantPanelType = {

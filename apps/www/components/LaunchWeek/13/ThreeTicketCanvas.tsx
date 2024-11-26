@@ -503,11 +503,11 @@ const ThreeTicketCanvas: React.FC<{
   return (
     <div
       className={cn(
-        'w-screen absolute inset-0 lg:h-full lg:min-h-full flex justify-end items-center overflow-hidden pointer-events-none',
+        'w-screen absolute inset-0 lg:h-full lg:min-h-full lg:max-h-[1000px] flex justify-end items-center overflow-hidden pointer-events-none',
         className
       )}
     >
-      <div ref={canvasRef} className="w-full lg:h-full !cursor-none" />
+      <div ref={canvasRef} className="w-full lg:h-full" />
       {isGameMode && !hasWon && !sharePage && (
         <InputOTP
           ref={inputRef}

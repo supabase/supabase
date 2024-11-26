@@ -40,6 +40,10 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
+import { useParams } from 'common/hooks'
+import { useSearchParamsShallow } from 'common/hooks'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useRouter } from 'next/router'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -71,14 +75,18 @@ export const AIAssistant = ({
   className,
   onResetConversation,
 }: AIAssistantProps) => {
+  const router = useRouter()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
+  const { id: entityId } = useParams()
+  const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
+  const { snippets } = useSqlEditorV2StateSnapshot()
   const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-  const { initialInput, sqlSnippets, suggestions } = aiAssistantPanel
+  const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -93,6 +101,10 @@ export const AIAssistant = ({
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
+  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const snippet = snippets[entityId ?? '']
+  const snippetContent = snippet?.snippet?.content?.sql
+
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -101,6 +113,9 @@ export const AIAssistant = ({
     connectionString: project?.connectionString,
     schema: 'public',
   })
+
+  const currentTable = tables?.find((t) => t.id.toString() === entityId)
+  const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
   const sendTelemetryEvent = (value: string) => {
@@ -126,6 +141,8 @@ export const AIAssistant = ({
       includeSchemaMetadata,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      schema: currentSchema,
+      table: currentTable?.name,
     },
   })
 
@@ -264,6 +281,20 @@ export const AIAssistant = ({
     }
   }, [messages, isChatLoading, setAiAssistantPanel])
 
+  // Remove suggestions if sqlSnippets were removed
+  useEffect(() => {
+    if (!sqlSnippets || sqlSnippets.length === 0) {
+      setAiAssistantPanel({ suggestions: undefined })
+    }
+  }, [sqlSnippets, suggestions, setAiAssistantPanel])
+
+  useEffect(() => {
+    if (open && isInSQLEditor && !!snippetContent) {
+      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, isInSQLEditor, snippetContent])
+
   if (isLoadingTables) {
     return (
       <div className="h-full w-full flex justify-center items-center">
@@ -329,7 +360,7 @@ export const AIAssistant = ({
                 })}
               </div>
               {renderedMessages}
-              {last(messages)?.role === 'user' && (
+              {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
                 <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
                   <span>Thinking</span>
                   <div className="flex gap-1">
@@ -363,7 +394,7 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts.map((prompt) => (
+                {suggestions?.prompts?.map((prompt) => (
                   <Button
                     size="small"
                     icon={<FileText strokeWidth={1.5} size={16} />}

@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
-  const { messages, projectRef, connectionString, includeSchemaMetadata } = req.body
+  const { messages, projectRef, connectionString, includeSchemaMetadata, schema, table } = req.body
 
   if (!projectRef) {
     return res.status(400).json({
@@ -109,6 +109,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
 
       Here are the existing database schema names you can retrieve: ${schemas}
+
+      ${schema !== undefined ? `The user is currently looking at the ${schema} schema.` : ''}
+      ${table !== undefined ? `The user is currently looking at the ${table} table.` : ''}
       `,
     messages,
     tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
