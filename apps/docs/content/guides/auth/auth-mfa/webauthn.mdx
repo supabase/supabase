@@ -90,7 +90,7 @@ You can enroll a WebAuthn factor with a single step:
 ```ts
 import { browserSupportsWebAuthn } from '@supabase/supabase-js'
 if (supabase.auth.browserSupportsWebAuthn()) {
-    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn'})
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', friendlyName: 'my-friendly-name'})
 })
 ```
 
@@ -120,67 +120,6 @@ const credential = await navigator.credentials.create(data)
 const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
 ```
 
-Verification is often done on a page with a single button.
-
-```ts
-export default function MFAWebAuthn() {
-  const [error, setError] = useState(null)
-  const [isAuthenticating, setIsAuthenticating] = useState(false)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    startAuthentication()
-  }, [])
-
-  const startAuthentication = async () => {
-    setIsAuthenticating(true)
-    setError(null)
-
-    try {
-      const { data, error: authError } = await supabase.auth.mfa.verify({
-        factorType: 'webauthn'
-      })
-
-      if (authError) throw authError
-
-      console.log('Authentication successful', data)
-      // Handle successful authentication here
-      // For example, navigate to protected route:
-      // navigate('/dashboard')
-
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setIsAuthenticating(false)
-    }
-  }
-
-  return (
-    <div>
-      <h2>Security Verification Required</h2>
-      <p>Please verify your identity using your security key.</p>
-
-      {error && (
-        <div>
-          <p>Error: {error}</p>
-        </div>
-      )}
-
-      <button
-        onClick={startAuthentication}
-        disabled={isAuthenticating}
-      >
-        {isAuthenticating ? 'Verifying...' : 'Verify Identity'}
-      </button>
-
-      <button onClick={() => navigate('/mfa-selection')}>
-        Use Different Method
-      </button>
-    </div>
-  )
-}
-```
-
 Setting `useMultiStep` to false informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application
 
 When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
@@ -203,6 +142,52 @@ Once a user has registered a factor, they can proceed to log in. In single-step 
 
 ```ts
 const { data, error } = await supabase.auth.mfa.verify({ factorType: 'webauthn' })
+```
+
+Here's an example login page:
+
+```tsx
+const MFAWebAuthn = ({ supabase }) => {
+  const [error, setError] = useState(null)
+  const [isVerifying, setIsVerifying] = useState(false)
+
+  const verify = async () => {
+    setIsVerifying(true)
+    setError(null)
+    try {
+      const { data, error } = await supabase.auth.mfa.verify({
+        factorType: 'webauthn',
+      })
+      if (error) throw error
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
+  // Start verification on mount
+  useEffect(() => {
+    verify()
+  }, [])
+
+  return (
+    <div>
+      <h2>Security Key Verification</h2>
+      <p>Follow your browser's instructions to continue</p>
+
+      {error && (
+        <div role="alert">
+          <p>Error: {error}</p>
+        </div>
+      )}
+
+      <button onClick={verify} disabled={isVerifying}>
+        {isVerifying ? 'Verifying...' : 'Try Again'}
+      </button>
+    </div>
+  )
+}
 ```
 
 As with enrollment, developers have the option of performing verification over multiple steps.
