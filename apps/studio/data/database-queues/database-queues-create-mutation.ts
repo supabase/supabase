@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { tableKeys } from 'data/tables/keys'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
@@ -62,6 +63,7 @@ export const useDatabaseQueueCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+        queryClient.invalidateQueries(tableKeys.list(projectRef, 'pgmq'))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

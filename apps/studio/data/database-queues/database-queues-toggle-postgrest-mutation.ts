@@ -169,7 +169,6 @@ comment on function ${QUEUES_SCHEMA}.queue_read(queue_name text, sleep_seconds i
 grant execute on function ${QUEUES_SCHEMA}.queue_pop(text) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.pop(text) to postgres, service_role, anon, authenticated;
 
-
 grant execute on function ${QUEUES_SCHEMA}.queue_send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
 
@@ -197,31 +196,29 @@ grant usage on schema pgmq to postgres, anon, authenticated, service_role;
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
   drop function if exists 
-    ${QUEUES_SCHEMA}.pop(queue_name text),
-    ${QUEUES_SCHEMA}.send(queue_name text, msg jsonb, sleep_seconds integer),
-    ${QUEUES_SCHEMA}.send(queue_name text, msg jsonb, available_at timestamp with time zone),
-    ${QUEUES_SCHEMA}.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer),
-    ${QUEUES_SCHEMA}.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone),
-    ${QUEUES_SCHEMA}.archive(queue_name text, msg_id bigint),
-    ${QUEUES_SCHEMA}.delete(queue_name text, msg_id bigint),
-    ${QUEUES_SCHEMA}.read(queue_name text, sleep integer, qty integer)
+    ${QUEUES_SCHEMA}.queue_pop(queue_name text),
+    ${QUEUES_SCHEMA}.queue_send(queue_name text, message jsonb, sleep_seconds integer),
+    ${QUEUES_SCHEMA}.queue_send_batch(queue_name text, message jsonb[], sleep_seconds integer),
+    ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint),
+    ${QUEUES_SCHEMA}.queue_delete(queue_name text, message_id bigint),
+    ${QUEUES_SCHEMA}.queue_read(queue_name text, sleep integer, n integer)
   ;
 
-  -- Revoke execute permissions on inner pgmq functions to roles
-  revoke execute on function pgmq.pop(text) from service_role, anon, authenticated;
-  revoke execute on function pgmq.send(text, jsonb, integer) from service_role, anon, authenticated;
-  -- revoke execute on function pgmq.send(payload jsonb, text, text, boolean) from service_role, anon, authenticated;
-  revoke execute on function pgmq.send_batch(text, jsonb[], integer) from service_role, anon, authenticated;
-  -- revoke execute on function pgmq.send_batch(text, jsonb[], timestamp with time zone) from service_role, anon, authenticated;
-  revoke execute on function pgmq.archive(text, bigint) from service_role, anon, authenticated;
-  revoke execute on function pgmq.delete(text, bigint) from service_role, anon, authenticated;
-  revoke execute on function pgmq.read(text, integer, integer) from service_role, anon, authenticated;
+  -- Revoke execute permissions on inner pgmq functions to roles (inverse of enabling)
+  revoke execute on function pgmq.pop(text) from postgres, service_role, anon, authenticated;
+  revoke execute on function pgmq.send(text, jsonb, integer) from postgres, service_role, anon, authenticated;
+  revoke execute on function pgmq.send_batch(text, jsonb[], integer) from postgres, service_role, anon, authenticated;
+  revoke execute on function pgmq.archive(text, bigint) from postgres, service_role, anon, authenticated;
+  revoke execute on function pgmq.delete(text, bigint) from postgres, service_role, anon, authenticated;
+  revoke execute on function pgmq.read(text, integer, integer) from postgres, service_role, anon, authenticated;
 
   -- For service role, revoke permissions on existing tables
-  revoke all privileges on all tables in schema pgmq from service_role;
+  revoke all privileges on all tables in schema pgmq from postgres, service_role;
 
   -- Ensure service_role has no permissions on future tables
-  alter default privileges in schema pgmq revoke all privileges on tables from service_role;
+  alter default privileges in schema pgmq revoke all privileges on tables from postgres, service_role;
+
+  revoke usage on schema pgmq from postgres, anon, authenticated, service_role;
 
   drop schema if exists ${QUEUES_SCHEMA};
 `)
