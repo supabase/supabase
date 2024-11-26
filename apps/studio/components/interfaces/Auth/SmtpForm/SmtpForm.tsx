@@ -29,6 +29,7 @@ import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -218,10 +219,17 @@ const SmtpForm = () => {
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
                     descriptionText={
-                      <Markdown
-                        className="max-w-full [&>p]:text-foreground-lighter"
-                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/project/${projectRef}/auth/rate-limits).`}
-                      />
+                      <p className="max-w-full prose text-sm text-foreground-lighter">
+                        Emails will be sent using your custom SMTP provider. Email rate limits can
+                        be adjusted{' '}
+                        <Link
+                          className="underline"
+                          href={`/project/${projectRef}/auth/rate-limits`}
+                        >
+                          here
+                        </Link>
+                        .
+                      </p>
                     }
                   />
                   {enableSmtp ? (
