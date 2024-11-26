@@ -37,7 +37,7 @@ export async function createDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} ${enableRls ? `alter table "a_${name}" enable row level security;` : ''}`.trim(),
+    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
     queryKey: databaseQueuesKeys.create(),
   })
 

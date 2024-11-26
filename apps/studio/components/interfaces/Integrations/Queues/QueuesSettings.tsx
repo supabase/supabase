@@ -198,11 +198,6 @@ export const QueuesSettings = () => {
                             endpoint to manage your queues. Permissions on individual queues can
                             also be further managed through privileges and row level security (RLS).
                           </p>
-                          <DocsButton
-                            abbrev={false}
-                            className="w-min"
-                            href="https://supabase.com/docs"
-                          />
                         </div>
                       </Admonition>
                     )}
@@ -237,22 +232,29 @@ export const QueuesSettings = () => {
                 )}
               />
             </FormPanelContent>
-            <FormPanelFooter className="flex px-8 py-4 flex items-center justify-end gap-x-2">
-              <Button
-                type="default"
-                disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
-                onClick={() => form.reset({ enable: false })}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="primary"
-                htmlType="submit"
-                disabled={Object.keys(formState.dirtyFields).length === 0}
-                loading={isToggling}
-              >
-                Save changes
-              </Button>
+
+            <FormPanelFooter className="flex px-8 py-4 flex items-center justify-between">
+              <DocsButton
+                abbrev={false}
+                href="https://github.com/tembo-io/pgmq?tab=readme-ov-file#sql-examples"
+              />
+              <div className="flex items-center gap-x-2">
+                <Button
+                  type="default"
+                  disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
+                  onClick={() => form.reset({ enable: false })}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  disabled={Object.keys(formState.dirtyFields).length === 0}
+                  loading={isToggling}
+                >
+                  Save changes
+                </Button>
+              </div>
             </FormPanelFooter>
           </FormPanelContainer>
         </form>
