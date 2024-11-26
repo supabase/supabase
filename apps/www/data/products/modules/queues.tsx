@@ -1,27 +1,32 @@
 import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default () => ({
-  metaTitle: 'Supabase Cron | Schedule and automate tasks',
+  metaTitle: 'Supabase Queues | Schedule and automate tasks',
   metaDescription: 'Schedule and automate tasks at scale',
-  url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
-  docsUrl: '/docs/guides/cron',
+  url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+  docsUrl: '/docs/guides/queues',
   heroSection: {
-    title: 'Supabase Cron',
+    title: 'Supabase Queues',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        Schedule and automate tasks at scale
+        Native pull queues without headache
       </span>
     ),
-    subheader: <>Runs maintenance routines at specified intervals directly inside the database.</>,
+    subheader: (
+      <>
+        Manage queues without maintaining additional infrastructure with native PostgreSQL-based
+        message queue system.
+      </>
+    ),
     // image: '/images/product/vector/vector-hero.svg',
-    icon: PRODUCT_MODULES['cron-jobs'].icon[24],
+    icon: PRODUCT_MODULES.queues.icon[24],
     cta: {
       label: 'Try for free',
-      link: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+      link: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
     secondaryCta: {
       label: 'Explore documentation',
-      link: '/docs/guides/cron',
+      link: '/docs/guides/queues',
     },
   },
   highlightsSection: {
@@ -64,7 +69,7 @@ export default () => ({
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
     cta: {
       label: 'Start scheduling',
-      url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
     // features: [
     //   {
@@ -89,7 +94,7 @@ export default () => ({
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
     // cta: {
     //   label: 'Start scheduling',
-    //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+    //   url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     // },
     // features: [
     //   {

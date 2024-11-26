@@ -3,7 +3,7 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import CronPageData from '~/data/products/modules/cron'
+import CronPageData from '~/data/products/modules/queues'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import CTABanner from '~/components/CTABanner'
 
@@ -28,7 +28,7 @@ function CronPage() {
         openGraph={{
           title: pageData.metaTitle,
           description: pageData.metaDescription,
-          url: `https://supabase.com/modules/cron-jobs`,
+          url: `https://supabase.com/modules/queues`,
           images: [
             {
               url: `https://supabase.com${basePath}/images/product/vector/og.png`,
@@ -37,7 +37,7 @@ function CronPage() {
         }}
       />
       <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
-        <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON_JOBS} docsUrl={pageData.docsUrl} />
+        <ModulesNav activePage={PRODUCT_MODULES_NAMES.QUEUES} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <CenteredImage {...pageData.centeredImage} />
         <HighlightCards {...(pageData.highlightsSection as any)} />

@@ -19,18 +19,18 @@ const ProductModules: ProductType = {
     label: '',
     url: '/modules/vector',
   },
-  [PRODUCT_MODULES_SHORTNAMES.CRON_JOBS]: {
-    name: PRODUCT_MODULES_NAMES.CRON_JOBS,
-    icon: PRODUCT_MODULES['cron-jobs'].icon[24],
+  [PRODUCT_MODULES_SHORTNAMES.QUEUES]: {
+    name: PRODUCT_MODULES_NAMES.QUEUES,
+    icon: PRODUCT_MODULES.queues.icon[24],
     description: (
       <>
-        Integrate your favorite ML-models to{' '}
-        <strong>store, index and search vector embeddings</strong>.
+        Native Postgres queuing solution for dedicated message queues with the simplicity of SQL and
+        zero additional infrastructure
       </>
     ),
-    description_short: 'Schedule, manage and monitor jobs',
+    description_short: 'Native pull queues without headache',
     label: '',
-    url: '/modules/cron-jobs',
+    url: '/modules/queues',
   },
 }
 
