@@ -3,9 +3,11 @@ import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
+import { Markdown } from 'components/interfaces/Markdown'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-queues-create-mutation'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import {
   Badge,
   Button,
@@ -27,9 +29,7 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Markdown } from 'components/interfaces/Markdown'
+import { useRouter } from 'next/router'
 
 export interface CreateQueueSheetProps {
   isClosing: boolean
@@ -77,6 +77,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )
+  const router = useRouter()
   const { project } = useProjectContext()
 
   const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
@@ -96,7 +97,6 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
   })
 
   const isEdited = form.formState.isDirty
-  const { enableRls } = form.watch()
 
   // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
   if (!isEdited && isClosing) onClose()
@@ -128,6 +128,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
       {
         onSuccess: () => {
           toast.success(`Successfully created queue ${name}`)
+          router.push(`/project/${project?.ref}/integrations/queues/queues/${name}`)
           onClose()
         },
       }
@@ -317,7 +318,7 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                         <Checkbox_Shadcn_
                           checked={field.value}
                           onCheckedChange={field.onChange}
-                          disabled={field.disabled}
+                          disabled={field.disabled || isExposed}
                         />
                       </FormControl_Shadcn_>
                     </FormItemLayout>
@@ -334,17 +335,11 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                       endpoints by enabling this in the [queues settings](/project/${project?.ref}/integrations/queues/settings).`}
                     />
                   </Admonition>
-                ) : enableRls ? (
-                  <Admonition
-                    type="default"
-                    title="Policies are required to manage queues"
-                    description="The queue will not be accessible until a policy is defined"
-                  />
                 ) : (
                   <Admonition
-                    type="warning"
-                    title="You are allowing anonymous access to your queue"
-                    description="Anyone will be able to manage your queue"
+                    type="default"
+                    title="RLS must be enabled as queues are exposed via PostgREST"
+                    description="This is to prevent anonymous access to any of your queues"
                   />
                 )}
               </SheetSection>

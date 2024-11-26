@@ -13,18 +13,7 @@ export type DatabaseQueuesVariables = {
 
 // [Joshen] Check if all the relevant functions exist to indicate whether PGMQ has been exposed through PostgREST
 const queueSqlQuery = minify(/**SQL */ `
-  SELECT (count(*) = 6) as exists
-  FROM pg_proc p
-  JOIN pg_namespace n ON p.pronamespace = n.oid
-  WHERE n.nspname = '${QUEUES_SCHEMA}'
-  AND (
-      (p.proname = 'queue_pop' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text') OR
-      (p.proname = 'queue_send' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, message jsonb, sleep_seconds integer') OR
-      (p.proname = 'queue_send_batch' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, messages jsonb[], sleep_seconds integer') OR
-      (p.proname = 'queue_archive' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, message_id bigint') OR
-      (p.proname = 'queue_delete' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, message_id bigint') OR
-      (p.proname = 'queue_read' AND pg_get_function_identity_arguments(p.oid) = 'queue_name text, sleep_seconds integer, n integer')
-  );
+  SELECT exists (select schema_name FROM information_schema.schemata WHERE schema_name = '${QUEUES_SCHEMA}');
 `)
 
 export async function getDatabaseQueuesExposePostgrestStatus({
@@ -38,7 +27,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     connectionString,
     sql: queueSqlQuery,
   })
-  return result[0].exists
+  return result[0].exists as boolean
 }
 
 export type DatabaseQueueData = boolean

@@ -94,7 +94,7 @@ export const QueuesTab = () => {
       </div>
 
       <Sheet open={createQueueSheetShown} onOpenChange={() => setIsClosingCreateQueueSheet(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
+        <SheetContent size="default" className="w-[35%]" tabIndex={undefined}>
           <CreateQueueSheet
             onClose={() => {
               setIsClosingCreateQueueSheet(false)

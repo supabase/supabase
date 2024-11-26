@@ -82,13 +82,14 @@ export const QueueTab = () => {
   })
 
   const onToggleRLS = async () => {
+    if (!project) return console.error('Project is required')
     if (!queueTable) return toast.error('Unable to toggle RLS: Queue table not found')
     const payload = {
       id: queueTable.id,
       rls_enabled: true,
     }
     updateTable({
-      projectRef: project?.ref!,
+      projectRef: project?.ref,
       connectionString: project?.connectionString,
       id: payload.id,
       schema: 'pgmq',
