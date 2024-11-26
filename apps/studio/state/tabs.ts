@@ -51,6 +51,7 @@ export const getTabsStore = (ref: string | undefined): TabsState => {
     const stored = localStorage.getItem(getStorageKey(ref))
     tabsStore[ref] = proxy(stored ? JSON.parse(stored) : { ...defaultState })
   }
+
   return tabsStore[ref]
 }
 

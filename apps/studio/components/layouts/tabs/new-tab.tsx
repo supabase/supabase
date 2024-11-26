@@ -16,7 +16,7 @@ import { toast } from 'sonner'
 import type { RecentItem } from 'state/recent-items'
 import { recentItemsStore } from 'state/recent-items'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { editorEntityTypes, removeNewTab } from 'state/tabs'
+import { createTabId, editorEntityTypes, getTabsStore, removeNewTab } from 'state/tabs'
 import {
   Badge,
   Button,
@@ -39,6 +39,8 @@ import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { ActionCard } from './actions-card'
 import { partition } from 'lodash'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 
 dayjs.extend(relativeTime)
 
@@ -193,6 +195,7 @@ export function NewTab() {
   const { profile } = useProfile()
   const editor = useEditorType()
   const project = useSelectedProject()
+  const store = getTabsStore(ref)
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { isInUse: isPostgresInUse, isLoading: isLoadingCheckingPostgres } = usePostgresInUse()
 
@@ -203,24 +206,52 @@ export function NewTab() {
 
   //   const showRightPanel = false
 
-  const handleNewQuery = async () => {
+  const handleNewQuery = async (sql?: string, name?: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
+    const id = uuidv4()
+    const tabId = createTabId('sql', { id })
 
-    try {
-      const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
-        name: untitledSnippetTitle,
-        owner_id: profile.id,
-        project_id: project.id,
-        sql: '',
-      })
-      snapV2.addSnippet({ projectRef: ref as string, snippet })
-      removeNewTab(ref)
-      router.push(`/project/${ref}/sql/${snippet.id}`)
-    } catch (error: any) {
-      toast.error(`Failed to create new query: ${error.message}`)
+    if (sql && name) {
+      try {
+        const snippet = createSqlSnippetSkeletonV2({
+          id,
+          name,
+          sql,
+          owner_id: profile?.id,
+          project_id: project?.id,
+        })
+        snapV2.addSnippet({ projectRef: ref, snippet })
+        snapV2.addNeedsSaving(snippet.id)
+        store.openTabs = [...store.openTabs, tabId]
+        store.tabsMap[tabId] = {
+          id: tabId,
+          type: 'sql',
+          // Remove the label since we'll derive it dynamically
+          metadata: { sqlId: snippet.id },
+        }
+        store.activeTab = tabId
+
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+      } catch (error: any) {
+        toast.error(`Failed to create new query: ${error.message}`)
+      }
+    } else {
+      try {
+        const snippet = createSqlSnippetSkeletonV2({
+          id: uuidv4(),
+          name: untitledSnippetTitle,
+          owner_id: profile.id,
+          project_id: project.id,
+          sql: '',
+        })
+        snapV2.addSnippet({ projectRef: ref as string, snippet })
+        removeNewTab(ref)
+        router.push(`/project/${ref}/sql/${snippet.id}`)
+      } catch (error: any) {
+        toast.error(`Failed to create new query: ${error.message}`)
+      }
     }
   }
 
@@ -231,6 +262,8 @@ export function NewTab() {
 
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   return (
     <LayoutGroup>
@@ -285,41 +318,41 @@ export function NewTab() {
                       // },
                     ]
                   : [
-                      {
-                        icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-                        title: 'New Table',
-                        description: 'Create Postgres tables',
-                        bgColor: 'bg-blue-500',
-                        isBeta: false,
-                      },
-                      {
-                        icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-                        title: 'Upload CSV',
-                        description: 'Import data from CSV files',
-                        bgColor: 'bg-green-500',
-                        isBeta: false,
-                        onClick: handleNewQuery,
-                      },
                       // {
-                      //   icon: (
-                      //     <SQL_ICON
-                      //       className={cn('fill-foreground', 'w-4 h-4')}
-                      //       strokeWidth={1.5}
-                      //     />
-                      //   ),
-                      //   title: 'New Query',
-                      //   description: 'Execute SQL queries',
-                      //   bgColor: 'bg-violet-500',
+                      //   icon: <Table2 className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                      //   title: 'New Table',
+                      //   description: 'Create Postgres tables',
+                      //   bgColor: 'bg-blue-500',
+                      //   isBeta: false,
+                      // },
+                      // {
+                      //   icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
+                      //   title: 'Upload CSV',
+                      //   description: 'Import data from CSV files',
+                      //   bgColor: 'bg-green-500',
                       //   isBeta: false,
                       //   onClick: handleNewQuery,
                       // },
-                      // {
-                      //   icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
-                      //   title: 'New Report',
-                      //   description: 'Create data visualizations',
-                      //   bgColor: 'bg-orange-500',
-                      //   isBeta: true,
-                      // },
+                      {
+                        icon: (
+                          <SQL_ICON
+                            className={cn('fill-foreground', 'w-4 h-4')}
+                            strokeWidth={1.5}
+                          />
+                        ),
+                        title: 'New Query',
+                        description: 'Execute SQL queries',
+                        bgColor: 'bg-violet-500',
+                        isBeta: false,
+                        onClick: handleNewQuery,
+                      },
+                      {
+                        icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
+                        title: 'New Report',
+                        description: 'Create data visualizations',
+                        bgColor: 'bg-orange-500',
+                        isBeta: true,
+                      },
                     ]
                 ).map((item, i) => (
                   <ActionCard key={`action-card-${i}`} {...item} />
@@ -478,6 +511,14 @@ export function NewTab() {
                     <div className="grid grid-cols-3 gap-4">
                       {templates.map((item, i) => (
                         <ActionCard
+                          onClick={() => {
+                            handleNewQuery(item.sql, item.title)
+                            sendEvent({
+                              category: 'scripts',
+                              action: 'script_clicked',
+                              label: item.title,
+                            })
+                          }}
                           bgColor="bg-alternative"
                           key={`action-card-${i}`}
                           {...item}
@@ -495,6 +536,14 @@ export function NewTab() {
                     <div className="grid grid-cols-3 gap-4">
                       {quickstarts.map((item, i) => (
                         <ActionCard
+                          onClick={() => {
+                            handleNewQuery(item.sql, item.title)
+                            sendEvent({
+                              category: 'scripts',
+                              action: 'script_clicked',
+                              label: item.title,
+                            })
+                          }}
                           bgColor="bg-alternative"
                           key={`action-card-${i}`}
                           {...item}

@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
-import { HandleEditorLayouts } from 'components/layouts/editors/handle-editor-layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
@@ -17,7 +16,6 @@ const TableEditorPage: NextPageWithLayout = () => {
   // handle redirect to last table tab
   const lastTabId = store.openTabs.find((id) => store.tabsMap[id]?.type === 'sql')
 
-  console.log('lastTabId in SQL id', lastTabId)
   if (lastTabId) {
     const lastTab = store.tabsMap[lastTabId]
     if (lastTab) {
