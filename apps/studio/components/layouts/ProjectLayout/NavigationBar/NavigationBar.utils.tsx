@@ -145,7 +145,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       key: 'integrations',
       label: 'Integrations',
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/wrappers`),
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
     },
   ]
 }

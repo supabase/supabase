@@ -3,8 +3,10 @@ import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import ProjectLinker, {
+  ForeignProject,
+} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'

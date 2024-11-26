@@ -8,6 +8,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -78,9 +81,14 @@ const TriggerList = ({
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
-            <p title={x.name} className="truncate">
-              {x.name}
-            </p>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ className="cursor-default truncate max-w-48 inline-block">
+                {x.name}
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                {x.name}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </Table.td>
 
           <Table.td className="break-all">

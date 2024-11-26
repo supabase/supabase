@@ -130,7 +130,7 @@
               "application/json": {
                 "schema": {
                   "type": "array",
-                  "items": { "$ref": "#/components/schemas/V1ProjectResponse" }
+                  "items": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
                 }
               }
             }
@@ -146,7 +146,9 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": { "schema": { "$ref": "#/components/schemas/V1CreateProjectBody" } }
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V1CreateProjectBodyDto" }
+            }
           }
         },
         "responses": {
@@ -192,7 +194,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/CreateOrganizationBodyV1" }
+              "schema": { "$ref": "#/components/schemas/CreateOrganizationV1Dto" }
             }
           }
         },
@@ -312,7 +314,7 @@
         "operationId": "v1-get-a-snippet",
         "summary": "Gets a specific SQL snippet",
         "parameters": [
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "uuid" } }
         ],
         "responses": {
           "200": {
@@ -338,7 +340,8 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
+          },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
           "200": {
@@ -366,7 +369,8 @@
             "in": "path",
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
-          }
+          },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "requestBody": {
           "required": true,
@@ -398,7 +402,8 @@
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           },
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "requestBody": {
           "required": true,
@@ -406,6 +411,31 @@
             "application/json": { "schema": { "$ref": "#/components/schemas/UpdateApiKeyBody" } }
           }
         },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/ApiKeyResponse" } }
+            }
+          }
+        },
+        "tags": ["Secrets"],
+        "security": [{ "bearer": [] }]
+      },
+      "get": {
+        "operationId": "getApiKey",
+        "summary": "[Alpha] Get API key",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          },
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
+        ],
         "responses": {
           "200": {
             "description": "",
@@ -428,7 +458,8 @@
             "description": "Project ref",
             "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
           },
-          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } }
+          { "name": "id", "required": true, "in": "path", "schema": { "type": "string" } },
+          { "name": "reveal", "required": true, "in": "query", "schema": { "type": "boolean" } }
         ],
         "responses": {
           "200": {
@@ -940,7 +971,9 @@
           "200": {
             "description": "",
             "content": {
-              "application/json": { "schema": { "$ref": "#/components/schemas/V1ProjectResponse" } }
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V1ProjectWithDatabaseResponse" }
+              }
             }
           },
           "500": { "description": "Failed to retrieve project" }
@@ -2035,6 +2068,12 @@
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
+          },
+          {
+            "name": "resource_multiplier",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "requestBody": {
@@ -2175,6 +2214,12 @@
           },
           {
             "name": "import_map_path",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "resource_multiplier",
             "required": false,
             "in": "query",
             "schema": { "type": "string" }
@@ -2697,7 +2742,7 @@
         },
         "required": ["host", "version", "postgres_engine", "release_channel"]
       },
-      "V1ProjectResponse": {
+      "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
           "id": { "type": "string", "description": "Id of your project" },
@@ -2735,33 +2780,9 @@
             "type": "string"
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": ["id", "organization_id", "name", "region", "created_at", "database", "status"]
       },
-      "DesiredInstanceSize": {
-        "type": "string",
-        "enum": [
-          "micro",
-          "small",
-          "medium",
-          "large",
-          "xlarge",
-          "2xlarge",
-          "4xlarge",
-          "8xlarge",
-          "12xlarge",
-          "16xlarge"
-        ]
-      },
-      "ReleaseChannel": {
-        "type": "string",
-        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
-      },
-      "PostgresEngine": {
-        "type": "string",
-        "description": "Postgres engine version. If not provided, the latest version will be used.",
-        "enum": ["15"]
-      },
-      "V1CreateProjectBody": {
+      "V1CreateProjectBodyDto": {
         "type": "object",
         "properties": {
           "db_pass": { "type": "string", "description": "Database password" },
@@ -2773,12 +2794,12 @@
           "plan": {
             "type": "string",
             "enum": ["free", "pro"],
-            "description": "Subscription Plan is now set on organization level and is ignored in this request",
-            "example": "free",
-            "deprecated": true
+            "deprecated": true,
+            "description": "Subscription Plan is now set on organization level and is ignored in this request"
           },
           "region": {
             "type": "string",
+            "description": "Region you want your server to reside in",
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -2798,35 +2819,97 @@
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
-            ],
-            "description": "Region you want your server to reside in",
-            "example": "us-east-1"
+            ]
           },
           "kps_enabled": {
             "type": "boolean",
             "deprecated": true,
             "description": "This field is deprecated and is ignored in this request"
           },
-          "desired_instance_size": { "$ref": "#/components/schemas/DesiredInstanceSize" },
+          "desired_instance_size": {
+            "type": "string",
+            "enum": [
+              "micro",
+              "small",
+              "medium",
+              "large",
+              "xlarge",
+              "2xlarge",
+              "4xlarge",
+              "8xlarge",
+              "12xlarge",
+              "16xlarge"
+            ]
+          },
           "template_url": {
             "type": "string",
+            "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
           },
-          "release_channel": { "$ref": "#/components/schemas/ReleaseChannel" },
-          "postgres_engine": { "$ref": "#/components/schemas/PostgresEngine" }
+          "release_channel": {
+            "type": "string",
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"],
+            "description": "Release channel. If not provided, GA will be used."
+          },
+          "postgres_engine": {
+            "type": "string",
+            "enum": ["15"],
+            "description": "Postgres engine version. If not provided, the latest version will be used."
+          }
         },
-        "required": ["db_pass", "name", "organization_id", "region"]
+        "required": ["db_pass", "name", "organization_id", "region"],
+        "additionalProperties": false
+      },
+      "V1ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Id of your project" },
+          "organization_id": { "type": "string", "description": "Slug of your organization" },
+          "name": { "type": "string", "description": "Name of your project" },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "GOING_DOWN",
+              "INACTIVE",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTARTING",
+              "UNKNOWN",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ],
+            "type": "string"
+          }
+        },
+        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
       },
       "OrganizationResponseV1": {
         "type": "object",
         "properties": { "id": { "type": "string" }, "name": { "type": "string" } },
         "required": ["id", "name"]
       },
-      "CreateOrganizationBodyV1": {
+      "CreateOrganizationV1Dto": {
         "type": "object",
         "properties": { "name": { "type": "string" } },
-        "required": ["name"]
+        "required": ["name"],
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -2945,10 +3028,14 @@
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
+          "type": {
+            "nullable": true,
+            "type": "string",
+            "enum": ["publishable", "secret", "legacy"]
+          },
           "name": { "type": "string" },
           "api_key": { "type": "string" },
           "id": { "type": "string", "nullable": true },
-          "type": { "nullable": true, "type": "object" },
           "prefix": { "type": "string", "nullable": true },
           "description": { "type": "string", "nullable": true },
           "hash": { "type": "string", "nullable": true },
@@ -2982,6 +3069,30 @@
             "allOf": [{ "$ref": "#/components/schemas/ApiKeySecretJWTTemplate" }]
           }
         }
+      },
+      "DesiredInstanceSize": {
+        "type": "string",
+        "enum": [
+          "micro",
+          "small",
+          "medium",
+          "large",
+          "xlarge",
+          "2xlarge",
+          "4xlarge",
+          "8xlarge",
+          "12xlarge",
+          "16xlarge"
+        ]
+      },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+      },
+      "PostgresEngine": {
+        "type": "string",
+        "description": "Postgres engine version. If not provided, the latest version will be used.",
+        "enum": ["15"]
       },
       "CreateBranchBody": {
         "type": "object",
@@ -4134,7 +4245,8 @@
           "slug": { "type": "string", "pattern": "/^[A-Za-z0-9_-]+$/" },
           "name": { "type": "string" },
           "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
+          "verify_jwt": { "type": "boolean" },
+          "resource_multiplier": { "type": "string" }
         },
         "required": ["slug", "name", "body"]
       },
@@ -4151,7 +4263,8 @@
           "verify_jwt": { "type": "boolean" },
           "import_map": { "type": "boolean" },
           "entrypoint_path": { "type": "string" },
-          "import_map_path": { "type": "string" }
+          "import_map_path": { "type": "string" },
+          "resource_multiplier": { "type": "string" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
@@ -4168,7 +4281,8 @@
           "verify_jwt": { "type": "boolean" },
           "import_map": { "type": "boolean" },
           "entrypoint_path": { "type": "string" },
-          "import_map_path": { "type": "string" }
+          "import_map_path": { "type": "string" },
+          "resource_multiplier": { "type": "string" }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
       },
@@ -4177,7 +4291,8 @@
         "properties": {
           "name": { "type": "string" },
           "body": { "type": "string" },
-          "verify_jwt": { "type": "boolean" }
+          "verify_jwt": { "type": "boolean" },
+          "resource_multiplier": { "type": "string" }
         }
       },
       "V1StorageBucketResponse": {

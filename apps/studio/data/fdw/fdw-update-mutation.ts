@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import type { WrapperMeta } from 'components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { foreignTableKeys } from 'data/foreign-tables/keys'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
