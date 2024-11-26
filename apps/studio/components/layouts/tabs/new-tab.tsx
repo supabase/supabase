@@ -207,52 +207,53 @@ export function NewTab() {
   //   const showRightPanel = false
 
   const handleNewQuery = async (sql?: string, name?: string) => {
-    if (!ref) return console.error('Project ref is required')
-    if (!project) return console.error('Project is required')
-    if (!profile) return console.error('Profile is required')
-    const id = uuidv4()
-    const tabId = createTabId('sql', { id })
+    router.push(`/project/${ref}/sql/new`)
+    // if (!ref) return console.error('Project ref is required')
+    // if (!project) return console.error('Project is required')
+    // if (!profile) return console.error('Profile is required')
+    // const id = uuidv4()
+    // const tabId = createTabId('sql', { id })
 
-    if (sql && name) {
-      try {
-        const snippet = createSqlSnippetSkeletonV2({
-          id,
-          name,
-          sql,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        snapV2.addNeedsSaving(snippet.id)
-        store.openTabs = [...store.openTabs, tabId]
-        store.tabsMap[tabId] = {
-          id: tabId,
-          type: 'sql',
-          // Remove the label since we'll derive it dynamically
-          metadata: { sqlId: snippet.id },
-        }
-        store.activeTab = tabId
+    // if (sql && name) {
+    //   try {
+    //     const snippet = createSqlSnippetSkeletonV2({
+    //       id,
+    //       name,
+    //       sql,
+    //       owner_id: profile?.id,
+    //       project_id: project?.id,
+    //     })
+    //     snapV2.addSnippet({ projectRef: ref, snippet })
+    //     snapV2.addNeedsSaving(snippet.id)
+    //     store.openTabs = [...store.openTabs, tabId]
+    //     store.tabsMap[tabId] = {
+    //       id: tabId,
+    //       type: 'sql',
+    //       // Remove the label since we'll derive it dynamically
+    //       metadata: { sqlId: snippet.id },
+    //     }
+    //     store.activeTab = tabId
 
-        router.push(`/project/${ref}/sql/${snippet.id}`)
-      } catch (error: any) {
-        toast.error(`Failed to create new query: ${error.message}`)
-      }
-    } else {
-      try {
-        const snippet = createSqlSnippetSkeletonV2({
-          id: uuidv4(),
-          name: untitledSnippetTitle,
-          owner_id: profile.id,
-          project_id: project.id,
-          sql: '',
-        })
-        snapV2.addSnippet({ projectRef: ref as string, snippet })
-        removeNewTab(ref)
-        router.push(`/project/${ref}/sql/${snippet.id}`)
-      } catch (error: any) {
-        toast.error(`Failed to create new query: ${error.message}`)
-      }
-    }
+    //     router.push(`/project/${ref}/sql/${snippet.id}`)
+    //   } catch (error: any) {
+    //     toast.error(`Failed to create new query: ${error.message}`)
+    //   }
+    // } else {
+    //   try {
+    //     const snippet = createSqlSnippetSkeletonV2({
+    //       id: uuidv4(),
+    //       name: untitledSnippetTitle,
+    //       owner_id: profile.id,
+    //       project_id: project.id,
+    //       sql: '',
+    //     })
+    //     snapV2.addSnippet({ projectRef: ref as string, snippet })
+    //     removeNewTab(ref)
+    //     router.push(`/project/${ref}/sql/${snippet.id}`)
+    //   } catch (error: any) {
+    //     toast.error(`Failed to create new query: ${error.message}`)
+    //   }
+    // }
   }
 
   useEffect(() => {
@@ -508,7 +509,7 @@ export function NewTab() {
                     <TabsTrigger_Shadcn_ value="quickstarts">Quickstarts</TabsTrigger_Shadcn_>
                   </TabsList_Shadcn_>
                   <TabsContent_Shadcn_ value="templates" className="max-w-5xl mx-auto py-5">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-4 px-8">
                       {templates.map((item, i) => (
                         <ActionCard
                           onClick={() => {
@@ -533,7 +534,7 @@ export function NewTab() {
                     </div>
                   </TabsContent_Shadcn_>
                   <TabsContent_Shadcn_ value="quickstarts" className="max-w-5xl mx-auto py-5">
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-3 gap-4 px-8">
                       {quickstarts.map((item, i) => (
                         <ActionCard
                           onClick={() => {

@@ -172,7 +172,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))
 
     if (existingSnippetIds.length === 0) {
-      router.push(`/project/${projectRef}/sql/new`)
+      router.push(`/project/${projectRef}/sql`)
     } else if (ids.includes(id as string)) {
       router.push(`/project/${projectRef}/sql/${existingSnippetIds[0]}`)
     }

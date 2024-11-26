@@ -185,8 +185,11 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
     handleTabNavigation(ref, id, router)
   }
 
-  const hasNewTab = router.pathname.includes('/new') // Object.values(tabs.tabsMap).some((tab) => tab.type === 'new')
+  const hasNewTab = router.asPath.includes('/new')
   const isOnNewPage = router.pathname.endsWith('/explorer/new')
+
+  console.log('hasNewTab', hasNewTab)
+  console.log('router', router.pathname)
 
   return (
     <Tabs_Shadcn_

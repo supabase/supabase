@@ -265,7 +265,7 @@ export const handleTabClose = (
     handleTabNavigation(ref, nextTabId, router)
   } else {
     // If no tabs of same type, go to the home of the current section
-    switch (currentTab.type) {
+    switch (currentTab?.type) {
       case 'sql':
         router.push(`/project/${router.query.ref}/sql`)
         break
@@ -273,7 +273,7 @@ export const handleTabClose = (
         router.push(`/project/${router.query.ref}/editor`)
         break
       default:
-        router.push(`/project/${router.query.ref}/editor`)
+        router.push(`/project/${router.query.ref}/${editor}`)
     }
   }
 
@@ -363,4 +363,22 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p', 'schema'],
   sql: ['sql'],
+}
+
+export function removeTabsByEditor(ref: string | undefined, type: 'table' | 'sql') {
+  if (!ref) return
+  const store = getTabsStore(ref)
+
+  // Get tab IDs to remove
+  const tabIdsToRemove = store.openTabs.filter((id) => {
+    return editorEntityTypes[type].some((entityType) => id.startsWith(`${entityType}-`))
+  })
+
+  removeTabs(ref, tabIdsToRemove)
+}
+
+export function removePreviewTab(ref: string | undefined) {
+  if (!ref) return
+  const store = getTabsStore(ref)
+  store.previewTabId = undefined
 }

@@ -7,9 +7,13 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { getTabsStore, removePreviewTab, removeTabsByEditor } from 'state/tabs'
+import { useParams } from 'common'
 
 const FeaturePreviewModal = () => {
   const snap = useAppStateSnapshot()
+  const { ref } = useParams()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
   const enableFunctionsAssistant = useFlag('functionsAssistantV2')
@@ -40,6 +44,15 @@ const FeaturePreviewModal = () => {
       action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
       label: selectedFeatureKey,
     })
+
+    // handle Tabs preview
+    removePreviewTab(ref as string | undefined)
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'table')
+    }
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'sql')
+    }
   }
 
   function handleCloseFeaturePreviewModal() {
