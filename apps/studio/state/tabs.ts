@@ -5,8 +5,10 @@ import { proxy, subscribe } from 'valtio'
 import { addRecentItem } from './recent-items'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
+// Define the type of tabs available in the application
 export type TabType = ENTITY_TYPE | 'sql' | 'schema' | 'new'
 
+// Interface representing a single tab
 export interface Tab {
   id: string
   type: TabType
@@ -21,6 +23,7 @@ export interface Tab {
   isPreview?: boolean
 }
 
+// Interface representing the state of tabs
 interface TabsState {
   activeTab: string | null
   openTabs: string[]
@@ -28,6 +31,7 @@ interface TabsState {
   previewTabId?: string
 }
 
+// Map of tab states for different references
 interface TabsStateMap {
   [ref: string]: TabsState
 }
@@ -55,7 +59,7 @@ export const getTabsStore = (ref: string | undefined): TabsState => {
   return tabsStore[ref]
 }
 
-// Subscribe to changes for each ref
+// Subscribe to changes for each ref and save to localStorage
 if (typeof window !== 'undefined') {
   subscribe(tabsStore, () => {
     Object.entries(tabsStore).forEach(([ref, state]) => {
@@ -68,6 +72,7 @@ if (typeof window !== 'undefined') {
   })
 }
 
+// Function to add a new tab to the store
 export const addTab = (ref: string | undefined, tab: Tab) => {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -111,17 +116,20 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
   store.activeTab = tab.id
 }
 
+// Function to remove a tab from the store
 export const removeTab = (ref: string | undefined, id: string) => {
   const store = getTabsStore(ref)
   const idx = store.openTabs.indexOf(id)
   store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
   delete store.tabsMap[id]
 
+  // Update active tab if the removed tab was active
   if (id === store.activeTab) {
     store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
   }
 }
 
+// Function to remove multiple tabs from the store
 export const removeTabs = (ref: string | undefined, ids: string[]) => {
   if (!ref) return
   if (!ids.length) return
@@ -131,6 +139,7 @@ export const removeTabs = (ref: string | undefined, ids: string[]) => {
   })
 }
 
+// Function to reorder tabs in the store
 export const reorderTabs = (ref: string | undefined, oldIndex: number, newIndex: number) => {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -140,6 +149,7 @@ export const reorderTabs = (ref: string | undefined, oldIndex: number, newIndex:
   store.openTabs = newOpenTabs
 }
 
+// Function to make a tab permanent
 export const makeTabPermanent = (ref: string | undefined, tabId: string) => {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -155,6 +165,7 @@ export const makeTabPermanent = (ref: string | undefined, tabId: string) => {
   }
 }
 
+// Function to make the active tab permanent if it is a preview
 export const makeActiveTabPermanent = (ref?: string) => {
   if (!ref) return false
   const store = getTabsStore(ref)
@@ -166,6 +177,7 @@ export const makeActiveTabPermanent = (ref?: string) => {
   return false
 }
 
+// Function to open a new content tab
 export const openNewContentTab = (ref: string) => {
   const store = getTabsStore(ref)
   const tab: Tab = {
@@ -179,6 +191,7 @@ export const openNewContentTab = (ref: string) => {
   addTab(ref, tab)
 }
 
+// Function to remove the new tab if it exists
 export const removeNewTab = (ref: string | undefined) => {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -188,6 +201,7 @@ export const removeNewTab = (ref: string | undefined) => {
   }
 }
 
+// Function to handle navigation to a specific tab
 export const handleTabNavigation = (ref: string | undefined, id: string, router: NextRouter) => {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -224,6 +238,7 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
   }
 }
 
+// Function to handle closing a tab
 export const handleTabClose = (
   ref: string | undefined,
   id: string,
@@ -280,6 +295,7 @@ export const handleTabClose = (
   onClose?.(id)
 }
 
+// Function to handle the end of a tab drag event
 export const handleTabDragEnd = (
   ref: string | undefined,
   oldIndex: number,
@@ -339,6 +355,7 @@ type CreateTabIdParams = {
   new: never
 }
 
+// Function to create a unique tab ID based on type and parameters
 export function createTabId<T extends TabType>(type: T, params: CreateTabIdParams[T]): string {
   switch (type) {
     case 'r':
@@ -360,11 +377,13 @@ export function createTabId<T extends TabType>(type: T, params: CreateTabIdParam
   }
 }
 
+// Object mapping editor types to their corresponding tab types
 export const editorEntityTypes = {
   table: ['r', 'v', 'm', 'f', 'p', 'schema'],
   sql: ['sql'],
 }
 
+// Function to remove tabs based on their editor type
 export function removeTabsByEditor(ref: string | undefined, type: 'table' | 'sql') {
   if (!ref) return
   const store = getTabsStore(ref)
@@ -377,6 +396,7 @@ export function removeTabsByEditor(ref: string | undefined, type: 'table' | 'sql
   removeTabs(ref, tabIdsToRemove)
 }
 
+// Function to remove the preview tab if it exists
 export function removePreviewTab(ref: string | undefined) {
   if (!ref) return
   const store = getTabsStore(ref)
