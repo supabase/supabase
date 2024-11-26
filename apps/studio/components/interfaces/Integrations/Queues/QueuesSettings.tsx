@@ -138,7 +138,6 @@ export const QueuesSettings = () => {
         className="mb-0"
         title="Settings"
         description="Manage your queues via any client library or PostgREST endpoints"
-        docsUrl="https://supabase.com/docs"
       />
       <Form_Shadcn_ {...form}>
         <form id="pgmq-postgrest" onSubmit={form.handleSubmit(onSubmit)}>
@@ -185,9 +184,9 @@ export const QueuesSettings = () => {
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                     {formState.dirtyFields.enable && field.value === true && (
-                      <Admonition type="default" className="mt-2">
+                      <Admonition type="warning" className="mt-2">
                         <p>
-                          Queues will be managed through the{' '}
+                          Queues will be exposed and managed through the{' '}
                           <code className="text-xs">{QUEUES_SCHEMA}</code> schema
                         </p>
                         <p className="text-foreground-light">
@@ -196,6 +195,10 @@ export const QueuesSettings = () => {
                           where you can then call through any Supabase client library or PostgREST
                           endpoint to manage your queues. Permissions on individual queues can also
                           be further managed through privileges and row level security (RLS).
+                        </p>
+                        <p>
+                          Please ensure that all queues have RLS enabled prior to enabling this
+                          setting to prevent anonymous access.
                         </p>
                       </Admonition>
                     )}
