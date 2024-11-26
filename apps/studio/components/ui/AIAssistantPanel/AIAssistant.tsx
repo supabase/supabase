@@ -394,8 +394,9 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts?.map((prompt) => (
+                {suggestions?.prompts?.map((prompt, idx) => (
                   <Button
+                    key={`suggestion-${idx}`}
                     size="small"
                     icon={<FileText strokeWidth={1.5} size={16} />}
                     type="text"
@@ -518,8 +519,8 @@ export const AIAssistant = ({
             <div className="mb-2">
               {sqlSnippets.map((snippet, index) => (
                 <CollapsibleCodeBlock
-                  hideLineNumbers
                   key={index}
+                  hideLineNumbers
                   value={snippet}
                   onRemove={() => {
                     const newSnippets = [...sqlSnippets]
