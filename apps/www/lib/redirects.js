@@ -2829,6 +2829,11 @@ module.exports = [
     source: '/docs/guides/resources/examples',
     destination: '/docs/guides/getting-started',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
+    destination: '/docs/guides/database/connecting-to-postgres',
+  },
 
   // marketing
 
