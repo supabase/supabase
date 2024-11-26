@@ -1,11 +1,12 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
-import MotionNumber from 'motion-number'
+import MotionNumber from '@number-flow/react'
 import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { GB } from 'lib/constants'
@@ -19,7 +20,6 @@ import {
 } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
-import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -56,7 +56,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   })
   const { remainingDuration } = useRemainingDurationForDiskAttributeUpdate({ projectRef: ref })
 
-  const databaseSizeBytes = data?.result[0].db_size ?? 0
+  const databaseSizeBytes = data ?? 0
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
@@ -64,14 +64,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           {usedSize.toFixed(2)}
           <span>GB used of </span>
           <span className="text-foreground font-semibold -mt-[2px]">
-            <MotionNumber
-              value={newTotalSize}
-              style={{ lineHeight: 0.8 }}
-              transition={{
-                y: { type: 'spring', duration: 0.35, bounce: 0 },
-              }}
-              className="font-mono"
-            />
+            <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
           </span>{' '}
           GB
         </span>

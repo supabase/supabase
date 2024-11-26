@@ -1,12 +1,13 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { Fragment, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useIndexesQuery } from 'data/database/indexes-query'
+import { databaseKeys } from 'data/database/keys'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
@@ -43,6 +44,7 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
+  const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
@@ -51,11 +53,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
   const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
-  const { refetch: refetchIndexes } = useIndexesQuery({
-    schema: selectedSchema,
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -80,7 +78,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
 
   const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
     onSuccess: async () => {
-      await refetchIndexes()
+      await queryClient.invalidateQueries(databaseKeys.indexes(project?.ref, selectedSchema))
       onClose()
       toast.success(`Successfully created index`)
     },
@@ -98,7 +96,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     setSearchTerm(value)
   }
 
-  const columns = tableColumns?.result[0]?.columns ?? []
+  const columns = tableColumns?.[0]?.columns ?? []
   const columnOptions: MultiSelectOption[] = columns
     .filter((column): column is NonNullable<typeof column> => column !== null)
     .map((column) => ({
@@ -349,8 +347,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   </SelectTrigger_Shadcn_>
                   <SelectContent_Shadcn_>
                     {INDEX_TYPES.map((index, i) => (
-                      <>
-                        <SelectItem_Shadcn_ key={index.name} value={index.value}>
+                      <Fragment key={index.name}>
+                        <SelectItem_Shadcn_ value={index.value}>
                           <div className="flex flex-col gap-0.5">
                             <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
@@ -364,7 +362,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                           </div>
                         </SelectItem_Shadcn_>
                         {i < INDEX_TYPES.length - 1 && <SelectSeparator_Shadcn_ />}
-                      </>
+                      </Fragment>
                     ))}
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>

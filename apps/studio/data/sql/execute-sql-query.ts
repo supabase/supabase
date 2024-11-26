@@ -37,7 +37,8 @@ export async function executeSql(
     | 'handleError'
     | 'isRoleImpersonationEnabled'
   >,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -47,7 +48,7 @@ export async function executeSql(
     throw new Error('Query is too large to be run via the SQL Editor')
   }
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   let { data, error } = await post('/platform/pg-meta/{ref}/query', {
@@ -55,7 +56,7 @@ export async function executeSql(
     params: {
       header: { 'x-connection-encrypted': connectionString ?? '' },
       path: { ref: projectRef },
-      // @ts-ignore: This is just a client side thing to identify queries better
+      // @ts-expect-error: This is just a client side thing to identify queries better
       query: {
         key:
           queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ??
@@ -64,7 +65,7 @@ export async function executeSql(
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
-  } as any) // Needed to fix generated api types for now
+  })
 
   if (error) {
     if (
@@ -114,6 +115,9 @@ export async function executeSql(
 export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = ResponseError
 
+/**
+ * @deprecated Use the regular useQuery with a function that calls executeSql() instead
+ */
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
   {
     projectRef,

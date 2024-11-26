@@ -52,9 +52,10 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { AiAssistantPanel } from './AiAssistantPanel'
+import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { DiffActionBar } from './DiffActionBar'
 import {
   ROWS_PER_PAGE_OPTIONS,
@@ -87,8 +88,8 @@ const DiffEditor = dynamic(
 )
 
 const SQLEditor = () => {
-  const { ref, id: urlId } = useParams()
   const router = useRouter()
+  const { ref, id: urlId } = useParams()
 
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -105,11 +106,13 @@ const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
+  const { open } = appSnap.aiAssistantPanel
+
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const [selectedMessage, setSelectedMessage] = useState<string>()
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
@@ -118,6 +121,7 @@ const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const aiPanelRef = useRef<ImperativePanelHandle>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -127,7 +131,9 @@ const SQLEditor = () => {
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
+  // [Joshen] This eventually needs to be in the app state
   const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
+  const isAssistantOpen = (!isAssistantV2Enabled && isAiOpen) || (isAssistantV2Enabled && open)
 
   const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
@@ -376,7 +382,7 @@ const SQLEditor = () => {
   )
 
   const updateEditorWithCheckForDiff = useCallback(
-    ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => {
+    ({ diffType, sql }: { diffType: DiffType; sql: string }) => {
       const editorModel = editorRef.current?.getModel()
       if (!editorModel) return
 
@@ -392,7 +398,6 @@ const SQLEditor = () => {
           },
         ])
       } else {
-        setSelectedMessage(id)
         const currentSql = editorRef.current?.getValue()
         const diff = { original: currentSql || '', modified: sql }
         setSourceSqlDiff(diff)
@@ -406,26 +411,33 @@ const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-
-      const { solution, sql } = await debugSql({
-        sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-        errorMessage: result.error.message,
-        entityDefinitions,
-      })
-
-      const formattedSql =
-        sqlAiDisclaimerComment +
-        '\n\n' +
-        format(sql, {
-          language: 'postgresql',
-          keywordCase: 'lower',
+      if (isAssistantV2Enabled) {
+        appSnap.setAiAssistantPanel({
+          open: true,
+          sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+          initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
         })
-      setDebugSolution(solution)
-      setSourceSqlDiff({
-        original: snippet.snippet.content.sql,
-        modified: formattedSql,
-      })
-      setSelectedDiffType(DiffType.Modification)
+      } else {
+        const { solution, sql } = await debugSql({
+          sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+          errorMessage: result.error.message,
+          entityDefinitions,
+        })
+
+        const formattedSql =
+          sqlAiDisclaimerComment +
+          '\n\n' +
+          format(sql, {
+            language: 'postgresql',
+            keywordCase: 'lower',
+          })
+        setDebugSolution(solution)
+        setSourceSqlDiff({
+          original: snippet.snippet.content.sql,
+          modified: formattedSql,
+        })
+        setSelectedDiffType(DiffType.Modification)
+      }
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -482,7 +494,6 @@ const SQLEditor = () => {
         label: debugSolution ? 'debug_snippet' : 'edit_snippet',
       })
 
-      setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSourceSqlDiff(undefined)
@@ -509,7 +520,6 @@ const SQLEditor = () => {
       label: debugSolution ? 'debug_snippet' : 'edit_snippet',
     })
 
-    setSelectedMessage(undefined)
     setDebugSolution(undefined)
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
@@ -588,6 +598,12 @@ const SQLEditor = () => {
     }
   }, [isSuccessReadReplicas, databases, ref])
 
+  useEffect(() => {
+    if (snapV2.diffContent !== undefined) {
+      updateEditorWithCheckForDiff(snapV2.diffContent)
+    }
+  }, [snapV2.diffContent])
+
   const defaultSqlDiff = useMemo(() => {
     if (!sourceSqlDiff) {
       return { original: '', modified: '' }
@@ -609,8 +625,6 @@ const SQLEditor = () => {
         return { original: '', modified: '' }
     }
   }, [selectedDiffType, sourceSqlDiff])
-
-  const aiPanelRef = useRef<ImperativePanelHandle>(null)
 
   return (
     <>
@@ -679,7 +693,7 @@ const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
+            {(isAssistantOpen || isDiffOpen) && !hasHipaaAddon && (
               <AISchemaSuggestionPopover
                 onClickSettings={() => {
                   appSnap.setShowAiSettingsModal(true)
@@ -715,14 +729,36 @@ const SQLEditor = () => {
             )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAiOpen && (
+                {!isAssistantV2Enabled && !isAiOpen && (
                   <motion.button
                     layoutId="ask-ai-input-icon"
                     transition={{ duration: 0.1 }}
-                    onClick={() => aiPanelRef.current?.expand()}
-                    className={cn(
-                      'group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out'
-                    )}
+                    className="group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out"
+                    onClick={() => {
+                      if (isAssistantV2Enabled) {
+                        const state = getSqlEditorV2StateSnapshot()
+                        const snippet = state.snippets[id]
+                        const editor = editorRef.current
+                        const selection = editor?.getSelection()
+                        const selectedValue = selection
+                          ? editor?.getModel()?.getValueInRange(selection)
+                          : undefined
+                        const sql = snippet
+                          ? (selectedValue || editorRef.current?.getValue()) ??
+                            snippet.snippet.content.sql
+                          : selectedValue || editorRef.current?.getValue()
+
+                        appSnap.setAiAssistantPanel({
+                          open: true,
+                          sqlSnippets: sql ? [sql] : [],
+                          initialInput: sql
+                            ? `Help me make a change to the attached sql snippet`
+                            : '',
+                        })
+                      } else {
+                        aiPanelRef.current?.expand()
+                      }
+                    }}
                   >
                     <AiIconAnimation loading={false} allowHoverEffect />
                   </motion.button>
@@ -860,25 +896,27 @@ const SQLEditor = () => {
           </ResizablePanelGroup>
         </ResizablePanel>
 
-        <ResizableHandle withHandle />
-
-        <ResizablePanel
-          ref={aiPanelRef}
-          collapsible
-          collapsedSize={0}
-          minSize={31}
-          maxSize={40}
-          onCollapse={() => setIsAiOpen(false)}
-          onExpand={() => setIsAiOpen(true)}
-        >
-          <AiAssistantPanel
-            selectedMessage={selectedMessage}
-            existingSql={editorRef.current?.getValue() || ''}
-            includeSchemaMetadata={includeSchemaMetadata}
-            onDiff={updateEditorWithCheckForDiff}
-            onClose={() => aiPanelRef.current?.collapse()}
-          />
-        </ResizablePanel>
+        {!isAssistantV2Enabled && (
+          <>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              ref={aiPanelRef}
+              collapsible
+              collapsedSize={0}
+              minSize={31}
+              maxSize={40}
+              onCollapse={() => setIsAiOpen(false)}
+              onExpand={() => setIsAiOpen(true)}
+            >
+              <AiAssistantPanel
+                existingSql={editorRef.current?.getValue() || ''}
+                includeSchemaMetadata={includeSchemaMetadata}
+                onDiff={updateEditorWithCheckForDiff}
+                onClose={() => aiPanelRef.current?.collapse()}
+              />
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
     </>
   )

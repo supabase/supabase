@@ -4,7 +4,6 @@ import dayjs from 'dayjs'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
-import { Markdown } from 'components/interfaces/Markdown'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -147,10 +146,14 @@ const Subscription = () => {
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <Markdown
-                        className="[&>p]:!leading-normal"
-                        content={`Projects may become unresponsive when this organization exceeds its [included usage quota](/org/${slug}/usage). To scale seamlessly and pay for over-usage, ${currentPlan?.id === 'free' ? 'upgrade to a paid plan.' : 'you can disable Spend Cap under the Cost Control settings.'}`}
-                      />
+                      <div className="[&>p]:!leading-normal prose text-sm">
+                        Projects may become unresponsive when this organization exceeds its
+                        <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
+                        seamlessly and pay for over-usage, $
+                        {currentPlan?.id === 'free'
+                          ? 'upgrade to a paid plan.'
+                          : 'you can disable Spend Cap under the Cost Control settings.'}
+                      </div>
                       <Button
                         type="default"
                         className="mt-1"
