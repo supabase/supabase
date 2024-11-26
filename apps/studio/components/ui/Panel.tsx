@@ -109,11 +109,9 @@ const PanelNotice = forwardRef<
           {/* <span className="font-medium text-foreground text-sm">{title}</span> */}
         </div>
         {description && (
-          <span className="text-foreground-light text-sm flex flex-col gap-0">
-            <ReactMarkdown className="prose text-xs max-w-none [&_p]:mt-2 [&_p]:mb-0">
-              {description}
-            </ReactMarkdown>
-          </span>
+          <div className="text-foreground-light text-sm flex flex-col gap-0">
+            <div className="prose text-xs max-w-none [&_p]:mt-2 [&_p]:mb-0">{description}</div>
+          </div>
         )}
       </div>
 
