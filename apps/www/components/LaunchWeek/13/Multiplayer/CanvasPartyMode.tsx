@@ -15,28 +15,17 @@ import { Coordinates, Payload, User } from './types'
 import { cloneDeep, throttle } from 'lodash'
 import Cursor from './Cursor'
 
-/**
- * [x] multiplayer cursors
- * [x] show own cursor
- * [x] show own trail
- * [x] show other users cursors
- * [x] brand color for current user
- * [x] gray for online users
- * [x] offset cursor position by scroll offset Y
- * [ ] hide own cursor on touch devices
- */
-
-const GRID_SIZE = 100
-const CELL_SIZE = 35
-const CANVAS_WIDTH = 1800
-const CANVAS_HEIGHT = 1600
-const HOVER_DURATION = 100
-const FADE_DURATION = 300
+export const GRID_SIZE = 100
+export const CELL_SIZE = 40
+export const CANVAS_WIDTH = 1800
+export const CANVAS_HEIGHT = 1600
+export const HOVER_DURATION = 100
+export const FADE_DURATION = 300
 
 const MAX_ROOM_USERS = 50
 const MAX_EVENTS_PER_SECOND = 10
-const X_THRESHOLD = 25
-const Y_THRESHOLD = 65
+export const X_THRESHOLD = 25
+export const Y_THRESHOLD = 65
 
 interface CellState {
   isHovered: boolean
@@ -72,6 +61,7 @@ export default function InteractiveGrid() {
   const [users, setUsers] = useState<{ [key: string]: User }>({})
 
   const setMousePosition = (coordinates: Coordinates) => {
+    // if (!mousePositionRef.current) return
     mousePositionRef.current = coordinates
     _setMousePosition(coordinates)
   }
@@ -110,7 +100,7 @@ export default function InteractiveGrid() {
         Client is joining 'rooms' channel to examine existing rooms and their users
         and then the channel is removed once a room is selected
       */
-      roomChannel = supabase?.channel('rooms')!
+      roomChannel = supabase?.channel('lw13_rooms')!
 
       roomChannel
         .on(REALTIME_LISTEN_TYPES.PRESENCE, { event: REALTIME_PRESENCE_LISTEN_EVENTS.SYNC }, () => {
@@ -133,7 +123,7 @@ export default function InteractiveGrid() {
         .subscribe()
     } else {
       // When user has been placed in a room
-      roomChannel = supabase?.channel('rooms', { config: { presence: { key: roomId } } })!
+      roomChannel = supabase?.channel('lw13_rooms', { config: { presence: { key: roomId } } })!
       roomChannel.on(
         REALTIME_LISTEN_TYPES.PRESENCE,
         { event: REALTIME_PRESENCE_LISTEN_EVENTS.SYNC },
@@ -155,7 +145,7 @@ export default function InteractiveGrid() {
   }, [supabase, roomId])
 
   useEffect(() => {
-    if (!roomId || !isInitialStateSynced) return
+    // if (!roomId || !isInitialStateSynced) return
 
     let messageChannel: RealtimeChannel
     let setMouseEvent: (e: MouseEvent) => void = () => {}
@@ -190,28 +180,28 @@ export default function InteractiveGrid() {
       }
     )
 
-    messageChannel.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
-      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
-        // Lodash throttle will be removed once realtime-js client throttles on the channel level
-        const sendMouseBroadcast = throttle(({ x, y }) => {
-          messageChannel
-            .send({
-              type: 'broadcast',
-              event: 'POS',
-              payload: { user_id: userId, x, y },
-            })
-            .catch(() => {})
-        }, 1000 / MAX_EVENTS_PER_SECOND)
+    messageChannel?.subscribe((status: `${REALTIME_SUBSCRIBE_STATES}`) => {
+      // Lodash throttle will be removed once realtime-js client throttles on the channel level
+      const sendMouseBroadcast = throttle(({ x, y }) => {
+        messageChannel
+          .send({
+            type: 'broadcast',
+            event: 'POS',
+            payload: { user_id: userId, x, y },
+          })
+          .catch(() => {})
+      }, 1000 / MAX_EVENTS_PER_SECOND)
 
-        setMouseEvent = (e: MouseEvent) => {
-          const top = window.pageYOffset || document.documentElement.scrollTop
-          const [x, y] = [e.clientX, e.clientY - Y_THRESHOLD + top]
+      setMouseEvent = (e: MouseEvent) => {
+        const top = window.pageYOffset || document.documentElement.scrollTop
+        const [x, y] = [e.clientX, e.clientY - Y_THRESHOLD + top]
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) {
           sendMouseBroadcast({ x, y })
-          setMousePosition({ x, y })
         }
-
-        window.addEventListener('mousemove', setMouseEvent)
+        setMousePosition({ x, y })
       }
+
+      window.addEventListener('mousemove', setMouseEvent)
     })
 
     return () => {
@@ -337,7 +327,7 @@ export default function InteractiveGrid() {
   }, [hoveredCells, setCellHovered, userData])
 
   return (
-    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen cursor-none">
+    <div className="absolute inset-0 w-screen h-screen flex justify-center items-center max-w-screen max-h-screen">
       <canvas
         ref={canvasRef}
         width={CANVAS_WIDTH}
@@ -348,7 +338,7 @@ export default function InteractiveGrid() {
       />
 
       {/* Current user cursor */}
-      <Cursor
+      {/* <Cursor
         key={userId}
         x={mousePosition?.x}
         y={mousePosition?.y}
@@ -357,7 +347,7 @@ export default function InteractiveGrid() {
         message={''}
         isTyping={false}
         isCurrentUser={true}
-      />
+      /> */}
 
       {/* Online users cursors */}
       {Object.entries(users).reduce((acc, [userId, data]) => {

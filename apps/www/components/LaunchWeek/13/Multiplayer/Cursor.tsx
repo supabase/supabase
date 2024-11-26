@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { FC, FormEvent, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 interface Props {
@@ -15,10 +15,7 @@ interface Props {
   onUpdateMessage?: (message: string) => void
 }
 
-const MAX_MESSAGE_LENGTH = 70
 const MAX_DURATION = 4000
-const MAX_BUBBLE_WIDTH_THRESHOLD = 280 + 50
-const MAX_BUBBLE_HEIGHT_THRESHOLD = 40 + 50
 
 const Cursor: FC<Props> = ({
   x,
@@ -32,7 +29,6 @@ const Cursor: FC<Props> = ({
   isLocalClient,
   onUpdateMessage = () => {},
 }) => {
-  // Don't show cursor for the local client
   const _isLocalClient = !x || !y
   const inputRef = useRef() as any
   const timeoutRef = useRef() as any
@@ -40,8 +36,6 @@ const Cursor: FC<Props> = ({
   const isMobile = useBreakpoint('sm')
 
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  const [flipX, setFlipX] = useState(false)
-  const [flipY, setFlipY] = useState(false)
   const [hideInput, setHideInput] = useState(false)
   const [showMessageBubble, setShowMessageBubble] = useState(false)
 
@@ -67,14 +61,6 @@ const Cursor: FC<Props> = ({
       }
     }
   }, [isLocalClient, isTyping, isCancelled, message, inputRef])
-
-  useEffect(() => {
-    // [Joshen] Experimental: dynamic flipping to ensure that chat
-    // bubble always stays within the viewport, comment this block
-    // out if the effect seems weird.
-    setFlipX((x || 0) + MAX_BUBBLE_WIDTH_THRESHOLD >= window.innerWidth)
-    setFlipY((y || 0) + MAX_BUBBLE_HEIGHT_THRESHOLD >= window.innerHeight)
-  }, [x, y, isTyping, chatBubbleRef])
 
   useEffect(() => {
     // touchscreen
@@ -119,39 +105,9 @@ const Cursor: FC<Props> = ({
         )}
         style={{
           backgroundColor: color,
-          transform: `translateX(${
-            (x || 0) + (flipX ? -chatBubbleRef.current.clientWidth - 20 : 20)
-          }px) translateY(${(y || 0) + (flipY ? -chatBubbleRef.current.clientHeight - 20 : 20)}px)`,
+          transform: `translateX(${(x || 0) + 20}px) translateY(${(y || 0) + 20}px)`,
         }}
-      >
-        {_isLocalClient && !hideInput ? (
-          <>
-            <input
-              ref={inputRef}
-              value={message}
-              className="w-full !outline-none bg-transparent !border-none text-foreground"
-              onChange={(e: FormEvent<HTMLInputElement>) => {
-                const text = e.currentTarget.value
-                if (text.length <= MAX_MESSAGE_LENGTH) onUpdateMessage(e.currentTarget.value)
-              }}
-            />
-            <p className="text-xs" style={{ color: hue }}>
-              {message.length}/{MAX_MESSAGE_LENGTH}
-            </p>
-          </>
-        ) : message.length ? (
-          <div className="truncate text-foreground-light">{message}</div>
-        ) : (
-          <div className="flex items-center justify-center">
-            <div className="loader-dots block relative h-6 w-10">
-              <div className="absolute top-0 my-2.5 w-1.5 h-1.5 rounded-full bg-foreground opacity-75"></div>
-              <div className="absolute top-0 my-2.5 w-1.5 h-1.5 rounded-full bg-foreground opacity-75"></div>
-              <div className="absolute top-0 my-2.5 w-1.5 h-1.5 rounded-full bg-foreground opacity-75"></div>
-              <div className="absolute top-0 my-2.5 w-1.5 h-1.5 rounded-full bg-foreground opacity-75"></div>
-            </div>
-          </div>
-        )}
-      </div>
+      ></div>
     </>
   )
 }

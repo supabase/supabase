@@ -30,7 +30,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
   const DISPLAY_NAME = name || username
-  const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
   const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} Launch Week Ticket`
   const DESCRIPTION = `Claim your Supabase Launch Week 13 ticket for a chance to win supa swag.`
   const PAGE_URL = `${LW_URL}/tickets/${username}`
@@ -101,7 +100,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                         <Button type="primary" asChild size="small">
                           <Link
                             href={`${SITE_URL}${username ? '?referral=' + username : ''}`}
-                            className="pointer-events-auto !cursor-none"
+                            className="pointer-events-auto"
                           >
                             Claim your ticket
                           </Link>
