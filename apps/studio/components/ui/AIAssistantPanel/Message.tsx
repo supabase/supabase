@@ -83,7 +83,7 @@ export const Message = function Message({
                     value={props.children[0].props.children}
                     language={language}
                     className={cn(
-                      'max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t border-b text-foreground !rounded-none w-full',
+                      'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t border-b text-foreground !rounded-none w-full',
                       '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
                     )}
                   />
