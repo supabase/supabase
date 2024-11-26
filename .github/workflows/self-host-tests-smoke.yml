@@ -22,4 +22,4 @@ jobs:
             docker/
       - name: Run docker-compose up
         # Ensure all services can be started and healthy with default config
-        run: cd docker && cp .env.example .env && docker-compose up --wait
+        run: cd docker && cp .env.example .env && docker compose up --wait
