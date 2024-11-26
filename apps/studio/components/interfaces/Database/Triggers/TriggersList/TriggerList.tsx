@@ -159,7 +159,7 @@ const TriggerList = ({
                             const sql = generateTriggerCreateSQL(x)
                             setAiAssistantPanel({
                               open: true,
-                              initialInput: 'Update this trigger to do...',
+                              initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
                               suggestions: {
                                 title:
                                   'I can help you make a change to this trigger, here are a few example prompts to get you started:',
