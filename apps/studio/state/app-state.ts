@@ -3,6 +3,7 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import type { Message as MessageType } from 'ai/react'
 
 const EMPTY_DASHBOARD_HISTORY: {
   sql?: string
@@ -19,14 +20,35 @@ export type CommonDatabaseEntity = {
   [key: string]: any
 }
 
+export type SuggestionsType = {
+  title: string
+  prompts: string[]
+}
+
 type AiAssistantPanelType = {
   open: boolean
+  messages?: MessageType[] | undefined
+  initialInput: string
+  sqlSnippets?: string[]
+  suggestions?: SuggestionsType
   editor?: SupportedAssistantEntities | null
   // Raw string content for the monaco editor, currently used to retain where the user left off when toggling off the panel
   content?: string
   // Mainly used for editing a database entity (e.g editing a function, RLS policy etc)
   entity?: CommonDatabaseEntity
   tables: { schema: string; name: string }[]
+}
+
+const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
+  open: false,
+  messages: undefined,
+  sqlSnippets: undefined,
+  initialInput: '',
+  suggestions: undefined,
+  editor: null,
+  content: '',
+  entity: undefined,
+  tables: [],
 }
 
 export const appState = proxy({
@@ -108,13 +130,14 @@ export const appState = proxy({
     appState.navigationPanelJustClosed = value
   },
 
-  aiAssistantPanel: {
-    open: false,
-    editor: null,
-    content: '',
-    entity: undefined,
-    tables: [],
-  } as AiAssistantPanelType,
+  resetAiAssistantPanel: () => {
+    appState.aiAssistantPanel = {
+      ...INITIAL_AI_ASSISTANT,
+      open: appState.aiAssistantPanel.open,
+    }
+  },
+
+  aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
   setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
 

@@ -27,4 +27,5 @@ jobs:
           echo "CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT origin/$BASE_REF $SHA | grep '^apps/docs/content/' | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
       - uses: errata-ai/vale-action@reviewdog
         with:
-          files: ${{ steps.changed-files.outputs.CHANGED_FILES }}
+          files: '${{ steps.changed-files.outputs.CHANGED_FILES }}'
+          separator: ','

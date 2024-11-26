@@ -62,9 +62,19 @@ const EventListItem = ({ event }: Props) => {
 
 const EventDate: React.FC<{ event: PostTypes }> = ({ event }) => (
   <p className="text-foreground-lighter lg:text-left lg:w-[240px] text-nowrap group-hover:text-foreground-light min-w-20 inline-flex items-center lg:justify-start gap-1.5 w-full">
-    {dayjs(event.date).tz(event.timezone).format('DD MMM YYYY')}
+    {event.type === 'event'
+      ? dayjs(event.date).format('DD MMM YYYY')
+      : dayjs(event.date).tz(event.timezone).format('DD MMM YYYY')}
     <span className="min-w-px h-[16px] bg-muted" />
-    <span className="">{dayjs(event.date).tz(event.timezone).format('hA')}</span>
+    <span className="">
+      {event.type === 'event'
+        ? dayjs(event.date).get('minutes') > 0
+          ? dayjs(event.date).format('h:mmA')
+          : dayjs(event.date).format('hA')
+        : dayjs(event.date).get('minutes') > 0
+          ? dayjs(event.date).tz(event.timezone).format('h:mmA')
+          : dayjs(event.date).tz(event.timezone).format('hA')}
+    </span>
     <span className="min-w-px h-[16px] bg-muted" />
     {dayjs(event.date).tz(event.timezone).format('z')}
   </p>

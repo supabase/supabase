@@ -35,6 +35,10 @@ port = 54324
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
+[storage.buckets.fonts]
+public = true
+objects_path = "buckets/fonts"
+
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.

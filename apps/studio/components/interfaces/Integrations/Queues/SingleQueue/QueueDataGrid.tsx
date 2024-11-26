@@ -130,7 +130,7 @@ export const QueueMessagesDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const router = useRouter()
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState('id', parseAsInteger)
+  const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
@@ -171,8 +171,8 @@ export const QueueMessagesDataGrid = ({
                   if (typeof idx === 'number' && idx >= 0) {
                     setSelectedMessageId(props.row.msg_id)
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                    const { id, ...rest } = router.query
-                    router.push({ ...router, query: { ...rest, id: props.row.msg_id } })
+                    const { messageId, ...rest } = router.query
+                    router.push({ ...router, query: { ...rest, messageId: props.row.msg_id } })
                   }
                 }}
               />
