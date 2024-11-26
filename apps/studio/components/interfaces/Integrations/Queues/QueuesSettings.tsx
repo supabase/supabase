@@ -153,7 +153,26 @@ export const QueuesSettings = () => {
                       className="w-full"
                       layout="flex"
                       label="Expose PGMQ via PostgREST"
-                      description="When enabled, you will be able to use any Supabase client library and PostgREST endpoints to manage your queues"
+                      description={
+                        <>
+                          <p>
+                            When enabled, you will be able to use any Supabase client library or
+                            PostgREST endpoints to manage your queues
+                          </p>
+                          <p className="mt-1">
+                            The following database functions will be available to use from the{' '}
+                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema:
+                          </p>
+                          <p>
+                            <code className="text-xs">send</code>,{' '}
+                            <code className="text-xs">send_batch</code>,{' '}
+                            <code className="text-xs">read</code>,{' '}
+                            <code className="text-xs">pop</code>,
+                            <code className="text-xs">archive</code>, and
+                            <code className="text-xs">delete</code>
+                          </p>
+                        </>
+                      }
                     >
                       <FormControl_Shadcn_>
                         <Switch
@@ -166,30 +185,26 @@ export const QueuesSettings = () => {
                       </FormControl_Shadcn_>
                     </FormItemLayout>
                     {formState.dirtyFields.enable && field.value === true && (
-                      <Admonition
-                        type="default"
-                        className="mt-2"
-                        title="Database functions for managing queues will be created upon enabling"
-                        description={
-                          <>
-                            <p>
-                              These functions include <code className="text-xs">send</code>,{' '}
-                              <code className="text-xs">send_batch</code>,{' '}
-                              <code className="text-xs">read</code>,{' '}
-                              <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and
-                              <code className="text-xs">delete</code>, and they will be created in a{' '}
-                              <code className="text-xs">queues_public</code> schema, where you can
-                              then call through any Supabase client library or PostgREST endpoint
-                            </p>
-                            <DocsButton
-                              abbrev={false}
-                              className="mt-2"
-                              href="https://supabase.com/docs"
-                            />
-                          </>
-                        }
-                      />
+                      <Admonition type="default" className="mt-2">
+                        <p>
+                          Queues will be managed through the{' '}
+                          <code className="text-xs">{QUEUES_SCHEMA}</code> schema
+                        </p>
+                        <div className="flex flex-col gap-y-2 text-foreground-light">
+                          <p>
+                            Database functions will be created in the{' '}
+                            <code className="text-xs">{QUEUES_SCHEMA}</code> schema upon enabling,
+                            where you can then call through any Supabase client library or PostgREST
+                            endpoint to manage your queues. Permissions on individual queues can
+                            also be further managed through privileges and row level security (RLS).
+                          </p>
+                          <DocsButton
+                            abbrev={false}
+                            className="w-min"
+                            href="https://supabase.com/docs"
+                          />
+                        </div>
+                      </Admonition>
                     )}
                     {formState.dirtyFields.enable && field.value === false && (
                       <Admonition

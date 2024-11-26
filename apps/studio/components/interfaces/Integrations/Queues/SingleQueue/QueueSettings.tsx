@@ -135,17 +135,24 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
               }),
             ]
           : []),
-        // Revoke insert on archive table only if role no longer has ANY perms on the queue table
+        // Revoke select + insert on archive table only if role no longer has ANY perms on the queue table
         ...(rolesNoLongerHavingPerms.length > 0
           ? [
               revokePrivilege({
                 projectRef: project.ref,
                 connectionString: project.connectionString,
-                revokes: rolesNoLongerHavingPerms.map((x) => ({
-                  grantee: x,
-                  privilege_type: 'INSERT',
-                  relation_id: archiveTable.id,
-                })),
+                revokes: [
+                  ...rolesNoLongerHavingPerms.map((x) => ({
+                    grantee: x,
+                    privilege_type: 'INSERT' as 'INSERT',
+                    relation_id: archiveTable.id,
+                  })),
+                  ...rolesNoLongerHavingPerms.map((x) => ({
+                    grantee: x,
+                    privilege_type: 'SELECT' as 'SELECT',
+                    relation_id: archiveTable.id,
+                  })),
+                ],
               }),
             ]
           : []),
@@ -160,15 +167,22 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                   relation_id: queueTable.id,
                 })) as TablePrivilegesGrant[],
               }),
-              // Just grant insert on archive table as long as we're granting any perms to the queue table for the role
+              // Just grant select + insert on archive table as long as we're granting any perms to the queue table for the role
               grantPrivilege({
                 projectRef: project.ref,
                 connectionString: project.connectionString,
-                grants: rolesBeingGrantedPerms.map((x) => ({
-                  grantee: x,
-                  privilege_type: 'INSERT',
-                  relation_id: archiveTable.id,
-                })),
+                grants: [
+                  ...rolesBeingGrantedPerms.map((x) => ({
+                    grantee: x,
+                    privilege_type: 'INSERT' as 'INSERT',
+                    relation_id: archiveTable.id,
+                  })),
+                  ...rolesBeingGrantedPerms.map((x) => ({
+                    grantee: x,
+                    privilege_type: 'SELECT' as 'SELECT',
+                    relation_id: archiveTable.id,
+                  })),
+                ],
               }),
             ]
           : []),

@@ -17,10 +17,13 @@ export const QUEUES_SCHEMA = 'pgmq_public'
 
 const EXPOSE_QUEUES_TO_POSTGREST_SQL = minify(/* SQL */ `
 create schema if not exists ${QUEUES_SCHEMA};
+grant usage on schema ${QUEUES_SCHEMA} to postgres, anon, authenticated, service_role;
 
-create or replace function ${QUEUES_SCHEMA}.pop(queue_name text)
-returns setof pgmq.message_record
-language plpgsql
+create or replace function ${QUEUES_SCHEMA}.queue_pop(
+    queue_name text
+)
+  returns setof pgmq.message_record
+  language plpgsql
   set search_path = ''
 as $$
 begin
@@ -32,34 +35,13 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
+comment on function ${QUEUES_SCHEMA}.queue_pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
 
-create or replace function ${QUEUES_SCHEMA}.send(
-  queue_name text,
-  msg jsonb,
-  sleep_seconds integer default 0  -- renamed from 'delay'
-)
-returns setof bigint
-language plpgsql
-set search_path = ''
-as $$
-begin
-    return query
-    select *
-    from pgmq.send(
-      queue_name := queue_name,
-      msg := msg,
-      delay := sleep_seconds
-    );
-end;
-$$;
 
-comment on function ${QUEUES_SCHEMA}.send(queue_name text, msg jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
-
-create or replace function ${QUEUES_SCHEMA}.send(
+create or replace function ${QUEUES_SCHEMA}.queue_send(
     queue_name text,
-    msg jsonb,
-    available_at timestamp with time zone  -- renamed from 'delay'
+    message jsonb,
+    sleep_seconds integer default 0  -- renamed from 'delay'
 )
   returns setof bigint
   language plpgsql
@@ -70,17 +52,18 @@ begin
     select *
     from pgmq.send(
         queue_name := queue_name,
-        msg := msg,
-        delay := available_at
+        msg := message,
+        delay := sleep_seconds
     );
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.send(queue_name text, msg jsonb, available_at timestamp with time zone) is 'Sends a message to the specified queue, making it available at the specified timestamp.';
+comment on function ${QUEUES_SCHEMA}.queue_send(queue_name text, message jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
 
-create or replace function ${QUEUES_SCHEMA}.send_batch(
+
+create or replace function ${QUEUES_SCHEMA}.queue_send_batch(
     queue_name text,
-    msgs jsonb[],
+    messages jsonb[],
     sleep_seconds integer default 0  -- renamed from 'delay'
 )
   returns setof bigint
@@ -92,39 +75,18 @@ begin
     select *
     from pgmq.send_batch(
         queue_name := queue_name,
-        msgs := msgs,
+        msgs := messages,
         delay := sleep_seconds
     );
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.send_batch(queue_name text, msgs jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
+comment on function ${QUEUES_SCHEMA}.queue_send_batch(queue_name text, messages jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
 
-create or replace function ${QUEUES_SCHEMA}.send_batch(
+
+create or replace function ${QUEUES_SCHEMA}.queue_archive(
     queue_name text,
-    msgs jsonb[],
-    available_at timestamp with time zone  -- renamed from 'delay'
-)
-  returns setof bigint
-  language plpgsql
-  set search_path = ''
-as $$
-begin
-    return query
-    select *
-    from pgmq.send_batch(
-        queue_name := queue_name,
-        msgs := msgs,
-        delay := available_at
-    );
-end;
-$$;
-
-comment on function ${QUEUES_SCHEMA}.send_batch(queue_name text, msgs jsonb[], available_at timestamp with time zone) is 'Sends a batch of messages to the specified queue, making them available at the specified timestamp.';
-
-create or replace function ${QUEUES_SCHEMA}.archive(
-    queue_name text,
-    msg_id bigint
+    message_id bigint
 )
   returns boolean
   language plpgsql
@@ -134,16 +96,17 @@ begin
     return
     pgmq.archive(
         queue_name := queue_name,
-        msg_id := msg_id
+        msg_id := message_id
     );
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
-create or replace function ${QUEUES_SCHEMA}.archive(
+
+create or replace function ${QUEUES_SCHEMA}.queue_archive(
     queue_name text,
-    msg_id bigint
+    message_id bigint
 )
   returns boolean
   language plpgsql
@@ -153,16 +116,17 @@ begin
     return
     pgmq.archive(
         queue_name := queue_name,
-        msg_id := msg_id
+        msg_id := message_id
     );
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.archive(queue_name text, msg_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
-create or replace function ${QUEUES_SCHEMA}.delete(
+
+create or replace function ${QUEUES_SCHEMA}.queue_delete(
     queue_name text,
-    msg_id bigint
+    message_id bigint
 )
   returns boolean
   language plpgsql
@@ -172,17 +136,17 @@ begin
     return
     pgmq.delete(
         queue_name := queue_name,
-        msg_id := msg_id
+        msg_id := message_id
     );
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.delete(queue_name text, msg_id bigint) is 'Permanently deletes a message from the specified queue.';
+comment on function ${QUEUES_SCHEMA}.queue_delete(queue_name text, message_id bigint) is 'Permanently deletes a message from the specified queue.';
 
-create or replace function ${QUEUES_SCHEMA}.read(
+create or replace function ${QUEUES_SCHEMA}.queue_read(
     queue_name text,
     sleep_seconds integer,
-    qty integer
+    n integer
 )
   returns setof pgmq.message_record
   language plpgsql
@@ -199,38 +163,36 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.read(queue_name text, sleep_seconds integer, qty integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout) and conditional filtering.';
-
--- Grant usage on schemas to roles
-grant usage on schema public to service_role, anon, authenticated;
-grant usage on schema pgmq to service_role, anon, authenticated;
+comment on function ${QUEUES_SCHEMA}.queue_read(queue_name text, sleep_seconds integer, n integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout).';
 
 -- Grant execute permissions on wrapper functions to roles
-grant execute on function ${QUEUES_SCHEMA}.pop(text) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.send(text, jsonb, integer) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.send(text, jsonb, timestamp with time zone) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.archive(text, bigint) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.delete(text, bigint) to service_role, anon, authenticated;
-grant execute on function ${QUEUES_SCHEMA}.read(text, integer, integer) to service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.queue_pop(text) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.pop(text) to postgres, service_role, anon, authenticated;
 
--- Grant execute permissions on inner pgmq functions to roles
-grant execute on function pgmq.pop(text) to service_role, anon, authenticated;
-grant execute on function pgmq.send(text, jsonb, integer) to service_role, anon, authenticated;
--- grant execute on function pgmq.send(payload jsonb, text, text, boolean) to service_role, anon, authenticated;
-grant execute on function pgmq.send_batch(text, jsonb[], integer) to service_role, anon, authenticated;
--- grant execute on function pgmq.send_batch(text, jsonb[], timestamp with time zone) to service_role, anon, authenticated;
-grant execute on function pgmq.archive(text, bigint) to service_role, anon, authenticated;
-grant execute on function pgmq.delete(text, bigint) to service_role, anon, authenticated;
-grant execute on function pgmq.read(text, integer, integer) to service_role, anon, authenticated;
+
+grant execute on function ${QUEUES_SCHEMA}.queue_send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
+
+grant execute on function ${QUEUES_SCHEMA}.queue_send_batch(text, jsonb[], integer) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.send_batch(text, jsonb[], integer) to postgres, service_role, anon, authenticated;
+
+grant execute on function ${QUEUES_SCHEMA}.queue_archive(text, bigint) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.archive(text, bigint) to postgres, service_role, anon, authenticated;
+
+grant execute on function ${QUEUES_SCHEMA}.queue_delete(text, bigint) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.delete(text, bigint) to postgres, service_role, anon, authenticated;
+
+grant execute on function ${QUEUES_SCHEMA}.queue_read(text, integer, integer) to postgres, service_role, anon, authenticated;
+grant execute on function pgmq.read(text, integer, integer) to postgres, service_role, anon, authenticated;
 
 -- For the service role, we want full access
 -- Grant permissions on existing tables
-grant all privileges on all tables in schema pgmq to service_role;
+grant all privileges on all tables in schema pgmq to postgres, service_role;
 
 -- Ensure service_role has permissions on future tables
-alter default privileges in schema pgmq grant all privileges on tables to service_role;
+alter default privileges in schema pgmq grant all privileges on tables to postgres, service_role;
+
+grant usage on schema pgmq to postgres, anon, authenticated, service_role;
 `)
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `

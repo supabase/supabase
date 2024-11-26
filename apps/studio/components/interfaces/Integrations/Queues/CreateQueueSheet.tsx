@@ -9,6 +9,7 @@ import { useDatabaseQueueCreateMutation } from 'data/database-queues/database-qu
 import {
   Badge,
   Button,
+  Checkbox_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -22,6 +23,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { QUEUE_TYPES } from './Queues.constants'
@@ -52,6 +54,7 @@ const FormSchema = z.object({
     .trim()
     .min(1, 'Please provide a name for your queue')
     .max(47, "The name can't be longer than 47 characters"),
+  enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,
     partitionedQueueSchema,
@@ -67,30 +70,28 @@ const FORM_ID = 'create-queue-sidepanel'
 export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQueueSheetProps) => {
   // This is for enabling pg_partman extension which will be used for partitioned queues (3rd kind of queue)
   // const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-  const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
-
   // const canToggleExtensions = useCheckPermissions(
   //   PermissionAction.TENANT_SQL_ADMIN_WRITE,
   //   'extensions'
   // )
 
+  const { mutate: createQueue, isLoading } = useDatabaseQueueCreateMutation()
+
   const form = useForm<CreateQueueForm>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: '',
-      values: {
-        type: 'basic',
-      },
+      enableRls: true,
+      values: { type: 'basic' },
     },
   })
 
   const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
+  const { enableRls } = form.watch()
 
   // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
-  if (!isEdited && isClosing) {
-    onClose()
-  }
+  if (!isEdited && isClosing) onClose()
 
   const onClosePanel = () => {
     if (isEdited) {
@@ -100,20 +101,21 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
     }
   }
 
-  const onSubmit: SubmitHandler<CreateQueueForm> = async ({ name, values }) => {
-    let query = `SELECT pgmq.create('${name}');`
-    if (values.type === 'partitioned') {
-      query = `select from pgmq.create_partitioned('${name}', '${values.partitionInterval}', '${values.retentionInterval}');`
-    }
-    if (values.type === 'unlogged') {
-      query = `SELECT pgmq.create_unlogged('${name}');`
-    }
-
+  const onSubmit: SubmitHandler<CreateQueueForm> = async ({ name, enableRls, values }) => {
     createQueue(
       {
         projectRef: project!.ref,
         connectionString: project?.connectionString,
-        query,
+        name,
+        enableRls,
+        type: values.type,
+        configuration:
+          values.type === 'partitioned'
+            ? {
+                partitionInterval: values.partitionInterval,
+                retentionInterval: values.retentionInterval,
+              }
+            : undefined,
       },
       {
         onSuccess: () => {
@@ -187,22 +189,20 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                               }
                               showIndicator={false}
                             >
-                              <div className="flex items-center gap-x-5">
+                              <div className="flex items-start gap-x-5">
                                 <div className="text-foreground">{definition.icon}</div>
-                                <div className="flex flex-col">
-                                  <div className="flex gap-x-2">
-                                    <p className="text-foreground">{definition.label}</p>
+                                <div className="flex flex-col gap-y-1">
+                                  <div className="flex items-center gap-x-2">
+                                    <p className="text-foreground text-left">{definition.label}</p>
+                                    {definition.value === 'partitioned' && (
+                                      <Badge variant="warning">Coming soon</Badge>
+                                    )}
                                   </div>
-                                  <p className="text-foreground-light text-left">
+                                  <p className="text-foreground-lighter text-left">
                                     {definition.description}
                                   </p>
                                 </div>
                               </div>
-                              {definition.value === 'partitioned' ? (
-                                <div className="pt-2 pl-10">
-                                  <Badge variant="warning">COMING SOON</Badge>
-                                </div>
-                              ) : null}
                               {/* {!pgPartmanExtensionInstalled &&
                               definition.value === 'partitioned' ? (
                                 <div className="w-full flex gap-x-2 pl-11 py-2 items-center">
@@ -287,8 +287,48 @@ export const CreateQueueSheet = ({ isClosing, setIsClosing, onClose }: CreateQue
                       )}
                     />
                   </SheetSection>
+                  <Separator />
                 </>
               )}
+              <SheetSection className="flex flex-col gap-y-2">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="enableRls"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="flex"
+                      label={
+                        <div className="flex items-center gap-x-2">
+                          <p>Enable Row Level Security (RLS)</p>
+                          <Badge color="scale">Recommended</Badge>
+                        </div>
+                      }
+                      description="Restrict access to your queue by enabling RLS and writing Postgres policies to control access for each role."
+                    >
+                      <FormControl_Shadcn_>
+                        <Checkbox_Shadcn_
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={field.disabled}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+                {enableRls ? (
+                  <Admonition
+                    type="default"
+                    title="Policies are required to manage queues"
+                    description="The queue will not be accessible until a policy is defined"
+                  />
+                ) : (
+                  <Admonition
+                    type="warning"
+                    title="You are allowing anonymous access to your queue"
+                    description="Anyone will be able to manage your queue"
+                  />
+                )}
+              </SheetSection>
             </form>
           </Form_Shadcn_>
         </div>

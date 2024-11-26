@@ -35,7 +35,9 @@ const IntegrationPage: NextPageWithLayout = () => {
       router?.isReady &&
       !isIntegrationsLoading &&
       !installation &&
-      pageId !== 'overview'
+      pageId !== 'overview' &&
+      // [TODO REMOVE]
+      id !== 'queues'
     ) {
       router.replace(`/project/${ref}/integrations/${id}/overview`)
     }

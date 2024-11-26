@@ -8,18 +8,36 @@ import { databaseQueuesKeys } from './keys'
 export type DatabaseQueueCreateVariables = {
   projectRef: string
   connectionString?: string
-  query: string
+  name: string
+  type: 'basic' | 'partitioned' | 'unlogged'
+  enableRls: boolean
+  configuration?: {
+    partitionInterval?: number
+    retentionInterval?: number
+  }
 }
 
 export async function createDatabaseQueue({
   projectRef,
   connectionString,
-  query,
+  name,
+  type,
+  enableRls,
+  configuration,
 }: DatabaseQueueCreateVariables) {
+  const { partitionInterval, retentionInterval } = configuration ?? {}
+
+  const query =
+    type === 'partitioned'
+      ? `select from pgmq.create_partitioned('${name}', '${partitionInterval}', '${retentionInterval}');`
+      : type === 'unlogged'
+        ? `SELECT pgmq.create_unlogged('${name}');`
+        : `SELECT pgmq.create('${name}');`
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: query,
+    sql: `${query} ${enableRls ? `alter table "a_${name}" enable row level security;` : ''}`.trim(),
     queryKey: databaseQueuesKeys.create(),
   })
 
