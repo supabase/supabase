@@ -24,8 +24,8 @@ export const QueuesOverviewTab = () => {
             title="Queues can be managed via any Supabase client library or PostgREST endpoints"
           >
             <p>
-              You may choose to toggle the exposure of <code className="text-xs">pgmq</code> through
-              PostgREST via the queues settings
+              You may choose to toggle the exposure of Queues through PostgREST via the queues
+              settings
             </p>
             <Button asChild type="default">
               <Link href={`/project/${ref}/integrations/queues/settings`}>

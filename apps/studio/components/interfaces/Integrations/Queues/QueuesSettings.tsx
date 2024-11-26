@@ -151,7 +151,7 @@ export const QueuesSettings = () => {
                     <FormItemLayout
                       className="w-full"
                       layout="flex"
-                      label="Expose PGMQ via PostgREST"
+                      label="Expose Queues via PostgREST"
                       description={
                         <>
                           <p>
