@@ -58,7 +58,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'ai',
           },
           {
-            label: 'Cron Jobs',
+            label: 'Cron',
             icon: 'cron',
             href: '/guides/cron',
             level: 'cron',
@@ -1117,13 +1117,13 @@ export const database: NavMenuConstant = {
 
 export const cron: NavMenuConstant = {
   icon: 'cron',
-  title: 'Cron Jobs',
+  title: 'Cron',
   url: '/guides/cron',
   items: [
     { name: 'Overview', url: '/guides/cron' },
     { name: 'Install', url: '/guides/cron/install' },
-    { name: 'Create Cron Job', url: '/guides/cron/create-cron-job' },
-    { name: 'Edit or delete Cron Job', url: '/guides/cron/edit-delete-cron-job' },
+    { name: 'Create Cron job', url: '/guides/cron/create-cron-job' },
+    { name: 'Edit or delete Cron job', url: '/guides/cron/edit-delete-cron-job' },
   ],
 }
 

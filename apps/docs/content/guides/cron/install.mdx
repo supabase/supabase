@@ -1,8 +1,8 @@
 ---
-title: 'Install the Cron Jobs Module'
+title: 'Install the Cron Module'
 ---
 
-Install the Cron Jobs Module to schedule background jobs.
+Install the Cron Module to schedule background jobs.
 
 ## Install using the Dashboard
 
@@ -13,7 +13,7 @@ Install the Cron Jobs Module to schedule background jobs.
 
 ## Install using SQL
 
-You can install the Cron Jobs module by enabling `pg_cron`:
+You can install the Cron module by enabling `pg_cron`:
 
 ```sql
 create extension pg_cron with schema pg_catalog;
@@ -24,7 +24,7 @@ grant all privileges on all tables in schema cron to postgres;
 
 ## Uninstall
 
-Uninstall the Cron Jobs module by disabling `pg_cron`:
+Uninstall the Cron module by disabling `pg_cron`:
 
 ```sql
 drop extension if exists pg_cron;

@@ -80,7 +80,7 @@ Delete old data every Saturday at 3:30am (GMT):
 
 ```sql
 select cron.schedule (
-    'saturday-cleanup', -- name of the cron job
+    'saturday-cleanup', -- name of the Cron job
     '30 3 * * 6', -- Saturday at 3:30am (GMT)
     $$ delete from events where event_time < now() - interval '1 week' $$
 );

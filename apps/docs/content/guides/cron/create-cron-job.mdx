@@ -1,25 +1,25 @@
 ---
-title: 'Create a Cron Job'
+title: 'Create a Cron job'
 ---
 
-Create a Cron Job from the [Integrations section](/dashboard/project/_/integrations/cron-jobs) section of the Dashboard.
+Create a Cron job from the [Integrations section](/dashboard/project/_/integrations/cron-jobs) section of the Dashboard.
 
-## Create a Cron Job
+## Create a Cron job
 
 1. Go to the [Cron Jobs](/dashboard/project/_/integrations/cron-jobs) tab in the Integrations section.
 1. Click `Create a new cron job`.
-1. Name your Cron Job.
-1. Give your Cron Job a schedule.
-1. Pick a SQL snippet, function, or HTTP request to execute whenever the Cron Job runs.
+1. Name your Cron job.
+1. Give your Cron job a schedule.
+1. Pick a SQL snippet, function, or HTTP request to execute whenever the Cron job runs.
 1. Click `Create cron job`.
 
 ## Examples
 
-Here are some example use cases for Cron Jobs:
+Here are some example use cases for Cron:
 
 ### Delete old data
 
-Create a Cron Job with the following SQL snippet:
+Create a Cron job with the following SQL snippet:
 
 ```sql
 delete from events
@@ -28,7 +28,7 @@ delete from events
 
 ### Run a vacuum
 
-Create a Cron Job with the following SQL snippet:
+Create a Cron job with the following SQL snippet:
 
 ```sql
 vacuum;
@@ -36,19 +36,19 @@ vacuum;
 
 ### Call a stored procedure
 
-To use a stored procedure, create a Cron Job with a SQL snippet to call it:
+To use a stored procedure, create a Cron job with a SQL snippet to call it:
 
 ```sql
 call my_procedure();
 ```
 
-## Manage Cron Jobs with SQL
+## Manage Cron with SQL
 
-Cron Jobs are managed using the [`pg_cron`](https://github.com/citusdata/pg_cron) extension, which provides a `cron.schedule` function. Call this function to manually create a Cron Job:
+Cron jobs are managed using the [`pg_cron`](https://github.com/citusdata/pg_cron) extension, which provides a `cron.schedule` function. Call this function to manually create a Cron Job:
 
 ```sql
 select cron.schedule (
-    'job_name', -- name of the Cron Job
+    'job_name', -- name of the Cron job
     '30 3 * * 6', -- job schedule
     $$ delete from events where event_time < now() - interval '1 week' $$ -- SQL to execute
 );

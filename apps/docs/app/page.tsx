@@ -74,7 +74,7 @@ const postgresIntegrations = [
     description: 'AI toolkit to manage embeddings',
   },
   {
-    title: 'Cron Jobs',
+    title: 'Cron',
     icon: 'cron',
     href: '/guides/cron',
     description: 'Schedule, manage, and monitor jobs',
