@@ -575,7 +575,7 @@ export const AIAssistant = ({
                 ? 'Reply to the assistant...'
                 : (sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'How can we help you today?'
+                  : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
