@@ -3,7 +3,7 @@ import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-import { cn, markdownComponents, WarningIcon } from 'ui'
+import { cn, markdownComponents, WarningIcon, CodeBlock } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { SqlSnippet } from './SqlSnippet'
 
@@ -56,20 +56,38 @@ export const Message = function Message({
           components={{
             ...markdownComponents,
             pre: (props: any) => {
-              return readOnly ? (
-                <div className="mb-1 -mt-2">
-                  <CollapsibleCodeBlock
-                    value={props.children[0].props.children[0]}
-                    language="sql"
+              const language = props.children[0].props.className?.replace('language-', '') || 'sql'
+
+              if (language === 'sql') {
+                return readOnly ? (
+                  <div className="mb-1 -mt-2">
+                    <CollapsibleCodeBlock
+                      value={props.children[0].props.children[0]}
+                      language="sql"
+                      hideLineNumbers
+                    />
+                  </div>
+                ) : (
+                  <SqlSnippet
+                    readOnly={readOnly}
+                    isLoading={isLoading}
+                    sql={props.children[0].props.children}
+                  />
+                )
+              }
+
+              return (
+                <div className="-mx-8">
+                  <CodeBlock
                     hideLineNumbers
+                    value={props.children[0].props.children}
+                    language={language}
+                    className={cn(
+                      'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t border-b text-foreground !rounded-none w-full',
+                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+                    )}
                   />
                 </div>
-              ) : (
-                <SqlSnippet
-                  readOnly={readOnly}
-                  isLoading={isLoading}
-                  sql={props.children[0].props.children}
-                />
               )
             },
             ol: (props: any) => {

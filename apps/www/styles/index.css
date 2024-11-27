@@ -704,10 +704,6 @@ launch week
   transition-timing-function: linear;
 }
 
-/* .lw8-particle-handle {
-  @apply text-xs bg-black flex items-center justify-center rounded-full py-1 px-2 [&>div]:!relative;
-} */
-
 /* dat.GUI */
 
 .dg.ac {
@@ -732,4 +728,72 @@ launch week
 }
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
+}
+
+/* Loader dots */
+
+.loader-dots div {
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+
+.loader-dots div:nth-child(1) {
+  left: 4px;
+  animation: loader-dots1 0.6s infinite;
+}
+
+.loader-dots div:nth-child(2) {
+  left: 4px;
+  animation: loader-dots2 0.6s infinite;
+}
+
+.loader-dots div:nth-child(3) {
+  left: 16px;
+  animation: loader-dots2 0.6s infinite;
+}
+
+.loader-dots div:nth-child(4) {
+  left: 28px;
+  animation: loader-dots3 0.6s infinite;
+}
+
+@keyframes loader-dots1 {
+  0% {
+    transform: scale(0);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes loader-dots3 {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(0);
+  }
+}
+
+@keyframes loader-dots2 {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(12px, 0);
+  }
+}
+
+.lw13-game-input {
+  visibility: none;
+  opacity: 0;
+}
+
+@media (hover: none) {
+  .lw13-game-input {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
 }

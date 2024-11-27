@@ -9,15 +9,14 @@ export default function TicketCopy() {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = secret
-  const displayUrl = `.../launch-week/tickets/${username}?lw=12${
+  const displayUrl = `.../launch-week/tickets/${username}?lw=13${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
-  const url = `${LW_URL}/tickets/${username}?lw=12${
+  const url = `${LW_URL}/tickets/${username}?lw=13${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
 
   return (
-    // <div className="h-full w-full">
     <button
       type="button"
       name="Copy"
@@ -30,17 +29,12 @@ export default function TicketCopy() {
           }, 2000)
         })
       }}
-      className="font-mono w-full flex justify-center items-center gap-2 relative text-foreground-light hover:text-foreground text-sm"
+      className="font-mono w-full flex-grow px-2 lg:px-3.5 !pr-1 py-1 rounded-md bg-alternative-200 border flex gap-2 relative text-foreground-light hover:text-foreground text-xs pointer-events-auto justify-between items-center hover:border-stronger transition-all"
     >
-      <div className="w-4 min-w-4 flex-shrink-0">
-        {copied ? (
-          <Check size={14} strokeWidth={3} className="text-foreground" />
-        ) : (
-          <Copy size={14} strokeWidth={1.5} />
-        )}
-      </div>
       <span className="truncate">{displayUrl}</span>
+      <div className="w-6 min-w-6 h-6 flex items-center justify-center flex-shrink-0 border border-strong rounded bg-muted hover:bg-selection hover:border-stronger">
+        {copied ? <Check size={14} strokeWidth={3} /> : <Copy size={14} strokeWidth={1.5} />}
+      </div>
     </button>
-    // </div>
   )
 }

@@ -1,4 +1,4 @@
-# PostgreSQL SQL Style Guide
+# Postgres SQL Style Guide
 
 ## General
 
@@ -12,7 +12,7 @@
 
 - Avoid SQL reserved words and ensure names are unique and under 63 characters.
 - Use snake_case for tables and columns.
-- Prefer plurals for table names 
+- Prefer plurals for table names
 - Prefer singular names for columns.
 
 ## Tables
@@ -62,12 +62,12 @@ where employee_id = 1001;
 Larger queries:
 
 ```sql
-select 
-  first_name, 
+select
+  first_name,
   last_name
-from 
+from
   employees
-where 
+where
   start_date between '2021-01-01' and '2021-12-31'
 and
   status = 'employed';
@@ -80,14 +80,14 @@ and
 - Prefer full table names when referencing tables. This helps for readability.
 
 ```sql
-select 
-  employees.employee_name, 
+select
+  employees.employee_name,
   departments.department_name
-from 
+from
   employees
-join 
+join
   departments on employees.department_id = departments.department_id
-where 
+where
   employees.start_date > '2022-01-01';
 ```
 
@@ -104,7 +104,7 @@ where end_date is null;
 
 ## Complex queries and CTEs
 
-- If a query is extremely complex, prefer a CTE. 
+- If a query is extremely complex, prefer a CTE.
 - Make sure the CTE is clear and linear. Prefer readability over performance.
 - Add comments to each block.
 
