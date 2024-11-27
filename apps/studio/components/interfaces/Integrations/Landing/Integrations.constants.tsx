@@ -76,6 +76,10 @@ const supabaseIntegrations: IntegrationDefinition[] = [
           <Layers size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
         ),
       },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
@@ -87,17 +91,20 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+                (mod) => mod.QueuesOverviewTab
               ),
-            {
-              loading: Loading,
-            }
+            { loading: Loading }
           )
         case 'queues':
           return dynamic(() => import('../Queues/QueuesTab').then((mod) => mod.QueuesTab), {
             loading: Loading,
           })
+        case 'settings':
+          return dynamic(
+            () => import('../Queues/QueuesSettings').then((mod) => mod.QueuesSettings),
+            { loading: Loading }
+          )
       }
       return null
     },

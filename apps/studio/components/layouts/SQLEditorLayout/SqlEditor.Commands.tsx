@@ -35,7 +35,7 @@ import {
   useSetPage,
 } from 'ui-patterns/CommandMenu'
 import { usePrefetchTables, useTablesQuery, type TablesData } from 'data/tables/tables-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useEffect, useRef } from 'react'
 
 export function useSqlEditorGotoCommands(options?: CommandOptions) {
@@ -356,7 +356,7 @@ from ${formatTableIdentifier(table)}
 }
 
 function excludeSupabaseControlledSchemas(tables: TablesData) {
-  return tables.filter((table) => !EXCLUDED_SCHEMAS.includes(table.schema))
+  return tables.filter((table) => !PROTECTED_SCHEMAS.includes(table.schema))
 }
 
 // Not a perfectly spec-compliant regex , since Postgres also allows non-Latin

@@ -1,25 +1,26 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
+import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Input, AiIconAnimation } from 'ui'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Search } from 'lucide-react'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { useAppStateSnapshot } from 'state/app-state'
+import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import TriggerList from './TriggerList'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface TriggersListProps {
   createTrigger: () => void
@@ -41,7 +42,7 @@ const TriggersList = ({
     connectionString: project?.connectionString,
   })
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)

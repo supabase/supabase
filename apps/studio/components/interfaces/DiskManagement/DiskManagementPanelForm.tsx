@@ -118,7 +118,7 @@ export function DiskManagementPanelForm() {
       },
     }
   )
-  // @ts-ignore [Joshen TODO] check whats happening here
+  // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
   const isRequestingChanges = data?.requested_modification !== undefined
 
