@@ -62,7 +62,7 @@ const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
             <motion.div
               key={index}
               variants={isHighlighted ? highlightedVariants : item}
-              className={`w-[1px] h-[1px] rounded-full bg-white`}
+              className={`w-[1px] h-[1px] rounded-full bg-foreground`}
             />
           )
         })}
