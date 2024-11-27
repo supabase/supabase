@@ -19,7 +19,7 @@ import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/databas
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { BASE_PATH } from 'lib/constants'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { PauseCircle, PlayCircle, Terminal } from 'lucide-react'
 import type { Dictionary } from 'types'
 import ChooseFunctionForm from './ChooseFunctionForm'
@@ -148,7 +148,7 @@ class CreateTriggerStore implements ICreateTriggerStore {
   setTables = (value: any[]) => {
     this.tables = value
       .sort((a, b) => a.schema.localeCompare(b.schema))
-      .filter((a) => !EXCLUDED_SCHEMAS.includes(a.schema)) as any
+      .filter((a) => !PROTECTED_SCHEMAS.includes(a.schema)) as any
     this.setDefaultSelectedTable()
   }
 

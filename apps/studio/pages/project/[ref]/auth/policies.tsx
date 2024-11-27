@@ -19,7 +19,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
@@ -79,7 +79,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   })
   const [protectedSchemas] = partition(
     schemas,
-    (schema) => schema?.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    (schema) => schema?.name !== 'realtime' && PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
