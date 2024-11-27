@@ -41,7 +41,6 @@ const PlanUpdateSidePanel = () => {
   const slug = selectedOrganization?.slug
 
   const queryClient = useQueryClient()
-
   const originalPlanRef = useRef<string>()
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
@@ -59,6 +58,8 @@ const PlanUpdateSidePanel = () => {
   const orgProjects = (allProjects || []).filter(
     (it) => it.organization_id === selectedOrganization?.id
   )
+  // [Joshen TODO Oriole] Hook up properly once API changes are ready
+  const hasOrioleProjects = true
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
@@ -181,10 +182,10 @@ const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-              <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
+            <Button asChild type="default" icon={<ExternalLink />}>
+              <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
-              </Link>
+              </a>
             </Button>
           </div>
         }
@@ -213,13 +214,14 @@ const PlanUpdateSidePanel = () => {
               return (
                 <div
                   key={plan.id}
-                  className={
-                    'border rounded-md px-4 py-4 flex flex-col items-start justify-between col-span-12 md:col-span-4 bg-surface-200'
-                  }
+                  className={cn(
+                    'px-4 py-4 flex flex-col items-start justify-between',
+                    'border rounded-md col-span-12 md:col-span-4 bg-surface-200'
+                  )}
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
+                      <p className="text-brand text-sm uppercase">{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
@@ -228,9 +230,7 @@ const PlanUpdateSidePanel = () => {
                         <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
-                      ) : (
-                        <></>
-                      )}
+                      ) : null}
                     </div>
                     <div className="mt-4 flex items-center space-x-1 mb-4">
                       {(price ?? 0) > 0 && <p className="text-foreground-light text-sm">From</p>}
@@ -251,17 +251,24 @@ const PlanUpdateSidePanel = () => {
                       <ButtonTooltip
                         block
                         type={isDowngradeOption ? 'default' : 'primary'}
-                        disabled={subscription?.plan?.id === 'enterprise' || !canUpdateSubscription}
+                        disabled={
+                          subscription?.plan?.id === 'enterprise' ||
+                          hasOrioleProjects ||
+                          !canUpdateSubscription
+                        }
                         onClick={() => setSelectedTier(plan.id as any)}
                         tooltip={{
                           content: {
                             side: 'bottom',
+                            className: hasOrioleProjects ? 'w-80 text-center' : '',
                             text:
                               subscription?.plan?.id === 'enterprise'
                                 ? 'Reach out to us via support to update your plan from Enterprise'
-                                : !canUpdateSubscription
-                                  ? 'You do not have permission to change the subscription plan'
-                                  : undefined,
+                                : hasOrioleProjects
+                                  ? 'Your organization has projects that are on OrioleDB, which is only for the free plan. Remove all OrioleDB projects before changing your plan'
+                                  : !canUpdateSubscription
+                                    ? 'You do not have permission to change the subscription plan'
+                                    : undefined,
                           },
                         }}
                       >
