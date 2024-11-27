@@ -5,12 +5,11 @@ import { AIDemoPanel } from '~/components/AIDemo/Panel'
 import { useEffect, useState } from 'react'
 import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import aiSpace from 'public/images/ai/ai-space.jpg'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/router'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
+import DotGrid from '~/components/AIDemo/DotGrid'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
@@ -693,7 +692,14 @@ function Assistant() {
         }}
       />
       <DefaultLayout className="lg:h-screen min-h-screen overflow-hidden">
-        <SectionContainer className="h-full lg:pt-6">
+        <SectionContainer className="h-full lg:pt-6 relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, transition: { duration: 5 } }}
+            className="absolute inset-0 left-1/2"
+          >
+            <DotGrid rows={20} columns={20} count={200} />
+          </motion.div>
           <div className="h-full grid grid-cols-12 gap-8 items-center">
             {/* Left Column */}
             <div className="col-span-12 lg:col-span-6 relative z-10">
@@ -765,16 +771,6 @@ function Assistant() {
 
             {/* Right Column */}
             <motion.div className="col-span-12 relative lg:col-span-6 h-[500px] lg:h-full justify-center flex items-center">
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: 5 } }}
-              >
-                <Image
-                  src={aiSpace}
-                  alt="Supabase AI is like talking to your data"
-                  className="z-0 pointer-events-none mix-blend-darken dark:mix-blend-lighten invert dark:invert-0  absolute left-1/2 -translate-x-1/2 -bottom-96 w-[1400px] max-w-none opacity-15"
-                />
-              </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 1.04, filter: 'blur(5px)' }}
                 animate={{
