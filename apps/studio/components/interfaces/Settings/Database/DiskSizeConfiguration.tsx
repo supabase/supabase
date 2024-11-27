@@ -62,7 +62,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const databaseSizeBytesUsed = data?.result[0].db_size ?? 0
+  const databaseSizeBytesUsed = data ?? 0
 
   return (
     <div id="diskManagement">

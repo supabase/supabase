@@ -5,7 +5,7 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { Tabs } from 'ui'
+import { Tabs, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
@@ -42,27 +42,31 @@ const EmailTemplates = () => {
       {isLoading && <GenericSkeletonLoader />}
       {isSuccess && (
         <FormPanel>
-          <Tabs
-            scrollable
-            size="small"
-            type="underlined"
-            listClassNames="px-8 pt-4"
-            defaultActiveId={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}
-          >
+          <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
+            <TabsList_Shadcn_ className="px-8 pt-2 gap-5">
+              {TEMPLATES_SCHEMAS.map((template) => {
+                return (
+                  <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
+                    {template.title}
+                  </TabsTrigger_Shadcn_>
+                )
+              })}
+            </TabsList_Shadcn_>
+
             {TEMPLATES_SCHEMAS.map((template) => {
               const panelId = template.title.trim().replace(/\s+/g, '-')
               return (
-                <Tabs.Panel id={panelId} label={template.title} key={panelId}>
+                <TabsContent_Shadcn_ value={panelId} key={panelId}>
                   {builtInSMTP ? (
                     <div className="mx-8">
                       <EmailRateLimitsAlert />
                     </div>
                   ) : null}
                   <TemplateEditor key={template.title} template={template} />
-                </Tabs.Panel>
+                </TabsContent_Shadcn_>
               )
             })}
-          </Tabs>
+          </Tabs_Shadcn_>
         </FormPanel>
       )}
     </div>

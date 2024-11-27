@@ -5,14 +5,14 @@
       <link>https://supabase.com/blog</link>
       <description>Latest Postgres news from Filipe Cabaço at Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 08 Jan 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Tue, 09 Jan 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/planetpg-filipe-rss.xml" rel="self" type="application/rss+xml"/>
       <item>
   <guid>https://supabase.com/blog/elixir-clustering-using-postgres</guid>
   <title>Elixir clustering using Postgres</title>
   <link>https://supabase.com/blog/elixir-clustering-using-postgres</link>
   <description>Learn about our approach to connecting multiple nodes in Elixir using Postgres</description>
-  <pubDate>Mon, 08 Jan 2024 23:00:00 GMT</pubDate>
+  <pubDate>Tue, 09 Jan 2024 00:00:00 -0700</pubDate>
 </item>
 
     </channel>

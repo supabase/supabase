@@ -22,9 +22,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
   const { anonKey, serviceKey } = getAPIKeys(settings)
 
   const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
-    {
-      projectRef: config.projectRef,
-    },
+    { projectRef: config.projectRef },
     { enabled: IS_PLATFORM }
   )
   const jwtSecret = postgrestConfig?.jwt_secret

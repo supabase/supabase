@@ -1,8 +1,10 @@
+import { AlertOctagon, MinusCircle, PauseCircle } from 'lucide-react'
+
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
-import { AlertOctagon, MinusCircle, PauseCircle } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
-import { Alert, Modal } from 'ui'
+import { Modal } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface DowngradeModalProps {
   visible: boolean
@@ -76,6 +78,7 @@ const DowngradeModal = ({
     <Modal
       size="large"
       alignFooter="right"
+      variant="warning"
       visible={visible}
       onCancel={onClose}
       onConfirm={onConfirm}
@@ -83,20 +86,16 @@ const DowngradeModal = ({
     >
       <Modal.Content>
         <div className="space-y-2">
-          <Alert
-            withIcon
-            variant="warning"
+          <Admonition
+            type="warning"
             title="Downgrading to the Free Plan will lead to reductions in your organization's quota"
-          >
-            <p>
-              If you're already past the limits of the Free Plan, your projects could become
-              unresponsive or enter read only mode.
-            </p>
-          </Alert>
+            description="If you're already past the limits of the Free Plan, your projects could become
+              unresponsive or enter read only mode."
+          />
 
           {((previousProjectAddons.length ?? 0) > 0 ||
             (hasInstancesOnMicro && downgradingToNano)) && (
-            <Alert title={`Projects affected by the downgrade`} variant="warning" withIcon>
+            <Admonition type="warning" title="Projects affected by the downgrade">
               <ul className="space-y-1 max-h-[100px] overflow-y-auto">
                 {previousProjectAddons.map((project) => (
                   <ProjectDowngradeListItem key={project.ref} projectAddon={project} />
@@ -111,39 +110,32 @@ const DowngradeModal = ({
                     </li>
                   ))}
               </ul>
-            </Alert>
+            </Admonition>
           )}
         </div>
 
         <ul className="mt-4 space-y-5 text-sm">
-          <li className="flex gap-3">
-            <div>
-              <PauseCircle />
-            </div>
+          <li className="flex items-center gap-3">
+            <PauseCircle size={18} />
             <span>Projects will be paused after a week of inactivity</span>
           </li>
 
-          <li>
-            <div className="flex gap-3 mb-2">
-              <div>
-                <MinusCircle />
-              </div>
-              <span>Add ons from all projects under this organization will be removed.</span>
-            </div>
+          <li className="flex items-center gap-3 mb-2">
+            <MinusCircle size={18} />
+            <span>Add ons from all projects under this organization will be removed.</span>
           </li>
 
           <li className="flex gap-3">
-            <AlertOctagon size={14} className="flex-shrink-0" />
             <div>
               <strong>Before you downgrade to the {selectedPlan?.name} plan, consider:</strong>
               <ul className="space-y-2 mt-2">
-                <li className="list-disc ml-4">
+                <li className="list-disc ml-6 text-foreground-light">
                   Your projects no longer require their respective add ons.
                 </li>
-                <li className="list-disc ml-4">
+                <li className="list-disc ml-6 text-foreground-light">
                   Your resource consumption are well within the {selectedPlan?.name} plan's quota.
                 </li>
-                <li className="list-disc ml-4">
+                <li className="list-disc ml-6 text-foreground-light">
                   Alternatively, you may also transfer projects across organizations.
                 </li>
               </ul>

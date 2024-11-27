@@ -4,10 +4,14 @@ import { Info } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { Message as MessageType } from 'ai'
 import { useChat } from 'ai/react'
 import { useParams } from 'common'
+import { IS_PLATFORM } from 'common/constants/environment'
+import { Markdown } from 'components/interfaces/Markdown'
 import { SchemaComboBox } from 'components/ui/SchemaComboBox'
+import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
@@ -73,6 +77,9 @@ export const AiAssistantPanel = ({
   const shouldShowNotOptimizedAlert =
     selectedOrganization && !includeSchemaMetadata && showAiNotOptimizedWarningSetting
 
+  const { data: check } = useCheckOpenAIKeyQuery()
+  const isApiKeySet = IS_PLATFORM || !!check?.hasKey
+
   const { data } = useEntityDefinitionsQuery(
     {
       schemas: selectedSchemas,
@@ -87,13 +94,13 @@ export const AiAssistantPanel = ({
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const {
     messages: chatMessages,
-    append,
     isLoading,
+    append,
   } = useChat({
     id: chatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     body: {
-      existingSql: existingSql,
+      existingSql,
       entityDefinitions: entityDefinitions,
     },
   })
@@ -289,11 +296,21 @@ export const AiAssistantPanel = ({
         <div ref={bottomRef} className="h-1" />
       </div>
 
-      <div className="sticky p-5 flex-0 border-t">
+      <div className="sticky p-5 flex-0 border-t grid gap-4">
+        {!isApiKeySet && (
+          <Alert>
+            <AlertTitle>OpenAI API key not set</AlertTitle>
+            <AlertDescription>
+              <Markdown
+                content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+              />
+            </AlertDescription>
+          </Alert>
+        )}
         <AssistantChatForm
           textAreaRef={inputRef}
           loading={isLoading}
-          disabled={isLoading}
+          disabled={isLoading || !isApiKeySet}
           icon={
             <AiIconAnimation
               allowHoverEffect

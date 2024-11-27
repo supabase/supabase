@@ -44,6 +44,9 @@ info:
     - id: analytics
       title: Analytics
       description: Analytics settings.
+    - id: experimental
+      title: Experimental
+      description: Settings in alpha testing, subject to changes or removal at any time.
     - id: local
       title: Local Development
       description: Local Development settings.
@@ -189,6 +192,237 @@ parameters:
     links:
       - name: 'PgBouncer Configuration'
         link: https://www.pgbouncer.org/config.html#default_pool_size
+
+  - id: 'db.settings.effective_cache_size'
+    title: 'db.settings.effective_cache_size'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the planner's assumption about the effective size of the disk cache.
+      This is a query planner parameter that doesn't affect actual memory allocation.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-query.html#GUC-EFFECTIVE-CACHE-SIZE'
+
+  - id: 'db.settings.logical_decoding_work_mem'
+    title: 'db.settings.logical_decoding_work_mem'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the amount of memory to be used by logical decoding, before writing data to local disk.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-LOGICAL-DECODING-WORK-MEM'
+
+  - id: 'db.settings.maintenance_work_mem'
+    title: 'db.settings.maintenance_work_mem'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the maximum amount of memory to be used by maintenance operations, such as VACUUM, CREATE INDEX, and ALTER TABLE ADD FOREIGN KEY.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAINTENANCE-WORK-MEM'
+
+  - id: 'db.settings.max_connections'
+    title: 'db.settings.max_connections'
+    tags: ['database']
+    required: false
+    description: |
+      Determines the maximum number of concurrent connections to the database server.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-connection.html#GUC-MAX-CONNECTIONS'
+
+  - id: 'db.settings.max_locks_per_transaction'
+    title: 'db.settings.max_locks_per_transaction'
+    tags: ['database']
+    required: false
+    description: |
+      Controls the average number of object locks allocated for each transaction.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-locks.html#GUC-MAX-LOCKS-PER-TRANSACTION'
+
+  - id: 'db.settings.max_parallel_maintenance_workers'
+    title: 'db.settings.max_parallel_maintenance_workers'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum number of parallel workers that can be started by a single utility command.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-MAINTENANCE-WORKERS'
+
+  - id: 'db.settings.max_parallel_workers'
+    title: 'db.settings.max_parallel_workers'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum number of parallel workers that the system can support.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS'
+
+  - id: 'db.settings.max_parallel_workers_per_gather'
+    title: 'db.settings.max_parallel_workers_per_gather'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum number of parallel workers that can be started by a single Gather or Gather Merge node.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-PARALLEL-WORKERS-PER-GATHER'
+
+  - id: 'db.settings.max_replication_slots'
+    title: 'db.settings.max_replication_slots'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the maximum number of replication slots that the server can support.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-REPLICATION-SLOTS'
+
+  - id: 'db.settings.max_slot_wal_keep_size'
+    title: 'db.settings.max_slot_wal_keep_size'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the maximum size of WAL files that replication slots are allowed to retain in the pg_wal directory.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-SLOT-WAL-KEEP-SIZE'
+
+  - id: 'db.settings.max_standby_archive_delay'
+    title: 'db.settings.max_standby_archive_delay'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum delay before canceling queries when a hot standby server is processing archived WAL data.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-STANDBY-ARCHIVE-DELAY'
+
+  - id: 'db.settings.max_standby_streaming_delay'
+    title: 'db.settings.max_standby_streaming_delay'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum delay before canceling queries when a hot standby server is processing streamed WAL data.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-STANDBY-STREAMING-DELAY'
+
+  - id: 'db.settings.max_wal_size'
+    title: 'db.settings.max_wal_size'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the maximum size of WAL files that the system will keep in the pg_wal directory.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-wal.html#GUC-MAX-WAL-SIZE'
+
+  - id: 'db.settings.max_wal_senders'
+    title: 'db.settings.max_wal_senders'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the maximum number of concurrent connections from standby servers or streaming base backup clients.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-MAX-WAL-SENDERS'
+
+  - id: 'db.settings.max_worker_processes'
+    title: 'db.settings.max_worker_processes'
+    tags: ['database']
+    required: false
+    type: 'uint'
+    description: |
+      Sets the maximum number of background processes that the system can support.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-MAX-WORKER-PROCESSES'
+
+  - id: 'db.settings.session_replication_role'
+    title: 'db.settings.session_replication_role'
+    tags: ['database']
+    required: false
+    description: |
+      Controls whether triggers and rewrite rules are enabled. Valid values are: "origin", "replica", or "local".
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-SESSION-REPLICATION-ROLE'
+
+  - id: 'db.settings.shared_buffers'
+    title: 'db.settings.shared_buffers'
+    tags: ['database']
+    required: false
+    description: |
+      Sets the amount of memory the database server uses for shared memory buffers.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-SHARED-BUFFERS'
+
+  - id: 'db.settings.statement_timeout'
+    title: 'db.settings.statement_timeout'
+    tags: ['database']
+    required: false
+    description: |
+      Abort any statement that takes more than the specified amount of time.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-STATEMENT-TIMEOUT'
+
+  - id: 'db.settings.track_commit_timestamp'
+    title: 'db.settings.track_commit_timestamp'
+    tags: ['database']
+    required: false
+    type: 'bool'
+    description: |
+      Record commit time of transactions.
+      Note: Changing this parameter requires a database restart.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-TRACK-COMMIT-TIMESTAMP'
+
+  - id: 'db.settings.wal_keep_size'
+    title: 'db.settings.wal_keep_size'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the minimum size of past log file segments kept in the pg_wal directory.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-KEEP-SIZE'
+
+  - id: 'db.settings.wal_sender_timeout'
+    title: 'db.settings.wal_sender_timeout'
+    tags: ['database']
+    required: false
+    description: |
+      Terminate replication connections that are inactive for longer than this amount of time.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-SENDER-TIMEOUT'
+
+  - id: 'db.settings.work_mem'
+    title: 'db.settings.work_mem'
+    tags: ['database']
+    required: false
+    description: |
+      Specifies the amount of memory to be used by internal sort operations and hash tables before writing to temporary disk files.
+    links:
+      - name: 'PostgreSQL configuration'
+        link: 'https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-WORK-MEM'
 
   - id: 'db.pooler.max_client_conn'
     title: 'db.pooler.max_client_conn'
@@ -459,6 +693,56 @@ parameters:
     default: 'false'
     description: |
       If enabled, users need to confirm their email address before signing in.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.secure_password_change'
+    title: 'auth.email.secure_password_change'
+    tags: ['auth']
+    required: false
+    type: 'bool'
+    default: false
+    description: |
+      If enabled, requires the user's current password to be provided when changing to a new password.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.max_frequency'
+    title: 'auth.email.max_frequency'
+    tags: ['auth']
+    required: false
+    type: 'duration'
+    default: '1m'
+    description: |
+      The minimum amount of time that must pass between email requests.
+      Helps prevent email spam by limiting how frequently emails can be sent.
+      Example values: "1m", "1h", "24h"
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.otp_length'
+    title: 'auth.email.otp_length'
+    tags: ['auth']
+    required: false
+    default: '6'
+    description: |
+      The length of the OTP code to be sent in emails.
+      Must be between 6 and 10 digits.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.email.otp_exp'
+    title: 'auth.email.otp_exp'
+    tags: ['auth']
+    required: false
+    default: '300'
+    description: |
+      The expiry time for an OTP code in seconds.
+      Default is 300 seconds (5 minutes).
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
@@ -780,6 +1064,38 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.external.provider.skip_nonce_check'
+    title: 'auth.external.<provider>.skip_nonce_check'
+    tags: ['auth']
+    required: false
+    description: |
+      Disables nonce validation during OIDC authentication flow for the specified provider. Enable only when client libraries cannot properly handle nonce verification. Be aware that this reduces security by allowing potential replay attacks with stolen ID tokens.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.web_authn.enroll_enabled'
+    title: 'auth.mfa.web_authn.enroll_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable WebAuthn enrollment for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.web_authn.verify_enabled'
+    title: 'auth.mfa.web_authn.verify_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable WebAuthn verification for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'functions.function_name.enabled'
     title: 'functions.<function_name>.enabled'
     tags: ['edge-functions']
@@ -820,6 +1136,20 @@ parameters:
     links:
       - name: '`supabase functions` CLI subcommands'
         link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+
+  - id: 'functions.function_name.entrypoint'
+    title: 'functions.<function_name>.entrypoint'
+    tags: ['edge-functions']
+    required: false
+    description: |
+      Specify a custom entrypoint path for the function relative to the project root.
+      When not specified, defaults to `supabase/functions/<function_name>/index.ts`.
+    links:
+      - name: '`supabase functions` CLI subcommands'
+        link: 'https://supabase.com/docs/reference/cli/supabase-functions'
+    usage: |
+      [functions.my_function]
+      entrypoint = "path/to/custom/function.ts"
 
   - id: 'analytics.enabled'
     title: 'analytics.enabled'
@@ -863,3 +1193,66 @@ parameters:
     links:
       - name: Self-hosted Logflare Configuration
         link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
+
+  - id: 'experimental.webhooks.enabled'
+    title: 'experimental.webhooks.enabled'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Automatically enable webhook features on each new created branch
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.orioledb_version'
+    title: 'experimental.orioledb_version'
+    tags: ['experimental']
+    required: false
+    description: |
+      Configures Postgres storage engine to use OrioleDB with S3 support.
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.s3_host'
+    title: 'experimental.s3_host'
+    tags: ['experimental']
+    required: false
+    default: 'env(S3_HOST)'
+    description: |
+      Configures S3 bucket URL for OrioleDB storage.
+      Format example: <bucket_name>.s3-<region>.amazonaws.com
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.s3_region'
+    title: 'experimental.s3_region'
+    tags: ['experimental']
+    required: false
+    default: 'env(S3_REGION)'
+    description: |
+      Configures S3 bucket region for OrioleDB storage.
+      Example: us-east-1
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.s3_access_key'
+    title: 'experimental.s3_access_key'
+    tags: ['experimental']
+    required: false
+    default: 'env(S3_ACCESS_KEY)'
+    description: |
+      Configures AWS_ACCESS_KEY_ID for S3 bucket access.
+      DO NOT commit your AWS access key to git. Use environment variable substitution instead.
+      Note: This is an experimental feature and may change in future releases.
+    links: []
+
+  - id: 'experimental.s3_secret_key'
+    title: 'experimental.s3_secret_key'
+    tags: ['experimental']
+    required: false
+    default: 'env(S3_SECRET_KEY)'
+    description: |
+      Configures AWS_SECRET_ACCESS_KEY for S3 bucket access.
+      DO NOT commit your AWS secret key to git. Use environment variable substitution instead.
+      Note: This is an experimental feature and may change in future releases.
+    links: []

@@ -82,7 +82,7 @@ const PlanUpdateSidePanel = () => {
         setSelectedTier(undefined)
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-        setShowUpgradeSurvey(true)
+        if (planMeta?.change_type === 'upgrade') setShowUpgradeSurvey(true)
       },
       onError: (error) => {
         toast.error(`Unable to update subscription: ${error.message}`)
@@ -102,7 +102,9 @@ const PlanUpdateSidePanel = () => {
   } = useOrganizationBillingSubscriptionPreview({ tier: selectedTier, organizationSlug: slug })
 
   const availablePlans: OrgPlan[] = plans?.plans ?? []
-  const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const hasMembersExceedingFreeTierLimit =
+    (membersExceededLimit || []).length > 0 &&
+    orgProjects.filter((it) => it.status !== 'INACTIVE' && it.status !== 'GOING_DOWN').length > 0
   const subscriptionPlanMeta = subscriptionsPlans.find((tier) => tier.id === selectedTier)
 
   const expandUsageFee = (fee: string) => {
