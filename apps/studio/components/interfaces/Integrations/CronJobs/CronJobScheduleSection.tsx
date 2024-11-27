@@ -26,8 +26,8 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import CronSyntaxChart from './CronSyntaxChart'
 import { getScheduleMessage, secondsPattern } from './CronJobs.utils'
+import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
@@ -37,7 +37,7 @@ interface CronJobScheduleSectionProps {
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
   const initialValue = form.getValues('schedule')
-  const { schedule } = form.watch()
+  const schedule = form.watch('schedule')
 
   const [presetValue, setPresetValue] = useState<string>(initialValue)
   const [inputValue, setInputValue] = useState(initialValue)
@@ -123,13 +123,17 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
       <FormField_Shadcn_
         control={form.control}
         name="schedule"
-        render={({ field, fieldState }) => {
+        render={({ field }) => {
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
-              <FormLabel_Shadcn_ className="!text-foreground">Schedule</FormLabel_Shadcn_>
-              <FormLabel_Shadcn_ className="text-foreground-lighter">
-                {useNaturalLanguage ? 'Describe your schedule in words' : 'Enter a cron expression'}
-              </FormLabel_Shadcn_>
+              <div className="flex flex-row justify-between">
+                <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
+                <span className="text-foreground-lighter text-xs">
+                  {useNaturalLanguage
+                    ? 'Describe your schedule in words'
+                    : 'Enter a cron expression'}
+                </span>
+              </div>
 
               <FormControl_Shadcn_>
                 <div className="flex flex-col gap-y-2">
@@ -157,11 +161,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                       }}
                     />
                   )}
-                  {fieldState.error && (
-                    <FormMessage_Shadcn_ className="text-red-900">
-                      {fieldState.error.message}
-                    </FormMessage_Shadcn_>
-                  )}
+                  <FormMessage_Shadcn_ />
 
                   <div className="flex items-center gap-2 mt-2">
                     <Switch

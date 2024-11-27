@@ -18,7 +18,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormLabel_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -33,13 +32,14 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
   buildHttpRequestCommand,
   cronPattern,
-  secondsPattern,
   parseCronJobCommand,
+  secondsPattern,
 } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
@@ -48,10 +48,10 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
+  supportsSeconds: boolean
   isClosing: boolean
   setIsClosing: (v: boolean) => void
   onClose: () => void
@@ -90,70 +90,37 @@ const sqlSnippetSchema = z.object({
   snippet: z.string().trim().min(1),
 })
 
-const FormSchema = z.object({
-  name: z.string().trim().min(1, 'Please provide a name for your cron job'),
-  schedule: z
-    .string()
-    .trim()
-    .min(1)
-    .refine((value) => {
-      if (cronPattern.test(value)) {
-        try {
-          CronToString(value)
+const FormSchema = z
+  .object({
+    name: z.string().trim().min(1, 'Please provide a name for your cron job'),
+    supportsSeconds: z.boolean(),
+    schedule: z
+      .string()
+      .trim()
+      .min(1)
+      .refine((value) => {
+        if (cronPattern.test(value)) {
+          try {
+            CronToString(value)
+            return true
+          } catch {
+            return false
+          }
+        } else if (secondsPattern.test(value)) {
           return true
-        } catch {
-          return false
         }
-      } else if (secondsPattern.test(value)) {
-        return true
-      }
-      return false
-    }, 'Invalid Cron format'),
-  values: z.discriminatedUnion('type', [
-    edgeFunctionSchema,
-    httpRequestSchema,
-    sqlFunctionSchema,
-    sqlSnippetSchema,
-  ]),
-})
-
-export type CreateCronJobForm = z.infer<typeof FormSchema>
-export type CronJobType = CreateCronJobForm['values']
-
-const FORM_ID = 'create-cron-job-sidepanel'
-
-export const CreateCronJobSheet = ({
-  selectedCronJob,
-  isClosing,
-  setIsClosing,
-  onClose,
-}: CreateCronJobSheetProps) => {
-  const { project } = useProjectContext()
-  const isEditing = !!selectedCronJob?.jobname
-
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
+        return false
+      }, 'Invalid Cron format'),
+    values: z.discriminatedUnion('type', [
+      edgeFunctionSchema,
+      httpRequestSchema,
+      sqlFunctionSchema,
+      sqlSnippetSchema,
+    ]),
   })
-
-  // check pg_cron version to see if it supports seconds
-  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
-  const installedVersion = pgCronExtension?.installed_version
-  const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
-
-  const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
-  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
-
-  const canToggleExtensions = useCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'extensions'
-  )
-
-  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
-
-  const FormSchemaWithSeconds = FormSchema.superRefine((data, ctx) => {
+  .superRefine((data, ctx) => {
     if (!cronPattern.test(data.schedule)) {
-      if (!(supportsSeconds && secondsPattern.test(data.schedule))) {
+      if (!(data.supportsSeconds && secondsPattern.test(data.schedule))) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
@@ -173,11 +140,37 @@ export const CreateCronJobSheet = ({
     }
   })
 
+export type CreateCronJobForm = z.infer<typeof FormSchema>
+export type CronJobType = CreateCronJobForm['values']
+
+const FORM_ID = 'create-cron-job-sidepanel'
+
+export const CreateCronJobSheet = ({
+  selectedCronJob,
+  supportsSeconds,
+  isClosing,
+  setIsClosing,
+  onClose,
+}: CreateCronJobSheetProps) => {
+  const { project } = useProjectContext()
+  const isEditing = !!selectedCronJob?.jobname
+
+  const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+  const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
+
+  const canToggleExtensions = useCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'extensions'
+  )
+
+  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
+
   const form = useForm<CreateCronJobForm>({
-    resolver: zodResolver(FormSchemaWithSeconds),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
       schedule: selectedCronJob?.schedule || '*/5 * * * *',
+      supportsSeconds,
       values: cronJobValues,
     },
   })
@@ -273,11 +266,16 @@ export const CreateCronJobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
+                    <FormItemLayout
+                      label="Name"
+                      layout="vertical"
+                      className="gap-1 relative"
+                      labelOptional=""
+                    >
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
-                      <span className="!text-foreground-lighter text-xs absolute top-0 right-0 ">
+                      <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                         Cron jobs cannot be renamed once created
                       </span>
                     </FormItemLayout>
