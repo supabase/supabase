@@ -16,7 +16,7 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { SonnerToaster, themes } from 'ui'
+import { Announcement, SonnerToaster, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -29,6 +29,7 @@ import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/c
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
+import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -164,6 +165,9 @@ export default function App({ Component, pageProps }: AppProps) {
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
             <CommandProvider>
+              <Announcement>
+                <LW13CountdownBanner />
+              </Announcement>
               <SonnerToaster position="top-right" />
               <Component {...pageProps} />
               <WwwCommandMenu />

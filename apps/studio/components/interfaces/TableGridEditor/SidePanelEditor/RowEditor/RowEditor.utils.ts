@@ -210,7 +210,6 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
-      if (field.name === 'bool_default_true') console.log(field)
       if (value === 'null') rowObject[field.name] = null
       else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {

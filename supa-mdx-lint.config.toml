@@ -1,0 +1,48 @@
+ignore_patterns = ["**/_*.mdx"]
+
+# Heading should be sentence case
+[Rule001HeadingCase]
+# Words that may be uppercased even if they are not the first word in the sentence.
+# Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
+may_uppercase = [
+    "[A-Z]{3,5}",
+    "Android",
+    "Angular",
+    "Apple",
+    "Auth",
+    "Content Delivery Network",
+    "Dart",
+    "Edge Functions",
+    "Flutter",
+    "GoTrue",
+    "Google",
+    "GraphQL",
+    "Ionic Angular",
+    "Ionic React",
+    "Ionic Vue",
+    "JavaScript",
+    "Kotlin",
+    "Next.js",
+    "Nuxt",
+    "OpenAI",
+    "Postgres",
+    "PostgreSQL",
+    "PostgREST",
+    "React",
+    "React Native",
+    "RedwoodJS",
+    "Row Level Security",
+    "Server-Side Auth",
+    "Single Sign-On",
+    "SolidJS",
+    "Supabase",
+    "Svelte",
+    "SvelteKit",
+    "Swift",
+    "SwiftUI",
+    "Xcode",
+    "Vue",
+]
+# Words that may be lowercased even if they are the first word in the sentence.
+# Can also specify a regex that is compatible with the [Rust regex crate](https://docs.rs/regex/latest/regex/).
+may_lowercase = []
