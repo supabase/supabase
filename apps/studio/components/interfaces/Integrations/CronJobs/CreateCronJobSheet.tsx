@@ -127,16 +127,6 @@ const FormSchema = z
           path: ['schedule'],
         })
       }
-    } else {
-      try {
-        CronToString(data.schedule)
-      } catch {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Invalid cron format',
-          path: ['schedule'],
-        })
-      }
     }
   })
 
@@ -266,12 +256,7 @@ export const CreateCronJobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout
-                      label="Name"
-                      layout="vertical"
-                      className="gap-1 relative"
-                      labelOptional=""
-                    >
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>

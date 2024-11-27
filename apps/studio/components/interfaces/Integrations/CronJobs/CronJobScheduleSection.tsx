@@ -46,12 +46,12 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   const [scheduleString, setScheduleString] = useState('')
 
   const PRESETS = [
+    ...(supportsSeconds ? [{ name: 'Every 30 seconds', expression: '30 seconds' }] : []),
     { name: 'Every minute', expression: '* * * * *' },
     { name: 'Every 5 minutes', expression: '*/5 * * * *' },
     { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
     { name: 'Every night at midnight', expression: '0 0 * * *' },
     { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
-    ...(supportsSeconds ? [{ name: 'Every 30 seconds', expression: '30 seconds' }] : []),
   ] as const
 
   const { complete: generateCronSyntax, isLoading: isGeneratingCron } = useCompletion({
