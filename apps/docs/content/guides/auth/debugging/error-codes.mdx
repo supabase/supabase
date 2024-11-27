@@ -62,6 +62,7 @@ Errors originating from the server API classed as `AuthApiError` always have a `
 All exceptions originating from the `supabase.auth` namespace of the Kotlin client library will be a subclass of `RestException`.
 
 Rest exceptions are split into a few classes:
+
 - `AuthRestException` -- exceptions which originate from the Supabase Auth API and have a `errorCode` property that can be used to identify the error returned by the server.
 - `AuthWeakPasswordException` -- an `AuthRestException` which indicates that the password is too weak.
 - `AuthSessionMissingException` -- an `AuthRestException` which indicates that the session is missing, if the user was logged out or deleted.
