@@ -54,28 +54,57 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         )
       : { result: [] }
 
+    console.log(`before selection: ${textBeforeCursor}
+            selection: ${selection}
+            after selection: ${textAfterCursor}`)
+
     const { text } = await generateText({
       model: openai('gpt-4o-mini'),
       maxSteps: 5,
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
-      system: `You are an expert programmer who provides concise code completions.
-        When writing code:
-        - Use modern ${language} practices and patterns
-        - Provide only the completed code without markdown, or explanations
-        - Don't wrap in markdown code snippet e.g. DONT DO \`\`\`sql ... \`\`\`
-        - Ensure code is properly formatted and follows best practices
-        - Only modify and return the selected text. It must work when inserted inbetween the before and after text.
-        - Add comments to explain the code if needed
-        - Consider the context before and after the cursor to provide relevant completions`,
+      system: `You are a Supabase Postgres expert who can do the following things.
+
+      # You generate and debug SQL
+      The generated SQL (must be valid SQL), and must adhere to the following:
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Always use semicolons
+      - Use vector(384) data type for any embedding/vector related query
+      - When debugging, retrieve sql schema details to ensure sql is correct
+
+      When generating tables, do the following:
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - Prefer creating foreign key references in the create statement
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+
+      Feel free to suggest corrections for suspected typos.
+
+      # You write row level security policies.
+
+      Your purpose is to generate a policy with the constraints given by the user.
+      - First, use getSchema to retrieve more information about a schema or schemas that will contain policies, usually the public schema.
+      
+      # You write database functions
+      Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
+      if the function returns a type of trigger. When generating functions, do the following:
+      - If the function returns a trigger type, ensure that it uses security definer, otherwise default to security invoker. Include this in the create functions SQL statement.
+      - Ensure to set the search_path configuration parameter as '', include this in the create functions SQL statement.
+      - Default to create or replace whenever possible for updating an existing function, otherwise use the alter function statement
+      Please make sure that all queries are valid Postgres SQL queries
+
+      Follow these instructions:
+      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
+
+      Here are the existing database schema names you can retrieve: ${schemas}.`,
       messages: [
         {
           role: 'user',
           content: `I have the following ${language} code:
-            before selection: ${textBeforeCursor}
-            selection: ${selection}
-            after selection: ${textAfterCursor}
-           Make these changes to the selected text: ${prompt}
-            Assume I will replace the selected text and insert between the before and after text.`,
+            <before>${textBeforeCursor}</before>
+            <selection>${selection}</selection>
+            <after>${textAfterCursor}</after>
+            Make changes to the selected text: ${prompt}
+            Only return edits to the <selection> and nothing else. Dont wrap in markdown code snippets. The new text must work as a complete sql statement when inserted inbetween the before and after text. e.g. prompt: change the table to messages <selection>public.channels</selection> then the generated text would be simply public.messages`,
         },
       ],
     })

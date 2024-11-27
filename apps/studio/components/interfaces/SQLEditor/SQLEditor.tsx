@@ -426,13 +426,10 @@ const SQLEditor = () => {
           entityDefinitions,
         })
 
-        const formattedSql =
-          sqlAiDisclaimerComment +
-          '\n\n' +
-          format(sql, {
-            language: 'postgresql',
-            keywordCase: 'lower',
-          })
+        const formattedSql = format(sql, {
+          language: 'postgresql',
+          keywordCase: 'lower',
+        })
         setDebugSolution(solution)
         setSourceSqlDiff({
           original: snippet.snippet.content.sql,
@@ -723,6 +720,13 @@ const SQLEditor = () => {
       })
     }
   }
+
+  useEffect(() => {
+    // Reset prompt input whenever isOpen changes
+    if (!promptState.isOpen) {
+      setPromptInput('')
+    }
+  }, [promptState.isOpen])
 
   return (
     <>
