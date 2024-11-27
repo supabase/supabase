@@ -97,12 +97,12 @@ const Partners = () => {
           <div className="absolute inset-0 z-[1] bg-[linear-gradient(to_top,hsl(var(--background-alternative-default))_40%,hsl(var(--background-default))_90%)]" />
         </div>
         <SectionContainer>
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-4">
-            <div className="col-span-1 lg:col-span-2">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
               <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-.5px]">
                 Explore our marketplace
               </h2>
-              <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base py-3 lg:max-w-md">
+              <p className="text-foreground-lighter text-sm sm:text-sm md:text-base py-3 md:max-w-md">
                 Discover how technology and consulting partners are already working with Supabase.
               </p>
               <TextLink
@@ -110,7 +110,7 @@ const Partners = () => {
                 label="View docs"
               />
             </div>
-            <div className="col-span-1 lg:col-span-3 w-full max-w-4xl grid gap-8 rounded md:grid-cols-2">
+            <div className="col-span-1 md:col-span-2 w-full max-w-4xl grid gap-8 rounded">
               <Panel
                 hasInnerShimmer={false}
                 hasActiveOnHover={true}
