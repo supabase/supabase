@@ -731,23 +731,24 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
 
             <Divider />
 
-            <div className={cn(CONTAINER_CLASSES)}>
-              <div className="flex w-full -mt-3">
-                <Button
-                  htmlType="submit"
-                  size="small"
-                  icon={<Mail />}
-                  disabled={isSubmitting}
-                  loading={isSubmitting}
-                  className="w-full"
-                >
-                  Send support request
-                </Button>
-              </div>
-              <div className="flex items-center space-x-1 justify-center block text-sm mt-4">
-                <p className="text-foreground-light">We will contact you at</p>
-                <p className="text-foreground font-medium">{respondToEmail}</p>
-                <p className="text-foreground-light">Make sure Hubspot is unblocked.</p>
+            <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
+              <Button
+                htmlType="submit"
+                size="small"
+                icon={<Mail />}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                Send support request
+              </Button>
+              <div className="flex flex-col items-end gap-1">
+                <div className="space-x-1 text-xs">
+                  <span className="text-foreground-light">We will contact you at</span>
+                  <span className="text-foreground font-medium">{respondToEmail}</span>
+                </div>
+                <span className="text-foreground-light text-xs">
+                  Make sure Hubspot is unblocked.
+                </span>
               </div>
             </div>
           </>
