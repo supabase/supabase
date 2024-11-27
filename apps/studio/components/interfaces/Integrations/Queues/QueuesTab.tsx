@@ -78,6 +78,9 @@ export const QueuesTab = () => {
                   <Table.th key="arguments" className="table-cell">
                     Type
                   </Table.th>
+                  <Table.th key="rls_enabled" className="table-cell">
+                    <div className="flex justify-center">RLS enabled</div>
+                  </Table.th>
                   <Table.th key="created_at" className="table-cell w-60">
                     Created at
                   </Table.th>
