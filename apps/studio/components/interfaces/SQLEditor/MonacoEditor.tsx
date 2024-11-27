@@ -156,12 +156,14 @@ const MonacoEditor = ({
 
   return (
     <>
-      <Admonition
-        type="default"
-        className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
-        title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
-        description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate personal copy"'
-      />
+      {disableEdit && (
+        <Admonition
+          type="default"
+          className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
+          title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
+          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate personal copy"'
+        />
+      )}
       <Editor
         className={cn(className, 'monaco-editor')}
         theme={'supabase'}
