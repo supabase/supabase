@@ -2090,7 +2090,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Cal.com is a scheduling platform',
     handlerName: WRAPPER_HANDLERS.CAL,
     validatorName: 'wasm_fdw_validator',
-    icon: `${BASE_PATH}/img/icons/cal-icon.svg`,
+    icon: `${BASE_PATH}/img/icons/cal-com-icon.svg`,
     extensionName: 'calFdw',
     label: 'Cal.com',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cal',
