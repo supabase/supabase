@@ -52,7 +52,7 @@ const MonacoEditor = ({
 
   const snippet = snapV2.snippets[id]
   const disableEdit =
-    snippet.snippet.visibility === 'project' && snippet.snippet.owner_id !== profile?.id
+    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
