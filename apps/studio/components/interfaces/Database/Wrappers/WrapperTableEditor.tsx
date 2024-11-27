@@ -90,7 +90,7 @@ const WrapperTableEditor = ({
               onValueChange={(value) => setSelectedTableIndex(value)}
             >
               <SelectTrigger_Shadcn_ className="mt-0">
-                <SelectValue_Shadcn_ placeholder="---">
+                <SelectValue_Shadcn_ placeholder="Select a table">
                   {selectedTableIndex
                     ? tables[selectedTableIndex as unknown as number].label
                     : '---'}
