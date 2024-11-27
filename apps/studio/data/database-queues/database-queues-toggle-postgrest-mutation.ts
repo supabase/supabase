@@ -205,20 +205,18 @@ const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
   ;
 
   -- Revoke execute permissions on inner pgmq functions to roles (inverse of enabling)
-  revoke execute on function pgmq.pop(text) from service_role, anon, authenticated;
-  revoke execute on function pgmq.send(text, jsonb, integer) from service_role, anon, authenticated;
-  revoke execute on function pgmq.send_batch(text, jsonb[], integer) from service_role, anon, authenticated;
-  revoke execute on function pgmq.archive(text, bigint) from service_role, anon, authenticated;
-  revoke execute on function pgmq.delete(text, bigint) from service_role, anon, authenticated;
-  revoke execute on function pgmq.read(text, integer, integer) from service_role, anon, authenticated;
-
-  -- For service role, revoke permissions on existing tables
-  revoke all privileges on all tables in schema pgmq from service_role;
-
-  -- Ensure service_role has no permissions on future tables
-  alter default privileges in schema pgmq revoke all privileges on tables from service_role;
-
-  revoke usage on schema pgmq from anon, authenticated, service_role;
+  do $$
+  begin
+      if exists (select 1 from pg_namespace where nspname = 'pgmq') then
+          -- Revoke privileges on the schema itself
+          revoke all on schema pgmq from anon, authenticated, service_role;
+          
+          -- Revoke default privileges for future objects
+          alter default privileges in schema pgmq revoke all on tables from anon, authenticated, service_role;
+          alter default privileges in schema pgmq revoke all on sequences from anon, authenticated, service_role;
+          alter default privileges in schema pgmq revoke all on functions from anon, authenticated, service_role;
+      end if;
+  end $$;
 
   drop schema if exists ${QUEUES_SCHEMA};
 `)

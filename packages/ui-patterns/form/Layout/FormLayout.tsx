@@ -313,12 +313,12 @@ export const FormLayout = React.forwardRef<
           {description}
         </FormDescription_Shadcn_>
       ) : description ? (
-        <div
+        <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
           data-formlayout-id={'description'}
         >
           {description}
-        </div>
+        </p>
       ) : null
 
     const LabelContents = () => (
