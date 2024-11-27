@@ -43,6 +43,8 @@ export async function chatSql(
     // is definitely not optimal at all, but just to get an idea started
     const generateInstructionsBasedOnContext = () => {
       switch (context) {
+        // [Joshen] Sorry for the mess, there's duplicate logic here between this and rls.ts - i'm wondering what should be the best practice
+        // here? Do we (1) Put ALL logic into this file, or (2) we split each context into their own files? Latter might be cleaner?
         case 'rls-policies':
           return stripIndent`
           You're a Supabase Postgres expert in writing row level security policies. Your purpose is to

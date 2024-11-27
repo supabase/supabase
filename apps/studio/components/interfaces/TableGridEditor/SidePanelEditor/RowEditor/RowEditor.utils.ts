@@ -1,10 +1,11 @@
-import type { PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
-import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
+import { compact, isEqual, isNull, isString, omitBy } from 'lodash'
 import type { Dictionary } from 'types'
 
 import { MAX_CHARACTERS } from 'data/table-rows/table-rows-query'
 import { minifyJSON, tryParseJson } from 'lib/helpers'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
   DATETIME_TYPES,
   JSON_TYPES,
@@ -13,7 +14,32 @@ import {
   TIME_TYPES,
 } from '../SidePanelEditor.constants'
 import type { RowField } from './RowEditor.types'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+
+const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary<any> }) => {
+  const isNewRow = row === undefined
+
+  if (isNewRow) {
+    if (TEXT_TYPES.includes(column.format)) {
+      return null
+    } else if (column.format === 'bool') {
+      if (column.default_value) {
+        return column.default_value
+      } else if (column.is_nullable) {
+        return 'null'
+      } else return null
+    } else {
+      return ''
+    }
+  } else {
+    if (column.format === 'bool' && row[column.name] === null) {
+      return 'null'
+    }
+
+    return DATETIME_TYPES.includes(column.format)
+      ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
+      : parseValue(row[column.name], column.format)
+  }
+}
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
@@ -23,20 +49,8 @@ export const generateRowFields = (
   const { primary_keys } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
-  return table.columns!.map((column) => {
-    const value =
-      isUndefined(row) && TEXT_TYPES.includes(column.format)
-        ? null
-        : isUndefined(row) && column.format === 'bool' && !column.is_nullable
-          ? column.default_value
-          : isUndefined(row) && column.format === 'bool' && column.is_nullable
-            ? 'null'
-            : isUndefined(row)
-              ? ''
-              : DATETIME_TYPES.includes(column.format)
-                ? convertPostgresDatetimeToInputDatetime(column.format, row[column.name])
-                : parseValue(row[column.name], column.format)
-
+  return (table.columns ?? []).map((column) => {
+    const value = getRowValue({ column, row })
     const foreignKey = foreignKeys.find((fk) => {
       return fk.columns.map((x) => x.source).includes(column.name)
     })
@@ -166,6 +180,11 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   }
 }
 
+// [Joshen] JFYI this presents a small problem in particular when creating a new row
+// given that we don't include null properties. Because of that if the column has a default
+// value, the column value will then always be the default value, instead of null
+// which may be considered a bug if e.g for a boolean column the user specifically selects "NULL" option
+// This would probably also apply to other column types like numbers (e.g user specifically wants a null value)
 export const generateRowObjectFromFields = (
   fields: RowField[],
   includeNullProperties = false

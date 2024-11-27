@@ -11,15 +11,21 @@ jobs:
     name: runner / vale
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             .vale.ini
             vale
             apps/docs/content
+      - name: Get changed files
+        id: changed-files
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          SHA: ${{ github.sha }}
+        run: |
+          git fetch origin $BASE_REF
+          echo "CHANGED_FILES=$(git diff --name-only --diff-filter=ACMRT origin/$BASE_REF $SHA | grep '^apps/docs/content/' | tr '\n' ',' | sed 's/,$//')" >> $GITHUB_OUTPUT
       - uses: errata-ai/vale-action@reviewdog
         with:
-          files: apps/docs/content
-          # [Charis] Temporary because we still have to go through giant backlog of existing errors
-          # Don't want people to worry about this (just want them looking at the specific PR comments)
-          # fail_on_error: true
+          files: '${{ steps.changed-files.outputs.CHANGED_FILES }}'
+          separator: ','

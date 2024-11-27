@@ -349,6 +349,16 @@ export const gettingstarted: NavMenuConstant = {
         },
       ],
     },
+    {
+      name: 'AI Prompts',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/getting-started/ai-prompts',
+        },
+      ],
+    },
   ],
 }
 
@@ -701,6 +711,50 @@ export const auth = {
   ],
 }
 
+const ormQuickstarts: NavMenuSection = {
+  name: 'ORM Quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'Prisma',
+      url: '/guides/database/prisma',
+      items: [
+        {
+          name: 'Prisma troubleshooting',
+          url: '/guides/database/prisma/prisma-troubleshooting',
+        },
+      ],
+    },
+    {
+      name: 'Drizzle',
+      url: '/guides/database/drizzle',
+    },
+    {
+      name: 'Postgres.js',
+      url: '/guides/database/postgres-js',
+    },
+  ],
+}
+
+const guiQuickstarts: NavMenuSection = {
+  name: 'GUI quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'pgAdmin',
+      url: '/guides/database/pgadmin',
+    },
+    {
+      name: 'PSQL',
+      url: '/guides/database/psql',
+    },
+    {
+      name: 'DBeaver',
+      url: '/guides/database/dbeaver',
+    },
+  ],
+}
+
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
@@ -714,12 +768,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
-          items: [
-            {
-              name: 'Serverless Drivers',
-              url: '/guides/database/connecting-to-postgres/serverless-drivers',
-            },
-          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -864,48 +912,8 @@ export const database: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'ORM Quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'Prisma',
-          url: '/guides/database/prisma',
-          items: [
-            {
-              name: 'Prisma troubleshooting',
-              url: '/guides/database/prisma/prisma-troubleshooting',
-            },
-          ],
-        },
-        {
-          name: 'Drizzle',
-          url: '/guides/database/drizzle',
-        },
-        {
-          name: 'Postgres.js',
-          url: '/guides/database/postgres-js',
-        },
-      ],
-    },
-    {
-      name: 'GUI quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'pgAdmin',
-          url: '/guides/database/pgadmin',
-        },
-        {
-          name: 'PSQL',
-          url: '/guides/database/psql',
-        },
-        {
-          name: 'DBeaver',
-          url: '/guides/database/dbeaver',
-        },
-      ],
-    },
+    ormQuickstarts,
+    guiQuickstarts,
     {
       name: 'Extensions',
       url: undefined,
@@ -1249,6 +1257,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Handling Routing in Functions',
           url: '/guides/functions/routing',
+        },
+        {
+          name: 'Background Tasks',
+          url: '/guides/functions/background-tasks',
         },
         {
           name: 'Running AI Models',
@@ -2536,4 +2548,6 @@ export const navDataForMdx = {
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialLoginItems: SocialLoginItems,
+  ormQuickstarts,
+  guiQuickstarts,
 }

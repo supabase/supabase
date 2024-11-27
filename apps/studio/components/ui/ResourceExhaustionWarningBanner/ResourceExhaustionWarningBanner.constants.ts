@@ -43,7 +43,7 @@ export const RESOURCE_WARNING_MESSAGES: Record<string, ResourceWarningMessage> =
       },
     },
     docsUrl: 'https://supabase.com/docs/guides/platform/database-size#disabling-read-only-mode',
-    buttonText: 'View database settings',
+    buttonText: 'View Compute and Disk',
     metric: 'read_only',
   },
   disk_io_exhaustion: {

@@ -1,29 +1,17 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Lock } from 'lucide-react'
-import { useRouter } from 'next/router'
-
-import { useParams } from 'common'
-import { Button } from 'ui'
-import { generateAlterPolicyQuery, generateCreatePolicyQuery } from './AIPolicyEditorPanel.utils'
 
 interface LockedCreateQuerySection {
   schema: string
   selectedPolicy?: PostgresPolicy
   formFields: { name: string; table: string; behavior: string; command: string; roles: string }
-  editorOneRef: any
-  editorTwoRef: any
 }
 
 export const LockedCreateQuerySection = ({
   schema,
   selectedPolicy,
   formFields,
-  editorOneRef,
-  editorTwoRef,
 }: LockedCreateQuerySection) => {
-  const router = useRouter()
-  const { ref } = useParams()
-
   const isEditing = selectedPolicy !== undefined
   const { name, table, behavior, command, roles } = formFields
 
@@ -38,41 +26,6 @@ export const LockedCreateQuerySection = ({
             Use options above to edit
           </p>
         </div>
-        {/* <Button
-          type="default"
-          onClick={() => {
-            const query = isEditing
-              ? generateAlterPolicyQuery({
-                  name: '',
-                  newName: name,
-                  schema,
-                  table,
-                  command,
-                  roles: roles.length === 0 ? 'public' : roles,
-                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
-                  check:
-                    command === 'insert'
-                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
-                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
-                })
-              : generateCreatePolicyQuery({
-                  name,
-                  schema,
-                  table,
-                  behavior,
-                  command,
-                  roles: roles.length === 0 ? 'public' : roles,
-                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
-                  check:
-                    command === 'insert'
-                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
-                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
-                })
-            router.push(`/project/${ref}/sql/new?content=${query}`)
-          }}
-        >
-          Open in SQL Editor
-        </Button> */}
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
