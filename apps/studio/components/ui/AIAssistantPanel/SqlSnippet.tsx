@@ -313,11 +313,12 @@ export const SqlCard = ({
       {showCode && (
         <CodeBlock
           hideLineNumbers
+          wrapLines={false}
           value={sql}
           language="sql"
           className={cn(
             'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
-            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+            '[&>code]:m-0 [&>code>span]:text-foreground'
           )}
         />
       )}
