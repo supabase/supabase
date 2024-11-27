@@ -81,7 +81,7 @@ export const CronjobsTab = () => {
                   })
                 }
               >
-                Create a queue
+                Create a cron job
               </Button>
             </div>
             {filteredCronJobs.length === 0 ? (
