@@ -704,9 +704,9 @@ function Assistant() {
             {/* Left Column */}
             <div className="col-span-12 lg:col-span-6 relative z-10">
               {/* Main content */}
-              <div className="mb-6 flex flex-col gap-2 max-w-lg">
+              <div className="mb-6 flex flex-col gap-4 max-w-lg">
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
-                <p className="p">
+                <p className="p text-lg !m-0">
                   Generate, run and debug queries, chart your data, create functions, policies and
                   more. The assistant is here to help.
                 </p>
