@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { DatabaseFunction } from 'data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import type { FormSchema } from 'types'
 import {
   Button,
@@ -203,7 +203,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       <FormControl_Shadcn_>
                         <SchemaSelector
                           selectedSchemaName={field.value}
-                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          excludedSchemas={PROTECTED_SCHEMAS}
                           size="small"
                           onSelectSchema={(name) => field.onChange(name)}
                         />

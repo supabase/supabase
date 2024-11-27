@@ -28,10 +28,10 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: 9fd8c8fa7487a3d454a676e6e3d7409af34fc715
+          key: e23c860111349d8bac17b78b1fe632afe84223f9
       - name: install linter
         if: steps.cache-cargo.outputs.cache-hit != 'true'
-        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 9fd8c8fa7487a3d454a676e6e3d7409af34fc715
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev e23c860111349d8bac17b78b1fe632afe84223f9
       - name: install reviewdog
         uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
         with:
@@ -41,4 +41,4 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -o pipefail
-          supa-mdx-lint apps/docs/content/guides/getting-started --format rdf | reviewdog -f=rdjsonl -reporter=github-pr-review
+          supa-mdx-lint apps/docs/content/guides/getting-started apps/docs/content/guides/ai --format rdf | reviewdog -f=rdjsonl -reporter=github-pr-review
