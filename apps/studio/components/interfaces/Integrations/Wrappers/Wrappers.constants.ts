@@ -15,6 +15,7 @@ export const WRAPPER_HANDLERS = {
   REDIS: 'redis_fdw_handler',
   PADDLE: 'wasm_fdw_handler',
   SNOWFLAKE: 'wasm_fdw_handler',
+  CAL: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -2077,6 +2078,213 @@ export const WRAPPERS: WrapperMeta[] = [
             label: 'Row ID Column',
             defaultValue: 'id',
             editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'cal_wrapper',
+    description: 'Cal.com is a scheduling platform',
+    handlerName: WRAPPER_HANDLERS.CAL,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/cal-com-icon.svg`,
+    extensionName: 'calFdw',
+    label: 'Cal.com',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cal',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:cal-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'bca8a82d6c5f8da0aa58011940c4ddb40bb2c909c02dd89b488289c4fff890c1',
+          hidden: true,
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.cal.com/v2',
+        },
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'My Profile',
+        description: 'Shows your Cal profile',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'my_profile',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Event Types',
+        description: 'Shows your Event Types',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'event-types',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Bookings',
+        description: 'Shows your Bookings',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'bookings',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Calendars',
+        description: 'Shows your Calendars',
+        availableColumns: [
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'calendars',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Schedules',
+        description: 'Shows your Schedules',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'schedules',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Conferencing',
+        description: 'Shows conferencing',
+        availableColumns: [
+          {
+            name: 'id',
+            type: 'bigint',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'conferencing',
+            editable: false,
             required: true,
             type: 'text',
           },
