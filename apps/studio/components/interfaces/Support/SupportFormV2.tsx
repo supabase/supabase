@@ -680,50 +680,46 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 )}
               </div>
             </div>
-            {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
-              <>
-                <Separator />
-                <FormField_Shadcn_
-                  name="allowSupportAccess"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      className="px-6"
-                      layout="flex"
-                      label="Allow temporary support access"
-                      description="This will help us answer questions specific to your project."
-                    >
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={(e) => {
-                          console.log('e', e)
-                          field.onChange(e)
-                        }}
-                      />
-                    </FormItemLayout>
-                  )}
-                />
-              </>
-            )}
             <Separator />
-            <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
-              <Button
-                htmlType="submit"
-                size="small"
-                icon={<Mail />}
-                disabled={isSubmitting}
-                loading={isSubmitting}
-              >
-                Send support request
-              </Button>
-              <div className="flex flex-col items-end gap-1">
-                <div className="space-x-1 text-xs">
-                  <span className="text-foreground-light">We will contact you at</span>
-                  <span className="text-foreground font-medium">{respondToEmail}</span>
+            <div className="flex flex-col gap-5">
+              {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+                <>
+                  <FormField_Shadcn_
+                    name="allowSupportAccess"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        className="px-6"
+                        layout="flex"
+                        label="Allow temporary support access"
+                        description="This will help us answer questions specific to your project."
+                      >
+                        <Switch checked={field.value} onCheckedChange={field.onChange} />
+                      </FormItemLayout>
+                    )}
+                  />
+                </>
+              )}
+              <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
+                <Button
+                  htmlType="submit"
+                  size="large"
+                  block
+                  icon={<Mail />}
+                  disabled={isSubmitting}
+                  loading={isSubmitting}
+                >
+                  Send support request
+                </Button>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="space-x-1 text-xs">
+                    <span className="text-foreground-light">We will contact you at</span>
+                    <span className="text-foreground font-medium">{respondToEmail}</span>
+                  </div>
+                  <span className="text-foreground-light text-xs">
+                    Make sure Hubspot is unblocked.
+                  </span>
                 </div>
-                <span className="text-foreground-light text-xs">
-                  Make sure Hubspot is unblocked.
-                </span>
               </div>
             </div>
           </>
