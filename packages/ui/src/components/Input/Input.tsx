@@ -174,7 +174,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={cn(inputClasses)}
+          className={cn(inputClasses, size === 'tiny' && 'pl-8')}
           {...props}
         />
         {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}

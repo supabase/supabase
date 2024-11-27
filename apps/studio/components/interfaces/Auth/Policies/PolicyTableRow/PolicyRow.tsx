@@ -21,8 +21,9 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { useIsDatabaseFunctionsAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useAppStateSnapshot } from 'state/app-state'
+import { generatePolicyCreateSQL } from './PolicyTableRow.utils'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -38,7 +39,7 @@ const PolicyRow = ({
   onSelectDeletePolicy = noop,
 }: PolicyRowProps) => {
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const enableAssistantV2 = useIsDatabaseFunctionsAssistantEnabled()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   const { project } = useProjectContext()
@@ -61,36 +62,42 @@ const PolicyRow = ({
         'w-full last:border-0 space-x-4 border-b py-4 lg:items-center'
       )}
     >
-      <div className="flex grow flex-col space-y-1">
-        <div className="flex items-center space-x-4">
-          <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
-          <p className="text-sm text-foreground">{policy.name}</p>
+      <div className="flex grow flex-col gap-y-1">
+        <div className="flex items-start gap-x-4">
+          <p className="font-mono text-xs text-foreground-light translate-y-[2px] min-w-12">
+            {policy.command}
+          </p>
+
+          <div className="flex flex-col gap-y-1">
+            <p className="text-sm text-foreground">{policy.name}</p>
+            <div className="flex items-center gap-x-1">
+              <div className="text-foreground-lighter text-sm">
+                Applied to:
+                {policy.roles.slice(0, 3).map((role, i) => (
+                  <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
+                    {role}
+                  </code>
+                ))}{' '}
+                role
+              </div>
+              {policy.roles.length > 3 && (
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <code key="policy-etc" className="text-foreground-light text-xs">
+                      + {policy.roles.length - 3} more roles
+                    </code>
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="bottom" align="center">
+                    {policy.roles.slice(3).join(', ')}
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              )}
+            </div>
+          </div>
+
           {appliesToAnonymousUsers ? (
             <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
-        </div>
-        <div className="flex items-center gap-x-1 ml-[60px]">
-          <div className="text-foreground-lighter text-sm">
-            Applied to:
-            {policy.roles.slice(0, 3).map((role, i) => (
-              <code key={`policy-${role}-${i}`} className="text-foreground-light text-xs">
-                {role}
-              </code>
-            ))}{' '}
-            role
-          </div>
-          {policy.roles.length > 3 && (
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <code key="policy-etc" className="text-foreground-light text-xs">
-                  + {policy.roles.length - 3} more roles
-                </code>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" align="center">
-                {policy.roles.slice(3).join(', ')}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
-          )}
         </div>
       </div>
       <div>
@@ -102,21 +109,29 @@ const PolicyRow = ({
             <DropdownMenuContent
               side="bottom"
               align="end"
-              className={cn(enableAssistantV2 ? 'w-52' : 'w-40')}
+              className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
             >
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <Edit size={14} />
                 <p>Edit policy</p>
               </DropdownMenuItem>
-              {enableAssistantV2 && (
+              {isAssistantV2Enabled && (
                 <DropdownMenuItem
                   className="space-x-2"
                   onClick={() => {
+                    const sql = generatePolicyCreateSQL(policy)
                     setAiAssistantPanel({
                       open: true,
-                      editor: 'rls-policies',
-                      entity: policy,
-                      tables: [{ schema: policy.schema, name: policy.table }],
+                      sqlSnippets: [sql],
+                      initialInput: `Update the policy with name "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table. It should...`,
+                      suggestions: {
+                        title: `I can help you make a change to the policy "${policy.name}" in the ${policy.schema} schema on the ${policy.table} table, here are a few example prompts to get you started:`,
+                        prompts: [
+                          'Tell me how I can improve this policy...',
+                          'Duplicate this policy for another table...',
+                          'Add extra conditions to this policy...',
+                        ],
+                      },
                     })
                   }}
                 >

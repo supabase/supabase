@@ -10,6 +10,7 @@ import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import {
   getGeneralPolicyTemplates,
+  getQueuePolicyTemplates,
   getRealtimePolicyTemplates,
 } from '../PolicyEditorModal/PolicyEditorModal.constants'
 
@@ -33,7 +34,9 @@ export const PolicyTemplates = ({
   const templates =
     schema === 'realtime'
       ? getRealtimePolicyTemplates()
-      : getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
+      : schema === 'pgmq'
+        ? getQueuePolicyTemplates()
+        : getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
 
   const baseTemplates =
     selectedPolicy !== undefined
