@@ -15,7 +15,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
@@ -61,7 +61,7 @@ const ColumnList = ({
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
