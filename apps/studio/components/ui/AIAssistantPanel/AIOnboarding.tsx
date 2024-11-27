@@ -19,7 +19,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
   }
 
   return (
-    <div className="w-full px-8 py-8 flex flex-col grow shrink-0 justify-end overflow-auto">
+    <div className="w-full px-5 py-8 flex flex-col grow shrink-0 justify-end overflow-auto">
       <div className="min-h-48 grow shrink-0">
         <DotGrid rows={10} columns={10} count={33} />
       </div>
