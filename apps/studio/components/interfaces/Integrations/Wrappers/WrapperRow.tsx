@@ -133,7 +133,7 @@ const WrapperRow = ({ wrapper }: WrapperRowProps) => {
         </TableCell>
       </TableRow>
       <Sheet open={editWrapperShown} onOpenChange={() => setisClosingEditWrapper(true)}>
-        <SheetContent size="default" tabIndex={undefined}>
+        <SheetContent size="lg" tabIndex={undefined}>
           <EditWrapperSheet
             wrapper={wrapper}
             wrapperMeta={integration.meta}
