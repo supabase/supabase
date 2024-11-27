@@ -1,20 +1,21 @@
 import { toString as CronToString } from 'cronstrue'
 import { List } from 'lucide-react'
 import Link from 'next/link'
-import { useRef } from 'react'
-import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import { UIEvent, useCallback, useMemo } from 'react'
+import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import {
   CronJobRun,
-  useCronJobRunsQuery,
-} from 'data/database-cron-jobs/database-cron-jobs-runs-query'
+  useCronJobRunsInfiniteQuery,
+} from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import {
   Badge,
   Button,
   cn,
+  LoadingLine,
   SimpleCodeBlock,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
@@ -66,7 +67,7 @@ const cronJobColumns = [
     name: 'Status',
     minWidth: 75,
     value: (row: CronJobRun) => (
-      <Badge variant={row.status === 'success' ? 'success' : 'warning'}>{row.status}</Badge>
+      <Badge variant={row.status === 'succeeded' ? 'success' : 'warning'}>{row.status}</Badge>
     ),
   },
   {
@@ -126,11 +127,13 @@ const columns = cronJobColumns.map((col) => {
   return result
 })
 
+function isAtBottom({ currentTarget }: UIEvent<HTMLDivElement>): boolean {
+  return currentTarget.scrollTop + 10 >= currentTarget.scrollHeight - currentTarget.clientHeight
+}
+
 export const PreviousRunsTab = () => {
   const { childId: jobName } = useParams()
   const { project } = useProjectContext()
-
-  const gridRef = useRef<DataGridHandle>(null)
 
   const { data: cronJobs, isLoading: isLoadingCronJobs } = useCronJobsQuery({
     projectRef: project?.ref,
@@ -139,27 +142,41 @@ export const PreviousRunsTab = () => {
 
   const currentJobState = cronJobs?.find((job) => job.jobname === jobName)
 
-  const { data: cronJobRuns, isLoading: isLoadingCronJobRuns } = useCronJobRunsQuery(
+  const {
+    data,
+    isLoading: isLoadingCronJobRuns,
+    fetchNextPage,
+    isFetching,
+  } = useCronJobRunsInfiniteQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       jobId: Number(currentJobState?.jobid),
     },
-    { enabled: !!currentJobState?.jobid }
+    { enabled: !!currentJobState?.jobid, staleTime: 30 }
   )
 
-  return (
-    <div className="h-full flex flex-col w-full bg-200">
-      {/* turn this into some kind of proper tabs?  */}
-      <div className="flex items-center px-6 justify-between h-7"></div>
+  const handleScroll = useCallback(
+    (event: UIEvent<HTMLDivElement>) => {
+      if (isLoadingCronJobRuns || !isAtBottom(event)) return
+      // the cancelRefetch is to prevent the query from being refetched when the user scrolls back up and down again,
+      // resulting in multiple fetchNextPage calls
+      fetchNextPage({ cancelRefetch: false })
+    },
+    [fetchNextPage, isLoadingCronJobRuns]
+  )
 
-      <div className="flex flex-col w-full h-full mt-4">
+  const cronJobRuns = useMemo(() => data?.pages.flatMap((p) => p) || [], [data?.pages])
+
+  return (
+    <div className="h-full flex flex-col">
+      <div className="mt-4 h-full">
+        <LoadingLine loading={isFetching} />
         <DataGrid
-          ref={gridRef}
-          style={{ height: '100%' }}
-          className={cn('flex-1 flex-grow h-full')}
+          className="flex-grow h-full"
           rowHeight={44}
           headerRowHeight={36}
+          onScroll={handleScroll}
           columns={columns}
           rows={cronJobRuns ?? []}
           rowClass={() => {

@@ -101,6 +101,7 @@ export const CronjobsTab = () => {
             ) : (
               filteredCronJobs.map((job) => (
                 <CronJobCard
+                  key={job.jobid}
                   job={job}
                   onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
                   onDeleteCronJob={(job) => setCronJobForDeletion(job)}

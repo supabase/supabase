@@ -27,10 +27,6 @@ interface CronJobCardProps {
   onDeleteCronJob: (job: CronJob) => void
 }
 
-const generateJobDetailsSQL = (jobId: number) => {
-  return `select * from cron.job_run_details where jobid = '${jobId}' order by start_time desc limit 10`
-}
-
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
   const { ref } = useParams()
