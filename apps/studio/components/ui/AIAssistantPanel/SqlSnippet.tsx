@@ -1,4 +1,4 @@
-import { Code, DatabaseIcon, Edit, Play } from 'lucide-react'
+import { Code, Edit, Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
@@ -21,6 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SQL_ICON,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -211,7 +212,17 @@ export const SqlCard = ({
           </Admonition>
         ) : (
           <>
-            <DatabaseIcon size={16} strokeWidth={1.5} />
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5 shrink-0',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
             <h3 className="text-sm font-medium flex-1">{title}</h3>
 
             {!readOnly && (
