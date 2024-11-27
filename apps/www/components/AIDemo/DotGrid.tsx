@@ -21,7 +21,7 @@ const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
 
   const item = {
     hidden: { opacity: 0 },
-    visible: { opacity: 0.5 },
+    visible: { opacity: 0.3 },
   }
 
   const highlightedVariants = {
@@ -37,9 +37,9 @@ const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
   }
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full min-h-[600px]">
       <motion.div
-        className="grid w-full h-full justify-between items-space-between items-start"
+        className="grid h-full md:w-full aspect-square justify-between items-space-between items-start"
         style={{
           gridTemplateColumns: `repeat(${columns}, 1px)`,
           gridTemplateRows: `repeat(${rows}, 1fr)`,
@@ -56,10 +56,12 @@ const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
             <motion.div
               key={index}
               variants={isHighlighted ? highlightedVariants : item}
-              className={`w-[1px] h-[1px] rounded-full bg-foreground`}
+              className="w-[2px] h-[2px] dark:w-[1px] dark:h-[1px] rounded-full bg-foreground-lighter"
             />
           )
         })}
+        <div className="absolute bg-gradient-to-b lg:bg-gradient-to-r inset-0 w-full h-full from-background to-transparent to-40%" />
+        <div className="absolute bg-gradient-to-t lg:bg-gradient-to-l inset-0 w-full h-full from-background to-transparent to-20%" />
       </motion.div>
     </div>
   )

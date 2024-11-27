@@ -1,6 +1,5 @@
 import { Button } from 'ui'
 import dynamic from 'next/dynamic'
-import { ArrowRight } from 'lucide-react'
 import { AIDemoPanel } from '~/components/AIDemo/Panel'
 import { useEffect, useState } from 'react'
 import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
@@ -10,6 +9,7 @@ import { useRouter } from 'next/router'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import Link from 'next/link'
 import DotGrid from '~/components/AIDemo/DotGrid'
+import { EASE_OUT } from '../lib/animations'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
 const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
@@ -695,46 +695,39 @@ function Assistant() {
         <SectionContainer className="h-full lg:pt-6 relative">
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 5 } }}
-            className="absolute inset-0 left-1/2"
+            animate={{ opacity: 1, transition: { delay: 1, duration: 5 } }}
+            className="absolute inset-0 hidden lg:block left-1/3"
           >
-            <DotGrid rows={20} columns={20} count={200} />
+            <DotGrid rows={30} columns={30} count={900} />
           </motion.div>
           <div className="h-full grid grid-cols-12 gap-8 items-center">
             {/* Left Column */}
             <div className="col-span-12 lg:col-span-6 relative z-10">
               {/* Main content */}
-              <div className="mb-6">
-                <h1 className="text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
-                  Chat with Postgres
-                </h1>
-                <p className="p text-lg mt-4">
+              <div className="mb-6 flex flex-col gap-2 max-w-lg">
+                <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
+                <p className="p">
                   Generate, run and debug queries, chart your data, create functions, policies and
                   more. The assistant is here to help.
                 </p>
-                {!isUserLoading && (
-                  <>
-                    {isLoggedIn ? (
-                      <Link href="/dashboard/projects" passHref legacyBehavior>
-                        <Button iconRight={<ArrowRight />} type="primary" size={'large'}>
-                          Dashboard
-                        </Button>
-                      </Link>
+                <div className="min-h-12">
+                  {!isUserLoading &&
+                    (isLoggedIn ? (
+                      <Button type="primary" size="medium" asChild>
+                        <Link href="/dashboard/projects">Dashboard</Link>
+                      </Button>
                     ) : (
-                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
-                        <Button iconRight={<ArrowRight />} type="primary" size={'large'}>
-                          Start your project
-                        </Button>
-                      </Link>
-                    )}
-                  </>
-                )}
+                      <Button type="primary" size="medium" asChild>
+                        <Link href="https://supabase.com/dashboard">Start your project</Link>
+                      </Button>
+                    ))}
+                </div>
               </div>
 
               {/* Grid of secondary buttons */}
               <div>
-                <h2 className="font-mono text-foreground-muted text-sm mb-4">Try me</h2>
-                <div className="flex flex-wrap gap-2">
+                <h2 className="font-mono text-foreground-lighter text-sm mb-4">Try me</h2>
+                <div className="flex flex-wrap items-start gap-2 min-h-24">
                   <motion.div
                     initial="hidden"
                     animate="visible"
@@ -772,12 +765,19 @@ function Assistant() {
             {/* Right Column */}
             <motion.div className="col-span-12 relative lg:col-span-6 h-[500px] lg:h-full justify-center flex items-center">
               <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { delay: 1, duration: 5 } }}
+                className="absolute w-screen bottom-0 -top-28 -inset-x-[calc(((100vw-480px)/2)+24px)] sm:-inset-x-[calc(((100vw-640px)/2)+24px)] md:-inset-x-[calc(((100vw-768px)/2)+24px)] lg:hidden"
+              >
+                <DotGrid rows={30} columns={30} count={900} />
+              </motion.div>
+              <motion.div
                 initial={{ opacity: 0, scale: 1.04, filter: 'blur(5px)' }}
                 animate={{
                   opacity: 1,
                   scale: 1,
                   filter: 'blur(0px)',
-                  transition: { duration: 1, ease: 'easeInOut', delay: 1.5 },
+                  transition: { duration: 1.5, ease: EASE_OUT, delay: 0.5 },
                 }}
                 className="w-full lg:max-w-[400px] h-full max-h-[700px] relative overflow-hidden"
               >
@@ -785,9 +785,9 @@ function Assistant() {
                   initial={{ x: '-100%' }}
                   animate={{ x: '200%' }}
                   transition={{
-                    duration: 1.5,
+                    duration: 0.5,
                     ease: 'easeInOut',
-                    delay: 2,
+                    delay: 0.5,
                   }}
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-background-muted/40 to-transparent transform -skew-x-12 z-10"
                 />
