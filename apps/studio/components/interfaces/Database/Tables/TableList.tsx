@@ -36,7 +36,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -185,7 +185,7 @@ const TableList = ({
     (x) => visibleTypes.includes(x.type)
   )
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables

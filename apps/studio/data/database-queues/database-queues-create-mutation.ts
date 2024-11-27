@@ -4,22 +4,41 @@ import { toast } from 'sonner'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { tableKeys } from 'data/tables/keys'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
   connectionString?: string
-  query: string
+  name: string
+  type: 'basic' | 'partitioned' | 'unlogged'
+  enableRls: boolean
+  configuration?: {
+    partitionInterval?: number
+    retentionInterval?: number
+  }
 }
 
 export async function createDatabaseQueue({
   projectRef,
   connectionString,
-  query,
+  name,
+  type,
+  enableRls,
+  configuration,
 }: DatabaseQueueCreateVariables) {
+  const { partitionInterval, retentionInterval } = configuration ?? {}
+
+  const query =
+    type === 'partitioned'
+      ? `select from pgmq.create_partitioned('${name}', '${partitionInterval}', '${retentionInterval}');`
+      : type === 'unlogged'
+        ? `SELECT pgmq.create_unlogged('${name}');`
+        : `SELECT pgmq.create('${name}');`
+
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: query,
+    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
     queryKey: databaseQueuesKeys.create(),
   })
 
@@ -44,6 +63,7 @@ export const useDatabaseQueueCreateMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         await queryClient.invalidateQueries(databaseQueuesKeys.list(projectRef))
+        queryClient.invalidateQueries(tableKeys.list(projectRef, 'pgmq'))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {
