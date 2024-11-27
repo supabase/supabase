@@ -106,7 +106,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       Please make sure that all queries are valid Postgres SQL queries
 
       # You convert sql to supabase-js client code
-      Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only convert when asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
+      Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
 
       Follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
