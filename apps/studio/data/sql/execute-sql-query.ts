@@ -37,7 +37,8 @@ export async function executeSql(
     | 'handleError'
     | 'isRoleImpersonationEnabled'
   >,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
@@ -47,7 +48,7 @@ export async function executeSql(
     throw new Error('Query is too large to be run via the SQL Editor')
   }
 
-  let headers = new Headers()
+  let headers = new Headers(headersInit)
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
   let { data, error } = await post('/platform/pg-meta/{ref}/query', {

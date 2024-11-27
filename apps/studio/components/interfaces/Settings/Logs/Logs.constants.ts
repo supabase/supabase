@@ -363,6 +363,7 @@ export enum LogsTableName {
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
+  CRON_JOBS = 'cron_job_run_details',
 }
 
 export const LOGS_TABLES = {
@@ -376,6 +377,7 @@ export const LOGS_TABLES = {
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
+  cron: LogsTableName.CRON_JOBS,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -389,6 +391,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
+  [LogsTableName.CRON_JOBS]: 'Logs obtained from cron job runs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {

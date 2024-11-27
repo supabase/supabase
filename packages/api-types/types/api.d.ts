@@ -1207,6 +1207,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/invoices/{invoiceId}/payment-link': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the payment link to manually pay the given invoice */
+    get: operations['OrgInvoicesController_getInvoicePaymentLink']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/invoices/upcoming': {
     parameters: {
       query?: never
@@ -4079,6 +4096,23 @@ export interface paths {
     head?: never
     /** Updates the database password */
     patch: operations['DatabasePasswordController_updatePassword']
+    trace?: never
+  }
+  '/system/email/send': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Send email using Postmark template */
+    post: operations['SystemEmailController_sendEmail']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
     trace?: never
   }
   '/system/github-secret-alert': {
@@ -9162,6 +9196,7 @@ export interface components {
       query: string
     }
     FunctionResponse: {
+      compute_multiplier?: number
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -9169,7 +9204,6 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
-      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -9179,6 +9213,7 @@ export interface components {
       version: number
     }
     FunctionSlugResponse: {
+      compute_multiplier?: number
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -9186,7 +9221,6 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
-      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -9669,6 +9703,9 @@ export interface components {
       status: string
       subscription: string | null
       subtotal: number
+    }
+    InvoicePaymentLinkResponse: {
+      redirectUrl: string
     }
     JoinResponse: {
       billing_email: string
@@ -11003,6 +11040,16 @@ export interface components {
       page: string
       team?: string
       title: string
+    }
+    SendEmailBodyDto: {
+      addresses: string[]
+      custom_properties: {
+        [key: string]: unknown
+      }
+      template_alias: string
+    }
+    SendEmailResponseBodyDto: {
+      message: string
     }
     SendExitSurveyBody: {
       additionalFeedback?: string
@@ -12375,8 +12422,8 @@ export interface components {
     }
     V1CreateFunctionBody: {
       body: string
+      compute_multiplier?: number
       name: string
-      resource_multiplier?: string
       slug: string
       verify_jwt?: boolean
     }
@@ -12507,7 +12554,42 @@ export interface components {
        * @example 2023-03-29T16:32:59Z
        */
       created_at: string
-      database?: components['schemas']['V1DatabaseResponse']
+      /** @description Id of your project */
+      id: string
+      /** @description Name of your project */
+      name: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @description Region of your project
+       * @example us-east-1
+       */
+      region: string
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INACTIVE'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTARTING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORING'
+        | 'RESTORE_FAILED'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
+    }
+    V1ProjectWithDatabaseResponse: {
+      /**
+       * @description Creation timestamp
+       * @example 2023-03-29T16:32:59Z
+       */
+      created_at: string
+      database: components['schemas']['V1DatabaseResponse']
       /** @description Id of your project */
       id: string
       /** @description Name of your project */
@@ -12565,8 +12647,8 @@ export interface components {
     }
     V1UpdateFunctionBody: {
       body?: string
+      compute_multiplier?: number
       name?: string
-      resource_multiplier?: string
       verify_jwt?: boolean
     }
     ValidateQueryBody: {
@@ -12575,7 +12657,7 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
-    ValidateSpamBody: {
+    ValidateSpamBodyDto: {
       content: string
       subject: string
     }
@@ -13618,7 +13700,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateSpamBody']
+        'application/json': components['schemas']['ValidateSpamBodyDto']
       }
     }
     responses: {
@@ -15192,6 +15274,41 @@ export interface operations {
         content?: never
       }
       /** @description Failed to retrieve invoice */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgInvoicesController_getInvoicePaymentLink: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        invoiceId: string
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['InvoicePaymentLinkResponse']
+        }
+      }
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve invoice payment link */
       500: {
         headers: {
           [name: string]: unknown
@@ -23543,6 +23660,30 @@ export interface operations {
       }
     }
   }
+  SystemEmailController_sendEmail: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendEmailBodyDto']
+      }
+    }
+    responses: {
+      /** @description Email queued successfully */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SendEmailResponseBodyDto']
+        }
+      }
+    }
+  }
   GithubSecretAlertController_resetJwt: {
     parameters: {
       query?: never
@@ -24407,11 +24548,11 @@ export interface operations {
   'v1-create-a-function': {
     parameters: {
       query?: {
+        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
         name?: string
-        resource_multiplier?: string
         slug?: string
         verify_jwt?: boolean
       }
@@ -24510,11 +24651,11 @@ export interface operations {
   'v1-update-a-function': {
     parameters: {
       query?: {
+        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
         name?: string
-        resource_multiplier?: string
         slug?: string
         verify_jwt?: boolean
       }
@@ -25429,7 +25570,7 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateSpamBody']
+        'application/json': components['schemas']['ValidateSpamBodyDto']
       }
     }
     responses: {
@@ -32145,7 +32286,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectResponse'][]
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse'][]
         }
       }
     }
@@ -32190,7 +32331,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['V1ProjectResponse']
+          'application/json': components['schemas']['V1ProjectWithDatabaseResponse']
         }
       }
       /** @description Failed to retrieve project */
@@ -33411,11 +33552,11 @@ export interface operations {
   'v1-create-a-function': {
     parameters: {
       query?: {
+        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
         name?: string
-        resource_multiplier?: string
         slug?: string
         verify_jwt?: boolean
       }
@@ -33531,11 +33672,11 @@ export interface operations {
   'v1-update-a-function': {
     parameters: {
       query?: {
+        compute_multiplier?: number
         entrypoint_path?: string
         import_map?: boolean
         import_map_path?: string
         name?: string
-        resource_multiplier?: string
         slug?: string
         verify_jwt?: boolean
       }
@@ -34622,7 +34763,7 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        id: Record<string, never>
+        id: string
       }
       cookie?: never
     }

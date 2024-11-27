@@ -336,7 +336,7 @@ interface SkeletonProps extends PropsWithChildren {
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
 function TopNavSkeleton({ children }) {
