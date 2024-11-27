@@ -25,8 +25,8 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { secondsPattern } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
+import { secondsPattern } from './CronJobs.utils'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
