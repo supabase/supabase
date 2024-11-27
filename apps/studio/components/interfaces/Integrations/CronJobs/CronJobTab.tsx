@@ -203,12 +203,12 @@ export const CronJobTab = () => {
         />
       </div>
 
-      <div className="px-6 py-6 flex gap-24 border-t">
+      <div className="px-6 py-6 flex gap-12 border-t">
         {isLoadingCronJobs ? (
           <GenericSkeletonLoader />
         ) : (
           <>
-            <div className="grid gap-2">
+            <div className="grid gap-2 w-56">
               <h3 className="text-sm">Schedule</h3>
               <p className="text-xs text-foreground-light">
                 {currentJobState?.schedule ? (
@@ -228,7 +228,32 @@ export const CronJobTab = () => {
 
             <div className="grid gap-2">
               <h3 className="text-sm">Command</h3>
-              <p className="text-xs text-foreground-light">
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ className=" text-left p-0! cursor-pointer truncate max-w-[300px] h-12 relative">
+                  <SimpleCodeBlock
+                    showCopy={false}
+                    className="sql"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
+                  >
+                    {currentJobState?.command}
+                  </SimpleCodeBlock>
+                  <div className="bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-background-200 to-transparent absolute " />
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_
+                  side="bottom"
+                  align="center"
+                  className="max-w-[400px] text-wrap"
+                >
+                  <SimpleCodeBlock
+                    showCopy={false}
+                    className="sql"
+                    parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
+                  >
+                    {currentJobState?.command}
+                  </SimpleCodeBlock>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+              {/* <div className="text-xs text-foreground-light">
                 <SimpleCodeBlock
                   showCopy={false}
                   className="sql"
@@ -236,7 +261,7 @@ export const CronJobTab = () => {
                 >
                   {currentJobState?.command}
                 </SimpleCodeBlock>
-              </p>
+              </div> */}
             </div>
 
             <div className="grid gap-2">
