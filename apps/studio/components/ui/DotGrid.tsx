@@ -1,4 +1,3 @@
-import React from 'react'
 import { motion } from 'framer-motion'
 
 interface DotGridProps {
@@ -7,7 +6,7 @@ interface DotGridProps {
   count: number
 }
 
-const DotGrid: React.FC<DotGridProps> = ({ rows, columns, count }) => {
+const DotGrid = ({ rows, columns, count }: DotGridProps) => {
   const container = {
     hidden: { opacity: 1 },
     visible: {
