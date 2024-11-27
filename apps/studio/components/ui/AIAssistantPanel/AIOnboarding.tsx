@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
+import { FileText, MessageCircleMore, WandSparkles } from 'lucide-react'
+
+import DotGrid from 'components/ui/DotGrid'
 import { Button } from 'ui'
-import { WandSparkles, FileText, MessageCircle, MessageCircleMore } from 'lucide-react'
 import {
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
 } from 'ui-patterns/InnerSideMenu'
-import DotGrid from 'components/ui/DotGrid'
 
 interface AIOnboardingProps {
   setMessages: (messages: any[]) => void
