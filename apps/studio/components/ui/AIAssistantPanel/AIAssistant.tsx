@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { FileText } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
@@ -235,14 +235,18 @@ export const AIAssistant = ({
 
   // Add useEffect to set up scroll listener
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', handleScroll)
-      // Initial check
-      handleScroll()
-    }
+    // Use a small delay to ensure container is mounted and has content
+    const timeoutId = setTimeout(() => {
+      const container = scrollContainerRef.current
+      if (container) {
+        container.addEventListener('scroll', handleScroll)
+        handleScroll()
+      }
+    }, 100)
 
     return () => {
+      clearTimeout(timeoutId)
+      const container = scrollContainerRef.current
       if (container) {
         container.removeEventListener('scroll', handleScroll)
       }
@@ -507,12 +511,18 @@ export const AIAssistant = ({
             </div>
           )}
         </div>
-
-        {showFade && (
-          <div className="pointer-events-none z-10 -mt-24">
-            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
-          </div>
-        )}
+        <AnimatePresence>
+          {showFade && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
