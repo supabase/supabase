@@ -19,7 +19,7 @@ const EXPOSE_QUEUES_TO_POSTGREST_SQL = minify(/* SQL */ `
 create schema if not exists ${QUEUES_SCHEMA};
 grant usage on schema ${QUEUES_SCHEMA} to postgres, anon, authenticated, service_role;
 
-create or replace function ${QUEUES_SCHEMA}.queue_pop(
+create or replace function ${QUEUES_SCHEMA}.pop(
     queue_name text
 )
   returns setof pgmq.message_record
@@ -35,10 +35,10 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
+comment on function ${QUEUES_SCHEMA}.pop(queue_name text) is 'Retrieves and locks the next message from the specified queue.';
 
 
-create or replace function ${QUEUES_SCHEMA}.queue_send(
+create or replace function ${QUEUES_SCHEMA}.send(
     queue_name text,
     message jsonb,
     sleep_seconds integer default 0  -- renamed from 'delay'
@@ -58,10 +58,10 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_send(queue_name text, message jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
+comment on function ${QUEUES_SCHEMA}.send(queue_name text, message jsonb, sleep_seconds integer) is 'Sends a message to the specified queue, optionally delaying its availability by a number of seconds.';
 
 
-create or replace function ${QUEUES_SCHEMA}.queue_send_batch(
+create or replace function ${QUEUES_SCHEMA}.send_batch(
     queue_name text,
     messages jsonb[],
     sleep_seconds integer default 0  -- renamed from 'delay'
@@ -81,10 +81,10 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_send_batch(queue_name text, messages jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
+comment on function ${QUEUES_SCHEMA}.send_batch(queue_name text, messages jsonb[], sleep_seconds integer) is 'Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.';
 
 
-create or replace function ${QUEUES_SCHEMA}.queue_archive(
+create or replace function ${QUEUES_SCHEMA}.archive(
     queue_name text,
     message_id bigint
 )
@@ -101,10 +101,10 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
 
-create or replace function ${QUEUES_SCHEMA}.queue_archive(
+create or replace function ${QUEUES_SCHEMA}.archive(
     queue_name text,
     message_id bigint
 )
@@ -121,10 +121,10 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
+comment on function ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint) is 'Archives a message by moving it from the queue to a permanent archive.';
 
 
-create or replace function ${QUEUES_SCHEMA}.queue_delete(
+create or replace function ${QUEUES_SCHEMA}.delete(
     queue_name text,
     message_id bigint
 )
@@ -141,9 +141,9 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_delete(queue_name text, message_id bigint) is 'Permanently deletes a message from the specified queue.';
+comment on function ${QUEUES_SCHEMA}.delete(queue_name text, message_id bigint) is 'Permanently deletes a message from the specified queue.';
 
-create or replace function ${QUEUES_SCHEMA}.queue_read(
+create or replace function ${QUEUES_SCHEMA}.read(
     queue_name text,
     sleep_seconds integer,
     n integer
@@ -163,25 +163,25 @@ begin
 end;
 $$;
 
-comment on function ${QUEUES_SCHEMA}.queue_read(queue_name text, sleep_seconds integer, n integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout).';
+comment on function ${QUEUES_SCHEMA}.read(queue_name text, sleep_seconds integer, n integer) is 'Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout).';
 
 -- Grant execute permissions on wrapper functions to roles
-grant execute on function ${QUEUES_SCHEMA}.queue_pop(text) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.pop(text) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.pop(text) to postgres, service_role, anon, authenticated;
 
-grant execute on function ${QUEUES_SCHEMA}.queue_send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.send(text, jsonb, integer) to postgres, service_role, anon, authenticated;
 
-grant execute on function ${QUEUES_SCHEMA}.queue_send_batch(text, jsonb[], integer) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.send_batch(text, jsonb[], integer) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.send_batch(text, jsonb[], integer) to postgres, service_role, anon, authenticated;
 
-grant execute on function ${QUEUES_SCHEMA}.queue_archive(text, bigint) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.archive(text, bigint) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.archive(text, bigint) to postgres, service_role, anon, authenticated;
 
-grant execute on function ${QUEUES_SCHEMA}.queue_delete(text, bigint) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.delete(text, bigint) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.delete(text, bigint) to postgres, service_role, anon, authenticated;
 
-grant execute on function ${QUEUES_SCHEMA}.queue_read(text, integer, integer) to postgres, service_role, anon, authenticated;
+grant execute on function ${QUEUES_SCHEMA}.read(text, integer, integer) to postgres, service_role, anon, authenticated;
 grant execute on function pgmq.read(text, integer, integer) to postgres, service_role, anon, authenticated;
 
 -- For the service role, we want full access
@@ -196,12 +196,12 @@ grant usage on schema pgmq to postgres, anon, authenticated, service_role;
 
 const HIDE_QUEUES_FROM_POSTGREST_SQL = minify(/* SQL */ `
   drop function if exists 
-    ${QUEUES_SCHEMA}.queue_pop(queue_name text),
-    ${QUEUES_SCHEMA}.queue_send(queue_name text, message jsonb, sleep_seconds integer),
-    ${QUEUES_SCHEMA}.queue_send_batch(queue_name text, message jsonb[], sleep_seconds integer),
-    ${QUEUES_SCHEMA}.queue_archive(queue_name text, message_id bigint),
-    ${QUEUES_SCHEMA}.queue_delete(queue_name text, message_id bigint),
-    ${QUEUES_SCHEMA}.queue_read(queue_name text, sleep integer, n integer)
+    ${QUEUES_SCHEMA}.pop(queue_name text),
+    ${QUEUES_SCHEMA}.send(queue_name text, message jsonb, sleep_seconds integer),
+    ${QUEUES_SCHEMA}.send_batch(queue_name text, message jsonb[], sleep_seconds integer),
+    ${QUEUES_SCHEMA}.archive(queue_name text, message_id bigint),
+    ${QUEUES_SCHEMA}.delete(queue_name text, message_id bigint),
+    ${QUEUES_SCHEMA}.read(queue_name text, sleep integer, n integer)
   ;
 
   -- Revoke execute permissions on inner pgmq functions to roles (inverse of enabling)
