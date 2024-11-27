@@ -2087,6 +2087,7 @@ export const WRAPPERS: WrapperMeta[] = [
   },
   {
     name: 'cal_wrapper',
+    description: 'Cal.com is a scheduling platform',
     handlerName: WRAPPER_HANDLERS.CAL,
     validatorName: 'wasm_fdw_validator',
     icon: `${BASE_PATH}/img/icons/cal-icon.svg`,
@@ -2130,7 +2131,7 @@ export const WRAPPERS: WrapperMeta[] = [
           required: true,
           encrypted: false,
           secureEntry: false,
-          defaultValue: 'tbd',
+          defaultValue: 'bca8a82d6c5f8da0aa58011940c4ddb40bb2c909c02dd89b488289c4fff890c1',
           hidden: true,
         },
         {
