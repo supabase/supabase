@@ -34,6 +34,7 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Separator,
+  Switch,
   TextArea_Shadcn_,
   Toggle,
 } from 'ui'
@@ -78,23 +79,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
   const [docsResults, setDocsResults] = useState<Page[]>([])
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([])
   const [uploadedDataUrls, setUploadedDataUrls] = useState<string[]>([])
-
-  const [supportAccess, setSupportAccess] = useState(false)
-
-  const snap = useAppStateSnapshot()
-  const { mutate: sendReset } = useSendResetMutation()
-
-  const onToggleOptIn = () => {
-    const value = !snap.isOptedInTelemetry ? 'true' : 'false'
-    snap.setIsOptedInTelemetry(value === 'true')
-    if (value === 'false') sendReset()
-    setSupportAccess(value === 'true')
-    form.setValue('allowSupportAccess', value === 'true')
-  }
-
-  const Divider = () => {
-    return <div className="h-px w-[92%] bg-border mx-auto"></div>
-  }
 
   const FormSchema = z
     .object({
@@ -561,7 +545,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 </div>
               )}
             </div>
-
             {category === 'Problem' && (
               <FormField_Shadcn_
                 name="library"
@@ -596,9 +579,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 )}
               />
             )}
-
             {library.length > 0 && <LibrarySuggestions library={library} />}
-
             {category !== 'Login_issues' && (
               <FormField_Shadcn_
                 name="affectedServices"
@@ -624,7 +605,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 )}
               />
             )}
-
             <FormField_Shadcn_
               name="message"
               control={form.control}
@@ -651,7 +631,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 </FormItemLayout>
               )}
             />
-
             <div className={cn(CONTAINER_CLASSES)}>
               <div className="flex flex-col gap-y-1">
                 <p className="text-sm text-foreground-light">Attachments</p>
@@ -701,36 +680,32 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 )}
               </div>
             </div>
-
-            <div className="flex items-center justify-center text-sm -mb-5">
-              {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+            {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
+              <>
+                <Separator />
                 <FormField_Shadcn_
                   name="allowSupportAccess"
                   control={form.control}
                   render={({ field }) => (
-                    <div className="flex items-center justify-start w-full pl-5">
-                      <Toggle
-                        id=""
-                        label="Allow temporary support access"
-                        descriptionText="This will help us answer questions specific to your project."
+                    <FormItemLayout
+                      className="px-6"
+                      layout="flex"
+                      label="Allow temporary support access"
+                      description="This will help us answer questions specific to your project."
+                    >
+                      <Switch
                         checked={field.value}
-                        onChange={() => {
-                          const newValue = !field.value
-                          field.onChange(newValue)
-                          setSupportAccess(newValue)
-                          snap.setIsOptedInTelemetry(newValue)
-                          if (!newValue) sendReset()
+                        onCheckedChange={(e) => {
+                          console.log('e', e)
+                          field.onChange(e)
                         }}
-                        size="small"
                       />
-                    </div>
+                    </FormItemLayout>
                   )}
                 />
-              )}
-            </div>
-
-            <Divider />
-
+              </>
+            )}
+            <Separator />
             <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
               <Button
                 htmlType="submit"
