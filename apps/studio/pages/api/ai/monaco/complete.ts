@@ -100,11 +100,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           role: 'user',
           content: `I have the following ${language} code:
-            <before>${textBeforeCursor}</before>
-            <selection>${selection}</selection>
-            <after>${textAfterCursor}</after>
+            before: ${textBeforeCursor}
+            selection: ${selection}
+            after: ${textAfterCursor}
             Make changes to the selected text: ${prompt}
-            Only return edits to the <selection> and nothing else. Dont wrap in markdown code snippets. The new text must work as a complete sql statement when inserted inbetween the before and after text. e.g. prompt: change the table to messages <selection>public.channels</selection> then the generated text would be simply public.messages`,
+            Only return edits to the selection and nothing else. Dont wrap in markdown code snippets. The new text must work as a complete sql statement when inserted inbetween the before and after text. If before and after are empty, the new text must work as a complete sql statement. `,
         },
       ],
     })
