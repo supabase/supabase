@@ -26,7 +26,6 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
   if (isLoading)
     return (
       <div className="p-10">
@@ -95,9 +94,14 @@ export const CronjobsTab = () => {
                   Your search for "{searchQuery}" did not return any results
                 </p>
               </div>
+            ) : isLoading ? (
+              <div className="p-10">
+                <GenericSkeletonLoader />
+              </div>
             ) : (
               filteredCronJobs.map((job) => (
                 <CronJobCard
+                  key={job.jobid}
                   job={job}
                   onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
                   onDeleteCronJob={(job) => setCronJobForDeletion(job)}

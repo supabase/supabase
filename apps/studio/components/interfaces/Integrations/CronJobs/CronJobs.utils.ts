@@ -111,7 +111,36 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
   return DEFAULT_CRONJOB_COMMAND
 }
 
+export function calculateDuration(start: string, end: string): string {
+  const startTime = new Date(start).getTime()
+  const endTime = new Date(end).getTime()
+  const duration = endTime - startTime
+  return isNaN(duration) ? 'Invalid Date' : `${duration} ms`
+}
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString)
+  if (isNaN(date.getTime())) {
+    return 'Invalid Date'
+  }
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short', // Use 'long' for full month name
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false, // Use 12-hour format if preferred
+    timeZoneName: 'short', // Optional: to include timezone
+  }
+  return date.toLocaleString(undefined, options)
+}
+
 // detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
 export const secondsPattern = /^\d+\s+seconds$/
 export const cronPattern =
   /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
+
+export function isSecondsFormat(schedule: string): boolean {
+  return secondsPattern.test(schedule.trim())
+}
