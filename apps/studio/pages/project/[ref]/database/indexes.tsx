@@ -36,7 +36,7 @@ const IndexesPage: NextPageWithLayout = () => {
               className="no-underline"
               href="https://supabase.com/docs/guides/database/extensions/index_advisor"
             >
-              Optimization with index_advisor
+              Index Advisor
             </a>
           </Button>
         </ScaffoldSectionDetail>

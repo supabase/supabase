@@ -17,11 +17,14 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
+import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -117,6 +120,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             <FeedbackDropdown />
             <NotificationsPopoverV2 />
             <HelpPopover />
+            {isAssistantV2Enabled && !!projectRef && <AssistantButton />}
           </>
         )}
       </div>

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Info } from 'lucide-react'
-import MotionNumber from 'motion-number'
+import MotionNumber from '@number-flow/react'
 import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
@@ -64,14 +64,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           {usedSize.toFixed(2)}
           <span>GB used of </span>
           <span className="text-foreground font-semibold -mt-[2px]">
-            <MotionNumber
-              value={newTotalSize}
-              style={{ lineHeight: 0.8 }}
-              transition={{
-                y: { type: 'spring', duration: 0.35, bounce: 0 },
-              }}
-              className="font-mono"
-            />
+            <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
           </span>{' '}
           GB
         </span>

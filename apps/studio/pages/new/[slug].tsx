@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { ChevronRight, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
@@ -27,9 +26,11 @@ import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToInci
 import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 import {
   DbInstanceSize,
   ProjectCreateVariables,
@@ -50,6 +51,7 @@ import {
   PROVIDERS,
 } from 'lib/constants'
 import passwordStrength from 'lib/password-strength'
+import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -83,8 +85,6 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
-import { instanceSizeSpecs } from 'data/projects/new-project.constants'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -258,15 +258,9 @@ const Wizard: NextPageWithLayout = () => {
     // compute credits
     10
 
-  // [Joshen] Refactor: DB Password could be a common component
-  // used in multiple pages with repeated logic
-  function generateStrongPassword() {
-    const password = generator.generate({
-      length: 16,
-      numbers: true,
-      uppercase: true,
-    })
-
+  // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
+  function generatePassword() {
+    const password = generateStrongPassword()
     form.setValue('dbPass', password)
     delayedCheckPasswordStrength(password)
   }
@@ -759,7 +753,7 @@ const Wizard: NextPageWithLayout = () => {
                                 passwordStrengthScore={form.getValues('dbPassStrength')}
                                 password={field.value}
                                 passwordStrengthMessage={passwordStrengthMessage}
-                                generateStrongPassword={generateStrongPassword}
+                                generateStrongPassword={generatePassword}
                               />
                             }
                           >

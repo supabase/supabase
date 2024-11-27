@@ -30,7 +30,6 @@ const ProjectIntegrationsMenu = () => {
 
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const graphqlExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_graphql') !== undefined
-  // TODO: Change this to true for local development to work
   const pgmqExtensionExists = (data ?? []).find((ext) => ext.name === 'pgmq') !== undefined
 
   return (

@@ -32,7 +32,7 @@ function DatabaseBackupsNav({ active }: Props) {
       label: (
         <div className="flex items-center gap-1">
           Restore to new project{' '}
-          <Badge size="small" className="!text-[10px] px-1 py-0">
+          <Badge size="small" className="!text-[10px] px-1.5 py-0">
             New
           </Badge>
         </div>

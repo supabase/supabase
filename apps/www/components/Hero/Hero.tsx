@@ -3,9 +3,10 @@ import { useRouter } from 'next/router'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-
 import { Button } from 'ui'
+
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import AnnouncementBadge from '~/components/Announcement/Badge'
 
 const Hero = () => {
   const router = useRouter()
@@ -22,6 +23,13 @@ const Hero = () => {
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
               <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
                 <div className="flex flex-col items-center">
+                  <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
+                    <AnnouncementBadge
+                      url="/launch-week"
+                      badge="Launch Week 13"
+                      announcement="Claim ticket"
+                    />
+                  </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
                     <span className="block text-foreground">Build in a weekend</span>
                     <span className="text-brand block md:ml-0">Scale to millions</span>
