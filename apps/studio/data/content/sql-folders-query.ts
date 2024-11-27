@@ -17,27 +17,31 @@ export async function getSQLSnippetFolders(
 
   if (folderId) {
     const { data, error } = await get('/platform/projects/{ref}/content/folders/{id}', {
-      params: { path: { ref: projectRef, id: folderId }, query: { cursor } },
+      params: { path: { ref: projectRef, id: folderId }, query: { cursor, limit: '3' } },
       signal,
     })
 
     if (error) throw handleError(error)
-    return data.data
+    return {
+      ...data.data,
+      cursor: data.cursor,
+    }
   } else {
     const { data, error } = await get('/platform/projects/{ref}/content/folders', {
-      params: { path: { ref: projectRef }, query: { type: 'sql' } },
+      params: { path: { ref: projectRef }, query: { type: 'sql', cursor, limit: '3' } },
       signal,
     })
 
     if (error) throw handleError(error)
-    return data.data
+    return {
+      ...data.data,
+      cursor: data.cursor,
+    }
   }
 }
 
 export type SQLSnippetFoldersData = Awaited<ReturnType<typeof getSQLSnippetFolders>>
 export type SQLSnippetFoldersError = ResponseError
-
-const LIMIT = 50
 
 export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
   { projectRef, folderId }: { projectRef?: string; folderId?: string },
@@ -52,14 +56,8 @@ export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
       getSQLSnippetFolders({ projectRef, folderId, cursor: pageParam }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
-      getNextPageParam(lastPage, pages) {
-        const page = pages.length
-
-        if ((lastPage.contents?.length ?? 0) < LIMIT) {
-          return undefined
-        }
-
-        return String(page)
+      getNextPageParam(lastPage) {
+        return lastPage.cursor
       },
       ...options,
     }

@@ -7032,7 +7032,7 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
-    ValidateSpamBody: {
+    ValidateSpamBodyDto: {
       content: string
       subject: string
     }
@@ -7757,7 +7757,7 @@ export interface operations {
   ValidateController_validateSpam: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateSpamBody']
+        'application/json': components['schemas']['ValidateSpamBodyDto']
       }
     }
     responses: {
@@ -12772,7 +12772,8 @@ export interface operations {
         cursor?: string
         limit?: string
         visibility?: 'user' | 'project' | 'org' | 'public'
-        favourite?: boolean
+        type?: 'sql' | 'report' | 'log_sql'
+        favorite?: boolean
       }
       path: {
         ref: string

@@ -40,6 +40,7 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -89,7 +90,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const snippet = snapV2.snippets[id as string]?.snippet
 
   const privateSnippets = useMemo(
-    () => contents.filter((snippet) => snippet.visibility === 'user' && !snippet.favorite),
+    () => contents.filter((snippet) => snippet.visibility === 'user'),
     [contents]
   )
   const numPrivateSnippets = snapV2.privateSnippetCount[projectRef as string]
@@ -98,7 +99,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       ? [ROOT_NODE]
       : formatFolderResponseForTreeView({ folders, contents: privateSnippets })
 
-  const favoriteSnippets = useMemo(() => contents.filter((snippet) => snippet.favorite), [contents])
+  const favoriteSnippets = useMemo(
+    () =>
+      contents
+        .filter((snippet) => snippet.favorite)
+        .map((snippet) => ({ ...snippet, folder_id: undefined })),
+    [contents]
+  )
 
   const numFavoriteSnippets = favoriteSnippets.length
   const favoritesTreeState =
@@ -141,6 +148,15 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       })
     })
   }, [data, projectRef])
+
+  const { data: sharedSqlSnippetsData, ...rest } = useSqlSnippetsQuery(
+    {
+      projectRef,
+      favorite: true,
+    },
+    { enabled: showSharedSnippets }
+  )
+  console.log('sharedSqlSnippets:', sharedSqlSnippetsData, rest)
 
   // useSqlSnippetsQuery(projectRef, {
   //   onSuccess(data) {
