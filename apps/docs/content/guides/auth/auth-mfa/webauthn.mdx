@@ -97,26 +97,23 @@ if (supabase.auth.browserSupportsWebAuthn()) {
 Or in multiple-steps by setting the `useMultiStep` parameter to true.
 
 ```ts
-const { data: { factorId }, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
+const {
+  data: { factorId },
+  error,
+} = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
 
-const { data: {options}, error } = await supabase.auth.mfa.challenge({ factorId })
-const options = await supabase.auth.generateRegistrationOptions{
-		options,
-		rp_name,
-		user: {
-			name,
-			display_name,
-		}
-		authenticator_options: {
-			attestation: 'direct', // or developer choice of 'enterprise'
-			authenticatorAttachment,
-			requireResidentKey,
-			userVerification,
-		}
-	}
-})
+const {
+  data: { options },
+  error,
+} = await supabase.auth.mfa.challenge({ factorId })
 
-const credential = await navigator.credentials.create(data)
+let challengeOptions = challengeData?.credential_creation_options.publicKey
+
+// Modify challengeOptions as needed. See table below for full details.
+// challengeOptions.authenicatorAttachment = platform
+
+const credential = await supabase.auth.startAuthentication(challengeOptions)
+
 const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
 ```
 
@@ -194,13 +191,12 @@ As with enrollment, developers have the option of performing verification over m
 
 ```ts
 const { data: factors, error } = await supabase.auth.mfa.listFactors()
-const { data, error } = await supabase.auth.mfa.challenge({
+const { data: challengeData, error } = await supabase.auth.mfa.challenge({
   factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
 })
 
-const credential = await generateAuthenticationOptions({
-  authenticator: { userVerification, timeout, authenticatorAttachment },
-})
+// Modify challengeData as you wish
+let credential = await startRegistration(challengeData?.credential_creation_options.publicKey)
 
 const { data: factor, error } = await supabase.auth.mfa.verify({
   factorId,
