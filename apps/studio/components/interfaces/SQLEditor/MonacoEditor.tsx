@@ -26,6 +26,12 @@ export type MonacoEditorProps = {
   autoComplete?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onPrompt: (params: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    replaceText: (text: string) => void
+  }) => void
 }
 
 const MonacoEditor = ({
@@ -37,6 +43,7 @@ const MonacoEditor = ({
   className,
   executeQuery,
   onHasSelection,
+  onPrompt,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -62,82 +69,20 @@ const MonacoEditor = ({
   const [diffOriginal, setDiffOriginal] = useState('')
   const [diffModified, setDiffModified] = useState('')
   const diffEditorRef = useRef<any>(null)
+  const [currentWidget, setCurrentWidget] = useState<any>(null)
 
-  const handleEditorOnMount: OnMount = async (editor, monaco) => {
-    editorRef.current = editor
-    monacoRef.current = monaco
-
-    const model = editorRef.current.getModel()
-    if (model !== null) {
-      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+  const setupContentWidget = (editor: any, monaco: any) => {
+    if (currentWidget) {
+      editor.removeContentWidget(currentWidget)
     }
 
-    editor.addAction({
-      id: 'run-query',
-      label: 'Run Query',
-      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-      contextMenuGroupId: 'operation',
-      contextMenuOrder: 0,
-      run: () => {
-        executeQueryRef.current()
-      },
-    })
-
-    if (isAssistantV2Enabled) {
-      editor.addAction({
-        id: 'explain-code',
-        label: 'Explain Code',
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          setAiAssistantPanel({
-            open: true,
-            sqlSnippets: [selectedValue],
-            initialInput: 'Can you explain this section to me in more detail?',
-          })
-        },
-      })
-    }
-
-    editor.onDidChangeCursorSelection(({ selection }) => {
-      const noSelection =
-        selection.startLineNumber === selection.endLineNumber &&
-        selection.startColumn === selection.endColumn
-      onHasSelection(!noSelection)
-    })
-
-    // add margin above first line
-    editorRef.current.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
-
-    if (autoFocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
-
-    if (autoComplete) {
-      registerCompletion(monaco, editor, {
-        endpoint: '/api/ai/monaco/complete',
-        language: 'sql',
-      })
-    }
-
-    // Modify the widget structure
     const widget = {
       getId: () => 'my.inline.widget',
       getDomNode: () => {
         if (!widgetRef.current) {
           widgetRef.current = document.createElement('div')
           widgetRef.current.className =
-            'bg-white dark:bg-gray-800 rounded-md shadow-lg p-2 flex flex-col gap-2 z-30'
+            'bg-white dark:bg-gray-800 rounded-md shadow-lg p-2 flex flex-col gap-2 z-50'
 
           const updateWidgetContent = (showActions = false) => {
             widgetRef.current.innerHTML = ''
@@ -238,13 +183,15 @@ const MonacoEditor = ({
         return widgetRef.current
       },
       getPosition: () => ({
-        position: {
+        position: editor.getPosition() || {
           lineNumber: 0,
           column: 0,
         },
         preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
       }),
     }
+
+    setCurrentWidget(widget)
 
     editor.addAction({
       id: 'generate-sql',
@@ -254,21 +201,162 @@ const MonacoEditor = ({
         const position = editor.getPosition()
         if (!position) return
 
-        // Update widget position to current line
-        widget.getPosition = () => ({
-          position: {
-            lineNumber: position.lineNumber,
-            column: 1,
-          },
-          preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
-        })
+        if (currentWidget) {
+          editor.removeContentWidget(currentWidget)
+        }
 
         editor.addContentWidget(widget)
-        // Focus the input after a brief delay to ensure it's mounted
         setTimeout(() => {
           const input = widgetRef.current?.querySelector('input')
           if (input) input.focus()
         }, 0)
+      },
+    })
+
+    return widget
+  }
+
+  const setupDiffContentWidget = (editor: any, monaco: any) => {
+    const widget = {
+      getId: () => 'diff.inline.widget',
+      getDomNode: () => {
+        if (!widgetRef.current) {
+          widgetRef.current = document.createElement('div')
+          widgetRef.current.className =
+            'bg-white dark:bg-gray-800 rounded-md shadow-lg p-2 flex gap-2 z-50'
+
+          const acceptButton = document.createElement('button')
+          acceptButton.className =
+            'px-3 py-1 text-sm rounded bg-brand-600 text-white hover:bg-brand-700'
+          acceptButton.textContent = 'Accept'
+
+          const rejectButton = document.createElement('button')
+          rejectButton.className =
+            'px-3 py-1 text-sm border rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
+          rejectButton.textContent = 'Reject'
+
+          acceptButton.addEventListener('click', () => {
+            handleEditorChange(diffModified)
+            setShowDiff(false)
+            editor.removeContentWidget(widget)
+          })
+
+          rejectButton.addEventListener('click', () => {
+            setShowDiff(false)
+            editor.removeContentWidget(widget)
+          })
+
+          widgetRef.current.appendChild(acceptButton)
+          widgetRef.current.appendChild(rejectButton)
+        }
+        return widgetRef.current
+      },
+      getPosition: () => ({
+        position: {
+          lineNumber: 1,
+          column: 1,
+        },
+        preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
+      }),
+    }
+
+    // Add the widget immediately
+    editor.addContentWidget(widget)
+    return widget
+  }
+
+  const handleEditorOnMount: OnMount = async (editor, monaco) => {
+    editorRef.current = editor
+    monacoRef.current = monaco
+
+    const model = editorRef.current.getModel()
+    if (model !== null) {
+      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+    }
+
+    editor.addAction({
+      id: 'run-query',
+      label: 'Run Query',
+      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 0,
+      run: () => {
+        executeQueryRef.current()
+      },
+    })
+
+    if (isAssistantV2Enabled) {
+      editor.addAction({
+        id: 'explain-code',
+        label: 'Explain Code',
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 1,
+        run: () => {
+          const selectedValue = (editorRef?.current as any)
+            .getModel()
+            .getValueInRange((editorRef?.current as any)?.getSelection())
+          setAiAssistantPanel({
+            open: true,
+            sqlSnippets: [selectedValue],
+            initialInput: 'Can you explain this section to me in more detail?',
+          })
+        },
+      })
+    }
+
+    editor.onDidChangeCursorSelection(({ selection }) => {
+      const noSelection =
+        selection.startLineNumber === selection.endLineNumber &&
+        selection.startColumn === selection.endColumn
+      onHasSelection(!noSelection)
+    })
+
+    // add margin above first line
+    editorRef.current.changeViewZones((accessor) => {
+      accessor.addZone({
+        afterLineNumber: 0,
+        heightInPx: 4,
+        domNode: document.createElement('div'),
+      })
+    })
+
+    if (autoFocus) {
+      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+      editor.focus()
+    }
+
+    if (autoComplete) {
+      registerCompletion(monaco, editor, {
+        endpoint: '/api/ai/monaco/complete',
+        language: 'sql',
+      })
+    }
+
+    setupContentWidget(editor, monaco)
+
+    editor.addAction({
+      id: 'generate-sql',
+      label: 'General SQL',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      run: () => {
+        const selection = editor.getSelection()
+        const model = editor.getModel()
+        if (!model) return
+
+        const selectedText = selection ? model.getValueInRange(selection) : ''
+        const fullText = model.getValue()
+        const beforeSelection = selection
+          ? fullText.substring(0, model.getOffsetAt(selection.getStartPosition()))
+          : ''
+        const afterSelection = selection
+          ? fullText.substring(model.getOffsetAt(selection.getEndPosition()))
+          : ''
+
+        onPrompt({
+          selection: selectedText,
+          beforeSelection,
+          afterSelection,
+        })
       },
     })
   }
@@ -370,8 +458,13 @@ const MonacoEditor = ({
             original={diffOriginal}
             modified={diffModified}
             theme="supabase"
-            onMount={(editor) => {
+            onMount={(editor, monaco) => {
               diffEditorRef.current = editor
+              const modifiedEditor = editor.getModifiedEditor()
+
+              // Setup the diff-specific widget
+              const widget = setupDiffContentWidget(modifiedEditor, monaco)
+              widgetRef.current = widget
             }}
             options={{
               renderSideBySide: false,

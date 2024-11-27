@@ -1,9 +1,13 @@
 import { openai } from '@ai-sdk/openai'
 import { generateText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { getTools } from '../sql/tools'
+import { executeSql } from 'data/sql/execute-sql-query'
+import pgMeta from '@supabase/pg-meta'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
+const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
@@ -23,12 +27,37 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { completionMetadata } = req.body
+    const { completionMetadata, projectRef, connectionString, includeSchemaMetadata } = req.body
     const { textBeforeCursor, textAfterCursor, language, prompt, selection } = completionMetadata
+
+    if (!projectRef) {
+      return res.status(400).json({
+        completion: null,
+        error: 'Missing project_ref in request body',
+      })
+    }
+
+    const authorization = req.headers.authorization
+
+    const { result: schemas } = includeSchemaMetadata
+      ? await executeSql(
+          {
+            projectRef,
+            connectionString,
+            sql: pgMetaSchemasList.sql,
+          },
+          undefined,
+          {
+            'Content-Type': 'application/json',
+            ...(authorization && { Authorization: authorization }),
+          }
+        )
+      : { result: [] }
 
     const { text } = await generateText({
       model: openai('gpt-4o-mini'),
       maxSteps: 5,
+      tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: `You are an expert programmer who provides concise code completions.
         When writing code:
         - Use modern ${language} practices and patterns
