@@ -132,9 +132,12 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
-        return dynamic(() => import('../CronJobs/CronJobTab').then((mod) => mod.CronJobTab), {
-          loading: Loading,
-        })
+        return dynamic(
+          () => import('../CronJobs/PreviousRunsTab').then((mod) => mod.PreviousRunsTab),
+          {
+            loading: Loading,
+          }
+        )
       }
       switch (pageId) {
         case 'overview':

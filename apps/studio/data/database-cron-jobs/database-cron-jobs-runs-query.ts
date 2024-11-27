@@ -2,12 +2,24 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { ResponseError } from 'types'
 import { databaseCronJobsKeys } from './keys'
-import { CronJob } from './database-cron-jobs-query'
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string
   connectionString?: string
   jobId: number
+}
+
+export type CronJobRun = {
+  jobid: number
+  runid: number
+  job_pid: number
+  database: string
+  username: string
+  command: string
+  status: string
+  return_message: string
+  start_time: string
+  end_time: string
 }
 
 export async function getDatabaseCronJobRuns({
@@ -26,7 +38,7 @@ export async function getDatabaseCronJobRuns({
   return result
 }
 
-export type DatabaseCronJobData = CronJob[]
+export type DatabaseCronJobData = CronJobRun[]
 export type DatabaseCronJobError = ResponseError
 
 export const useCronJobRunsQuery = <TData = DatabaseCronJobData>(

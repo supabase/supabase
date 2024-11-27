@@ -72,7 +72,6 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 checked={job.active}
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
@@ -82,7 +81,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     Edit cron job
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link href={`/project/${ref}/integrations/cron-jobs/cron-jobs/${job.jobid}`}>
+                    <Link href={`/project/${ref}/integrations/cron-jobs/cron-jobs/${job.jobname}`}>
                       View previous runs
                     </Link>
                   </DropdownMenuItem>
