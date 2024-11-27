@@ -33,13 +33,14 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
   buildHttpRequestCommand,
   cronPattern,
-  secondsPattern,
   parseCronJobCommand,
+  secondsPattern,
 } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
@@ -48,7 +49,6 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
@@ -108,7 +108,7 @@ const FormSchema = z.object({
         return true
       }
       return false
-    }, 'Invalid Cron format'),
+    }, 'The schedule needs to be in a valid Cron format or specify seconds like "x seconds".'),
   values: z.discriminatedUnion('type', [
     edgeFunctionSchema,
     httpRequestSchema,
@@ -128,19 +128,7 @@ export const CreateCronJobSheet = ({
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
-  const { project } = useProjectContext()
   const isEditing = !!selectedCronJob?.jobname
-
-  const { data: extensions } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-
-  // check pg_cron version to see if it supports seconds
-  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
-  const installedVersion = pgCronExtension?.installed_version
-  const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
-
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
@@ -151,30 +139,8 @@ export const CreateCronJobSheet = ({
 
   const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '')
 
-  const FormSchemaWithSeconds = FormSchema.superRefine((data, ctx) => {
-    if (!cronPattern.test(data.schedule)) {
-      if (!(supportsSeconds && secondsPattern.test(data.schedule))) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
-          path: ['schedule'],
-        })
-      }
-    } else {
-      try {
-        CronToString(data.schedule)
-      } catch {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Invalid cron format',
-          path: ['schedule'],
-        })
-      }
-    }
-  })
-
   const form = useForm<CreateCronJobForm>({
-    resolver: zodResolver(FormSchemaWithSeconds),
+    resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
       schedule: selectedCronJob?.schedule || '*/5 * * * *',
@@ -182,6 +148,7 @@ export const CreateCronJobSheet = ({
     },
   })
 
+  const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
 
   // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
@@ -277,15 +244,16 @@ export const CreateCronJobSheet = ({
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
-                      <span className="!text-foreground-lighter text-xs absolute top-0 right-0 ">
+
+                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs absolute top-0 right-0 ">
                         Cron jobs cannot be renamed once created
-                      </span>
+                      </FormLabel_Shadcn_>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
               <Separator />
-              <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
+              <CronJobScheduleSection form={form} />
               <Separator />
               <SheetSection>
                 <FormField_Shadcn_

@@ -196,7 +196,7 @@ export const CronJobTab = () => {
               </div>
             ) : (
               <div className="flex items-center justify-center w-full col-span-6">
-                <CronJobsEmptyState context="runs" />
+                <CronJobsEmptyState page="runs" />
               </div>
             ),
           }}

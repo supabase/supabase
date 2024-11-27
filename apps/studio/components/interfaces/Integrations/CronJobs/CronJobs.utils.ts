@@ -1,10 +1,5 @@
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader, HTTPParameter } from './CronJobs.constants'
-import parser from 'cron-parser'
-import dayjs from 'dayjs'
-import utc from 'dayjs/plugin/utc'
-
-dayjs.extend(utc)
 
 export const buildCronQuery = (name: string, schedule: string, command: string) => {
   return `select cron.schedule('${name}','${schedule}',${command});`
@@ -148,46 +143,4 @@ export const cronPattern =
 
 export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim())
-}
-
-export function computeNextRunFromCurrentTime(schedule: string, currentTime: Date): string {
-  try {
-    let nextRun: Date
-
-    if (isSecondsFormat(schedule)) {
-      // Handle "x seconds" format
-      const seconds = parseInt(schedule.split(' ')[0])
-      nextRun = new Date(currentTime.getTime() + seconds * 1000)
-    } else {
-      // Handle cron syntax
-      const interval = parser.parseExpression(schedule, { currentDate: currentTime })
-      nextRun = interval.next().toDate()
-    }
-
-    return dayjs(nextRun).utc().format('YYYY-MM-DD HH:mm:ss [UTC]')
-  } catch (err) {
-    console.error('Error parsing schedule:', err)
-    return 'Invalid schedule format'
-  }
-}
-
-export function getScheduleMessage(scheduleString: string, schedule: string) {
-  if (!scheduleString) {
-    return 'Enter a valid cron expression above'
-  }
-
-  if (secondsPattern.test(schedule)) {
-    return `The cron will be run every ${schedule}`
-  }
-
-  if (scheduleString.includes('Invalid cron expression')) {
-    return scheduleString
-  }
-
-  const readableSchedule = scheduleString
-    .split(' ')
-    .map((s, i) => (i === 0 ? s.toLowerCase() : s))
-    .join(' ')
-
-  return `The cron will be run ${readableSchedule}.`
 }
