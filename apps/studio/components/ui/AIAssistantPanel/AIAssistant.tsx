@@ -352,7 +352,7 @@ export const AIAssistant = ({
             )}
           </div>
           {hasMessages ? (
-            <motion.div className="w-full px-5 py-8 flex flex-col">
+            <motion.div className="w-full p-8 flex flex-col">
               <div className="text-xs text-foreground-lighter text-center mb-5">
                 {new Date(messages[0].createdAt || new Date()).toLocaleDateString('en-US', {
                   month: 'long',
