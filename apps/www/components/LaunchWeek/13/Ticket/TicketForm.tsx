@@ -125,7 +125,7 @@ export default function TicketForm() {
 
     const redirectTo = `${SITE_ORIGIN}/launch-week/${
       userData.username ? '?referral=' + userData.username : ''
-    }`
+    }#ticket`
 
     supabase?.auth.signInWithOAuth({
       provider: 'github',

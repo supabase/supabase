@@ -6,8 +6,6 @@ import { Button, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
 
-import CountdownComponent from '~/components/LaunchWeek/13/Countdown'
-import CanvasPartyMode from '~/components/LaunchWeek/13/Multiplayer/CanvasPartyMode'
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
 import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -58,7 +56,7 @@ const TicketingFlow = () => {
 
   return (
     <>
-      <SectionContainer className="relative h-full lg:min-h-[calc(100dvh-65px)] flex-1 pointer-events-none">
+      <SectionContainer className="relative h-full lg:min-h-[calc(80dvh-65px)] flex-1 pointer-events-none">
         <div className="relative z-10 flex items-center h-full">
           <h1 className="sr-only">Supabase Launch Week 13 | {LW13_DATE}</h1>
           <LazyMotion features={domAnimation}>
@@ -103,12 +101,6 @@ const TicketingFlow = () => {
                   )}
                 >
                   <div className="h-full max-w-xs md:max-w-none flex flex-col justify-center gap-2 md:gap-6">
-                    <CountdownComponent
-                      date={LW13_LAUNCH_DATE}
-                      showCard={false}
-                      className="[&_*]:leading-4 text-foreground-lighter"
-                      size="large"
-                    />
                     <div className="flex flex-col gap-2 md:gap-6">
                       <div className="flex flex-col flex-wrap gap-0">
                         <h2 className="text-foreground uppercase tracking-wider text-2xl">
@@ -118,11 +110,7 @@ const TicketingFlow = () => {
                           {LW13_DATE}
                         </p>
                       </div>
-                      <p className="text-foreground-lighter text-sm">
-                        Join us for a week of new features and level up your development.
-                      </p>
                       <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
-                        <PartyModeButton />
                         <TicketPresence
                           className={cn(
                             'opacity-0 invisible translate-y-1 transition-all',
@@ -146,12 +134,6 @@ const TicketingFlow = () => {
                   className="w-full flex-1 lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
                   <div className="order-first lg:h-full w-full max-w-md xl:max-w-xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
-                    <CountdownComponent
-                      date={LW13_LAUNCH_DATE}
-                      showCard={false}
-                      className="[&_*]:leading-4 text-foreground-lighter -my-6"
-                      size="large"
-                    />
                     <div className="flex flex-col gap-1 max-w-sm">
                       {/* Header */}
                       <div className="text-2xl">
@@ -159,44 +141,20 @@ const TicketingFlow = () => {
                           hasSecretTicket ? (
                             <p>Got the secret ticket, {FIRST_NAME}!</p>
                           ) : (
-                            <p>Thanks for sharing, {FIRST_NAME}!</p>
+                            <p>Good to see you, {FIRST_NAME}!</p>
                           )
                         ) : winningChances !== 2 ? (
                           <>
                             {hasSecretTicket && <p>You found a secret ticket</p>}
-                            {!hasSecretTicket && <p>You're in, {FIRST_NAME}!</p>}
+                            {!hasSecretTicket && <p>Hi, {FIRST_NAME}!</p>}
                           </>
                         ) : (
-                          <p>Almost there, {FIRST_NAME}!</p>
+                          <p>Good to see you, {FIRST_NAME}!</p>
                         )}
                       </div>
                       {/* Paragraph */}
                       <div className="flex flex-col gap-2 text-foreground-lighter text-sm xl:text-base">
-                        {hasPlatinumTicket ? (
-                          <div>
-                            {hasSecretTicket ? (
-                              <p>
-                                Share your secret ticket to boost your chances of winning
-                                limited-edition swag.
-                              </p>
-                            ) : (
-                              <p>
-                                Follow Launch Week 13 announcements to find out if you're a lucky
-                                winner.
-                              </p>
-                            )}
-                          </div>
-                        ) : winningChances !== 2 ? (
-                          <p>
-                            Share your ticket to increase your chances of winning limited-edition
-                            swag.
-                          </p>
-                        ) : (
-                          <p>
-                            Now share on {!userData.shared_on_linkedin ? 'LinkedIn' : 'Twitter'} to
-                            increase your chances of winning limited-edition swag.
-                          </p>
-                        )}
+                        Registrations are closed but you can still claim a ticket.
                       </div>
                     </div>
                     <TicketSwagCtaBox className="w-full" />
@@ -234,7 +192,7 @@ const TicketingFlow = () => {
           </LazyMotion>
         </div>
       </SectionContainer>
-      {isPartyMode ? <CanvasPartyMode /> : <CanvasSingleMode />}
+      <CanvasSingleMode />
       {hasTicket && (
         <ThreeTicketCanvas
           username={DISPLAY_NAME ?? ''}

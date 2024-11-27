@@ -7,7 +7,7 @@ import { cn } from '../../../lib/utils/cn'
 import announcement from '../data/Announcement.json'
 import Countdown from './Countdown'
 
-export function LW12CountdownBanner() {
+export function LW13CountdownBanner() {
   const pathname = usePathname()
   const isHomePage = pathname === '/'
   const isLaunchWeekPage =
@@ -39,4 +39,4 @@ export function LW12CountdownBanner() {
   )
 }
 
-export default LW12CountdownBanner
+export default LW13CountdownBanner
