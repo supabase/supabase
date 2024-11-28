@@ -1,21 +1,21 @@
-import Editor, { Monaco, OnMount, DiffEditor } from '@monaco-editor/react'
+import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn } from 'ui'
+import { Admonition } from 'ui-patterns'
+import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
-import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
-import { useAppStateSnapshot } from 'state/app-state'
-import { registerCompletion } from 'monacopilot'
 
 export type MonacoEditorProps = {
   id: string
@@ -23,15 +23,9 @@ export type MonacoEditorProps = {
   editorRef: MutableRefObject<IStandaloneCodeEditor | null>
   monacoRef: MutableRefObject<Monaco | null>
   autoFocus?: boolean
-  autoComplete?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
-  onPrompt: (params: {
-    selection: string
-    beforeSelection: string
-    afterSelection: string
-    replaceText: (text: string) => void
-  }) => void
+  onPrompt?: (value: { selection: string; beforeSelection: string; afterSelection: string }) => void
 }
 
 const MonacoEditor = ({
@@ -39,7 +33,6 @@ const MonacoEditor = ({
   editorRef,
   monacoRef,
   autoFocus = true,
-  autoComplete = false,
   className,
   executeQuery,
   onHasSelection,
@@ -60,210 +53,11 @@ const MonacoEditor = ({
   )
 
   const snippet = snapV2.snippets[id]
+  const disableEdit =
+    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
 
   const executeQueryRef = useRef(executeQuery)
   executeQueryRef.current = executeQuery
-
-  const widgetRef = useRef<any>(null)
-  const [showDiff, setShowDiff] = useState(false)
-  const [diffOriginal, setDiffOriginal] = useState('')
-  const [diffModified, setDiffModified] = useState('')
-  const diffEditorRef = useRef<any>(null)
-  const [currentWidget, setCurrentWidget] = useState<any>(null)
-
-  const setupContentWidget = (editor: any, monaco: any) => {
-    if (currentWidget) {
-      editor.removeContentWidget(currentWidget)
-    }
-
-    const widget = {
-      getId: () => 'my.inline.widget',
-      getDomNode: () => {
-        if (!widgetRef.current) {
-          widgetRef.current = document.createElement('div')
-          widgetRef.current.className =
-            'bg-white dark:bg-gray-800 rounded-md shadow-lg p-2 flex flex-col gap-2 z-50'
-
-          const updateWidgetContent = (showActions = false) => {
-            widgetRef.current.innerHTML = ''
-
-            if (!showActions) {
-              // Input state
-              const inputRow = document.createElement('div')
-              inputRow.className = 'flex gap-2'
-
-              const input = document.createElement('input')
-              input.className = 'border rounded px-2 py-1 text-sm flex-1'
-              input.placeholder = 'Enter text...'
-              input.autofocus = true
-
-              const button = document.createElement('button')
-              button.className = 'bg-brand-600 text-white rounded px-3 py-1 text-sm'
-              button.textContent = 'Generate'
-
-              inputRow.appendChild(input)
-              inputRow.appendChild(button)
-              widgetRef.current.appendChild(inputRow)
-
-              button.addEventListener('click', async () => {
-                const selection = editor.getSelection()
-                const model = editor.getModel()
-                const selectedText = selection ? model?.getValueInRange(selection) : ''
-                const input = widgetRef.current?.querySelector('input') as HTMLInputElement
-                const inputValue = input?.value || ''
-
-                const fullText = model?.getValue() || ''
-                const beforeSelection = selection
-                  ? fullText.substring(0, model?.getOffsetAt(selection.getStartPosition()) || 0)
-                  : ''
-                const afterSelection = selection
-                  ? fullText.substring(model?.getOffsetAt(selection.getEndPosition()) || 0)
-                  : ''
-
-                fetch('/api/ai/monaco/complete', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    completionMetadata: {
-                      textBeforeCursor: beforeSelection || '',
-                      textAfterCursor: afterSelection || '',
-                      language: 'pgsql',
-                      prompt: inputValue,
-                      selection: selectedText || '',
-                    },
-                  }),
-                })
-                  .then((response) => response.json())
-                  .then((data) => {
-                    if (data.completion && selection) {
-                      const newText = beforeSelection + data.completion + afterSelection
-                      setDiffOriginal(fullText)
-                      setDiffModified(newText)
-                      setShowDiff(true)
-                      updateWidgetContent(true)
-                    }
-                  })
-              })
-            } else {
-              // Action state
-              const actionRow = document.createElement('div')
-              actionRow.className = 'flex gap-2'
-
-              const acceptButton = document.createElement('button')
-              acceptButton.className =
-                'px-3 py-1 text-sm rounded bg-brand-600 text-white hover:bg-brand-700'
-              acceptButton.textContent = 'Accept'
-
-              const rejectButton = document.createElement('button')
-              rejectButton.className =
-                'px-3 py-1 text-sm border rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
-              rejectButton.textContent = 'Reject'
-
-              actionRow.appendChild(acceptButton)
-              actionRow.appendChild(rejectButton)
-              widgetRef.current.appendChild(actionRow)
-
-              acceptButton.addEventListener('click', () => {
-                handleEditorChange(diffModified)
-                setShowDiff(false)
-                editor.removeContentWidget(widget)
-              })
-
-              rejectButton.addEventListener('click', () => {
-                setShowDiff(false)
-                editor.removeContentWidget(widget)
-              })
-            }
-          }
-
-          updateWidgetContent()
-        }
-        return widgetRef.current
-      },
-      getPosition: () => ({
-        position: editor.getPosition() || {
-          lineNumber: 0,
-          column: 0,
-        },
-        preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
-      }),
-    }
-
-    setCurrentWidget(widget)
-
-    editor.addAction({
-      id: 'generate-sql',
-      label: 'General SQL',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
-      run: () => {
-        const position = editor.getPosition()
-        if (!position) return
-
-        if (currentWidget) {
-          editor.removeContentWidget(currentWidget)
-        }
-
-        editor.addContentWidget(widget)
-        setTimeout(() => {
-          const input = widgetRef.current?.querySelector('input')
-          if (input) input.focus()
-        }, 0)
-      },
-    })
-
-    return widget
-  }
-
-  const setupDiffContentWidget = (editor: any, monaco: any) => {
-    const widget = {
-      getId: () => 'diff.inline.widget',
-      getDomNode: () => {
-        if (!widgetRef.current) {
-          widgetRef.current = document.createElement('div')
-          widgetRef.current.className =
-            'bg-white dark:bg-gray-800 rounded-md shadow-lg p-2 flex gap-2 z-50'
-
-          const acceptButton = document.createElement('button')
-          acceptButton.className =
-            'px-3 py-1 text-sm rounded bg-brand-600 text-white hover:bg-brand-700'
-          acceptButton.textContent = 'Accept'
-
-          const rejectButton = document.createElement('button')
-          rejectButton.className =
-            'px-3 py-1 text-sm border rounded bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700'
-          rejectButton.textContent = 'Reject'
-
-          acceptButton.addEventListener('click', () => {
-            handleEditorChange(diffModified)
-            setShowDiff(false)
-            editor.removeContentWidget(widget)
-          })
-
-          rejectButton.addEventListener('click', () => {
-            setShowDiff(false)
-            editor.removeContentWidget(widget)
-          })
-
-          widgetRef.current.appendChild(acceptButton)
-          widgetRef.current.appendChild(rejectButton)
-        }
-        return widgetRef.current
-      },
-      getPosition: () => ({
-        position: {
-          lineNumber: 1,
-          column: 1,
-        },
-        preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
-      }),
-    }
-
-    // Add the widget immediately
-    editor.addContentWidget(widget)
-    return widget
-  }
 
   const handleEditorOnMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
@@ -304,6 +98,34 @@ const MonacoEditor = ({
       })
     }
 
+    if (onPrompt) {
+      editor.addAction({
+        id: 'generate-sql',
+        label: 'General SQL',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        run: () => {
+          const selection = editor.getSelection()
+          const model = editor.getModel()
+          if (!model) return
+
+          const selectedText = selection ? model.getValueInRange(selection) : ''
+          const fullText = model.getValue()
+          const beforeSelection = selection
+            ? fullText.substring(0, model.getOffsetAt(selection.getStartPosition()))
+            : ''
+          const afterSelection = selection
+            ? fullText.substring(model.getOffsetAt(selection.getEndPosition()))
+            : ''
+
+          onPrompt({
+            selection: selectedText,
+            beforeSelection,
+            afterSelection,
+          })
+        },
+      })
+    }
+
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =
         selection.startLineNumber === selection.endLineNumber &&
@@ -324,41 +146,6 @@ const MonacoEditor = ({
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
-
-    if (autoComplete) {
-      registerCompletion(monaco, editor, {
-        endpoint: '/api/ai/monaco/complete',
-        language: 'sql',
-      })
-    }
-
-    setupContentWidget(editor, monaco)
-
-    editor.addAction({
-      id: 'generate-sql',
-      label: 'General SQL',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
-      run: () => {
-        const selection = editor.getSelection()
-        const model = editor.getModel()
-        if (!model) return
-
-        const selectedText = selection ? model.getValueInRange(selection) : ''
-        const fullText = model.getValue()
-        const beforeSelection = selection
-          ? fullText.substring(0, model.getOffsetAt(selection.getStartPosition()))
-          : ''
-        const afterSelection = selection
-          ? fullText.substring(model.getOffsetAt(selection.getEndPosition()))
-          : ''
-
-        onPrompt({
-          selection: selectedText,
-          beforeSelection,
-          afterSelection,
-        })
-      },
-    })
   }
 
   // [Joshen] Also needs updating here
@@ -398,7 +185,15 @@ const MonacoEditor = ({
   }, [])
 
   return (
-    <div className="relative h-full">
+    <>
+      {disableEdit && (
+        <Admonition
+          type="default"
+          className="m-0 py-2 rounded-none border-0 border-b [&>h5]:mb-0.5"
+          title="This snippet has been shared to the project and is only editable by the owner who created this snippet"
+          description='You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting "Duplicate personal copy"'
+        />
+      )}
       <Editor
         className={cn(className, 'monaco-editor')}
         theme={'supabase'}
@@ -410,6 +205,9 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          lineDecorationsWidth: 0,
+          readOnly: disableEdit,
+          padding: { top: 16 },
           minimap: { enabled: false },
           wordWrap: 'on',
           // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
@@ -450,32 +248,7 @@ const MonacoEditor = ({
           },
         }}
       />
-      {showDiff && (
-        <div className="absolute inset-0">
-          <DiffEditor
-            height="100%"
-            language="pgsql"
-            original={diffOriginal}
-            modified={diffModified}
-            theme="supabase"
-            onMount={(editor, monaco) => {
-              diffEditorRef.current = editor
-              const modifiedEditor = editor.getModifiedEditor()
-
-              // Setup the diff-specific widget
-              const widget = setupDiffContentWidget(modifiedEditor, monaco)
-              widgetRef.current = widget
-            }}
-            options={{
-              renderSideBySide: false,
-              readOnly: true,
-              minimap: { enabled: false },
-              wordWrap: 'on',
-            }}
-          />
-        </div>
-      )}
-    </div>
+    </>
   )
 }
 

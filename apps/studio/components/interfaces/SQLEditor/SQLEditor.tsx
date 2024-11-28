@@ -1,7 +1,7 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -832,12 +832,12 @@ const SQLEditor = () => {
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
                 {promptState.isOpen && (
-                  <div className="py-1 px-4 border-b">
-                    <div className="flex gap-4 items-center">
+                  <div className="bg border-b">
+                    <div className="flex gap-4 pr-2 py-1 items-center">
                       <Input
                         className="flex-1"
                         autoFocus
-                        inputClassName="bg-transparent border-none focus:ring-0"
+                        inputClassName="bg-transparent border-none focus:ring-0 px-4"
                         value={promptInput}
                         onChange={(e) => setPromptInput(e.target.value)}
                         placeholder="Enter your prompt..."
@@ -929,15 +929,7 @@ const SQLEditor = () => {
                 ) : (
                   <>
                     {isDiffOpen && (
-                      <motion.div
-                        className="w-full h-full"
-                        variants={{
-                          visible: { opacity: 1, filter: 'blur(0px)' },
-                          hidden: { opacity: 0, filter: 'blur(10px)' },
-                        }}
-                        initial="hidden"
-                        animate="visible"
-                      >
+                      <div className="w-full h-full">
                         <DiffEditor
                           theme="supabase"
                           language="pgsql"
@@ -948,21 +940,11 @@ const SQLEditor = () => {
                           }}
                           options={{ fontSize: 13, renderSideBySide: !promptState.isOpen }}
                         />
-                      </motion.div>
+                      </div>
                     )}
-                    <motion.div
-                      key={id}
-                      variants={{
-                        visible: { opacity: 1, filter: 'blur(0px)' },
-                        hidden: { opacity: 0, filter: 'blur(10px)' },
-                      }}
-                      initial="hidden"
-                      animate={isDiffOpen ? 'hidden' : 'visible'}
-                      className="w-full h-full"
-                    >
+                    <div key={id} className="w-full h-full relative">
                       <MonacoEditor
                         autoFocus
-                        autoComplete={true}
                         id={id}
                         editorRef={editorRef}
                         monacoRef={monacoRef}
@@ -978,7 +960,19 @@ const SQLEditor = () => {
                           })
                         }}
                       />
-                    </motion.div>
+                      <AnimatePresence>
+                        {!promptState.isOpen && !editorRef.current?.getValue() && (
+                          <motion.p
+                            initial={{ y: 5, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 5, opacity: 0 }}
+                            className="text-foreground-muted absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
+                          >
+                            Hit <Command size={12} />K to edit with assistance
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </div>
                   </>
                 )}
               </div>
