@@ -68,7 +68,7 @@ export const CronjobsTab = () => {
             }
           >
             <p className="text-sm text-foreground">No cron jobs created yet</p>
-            <Button onClick={() => setCreateCronJobSheetShown(true)}>Add a new cron job</Button>
+            <Button onClick={() => setCreateCronJobSheetShown(true)}>Create job</Button>
           </div>
         ) : (
           <div className="w-full space-y-4">
@@ -82,7 +82,7 @@ export const CronjobsTab = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
 
-              <Button onClick={() => setCreateCronJobSheetShown(true)}>Create a cron job</Button>
+              <Button onClick={() => setCreateCronJobSheetShown(true)}>Create job</Button>
             </div>
             {filteredCronJobs.length === 0 ? (
               <div

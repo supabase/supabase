@@ -113,7 +113,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'cron-jobs',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_cron'],
-    name: `Cron Jobs`,
+    name: `Cron`,
     icon: ({ className, ...props } = {}) => (
       <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
@@ -129,8 +129,8 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         label: 'Overview',
       },
       {
-        route: 'cron-jobs',
-        label: 'Cron Jobs',
+        route: 'jobs',
+        label: 'Jobs',
         hasChild: true,
         childIcon: (
           <Timer size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
@@ -157,7 +157,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
               loading: Loading,
             }
           )
-        case 'cron-jobs':
+        case 'jobs':
           return dynamic(() => import('../CronJobs/CronJobsTab').then((mod) => mod.CronjobsTab), {
             loading: Loading,
           })
