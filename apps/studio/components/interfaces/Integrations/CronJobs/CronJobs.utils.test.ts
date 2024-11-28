@@ -29,7 +29,7 @@ describe('parseCronJobCommand', () => {
       edgeFunctionName: 'https://_.supabase.co/functions/v1/_',
       method: 'POST',
       httpHeaders: [],
-      httpParameters: [],
+      httpBody: '',
       timeoutMs: 5000,
       type: 'edge_function',
     })
