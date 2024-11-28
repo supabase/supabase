@@ -79,7 +79,7 @@ An enrollment flow provides a UI for users to set up additional authentication f
 
 1. Right after login or sign up.
    This allows users quickly set up Multi Factor Authentication (MFA) post login or account creation. Where possible, encourage all users to set up MFA. Many applications offer this as an opt-in step in an
-   effort to reduce onboarding friction.
+   effort to reduce on-boarding friction.
 2. From within a settings page.
    Allows users to set up, disable or modify their MFA settings.
 
@@ -110,7 +110,7 @@ const {
 let challengeOptions = challengeData?.credential_creation_options.publicKey
 
 // Modify challengeOptions as needed. See table below for full details.
-// challengeOptions.authenicatorAttachment = platform
+// challengeOptions.attestation = 'indirect'
 
 const credential = await supabase.auth.startAuthentication(challengeOptions)
 
@@ -121,13 +121,13 @@ Setting `useMultiStep` to false informs Auth to abstract away the complexities o
 
 When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
 
-| Field Name                | Configurability  | Description                                                           |
-| ------------------------- | ---------------- | --------------------------------------------------------------------- |
-| `attestation`             | Developer choice | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
-| `authenticatorAttachment` | Developer choice | Preferred authenticator type ('platform' or 'cross-platform')         |
-| `requireResidentKey`      | Developer choice | Whether a resident key is required (true or false)                    |
-| `userVerification`        | Developer choice | User verification preference ('required', 'preferred', 'discouraged') |
-| `rp.name`                 | Developer choice | Human-readable name for the Relying Party                             |
+| Field Name                | Description                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| `attestation`             | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
+| `authenticatorAttachment` | Preferred authenticator type ('platform' or 'cross-platform')         |
+| `requireResidentKey`      | Whether a resident key is required (true or false)                    |
+| `userVerification`        | User verification preference ('required', 'preferred', 'discouraged') |
+| `rp.name`                 | Human-readable name for the Relying Party                             |
 
 While configurable fields can be set by developers, it's important to choose appropriate values based on your security requirements and user experience considerations.
 
@@ -195,7 +195,6 @@ const { data: challengeData, error } = await supabase.auth.mfa.challenge({
   factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
 })
 
-// Modify challengeData as you wish
 let credential = await startRegistration(challengeData?.credential_creation_options.publicKey)
 
 const { data: factor, error } = await supabase.auth.mfa.verify({
@@ -206,11 +205,12 @@ const { data: factor, error } = await supabase.auth.mfa.verify({
 ```
 
 Note that you do not have to specify a `factorId` parameter. Unlike MFA (Phone) and MFA (TOTP), authentication via the WebAuthn factor does not depend on the specific factor in use. Auth will check the assertion against all verified factors owned by the user, as well as the existing WebAuthn session, and make a decision on authentication based on the information given.
+
 Ensure that developers complete authentication within five seconds as there is a default timeout of five seconds for both `enroll` and `verify` calls.
 
 ### Factor Selection
 
-Build an intermediary page to allow users to select between factor types. Here's an example page which showcases how to switch between TOTP and WebAuthn factors.
+When working with multiple types of MFA factors, you can build an intermediary page to allow users to select between factor types. Here's an example page which showcases how to switch between TOTP and WebAuthn factors.
 
 ```tsx
 function MFASelectionPage() {
@@ -292,7 +292,7 @@ function MFASelectionPage() {
 }
 ```
 
-Let the user pick their preferred authentication method and redirect the user to authenticate based on the factor they have selected.
+Redirect the user to the appropriate authentication page based on the selected factor.
 
 ## Factor Management
 
@@ -351,7 +351,7 @@ You can confirm that the mapping is accurate by using the helper site [on this p
 
 ## Local Development
 
-Configure the following fields in `config.toml` to enable MFA for WebAuthn. Ensure that the Auth version on your instances is `v2.164.0` or later.
+Configure the following fields in `config.toml` to enable MFA for WebAuthn. Ensure that you have the latest version of the CLI installed.
 
 ```
 [auth.mfa.web_authn]
