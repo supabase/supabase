@@ -92,7 +92,7 @@ export const CronjobsTab = () => {
                   })
                 }
               >
-                Create a queue
+                Create a cron job
               </Button>
             </div>
             {filteredCronJobs.length === 0 ? (
@@ -106,9 +106,14 @@ export const CronjobsTab = () => {
                   Your search for "{searchQuery}" did not return any results
                 </p>
               </div>
+            ) : isLoading ? (
+              <div className="p-10">
+                <GenericSkeletonLoader />
+              </div>
             ) : (
               filteredCronJobs.map((job) => (
                 <CronJobCard
+                  key={job.jobid}
                   job={job}
                   onEditCronJob={(job) => setCreateCronJobSheetShown(job)}
                   onDeleteCronJob={(job) => setCronJobForDeletion(job)}

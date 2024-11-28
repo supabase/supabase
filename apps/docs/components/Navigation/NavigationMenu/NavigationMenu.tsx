@@ -256,7 +256,7 @@ const NavigationMenu = ({
   additionalNavItems,
 }: {
   menuId: MenuId
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }) => {
   const level = menuId
   const menu = getMenuById(level)
