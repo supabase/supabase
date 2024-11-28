@@ -147,9 +147,9 @@ const Subscription = () => {
                       title="This organization is limited by the included usage"
                     >
                       <div className="[&>p]:!leading-normal prose text-sm">
-                        Projects may become unresponsive when this organization exceeds its
+                        Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
-                        seamlessly and pay for over-usage, $
+                        seamlessly and pay for over-usage,{' '}
                         {currentPlan?.id === 'free'
                           ? 'upgrade to a paid plan.'
                           : 'you can disable Spend Cap under the Cost Control settings.'}
