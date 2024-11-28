@@ -36,7 +36,6 @@ export function useSelectedOrganization({ enabled = true } = {}) {
   const { data } = useOrganizationsQuery({ enabled: isLoggedIn && enabled })
 
   const selectedProject = useProjectByRef(ref)
-  console.log({ selectedProject })
 
   const localStorageSlug = useMemo(() => {
     return typeof window !== 'undefined'

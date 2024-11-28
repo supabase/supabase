@@ -61,7 +61,6 @@ const PlanUpdateSidePanel = () => {
   )
 
   const { data } = useOrganizationQuery({ slug })
-  console.log({ selectedOrganization, data })
   const hasOrioleProjects = !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
