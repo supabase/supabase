@@ -35,7 +35,7 @@ export async function getSqlSnippets(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as SqlSnippet[],
+    contents: data.data as unknown as SqlSnippet[],
   }
 }
 

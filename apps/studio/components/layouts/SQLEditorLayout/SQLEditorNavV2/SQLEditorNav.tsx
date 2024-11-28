@@ -19,6 +19,7 @@ import {
   getSQLSnippetFolders,
   useSQLSnippetFoldersQuery,
 } from 'data/content/sql-folders-query'
+import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
@@ -29,7 +30,7 @@ import {
   useSnippets,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { Separator, Skeleton, TreeView } from 'ui'
+import { Separator, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -38,9 +39,9 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -63,7 +64,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   const [showMoveModal, setShowMoveModal] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showRenameModal, setShowRenameModal] = useState(false)
-  const [showFavouriteSnippets, setShowFavouriteSnippets] = useState(false)
+  const [showFavoriteSnippets, setShowFavoriteSnippets] = useState(false)
   const [showSharedSnippets, setShowSharedSnippets] = useState(false)
   const [showPrivateSnippets, setShowPrivateSnippets] = useState(true)
 
@@ -127,7 +128,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // [Joshen] React Queries
   // =================================
 
-  const { isLoading, data } = useSQLSnippetFoldersQuery(
+  const { isLoading, data, hasNextPage, fetchNextPage } = useSQLSnippetFoldersQuery(
     { projectRef },
     {
       refetchOnWindowFocus: false,
@@ -149,23 +150,51 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     })
   }, [data, projectRef])
 
-  const { data: sharedSqlSnippetsData, ...rest } = useSqlSnippetsQuery(
+  const {
+    data: sharedSqlSnippetsData,
+    isLoading: isLoadingSharedSqlSnippets,
+    isSuccess: isSuccessSharedSqlSnippets,
+  } = useSqlSnippetsQuery(
+    {
+      projectRef,
+      visibility: 'project',
+    },
+    { enabled: showSharedSnippets }
+  )
+
+  useEffect(() => {
+    if (projectRef === undefined) return
+
+    sharedSqlSnippetsData?.pages.forEach((page) => {
+      page.contents?.forEach((snippet) => {
+        // TODO: get favorite status from the API
+        snapV2.addSnippet({ projectRef, snippet: { ...snippet, favorite: false } })
+      })
+    })
+  }, [projectRef, sharedSqlSnippetsData?.pages])
+
+  const {
+    data: favoriteSqlSnippetsData,
+    isLoading: isLoadingFavoriteSqlSnippets,
+    isSuccess: isSuccessFavoriteSqlSnippets,
+  } = useSqlSnippetsQuery(
     {
       projectRef,
       favorite: true,
     },
-    { enabled: showSharedSnippets }
+    { enabled: showFavoriteSnippets }
   )
-  console.log('sharedSqlSnippets:', sharedSqlSnippetsData, rest)
 
-  // useSqlSnippetsQuery(projectRef, {
-  //   onSuccess(data) {
-  //     if (projectRef !== undefined) {
-  //       const favoriteSnippets = data.snippets.filter((snippet) => snippet.content.favorite)
-  //       snapV2.initializeFavoriteSnippets({ projectRef, snippets: favoriteSnippets })
-  //     }
-  //   },
-  // })
+  useEffect(() => {
+    if (projectRef === undefined) return
+
+    favoriteSqlSnippetsData?.pages.forEach((page) => {
+      page.contents?.forEach((snippet) => {
+        // TODO: get favorite status from the API
+        snapV2.addSnippet({ projectRef, snippet: { ...snippet, favorite: true } })
+      })
+    })
+  }, [projectRef, favoriteSqlSnippetsData?.pages])
 
   useContentCountQuery(
     { projectRef, type: 'sql' },
@@ -380,10 +409,12 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
             className="px-0"
           >
             <InnerSideMenuCollapsibleTrigger
-              title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
+              title={`Shared ${isSuccessSharedSqlSnippets && numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
             />
             <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-              {numProjectSnippets === 0 ? (
+              {isLoadingSharedSqlSnippets ? (
+                <SQLEditorLoadingSnippets />
+              ) : numProjectSnippets === 0 ? (
                 <InnerSideBarEmptyPanel
                   className="mx-2"
                   title="No shared queries"
@@ -428,20 +459,22 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         <>
           <InnerSideMenuCollapsible
             className="px-0"
-            open={showFavouriteSnippets}
-            onOpenChange={setShowFavouriteSnippets}
+            open={showFavoriteSnippets}
+            onOpenChange={setShowFavoriteSnippets}
           >
             <InnerSideMenuCollapsibleTrigger
-              title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
+              title={`Favorites ${isSuccessFavoriteSqlSnippets && numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
             />
             <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
-              {numFavoriteSnippets === 0 ? (
+              {isLoadingFavoriteSqlSnippets ? (
+                <SQLEditorLoadingSnippets />
+              ) : numFavoriteSnippets === 0 ? (
                 <InnerSideBarEmptyPanel
                   title="No favorite queries"
                   className="mx-2"
                   description={
                     <>
-                      Save a query to favorites for easy accessbility by clicking the{' '}
+                      Save a query to favorites for easy accessibility by clicking the{' '}
                       <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
                       icon.
                     </>
@@ -494,28 +527,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
-            <>
-              <div className="flex flex-row h-6 px-3 items-center gap-3">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-32 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-75">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-50">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-25">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-            </>
+            <SQLEditorLoadingSnippets />
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-3 px-4"

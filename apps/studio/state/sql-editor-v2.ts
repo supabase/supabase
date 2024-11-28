@@ -406,7 +406,7 @@ if (typeof window !== 'undefined') {
             visibility: visibility ?? 'user',
             project_id: project_id ?? 0,
             owner_id: owner_id,
-            folder_id: folder_id,
+            folder_id: folder_id ?? undefined,
             content: {
               ...content!,
               content_id: id,
