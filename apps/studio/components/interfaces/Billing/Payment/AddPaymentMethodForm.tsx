@@ -61,7 +61,11 @@ const AddPaymentMethodForm = ({
       setIsSaving(false)
       toast.error(error?.message ?? ' Failed to save card details')
     } else {
-      if ((isDefault || autoMarkAsDefaultPaymentMethod) && selectedOrganization && typeof setupIntent?.payment_method === 'string') {
+      if (
+        (isDefault || autoMarkAsDefaultPaymentMethod) &&
+        selectedOrganization &&
+        typeof setupIntent?.payment_method === 'string'
+      ) {
         try {
           await markAsDefault({
             slug: selectedOrganization.slug,
