@@ -73,19 +73,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       messages: [
         {
           role: 'user',
-          content: `You are helping me edit some SQL code.
+          content: `You are helping me edit some pgsql code.
             Here is the context:
-            - Text before cursor: ${textBeforeCursor}
-            - Selected text to modify: ${selection} 
-            - Text after cursor: ${textAfterCursor}
+            ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
             
             Instructions:
             1. Only modify the selected text based on this prompt: ${prompt}
-            2. Your response should be ONLY the modified selection text, nothing else
+            2. Your response should be ONLY the modified selection text, nothing else. Remove selected text if needed.
             3. Do not wrap in code blocks or markdown
-            4. Ensure the modified text flows naturally with the surrounding context
-            5. Avoid duplicating SQL keywords (SELECT, FROM, WHERE, etc) when considering the full statement
-            6. If there is no surrounding context, make sure your response is a complete valid SQL statement
+            4. You can respond with one word or multiple words
+            5. Ensure the modified text flows naturally within the current line
+            6. Avoid duplicating SQL keywords (SELECT, FROM, WHERE, etc) when considering the full statement
+            7. If there is no surrounding context (before or after), make sure your response is a complete valid SQL statement that can be run and resolves the prompt.
             
             Modify the selected text now:`,
         },
