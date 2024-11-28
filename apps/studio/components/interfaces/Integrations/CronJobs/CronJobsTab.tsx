@@ -9,6 +9,7 @@ import { parseAsString, useQueryState } from 'nuqs'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CronJobCard } from '../CronJobs/CronJobCard'
 import DeleteCronJob from '../CronJobs/DeleteCronJob'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 
 export const CronjobsTab = () => {
   const { project } = useProjectContext()
@@ -26,6 +27,17 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  // check pg_cron version to see if it supports seconds
+  const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
+  const installedVersion = pgCronExtension?.installed_version
+  const supportsSeconds = installedVersion ? parseFloat(installedVersion) >= 1.5 : false
+
   if (isLoading)
     return (
       <div className="p-10">
@@ -125,6 +137,7 @@ export const CronjobsTab = () => {
         <SheetContent size="default" tabIndex={undefined}>
           <CreateCronJobSheet
             selectedCronJob={createCronJobSheetShown}
+            supportsSeconds={supportsSeconds}
             onClose={() => {
               setIsClosingCreateCronJobSheet(false)
               setCreateCronJobSheetShown(undefined)

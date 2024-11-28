@@ -554,6 +554,22 @@ parameters:
       - name: 'Inbucket documentation'
         link: 'https://www.inbucket.org'
 
+  - id: 'inbucket.admin_email'
+    title: 'inbucket.admin_email'
+    tags: ['local']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'inbucket.sender_name'
+    title: 'inbucket.sender_name'
+    tags: ['local']
+    required: false
+    default: 'Admin'
+    description: |
+      Display name used as the sender for emails sent from the application.
+
   - id: 'storage.enabled'
     title: 'storage.enabled'
     tags: ['storage']
@@ -1095,6 +1111,35 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'edge_runtime.enabled'
+    title: 'edge_runtime.enabled'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Edge Runtime service for Edge Functions.
+    links: []
+
+  - id: 'edge_runtime.policy'
+    title: 'edge_runtime.policy'
+    tags: ['edge-functions']
+    required: false
+    default: '"oneshot"'
+    description: |
+      Configure the request handling policy for Edge Functions. Available options:
+      - `oneshot`: Recommended for development with hot reload support
+      - `per_worker`: Recommended for load testing scenarios
+    links: []
+
+  - id: 'edge_runtime.inspector_port'
+    title: 'edge_runtime.inspector_port'
+    tags: ['edge-functions']
+    required: false
+    default: '8083'
+    description: |
+      Port to attach the Chrome inspector for debugging Edge Functions.
+    links: []
 
   - id: 'functions.function_name.enabled'
     title: 'functions.<function_name>.enabled'
