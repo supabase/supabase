@@ -81,6 +81,7 @@ import {
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { constructHeaders } from 'data/fetchers'
+import { useCompletion } from 'ai/react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -524,6 +525,31 @@ const SQLEditor = () => {
     setPendingTitle(undefined)
   }, [debugSolution, router])
 
+  const {
+    complete,
+    completion,
+    isLoading: isCompletionLoading,
+    error: completionError,
+  } = useCompletion({
+    api: '/api/ai/monaco/complete',
+    body: {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      includeSchemaMetadata,
+    },
+    onResponse: (response) => {
+      if (!response.ok) {
+        throw new Error('Failed to generate completion')
+      }
+    },
+    onFinish: (prompt, completion) => {
+      setAiQueryCount((count) => count + 1)
+    },
+    onError: (error) => {
+      toast.error('Failed to generate SQL')
+    },
+  })
+
   const [promptState, setPromptState] = useState<{
     isOpen: boolean
     selection: string
@@ -537,7 +563,58 @@ const SQLEditor = () => {
     afterSelection: '',
     isLoading: false,
   })
+
   const [promptInput, setPromptInput] = useState('')
+
+  const handlePrompt = async () => {
+    try {
+      // Set loading state before starting completion
+      setPromptState((prev) => ({ ...prev, isLoading: true }))
+      const headerData = await constructHeaders()
+
+      await complete(promptInput, {
+        headers: { Authorization: headerData.get('Authorization') ?? '' },
+        body: {
+          completionMetadata: {
+            textBeforeCursor: promptState.beforeSelection,
+            textAfterCursor: promptState.afterSelection,
+            language: 'pgsql',
+            prompt: promptInput,
+            selection: promptState.selection,
+          },
+        },
+      })
+    } catch (error) {
+      // Clear loading state on error
+      setPromptState((prev) => ({ ...prev, isLoading: false }))
+      // Error will be handled by onError callback
+    }
+  }
+
+  const handleAcceptPrompt = () => {
+    if (sourceSqlDiff?.modified) {
+      acceptAiHandler()
+      // Clear prompt and completion states
+      setPromptInput('')
+      setPromptState({
+        isOpen: false,
+        selection: '',
+        beforeSelection: '',
+        afterSelection: '',
+        isLoading: false,
+      })
+      // Clear completion state
+      setSourceSqlDiff(undefined)
+      setSelectedDiffType(undefined)
+    }
+  }
+
+  useEffect(() => {
+    // Reset prompt input whenever isOpen changes
+    if (!promptState.isOpen) {
+      setPromptInput('')
+    }
+  }, [promptState.isOpen])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -669,64 +746,24 @@ const SQLEditor = () => {
     }
   }, [selectedDiffType, sourceSqlDiff])
 
-  const handlePrompt = async () => {
-    try {
-      setPromptState((prev) => ({ ...prev, isLoading: true }))
-      const headerData = await constructHeaders()
-      const response = await fetch('/api/ai/monaco/complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: headerData.get('Authorization') ?? '',
-        },
-        body: JSON.stringify({
-          completionMetadata: {
-            textBeforeCursor: promptState.beforeSelection,
-            textAfterCursor: promptState.afterSelection,
-            language: 'pgsql',
-            prompt: promptInput,
-            selection: promptState.selection,
-          },
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          includeSchemaMetadata: includeSchemaMetadata,
-        }),
-      })
-      const data = await response.json()
-      if (data.completion) {
-        setSourceSqlDiff({
-          original:
-            promptState.beforeSelection + promptState.selection + promptState.afterSelection,
-          modified: promptState.beforeSelection + data.completion + promptState.afterSelection,
-        })
-        setSelectedDiffType(DiffType.Modification)
-      }
-    } catch (error) {
+  useEffect(() => {
+    if (completionError) {
       toast.error('Failed to generate SQL')
-    } finally {
-      setPromptState((prev) => ({ ...prev, isLoading: false }))
     }
-  }
-
-  const handleAcceptPrompt = () => {
-    if (sourceSqlDiff?.modified) {
-      acceptAiHandler()
-      setPromptState({
-        isOpen: false,
-        selection: '',
-        beforeSelection: '',
-        afterSelection: '',
-        isLoading: false,
-      })
-    }
-  }
+  }, [completionError])
 
   useEffect(() => {
-    // Reset prompt input whenever isOpen changes
-    if (!promptState.isOpen) {
-      setPromptInput('')
+    console.log('completion called', completion)
+    if (completion && isCompletionLoading) {
+      setSourceSqlDiff({
+        original: promptState.beforeSelection + promptState.selection + promptState.afterSelection,
+        modified: promptState.beforeSelection + completion + promptState.afterSelection,
+      })
+      setSelectedDiffType(DiffType.Modification)
+      // Set promptState.isLoading to false when completion is received
+      setPromptState((prev) => ({ ...prev, isLoading: false }))
     }
-  }, [promptState.isOpen])
+  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
   return (
     <>
@@ -829,6 +866,7 @@ const SQLEditor = () => {
                 )}
               </AISchemaSuggestionPopover>
             )}
+
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
                 {promptState.isOpen && (
@@ -840,7 +878,7 @@ const SQLEditor = () => {
                         inputClassName="bg-transparent border-none focus:ring-0 px-4"
                         value={promptInput}
                         onChange={(e) => setPromptInput(e.target.value)}
-                        placeholder="Enter your prompt..."
+                        placeholder="Edit your query..."
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && !e.shiftKey) {
                             handlePrompt()
@@ -848,11 +886,11 @@ const SQLEditor = () => {
                         }}
                       />
                       <p className="text-foreground-muted text-xs">Escape to close</p>
-                      {!sourceSqlDiff || promptState.isLoading ? (
+                      {!sourceSqlDiff || isCompletionLoading ? (
                         <Button
                           onClick={handlePrompt}
-                          loading={promptState.isLoading}
-                          disabled={promptState.isLoading}
+                          loading={isCompletionLoading}
+                          disabled={isCompletionLoading}
                         >
                           Submit edit
                         </Button>
@@ -860,8 +898,8 @@ const SQLEditor = () => {
                         <div className="flex gap-2">
                           <Button
                             onClick={handleAcceptPrompt}
-                            loading={promptState.isLoading}
-                            disabled={promptState.isLoading}
+                            loading={isCompletionLoading}
+                            disabled={isCompletionLoading}
                           >
                             Accept
                           </Button>
@@ -878,7 +916,7 @@ const SQLEditor = () => {
                                 isLoading: false,
                               })
                             }}
-                            disabled={promptState.isLoading}
+                            disabled={isCompletionLoading}
                           >
                             Reject
                           </Button>
