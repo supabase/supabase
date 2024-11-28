@@ -55,7 +55,7 @@ export const useContentUpsertV2Mutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
         if (invalidateQueriesOnSuccess) {
-          await queryClient.invalidateQueries(contentKeys.list(projectRef))
+          await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         }
         await onSuccess?.(data, variables, context)
       },
