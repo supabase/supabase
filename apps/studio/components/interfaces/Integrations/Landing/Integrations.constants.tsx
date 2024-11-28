@@ -226,7 +226,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
   },
   {
     id: 'webhooks',
-    type: 'custom' as const,
+    type: 'postgres_extension' as const,
     name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
       <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
