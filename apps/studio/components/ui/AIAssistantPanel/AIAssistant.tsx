@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
 import { FileText } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
+import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
@@ -25,7 +26,9 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
 import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
@@ -40,10 +43,6 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import { useParams } from 'common/hooks'
-import { useSearchParamsShallow } from 'common/hooks'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useRouter } from 'next/router'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -235,14 +234,18 @@ export const AIAssistant = ({
 
   // Add useEffect to set up scroll listener
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', handleScroll)
-      // Initial check
-      handleScroll()
-    }
+    // Use a small delay to ensure container is mounted and has content
+    const timeoutId = setTimeout(() => {
+      const container = scrollContainerRef.current
+      if (container) {
+        container.addEventListener('scroll', handleScroll)
+        handleScroll()
+      }
+    }, 100)
 
     return () => {
+      clearTimeout(timeoutId)
+      const container = scrollContainerRef.current
       if (container) {
         container.removeEventListener('scroll', handleScroll)
       }
@@ -507,12 +510,18 @@ export const AIAssistant = ({
             </div>
           )}
         </div>
-
-        {showFade && (
-          <div className="pointer-events-none z-10 -mt-24">
-            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
-          </div>
-        )}
+        <AnimatePresence>
+          {showFade && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
@@ -565,7 +574,7 @@ export const AIAssistant = ({
                 ? 'Reply to the assistant...'
                 : (sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'How can we help you today?'
+                  : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
