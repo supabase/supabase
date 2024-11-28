@@ -63,19 +63,13 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: false,
+    isToday: true,
     blog: '',
     hasCountdown: false,
     date: '2 December',
     published_at: '2024-12-02T08:00:00.000-07:00',
-    title: '',
-    description: (
-      <>
-        <strong className="text-foreground">postgres.new:</strong>
-        <br className="hidden sm:block" /> In-browser Postgres
-        <br className="hidden sm:block" /> with an AI interface
-      </>
-    ),
+    title: 'TBD',
+    description: 'TBD',
     links: [
       // {
       //   type: 'video',
@@ -86,15 +80,29 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         href: 'https://supabase.link/lw13-xspace-1',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'TBD',
+        url: '#',
+        blog: '#',
+        bg_layers: [
+          // {
+          //   img: '/images/launchweek/13/d1/tbd',
+          //   mobileImg: '/images/launchweek/13/d1/tbd',
+          //   imgLight: '/images/launchweek/13/d1/tbd',
+          //   mobileImgLight: '/images/launchweek/13/d1/tbd',
+          // },
+        ],
+      },
+    ],
   },
   {
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: true,
+    shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '3 December',
     published_at: '2024-12-03T08:00:00.000-07:00',
@@ -116,7 +124,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: true,
+    shipped: false,
     isToday: false,
     hasCountdown: false,
     blog: '',
@@ -140,7 +148,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: true,
+    shipped: false,
     isToday: false,
     hasCountdown: false,
     blog: '',
@@ -164,7 +172,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: true,
+    shipped: false,
     isToday: false,
     hasCountdown: false,
     blog: '',
