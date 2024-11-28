@@ -89,9 +89,9 @@ You can enroll a WebAuthn factor with a single step:
 
 ```ts
 import { browserSupportsWebAuthn } from '@supabase/supabase-js'
-if (supabase.auth.browserSupportsWebAuthn()) {
+if (browserSupportsWebAuthn()) {
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', friendlyName: 'my-friendly-name'})
-})
+}
 ```
 
 Or in multiple-steps by setting the `useMultiStep` parameter to true.
@@ -117,7 +117,7 @@ const credential = await supabase.auth.startAuthentication(challengeOptions)
 const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
 ```
 
-Setting `useMultiStep` to false informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application
+Setting `useMultiStep` to false informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application.
 
 When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
 
