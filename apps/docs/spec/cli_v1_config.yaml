@@ -1114,7 +1114,7 @@ parameters:
 
   - id: 'edge_runtime.enabled'
     title: 'edge_runtime.enabled'
-    tags: ['local']
+    tags: ['edge-functions']
     required: false
     default: 'true'
     description: |
@@ -1123,7 +1123,7 @@ parameters:
 
   - id: 'edge_runtime.policy'
     title: 'edge_runtime.policy'
-    tags: ['local']
+    tags: ['edge-functions']
     required: false
     default: '"oneshot"'
     description: |
@@ -1135,7 +1135,7 @@ parameters:
 
   - id: 'edge_runtime.inspector_port'
     title: 'edge_runtime.inspector_port'
-    tags: ['local']
+    tags: ['edge-functions']
     required: false
     default: '8083'
     description: |
