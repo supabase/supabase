@@ -20,7 +20,7 @@ export const buildHttpRequestCommand = (
             .filter((v) => v.name && v.value)
             .map((v) => `'${v.name}', '${v.value}'`)
             .join(', ')}),
-          body:='${body}',
+          ${method === 'POST' ? `body:='${body}'` : ''},
           timeout_milliseconds:=${timeout}
       );
     $$`
