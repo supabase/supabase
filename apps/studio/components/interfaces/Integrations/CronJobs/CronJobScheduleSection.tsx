@@ -109,6 +109,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   <Input
                     value={inputValue}
                     placeholder="E.g. every 5 minutes"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                      }
+                    }}
                     onChange={(e) => setInputValue(e.target.value)}
                   />
                 ) : (
@@ -143,7 +148,9 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                       <Button
                         type="outline"
                         onClick={() => {
-                          setUseNaturalLanguage(false)
+                          if (useNaturalLanguage) {
+                            setUseNaturalLanguage(false)
+                          }
                           form.setValue('schedule', preset.expression)
                         }}
                       >
@@ -170,9 +177,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                 <span
                   className={cn(
                     'text-xl font-mono',
-                    isGeneratingCron && 'animate-pulse text-foreground-lighter',
-                    // when the schedule string is null, the schedule is invalid
-                    scheduleString ? 'text-foreground' : 'text-foreground-lighter'
+                    scheduleString
+                      ? isGeneratingCron
+                        ? 'animate-pulse text-foreground-lighter'
+                        : 'text-foreground'
+                      : 'text-foreground-lighter'
                   )}
                 >
                   {isGeneratingCron ? <CronSyntaxLoader /> : schedule || '* * * * * *'}
