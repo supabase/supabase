@@ -62,7 +62,7 @@ npm run dev
 ### Using a Remote Supabase Project
 
 1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
-2. Link the local project:
+2. Link the local project and merge the local configuration with the remote one for some values such as `additional_redirect_urls`:
 
 ```bash
 npx supabase@latest link --project-ref <your-project-ref>
