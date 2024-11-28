@@ -18,7 +18,6 @@ import {
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
-  FormLabel_Shadcn_,
   Input_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
@@ -33,13 +32,14 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
   buildHttpRequestCommand,
   cronPattern,
-  secondsPattern,
   parseCronJobCommand,
+  secondsPattern,
 } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
@@ -48,10 +48,10 @@ import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
+  supportsSeconds: boolean
   isClosing: boolean
   setIsClosing: (v: boolean) => void
   onClose: () => void
@@ -90,32 +90,45 @@ const sqlSnippetSchema = z.object({
   snippet: z.string().trim().min(1),
 })
 
-const FormSchema = z.object({
-  name: z.string().trim().min(1, 'Please provide a name for your cron job'),
-  schedule: z
-    .string()
-    .trim()
-    .min(1)
-    .refine((value) => {
-      if (cronPattern.test(value)) {
-        try {
-          CronToString(value)
+const FormSchema = z
+  .object({
+    name: z.string().trim().min(1, 'Please provide a name for your cron job'),
+    supportsSeconds: z.boolean(),
+    schedule: z
+      .string()
+      .trim()
+      .min(1)
+      .refine((value) => {
+        if (cronPattern.test(value)) {
+          try {
+            CronToString(value)
+            return true
+          } catch {
+            return false
+          }
+        } else if (secondsPattern.test(value)) {
           return true
-        } catch {
-          return false
         }
-      } else if (secondsPattern.test(value)) {
-        return true
+        return false
+      }, 'Invalid Cron format'),
+    values: z.discriminatedUnion('type', [
+      edgeFunctionSchema,
+      httpRequestSchema,
+      sqlFunctionSchema,
+      sqlSnippetSchema,
+    ]),
+  })
+  .superRefine((data, ctx) => {
+    if (!cronPattern.test(data.schedule)) {
+      if (!(data.supportsSeconds && secondsPattern.test(data.schedule))) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
+          path: ['schedule'],
+        })
       }
-      return false
-    }, 'The schedule needs to be in a valid Cron format or specify seconds like "x seconds".'),
-  values: z.discriminatedUnion('type', [
-    edgeFunctionSchema,
-    httpRequestSchema,
-    sqlFunctionSchema,
-    sqlSnippetSchema,
-  ]),
-})
+    }
+  })
 
 export type CreateCronJobForm = z.infer<typeof FormSchema>
 export type CronJobType = CreateCronJobForm['values']
@@ -124,11 +137,14 @@ const FORM_ID = 'create-cron-job-sidepanel'
 
 export const CreateCronJobSheet = ({
   selectedCronJob,
+  supportsSeconds,
   isClosing,
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
+  const { project } = useProjectContext()
   const isEditing = !!selectedCronJob?.jobname
+
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
@@ -144,11 +160,11 @@ export const CreateCronJobSheet = ({
     defaultValues: {
       name: selectedCronJob?.jobname || '',
       schedule: selectedCronJob?.schedule || '*/5 * * * *',
+      supportsSeconds,
       values: cronJobValues,
     },
   })
 
-  const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
 
   // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
@@ -244,16 +260,15 @@ export const CreateCronJobSheet = ({
                       <FormControl_Shadcn_>
                         <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
-
-                      <FormLabel_Shadcn_ className="text-foreground-lighter text-xs absolute top-0 right-0 ">
+                      <span className="text-foreground-lighter text-xs absolute top-0 right-0">
                         Cron jobs cannot be renamed once created
-                      </FormLabel_Shadcn_>
+                      </span>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
               <Separator />
-              <CronJobScheduleSection form={form} />
+              <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
               <Separator />
               <SheetSection>
                 <FormField_Shadcn_
