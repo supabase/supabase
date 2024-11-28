@@ -42,6 +42,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
       case 'database':
         return <DatabasePostgresSelectionRender log={log} />
+      case 'pg_cron':
+        return <DatabasePostgresSelectionRender log={log} />
 
       case 'fn_edge':
         return <FunctionInvocationSelectionRender log={log} />

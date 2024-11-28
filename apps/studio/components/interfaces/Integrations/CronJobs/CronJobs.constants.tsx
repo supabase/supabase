@@ -18,8 +18,8 @@ export const CRONJOB_DEFINITIONS = [
   {
     value: 'sql_function',
     icon: <ScrollText strokeWidth={1} />,
-    label: 'Postgres SQL Function',
-    description: 'Choose a Postgres SQL functions to run.',
+    label: 'Database function',
+    description: 'Choose a database function to run.',
   },
 
   {

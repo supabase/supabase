@@ -40,7 +40,7 @@ export const AvailableIntegrations = () => {
         value={selectedCategory}
         onValueChange={(value) => setSelectedCategory(value as IntegrationCategory)}
       >
-        <TabsList_Shadcn_ className="px-10">
+        <TabsList_Shadcn_ className="px-10 gap-5">
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -55,15 +55,9 @@ export const AvailableIntegrations = () => {
             className="pl-7 rounded-none !border-0 border-transparent bg-transparent !shadow-none !ring-0 !ring-offset-0"
             placeholder="Search..."
           />
-          <TabsTrigger_Shadcn_ value="all" className="px-4">
-            All Integrations
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="wrapper" className="px-4">
-            Foreign Data Wrappers
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="postgres_extension" className="px-4">
-            Postgres Extensions
-          </TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="all">All Integrations</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="wrapper">Foreign Data Wrappers</TabsTrigger_Shadcn_>
+          <TabsTrigger_Shadcn_ value="postgres_extension">Postgres Extensions</TabsTrigger_Shadcn_>
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
       <div className="p-10 py-8 flex flex-col gap-y-5">

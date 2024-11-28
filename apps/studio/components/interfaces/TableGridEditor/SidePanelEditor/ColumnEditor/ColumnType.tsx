@@ -57,6 +57,7 @@ interface ColumnTypeProps {
 
 const ColumnType = ({
   value,
+  className,
   enumTypes = [],
   disabled = false,
   showLabel = true,
@@ -184,7 +185,7 @@ const ColumnType = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>
