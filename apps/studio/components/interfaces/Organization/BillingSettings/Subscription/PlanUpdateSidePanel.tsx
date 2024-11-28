@@ -61,7 +61,7 @@ const PlanUpdateSidePanel = () => {
   )
 
   const { data } = useOrganizationQuery({ slug })
-  // @ts-expect-error [Joshen Oriole] Typing issue?
+  console.log({ selectedOrganization, data })
   const hasOrioleProjects = !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
