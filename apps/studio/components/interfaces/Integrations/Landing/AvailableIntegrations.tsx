@@ -22,15 +22,19 @@ export const AvailableIntegrations = () => {
   // available integrations for install
   const integrationsByCategory =
     selectedCategory === 'all'
-      ? availableIntegrations.filter((i) => !installedIds.includes(i.id))
-      : availableIntegrations.filter(
-          (i) => !installedIds.includes(i.id) && i.type === selectedCategory
-        )
+      ? availableIntegrations
+      : availableIntegrations.filter((i) => i.type === selectedCategory)
   const filteredIntegrations = (
     search.length > 0
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
       : integrationsByCategory
   ).sort((a, b) => a.name.localeCompare(b.name))
+
+  const CATEGORIES = [
+    { key: 'all', label: 'All Integrations' },
+    { key: 'wrapper', label: 'Wrapper' },
+    { key: 'postgres_extension', label: 'Postgres Modules' },
+  ]
 
   return (
     <>
@@ -40,23 +44,21 @@ export const AvailableIntegrations = () => {
         onValueChange={(value) => setSelectedCategory(value as IntegrationCategory)}
       >
         <TabsList_Shadcn_ className="px-10 gap-2 border-b-0 border-t pt-5">
-          {['all', 'wrapper', 'postgres_extension'].map((category) => (
+          {CATEGORIES.map((category) => (
             <TabsTrigger_Shadcn_
-              key={category}
-              value={category}
-              onClick={() => setSelectedCategory(category as IntegrationCategory)}
+              key={category.key}
+              value={category.key}
+              onClick={() => setSelectedCategory(category.key as IntegrationCategory)}
               className={cn(
                 buttonVariants({
                   size: 'tiny',
-                  type: selectedCategory === category ? 'default' : 'outline',
+                  type: selectedCategory === category.key ? 'default' : 'outline',
                 }),
-                selectedCategory === category ? 'text-foreground' : 'text-foreground-lighter',
+                selectedCategory === category.key ? 'text-foreground' : 'text-foreground-lighter',
                 '!rounded-full px-3'
               )}
             >
-              {category === 'all'
-                ? 'All Integrations'
-                : category.replace('_', ' ').replace(/\b\w/g, (char) => char.toUpperCase())}
+              {category.label}
             </TabsTrigger_Shadcn_>
           ))}
           <Input
@@ -91,7 +93,10 @@ export const AvailableIntegrations = () => {
               error={error}
             />
           )}
-          {isSuccess && filteredIntegrations.map((i) => <IntegrationCard key={i.id} {...i} />)}
+          {isSuccess &&
+            filteredIntegrations.map((i) => (
+              <IntegrationCard key={i.id} {...i} isInstalled={installedIds.includes(i.id)} />
+            ))}
           {isSuccess && search.length > 0 && filteredIntegrations.length === 0 && (
             <NoSearchResults
               className="xl:col-span-3 2xl:col-span-4"
