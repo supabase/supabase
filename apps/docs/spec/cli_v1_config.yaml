@@ -1128,7 +1128,6 @@ parameters:
     default: '"oneshot"'
     description: |
       Configure the request handling policy for Edge Functions. Available options:
-
       - `oneshot`: Recommended for development with hot reload support
       - `per_worker`: Recommended for load testing scenarios
     links: []
