@@ -36,7 +36,6 @@ interface CronJobScheduleSectionProps {
 
 export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
-  const initialValue = form.getValues('schedule')
 
   const [inputValue, setInputValue] = useState('')
   const [debouncedValue] = useDebounce(inputValue, 750)
