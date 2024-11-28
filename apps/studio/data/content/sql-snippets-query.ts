@@ -24,7 +24,7 @@ export async function getSqlSnippets(
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: {
       path: { ref: projectRef },
-      query: { type: 'sql', cursor, visibility, favorite },
+      query: { type: 'sql', cursor, visibility, favorite, limit: '3' },
     },
     signal,
   })

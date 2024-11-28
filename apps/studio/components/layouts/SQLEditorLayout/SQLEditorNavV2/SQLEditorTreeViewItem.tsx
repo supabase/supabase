@@ -3,15 +3,14 @@ import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } fr
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
-import { getSQLSnippetFolders } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
+  Button,
   ContextMenuContent_Shadcn_,
   ContextMenuItem_Shadcn_,
   ContextMenuSeparator_Shadcn_,
@@ -19,6 +18,7 @@ import {
   ContextMenu_Shadcn_,
   TreeViewItem,
 } from 'ui'
+import { useFetchSQLSnippetFolders } from './SQLEditorNav.utils'
 
 interface SQLEditorTreeViewItemProps {
   element: any
@@ -40,6 +40,12 @@ interface SQLEditorTreeViewItemProps {
   onSelectDeleteFolder?: () => void
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
+
+  // Pagination options
+  isLastItem: boolean
+  hasNextPage?: boolean
+  fetchNextPage?: () => void
+  isFetchingNextPage?: boolean
 }
 
 export const SQLEditorTreeViewItem = ({
@@ -61,6 +67,10 @@ export const SQLEditorTreeViewItem = ({
   onSelectCopyPersonal,
   onEditSave,
   onMultiSelect,
+  isLastItem,
+  hasNextPage: _hasNextPage,
+  fetchNextPage: _fetchNextPage,
+  isFetchingNextPage: _isFetchingNextPage,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref } = useParams()
@@ -68,7 +78,7 @@ export const SQLEditorTreeViewItem = ({
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const [isFetching, setIsFetching] = useState(false)
+  const [isFetchingFolder, setIsFetchingFolder] = useState(false)
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -81,22 +91,43 @@ export const SQLEditorTreeViewItem = ({
     subject: { id: profile?.id },
   })
 
-  // [Joshen] Folder contents are loaded on demand too
+  const fetchSQLSnippetFolders = useFetchSQLSnippetFolders()
+
+  const parentId = element.parent === 0 ? undefined : element.parent
+
+  const hasNextPage =
+    _hasNextPage !== undefined
+      ? _hasNextPage
+      : ref && snapV2.hasNextPage({ projectRef: ref, parentId })
+
+  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
+
+  function fetchNextPage() {
+    if (typeof _fetchNextPage === 'function') {
+      _fetchNextPage()
+      return
+    }
+
+    if (ref === undefined) return
+
+    setIsFetchingNextPage(true)
+
+    fetchSQLSnippetFolders({
+      projectRef: ref,
+      folderId: parentId,
+      cursor: snapV2.getCursor({ projectRef: ref, parentId }),
+    }).finally(() => {
+      setIsFetchingNextPage(false)
+    })
+  }
+
   const onOpenFolder = async (id: string) => {
     if (!ref) return console.error('Project ref is required')
 
-    try {
-      setIsFetching(true)
-      const { contents } = await getSQLSnippetFolders({ projectRef: ref, folderId: id })
-      console.log('contents:', contents)
-      contents?.forEach((snippet) => {
-        snapV2.addSnippet({ projectRef: ref, snippet })
-      })
-    } catch (error: any) {
-      toast.error(`Failed to retrieve folder contents: ${error.message}`)
-    } finally {
-      setIsFetching(false)
-    }
+    setIsFetchingFolder(true)
+    fetchSQLSnippetFolders({ projectRef: ref, folderId: id }).finally(() => {
+      setIsFetchingFolder(false)
+    })
   }
 
   return (
@@ -112,7 +143,7 @@ export const SQLEditorTreeViewItem = ({
             isBranch={isBranch}
             isSelected={isSelected || id === element.id}
             isEditing={isEditing}
-            isLoading={isFetching || isSaving}
+            isLoading={isFetchingFolder || isSaving}
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}
@@ -289,6 +320,27 @@ export const SQLEditorTreeViewItem = ({
           )}
         </ContextMenuContent_Shadcn_>
       </ContextMenu_Shadcn_>
+
+      {hasNextPage && typeof element.id === 'string' && isLastItem && (
+        <div
+          className="px-4 py-1"
+          style={{
+            paddingLeft:
+              !element.isBranch && element.level > 1 ? 48 * (element.level - 1) : undefined,
+          }}
+        >
+          <Button
+            type="outline"
+            size="tiny"
+            block
+            loading={isFetchingNextPage || _isFetchingNextPage}
+            disabled={isFetchingNextPage || _isFetchingNextPage}
+            onClick={fetchNextPage}
+          >
+            Load More
+          </Button>
+        </div>
+      )}
     </>
   )
 }

@@ -27,7 +27,7 @@ export type ContentType = Content['type']
 
 interface GetContentVariables {
   projectRef?: string
-  type?: ContentType
+  type: ContentType
 }
 
 export async function getContent({ projectRef, type }: GetContentVariables, signal?: AbortSignal) {

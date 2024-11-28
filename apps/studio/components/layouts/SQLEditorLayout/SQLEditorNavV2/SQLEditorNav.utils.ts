@@ -1,4 +1,7 @@
-import { SnippetFolderResponse } from 'data/content/sql-folders-query'
+import { getSQLSnippetFolders, SnippetFolderResponse } from 'data/content/sql-folders-query'
+import { useCallback } from 'react'
+import { toast } from 'sonner'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 export interface TreeViewItemProps {
   id: string | number
@@ -76,4 +79,34 @@ export function getLastItemIds(items: TreeViewItemProps[]) {
   }
 
   return lastItemIds
+}
+
+export function useFetchSQLSnippetFolders() {
+  const snapV2 = useSqlEditorV2StateSnapshot()
+
+  const fetchSQLSnippetFolders = useCallback(
+    ({ projectRef, folderId, cursor }: Parameters<typeof getSQLSnippetFolders>[0]) => {
+      if (projectRef === undefined) return Promise.resolve()
+
+      return getSQLSnippetFolders({ projectRef, folderId, cursor })
+        .then((data) => {
+          data.contents?.forEach((snippet) => {
+            snapV2.addSnippet({ projectRef, snippet })
+          })
+
+          data.folders?.forEach((folder) => {
+            snapV2.addFolder({ projectRef, folder })
+          })
+
+          snapV2.setCursor({ projectRef, parentId: folderId, cursor: data.cursor })
+        })
+        .catch((error) => {
+          toast.error('Failed to fetch snippets: ' + error.message)
+        })
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  )
+
+  return fetchSQLSnippetFolders
 }
