@@ -380,7 +380,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   title="OrioleDB currently only supports the B-tree index type"
                   description="More index types may be supported when OrioleDB is no longer in preview"
                 >
-                  {/* [Joshen TODO Oriole] Hook up proper docs URL */}
+                  {/* [Joshen Oriole] Hook up proper docs URL */}
                   <DocsButton className="mt-2" abbrev={false} href="https://supabase.com/docs" />
                 </Admonition>
               )}

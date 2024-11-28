@@ -34,6 +34,7 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
+import { useOrganizationQuery } from 'data/organizations/organization-query'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -58,8 +59,10 @@ const PlanUpdateSidePanel = () => {
   const orgProjects = (allProjects || []).filter(
     (it) => it.organization_id === selectedOrganization?.id
   )
-  // [Joshen TODO Oriole] Hook up properly once API changes are ready
-  const hasOrioleProjects = true
+
+  const { data } = useOrganizationQuery({ slug })
+  // @ts-expect-error [Joshen Oriole] Typing issue?
+  const hasOrioleProjects = !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'

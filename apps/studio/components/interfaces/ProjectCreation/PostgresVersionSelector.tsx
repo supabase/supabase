@@ -56,21 +56,26 @@ export const PostgresVersionSelector = ({
   field,
   form,
 }: PostgresVersionSelectorProps) => {
-  const { data, isLoading: isLoadingProjectVersions } = useProjectCreationPostgresVersionsQuery({
+  const {
+    data,
+    isLoading: isLoadingProjectVersions,
+    isSuccess,
+  } = useProjectCreationPostgresVersionsQuery({
     cloudProvider,
     dbRegion,
     organizationSlug,
   })
+  const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
+    a.version.localeCompare(b.version)
+  )
 
-  // [Joshen TODO Oriole] Hook this up properly
-  const isOrioleDbSelected = true
+  const { postgresVersionSelection } = form.watch()
+  const isOrioleDbSelected = postgresVersionSelection?.includes('oriole-preview')
 
   useEffect(() => {
-    const defaultValue = data?.available_versions?.[0]
-      ? formatValue(data.available_versions[0])
-      : undefined
+    const defaultValue = availableVersions[0] ? formatValue(availableVersions[0]) : undefined
     form.setValue('postgresVersionSelection', defaultValue)
-  }, [data, form])
+  }, [isSuccess, form])
 
   return (
     <FormItemLayout layout="horizontal" label="Postgres Version">
@@ -84,7 +89,7 @@ export const PostgresVersionSelector = ({
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           <SelectGroup_Shadcn_>
-            {(data?.available_versions || [])?.map((value) => {
+            {availableVersions.map((value) => {
               const postgresVersion = value.version.split('supabase-postgres-')[1]
               return (
                 <SelectItem_Shadcn_ key={formatValue(value)} value={formatValue(value)}>
@@ -109,7 +114,7 @@ export const PostgresVersionSelector = ({
           title="OrioleDB is not production ready"
           description="Postgres with OrioleDB is currently in preview. We do not recommend using it for production."
         >
-          {/* [Joshen TODO Oriole] Proper docs URL */}
+          {/* [Joshen Oriole] Hook up Proper docs URL */}
           <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
         </Admonition>
       )}

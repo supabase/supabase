@@ -23,9 +23,7 @@ export function useProjectByRef(ref?: string) {
 }
 
 export const useIsOrioleDb = () => {
-  // [Joshen TODO Oriole] Hook up properly once API changes are ready
   const project = useSelectedProject()
-  const isOrioleDb = project?.dbVersion?.includes('oriole')
-
-  return true
+  const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
+  return isOrioleDb
 }
