@@ -41,8 +41,11 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     onSuccess: (res) => setValidationResult(res),
   })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
-    onError: (error) => toast.error(`Failed to update email templates: ${error.message}`),
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      setIsSavingTemplate(false)
+      toast.error(`Failed to update email templates: ${error.message}`)
+    },
   })
 
   const { id, properties } = template
@@ -66,13 +69,16 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debounceValidateSpam = useCallback(debounce(validateSpam, 1000), [])
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
   const onSubmit = (values: any, { resetForm }: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    setIsSavingTemplate(true)
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -80,17 +86,44 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+    const [subjectKey] = Object.keys(properties)
+
+    validateSpam(
       {
-        onSuccess: () => {
-          toast.success('Successfully updated settings')
-          resetForm({
-            values: values,
-            initialValues: values,
-          })
-          setHasUnsavedChanges(false) // Reset the unsaved changes state
+        projectRef,
+        template: {
+          subject: payload[subjectKey],
+          content: payload[messageSlug],
         },
+      },
+      {
+        onSuccess: (res) => {
+          const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
+          const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
+
+          if (preventSaveFromSpamCheck) {
+            setIsSavingTemplate(false)
+            toast.error(
+              'Please rectify all spam warnings before saving while using the built-in email service'
+            )
+          } else {
+            updateAuthConfig(
+              { projectRef: projectRef, config: payload },
+              {
+                onSuccess: () => {
+                  setIsSavingTemplate(false)
+                  toast.success('Successfully updated settings')
+                  resetForm({
+                    values: values,
+                    initialValues: values,
+                  })
+                  setHasUnsavedChanges(false) // Reset the unsaved changes state
+                },
+              }
+            )
+          }
+        },
+        onError: () => setIsSavingTemplate(false),
       }
     )
   }
@@ -164,14 +197,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                               </ReactMarkdown>
                             ) : null
                           }
-                          onChange={(e) => {
-                            if (projectRef) {
-                              debounceValidateSpam({
-                                projectRef,
-                                template: { subject: e.target.value, content: bodyValue },
-                              })
-                            }
-                          }}
                           disabled={!canUpdateConfig}
                         />
                       </div>
@@ -219,14 +244,6 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                           onInputChange={(e: string | undefined) => {
                             setBodyValue(e ?? '')
                             if (bodyValue !== e) setHasUnsavedChanges(true)
-
-                            if (projectRef) {
-                              const [subjectKey] = Object.keys(values)
-                              debounceValidateSpam({
-                                projectRef,
-                                template: { subject: values[subjectKey], content: e ?? '' },
-                              })
-                            }
                           }}
                           options={{ wordWrap: 'on', contextmenu: false }}
                           value={bodyValue}
@@ -257,9 +274,9 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     }}
                     form={formId}
-                    isSubmitting={isUpdatingConfig}
+                    isSubmitting={isSavingTemplate}
                     hasChanges={hasChanges}
-                    disabled={preventSaveFromSpamCheck || !canUpdateConfig}
+                    disabled={!canUpdateConfig}
                     helper={
                       preventSaveFromSpamCheck
                         ? 'Please rectify all spam warnings before saving while using the built-in email service'
