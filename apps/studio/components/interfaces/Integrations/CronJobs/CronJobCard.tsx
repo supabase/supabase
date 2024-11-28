@@ -27,10 +27,6 @@ interface CronJobCardProps {
   onDeleteCronJob: (job: CronJob) => void
 }
 
-const generateJobDetailsSQL = (jobId: number) => {
-  return `select * from cron.job_run_details where jobid = '${jobId}' order by start_time desc limit 10`
-}
-
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
   const { ref } = useParams()
@@ -81,9 +77,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     Edit cron job
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
-                    <Link
-                      href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
-                    >
+                    <Link href={`/project/${ref}/integrations/cron-jobs/cron-jobs/${job.jobname}`}>
                       View previous runs
                     </Link>
                   </DropdownMenuItem>

@@ -2,6 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { configKeys } from './keys'
+import { ResponseError } from 'types'
 
 export type ProjectPostgrestConfigVariables = {
   projectRef?: string
@@ -36,7 +37,7 @@ export async function getProjectPostgrestConfig(
 }
 
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
-export type ProjectPostgrestConfigError = unknown
+export type ProjectPostgrestConfigError = ResponseError
 
 export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigData>(
   { projectRef }: ProjectPostgrestConfigVariables,
