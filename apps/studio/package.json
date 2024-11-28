@@ -59,6 +59,7 @@
     "config": "*",
     "configcat-js": "^7.0.0",
     "cronstrue": "^2.50.0",
+    "cron-parser": "^4.9.0",
     "dayjs": "^1.11.10",
     "dnd-core": "^16.0.1",
     "file-saver": "^2.0.5",
