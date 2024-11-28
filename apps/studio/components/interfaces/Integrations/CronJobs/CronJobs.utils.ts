@@ -29,7 +29,7 @@ export const buildHttpRequestCommand = (
     $$`
 }
 
-export const DEFAULT_CRONJOB_COMMAND = {
+const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
   snippet: '',
 } as const
@@ -136,11 +136,33 @@ export function formatDate(dateString: string): string {
   return date.toLocaleString(undefined, options)
 }
 
-// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
-export const secondsPattern = /^\d+\s+seconds$/
 export const cronPattern =
   /^(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)(\s+(\*|(\d+|\*\/\d+)|\d+\/\d+|\d+-\d+|\d+(,\d+)*)){4}$/
 
+// detect seconds like "10 seconds" or normal cron syntax like "*/5 * * * *"
+export const secondsPattern = /^\d+\s+seconds$/
+
 export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim())
+}
+
+export function getScheduleMessage(scheduleString: string, schedule: string) {
+  if (!scheduleString) {
+    return 'Enter a valid cron expression above'
+  }
+
+  if (secondsPattern.test(schedule)) {
+    return `The cron will be run every ${schedule}`
+  }
+
+  if (scheduleString.includes('Invalid cron expression')) {
+    return scheduleString
+  }
+
+  const readableSchedule = scheduleString
+    .split(' ')
+    .map((s, i) => (i === 0 ? s.toLowerCase() : s))
+    .join(' ')
+
+  return `The cron will be run ${readableSchedule}.`
 }
