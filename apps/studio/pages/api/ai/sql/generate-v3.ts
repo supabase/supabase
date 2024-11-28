@@ -77,6 +77,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Output as markdown
       - Always include code snippets if available
       - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnName", "yAxis": "columnName"}
+      - Only set chart to true if the query makes sense as a chart
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
