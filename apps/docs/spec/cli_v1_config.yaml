@@ -1112,8 +1112,8 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'edge-runtime.enabled'
-    title: 'edge-runtime.enabled'
+  - id: 'edge_runtime.enabled'
+    title: 'edge_runtime.enabled'
     tags: ['local']
     required: false
     default: 'true'
@@ -1121,8 +1121,8 @@ parameters:
       Enable the local Edge Runtime service for Edge Functions.
     links: []
 
-  - id: 'edge-runtime.policy'
-    title: 'edge-runtime.policy'
+  - id: 'edge_runtime.policy'
+    title: 'edge_runtime.policy'
     tags: ['local']
     required: false
     default: '"oneshot"'
@@ -1133,8 +1133,8 @@ parameters:
       - `per_worker`: Recommended for load testing scenarios
     links: []
 
-  - id: 'edge-runtime.inspector_port'
-    title: 'edge-runtime.inspector_port'
+  - id: 'edge_runtime.inspector_port'
+    title: 'edge_runtime.inspector_port'
     tags: ['local']
     required: false
     default: '8083'
