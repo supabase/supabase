@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -20,8 +20,10 @@ import { useProfile } from 'lib/profile'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
   cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -36,7 +38,6 @@ import {
   Separator,
   Switch,
   TextArea_Shadcn_,
-  Toggle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -54,8 +55,6 @@ import { IPV4SuggestionAlert } from './IPV4SuggestionAlert'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
 import { detectBrowser } from 'lib/helpers'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useSendResetMutation } from 'data/telemetry/send-reset-mutation'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -691,8 +690,45 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                       <FormItemLayout
                         className="px-6"
                         layout="flex"
-                        label="Allow temporary support access"
-                        description="This will help us answer questions specific to your project."
+                        labelOptional={
+                          <Collapsible_Shadcn_>
+                            <div className="flex items-center gap-x-2 cursor-pointer">
+                              <CollapsibleTrigger_Shadcn_ className="group [&[data-state=open]>div>svg]:!-rotate-180">
+                                <div className="flex items-center gap-x-2 w-full">
+                                  <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                                    Allow Supabase Support and AI-Assisted Diagnostics access to
+                                    your project
+                                  </p>
+                                  <ChevronDown
+                                    className="transition-transform duration-200"
+                                    strokeWidth={1.5}
+                                    size={14}
+                                  />
+                                </div>
+                              </CollapsibleTrigger_Shadcn_>
+                            </div>
+                            <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light pt-2">
+                              <p>
+                                By checking this box, you grant permission for our support team to
+                                access your project temporarily and, if applicable, to use AI tools
+                                to assist in diagnosing and resolving issues. This access may
+                                involve analyzing database configurations, query performance, and
+                                other relevant data to expedite troubleshooting and enhance support
+                                accuracy. We are committed to maintaining strict data privacy and
+                                security standards in all support activities.{' '}
+                                <Link
+                                  href="https://supabase.com/privacy"
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-foreground-light underline hover:text-foreground transition"
+                                >
+                                  Privacy Policy
+                                </Link>
+                                .
+                              </p>
+                            </CollapsibleContent_Shadcn_>
+                          </Collapsible_Shadcn_>
+                        }
                       >
                         <Switch checked={field.value} onCheckedChange={field.onChange} />
                       </FormItemLayout>
@@ -717,7 +753,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                     <span className="text-foreground font-medium">{respondToEmail}</span>
                   </div>
                   <span className="text-foreground-light text-xs">
-                    Make sure Hubspot is unblocked.
+                    Please ensure emails from supabase.io are allowed
                   </span>
                 </div>
               </div>
