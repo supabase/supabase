@@ -88,6 +88,7 @@ export const SQLEditorTreeViewItem = ({
     try {
       setIsFetching(true)
       const { contents } = await getSQLSnippetFolders({ projectRef: ref, folderId: id })
+      console.log('contents:', contents)
       contents?.forEach((snippet) => {
         snapV2.addSnippet({ projectRef: ref, snippet })
       })

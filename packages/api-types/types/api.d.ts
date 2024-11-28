@@ -1197,8 +1197,8 @@ export interface paths {
     post: operations['SystemEmailController_sendEmail']
   }
   '/system/github-secret-alert': {
-    /** Reset JWT if leaked keys found by GitHub secret scanning */
-    post: operations['GithubSecretAlertController_resetJwt']
+    /** Respond to GitHub secret scanning webhook request */
+    post: operations['GithubSecretAlertController_githubSecretScanningEndpoint']
   }
   '/system/health': {
     /** Get API health status */
@@ -3771,6 +3771,7 @@ export interface components {
     GetUserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -6749,6 +6750,7 @@ export interface components {
     UserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -6764,7 +6766,7 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
-      favorite: boolean | null
+      favorite?: boolean | null
       folder_id?: string
       id: string
       inserted_at: string
@@ -14777,25 +14779,10 @@ export interface operations {
       }
     }
   }
-  /** Reset JWT if leaked keys found by GitHub secret scanning */
-  GithubSecretAlertController_resetJwt: {
-    parameters: {
-      header: {
-        'github-public-key-identifier': string
-        'github-public-key-signature': string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': string
-      }
-    }
+  /** Respond to GitHub secret scanning webhook request */
+  GithubSecretAlertController_githubSecretScanningEndpoint: {
     responses: {
       200: {
-        content: never
-      }
-      /** @description Failed to reset JWT */
-      500: {
         content: never
       }
     }
