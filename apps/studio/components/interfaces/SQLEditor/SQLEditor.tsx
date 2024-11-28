@@ -753,7 +753,6 @@ const SQLEditor = () => {
   }, [completionError])
 
   useEffect(() => {
-    console.log('completion called', completion)
     if (completion && isCompletionLoading) {
       setSourceSqlDiff({
         original: promptState.beforeSelection + promptState.selection + promptState.afterSelection,

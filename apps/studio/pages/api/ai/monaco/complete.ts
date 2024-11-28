@@ -91,7 +91,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       ],
     })
 
-    // Use pipeDataStreamToResponse instead of toDataStreamResponse
     return result.pipeDataStreamToResponse(res)
   } catch (error) {
     console.error('Completion error:', error)
