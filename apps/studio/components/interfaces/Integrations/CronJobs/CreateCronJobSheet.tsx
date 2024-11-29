@@ -43,8 +43,8 @@ import {
 } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
+import { HttpBodyFieldSection } from './HttpBodyFieldSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
-import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
@@ -63,7 +63,7 @@ const edgeFunctionSchema = z.object({
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z.string().trim(),
 })
 
 const httpRequestSchema = z.object({
@@ -77,7 +77,7 @@ const httpRequestSchema = z.object({
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z.string().trim(),
 })
 
 const sqlFunctionSchema = z.object({
@@ -187,7 +187,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.edgeFunctionName,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'http_request') {
@@ -195,7 +195,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.endpoint,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'sql_function') {
@@ -367,7 +367,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'edge_function' && (
@@ -376,7 +376,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'sql_function' && <SqlFunctionSection form={form} />}

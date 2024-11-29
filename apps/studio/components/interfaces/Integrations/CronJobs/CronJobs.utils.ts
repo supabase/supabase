@@ -1,5 +1,5 @@
 import { CronJobType } from './CreateCronJobSheet'
-import { HTTPHeader, HTTPParameter } from './CronJobs.constants'
+import { HTTPHeader } from './CronJobs.constants'
 
 export const buildCronQuery = (name: string, schedule: string, command: string) => {
   return `select cron.schedule('${name}','${schedule}',${command});`
@@ -9,7 +9,7 @@ export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
   headers: HTTPHeader[],
-  body: HTTPParameter[],
+  body: string,
   timeout: number
 ) => {
   return `$$
@@ -20,10 +20,7 @@ export const buildHttpRequestCommand = (
             .filter((v) => v.name && v.value)
             .map((v) => `'${v.name}', '${v.value}'`)
             .join(', ')}),
-          body:=jsonb_build_object(${body
-            .filter((v) => v.name && v.value)
-            .map((v) => `'${v.name}', '${v.value}'`)
-            .join(', ')}),
+          ${method === 'POST' ? `body:='${body}',` : ''}
           timeout_milliseconds:=${timeout}
       );
     $$`
@@ -32,6 +29,10 @@ export const buildHttpRequestCommand = (
 const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
   snippet: '',
+  // add default values for the other command types. Even though they don't exist in sql_snippet, they'll still work as default values.
+  method: 'POST',
+  timeoutMs: 1000,
+  httpBody: '',
 } as const
 
 export const parseCronJobCommand = (originalCommand: string): CronJobType => {
@@ -40,11 +41,20 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
     .replaceAll(/\n/g, ' ')
     .replaceAll(/\s+/g, ' ')
     .trim()
+
   if (command.toLocaleLowerCase().startsWith('select net.')) {
-    const matches =
+    let matches =
       command.match(
-        /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),\s*body:=jsonb_build_object\(([^]*)\s*\),\s*timeout_milliseconds:=(\d+) \)/i
+        /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),(?:\s*body:='(.*)',)?\s*timeout_milliseconds:=(\d+) \)/i
       ) || []
+
+    // if the match has been unsuccesful, the cron may be created with the previous encoding/parsing.
+    if (matches.length === 0) {
+      matches =
+        command.match(
+          /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),\s*body:=jsonb_build_object\(([^]*)\s*\),\s*timeout_milliseconds:=(\d+) \)/i
+        ) || []
+    }
 
     // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
     const headers = (matches[3] || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
@@ -55,16 +65,8 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       }
     }
 
-    // convert the parameter string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
-    const parameters = (matches[4] || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
-    const parametersObjs: { name: string; value: string }[] = []
-    for (let i = 0; i < parameters.length; i += 2) {
-      if (parameters[i] && parameters[i].length > 0) {
-        parametersObjs.push({ name: parameters[i], value: parameters[i + 1] })
-      }
-    }
-
     const url = matches[2] || ''
+    const body = matches[4] || ''
 
     if (url.includes('.supabase.') && url.includes('/functions/v1/')) {
       return {
@@ -72,7 +74,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
         method: matches[1] === 'http_get' ? 'GET' : 'POST',
         edgeFunctionName: url,
         httpHeaders: headersObjs,
-        httpParameters: parametersObjs,
+        httpBody: body,
         timeoutMs: +matches[5] ?? 1000,
       }
     }
@@ -82,7 +84,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       method: matches[1] === 'http_get' ? 'GET' : 'POST',
       endpoint: url,
       httpHeaders: headersObjs,
-      httpParameters: parametersObjs,
+      httpBody: body,
       timeoutMs: +matches[5] ?? 1000,
     }
   }
