@@ -4,3 +4,4 @@ values
   ('New York', 'USA', 'lw12', now(), true),
   ('London', 'UK', 'lw12', now(), true),
   ('Singapore', 'Singapore', 'lw12', now(), true);
+select 1;
