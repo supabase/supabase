@@ -1,4 +1,7 @@
+// import Image from 'next/image'
 import { PRODUCT_MODULES } from 'shared-data/products'
+import BrowserFrame from '../../../components/BrowserFrame'
+import { Image } from 'ui'
 
 export default () => ({
   metaTitle: 'Supabase Cron | Schedule and automate tasks',
@@ -12,7 +15,12 @@ export default () => ({
         Schedule and automate tasks using Postgres
       </span>
     ),
-    subheader: <>Supabase Cron is a Postgres module that uses the pg_cron extension to manage recurring tasks. Manage your cron jobs using any Postgres tooling.</>,
+    subheader: (
+      <>
+        Supabase Cron is a Postgres module that uses the pg_cron extension to manage recurring
+        tasks. Manage your cron jobs using any Postgres tooling.
+      </>
+    ),
     // image: '/images/product/vector/vector-hero.svg',
     icon: PRODUCT_MODULES['cron-jobs'].icon[24],
     cta: {
@@ -34,7 +42,7 @@ export default () => ({
       },
       {
         title: 'Real-time Monitoring',
-        paragraph: 'Track and debug scheduled jobs with Supabase\'s observability tools.',
+        paragraph: "Track and debug scheduled jobs with Supabase's observability tools.",
         // image: ,
       },
       {
@@ -49,11 +57,21 @@ export default () => ({
       },
     ],
   },
-  centeredImage: {
-    image: () => (
-      <div className="w-full aspect-[2/1] md:aspect-[3/1] rounded-lg bg-surface-100 text-foreground-lighter p-8 flex items-center justify-center">
-        image here
-      </div>
+  video: {
+    image: (
+      <BrowserFrame
+        className="overflow-hidden lg:order-last bg-default w-full max-w-6xl mx-auto"
+        contentClassName="aspect-video border overflow-hidden rounded-lg"
+        hasFrameButtons={false}
+      >
+        <div className="video-container !border-none !rounded-none">
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/abc`}
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        </div>
+      </BrowserFrame>
     ),
   },
   section1: {
@@ -85,8 +103,21 @@ export default () => ({
     id: 'UI',
     label: 'UI',
     heading: <>Intuitive interface</>,
-    subheading:
-      'Supabase provides a clean and simple interface for managing and debugging Jobs.',
+    subheading: 'Supabase provides a clean and simple interface for managing and debugging Jobs.',
+    image: (
+      <Image
+        src={{
+          dark: '/images/auth-ui/modules/cron/cron-ui-dark.png',
+          light: '/images/auth-ui/modules/cron/cron-ui-light.png',
+        }}
+        alt="Cron Jobs UI"
+        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
+        fill
+        sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
+        quality={100}
+        draggable={false}
+      />
+    ),
     // cta: {
     //   label: 'Start scheduling',
     //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
@@ -112,6 +143,21 @@ export default () => ({
     heading: <>Extensible</>,
     subheading:
       'Supabase Cron is integrated with the entire Supabase suite of tools. Create jobs to call Database Functions, Edge Functions, and even remote webhooks.',
+    image: (
+      <Image
+        src={{
+          dark: '/images/auth-ui/modules/cron/cron-extensible-dark.png',
+          light: '/images/auth-ui/modules/cron/cron-extensible-light.png',
+        }}
+        alt="Cron Jobs UI"
+        containerClassName="bg-cover object-cover [&_img]:border"
+        className="w-full max-w-[490px] aspect-[1/0.99] object-cover bg-cover rounded-lg overflow-hidden shadow-lg"
+        fill
+        sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
+        quality={100}
+        draggable={false}
+      />
+    ),
     // cta: {
     //   label: 'Start scheduling',
     //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',

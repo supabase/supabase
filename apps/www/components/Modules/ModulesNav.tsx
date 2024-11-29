@@ -13,7 +13,7 @@ interface Props {
 
 function ModulesNav({ activePage, docsUrl }: Props) {
   return (
-    <nav className="sticky top-0 z-30 flex flex-nowrap items-center bg-alternative w-full border-b border-muted">
+    <nav className="sticky top-0 mb-4 z-30 flex flex-nowrap items-center bg-alternative/90 backdrop-blur-md w-full border-b border-muted">
       <SectionContainer className="!py-0 flex gap-3 items-center justify-between">
         <div className="w-max flex gap-3 items-center">
           {Object.entries(ProductModules).map((obj: any) => {
