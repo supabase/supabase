@@ -309,7 +309,7 @@ export const AIAssistant = ({
         >
           <div className="z-30 sticky top-0">
             <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
-              <AiIconAnimation loading={false} />
+              <AiIconAnimation allowHoverEffect />
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">

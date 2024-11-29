@@ -13,7 +13,7 @@ const AssistantButton = () => {
         setAiAssistantPanel({ open: !aiAssistantPanel.open })
       }}
     >
-      <AiIconAnimation size={20} />
+      <AiIconAnimation allowHoverEffect size={20} />
     </Button>
   )
 }
