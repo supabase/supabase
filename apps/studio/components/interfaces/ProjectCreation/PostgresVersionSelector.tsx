@@ -82,7 +82,7 @@ export const PostgresVersionSelector = ({
       <Select_Shadcn_
         value={field.value}
         onValueChange={field.onChange}
-        disabled={isLoadingProjectVersions}
+        disabled={availableVersions.length <= 1 || isLoadingProjectVersions}
       >
         <SelectTrigger_Shadcn_>
           <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />
