@@ -313,19 +313,18 @@ export const AIAssistant = ({
 
               <div className="text-sm flex-1">Assistant</div>
               <div className="flex gap-4 items-center">
-                <TooltipProvider_Shadcn_>
-                  <Tooltip_Shadcn_ delayDuration={100}>
-                    <TooltipTrigger_Shadcn_ asChild>
-                      <Info size={14} className="text-foreground-light" />
-                    </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ className="w-80">
-                      The Assistant is in alpha and your prompts might be rate limited.{' '}
-                      {includeSchemaMetadata
-                        ? 'Project metadata is being shared to improve Assistant responses.'
-                        : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
-                    </TooltipContent_Shadcn_>
-                  </Tooltip_Shadcn_>
-                </TooltipProvider_Shadcn_>
+                <Tooltip_Shadcn_ delayDuration={100}>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Info size={14} className="text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ className="w-80">
+                    The Assistant is in Alpha and your prompts might be rate limited.{' '}
+                    {includeSchemaMetadata
+                      ? 'Project metadata is being shared to improve Assistant responses.'
+                      : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+
                 {(hasMessages || suggestions || sqlSnippets) && (
                   <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
                     Reset

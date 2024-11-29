@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useMotionValue, useSpring } from 'framer-motion'
-import { FC, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { cn } from '../../lib/utils'
 
 interface AiIconAnimationProps {
@@ -11,12 +11,12 @@ interface AiIconAnimationProps {
   allowHoverEffect?: boolean
 }
 
-export const AiIconAnimation: FC<AiIconAnimationProps> = ({
+export const AiIconAnimation = ({
   size = 24,
   loading = false,
   className,
   allowHoverEffect = false,
-}) => {
+}: AiIconAnimationProps) => {
   const strokeWidth = Math.max(1, size / 46) // Ensure minimum stroke width of 1
   const containerRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)

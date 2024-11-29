@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion'
+import { User } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-import { cn, markdownComponents, WarningIcon, CodeBlock, AiIconAnimation, Avatar } from 'ui'
+import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { SqlSnippet } from './SqlSnippet'
-import { User } from 'lucide-react'
 
 interface MessageProps {
   id: string
