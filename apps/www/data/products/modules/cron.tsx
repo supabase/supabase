@@ -140,7 +140,7 @@ export default () => ({
   section3: {
     id: 'extensible',
     label: 'Extensible',
-    heading: <>Extensible</>,
+    heading: <>Designed to just work</>,
     subheading:
       'Supabase Cron is integrated with the entire Supabase suite of tools. Create jobs to call Database Functions, Edge Functions, and even remote webhooks.',
     image: (
@@ -150,8 +150,8 @@ export default () => ({
           light: '/images/auth-ui/modules/cron/cron-extensible-light.png',
         }}
         alt="Cron Jobs UI"
-        containerClassName="bg-cover object-cover [&_img]:border"
-        className="w-full max-w-[490px] aspect-[1/0.99] object-cover bg-cover rounded-lg overflow-hidden shadow-lg"
+        containerClassName="bg-cover object-cover"
+        className="w-full max-w-[490px] aspect-[1/0.99] object-cover bg-cover rounded-lg overflow-hidden"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}

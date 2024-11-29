@@ -12,9 +12,11 @@ import SectionContainer from '../../components/Layouts/SectionContainer'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
-const Section1 = dynamic(() => import('~/components/Modules/Cron/Section1'))
-const Section2 = dynamic(() => import('~/components/Modules/Cron/Section2'))
-const Section3 = dynamic(() => import('~/components/Modules/Cron/Section3'))
+const CronSQLSection = dynamic(() => import('~/components/Modules/Cron/CronSQLSection'))
+const CronUISection = dynamic(() => import('~/components/Modules/Cron/CronUISection'))
+const CronExtensibleSection = dynamic(
+  () => import('~/components/Modules/Cron/CronExtensibleSection')
+)
 const CenteredImage = dynamic(() => import('~/components/Sections/CenteredImage'))
 
 function CronPage() {
@@ -44,9 +46,9 @@ function CronPage() {
         <SectionContainer className="">{pageData.video.image}</SectionContainer>
         {/* <CenteredImage {...pageData.centeredImage} /> */}
         <HighlightCards {...(pageData.highlightsSection as any)} />
-        <Section1 {...pageData.section1} />
-        <Section2 {...pageData.section2} className="!py-0" />
-        <Section3 {...pageData.section3} className="" />
+        <CronSQLSection {...pageData.section1} />
+        <CronUISection {...pageData.section2} className="!py-0" />
+        <CronExtensibleSection {...pageData.section3} className="!pb-0" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
