@@ -7,9 +7,9 @@ project_id = "nextjs-user-management"
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. public and storage are always included.
-schemas = []
+schemas = ["public", "graphql_public"]
 # Extra schemas to add to the search_path of every request.
-extra_search_path = ["extensions"]
+extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
