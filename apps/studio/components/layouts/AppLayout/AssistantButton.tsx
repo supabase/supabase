@@ -7,7 +7,7 @@ const AssistantButton = () => {
   return (
     <Button
       type="text"
-      size={'tiny'}
+      size="tiny"
       id="assistant-trigger"
       onClick={() => {
         setAiAssistantPanel({ open: !aiAssistantPanel.open })
