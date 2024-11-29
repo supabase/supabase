@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText } from 'lucide-react'
+import { FileText, Info } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -315,12 +315,25 @@ export const AIAssistant = ({
           className={cn('flex-grow overflow-auto flex flex-col')}
           onScroll={handleScroll}
         >
-          <div className="z-30 bg-background/80 backdrop-blur-md sticky top-0">
-            <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
-              <AiIconAnimation loading={false} allowHoverEffect />
+          <div className="z-30 sticky top-0">
+            <div className="border-b flex items-center gap-x-3 px-5 h-[46px]">
+              <AiIconAnimation loading={false} />
 
-              <div className="text-sm flex-1">{hasMessages ? 'New chat' : 'Assistant'}</div>
-              <div className="flex gap-2">
+              <div className="text-sm flex-1">Assistant</div>
+              <div className="flex gap-4 items-center">
+                <TooltipProvider_Shadcn_>
+                  <Tooltip_Shadcn_ delayDuration={100}>
+                    <TooltipTrigger_Shadcn_ asChild>
+                      <Info size={14} className="text-foreground-light" />
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ className="w-80">
+                      The Assistant is in alpha and your prompts might be rate limited.{' '}
+                      {includeSchemaMetadata
+                        ? 'Project metadata is being shared to improve Assistant responses.'
+                        : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                </TooltipProvider_Shadcn_>
                 {(hasMessages || suggestions || sqlSnippets) && (
                   <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
                     Reset
@@ -590,11 +603,6 @@ export const AIAssistant = ({
               }
             }}
           />
-          {!hasMessages && (
-            <p className="text-xs text-foreground-lighter mt-2">
-              The Assistant is in Alpha and your prompts might be rate limited
-            </p>
-          )}
         </div>
       </div>
 
