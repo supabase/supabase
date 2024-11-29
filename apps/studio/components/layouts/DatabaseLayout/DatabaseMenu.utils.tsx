@@ -112,7 +112,7 @@ export const generateDatabaseMenu = (
         {
           name: 'Wrappers',
           key: 'wrappers',
-          url: `/project/${ref}/integrations/wrappers`,
+          url: `/project/${ref}/integrations?category=wrapper`,
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
           items: [],
         },

@@ -1,16 +1,18 @@
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { Search } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import { useParams } from 'common'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 
 export const AvailableIntegrations = () => {
+  const { category } = useParams()
   const [search, setSearch] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<IntegrationCategory>('all')
 
@@ -31,6 +33,10 @@ export const AvailableIntegrations = () => {
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
       : integrationsByCategory
   ).sort((a, b) => a.name.localeCompare(b.name))
+
+  useEffect(() => {
+    if (category) setSelectedCategory(category as IntegrationCategory)
+  }, [])
 
   return (
     <>
