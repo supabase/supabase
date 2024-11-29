@@ -79,12 +79,12 @@ const TicketingFlow = () => {
                   animate={animate}
                   exit={exit}
                   className={cn(
-                    'mx-auto lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 xl:gap-12 opacity-0 invisible',
+                    'mx-auto w-full max-w-4xl lg:min-h-[400px] max-h-[400px] h-full text-left grid md:grid-cols-2 justify-center gap-8 xl:gap-24 opacity-0 invisible',
                     !hasTicket && 'opacity-100 visible',
                     'justify-items-end'
                   )}
                 >
-                  <div className="h-full max-w-xs md:max-w-none flex flex-col justify-center gap-2 md:gap-6">
+                  <div className="h-full w-full max-w-xs md:max-w-none flex flex-col justify-center gap-2 md:gap-6">
                     <div className="flex flex-col gap-2 md:gap-6">
                       <div className="flex flex-col flex-wrap gap-0">
                         <h2 className="text-foreground uppercase tracking-wider text-2xl">
@@ -93,6 +93,9 @@ const TicketingFlow = () => {
                         <p className="text-foreground-lighter uppercase tracking-wider text-xl md:text-2xl">
                           {LW13_DATE}
                         </p>
+                      </div>
+                      <div className="flex flex-col gap-2 text-foreground-lighter text-sm xl:text-base">
+                        You can still claim a ticket thoughout the week.
                       </div>
                       <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
                         <TicketPresence
@@ -115,7 +118,7 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full flex-1 lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
+                  className="w-full max-w-4xl mx-auto lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
                   <div className="order-first lg:h-full w-full max-w-md xl:max-w-2xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
                     <div className="flex flex-col gap-1 max-w-md">
@@ -123,22 +126,18 @@ const TicketingFlow = () => {
                       <div className="text-2xl">
                         {hasPlatinumTicket ? (
                           hasSecretTicket ? (
-                            <p>Got the secret ticket, {FIRST_NAME}!</p>
+                            <p>Got the gold ticket, {FIRST_NAME}!</p>
                           ) : (
                             <p>Good to see you, {FIRST_NAME}!</p>
                           )
                         ) : winningChances !== 2 ? (
                           <>
-                            {hasSecretTicket && <p>You found a secret ticket</p>}
-                            {!hasSecretTicket && <p>Hi, {FIRST_NAME}!</p>}
+                            {hasSecretTicket && <p>{FIRST_NAME}, you're gold!</p>}
+                            {!hasSecretTicket && <p>Good to see you, {FIRST_NAME}!</p>}
                           </>
                         ) : (
                           <p>Good to see you, {FIRST_NAME}!</p>
                         )}
-                      </div>
-                      {/* Paragraph */}
-                      <div className="flex flex-col gap-2 text-foreground-lighter text-sm xl:text-base">
-                        Registrations are closed but you can still claim a ticket.
                       </div>
                     </div>
                     <div className="flex flex-col gap-4 mt-2 md:mt-0 md:mb-12 items-center lg:items-start">
