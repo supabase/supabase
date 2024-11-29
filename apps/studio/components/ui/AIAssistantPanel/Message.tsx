@@ -57,7 +57,7 @@ export const Message = function Message({
           <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
         )}
         <ReactMarkdown
-          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0"
+          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
           remarkPlugins={[remarkGfm]}
           components={{
             ...markdownComponents,
