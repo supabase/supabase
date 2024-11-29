@@ -67,8 +67,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '2 December',
     published_at: '2024-12-02T08:00:00.000-07:00',
-    title: 'TBD',
-    description: 'TBD',
+    title: 'Supabase AI Assistant V2',
+    description: 'Supabase AI Assistant V2',
     links: [
       // {
       //   type: 'video',
