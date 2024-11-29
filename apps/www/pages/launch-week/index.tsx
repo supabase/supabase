@@ -14,11 +14,10 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import LWStickyNav from '~/components/LaunchWeek/13/Releases/LWStickyNav'
 import LWHeader from '~/components/LaunchWeek/13/Releases/LWHeader'
 import MainStage from '~/components/LaunchWeek/13/Releases/MainStage'
-import TicketingFlow from '~/components/LaunchWeek/13/Ticket/TicketingFlow'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/13/Releases/BuildStage'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
-// const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/13/Ticket/TicketingFlow'))
+const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/13/Ticket/TicketingFlow'))
 // const LW13Meetups = dynamic(
 //   () => import('~/components/LaunchWeek/13/LWMeetups')
 // )

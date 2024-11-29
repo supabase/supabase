@@ -11,7 +11,7 @@ import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
-  const isMobile = useBreakpoint(639)
+  const isMobile = useBreakpoint('sm')
   const cssGroup = 'group/d' + day.d
 
   return (
@@ -95,7 +95,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                     )}
                     {!!layer.imgLight && (
                       <div
-                        key={`${day.title}-image-${i}`}
+                        key={`${day.title}-image-${i}-light`}
                         className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
                       >
                         <Image

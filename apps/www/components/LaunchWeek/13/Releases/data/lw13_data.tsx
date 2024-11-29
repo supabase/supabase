@@ -85,12 +85,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         url: '#',
         blog: '#',
         bg_layers: [
-          // {
-          //   img: '/images/launchweek/13/d1/tbd',
-          //   mobileImg: '/images/launchweek/13/d1/tbd',
-          //   imgLight: '/images/launchweek/13/d1/tbd',
-          //   mobileImgLight: '/images/launchweek/13/d1/tbd',
-          // },
+          {
+            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.png',
+          },
         ],
       },
     ],

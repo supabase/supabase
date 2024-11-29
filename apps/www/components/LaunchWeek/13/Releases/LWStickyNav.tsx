@@ -52,7 +52,7 @@ const LWXStickyNav: FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
-      <nav className="sticky z-30 top-0 bg-default/90 backdrop-blur-sm pointer-events-auto w-full border-b dark:border-muted h-[60px] flex items-center">
+      <nav className="sticky z-30 top-0 bg-default/30 dark:bg-default/90 backdrop-blur-md w-full border-b dark:border-muted h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="w-full flex items-center gap-4 md:gap-8">
             <ul className="w-full lw-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-lighter">
@@ -61,7 +61,7 @@ const LWXStickyNav: FC = () => {
                   <Link
                     href={`#${day.id}`}
                     className={cn(
-                      'p-1 transition-colors text-foreground-muted hover:text-foreground flex items-center',
+                      'p-1 transition-colors text-foreground-muted hover:text-foreground flex items-center pointer-events-auto',
                       (day.isToday || day.shipped) && 'text-foreground-light'
                     )}
                   >
@@ -76,7 +76,10 @@ const LWXStickyNav: FC = () => {
                 </li>
               ))}
               <li>
-                <Link href="#build-stage" className="p-1 transition-colors hover:text-foreground">
+                <Link
+                  href="#build-stage"
+                  className="p-1 transition-colors hover:text-foreground pointer-events-auto"
+                >
                   Build <span className="hidden sm:inline">Stage</span>
                 </Link>
               </li>
@@ -85,13 +88,16 @@ const LWXStickyNav: FC = () => {
                   <Link
                     href="/events?category=meetup"
                     target="_blank"
-                    className="p-1 transition-colors hover:text-foreground"
+                    className="p-1 transition-colors hover:text-foreground pointer-events-auto"
                   >
                     Meetups
                   </Link>
                 </li>
                 <li className="hidden sm:block">
-                  <Link href="#ticket" className="p-1 transition-colors hover:text-foreground">
+                  <Link
+                    href="#ticket"
+                    className="p-1 transition-colors hover:text-foreground pointer-events-auto"
+                  >
                     Ticket
                   </Link>
                 </li>
