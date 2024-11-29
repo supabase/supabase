@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Code, Play, DatabaseIcon } from 'lucide-react'
-import { Button, cn, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { Button, cn, ChartContainer, ChartTooltip, ChartTooltipContent, SQL_ICON } from 'ui'
 import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
@@ -90,7 +90,7 @@ export const SqlSnippet = ({
   const ResultsDisplay = () => {
     if (resultType === 'chart') {
       return (
-        <div className="p-5 border-t border-t-muted -mx-8">
+        <div className="p-5 border-t border-t-muted">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
               data={results}
@@ -165,11 +165,21 @@ export const SqlSnippet = ({
   }
 
   return (
-    <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
+    <div className="my-3 mt-2 border rounded bg-surface-100 overflow-hidden">
       <div className="">
-        <div className="flex items-center gap-2 px-5 py-2">
-          <DatabaseIcon size={16} strokeWidth={1.5} />
-          <h3 className="text-sm font-medium flex-1">{title}</h3>
+        <div className="flex items-center gap-2 px-4 py-1">
+          <SQL_ICON
+            className={cn(
+              'transition-colors',
+              'fill-foreground-muted',
+              'group-aria-selected:fill-foreground',
+              'w-5 h-5 shrink-0',
+              '-ml-0.5'
+            )}
+            size={16}
+            strokeWidth={1.5}
+          />
+          <h3 className="text-xs font-medium flex-1">{title}</h3>
           <div className="flex">
             <Button
               type="text"

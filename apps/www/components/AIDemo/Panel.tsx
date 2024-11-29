@@ -99,7 +99,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
       id: (Date.now() + 1).toString(),
       role: 'assistant',
       content: (
-        <div className="-mx-8 rounded overflow-hidden relative">
+        <div className="rounded-md overflow-hidden relative">
           <Image
             src={errorGif}
             alt="Try the assistant in your dashboard for real results"
@@ -110,13 +110,20 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
       createdAt: new Date(),
     }
 
+    const followUp: DemoMessage = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: "Sorry, custom queries aren't supported in this demo.",
+      createdAt: new Date(),
+    }
+
     setMessages((prev) => [...prev, userMessage])
-    setPendingMessages((prev) => [...prev, assistantMessage])
+    setPendingMessages((prev) => [...prev, assistantMessage, followUp])
     setInput('')
   }
 
   return (
-    <div className="w-full shadow-2xl relative h-full bg border border-text-light/25 rounded-md overflow-hidden">
+    <div className="w-full shadow-2xl relative h-full bg-surface-75 border border-text-light/25 rounded-md overflow-hidden">
       <div className="absolute inset-0 flex flex-col">
         {/* Header */}
         <div className="z-30 border-b border-b-muted flex items-center gap-x-3 px-5 h-[46px]">
@@ -139,23 +146,12 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
         {/* Messages */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-y-auto p-8 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+          className="flex-1 overflow-y-auto p-5 flex flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
         >
           {messages.map((message, index) => (
             <>
-              {index === 0 && (
-                <div className="text-xs text-foreground-lighter text-center mb-5">
-                  {new Date(message.createdAt).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                  })}
-                </div>
-              )}
               <motion.div
-                key={message.id}
+                key={index}
                 layout="position"
                 initial={{ y: 5, opacity: 0, scale: 0.99 }}
                 animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -218,7 +214,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Query anything..."
+              placeholder="Ask your data anything..."
               className={cn(
                 'w-full bg-background-muted rounded-md [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0 focus:outline-none'
               )}

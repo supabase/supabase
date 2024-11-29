@@ -680,6 +680,10 @@ function Assistant() {
     }
   }, [query.ref])
 
+  const handleNewMessage = (messages: Message[]) => {
+    setIncomingMessages(messages.map((message) => ({ ...message, id: Date.now().toString() })))
+  }
+
   return (
     <>
       <NextSeo
@@ -751,7 +755,7 @@ function Assistant() {
                         <Button
                           className="rounded-full"
                           type="default"
-                          onClick={() => setIncomingMessages(query.messages)}
+                          onClick={() => handleNewMessage(query.messages)}
                         >
                           {query.label}
                         </Button>
