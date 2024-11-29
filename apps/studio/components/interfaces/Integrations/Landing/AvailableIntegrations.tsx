@@ -1,20 +1,25 @@
+import { Search } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
+
 import AlertError from 'components/ui/AlertError'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { Search } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { buttonVariants, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
-import { useParams } from 'common'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
 
 export const AvailableIntegrations = () => {
-  const { category } = useParams()
-  const [search, setSearch] = useState('')
-  const [selectedCategory, setSelectedCategory] = useState<IntegrationCategory>('all')
+  const [selectedCategory, setSelectedCategory] = useQueryState(
+    'category',
+    parseAsString.withDefault('all').withOptions({ clearOnDefault: true })
+  )
+  const [search, setSearch] = useQueryState(
+    'search',
+    parseAsString.withDefault('').withOptions({ clearOnDefault: true })
+  )
 
   const { availableIntegrations, installedIntegrations, error, isError, isLoading, isSuccess } =
     useInstalledIntegrations()
@@ -33,10 +38,6 @@ export const AvailableIntegrations = () => {
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
       : integrationsByCategory
   ).sort((a, b) => a.name.localeCompare(b.name))
-
-  useEffect(() => {
-    if (category) setSelectedCategory(category as IntegrationCategory)
-  }, [])
 
   return (
     <>
