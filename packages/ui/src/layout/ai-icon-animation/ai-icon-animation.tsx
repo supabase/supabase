@@ -8,12 +8,14 @@ interface AiIconAnimationProps {
   size?: number
   loading?: boolean
   className?: string
+  allowHoverEffect?: boolean
 }
 
 export const AiIconAnimation: FC<AiIconAnimationProps> = ({
   size = 24,
   loading = false,
   className,
+  allowHoverEffect = false,
 }) => {
   const strokeWidth = Math.max(1, size / 46) // Ensure minimum stroke width of 1
   const containerRef = useRef<HTMLDivElement>(null)
@@ -26,6 +28,7 @@ export const AiIconAnimation: FC<AiIconAnimationProps> = ({
   const springY = useSpring(y, { stiffness: 300, damping: 30 })
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!allowHoverEffect) return
     if (!containerRef.current) return
 
     const rect = containerRef.current.getBoundingClientRect()
