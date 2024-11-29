@@ -402,12 +402,12 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/database/webhooks',
-        destination: '/project/:ref/integrations/webhooks',
+        destination: '/project/:ref/integrations/webhooks/overview',
       },
       {
         permanent: true,
         source: '/project/:ref/database/wrappers',
-        destination: '/project/:ref/integrations/wrappers',
+        destination: '/project/:ref/integrations?category=wrapper',
       },
       {
         permanent: true,
