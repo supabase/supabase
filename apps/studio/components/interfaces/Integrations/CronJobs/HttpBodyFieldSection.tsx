@@ -24,7 +24,7 @@ export const HttpBodyFieldSection = ({ form }: HttpBodyFieldSectionProps) => {
         name="values.httpBody"
         render={({ field }) => (
           <FormItem_Shadcn_ className="gap-1 flex flex-col">
-            <FormLabel_Shadcn_ className="">HTTP Request Body</FormLabel_Shadcn_>
+            <FormLabel_Shadcn_>HTTP Request Body</FormLabel_Shadcn_>
             <FormControl_Shadcn_>
               <TextArea_Shadcn_
                 className="h-72 rounded-none px-4 outline-none"

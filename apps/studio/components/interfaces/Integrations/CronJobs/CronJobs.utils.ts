@@ -37,42 +37,38 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
     .replaceAll(/\n/g, ' ')
     .replaceAll(/\s+/g, ' ')
     .trim()
+
   if (command.toLocaleLowerCase().startsWith('select net.')) {
-    const matches =
-      command.match(
-        /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),\s*body:=jsonb_build_object\(([^]*)\s*\),\s*timeout_milliseconds:=(\d+) \)/i
-      ) || []
+    const methodMatch = command.match(/net\.(http_[^(]+)/i)?.[1] || ''
+    const urlMatch = command.match(/url:='([^']+)'/)?.[1] || ''
+    const bodyMatch = command.match(/body:='(.*?)(?=',\s*timeout_milliseconds)/s)?.[1] || ''
+    const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/)?.[1] || '1000'
+    const headersMatch = command.match(/headers:=jsonb_build_object\(([^)]*)\)/)?.[1] || ''
 
-    // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
-    const headers = (matches[3] || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
-    const headersObjs: { name: string; value: string }[] = []
-    for (let i = 0; i < headers.length; i += 2) {
-      if (headers[i] && headers[i].length > 0) {
-        headersObjs.push({ name: headers[i], value: headers[i + 1] })
-      }
-    }
-
-    const url = matches[2] || ''
-    const body = matches[4] || ''
+    const method = methodMatch === 'http_get' ? 'GET' : 'POST'
+    const url = urlMatch
+    const headers = (headersMatch || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
+    const body = bodyMatch
+    const timeout = parseInt(timeoutMatch)
 
     if (url.includes('.supabase.') && url.includes('/functions/v1/')) {
       return {
         type: 'edge_function',
-        method: matches[1] === 'http_get' ? 'GET' : 'POST',
+        method: method,
         edgeFunctionName: url,
-        httpHeaders: headersObjs,
+        httpHeaders: headers.map((h) => ({ name: h, value: '' })),
         httpBody: body,
-        timeoutMs: +matches[5] ?? 1000,
+        timeoutMs: timeout,
       }
     }
 
     return {
       type: 'http_request',
-      method: matches[1] === 'http_get' ? 'GET' : 'POST',
+      method: method,
       endpoint: url,
-      httpHeaders: headersObjs,
+      httpHeaders: headers.map((h) => ({ name: h, value: '' })),
       httpBody: body,
-      timeoutMs: +matches[5] ?? 1000,
+      timeoutMs: timeout,
     }
   }
 
