@@ -149,9 +149,7 @@ const FunctionsList = ({
                       type="default"
                       disabled={!canCreateFunctions}
                       className="px-1 pointer-events-auto"
-                      icon={
-                        <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                      }
+                      icon={<AiIconAnimation size={16} />}
                       onClick={() =>
                         setAiAssistantPanel({
                           open: true,

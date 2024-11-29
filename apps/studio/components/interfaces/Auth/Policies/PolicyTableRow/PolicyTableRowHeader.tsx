@@ -137,7 +137,7 @@ const PolicyTableRowHeader = ({
                 },
               }}
             >
-              <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+              <AiIconAnimation size={16} />
             </ButtonTooltip>
           </div>
         </div>

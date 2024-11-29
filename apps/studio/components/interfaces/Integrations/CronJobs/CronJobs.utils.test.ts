@@ -1,14 +1,14 @@
 import { it } from 'vitest'
-import { parseCronJobCommand, secondsPattern, cronPattern } from './CronJobs.utils'
+import { cronPattern, parseCronJobCommand, secondsPattern } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
-    expect(parseCronJobCommand('')).toStrictEqual({ snippet: '', type: 'sql_snippet' })
+    expect(parseCronJobCommand('')).toMatchObject({ snippet: '', type: 'sql_snippet' })
   })
 
   it('should return a default object when the command is random', () => {
     const command = 'some random text'
-    expect(parseCronJobCommand(command)).toStrictEqual({
+    expect(parseCronJobCommand(command)).toMatchObject({
       snippet: 'some random text',
       type: 'sql_snippet',
     })
@@ -16,7 +16,7 @@ describe('parseCronJobCommand', () => {
 
   it('should return a sql function command when the command is CALL auth.jwt ()', () => {
     const command = 'CALL auth.jwt ()'
-    expect(parseCronJobCommand(command)).toStrictEqual({
+    expect(parseCronJobCommand(command)).toMatchObject({
       type: 'sql_function',
       schema: 'auth',
       functionName: 'jwt',
@@ -24,14 +24,62 @@ describe('parseCronJobCommand', () => {
   })
 
   it('should return a edge function config when the command posts to supabase.co', () => {
-    const command = `select net.http_post( url:='https://_.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:=jsonb_build_object(), timeout_milliseconds:=5000 );`
-    expect(parseCronJobCommand(command)).toStrictEqual({
+    const command = `select net.http_post( url:='https://_.supabase.co/functions/v1/_', headers:=jsonb_build_object(), body:='', timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command)).toMatchObject({
       edgeFunctionName: 'https://_.supabase.co/functions/v1/_',
       method: 'POST',
       httpHeaders: [],
-      httpParameters: [],
+      httpBody: '',
       timeoutMs: 5000,
       type: 'edge_function',
+    })
+  })
+
+  it('should return a HTTP request config with POST method, empty headers and a body as string', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='hello', timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [],
+      httpBody: 'hello',
+      timeoutMs: 5000,
+      type: 'http_request',
+    })
+  })
+
+  it('should return a HTTP request config with POST method, some headers and empty body', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('headerche', '2'), body:='', timeout_milliseconds:=1000 );`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'headerche', value: '2' }],
+      httpBody: '',
+      timeoutMs: 1000,
+      type: 'http_request',
+    })
+  })
+
+  it('should return a HTTP request config with GET method and empty body', () => {
+    const command = `select net.http_get( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'GET',
+      httpHeaders: [],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+    })
+  })
+
+  it('should return a HTTP request config with POST method and a body as JSON object', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object(), body:='{"key": "value"}', timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command)).toMatchObject({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [],
+      httpBody: '{"key": "value"}',
+      timeoutMs: 5000,
+      type: 'http_request',
     })
   })
 

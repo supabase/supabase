@@ -1,0 +1,22 @@
+# A string used to distinguish different Supabase projects on the same host. Defaults to the
+# working directory name when running `supabase init`.
+project_id = "resumable-upload-uppy"
+
+# Disable data API since we are not using the PostgREST client in this example.
+[api]
+enabled = false
+
+[storage]
+enabled = true
+# The maximum file size allowed for all buckets in the project.
+file_size_limit = "50MiB"
+
+[storage.image_transformation]
+enabled = false
+
+[storage.buckets.uploads]
+public = true
+# file_size_limit = "50MiB"
+# allowed_mime_types = ["image/png", "image/jpeg"]
+# Uncomment to specify a local directory to upload objects to the bucket.
+# objects_path = "./buckets/uploads"
