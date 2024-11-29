@@ -2132,6 +2132,7 @@ export const deployment: NavMenuConstant = {
       name: 'Environments',
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
         { name: 'Branching', url: '/guides/deployment/branching' },
       ],
     },
