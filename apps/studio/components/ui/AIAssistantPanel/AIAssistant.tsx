@@ -357,7 +357,7 @@ export const AIAssistant = ({
             )}
           </div>
           {!hasMessages && (
-            <div className="h-64 flex-0 m-8">
+            <div className="h-48 flex-0 m-8">
               <DotGrid rows={10} columns={10} count={33} />
             </div>
           )}
