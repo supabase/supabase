@@ -10,6 +10,11 @@ import { IntegrationCard, IntegrationLoadingCard } from './IntegrationCard'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
 
 type IntegrationCategory = 'all' | 'wrapper' | 'postgres_extensions' | 'custom'
+const CATEGORIES = [
+  { key: 'all', label: 'All Integrations' },
+  { key: 'wrapper', label: 'Wrappers' },
+  { key: 'postgres_extension', label: 'Postgres Modules' },
+] as const
 
 export const AvailableIntegrations = () => {
   const [selectedCategory, setSelectedCategory] = useQueryState(
@@ -36,12 +41,6 @@ export const AvailableIntegrations = () => {
       ? integrationsByCategory.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
       : integrationsByCategory
   ).sort((a, b) => a.name.localeCompare(b.name))
-
-  const CATEGORIES = [
-    { key: 'all', label: 'All Integrations' },
-    { key: 'wrapper', label: 'Wrapper' },
-    { key: 'postgres_extension', label: 'Postgres Modules' },
-  ]
 
   return (
     <>
