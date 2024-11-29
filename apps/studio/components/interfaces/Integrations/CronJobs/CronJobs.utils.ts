@@ -20,7 +20,7 @@ export const buildHttpRequestCommand = (
             .filter((v) => v.name && v.value)
             .map((v) => `'${v.name}', '${v.value}'`)
             .join(', ')}),
-          ${method === 'POST' ? `body:='${body}'` : ''},
+          ${method === 'POST' ? `body:='${body}',` : ''}
           timeout_milliseconds:=${timeout}
       );
     $$`
@@ -29,6 +29,10 @@ export const buildHttpRequestCommand = (
 const DEFAULT_CRONJOB_COMMAND = {
   type: 'sql_snippet',
   snippet: '',
+  // add default values for the other command types. Even though they don't exist in sql_snippet, they'll still work as default values.
+  method: 'POST',
+  timeoutMs: 1000,
+  httpBody: '',
 } as const
 
 export const parseCronJobCommand = (originalCommand: string): CronJobType => {
@@ -39,36 +43,49 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
     .trim()
 
   if (command.toLocaleLowerCase().startsWith('select net.')) {
-    const methodMatch = command.match(/net\.(http_[^(]+)/i)?.[1] || ''
-    const urlMatch = command.match(/url:='([^']+)'/)?.[1] || ''
-    const bodyMatch = command.match(/body:='(.*?)(?=',\s*timeout_milliseconds)/s)?.[1] || ''
-    const timeoutMatch = command.match(/timeout_milliseconds:=(\d+)/)?.[1] || '1000'
-    const headersMatch = command.match(/headers:=jsonb_build_object\(([^)]*)\)/)?.[1] || ''
+    let matches =
+      command.match(
+        /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),(?:\s*body:='(.*)',)?\s*timeout_milliseconds:=(\d+) \)/i
+      ) || []
 
-    const method = methodMatch === 'http_get' ? 'GET' : 'POST'
-    const url = urlMatch
-    const headers = (headersMatch || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
-    const body = bodyMatch
-    const timeout = parseInt(timeoutMatch)
+    // if the match has been unsuccesful, the cron may be created with the previous encoding/parsing.
+    if (matches.length === 0) {
+      matches =
+        command.match(
+          /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),\s*body:=jsonb_build_object\(([^]*)\s*\),\s*timeout_milliseconds:=(\d+) \)/i
+        ) || []
+    }
+
+    // convert the header string to array of objects, clean up the values, trim them of spaces and remove the quotation marks at start and end
+    const headers = (matches[3] || '').split(',').map((s) => s.trim().replace(/^'|'$/g, ''))
+    const headersObjs: { name: string; value: string }[] = []
+    for (let i = 0; i < headers.length; i += 2) {
+      if (headers[i] && headers[i].length > 0) {
+        headersObjs.push({ name: headers[i], value: headers[i + 1] })
+      }
+    }
+
+    const url = matches[2] || ''
+    const body = matches[4] || ''
 
     if (url.includes('.supabase.') && url.includes('/functions/v1/')) {
       return {
         type: 'edge_function',
-        method: method,
+        method: matches[1] === 'http_get' ? 'GET' : 'POST',
         edgeFunctionName: url,
-        httpHeaders: headers.map((h) => ({ name: h, value: '' })),
+        httpHeaders: headersObjs,
         httpBody: body,
-        timeoutMs: timeout,
+        timeoutMs: +matches[5] ?? 1000,
       }
     }
 
     return {
       type: 'http_request',
-      method: method,
+      method: matches[1] === 'http_get' ? 'GET' : 'POST',
       endpoint: url,
-      httpHeaders: headers.map((h) => ({ name: h, value: '' })),
+      httpHeaders: headersObjs,
       httpBody: body,
-      timeoutMs: timeout,
+      timeoutMs: +matches[5] ?? 1000,
     }
   }
 
