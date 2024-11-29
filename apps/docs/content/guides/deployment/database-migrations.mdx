@@ -11,14 +11,6 @@ Database schema changes are managed through "migrations." Database migrations ar
 
 ## Schema migrations
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/Kx5nHBmIxyQ"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
 
 For this guide, we'll create a table called `employees` and see how we can make changes to it.
 
@@ -27,7 +19,7 @@ For this guide, we'll create a table called `employees` and see how we can make 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create your first migration file">
 
-      To get started, generate a [new migration](https://supabase.com/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table
+      To get started, generate a [new migration](/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table.
 
     </StepHikeCompact.Details>
 
@@ -63,7 +55,7 @@ email text,
 created_at timestamptz default now()
 );
 
-````
+```
 
     </StepHikeCompact.Code>
 
@@ -105,7 +97,7 @@ supabase db reset
       ```bash
       supabase migration new add_department_to_employees_table
 
-````
+```
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -158,7 +150,7 @@ values
 ('Richard Hendricks'),
 ('Monica Hall');
 
-````
+```
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
@@ -175,7 +167,7 @@ values
     <StepHikeCompact.Code>
       ```bash
 supabase db reset
-````
+```
 
     </StepHikeCompact.Code>
 
