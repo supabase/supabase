@@ -38,25 +38,9 @@ const TicketingFlow = () => {
   const DISPLAY_NAME = userData?.name || userData?.username
   const FIRST_NAME = DISPLAY_NAME?.split(' ')[0]
 
-  const PartyModeButton = () => (
-    <Button
-      size="small"
-      onClick={() => setIsPartyMode(!isPartyMode)}
-      type="default"
-      className="sm:pl-1 pointer-events-auto"
-    >
-      <div className="flex items-center">
-        <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
-          P
-        </div>
-        Party Mode: {isPartyMode ? 'On 🎉' : 'Off 😴'}
-      </div>
-    </Button>
-  )
-
   return (
     <>
-      <SectionContainer className="relative h-full lg:min-h-[calc(80dvh-65px)] flex-1 pointer-events-none">
+      <SectionContainer className="relative h-full lg:min-h-[600px] lg:max-h-[600px] flex-1 pointer-events-none">
         <div className="relative z-10 flex items-center h-full">
           <h1 className="sr-only">Supabase Launch Week 13 | {LW13_DATE}</h1>
           <LazyMotion features={domAnimation}>
@@ -131,10 +115,10 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full flex-1 lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start lg:items-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
+                  className="w-full flex-1 lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
-                  <div className="order-first lg:h-full w-full max-w-md xl:max-w-xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
-                    <div className="flex flex-col gap-1 max-w-sm">
+                  <div className="order-first lg:h-full w-full max-w-md xl:max-w-2xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
+                    <div className="flex flex-col gap-1 max-w-md">
                       {/* Header */}
                       <div className="text-2xl">
                         {hasPlatinumTicket ? (
@@ -157,27 +141,7 @@ const TicketingFlow = () => {
                         Registrations are closed but you can still claim a ticket.
                       </div>
                     </div>
-                    <TicketSwagCtaBox className="w-full" />
-                    <div className="flex flex-col gap-4 mt-2 md:mt-0 items-center lg:items-start">
-                      <div className="flex flex-row gap-2 md:item-center">
-                        <PartyModeButton />
-                        <Button
-                          size="small"
-                          type="default"
-                          className="sm:pl-1 pointer-events-auto"
-                          asChild
-                        >
-                          <Link
-                            href="/events?category=meetup"
-                            className="[&>span]:flex w-full [&>span]:items-center"
-                          >
-                            <div className="relative h-6 w-6 border rounded bg-surface-75 mr-2 uppercase hidden sm:flex items-center justify-center">
-                              <Calendar strokeWidth={2} className="w-3 h-3 text-foreground-light" />
-                            </div>
-                            <span>Meetups</span>
-                          </Link>
-                        </Button>
-                      </div>
+                    <div className="flex flex-col gap-4 mt-2 md:mt-0 md:mb-12 items-center lg:items-start">
                       <TicketPresence
                         className={cn(
                           'opacity-0 invisible translate-y-1 transition-all',
@@ -197,7 +161,7 @@ const TicketingFlow = () => {
         <ThreeTicketCanvas
           username={DISPLAY_NAME ?? ''}
           ticketType={ticketType}
-          className="relative -mt-40 -mb-10 lg:my-0 lg:absolute"
+          className="relative -mt-44 -mb-10 lg:my-0 lg:absolute"
         />
       )}
     </>

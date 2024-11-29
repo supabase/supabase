@@ -43,7 +43,10 @@ export default function TicketForm() {
           })
           .select()
           .single()
-          .then(({ error }: any) => fetchUser({ error, username }))
+          .then(({ data, error }: any) => {
+            console.log(data, error, username, userData)
+            fetchUser({ error, username })
+          })
       }
     }
   }
@@ -125,7 +128,7 @@ export default function TicketForm() {
 
     const redirectTo = `${SITE_ORIGIN}/launch-week/${
       userData.username ? '?referral=' + userData.username : ''
-    }#ticket`
+    }`
 
     supabase?.auth.signInWithOAuth({
       provider: 'github',
