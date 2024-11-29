@@ -35,8 +35,8 @@ export const Message = function Message({
   return (
     <motion.div
       layout="position"
-      initial={{ y: 5, opacity: 0, scale: 0.99 }}
-      animate={{ y: 0, opacity: 1, scale: 1 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       className={cn(
         'mb-5 text-foreground-light text-sm',
         variant === 'warning' && 'bg-warning-200'
