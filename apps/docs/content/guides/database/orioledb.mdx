@@ -6,18 +6,18 @@ description: "A storage extension for PostgreSQL which uses PostgreSQL's pluggab
 
 The [OrioleDB](https://www.orioledb.com/) Postgres extension provides a drop-in replacement storage engine for the default heap storage method. It is designed to improve Postgres' scalability and performance.
 
-OrioleDB addresses PostgreSQL's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes WAL insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default PostgreSQL heap method with a 3.3x speedup.
+OrioleDB addresses PostgreSQL's scalability limitations by removing bottlenecks in the shared memory cache under high concurrency. It also optimizes write-ahead-log (WAL) insertion through row-level WAL logging. These changes lead to significant improvements in the industry standard TPC-C benchmark, which approximates a real-world transactional workload. The following benchmark was performed on a c7g.metal instance and shows OrioleDB's performance outperforming the default PostgreSQL heap method with a 3.3x speedup.
 
 <Image
   alt="TPC-C (warehouses = 500)"
-  src='/docs/img/database/orioledb-tpc-c-500-warehouse.png'
+  src="/docs/img/database/orioledb-tpc-c-500-warehouse.png"
   className="max-w-[550px] !mx-auto border rounded-md"
   zoomable
 />
 
 <Admonition type="info">
 
-OrioleDB is in active development and currently has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Currently, only B-tree indexes are supported, so features like pg_vector's HNSW indexes are not yet available. We are actively developing an Index Access Method bridge to unlock support for all index types used with heap storage. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
+OrioleDB is in active development and currently has [certain limitations](https://www.orioledb.com/docs/usage/getting-started#current-limitations). Currently, only B-tree indexes are supported, so features like pg_vector's HNSW indexes are not yet available. An Index Access Method bridge to unlock support for all index types used with heap storage is under active development. In the Supabase OrioleDB image the default storage method has been updated to use OrioleDB, granting better performance out of the box.
 
 </Admonition>
 
@@ -33,7 +33,7 @@ In-memory pages are connected to the storage pages using direct links. This allo
 
 ### Undo log
 
-Multi-Version Concurrency Control (MVCC) is implemented using UNDO log. The UNDO log stores previous row versions and transaction information, which enables consistent reads while removing the need for table vacuuming completely.
+Multi-Version Concurrency Control (MVCC) is implemented using an undo log. The undo log stores previous row versions and transaction information, which enables consistent reads while removing the need for table vacuuming completely.
 
 ### Copy-on-write checkpoints
 
@@ -93,7 +93,7 @@ create index blog_post_views on blog_post (views) where (views > 1000);
 
 ### Data manipulation
 
-You can query and modify data in OrioleDB tables using standard DML statements, including `SELECT`, `INSERT`, `UPDATE`, `DELETE` and `INSERT ... ON CONFLICT`.
+You can query and modify data in OrioleDB tables using standard SQL statements, including `SELECT`, `INSERT`, `UPDATE`, `DELETE` and `INSERT ... ON CONFLICT`.
 
 ```sql
 INSERT INTO blog_post (id, title, body, author, views)
