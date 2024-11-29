@@ -1,5 +1,4 @@
 import { ReactNode } from 'react'
-import { products } from 'shared-data/products'
 
 type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
 
@@ -77,7 +76,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       {
         type: 'xSpace',
-        href: 'https://supabase.link/lw13-xspace-1',
+        href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb ',
       },
     ],
     steps: [
@@ -115,7 +114,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       {
         type: 'xSpace',
-        href: 'https://supabase.link/lw13-xspace-2',
+        href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
       },
     ],
     steps: [],
@@ -139,7 +138,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       {
         type: 'xSpace',
-        href: 'https://supabase.link/lw13-xspace-3',
+        href: 'https://twitter.com/i/spaces/1eaKbaOAOdaxX',
       },
     ],
     steps: [],
@@ -163,7 +162,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       {
         type: 'xSpace',
-        href: 'https://supabase.link/lw13-xspace-4',
+        href: 'https://twitter.com/i/spaces/1ynKODOwObyGR',
       },
     ],
     steps: [],
@@ -187,7 +186,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       // },
       {
         type: 'xSpace',
-        href: 'https://supabase.link/lw13-xspace-5',
+        href: 'https://twitter.com/i/spaces/1zqKVYOEODYxB',
       },
     ],
     steps: [],

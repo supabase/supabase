@@ -27,7 +27,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-1"
                       badge="Launch Week 13"
-                      announcement="Day 1"
+                      announcement="Day 1: AI Assistant v2"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
