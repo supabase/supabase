@@ -43,6 +43,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
+import DotGrid from '../DotGrid'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -298,15 +299,6 @@ export const AIAssistant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isInSQLEditor, snippetContent])
 
-  if (isLoadingTables) {
-    return (
-      <div className="h-full w-full flex justify-center items-center">
-        {/* [Joshen] We could try play around with a custom loader for the assistant here */}
-        <GenericSkeletonLoader className="w-4/5" />
-      </div>
-    )
-  }
-
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
@@ -316,7 +308,7 @@ export const AIAssistant = ({
           onScroll={handleScroll}
         >
           <div className="z-30 sticky top-0">
-            <div className="border-b flex items-center gap-x-3 px-5 h-[46px]">
+            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
               <AiIconAnimation loading={false} />
 
               <div className="text-sm flex-1">Assistant</div>
@@ -364,42 +356,41 @@ export const AIAssistant = ({
               </Admonition>
             )}
           </div>
+          {!hasMessages && (
+            <div className="h-64 flex-0 m-8">
+              <DotGrid rows={10} columns={10} count={33} />
+            </div>
+          )}
           {hasMessages ? (
-            <motion.div className="w-full p-8 flex flex-col">
-              <div className="text-xs text-foreground-lighter text-center mb-5">
-                {new Date(messages[0].createdAt || new Date()).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
-              </div>
+            <motion.div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
-                <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                  <span>Thinking</span>
-                  <div className="flex gap-1">
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                    >
-                      .
-                    </motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                    >
-                      .
-                    </motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                    >
-                      .
-                    </motion.span>
-                  </div>
-                </motion.div>
+                <div className="flex gap-4 w-auto overflow-hidden">
+                  <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                    <span>Thinking</span>
+                    <div className="flex gap-1">
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                      >
+                        .
+                      </motion.span>
+                    </div>
+                  </motion.div>
+                </div>
               )}
               <div ref={bottomRef} className="h-1" />
             </motion.div>
@@ -430,48 +421,15 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
+          ) : isLoadingTables ? (
+            <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
+              {/* [Joshen] We could try play around with a custom loader for the assistant here */}
+              <GenericSkeletonLoader className="w-4/5" />
+            </div>
           ) : (tables ?? [])?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
-            <div className="w-full flex flex-col justify-end flex-1 h-full p-8">
-              <div className="flex-1">
-                <div className="shrink-0 h-64 mb-5 w-auto overflow-hidden -mx-8 -mt-8 relative">
-                  <motion.div
-                    initial={{ height: '800%', bottom: 0 }}
-                    animate={{ height: '100%', bottom: 0, transition: { duration: 8 } }}
-                    className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-b from-transparent to-background"
-                  />
-                  <div className="h-full w-full relative">
-                    <motion.div
-                      initial={{ x: 350, rotate: -45 }}
-                      animate={{
-                        x: 400,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                    <motion.div
-                      initial={{ x: 380, rotate: -45 }}
-                      animate={{
-                        x: 500,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                    <motion.div
-                      initial={{ x: 410, rotate: -45 }}
-                      animate={{
-                        x: 600,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
               <h2 className="text-base mb-2">Welcome to Supabase!</h2>
               <p className="text-sm text-foreground-lighter mb-6">
                 This is the Supabase assistant which will help you create, debug and modify tables,
