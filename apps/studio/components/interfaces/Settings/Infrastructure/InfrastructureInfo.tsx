@@ -55,11 +55,14 @@ const InfrastructureInfo = () => {
   const { current_app_version, current_app_version_release_channel, latest_app_version } =
     data || {}
   const isOnLatestVersion = current_app_version === latest_app_version
-  const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
+  const currentPgVersion = (current_app_version ?? '')
+    .split('supabase-postgres-')[1]
+    ?.replace('-orioledb', '')
   const isOnNonGenerallyAvailableReleaseChannel =
     current_app_version_release_channel && current_app_version_release_channel !== 'ga'
       ? current_app_version_release_channel
       : undefined
+  const isOrioleDb = (current_app_version ?? '').includes('orioledb')
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
   const isInactive = project?.status === 'INACTIVE'
@@ -142,6 +145,23 @@ const InfrastructureInfo = () => {
                                   database version release
                                 </TooltipContent_Shadcn_>
                               </Tooltip_Shadcn_>
+                            ),
+                            isOrioleDb && (
+                              <>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_>
+                                    <Badge variant="default" className="mr-1">
+                                      OrioleDB
+                                    </Badge>
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_
+                                    side="bottom"
+                                    className="w-44 text-center"
+                                  >
+                                    This project uses OrioleDB
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
+                              </>
                             ),
                             isOnLatestVersion && (
                               <Tooltip_Shadcn_>
