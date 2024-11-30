@@ -137,6 +137,7 @@ const Wizard: NextPageWithLayout = () => {
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const allowOrioleDB = useFlag('allowOrioleDb')
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
@@ -851,7 +852,9 @@ const Wizard: NextPageWithLayout = () => {
                     )}
 
                     <SecurityOptions form={form} />
-                    {!!availableOrioleVersion && <AdvancedConfiguration form={form} />}
+                    {allowOrioleDB && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
                   </>
                 )}
 
