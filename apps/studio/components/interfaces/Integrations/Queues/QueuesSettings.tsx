@@ -202,12 +202,12 @@ export const QueuesSettings = () => {
                               queues via any Supabase client library or PostgREST endpoints:
                             </p>
                             <p className="mt-2">
-                              <code className="text-xs">queue_send</code>,{' '}
-                              <code className="text-xs">queue_send_batch</code>,{' '}
-                              <code className="text-xs">queue_read</code>,{' '}
-                              <code className="text-xs">queue_pop</code>,
-                              <code className="text-xs">queue_archive</code>, and
-                              <code className="text-xs">queue_delete</code>
+                              <code className="text-xs">send</code>,{' '}
+                              <code className="text-xs">send_batch</code>,{' '}
+                              <code className="text-xs">read</code>,{' '}
+                              <code className="text-xs">pop</code>,
+                              <code className="text-xs">archive</code>, and
+                              <code className="text-xs">delete</code>
                             </p>
                           </>
                         }
