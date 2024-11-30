@@ -26,7 +26,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { Markdown } from 'components/interfaces/Markdown'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
@@ -60,11 +59,19 @@ const Home: NextPageWithLayout = () => {
               <TooltipTrigger_Shadcn_>
                 <Badge variant="warning">OrioleDB</Badge>
               </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" align="start">
-                <Markdown
-                  className="text-xs text-foreground max-w-80 text-center"
-                  content="This project is using Postgres with OrioleDB which is currently in preview and not suitable for production workloads. View our [documentation](https://supabase.com/docs/guides/database/orioledb) for all limitations."
-                />
+              <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
+                This project is using Postgres with OrioleDB which is currently in preview and not
+                suitable for production workloads. View our{' '}
+                {/* [Joshen] Make this into a reusable component to use links inline */}
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
+                  href="https://supabase.com/docs/guides/database/orioledb"
+                >
+                  documentation
+                </a>{' '}
+                for all limitations.
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           )}

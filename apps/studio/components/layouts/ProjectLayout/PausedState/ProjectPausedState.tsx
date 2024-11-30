@@ -336,7 +336,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                                 {availableVersions.map((value) => {
                                   const postgresVersion = value.version
                                     .split('supabase-postgres-')[1]
-                                    .replace('-orioledb', '')
+                                    ?.replace('-orioledb', '')
                                   return (
                                     <SelectItem_Shadcn_
                                       key={formatValue(value)}
