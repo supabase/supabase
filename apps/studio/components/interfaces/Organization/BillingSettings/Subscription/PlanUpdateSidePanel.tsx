@@ -262,12 +262,12 @@ const PlanUpdateSidePanel = () => {
                         tooltip={{
                           content: {
                             side: 'bottom',
-                            className: hasOrioleProjects ? 'w-80 text-center' : '',
+                            className: hasOrioleProjects ? 'w-96 text-center' : '',
                             text:
                               subscription?.plan?.id === 'enterprise'
                                 ? 'Reach out to us via support to update your plan from Enterprise'
                                 : hasOrioleProjects
-                                  ? 'Your organization has projects that are on OrioleDB, which is only for the free plan. Remove all OrioleDB projects before changing your plan'
+                                  ? 'Your organization has projects that are using the OrioleDB extension which is only available on the Free plan. Remove all OrioleDB projects before changing your plan.'
                                   : !canUpdateSubscription
                                     ? 'You do not have permission to change the subscription plan'
                                     : undefined,
