@@ -2,13 +2,13 @@
 title: 'OrioleDB Public Alpha'
 description: 'Launching OrioleDB public alpha'
 author: pavel
-image: 2024-11-30-orioledb-release/thumb.png
-thumb: 2024-11-30-orioledb-release/thumb.png
+image: 2024-12-01-orioledb-release/thumb.png
+thumb: 2024-12-01-orioledb-release/thumb.png
 categories:
   - engineering
 tags:
   - supabase-engineering
-date: '2024-11-29'
+date: '2024-12-01'
 toc_depth: 3
 ---
 
@@ -20,14 +20,15 @@ Today, we're releasing the public alpha of [OrioleDB](https://www.orioledb.com/)
 
 OrioleDB is a **storage extension** which uses Postgres' pluggable storage system. It’s designed to be a drop-in replacement for Postgres’ default Heap storage.
 
-You can read more about OrioleDB here [TODO - LINK TO orioledb.com post] and learn why you might choose it over the default Postgres storage engine.
+You can read more about OrioleDB [here](https://www.orioledb.com/blog/orioledb-beta7-benchmarks) and learn why you might choose it over the default Postgres storage engine.
 
 ### Limitations
 
 This initial release is a public alpha and you should _not_ use it for Production workloads. The release comes with several limitations:
 
 - The release is restricted to Free organizations. You will not be able to upgrade OrioleDB projects to larger instance sizes. If you want to run OrioleDB on a larger instance we suggest following the [Getting Started](https://www.orioledb.com/docs/usage/getting-started) guide on OrioleDB’s official website.
-- This release only supports the Postgres default B-Tree index type. It is not compatible with other built-in indexs like GIN/GiST, or indexes provided by extensions such as pgvector's HNSW.
+- Index support is restricted to the Postgres default B-Tree index type. Other indexs like GIN/GiST/BRIN/Hash, and pgvector's HNSW/IVFFlat are not supported.
+- No support for Supabase Realtime
 
 ### Should you use it today?
 
@@ -35,14 +36,13 @@ At this stage, the goal of adding OrioleDB to the platform is to make it easier 
 
 ### Getting started and more info
 
-TODO - update instructions
-To get started today, go to [database.new](http://database.new) and you can choose “OrioleDB” as a Region when launching a new database. If you want to learn more about OrioleDB and the vision for the future, check out the blog post the OrioleDB team released today. [TODO - LINK TO orioledb.com post]
-
-TODO - REPLACE WITH IMAGE SHOWING THE "CREATE PROJECT" SCREEN after it merges Saturday
+To get started today, go to [database.new](http://database.new) and choose “Postgres with OrioleDB” under the "Advanced Configuration" section when launching a new database.
 
 <Img
-  alt="security-peformance-advisor"
-  src="/images/blog/pgvector-0-7-0-perf.png"
+  alt="orioledb-project-create"
+  src="/images/blog/2024-12-01-orioledb-release/orioledb-project-create.png"
   captionAlign="left"
   zoomable={false}
 />
+
+If you want to learn more about OrioleDB and their vision for the future, check out the [blog post the OrioleDB team released today](https://www.orioledb.com/blog/orioledb-beta7-benchmarks).
