@@ -44,7 +44,7 @@ const PlanUpdateSidePanel = () => {
 
   const queryClient = useQueryClient()
   const originalPlanRef = useRef<string>()
-  const allowOrioleDB = useFlag('allowOrioleDB')
+  const allowOrioleDB = useFlag('allowOrioleDb')
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
