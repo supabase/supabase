@@ -17,8 +17,6 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Admonition } from 'ui-patterns'
-import { DocsButton } from 'components/ui/DocsButton'
 
 type ReleaseChannel = components['schemas']['ReleaseChannel']
 type PostgresEngine = components['schemas']['PostgresEngine']
@@ -69,9 +67,6 @@ export const PostgresVersionSelector = ({
     a.version.localeCompare(b.version)
   )
 
-  const { postgresVersionSelection } = form.watch()
-  const isOrioleDbSelected = postgresVersionSelection?.includes('oriole-preview')
-
   useEffect(() => {
     const defaultValue = availableVersions[0] ? formatValue(availableVersions[0]) : undefined
     form.setValue('postgresVersionSelection', defaultValue)
@@ -107,15 +102,10 @@ export const PostgresVersionSelector = ({
                           {value.release_channel}
                         </Badge>
                       )}
-                      {value.postgres_engine.includes('oriole-preview') && (
-                        <span>
-                          <Badge variant="warning" className="mr-1">
-                            OrioleDB
-                          </Badge>
-                          <Badge variant="warning" className="mr-1">
-                            Preview
-                          </Badge>
-                        </span>
+                      {value.postgres_engine.includes('oriole') && (
+                        <Badge variant="default" className="mr-1">
+                          OrioleDB
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -125,17 +115,6 @@ export const PostgresVersionSelector = ({
           </SelectGroup_Shadcn_>
         </SelectContent_Shadcn_>
       </Select_Shadcn_>
-      {isOrioleDbSelected && (
-        <Admonition
-          type="warning"
-          className="mt-2"
-          title="OrioleDB is not production ready"
-          description="Postgres with OrioleDB is currently in preview. We do not recommend using it for production."
-        >
-          {/* [Joshen Oriole] Hook up Proper docs URL */}
-          <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-        </Admonition>
-      )}
     </FormItemLayout>
   )
 }

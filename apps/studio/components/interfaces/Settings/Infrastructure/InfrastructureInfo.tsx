@@ -150,7 +150,7 @@ const InfrastructureInfo = () => {
                               <>
                                 <Tooltip_Shadcn_>
                                   <TooltipTrigger_Shadcn_>
-                                    <Badge variant="warning" className="mr-1">
+                                    <Badge variant="default" className="mr-1">
                                       OrioleDB
                                     </Badge>
                                   </TooltipTrigger_Shadcn_>
@@ -159,19 +159,6 @@ const InfrastructureInfo = () => {
                                     className="w-44 text-center"
                                   >
                                     This project uses OrioleDB
-                                  </TooltipContent_Shadcn_>
-                                </Tooltip_Shadcn_>
-                                <Tooltip_Shadcn_>
-                                  <TooltipTrigger_Shadcn_>
-                                    <Badge variant="warning" className="mr-1">
-                                      Preview
-                                    </Badge>
-                                  </TooltipTrigger_Shadcn_>
-                                  <TooltipContent_Shadcn_
-                                    side="bottom"
-                                    className="w-44 text-center"
-                                  >
-                                    This project uses a preview database version
                                   </TooltipContent_Shadcn_>
                                 </Tooltip_Shadcn_>
                               </>

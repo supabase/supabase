@@ -4683,7 +4683,7 @@ export interface components {
       work_mem?: string
     }
     /** @enum {string} */
-    PostgresEngine: '15' | '17-oriole-preview'
+    PostgresEngine: '15' | '17-oriole'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -5242,7 +5242,7 @@ export interface components {
       target_table_schema: string
     }
     /** @enum {string} */
-    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     RemoveNetworkBanRequest: {
       ipv4_addresses: string[]
     }
@@ -5783,7 +5783,7 @@ export interface components {
       db_pass: string
       db_pass_supabase: string
       jwt_secret: string
-      /** @description Name of your project, should not contain dots */
+      /** @description Name of your project */
       name: string
       /** @description Slug of your organization */
       organization_id: string
@@ -6900,7 +6900,7 @@ export interface components {
        * @description This field is deprecated and is ignored in this request
        */
       kps_enabled?: boolean
-      /** @description Name of your project, should not contain dots */
+      /** @description Name of your project */
       name: string
       /** @description Slug of your organization */
       organization_id: string
@@ -6914,7 +6914,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '15' | '17-oriole-preview'
+      postgres_engine?: '15' | '17-oriole'
       /**
        * @description Region you want your server to reside in
        * @enum {string}
@@ -6942,7 +6942,7 @@ export interface components {
        * @description Release channel. If not provided, GA will be used.
        * @enum {string}
        */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
