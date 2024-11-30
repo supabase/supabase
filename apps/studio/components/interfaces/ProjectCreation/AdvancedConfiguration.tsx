@@ -79,7 +79,15 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                         <FormControl_Shadcn_>
                           <RadioGroupStackedItem
                             value="true"
-                            label="Postgres with OrioleDB"
+                            // @ts-ignore
+                            label={
+                              <>
+                                Postgres with OrioleDB
+                                <Badge color="warning" className="ml-2">
+                                  Preview
+                                </Badge>
+                              </>
+                            }
                             description="Not recommended for production workloads"
                             className={cn(
                               '[&>div>div>p]:text-left [&>div>div>p]:text-xs',
