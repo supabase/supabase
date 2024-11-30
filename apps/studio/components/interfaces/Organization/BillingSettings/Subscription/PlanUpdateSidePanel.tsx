@@ -16,6 +16,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { organizationKeys } from 'data/organizations/keys'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
+import { useOrganizationQuery } from 'data/organizations/organization-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -23,6 +24,7 @@ import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscri
 import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
@@ -34,7 +36,6 @@ import ExitSurveyModal from './ExitSurveyModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 import UpgradeSurveyModal from './UpgradeModal'
-import { useOrganizationQuery } from 'data/organizations/organization-query'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -43,6 +44,7 @@ const PlanUpdateSidePanel = () => {
 
   const queryClient = useQueryClient()
   const originalPlanRef = useRef<string>()
+  const allowOrioleDB = useFlag('allowOrioleDB')
 
   const [showExitSurvey, setShowExitSurvey] = useState(false)
   const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
@@ -60,8 +62,8 @@ const PlanUpdateSidePanel = () => {
     (it) => it.organization_id === selectedOrganization?.id
   )
 
-  const { data } = useOrganizationQuery({ slug })
-  const hasOrioleProjects = !!data?.has_oriole_project
+  const { data } = useOrganizationQuery({ slug }, { enabled: allowOrioleDB })
+  const hasOrioleProjects = allowOrioleDB ? false : !!data?.has_oriole_project
 
   const snap = useOrgSettingsPageStateSnapshot()
   const visible = snap.panelKey === 'subscriptionPlan'
