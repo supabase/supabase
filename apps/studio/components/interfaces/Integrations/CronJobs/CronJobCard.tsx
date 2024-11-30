@@ -1,13 +1,13 @@
 import { toString as CronToString } from 'cronstrue'
-import { Clock, Loader2, MoreVertical } from 'lucide-react'
+import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 import { useParams } from 'common'
 import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
-import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -25,10 +25,6 @@ interface CronJobCardProps {
   job: CronJob
   onEditCronJob: (job: CronJob) => void
   onDeleteCronJob: (job: CronJob) => void
-}
-
-const generateJobDetailsSQL = (jobId: number) => {
-  return `select * from cron.job_run_details where jobid = '${jobId}' order by start_time desc limit 10`
 }
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
@@ -72,6 +68,11 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 checked={job.active}
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
+              <Button type="default" icon={<History />}>
+                <Link href={`/project/${ref}/integrations/cron-jobs/cron-jobs/${job.jobname}`}>
+                  History
+                </Link>
+              </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
@@ -79,13 +80,6 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 <DropdownMenuContent align="end" className="w-36">
                   <DropdownMenuItem onClick={() => onEditCronJob(job)}>
                     Edit cron job
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href={`/project/${ref}/sql/new?content=${encodeURIComponent(generateJobDetailsSQL(job.jobid))}`}
-                    >
-                      View previous runs
-                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => onDeleteCronJob(job)}>

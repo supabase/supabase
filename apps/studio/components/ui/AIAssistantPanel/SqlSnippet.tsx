@@ -1,4 +1,4 @@
-import { Code, DatabaseIcon, Edit, Play } from 'lucide-react'
+import { Code, Edit, Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
@@ -21,6 +21,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SQL_ICON,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
@@ -54,7 +55,7 @@ const SqlSnippetWrapper = ({
   const updatedFormatted = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
   return (
-    <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
+    <div className="overflow-hidden">
       <SqlCard
         sql={updatedFormatted}
         isChart={props.isChart === 'true'}
@@ -166,8 +167,8 @@ export const SqlCard = ({
   }, [sql, readOnly, isLoading])
 
   return (
-    <div className="overflow-hidden">
-      <div className={cn('flex items-center gap-2 border-t', showWarning ? '' : 'px-5 py-2')}>
+    <div className="overflow-hidden rounded border w-auto">
+      <div className={cn('flex items-center gap-2', showWarning ? '' : 'px-3 pr-1 py-1')}>
         {showWarning ? (
           <Admonition type="warning" className="mb-0 rounded-none border-0">
             <p>This query contains write operations. Are you sure you want to execute it?</p>
@@ -211,8 +212,18 @@ export const SqlCard = ({
           </Admonition>
         ) : (
           <>
-            <DatabaseIcon size={16} strokeWidth={1.5} />
-            <h3 className="text-sm font-medium flex-1">{title}</h3>
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5 shrink-0',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
+            <h3 className="text-xs font-medium flex-1">{title}</h3>
 
             {!readOnly && (
               <div className="flex">
@@ -313,18 +324,19 @@ export const SqlCard = ({
       {showCode && (
         <CodeBlock
           hideLineNumbers
+          wrapLines={false}
           value={sql}
           language="sql"
           className={cn(
             'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
-            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+            '[&>code]:m-0 [&>code>span]:text-foreground'
           )}
         />
       )}
 
       {/* Results Section */}
       {results !== undefined && results.length > 0 && isChart && xAxis && yAxis ? (
-        <div className="p-5 border-t">
+        <div className="p-3 border-t">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
               data={results}

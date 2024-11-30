@@ -53,7 +53,7 @@ const IntegrationPage: NextPageWithLayout = () => {
     return <div>Integration not found</div>
   }
 
-  if (!Component) return <div>Component not found</div>
+  if (!Component) return <div className="p-10 text-sm">Component not found</div>
 
   return <Component />
 }
