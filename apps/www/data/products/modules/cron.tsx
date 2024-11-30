@@ -4,27 +4,27 @@ import BrowserFrame from '../../../components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
-  metaTitle: 'Supabase Cron | Schedule and automate tasks',
-  metaDescription: 'Schedule and automate tasks at scale',
+  metaTitle: 'Supabase Cron | Schedule and Automate Tasks',
+  metaDescription: 'Schedule and Automate Tasks at Scale',
   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
   docsUrl: '/docs/guides/cron',
   heroSection: {
     title: 'Supabase Cron',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        Schedule and automate tasks using Postgres
+        Schedule and Automate Tasks Using Postgres
       </span>
     ),
     subheader: (
       <>
-        Supabase Cron is a Postgres module that uses the pg_cron extension to manage recurring
-        tasks. Manage your cron jobs using any Postgres tooling.
+        Supabase Cron is a Postgres module that uses the pg_cron database extension to manage
+        recurring tasks. Manage your Cron Jobs using any Postgres tooling.
       </>
     ),
     // image: '/images/product/vector/vector-hero.svg',
     icon: PRODUCT_MODULES['cron-jobs'].icon[24],
     cta: {
-      label: 'Try for free',
+      label: 'Create your first Job',
       link: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
     },
     secondaryCta: {
@@ -36,23 +36,33 @@ export default () => ({
     className: '!py-4',
     highlights: [
       {
-        title: 'Postgres native',
-        paragraph: 'Schedule and run tasks directly within your database.',
+        title: 'Postgres Native',
+        paragraph: 'Schedule and run Jobs directly within your database.',
         // image: ,
       },
       {
-        title: 'Real-time Monitoring',
-        paragraph: "Track and debug scheduled jobs with Supabase's observability tools.",
+        title: 'Cron Syntax and Natural Language',
+        paragraph: 'Use familiar Cron syntax or natural language to define your job run interval.',
         // image: ,
       },
       {
-        title: 'Extensible toolkit',
+        title: 'Sub-Minute Scheduling',
+        paragraph: 'Schedule recurring Jobs that run every 1-59 seconds.',
+        // image: ,
+      },
+      {
+        title: 'Real-Time Monitoring',
+        paragraph: "Track and debug scheduled Jobs with Supabase's observability tools.",
+        // image: ,
+      },
+      {
+        title: 'Extensible Toolkit',
         paragraph: 'Works with Database Functions, Edge Functions, and HTTP Webhooks.',
         // image: ,
       },
       {
-        title: 'Open source',
-        paragraph: 'Built on trusted, community-driven technology. 100% open source.',
+        title: '100% Open Source',
+        paragraph: 'Built on trusted, community-driven technology.',
         // image: ,
       },
     ],
@@ -77,7 +87,7 @@ export default () => ({
   section1: {
     id: 'api',
     label: 'API',
-    heading: <>SQL-based Approach</>,
+    heading: <>SQL-Based Approach</>,
     subheading:
       'Create and manage Jobs using simple SQL commands for ease of use. Track changes to your cron jobs using Postgres migrations stored in source control.',
     cta: {
@@ -100,10 +110,50 @@ export default () => ({
     // ],
   },
   section2: {
-    id: 'UI',
+    id: 'UI-Scheduling-Interface',
     label: 'UI',
-    heading: <>Intuitive interface</>,
-    subheading: 'Supabase provides a clean and simple interface for managing and debugging Jobs.',
+    heading: <>Intuitive Scheduling Interface</>,
+    subheading:
+      'Supabase Cron provides a clean and simple interface, including Cron syntax and natural language options, to create Jobs with ease.',
+    image: (
+      <Image
+        src={{
+          dark: '/images/auth-ui/modules/cron/cron-ui-dark.png',
+          light: '/images/auth-ui/modules/cron/cron-ui-light.png',
+        }}
+        alt="Cron Jobs UI"
+        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
+        fill
+        sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
+        quality={100}
+        draggable={false}
+      />
+    ),
+    cta: {
+      label: 'Start scheduling',
+      url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+    },
+    // features: [
+    //   {
+    //     icon: ShieldCheck,
+    //     heading: 'SOC 2 Type II certified',
+    //   },
+    //   {
+    //     icon: Activity,
+    //     heading: 'HIPAA compliant',
+    //   },
+    //   {
+    //     icon: ShieldAlert,
+    //     heading: 'DDoS Protection',
+    //   },
+    // ],
+  },
+  section3: {
+    id: 'UI-Job-Observability',
+    label: 'UI',
+    heading: <>Job Observability</>,
+    subheading:
+      'Track and investigate recurring Jobs and their historical runs in the Cron UI and Cron logs.',
     image: (
       <Image
         src={{
@@ -137,12 +187,12 @@ export default () => ({
     //   },
     // ],
   },
-  section3: {
+  section4: {
     id: 'extensible',
     label: 'Extensible',
-    heading: <>Designed to just work</>,
+    heading: <>Designed to Just Work</>,
     subheading:
-      'Supabase Cron is integrated with the entire Supabase suite of tools. Create jobs to call Database Functions, Edge Functions, and even remote webhooks.',
+      'Supabase Cron is integrated with the entire Supabase suite of tools. Create Jobs to call Database Functions, Edge Functions, and even remote webhooks.',
     image: (
       <Image
         src={{

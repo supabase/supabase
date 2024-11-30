@@ -5,11 +5,13 @@ import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
-const ciCode = `select *
-from cron.job_run_details
-where jobid = ‘2’
-order by start_time desc
-limit 10
+const ciCode = `
+select
+  cron.schedule(
+    'call-hello-world-every-5-minutes',
+    '*/5 * * * *',
+    'select hello_world()'
+  );
 `
 interface Props {
   id: string

@@ -28,7 +28,7 @@ const ProductModules: ProductType = {
         <strong>store, index and search vector embeddings</strong>.
       </>
     ),
-    description_short: 'Schedule, manage and monitor jobs',
+    description_short: 'Schedule and manage recurring Jobs',
     label: '',
     url: '/modules/cron-jobs',
   },

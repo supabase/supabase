@@ -48,7 +48,8 @@ function CronPage() {
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CronSQLSection {...pageData.section1} />
         <CronUISection {...pageData.section2} className="!py-0" />
-        <CronExtensibleSection {...pageData.section3} className="!pb-0" />
+        <CronUISection {...pageData.section3} className="!py-0" />
+        <CronExtensibleSection {...pageData.section4} className="!pb-0" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
