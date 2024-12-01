@@ -39,6 +39,7 @@ export const Message = function Message({
       animate={{ opacity: 1 }}
       className={cn(
         'mb-5 text-foreground-light text-sm',
+        isUser && 'text-foreground',
         variant === 'warning' && 'bg-warning-200'
       )}
     >
