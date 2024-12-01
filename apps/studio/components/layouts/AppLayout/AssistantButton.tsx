@@ -7,13 +7,14 @@ const AssistantButton = () => {
   return (
     <Button
       type="text"
+      size="tiny"
       id="assistant-trigger"
-      className="w-6 h-6"
       onClick={() => {
         setAiAssistantPanel({ open: !aiAssistantPanel.open })
       }}
-      icon={<AiIconAnimation allowHoverEffect className="w-4 h-4 text-foreground-light" />}
-    />
+    >
+      <AiIconAnimation allowHoverEffect size={20} />
+    </Button>
   )
 }
 

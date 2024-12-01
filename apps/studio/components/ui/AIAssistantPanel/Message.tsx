@@ -1,9 +1,10 @@
 import { motion } from 'framer-motion'
+import { User } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
-import { cn, markdownComponents, WarningIcon, CodeBlock } from 'ui'
+import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { SqlSnippet } from './SqlSnippet'
 
@@ -36,57 +37,60 @@ export const Message = function Message({
       layout="position"
       initial={{ y: 5, opacity: 0, scale: 0.99 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
-      className="w-full flex flex-col"
+      className={cn(
+        'mb-5 text-foreground-light text-sm',
+        variant === 'warning' && 'bg-warning-200'
+      )}
     >
       {children}
-      <div
-        className={cn(
-          'text-foreground-light text-sm mb max-w-full mb-6',
-          variant === 'warning' && 'bg-warning-200',
-          isUser ? 'px-5 py-3 rounded-lg bg-background-muted w-fit self-end' : 'mb-6'
+
+      {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
+
+      {action}
+
+      <div className="flex gap-4 w-auto overflow-hidden">
+        {isUser ? (
+          <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
+            <User size={16} strokeWidth={1.5} className="text-background" />
+          </figure>
+        ) : (
+          <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
         )}
-      >
-        {variant === 'warning' && <WarningIcon className="w-6 h-6" />}
-
-        {action}
-
         <ReactMarkdown
-          className="gap-x-2.5 gap-y-4 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
+          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
           remarkPlugins={[remarkGfm]}
           components={{
             ...markdownComponents,
             pre: (props: any) => {
               const language = props.children[0].props.className?.replace('language-', '') || 'sql'
 
-              if (language === 'sql') {
-                return readOnly ? (
-                  <div className="mb-1 -mt-2">
-                    <CollapsibleCodeBlock
-                      value={props.children[0].props.children[0]}
-                      language="sql"
-                      hideLineNumbers
-                    />
-                  </div>
-                ) : (
-                  <SqlSnippet
-                    readOnly={readOnly}
-                    isLoading={isLoading}
-                    sql={props.children[0].props.children}
-                  />
-                )
-              }
-
               return (
-                <div className="-mx-8">
-                  <CodeBlock
-                    hideLineNumbers
-                    value={props.children[0].props.children}
-                    language={language}
-                    className={cn(
-                      'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t border-b text-foreground !rounded-none w-full',
-                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
-                    )}
-                  />
+                <div className="w-auto -ml-[36px] overflow-x-hidden">
+                  {language === 'sql' ? (
+                    readOnly ? (
+                      <CollapsibleCodeBlock
+                        value={props.children[0].props.children[0]}
+                        language="sql"
+                        hideLineNumbers
+                      />
+                    ) : (
+                      <SqlSnippet
+                        readOnly={readOnly}
+                        isLoading={isLoading}
+                        sql={props.children[0].props.children}
+                      />
+                    )
+                  ) : (
+                    <CodeBlock
+                      hideLineNumbers
+                      value={props.children[0].props.children}
+                      language={language}
+                      className={cn(
+                        'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
+                        '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+                      )}
+                    />
+                  )}
                 </div>
               )
             },
