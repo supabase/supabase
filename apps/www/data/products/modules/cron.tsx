@@ -85,8 +85,8 @@ export default () => ({
     ),
   },
   section1: {
-    id: 'api',
-    label: 'API',
+    id: 'sql',
+    label: 'SQL',
     heading: <>SQL-Based Approach</>,
     subheading:
       'Create and manage Jobs using simple SQL commands for ease of use. Track changes to your cron jobs using Postgres migrations stored in source control.',
