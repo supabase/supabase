@@ -111,7 +111,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       Follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-      - If the question is about users or involves creating a users table, also retrieve the auth schema. In Supabase, the auth schemas already has a users table is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information.
+      - If the question is about users or involves creating a users table, also retrieve the auth schema. In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information. You often don't need to create a new users table.
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
