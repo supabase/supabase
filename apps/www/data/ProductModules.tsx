@@ -28,7 +28,7 @@ const ProductModules: ProductType = {
         zero additional infrastructure
       </>
     ),
-    description_short: 'Native pull queues without headache',
+    description_short: 'Message Queues with guarenteed delivery',
     label: '',
     url: '/modules/queues',
   },

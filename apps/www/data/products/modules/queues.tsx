@@ -1,28 +1,27 @@
 import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default () => ({
-  metaTitle: 'Supabase Queues | Native pull queues without headache',
-  metaDescription:
-    'Manage queues without maintaining additional infrastructure with native PostgreSQL-based message queue system.',
+  metaTitle: 'Supabase Queues | Message Queues with Guaranteed Delivery',
+  metaDescription: 'Message Queues with Guaranteed Delivery',
   url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
   docsUrl: '/docs/guides/queues',
   heroSection: {
     title: 'Supabase Queues',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        Native pull queues without headache
+        Create and Manage Message Queues using Postgres
       </span>
     ),
     subheader: (
       <>
-        Manage queues without maintaining additional infrastructure with native PostgreSQL-based
-        message queue system.
+        Supabase Queues is a Postgres module that uses the pgmq database extension to manage Message
+        Queues with guarenteed delivery. Manage your Queues using any Postgres tooling.
       </>
     ),
     // image: '/images/product/vector/vector-hero.svg',
     icon: PRODUCT_MODULES.queues.icon[24],
     cta: {
-      label: 'Try for free',
+      label: 'Create your first Queue',
       link: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
     secondaryCta: {
@@ -34,23 +33,28 @@ export default () => ({
     className: '!py-4',
     highlights: [
       {
-        title: 'Benefit 1',
-        paragraph: 'Lorem ipsum dolor sit amet yeah.',
+        title: 'Postgres Native',
+        paragraph: 'Create and Manage Queues directly within your database.',
         // image: ,
       },
       {
-        title: 'Benefit 2',
-        paragraph: 'Lorem ipsum dolor sit amet ahha.',
+        title: 'Exactly Once Message Delivery',
+        paragraph: 'Supabase Queues delivers a message exactly once within a visibility timeout.',
         // image: ,
       },
       {
-        title: 'Benefit 3',
-        paragraph: 'Lorem ipsum dolor sit amet woh.',
+        title: 'Message Archival',
+        paragraph: 'Messages in Queues can be archived instead of deleted for future reference.',
         // image: ,
       },
       {
-        title: 'Benefit 4',
-        paragraph: 'Lorem ipsum dolor sit amet yo.',
+        title: 'Real-Time Monitoring',
+        paragraph: "Track and manage messages in your Queues with Supabase's observability tools.",
+        // image: ,
+      },
+      {
+        title: '100% Open Source',
+        paragraph: 'Built on trusted, community-driven technology.',
         // image: ,
       },
     ],
@@ -63,13 +67,12 @@ export default () => ({
     ),
   },
   section1: {
-    id: 'api',
-    label: 'API',
-    heading: <>Lorem ipsum dolor sit</>,
-    subheading:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
+    id: 'sql',
+    label: 'SQL',
+    heading: <>Manage via SQL</>,
+    subheading: 'Create Queues and manage messages using SQL with any Postgres client.',
     cta: {
-      label: 'Start scheduling',
+      label: 'Start message queuing',
       url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
     // features: [
@@ -88,15 +91,40 @@ export default () => ({
     // ],
   },
   section2: {
-    id: 'UI',
-    label: 'UI',
-    heading: <>Lorem ipsum dolor sit</>,
+    id: 'api',
+    label: 'API',
+    heading: <>Manage via API</>,
     subheading:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sagittis in lorem at varius.',
-    // cta: {
-    //   label: 'Start scheduling',
-    //   url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
-    // },
+      'Create Queues and manage messages either server-side or client-side via PostgREST using any Supabase client library.',
+    cta: {
+      label: 'Start message queuing',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+    },
+    // features: [
+    //   {
+    //     icon: ShieldCheck,
+    //     heading: 'SOC 2 Type II certified',
+    //   },
+    //   {
+    //     icon: Activity,
+    //     heading: 'HIPAA compliant',
+    //   },
+    //   {
+    //     icon: ShieldAlert,
+    //     heading: 'DDoS Protection',
+    //   },
+    // ],
+  },
+  section3: {
+    id: 'ui',
+    label: 'UI',
+    heading: <>Manage and Monitor via Dashboard</>,
+    subheading:
+      'Create Queues and manage messages in the Dashboard as well as monitor your Queues and message processing in real-time.',
+    cta: {
+      label: 'Start message queuing',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+    },
     // features: [
     //   {
     //     icon: ShieldCheck,

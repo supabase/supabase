@@ -43,6 +43,7 @@ function CronPage() {
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <Section1 {...pageData.section1} />
         <Section2 {...pageData.section2} className="!pt-0" />
+        <Section2 {...pageData.section3} className="!pt-0" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
