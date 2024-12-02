@@ -27,6 +27,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import {
+  containsUnknownFunction,
   getContextualInvalidationKeys,
   identifyQueryType,
   isReadOnlySelect,
@@ -103,7 +104,7 @@ export const SqlCard = ({
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
-  const [showWarning, setShowWarning] = useState(false)
+  const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -117,12 +118,12 @@ export const SqlCard = ({
 
       setShowResults(true)
       setResults(res.result)
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
     onError: (error) => {
       setError(error)
       setResults([])
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
   })
 
@@ -130,8 +131,10 @@ export const SqlCard = ({
     if (!project?.ref || !sql || readOnly) return
 
     if (!isReadOnlySelect(sql)) {
+      const hasUnknownFunctions = containsUnknownFunction(sql)
+
       setShowCode(true)
-      setShowWarning(true)
+      setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
       return
     }
 
@@ -169,15 +172,20 @@ export const SqlCard = ({
   return (
     <div className="overflow-hidden rounded border w-auto bg-surface-100">
       <div className={cn('flex items-center gap-2', showWarning ? '' : 'px-3 pr-1 py-1')}>
-        {showWarning ? (
+        {!!showWarning ? (
           <Admonition type="warning" className="mb-0 rounded-none border-0">
-            <p>This query contains write operations. Are you sure you want to execute it?</p>
+            <p>
+              {showWarning === 'hasWriteOperation'
+                ? 'This query contains write operations.'
+                : 'This query involves running a function.'}{' '}
+              Are you sure you want to execute it?
+            </p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
                 size="tiny"
                 className="w-full flex-1"
-                onClick={() => setShowWarning(false)}
+                onClick={() => setShowWarning(undefined)}
               >
                 Cancel
               </Button>
@@ -186,7 +194,7 @@ export const SqlCard = ({
                 size="tiny"
                 className="w-full flex-1"
                 onClick={() => {
-                  setShowWarning(false)
+                  setShowWarning(undefined)
                   executeSql({
                     sql: suffixWithLimit(sql, 100),
                     projectRef: project?.ref,
