@@ -5,6 +5,7 @@ import { cn } from 'ui'
 import { isBrowser } from 'common'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { ArrowUpRight } from 'lucide-react'
 
 const LWXStickyNav: FC = () => {
   const days = mainDays()
@@ -88,9 +89,12 @@ const LWXStickyNav: FC = () => {
                   <Link
                     href="/events?category=meetup"
                     target="_blank"
-                    className="p-1 transition-colors hover:text-foreground pointer-events-auto"
+                    className="p-1 transition-colors hover:text-foreground pointer-events-auto flex gap-1"
                   >
-                    Meetups
+                    Meetups{' '}
+                    <span>
+                      <ArrowUpRight className="w-4 h-5 text-foreground-muted" />
+                    </span>
                   </Link>
                 </li>
                 <li className="hidden sm:block">

@@ -1,16 +1,13 @@
 import React from 'react'
-import Link from 'next/link'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
-import { Calendar } from 'lucide-react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { LW13_DATE, LW13_LAUNCH_DATE } from '~/lib/constants'
+import { LW13_DATE } from '~/lib/constants'
 
 import CanvasSingleMode from '~/components/LaunchWeek/13/Multiplayer/CanvasSingleMode'
 import ThreeTicketCanvas from '~/components/LaunchWeek/13/ThreeTicketCanvas'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import useLWPartyMode from '~/components/LaunchWeek/13/useLWPartyMode'
 import useWinningChances from '~/components/LaunchWeek/hooks/useWinningChances'
 
 import TicketForm from '~/components/LaunchWeek/13/Ticket/TicketForm'
@@ -19,7 +16,6 @@ import TicketPresence from './TicketPresence'
 
 const TicketingFlow = () => {
   const { ticketState, userData } = useConfData()
-  const { isPartyMode, setIsPartyMode } = useLWPartyMode()
 
   const isLoading = ticketState === 'loading'
   const isRegistering = ticketState === 'registration'
@@ -98,12 +94,7 @@ const TicketingFlow = () => {
                         You can still claim a ticket thoughout the week.
                       </div>
                       <div className="flex flex-col md:flex-row gap-4 mt-2 md:mt-0 items-start md:items-center">
-                        <TicketPresence
-                          className={cn(
-                            'opacity-0 invisible translate-y-1 transition-all',
-                            isPartyMode && 'opacity-80 visible translate-y-0'
-                          )}
-                        />
+                        <TicketPresence className="opacity-0 invisible translate-y-1 transition-all" />
                       </div>
                     </div>
                   </div>
@@ -142,12 +133,7 @@ const TicketingFlow = () => {
                     </div>
                     <div className="flex flex-col gap-4 mt-2 md:mt-0 md:mb-12 items-center lg:items-start">
                       <TicketSwagCtaBox />
-                      <TicketPresence
-                        className={cn(
-                          'opacity-0 invisible translate-y-1 transition-all',
-                          isPartyMode && 'opacity-80 visible translate-y-0'
-                        )}
-                      />
+                      <TicketPresence className="opacity-0 invisible translate-y-1 transition-all" />
                     </div>
                   </div>
                 </m.div>

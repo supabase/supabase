@@ -70,10 +70,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: 'Supabase AI Assistant V2',
     description: 'Supabase AI Assistant V2',
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb ',
