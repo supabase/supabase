@@ -119,8 +119,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
-      ${schema !== undefined ? `The user is currently looking at the ${schema} schema.` : ''}
-      ${table !== undefined ? `The user is currently looking at the ${table} table.` : ''}
+      ${schema !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${schema} schema.` : ''}
+      ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
       `,
     messages,
     tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
