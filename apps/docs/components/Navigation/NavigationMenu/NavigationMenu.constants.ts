@@ -967,6 +967,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
+          name: 'pg_cron: Job Scheduling',
+          url: '/guides/database/extensions/pg_cron',
+        },
+        {
           name: 'pg_graphql: GraphQL Support',
           url: '/guides/database/extensions/pg_graphql',
         },
