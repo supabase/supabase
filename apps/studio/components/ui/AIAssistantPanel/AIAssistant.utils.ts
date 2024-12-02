@@ -117,39 +117,61 @@ export const isReadOnlySelect = (query: string): boolean => {
     return false
   }
 
-  // List of keywords that indicate write operations or function calls
-  const disallowedPatterns = [
-    // Write operations
-    'insert',
-    'update',
-    'delete',
-    'alter',
-    'drop',
-    'create',
-    'truncate',
-    'replace',
-    'with',
+  // List of keywords that indicate write operations
+  const writeOperations = ['insert', 'update', 'delete', 'alter', 'drop', 'create', 'replace']
 
-    // Function patterns
-    'function',
-    'procedure',
+  // Safe read-only SQL functions
+  const readOnlyFunctions = [
+    'count(',
+    'sum(',
+    'avg(',
+    'min(',
+    'max(',
+    'coalesce(',
+    'nullif(',
+    'current_timestamp',
+    'current_date',
+    'length(',
+    'lower(',
+    'upper(',
+    'trim(',
+    'substring(',
+    'to_char(',
+    'to_date(',
+    'extract(',
+    'date_trunc(',
   ]
 
-  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted']
+  // Words that may appear in column names etc
+  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted', 'truncate']
 
-  // Check if query contains any disallowed patterns, but allow if part of allowedPatterns
-  return !disallowedPatterns.some((pattern) => {
-    // Check if the found disallowed pattern is actually part of an allowed pattern
-    const isPartOfAllowedPattern = allowedPatterns.some(
-      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(pattern)
+  // Check for any write operations
+  const hasWriteOperation = writeOperations.some((op) => {
+    // Ignore if part of allowed pattern
+    const isAllowed = allowedPatterns.some(
+      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(op)
     )
-
-    if (isPartOfAllowedPattern) {
-      return false
-    }
-
-    return normalizedQuery.includes(pattern)
+    return !isAllowed && normalizedQuery.includes(op)
   })
+
+  if (hasWriteOperation) {
+    return false
+  }
+
+  // Check for function calls that aren't in the safe list
+  const functionCallRegex = /\w+\s*\(/g
+  const functionCalls = normalizedQuery.match(functionCallRegex) || []
+
+  for (const func of functionCalls) {
+    const isReadOnlyFunc = readOnlyFunctions.some(
+      (safeFunc) => func.trim().toLowerCase() === safeFunc
+    )
+    if (!isReadOnlyFunc) {
+      return false // Unknown function call - assume not read-only
+    }
+  }
+
+  return true
 }
 
 const getContextKey = (pathname: string) => {

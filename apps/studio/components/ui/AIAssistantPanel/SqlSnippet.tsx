@@ -167,7 +167,7 @@ export const SqlCard = ({
   }, [sql, readOnly, isLoading])
 
   return (
-    <div className="overflow-hidden rounded border w-auto">
+    <div className="overflow-hidden rounded border w-auto bg-surface-100">
       <div className={cn('flex items-center gap-2', showWarning ? '' : 'px-3 pr-1 py-1')}>
         {showWarning ? (
           <Admonition type="warning" className="mb-0 rounded-none border-0">

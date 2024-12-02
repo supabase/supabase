@@ -47,83 +47,91 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
 
   return (
     <div
-      className={`flex h-12 max-h-12 min-h-12 items-center justify-between py-2 px-5 bg-dash-sidebar ${
+      className={`flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar ${
         headerBorder ? 'border-b border-default' : ''
       }`}
     >
-      <div className="-ml-2 flex items-center text-sm">
-        {/* Organization is selected */}
-        {projectRef && (
-          <>
-            <OrganizationDropdown />
+      <div className="flex items-center justify-between py-2 px-3 flex-1">
+        <div className="flex items-center text-sm">
+          {/* Organization is selected */}
+          {projectRef && (
+            <>
+              <OrganizationDropdown />
 
-            {projectRef && (
+              {projectRef && (
+                <>
+                  <span className="text-border-stronger">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
+                    >
+                      <path d="M16 3.549L7.12 20.600"></path>
+                    </svg>
+                  </span>
+
+                  <ProjectDropdown />
+
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive">Exceeding usage limits</Badge>
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {selectedProject && (
+                <>
+                  <span className="text-border-stronger">
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="16"
+                      height="16"
+                      stroke="currentColor"
+                      strokeWidth="1"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      shapeRendering="geometricPrecision"
+                    >
+                      <path d="M16 3.549L7.12 20.600"></path>
+                    </svg>
+                  </span>
+                  {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
+                </>
+              )}
+            </>
+          )}
+
+          {/* Additional breadcrumbs are supplied */}
+          <BreadcrumbsView defaultValue={breadcrumbs} />
+        </div>
+        <div className="flex items-center gap-x-2">
+          <div className="flex items-center gap-x-2">
+            {customHeaderComponents && customHeaderComponents}
+            {IS_PLATFORM && (
               <>
-                <span className="text-border-stronger">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    shapeRendering="geometricPrecision"
-                  >
-                    <path d="M16 3.549L7.12 20.600"></path>
-                  </svg>
-                </span>
-
-                <ProjectDropdown />
-
-                {exceedingLimits && (
-                  <div className="ml-2">
-                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge variant="destructive">Exceeding usage limits</Badge>
-                    </Link>
-                  </div>
-                )}
+                <FeedbackDropdown />
+                <NotificationsPopoverV2 />
+                <HelpPopover />
               </>
             )}
-
-            {selectedProject && (
-              <>
-                <span className="text-border-stronger">
-                  <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    fill="none"
-                    shapeRendering="geometricPrecision"
-                  >
-                    <path d="M16 3.549L7.12 20.600"></path>
-                  </svg>
-                </span>
-                {isBranchingEnabled ? <BranchDropdown /> : <EnableBranchingButton />}
-              </>
-            )}
-          </>
-        )}
-
-        {/* Additional breadcrumbs are supplied */}
-        <BreadcrumbsView defaultValue={breadcrumbs} />
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-x-2">
-        {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && (
-          <>
-            <FeedbackDropdown />
-            <NotificationsPopoverV2 />
-            <HelpPopover />
-            {isAssistantV2Enabled && !!projectRef && <AssistantButton />}
-          </>
-        )}
-      </div>
+      {isAssistantV2Enabled && !!projectRef && (
+        <div className="border-l flex-0 h-full">
+          <AssistantButton />
+        </div>
+      )}
     </div>
   )
 }
