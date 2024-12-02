@@ -103,7 +103,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     ? 'You need additional permissions to toggle extensions'
                     : orioleDbCheck
                       ? 'Project is using OrioleDB and cannot be disabled'
-                      : ''}
+                      : null}
                 </TooltipContent_Shadcn_>
               )}
             </Tooltip_Shadcn_>
