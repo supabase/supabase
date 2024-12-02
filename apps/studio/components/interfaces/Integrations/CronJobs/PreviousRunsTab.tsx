@@ -1,7 +1,7 @@
 import { toString as CronToString } from 'cronstrue'
 import { List } from 'lucide-react'
 import Link from 'next/link'
-import { UIEvent, useCallback, useMemo } from 'react'
+import { UIEvent, useCallback, useEffect, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -146,6 +146,7 @@ export const PreviousRunsTab = () => {
     data,
     isLoading: isLoadingCronJobRuns,
     fetchNextPage,
+    refetch,
     isFetching,
   } = useCronJobRunsInfiniteQuery(
     {
@@ -155,6 +156,15 @@ export const PreviousRunsTab = () => {
     },
     { enabled: !!currentJobState?.jobid, staleTime: 30 }
   )
+
+  useEffect(() => {
+    // Refetch only the first page
+    const timerId = setInterval(() => {
+      refetch({ refetchPage: (_page, index) => index === 0 })
+    }, 30000)
+
+    return () => clearInterval(timerId)
+  }, [refetch])
 
   const handleScroll = useCallback(
     (event: UIEvent<HTMLDivElement>) => {

@@ -429,6 +429,11 @@ const nextConfig = {
         source: '/project/:ref/settings/vault/keys',
         destination: '/project/:ref/integrations/vault/keys',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/integrations/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
