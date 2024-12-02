@@ -84,7 +84,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                               <>
                                 Postgres with OrioleDB
                                 <Badge color="warning" className="ml-2">
-                                  Preview
+                                  Alpha
                                 </Badge>
                               </>
                             }

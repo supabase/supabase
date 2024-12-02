@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/supabase-ai-assistant-v2</guid>
   <title>Supabase AI Assistant v2</title>
   <link>https://supabase.com/blog/supabase-ai-assistant-v2</link>
-  <description>An evolution of how we approach AI within the Supabase dashboard&apos;</description>
+  <description>An evolution of how we approach AI within the Supabase dashboard</description>
   <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
@@ -20,6 +20,13 @@
   <link>https://supabase.com/blog/supabase-assistant</link>
   <description>An evolution of how we approach AI within the Supabase dashboard</description>
   <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/orioledb-launch</guid>
+  <title>OrioleDB Public Alpha</title>
+  <link>https://supabase.com/blog/orioledb-launch</link>
+  <description>Launching OrioleDB Public Alpha</description>
+  <pubDate>Sun, 01 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-dynamic-functions</guid>

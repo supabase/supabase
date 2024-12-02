@@ -1,10 +1,10 @@
+import { BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Badge, cn, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Badge, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
-import { BadgeCheck, Maximize } from 'lucide-react'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
@@ -33,7 +33,7 @@ export const IntegrationLoadingCard = () => {
 
 export const IntegrationCard = ({
   id,
-  beta,
+  status,
   name,
   icon,
   description,
@@ -51,9 +51,9 @@ export const IntegrationCard = ({
           <div className="flex-col justify-start items-start gap-y-0.5 flex">
             <div className="flex items-center gap-x-2">
               <p className="text-foreground text-sm">{name}</p>
-              {beta && (
-                <Badge variant="warning" className="py-0 px-1.5">
-                  Beta
+              {status && (
+                <Badge variant="warning" className="py-0 px-1.5 capitalize">
+                  {status}
                 </Badge>
               )}
             </div>

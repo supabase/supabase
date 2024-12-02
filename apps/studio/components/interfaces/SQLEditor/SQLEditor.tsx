@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { format } from 'sql-formatter'
 
 import { Separator } from '@ui/components/SidePanel/SidePanel'
 import { useParams } from 'common'
@@ -35,14 +34,12 @@ import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
-  AiIconAnimation,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  ImperativePanelHandle,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -52,9 +49,7 @@ import {
   cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { AiAssistantPanel } from './AiAssistantPanel'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { DiffActionBar } from './DiffActionBar'
 import {
@@ -106,7 +101,6 @@ const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const { open } = appSnap.aiAssistantPanel
 
   const { mutate: formatQuery } = useFormatQueryMutation()
@@ -121,19 +115,11 @@ const SQLEditor = () => {
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
-  const aiPanelRef = useRef<ImperativePanelHandle>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
     projectRef: ref,
   })
-
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  // [Joshen] This eventually needs to be in the app state
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
-  const isAssistantOpen = (!isAssistantV2Enabled && isAiOpen) || (isAssistantV2Enabled && open)
 
   const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
@@ -141,6 +127,8 @@ const SQLEditor = () => {
 
   const isOptedInToAI = useOrgOptedIntoAi()
   const [selectedSchemas] = useSchemasForAi(project?.ref!)
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
@@ -411,33 +399,11 @@ const SQLEditor = () => {
     try {
       const snippet = snapV2.snippets[id]
       const result = snapV2.results[id]?.[0]
-      if (isAssistantV2Enabled) {
-        appSnap.setAiAssistantPanel({
-          open: true,
-          sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
-          initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
-        })
-      } else {
-        const { solution, sql } = await debugSql({
-          sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-          errorMessage: result.error.message,
-          entityDefinitions,
-        })
-
-        const formattedSql =
-          sqlAiDisclaimerComment +
-          '\n\n' +
-          format(sql, {
-            language: 'postgresql',
-            keywordCase: 'lower',
-          })
-        setDebugSolution(solution)
-        setSourceSqlDiff({
-          original: snippet.snippet.content.sql,
-          modified: formattedSql,
-        })
-        setSelectedDiffType(DiffType.Modification)
-      }
+      appSnap.setAiAssistantPanel({
+        open: true,
+        sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
+      })
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the
@@ -693,7 +659,7 @@ const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {(isAssistantOpen || isDiffOpen) && !hasHipaaAddon && (
+            {(open || isDiffOpen) && !hasHipaaAddon && (
               <AISchemaSuggestionPopover
                 onClickSettings={() => {
                   appSnap.setShowAiSettingsModal(true)
@@ -729,41 +695,6 @@ const SQLEditor = () => {
             )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {!isAssistantV2Enabled && !isAiOpen && (
-                  <motion.button
-                    layoutId="ask-ai-input-icon"
-                    transition={{ duration: 0.1 }}
-                    className="group absolute z-10 rounded-lg right-[24px] top-4 transition-all duration-200 ease-out"
-                    onClick={() => {
-                      if (isAssistantV2Enabled) {
-                        const state = getSqlEditorV2StateSnapshot()
-                        const snippet = state.snippets[id]
-                        const editor = editorRef.current
-                        const selection = editor?.getSelection()
-                        const selectedValue = selection
-                          ? editor?.getModel()?.getValueInRange(selection)
-                          : undefined
-                        const sql = snippet
-                          ? (selectedValue || editorRef.current?.getValue()) ??
-                            snippet.snippet.content.sql
-                          : selectedValue || editorRef.current?.getValue()
-
-                        appSnap.setAiAssistantPanel({
-                          open: true,
-                          sqlSnippets: sql ? [sql] : [],
-                          initialInput: sql
-                            ? `Help me make a change to the attached sql snippet`
-                            : '',
-                        })
-                      } else {
-                        aiPanelRef.current?.expand()
-                      }
-                    }}
-                  >
-                    <AiIconAnimation loading={false} allowHoverEffect />
-                  </motion.button>
-                )}
-
                 {isLoading ? (
                   <div className="flex h-full w-full items-center justify-center">
                     <Loader2 className="animate-spin text-brand" />
@@ -895,28 +826,6 @@ const SQLEditor = () => {
             </ResizablePanel>
           </ResizablePanelGroup>
         </ResizablePanel>
-
-        {!isAssistantV2Enabled && (
-          <>
-            <ResizableHandle withHandle />
-            <ResizablePanel
-              ref={aiPanelRef}
-              collapsible
-              collapsedSize={0}
-              minSize={31}
-              maxSize={40}
-              onCollapse={() => setIsAiOpen(false)}
-              onExpand={() => setIsAiOpen(true)}
-            >
-              <AiAssistantPanel
-                existingSql={editorRef.current?.getValue() || ''}
-                includeSchemaMetadata={includeSchemaMetadata}
-                onDiff={updateEditorWithCheckForDiff}
-                onClose={() => aiPanelRef.current?.collapse()}
-              />
-            </ResizablePanel>
-          </>
-        )}
       </ResizablePanelGroup>
     </>
   )
