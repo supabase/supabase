@@ -11,7 +11,6 @@ const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    console.log('no open ai key')
     return new Response(
       JSON.stringify({
         error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
