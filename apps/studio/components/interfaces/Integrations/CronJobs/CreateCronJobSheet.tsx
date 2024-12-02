@@ -66,7 +66,9 @@ const edgeFunctionSchema = z.object({
   httpBody: z
     .string()
     .trim()
+    .optional()
     .refine((value) => {
+      if (!value) return true
       try {
         JSON.parse(value)
         return true
@@ -90,7 +92,9 @@ const httpRequestSchema = z.object({
   httpBody: z
     .string()
     .trim()
+    .optional()
     .refine((value) => {
+      if (!value) return true
       try {
         JSON.parse(value)
         return true

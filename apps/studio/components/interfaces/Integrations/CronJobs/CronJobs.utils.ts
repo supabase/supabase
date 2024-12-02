@@ -9,7 +9,7 @@ export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
   headers: HTTPHeader[],
-  body: string,
+  body: string | undefined,
   timeout: number
 ) => {
   return `$$
@@ -20,7 +20,7 @@ export const buildHttpRequestCommand = (
             .filter((v) => v.name && v.value)
             .map((v) => `'${v.name}', '${v.value}'`)
             .join(', ')}),
-          ${method === 'POST' ? `body:='${body}',` : ''}
+          ${method === 'POST' && body ? `body:='${body}',` : ''}
           timeout_milliseconds:=${timeout}
       );
     $$`
