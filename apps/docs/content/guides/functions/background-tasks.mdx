@@ -48,7 +48,7 @@ You can call `EdgeRuntime.waitUntil` in the request handler too. This will not b
 
 ```ts
 async function fetchAndLog(url: string) {
-  const response = await fetch('https://httpbin.org/json')
+  const response = await fetch(url)
   console.log(response)
 }
 
