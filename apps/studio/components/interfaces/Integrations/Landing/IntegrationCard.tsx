@@ -33,7 +33,7 @@ export const IntegrationLoadingCard = () => {
 
 export const IntegrationCard = ({
   id,
-  beta,
+  status,
   name,
   icon,
   description,
@@ -51,9 +51,9 @@ export const IntegrationCard = ({
           <div className="flex-col justify-start items-start gap-y-0.5 flex">
             <div className="flex items-center gap-x-2">
               <p className="text-foreground text-sm">{name}</p>
-              {beta && (
+              {status && (
                 <Badge variant="warning" className="py-0 px-1.5">
-                  Beta
+                  {status}
                 </Badge>
               )}
             </div>
