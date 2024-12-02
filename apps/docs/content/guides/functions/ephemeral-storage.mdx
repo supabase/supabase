@@ -28,17 +28,14 @@ Here is an example of how to write a user-uploaded zip file into a temporary fil
 
 ```js
 Deno.serve(async (req) => {
-  if (req.headers.get("content-type") !== "application/zip") {
-    return new Response(
-      "file must be a zip file",
-      {
-        status: 400,
-      },
-    );
+  if (req.headers.get('content-type') !== 'application/zip') {
+    return new Response('file must be a zip file', {
+      status: 400,
+    })
   }
 
-  const uploadId = crypto.randomUUID();
-  await Deno.writeFile("/tmp/" + uploadId, req.body);
+  const uploadId = crypto.randomUUID()
+  await Deno.writeFile('/tmp/' + uploadId, req.body)
 
   // do something with the written zip file
 
