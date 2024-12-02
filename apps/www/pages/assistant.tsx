@@ -53,7 +53,7 @@ const welcomeMessages = [
           </g>
         </svg>
         <p>
-          Welcome Product Hunter! 👋 Thanks for checking out the Supabase assistant. Let me show you
+          Welcome Product Hunter! 👋 Thanks for checking out the Supabase Assistant. Let me show you
           what I can do!
         </p>
       </div>
@@ -677,7 +677,7 @@ function Assistant() {
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
                 <p className="p text-lg !m-0">
                   Generate, run and debug queries, chart your data, create functions, policies and
-                  more. The assistant is here to help.
+                  more. The Assistant is here to help.
                 </p>
                 <div className="min-h-12">
                   {!isUserLoading &&
