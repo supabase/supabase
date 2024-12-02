@@ -9,15 +9,15 @@ Edge Function instances can process background tasks outside of the request hand
 
 ### How it works
 
-You can use `EdgeRuntime.waitUntil(promise)` to explicitly mark background tasks. Function instance would continue to run until the promise provided to `waitUntil` completes.
+You can use `EdgeRuntime.waitUntil(promise)` to explicitly mark background tasks. The Function instance continues to run until the promise provided to `waitUntil` completes.
 
-The maximum duration it will run will be based on wall-clock, CPU or memory limit. The Function will shutdown when it reaches one of the [limits](/docs/guides/functions/limits).
+The maximum duration is capped based on the wall-clock, CPU, and memory limits. The Function will shutdown when it reaches one of these [limits](/docs/guides/functions/limits).
 
-You can listen to `beforeunload` event handler to be notified when function invocation is about to be shutdown.
+You can listen to the `beforeunload` event handler to be notified when Function invocation is about to be shut down.
 
 ### Example
 
-Here's an example of using `EdgeRuntime.waitUntil` to run a background task and using `beforeunload` event to be notified when the instance is about to be shutdown.
+Here's an example of using `EdgeRuntime.waitUntil` to run a background task and using `beforeunload` event to be notified when the instance is about to be shut down.
 
 ```ts
 async function longRunningTask() {
