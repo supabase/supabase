@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
@@ -7,10 +6,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useIsAssistantV2Enabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'common'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
@@ -73,7 +70,6 @@ const NavigationBar = () => {
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isFunctionsAssistantEnabled = useIsAssistantV2Enabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [allowNavPanelToExpand] = useLocalStorageQuery(
@@ -120,37 +116,7 @@ const NavigationBar = () => {
     )
   }
 
-  const CommandButton = !isFunctionsAssistantEnabled ? (
-    <NavigationIconButton
-      size="tiny"
-      onClick={() => {
-        setCommandMenuOpen(true)
-        snap.setNavigationPanelOpen(false)
-      }}
-      type="text"
-      icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-      rightText={
-        <div
-          className={cn(
-            'flex items-center gap-1',
-            'h-6 py-1.5 px-2 leading-none',
-            'bg-surface-100 text-foreground-lighter',
-            'border border-default rounded-md',
-            'shadow-xs shadow-background-surface-100'
-          )}
-        >
-          {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
-            <Command size={11.5} strokeWidth={1.5} />
-          ) : (
-            <p className="text-xs">CTRL</p>
-          )}
-          <p className="text-xs">K</p>
-        </div>
-      }
-    >
-      Search
-    </NavigationIconButton>
-  ) : (
+  const CommandButton = (
     <HoverCard_Shadcn_ openDelay={10}>
       <HoverCardTrigger_Shadcn_ asChild>
         <NavigationIconButton
