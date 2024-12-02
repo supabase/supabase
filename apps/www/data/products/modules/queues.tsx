@@ -95,7 +95,7 @@ export default () => ({
     label: 'API',
     heading: <>Manage via API</>,
     subheading:
-      'Create Queues and manage messages either server-side or client-side via PostgREST using any Supabase client library.',
+      'Create and manage messages either server-side or client-side via PostgREST using any Supabase client library.',
     cta: {
       label: 'Start message queuing',
       url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
