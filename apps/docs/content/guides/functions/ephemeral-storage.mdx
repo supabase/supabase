@@ -1,0 +1,48 @@
+---
+id: 'function-ephemeral-storage'
+title: 'Ephemeral Storage'
+description: 'Read and write from temporary directory'
+subtitle: 'Read and write from temporary directory'
+---
+
+Edge Functions provides ephemeral file storage. You can read and write files to `/tmp` directory.
+
+Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read only within the same invocation.
+
+### How to use
+
+You can use [Deno File System APIs](https://docs.deno.com/api/deno/file-system) or [`node:fs` module](https://docs.deno.com/api/node/fs/) to access the `/tmp` path.
+
+### Example
+
+Here is an example on how to write a zip file a user uploaded into a temproary file for further processing.
+
+```
+Deno.serve(async (req) => {
+  if (req.headers.get("content-type") !== "application/zip") {
+    return new Response(
+      "file must be a zip file",
+      {
+        status: 400,
+      },
+    );
+  }
+
+  const uploadId = crypto.randomUUID();
+  await Deno.writeFile("/tmp/" + uploadId, req.body);
+
+  // do something with the written zip file
+
+  return new Response('ok')
+})
+```
+
+### Unavailable APIs
+
+Currently, the synchronous APIs (eg: `Deno.writeFileSync` or `Deno.mkdirSync`) for creating or writing files are not supported.
+
+You can use sync variations of read APIs (eg: `Deno.readFileSync`).
+
+### Limits
+
+In the hosted platform, a free project can write up to 256MB of data to ephemeral storage. A paid project can write up to 512MB.
