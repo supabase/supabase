@@ -40,10 +40,10 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import DotGrid from '../DotGrid'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import DotGrid from '../DotGrid'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -444,7 +444,7 @@ export const AIAssistant = ({
                   Generate a ...
                 </Button>
                 {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider_Shadcn_>
+                  <TooltipProvider_Shadcn_ key={qs.title}>
                     <Tooltip_Shadcn_>
                       <TooltipTrigger_Shadcn_ asChild>
                         <Button
