@@ -49,7 +49,7 @@ Here are some basic examples of setting up WebSocket servers using Deno and Node
 
 <TabPanel id="node" label="Node.js">
 ```ts
-  import { createServer } from "node:http";
+import { createServer } from "node:http";
 import { WebSocketServer } from "npm:ws";
 
 const server = createServer();
@@ -184,6 +184,7 @@ Deno.serve(async (req) => {
 ### Authentication
 
 WebSocket browser clients don't have the option to send custom headers. Because of this, Edge Functions won't be able to perform the usual authorization header check to verify the JWT.
+
 You can skip the default authorization header checks by explicitly providing `--no-verify-jwt` when serving and deploying functions.
 
 To authenticate the user making WebSocket requests, you can pass the JWT in URL query params or via a custom protocol.
@@ -244,7 +245,7 @@ return new Response("User is not authenticated", { status: 403 });
 
 ````
 </TabPanel>
-<TabPanel id="query" label="Using custom protocol">
+<TabPanel id="protocol" label="Using custom protocol">
 ```ts
   import { createClient } from "jsr:@supabase/supabase-js@2";
 
