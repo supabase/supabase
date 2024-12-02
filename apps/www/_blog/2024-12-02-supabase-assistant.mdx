@@ -37,7 +37,7 @@ Let’s take a look at how the new Assistant can help you in your database journ
 
 First off, if you are creating something new, let the Assistant guide or inspire you with how to structure your database, as well as generate the queries required to set it up.
 
-<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/design.png" />
+<Img alt="Design new database schemas" src="/images/blog/launch-week-13/assistant/design.png" />
 
 ### Writing SQL
 
@@ -47,29 +47,37 @@ Like our previous Assistant, the new Assistant will help you write queries based
 
 Sometimes you or the Assistant will write an invalid query. Like previous versions, you can use the Assistant to attempt to debug what’s wrong, either through the SQL Editor or within the Assistant panel via the query blocks directly.
 
-<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/debug.png" />
+<Img alt="Debug your queries with AI" src="/images/blog/launch-week-13/assistant/debug.png" />
 
 ### Discover data insights
 
 Since you can now run queries directly within the Assistant, it can be a useful (and fun) way to query your data through natural language. Basic select queries are run automatically, and results are displayed to you within the conversation, either in tabular form or chart form. Chart axis are picked by the Assistant. Importantly, your data is not sent to the underlying LLM model, only information about your schema. This is an incredibly helpful tool for folks who are interested in analyzing the data, but may not feel comfortable writing SQL.
 
-<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/query.png" />
+<Img alt="Query data with AI" src="/images/blog/launch-week-13/assistant/query.png" />
 
 ### SQL to REST
 
 Once your database is set up, you’ll most likely want to connect to it, either directly or through one of our client libraries. If you’re using our `supabase-js` library, we’ve added a helpful tool to convert an SQL query to supabase-js client code. Simply ask the Assistant to convert a query, and it will respond with either a complete snippet for you to copy or a combination of function + RPC call. This is powered by the [sql-to-rest](https://github.com/supabase-community/sql-to-rest) library.
 
-<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/js.png" />
+<Img alt="Convert SQL to supabase-js code" src="/images/blog/launch-week-13/assistant/js.png" />
 
 ### RLS Policies: Protect your database
 
 Use the Assistant to suggest, create or modify RLS Policies. To create a new policy, just explain what kind of behavior you want and the Assistant will retrieve knowledge around your database schema and existing policies. To edit an existing policy, click “edit with Assistant” within your policy list and the Assistant will be given the appropriate context and starting prompt for you to modify. Run the generated queries to create or modify your policies.
 
-<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/policy.png" />
+<Img
+  alt="Create and edit RLS Policies with AI"
+  src="/images/blog/launch-week-13/assistant/policy.png"
+/>
 
 ### Postgres Functions and Triggers
 
 Suggest, create or update functions and triggers in a similar way to policies. Just describe what you want or select “edit with Assistant” from your function or trigger list.
+
+<Img
+  alt="Create and edit functions and triggers with AI"
+  src="/images/blog/launch-week-13/assistant/functions.png"
+/>
 
 ## Feedback
 
