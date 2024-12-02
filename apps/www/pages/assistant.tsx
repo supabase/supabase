@@ -687,7 +687,9 @@ function Assistant() {
                       </Button>
                     ) : (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard/project/_">Start your project</Link>
+                        <Link href="https://supabase.com/dashboard/project/_">
+                          Start your project
+                        </Link>
                       </Button>
                     ))}
                 </div>
