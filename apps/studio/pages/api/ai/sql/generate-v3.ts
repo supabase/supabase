@@ -77,10 +77,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Output as markdown
       - Always include code snippets if available
       - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
+      - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
       - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
+      - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
 
       When generating tables, do the following:
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
@@ -109,8 +111,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       # You convert sql to supabase-js client code
       Use the convertSqlToSupabaseJs tool to convert select sql to supabase-js client code. Only provide js code snippets if explicitly asked. If conversion isn't supported, build a postgres function instead and suggest using supabase-js to call it via  "const { data, error } = await supabase.rpc('echo', { say: '👋'})"
 
-      Follow these instructions:
-      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question. If the question is about users, also retrieve the auth schema.
+      # For all your abilities, follow these instructions:
+      - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
+      - If the question is about users or involves creating a users table, also retrieve the auth schema. 
+  
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
