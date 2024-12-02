@@ -77,7 +77,9 @@ const cronJobColumns = [
     id: 'end_time',
     name: 'End Time',
     minWidth: 120,
-    value: (row: CronJobRun) => <div className="text-xs">{formatDate(row.end_time)}</div>,
+    value: (row: CronJobRun) => (
+      <div className="text-xs">{row.status === 'succeeded' ? formatDate(row.end_time) : '-'}</div>
+    ),
   },
 
   {
