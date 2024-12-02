@@ -140,6 +140,7 @@ export const isReadOnlySelect = (query: string): boolean => {
     'to_date(',
     'extract(',
     'date_trunc(',
+    'string_agg(',
   ]
 
   // Words that may appear in column names etc
