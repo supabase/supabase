@@ -110,7 +110,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     },
   },
   {
-    id: 'cron-jobs',
+    id: 'cron',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_cron'],
     name: `Cron`,

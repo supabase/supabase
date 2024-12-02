@@ -43,7 +43,10 @@ export default function TicketForm() {
           })
           .select()
           .single()
-          .then(({ error }: any) => fetchUser({ error, username }))
+          .then(({ data, error }: any) => {
+            console.log(data, error, username, userData)
+            fetchUser({ error, username })
+          })
       }
     }
   }

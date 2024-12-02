@@ -5,10 +5,19 @@ import { usePathname } from 'next/navigation'
 import { Button } from '../../../components/Button/Button'
 import { cn } from '../../../lib/utils/cn'
 import announcement from '../data/Announcement.json'
-import Countdown from './Countdown'
+import Image from 'next/image'
+import { useTheme } from 'next-themes'
+// import Countdown from './Countdown'
 
-export function LW12CountdownBanner() {
+const LW13BGDark =
+  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-dark.png?t=2024-11-22T23%3A10%3A37.646Z'
+const LW13BGLight =
+  'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/images/launch-week/lw13/assets/lw13-banner-light.png?t=2024-11-22T23%3A10%3A37.646Z'
+
+export function LW13CountdownBanner() {
   const pathname = usePathname()
+  const { resolvedTheme } = useTheme()
+  const bgImage = resolvedTheme?.includes('dark') ? LW13BGDark : LW13BGLight
   const isHomePage = pathname === '/'
   const isLaunchWeekPage =
     pathname === '/launch-week' || pathname?.includes('/launch-week/tickets/')
@@ -27,16 +36,23 @@ export function LW12CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
+          <div className="hidden sm:block text-foreground-lighter">AI Assistant v2</div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href="https://supabase.com/launch-week">{announcement.cta}</Link>
+            <Link href={announcement.link}>{announcement.cta}</Link>
           </Button>
         </div>
       </div>
+      <Image
+        src={bgImage}
+        alt=""
+        fill
+        sizes="100%"
+        quality={100}
+        aria-hidden
+        className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
+      />
     </div>
   )
 }
 
-export default LW12CountdownBanner
+export default LW13CountdownBanner

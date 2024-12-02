@@ -53,7 +53,7 @@ const welcomeMessages = [
           </g>
         </svg>
         <p>
-          Welcome Product Hunter! 👋 Thanks for checking out the Supabase assistant. Let me show you
+          Welcome Product Hunter! 👋 Thanks for checking out the Supabase Assistant. Let me show you
           what I can do!
         </p>
       </div>
@@ -677,19 +677,30 @@ function Assistant() {
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
                 <p className="p text-lg !m-0">
                   Generate, run and debug queries, chart your data, create functions, policies and
-                  more. The assistant is here to help.
+                  more. The Assistant is here to help.
                 </p>
-                <div className="min-h-12">
+                <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading &&
                     (isLoggedIn ? (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
+                        <Link href="/dashboard/project/_">Dashboard</Link>
                       </Button>
                     ) : (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard">Start your project</Link>
+                        <Link href="https://supabase.com/dashboard/project/_">
+                          Start your project
+                        </Link>
                       </Button>
                     ))}
+                  <Button type="default" size="medium" asChild>
+                    <Link
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      href="https://supabase.com/blog/supabase-ai-assistant-v2"
+                    >
+                      Blog Post
+                    </Link>
+                  </Button>
                 </div>
               </div>
 
