@@ -215,7 +215,7 @@ export const PreviousRunsTab = () => {
         />
       </div>
 
-      <div className="px-6 py-6 flex gap-12 border-t">
+      <div className="px-6 py-6 flex gap-12 border-t bg sticky bottom-0">
         {isLoadingCronJobs ? (
           <GenericSkeletonLoader />
         ) : (
