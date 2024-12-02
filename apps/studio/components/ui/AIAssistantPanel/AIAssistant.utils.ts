@@ -7,6 +7,7 @@ import { enumeratedTypesKeys } from 'data/enumerated-types/keys'
 import { tableKeys } from 'data/tables/keys'
 import { CommonDatabaseEntity } from 'state/app-state'
 import { SupportedAssistantEntities } from './AIAssistant.types'
+import { SAFE_FUNCTIONS } from './AiAssistant.constants'
 
 const PLACEHOLDER_PREFIX = `-- Press tab to use this code
 \n&nbsp;\n`
@@ -109,39 +110,26 @@ export const identifyQueryType = (query: string) => {
   }
 }
 
+// Check for function calls that aren't in the safe list
+export const containsUnknownFunction = (query: string) => {
+  const normalizedQuery = query.trim().toLowerCase()
+  const functionCallRegex = /\w+\s*\(/g
+  const functionCalls = normalizedQuery.match(functionCallRegex) || []
+
+  return functionCalls.some((func) => {
+    const isReadOnlyFunc = SAFE_FUNCTIONS.some((safeFunc) => func.trim().toLowerCase() === safeFunc)
+    return !isReadOnlyFunc
+  })
+}
+
 export const isReadOnlySelect = (query: string): boolean => {
   const normalizedQuery = query.trim().toLowerCase()
 
   // Check if it starts with SELECT
-  if (!normalizedQuery.startsWith('select')) {
-    return false
-  }
+  if (!normalizedQuery.startsWith('select')) return false
 
   // List of keywords that indicate write operations
   const writeOperations = ['insert', 'update', 'delete', 'alter', 'drop', 'create', 'replace']
-
-  // Safe read-only SQL functions
-  const readOnlyFunctions = [
-    'count(',
-    'sum(',
-    'avg(',
-    'min(',
-    'max(',
-    'coalesce(',
-    'nullif(',
-    'current_timestamp',
-    'current_date',
-    'length(',
-    'lower(',
-    'upper(',
-    'trim(',
-    'substring(',
-    'to_char(',
-    'to_date(',
-    'extract(',
-    'date_trunc(',
-    'string_agg(',
-  ]
 
   // Words that may appear in column names etc
   const allowedPatterns = ['created', 'inserted', 'updated', 'deleted', 'truncate']
@@ -154,23 +142,10 @@ export const isReadOnlySelect = (query: string): boolean => {
     )
     return !isAllowed && normalizedQuery.includes(op)
   })
+  if (hasWriteOperation) return false
 
-  if (hasWriteOperation) {
-    return false
-  }
-
-  // Check for function calls that aren't in the safe list
-  const functionCallRegex = /\w+\s*\(/g
-  const functionCalls = normalizedQuery.match(functionCallRegex) || []
-
-  for (const func of functionCalls) {
-    const isReadOnlyFunc = readOnlyFunctions.some(
-      (safeFunc) => func.trim().toLowerCase() === safeFunc
-    )
-    if (!isReadOnlyFunc) {
-      return false // Unknown function call - assume not read-only
-    }
-  }
+  const hasUnknownFunction = containsUnknownFunction(normalizedQuery)
+  if (hasUnknownFunction) return false
 
   return true
 }
