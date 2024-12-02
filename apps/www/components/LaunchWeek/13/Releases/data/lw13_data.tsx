@@ -63,7 +63,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Mon',
     shipped: true,
     isToday: true,
-    blog: '',
+    blog: '/blog/supabase-assistant',
     hasCountdown: false,
     date: '2 December',
     published_at: '2024-12-02T08:00:00.000-07:00',
@@ -86,10 +86,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.png',
-            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.png',
-            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.png',
-            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.png',
+            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.svg',
+            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.svg',
+            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.svg',
+            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.svg',
           },
         ],
       },
