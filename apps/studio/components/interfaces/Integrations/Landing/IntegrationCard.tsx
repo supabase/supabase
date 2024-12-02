@@ -52,7 +52,7 @@ export const IntegrationCard = ({
             <div className="flex items-center gap-x-2">
               <p className="text-foreground text-sm">{name}</p>
               {status && (
-                <Badge variant="warning" className="py-0 px-1.5">
+                <Badge variant="warning" className="py-0 px-1.5 capitalize">
                   {status}
                 </Badge>
               )}
