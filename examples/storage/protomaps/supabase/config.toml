@@ -2,17 +2,13 @@
 # working directory name when running `supabase init`.
 project_id = "protomaps"
 
-# Disable data API since we are not using the PostgREST client in this example.
 [api]
+# Disable data API since we are not using the PostgREST client in this example.
 enabled = false
 
 [storage]
-enabled = true
 # The maximum file size allowed for all buckets in the project.
 file_size_limit = "50MiB"
-
-[storage.image_transformation]
-enabled = true
 
 [storage.buckets.maps-private]
 public = false
@@ -20,14 +16,6 @@ public = false
 # allowed_mime_types = ["application/vnd.pmtiles"]
 # Uncomment to specify a local directory to upload objects to the bucket.
 # objects_path = "./buckets/maps-private"
-
-[edge_runtime]
-enabled = true
-# Configure one of the supported request policies: `oneshot`, `per_worker`.
-# Use `oneshot` for hot reload, or `per_worker` for load testing.
-policy = "oneshot"
-# Port to attach the Chrome inspector for debugging Edge Functions locally.
-inspector_port = 8083
 
 [functions.maps-private]
 enabled = true
