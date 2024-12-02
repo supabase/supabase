@@ -91,7 +91,7 @@ const IntegrationTopHeaderLayout = ({ ...props }: PropsWithChildren) => {
   } = useInstalledIntegrations()
   const installedIntegrationItems = integrations.map((integration) => ({
     name: integration.name,
-    label: integration.beta ? 'Beta' : undefined,
+    label: integration.status,
     key: `integrations/${integration.id}`,
     url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (
@@ -167,7 +167,7 @@ const IntegrationsLayoutSide = ({ ...props }: PropsWithChildren) => {
   } = useInstalledIntegrations()
   const installedIntegrationItems = integrations.map((integration) => ({
     name: integration.name,
-    label: integration.beta ? 'Beta' : undefined,
+    label: integration.status,
     key: `integrations/${integration.id}`,
     url: `/project/${project?.ref}/integrations/${integration.id}/overview`,
     icon: (
