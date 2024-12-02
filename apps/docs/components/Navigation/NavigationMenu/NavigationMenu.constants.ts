@@ -1273,6 +1273,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/background-tasks',
         },
         {
+          name: 'Ephemeral Storage',
+          url: '/guides/functions/ephemeral-storage',
+        },
+        {
           name: 'Running AI Models',
           url: '/guides/functions/ai-models',
         },
