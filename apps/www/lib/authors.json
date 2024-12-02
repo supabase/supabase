@@ -565,5 +565,13 @@
     "position": "Engineering",
     "author_url": "https://github.com/jgoux",
     "author_image_url": "https://github.com/jgoux.png"
+  },
+  {
+    "author_id": "saxon_fletcher",
+    "author": "Saxon Fletcher",
+    "username": "saxonf",
+    "position": "Product Design",
+    "author_url": "https://github.com/saxonf",
+    "author_image_url": "https://github.com/saxonf.png"
   }
 ]
