@@ -105,8 +105,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '',
     date: '3 December',
     published_at: '2024-12-03T08:00:00.000-07:00',
-    title: 'Supabase Functions',
-    description: 'Supabase Functions',
+    title: 'Supabase Functions v3: Background tasks',
+    description: (
+      <>
+        Supabase Functions v3: <br className="hidden sm:block" /> Background tasks
+      </>
+    ),
     links: [
       {
         type: 'video',
