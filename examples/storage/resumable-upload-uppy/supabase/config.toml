@@ -2,12 +2,11 @@
 # working directory name when running `supabase init`.
 project_id = "resumable-upload-uppy"
 
-# Disable data API since we are not using the PostgREST client in this example.
 [api]
+# Disable data API since we are not using the PostgREST client in this example.
 enabled = false
 
 [storage]
-enabled = true
 # The maximum file size allowed for all buckets in the project.
 file_size_limit = "50MiB"
 
