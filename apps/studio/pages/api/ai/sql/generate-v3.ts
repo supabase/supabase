@@ -82,6 +82,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
+      - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
 
       When generating tables, do the following:
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
@@ -112,7 +113,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # For all your abilities, follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-      - If the question is about users or involves creating a users table, also retrieve the auth schema. In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information. You often don't need to create a new users table.
+      - If the question is about users or involves creating a users table, also retrieve the auth schema. 
+  
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
