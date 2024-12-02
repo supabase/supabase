@@ -20,6 +20,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Button,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -42,8 +45,11 @@ import {
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
 import { getQueueFunctionsMapping } from './Queue.utils'
+import { Admonition } from 'ui-patterns'
+import Link from 'next/link'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
+const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
 type Privileges = { select?: boolean; insert?: boolean; update?: boolean; delete?: boolean }
 
 interface QueueSettingsProps {}
@@ -65,7 +71,9 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+  const roles = (data ?? [])
+    .filter((x) => ROLES.includes(x.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: queueTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -233,8 +241,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
         <SheetHeader>
           <SheetTitle>Manage queue permissions on {name}</SheetTitle>
           <SheetDescription>
-            Configure permissions for each role to grant access to the relevant actions on the
-            queue.{' '}
+            Configure permissions for the following roles to grant access to the relevant actions on
+            the queue.{' '}
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
@@ -245,6 +253,31 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
         </SheetHeader>
 
         <SheetSection className="p-0 flex-grow">
+          {!isExposed ? (
+            <Admonition
+              type="default"
+              className="rounded-none border-x-0 border-t-0"
+              title="Queue permissions are only relevant if exposure through PostgREST has been enabled"
+              description={
+                <>
+                  You may opt to manage your queues via any Supabase client libraries or PostgREST
+                  endpoints by enabling this in the{' '}
+                  <Link
+                    href={`/project/${project?.ref}/integrations/queues/settings`}
+                    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
+                  >
+                    queues settings
+                  </Link>
+                </>
+              }
+            />
+          ) : (
+            <Admonition
+              type="default"
+              className="rounded-none border-x-0 border-t-0"
+              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+            />
+          )}
           <Table>
             <TableHeader className="[&_th]:h-8">
               <TableRow className="py-2">

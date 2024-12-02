@@ -62,7 +62,7 @@ const Home: NextPageWithLayout = () => {
               <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
                 This project is using Postgres with OrioleDB which is currently in preview and not
                 suitable for production workloads. View our{' '}
-                {/* [Joshen] Make this into a reusable component to use links inline */}
+                {/* [Refactor] Make this into a reusable component to use links inline */}
                 <a
                   target="_blank"
                   rel="noreferrer noopener"
