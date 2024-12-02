@@ -10,14 +10,21 @@ import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormActions } from 'components/ui/Forms/FormActions'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import InformationBox from 'components/ui/InformationBox'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useValidateSpamMutation, ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import type { FormSchema } from 'types'
-import { Form, Input, Tabs } from 'ui'
+import {
+  Form,
+  Input,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 import { SpamValidation } from './SpamValidation'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -34,8 +41,11 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     onSuccess: (res) => setValidationResult(res),
   })
 
-  const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation({
-    onError: (error) => toast.error(`Failed to update email templates: ${error.message}`),
+  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation({
+    onError: (error) => {
+      setIsSavingTemplate(false)
+      toast.error(`Failed to update email templates: ${error.message}`)
+    },
   })
 
   const { id, properties } = template
@@ -59,13 +69,16 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
   const [validationResult, setValidationResult] = useState<ValidateSpamResponse>()
   const [bodyValue, setBodyValue] = useState((authConfig && authConfig[messageSlug]) ?? '')
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false)
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const debounceValidateSpam = useCallback(debounce(validateSpam, 1000), [])
   const spamRules = (validationResult?.rules ?? []).filter((rule) => rule.score > 0)
   const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
 
   const onSubmit = (values: any, { resetForm }: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+
+    setIsSavingTemplate(true)
     const payload = { ...values }
 
     // Because the template content uses the code editor which is not a form component
@@ -73,17 +86,44 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
     delete payload[messageSlug]
     if (messageProperty) payload[messageSlug] = bodyValue
 
-    updateAuthConfig(
-      { projectRef: projectRef!, config: payload },
+    const [subjectKey] = Object.keys(properties)
+
+    validateSpam(
       {
-        onSuccess: () => {
-          toast.success('Successfully updated settings')
-          resetForm({
-            values: values,
-            initialValues: values,
-          })
-          setHasUnsavedChanges(false) // Reset the unsaved changes state
+        projectRef,
+        template: {
+          subject: payload[subjectKey],
+          content: payload[messageSlug],
         },
+      },
+      {
+        onSuccess: (res) => {
+          const spamRules = (res?.rules ?? []).filter((rule) => rule.score > 0)
+          const preventSaveFromSpamCheck = builtInSMTP && spamRules.length > 0
+
+          if (preventSaveFromSpamCheck) {
+            setIsSavingTemplate(false)
+            toast.error(
+              'Please rectify all spam warnings before saving while using the built-in email service'
+            )
+          } else {
+            updateAuthConfig(
+              { projectRef: projectRef, config: payload },
+              {
+                onSuccess: () => {
+                  setIsSavingTemplate(false)
+                  toast.success('Successfully updated settings')
+                  resetForm({
+                    values: values,
+                    initialValues: values,
+                  })
+                  setHasUnsavedChanges(false) // Reset the unsaved changes state
+                },
+              }
+            )
+          }
+        },
+        onError: () => setIsSavingTemplate(false),
       }
     )
   }
@@ -184,33 +224,33 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                         }
                       />
                     </div>
-                    <Tabs defaultActiveId="source" type="underlined" size="tiny">
-                      <Tabs.Panel id="source" icon={<Code size={14} />} label="Source">
+                    <Tabs_Shadcn_ defaultValue="source">
+                      <TabsList_Shadcn_ className="gap-3">
+                        <TabsTrigger_Shadcn_ value="source" className="gap-2">
+                          <Code size={14} />
+                          Source
+                        </TabsTrigger_Shadcn_>
+                        <TabsTrigger_Shadcn_ value="preview" className="gap-2">
+                          <Monitor size={14} />
+                          Preview
+                        </TabsTrigger_Shadcn_>
+                      </TabsList_Shadcn_>
+                      <TabsContent_Shadcn_ value="source" className="-space-y-px">
+                        <CodeEditor
+                          id="code-id"
+                          language="html"
+                          isReadOnly={!canUpdateConfig}
+                          className="!mb-0 relative h-96 overflow-hidden rounded border rounded-b-none"
+                          onInputChange={(e: string | undefined) => {
+                            setBodyValue(e ?? '')
+                            if (bodyValue !== e) setHasUnsavedChanges(true)
+                          }}
+                          options={{ wordWrap: 'on', contextmenu: false }}
+                          value={bodyValue}
+                        />
                         <SpamValidation validationResult={validationResult} />
-                        <div className="relative h-96">
-                          <CodeEditor
-                            id="code-id"
-                            language="html"
-                            isReadOnly={!canUpdateConfig}
-                            className="!mb-0 h-96 overflow-hidden rounded border"
-                            onInputChange={(e: string | undefined) => {
-                              setBodyValue(e ?? '')
-                              if (bodyValue !== e) setHasUnsavedChanges(true)
-
-                              if (projectRef) {
-                                const [subjectKey] = Object.keys(values)
-                                debounceValidateSpam({
-                                  projectRef,
-                                  template: { subject: values[subjectKey], content: e ?? '' },
-                                })
-                              }
-                            }}
-                            options={{ wordWrap: 'on', contextmenu: false }}
-                            value={bodyValue}
-                          />
-                        </div>
-                      </Tabs.Panel>
-                      <Tabs.Panel id="preview" icon={<Monitor size={14} />} label="Preview">
+                      </TabsContent_Shadcn_>
+                      <TabsContent_Shadcn_ value="preview">
                         <Admonition
                           type="default"
                           title="The preview may differ slightly from the actual rendering in the email client"
@@ -220,8 +260,8 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                           title={id}
                           srcDoc={bodyValue}
                         />
-                      </Tabs.Panel>
-                    </Tabs>
+                      </TabsContent_Shadcn_>
+                    </Tabs_Shadcn_>
                   </>
                 )}
                 <div className="col-span-12 flex w-full">
@@ -234,9 +274,9 @@ const TemplateEditor = ({ template }: TemplateEditorProps) => {
                       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
                     }}
                     form={formId}
-                    isSubmitting={isUpdatingConfig}
+                    isSubmitting={isSavingTemplate}
                     hasChanges={hasChanges}
-                    disabled={preventSaveFromSpamCheck || !canUpdateConfig}
+                    disabled={!canUpdateConfig}
                     helper={
                       preventSaveFromSpamCheck
                         ? 'Please rectify all spam warnings before saving while using the built-in email service'

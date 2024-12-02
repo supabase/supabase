@@ -42,9 +42,9 @@ import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
 import Link from 'next/link'
+import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
+import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -128,12 +128,7 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(
-    projectRef: string,
-    url: string,
-    serviceKey: string,
-    protocol: string = PROJECT_ENDPOINT_PROTOCOL
-  ) {
+  initStore(projectRef: string, url: string, serviceKey: string, protocol: string) {
     this.projectRef = projectRef
     this.resumableUploadUrl = `${IS_PLATFORM ? 'https' : protocol}://${url}/storage/v1/upload/resumable`
     this.serviceKey = serviceKey

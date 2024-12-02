@@ -7,7 +7,7 @@ import { useParams } from 'common'
 import {
   DISK_PRICING,
   DiskType,
-} from 'components/interfaces/DiskManagement/DiskManagement.constants'
+} from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import {
   calculateIOPSPrice,
   calculateThroughputPrice,
@@ -72,6 +72,7 @@ const DeployNewReplicaPanel = ({
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const diskManagementV2 = useFlag('diskManagementV2')
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
@@ -100,7 +101,8 @@ const DeployNewReplicaPanel = ({
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
   const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
-  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
+  const additionalCostDiskSize =
+    readReplicaDiskSizes * (DISK_PRICING[type as DiskType]?.storage ?? 0)
   const additionalCostIOPS = calculateIOPSPrice({
     oldStorageType: type as DiskType,
     newStorageType: type as DiskType,
@@ -298,7 +300,9 @@ const DeployNewReplicaPanel = ({
                     href={
                       isFreePlan
                         ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                        : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                        : diskAndComputeFormEnabled
+                          ? `/project/${projectRef}/settings/compute-and-disk`
+                          : `/project/${projectRef}/settings/addons?panel=computeInstance`
                     }
                   >
                     {isFreePlan ? 'Upgrade to Pro' : 'Change compute size'}
@@ -395,7 +399,9 @@ const DeployNewReplicaPanel = ({
                         href={
                           isFreePlan
                             ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                            : `/project/${projectRef}/settings/addons?panel=computeInstance`
+                            : diskAndComputeFormEnabled
+                              ? `/project/${projectRef}/settings/compute-and-disk`
+                              : `/project/${projectRef}/settings/addons?panel=computeInstance`
                         }
                       >
                         Upgrade compute size

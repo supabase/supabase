@@ -9,7 +9,7 @@ const dismissToast = async (page: Page) => {
 test.describe('Table Editor page', () => {
   test.beforeEach(async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
     await page.goto('/project/default/editor')
@@ -108,7 +108,7 @@ test.describe('Table Editor page', () => {
 
   test('should check the auth schema', async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
 

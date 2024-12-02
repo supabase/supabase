@@ -49,6 +49,7 @@ interface ColumnTypeProps {
   error?: any
   disabled?: boolean
   showLabel?: boolean
+  layout?: 'horizontal' | 'vertical'
   description?: ReactNode
   showRecommendation?: boolean
   onOptionSelect: (value: string) => void
@@ -56,10 +57,11 @@ interface ColumnTypeProps {
 
 const ColumnType = ({
   value,
+  className,
   enumTypes = [],
-  error,
   disabled = false,
   showLabel = true,
+  layout = 'horizontal',
   description,
   showRecommendation = false,
   onOptionSelect = noop,
@@ -115,8 +117,8 @@ const ColumnType = ({
             readOnly
             disabled
             label={showLabel ? 'Type' : ''}
-            layout={showLabel ? 'horizontal' : undefined}
-            className="md:gap-x-0"
+            layout={showLabel ? layout : undefined}
+            className="md:gap-x-0 [&>div>div]:text-left"
             size="small"
             icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
             value={value}
@@ -183,7 +185,7 @@ const ColumnType = ({
   }
 
   return (
-    <div className="flex flex-col gap-y-2">
+    <div className={cn('flex flex-col gap-y-2', className)}>
       {showLabel && <Label_Shadcn_ className="text-foreground-light">Type</Label_Shadcn_>}
       <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
         <PopoverTrigger_Shadcn_ asChild>

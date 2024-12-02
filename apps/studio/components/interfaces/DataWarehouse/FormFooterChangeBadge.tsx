@@ -29,6 +29,7 @@ export const FormFooterChangeBadge = ({ formState }: FormFooterChangeBadgeProps)
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.1 }}
+                className="text-sm"
               >
                 {Object.keys(formState.dirtyFields).length === 1
                   ? '1 change to review'

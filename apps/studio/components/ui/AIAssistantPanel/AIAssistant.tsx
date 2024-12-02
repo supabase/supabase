@@ -1,160 +1,128 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText, MessageCircleMore, Plus, WandSparkles } from 'lucide-react'
-import Link from 'next/link'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { FileText, Info } from 'lucide-react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
-import { useParams } from 'common'
+import { useParams, useSearchParamsShallow } from 'common/hooks'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
-import { MessageWithDebug } from 'components/interfaces/SQLEditor/AiAssistantPanel'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useCheckOpenAIKeyQuery } from 'data/ai/check-api-key-query'
-import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
-import { useEntityDefinitionQuery } from 'data/database/entity-definition-query'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { constructHeaders } from 'data/fetchers'
 import { useOrganizationUpdateMutation } from 'data/organizations/organization-update-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useOrgOptedIntoAi } from 'hooks/misc/useOrgOptedIntoAi'
-import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import {
-  BASE_PATH,
-  IS_PLATFORM,
-  OPT_IN_TAGS,
-  TELEMETRY_ACTIONS,
-  TELEMETRY_CATEGORIES,
-  TELEMETRY_LABELS,
-} from 'lib/constants'
+import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import uuidv4 from 'lib/uuid'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
   cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-  SheetHeader,
-  SheetSection,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
+  TooltipProvider_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { Admonition, AssistantChatForm } from 'ui-patterns'
+import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { DocsButton } from '../DocsButton'
-import { ASSISTANT_SUPPORT_ENTITIES } from './AiAssistant.constants'
-import { SupportedAssistantEntities, SupportedAssistantQuickPromptTypes } from './AIAssistant.types'
-import { generatePrompt, retrieveDocsUrl } from './AIAssistant.utils'
-import { ContextBadge } from './ContextBadge'
-import { EntitiesDropdownMenu } from './EntitiesDropdownMenu'
+import AIOnboarding from './AIOnboarding'
+import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import { SchemasDropdownMenu } from './SchemasDropdownMenu'
+import DotGrid from '../DotGrid'
 
-const ANIMATION_DURATION = 0.3
+const MemoizedMessage = memo(
+  ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
+    return (
+      <Message
+        key={message.id}
+        id={message.id}
+        role={message.role}
+        content={message.content}
+        readOnly={message.role === 'user'}
+        isLoading={isLoading}
+      />
+    )
+  }
+)
+
+MemoizedMessage.displayName = 'MemoizedMessage'
 
 interface AIAssistantProps {
   id: string
+  initialMessages?: MessageType[] | undefined
   className?: string
-  debugThread: MessageWithDebug[]
-  onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onResetConversation: () => void
 }
 
-// [Joshen] For some reason I'm having issues working with dropdown menu and scroll area
-
 export const AIAssistant = ({
   id,
+  initialMessages,
   className,
-  debugThread,
-  onDiff,
   onResetConversation,
 }: AIAssistantProps) => {
-  const { ref } = useParams()
+  const router = useRouter()
   const project = useSelectedProject()
   const isOptedInToAI = useOrgOptedIntoAi()
   const selectedOrganization = useSelectedOrganization()
+  const { id: entityId } = useParams()
+  const searchParams = useSearchParamsShallow()
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
   const disablePrompts = useFlag('disableAssistantPrompts')
-  const { aiAssistantPanel } = useAppStateSnapshot()
-  const { editor, entity } = aiAssistantPanel
+  const { snippets } = useSqlEditorV2StateSnapshot()
+  const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+  const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const [value, setValue] = useState<string>('')
-  const [selectedDatabaseEntity, setSelectedDatabaseEntity] = useState<
-    SupportedAssistantEntities | ''
-  >('')
-  const [selectedSchemas, setSelectedSchemas] = useSchemasForAi(project?.ref!)
-  const [selectedTables, setSelectedTables] = useState<{ schema: string; name: string }[]>([])
-  const [contextHistory, setContextHistory] = useState<{
-    [key: string]: { entity: string; schemas: string[]; tables: string[] }
-  }>({})
-  // [Joshen] Mainly for error handling on useChat - cause last sent messages will be voided
+  const [value, setValue] = useState<string>(initialInput)
   const [assistantError, setAssistantError] = useState<string>()
   const [lastSentMessage, setLastSentMessage] = useState<MessageType>()
   const [isConfirmOptInModalOpen, setIsConfirmOptInModalOpen] = useState(false)
-
-  const docsUrl = retrieveDocsUrl(selectedDatabaseEntity as SupportedAssistantEntities)
-  const entityContext = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === selectedDatabaseEntity)
-  const noContextAdded =
-    selectedDatabaseEntity.length === 0 &&
-    selectedSchemas.length === 0 &&
-    selectedTables.length === 0
+  const [showFade, setShowFade] = useState(false)
 
   const { data: check } = useCheckOpenAIKeyQuery()
   const isApiKeySet = IS_PLATFORM || !!check?.hasKey
 
-  const { data: existingDefinition } = useEntityDefinitionQuery({
-    id: entity?.id,
-    type: editor,
+  const isInSQLEditor = router.pathname.includes('/sql/[id]')
+  const snippet = snippets[entityId ?? '']
+  const snippetContent = snippet?.snippet?.content?.sql
+
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
+  const { data: tables, isLoading: isLoadingTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: 'public',
   })
 
-  const { data } = useEntityDefinitionsQuery(
-    {
-      schemas: selectedSchemas,
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: includeSchemaMetadata }
-  )
-
-  const tableDefinitions =
-    selectedTables.length === 0
-      ? data?.map((def) => def.sql.trim()) ?? []
-      : data
-          ?.filter((def) => {
-            return selectedTables.some((table) => {
-              return def.sql.startsWith(`CREATE  TABLE ${table.schema}.${table.name}`)
-            })
-          })
-          .map((def) => def.sql.trim()) ?? []
-  const entityDefinitions = includeSchemaMetadata ? tableDefinitions : undefined
+  const currentTable = tables?.find((t) => t.id.toString() === entityId)
+  const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (action: string) => {
+  const sendTelemetryEvent = (value: string) => {
     sendEvent({
-      action,
-      category: TELEMETRY_CATEGORIES.AI_ASSISTANT,
-      label: TELEMETRY_LABELS.QUICK_SQL_EDITOR,
+      value,
+      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
+      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
     })
   }
 
@@ -162,23 +130,28 @@ export const AIAssistant = ({
     messages: chatMessages,
     isLoading: isChatLoading,
     append,
+    setMessages,
   } = useChat({
     id,
-    api: `${BASE_PATH}/api/ai/sql/generate-v2`,
-    body: { entityDefinitions, context: selectedDatabaseEntity, existingSql: existingDefinition },
-    onError: (error) => setAssistantError(JSON.parse(error.message).error),
+    api: `${BASE_PATH}/api/ai/sql/generate-v3`,
+    maxSteps: 5,
+    // [Joshen] Not currently used atm, but initialMessages will be for...
+    initialMessages,
+    body: {
+      includeSchemaMetadata,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      schema: currentSchema,
+      table: currentTable?.name,
+    },
   })
 
   const canUpdateOrganization = useCheckPermissions(PermissionAction.UPDATE, 'organizations')
   const { mutate: updateOrganization, isLoading: isUpdating } = useOrganizationUpdateMutation()
 
-  const { isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-  const isLoading = isChatLoading || isDebugSqlLoading
-
   const messages = useMemo(() => {
     const merged = [
-      ...debugThread,
-      ...chatMessages.map((m) => ({ ...m, isDebug: false })),
+      ...chatMessages,
       ...(assistantError !== undefined && lastSentMessage !== undefined ? [lastSentMessage] : []),
     ]
 
@@ -187,59 +160,40 @@ export const AIAssistant = ({
         (a.createdAt?.getTime() ?? 0) - (b.createdAt?.getTime() ?? 0) ||
         a.role.localeCompare(b.role)
     )
-  }, [chatMessages, debugThread, assistantError, lastSentMessage])
+  }, [chatMessages, assistantError, lastSentMessage])
+
+  const renderedMessages = useMemo(
+    () =>
+      messages.map((message) => {
+        return (
+          <MemoizedMessage
+            key={message.id}
+            message={message}
+            isLoading={isChatLoading && message === messages[messages.length - 1]}
+          />
+        )
+      }),
+    [messages, isChatLoading]
+  )
 
   const hasMessages = messages.length > 0
-  const lastMessage = last(messages)
-  const pendingChatReply = isLoading && lastMessage?.role === 'user'
-  const pendingDebugReply =
-    (lastMessage as MessageWithDebug)?.isDebug &&
-    lastMessage?.role === 'assistant' &&
-    lastMessage.content === 'Thinking...'
-  const pendingReply = pendingChatReply || pendingDebugReply
 
-  const sendMessageToAssistant = (content: string) => {
+  const sendMessageToAssistant = async (content: string) => {
     const payload = { role: 'user', createdAt: new Date(), content } as MessageType
-    append(payload)
+    const headerData = await constructHeaders()
+    append(payload, {
+      headers: { Authorization: headerData.get('Authorization') ?? '' },
+    })
+
+    setAiAssistantPanel({ sqlSnippets: undefined })
+    setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
-    sendTelemetryEvent(TELEMETRY_ACTIONS.PROMPT_SUBMITTED)
-  }
 
-  const toggleSchema = (schema: string) => {
-    if (selectedSchemas.includes(schema)) {
-      setSelectedSchemas(selectedSchemas.filter((s) => s !== schema))
+    if (content.includes('Help me to debug')) {
+      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
     } else {
-      const newSelectedSchemas = [...selectedSchemas, schema].sort((a, b) => a.localeCompare(b))
-      setSelectedSchemas(newSelectedSchemas)
-      sendTelemetryEvent(TELEMETRY_ACTIONS.SCHEMA_CONTEXT_ADDED)
-    }
-  }
-
-  const toggleEntity = ({ schema, name }: { schema: string; name: string }) => {
-    const isExisting = selectedTables.find((x) => x.schema === schema && x.name === name)
-    if (isExisting) {
-      setSelectedTables(selectedTables.filter((x) => !(x.schema === schema && x.name === name)))
-    } else {
-      const newselectedTables = [...selectedTables, { schema, name }].sort(
-        (a, b) => a.schema.localeCompare(b.schema) || a.name.localeCompare(b.name)
-      )
-      setSelectedTables(newselectedTables)
-      sendTelemetryEvent(TELEMETRY_ACTIONS.TABLE_CONTEXT_ADDED)
-    }
-  }
-
-  const onClickQuickPrompt = (type: SupportedAssistantQuickPromptTypes) => {
-    const prompt = generatePrompt({
-      type,
-      context: selectedDatabaseEntity as any,
-      schemas: selectedSchemas,
-      tables: selectedTables,
-    })
-    if (prompt) {
-      setValue(prompt)
-      sendMessageToAssistant(prompt)
-      sendTelemetryEvent(TELEMETRY_ACTIONS.QUICK_PROMPT_SELECTED(type))
+      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
     }
   }
 
@@ -267,16 +221,48 @@ export const AIAssistant = ({
     )
   }
 
-  useEffect(() => {
-    if (editor) {
-      const mode = ASSISTANT_SUPPORT_ENTITIES.find((x) => x.id === editor)
-      if (mode) setSelectedDatabaseEntity(mode.id)
+  const handleScroll = () => {
+    const container = scrollContainerRef.current
+    if (container) {
+      const scrollPercentage =
+        (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100
+      const isScrollable = container.scrollHeight > container.clientHeight
+      const isAtBottom = scrollPercentage >= 100
+
+      setShowFade(isScrollable && !isAtBottom)
     }
-  }, [editor])
+  }
+
+  // Add useEffect to set up scroll listener
+  useEffect(() => {
+    // Use a small delay to ensure container is mounted and has content
+    const timeoutId = setTimeout(() => {
+      const container = scrollContainerRef.current
+      if (container) {
+        container.addEventListener('scroll', handleScroll)
+        handleScroll()
+      }
+    }, 100)
+
+    return () => {
+      clearTimeout(timeoutId)
+      const container = scrollContainerRef.current
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [])
 
   useEffect(() => {
-    if (!isLoading) {
-      setValue('')
+    setValue(initialInput)
+    if (inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
+    }
+  }, [initialInput])
+
+  useEffect(() => {
+    if (!isChatLoading) {
       if (inputRef.current) inputRef.current.focus()
     }
 
@@ -284,452 +270,299 @@ export const AIAssistant = ({
       () => {
         if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
       },
-      isLoading ? 100 : 500
+      isChatLoading ? 100 : 500
     )
-  }, [isLoading])
+  }, [isChatLoading])
 
   useEffect(() => {
     if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
-
-  useEffect(() => {
-    const lastMessage = last(messages)
-    if (lastMessage?.role === 'user') {
-      const entity = entityContext?.label ?? selectedDatabaseEntity
-      setContextHistory({
-        ...contextHistory,
-        [lastMessage.id]: {
-          entity,
-          schemas: selectedSchemas,
-          tables: selectedTables.map((x) =>
-            selectedSchemas.length > 1 ? `${x.schema}.${x.name}` : x.name
-          ),
-        },
+    handleScroll()
+    // Load messages into state
+    if (!isChatLoading) {
+      setAiAssistantPanel({
+        messages,
       })
     }
+  }, [messages, isChatLoading, setAiAssistantPanel])
+
+  // Remove suggestions if sqlSnippets were removed
+  useEffect(() => {
+    if (!sqlSnippets || sqlSnippets.length === 0) {
+      setAiAssistantPanel({ suggestions: undefined })
+    }
+  }, [sqlSnippets, suggestions, setAiAssistantPanel])
+
+  useEffect(() => {
+    if (open && isInSQLEditor && !!snippetContent) {
+      setAiAssistantPanel({ sqlSnippets: [snippetContent] })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages.length])
+  }, [open, isInSQLEditor, snippetContent])
 
   return (
     <>
-      <div className={cn('flex flex-col', className)}>
-        <SheetHeader className="flex items-center justify-between py-3">
-          <div className="flex items-center gap-x-2">
-            <AiIconAnimation
-              allowHoverEffect
-              className="[&>div>div]:border-black dark:[&>div>div]:border-white"
-            />
-            <p>Assistant</p>
-          </div>
-          <AnimatePresence>
-            {hasMessages && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 100 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button type="default" disabled={isLoading} onClick={() => onResetConversation()}>
-                  Reset conversation
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </SheetHeader>
-
-        <SheetSection
-          className={cn(
-            'flex-grow flex flex-col items-center !p-0',
-            hasMessages ? 'justify-between h-[90%]' : 'justify-center h-full'
-          )}
+      <div className={cn('flex flex-col h-full', className)}>
+        <div
+          ref={scrollContainerRef}
+          className={cn('flex-grow overflow-auto flex flex-col')}
+          onScroll={handleScroll}
         >
-          {hasMessages && (
-            <motion.div
-              initial={{ height: 0 }}
-              transition={{ duration: ANIMATION_DURATION }}
-              className="w-full overflow-auto flex-1"
-            >
-              {messages.map((m, index) => {
-                const isFirstUserMessage =
-                  m.role === 'user' && messages.slice(0, index).every((msg) => msg.role !== 'user')
+          <div className="z-30 sticky top-0">
+            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
+              <AiIconAnimation allowHoverEffect />
 
-                return (
-                  <Message
-                    key={`message-${m.id}`}
-                    name={m.name}
-                    role={m.role}
-                    content={m.content}
-                    createdAt={new Date(m.createdAt || new Date()).getTime()}
-                    isDebug={(m as MessageWithDebug).isDebug}
-                    context={contextHistory[m.id]}
-                    onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-                  >
-                    {isFirstUserMessage && !includeSchemaMetadata && (
-                      <Admonition
-                        type="default"
-                        title="Project metadata is not shared with the Assistant"
-                        description="The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions."
-                      >
-                        <Button
-                          type="default"
-                          className="w-fit"
-                          onClick={() => setIsConfirmOptInModalOpen(true)}
-                        >
-                          Update AI settings
-                        </Button>
-                      </Admonition>
-                    )}
-                    {isFirstUserMessage &&
-                      includeSchemaMetadata &&
-                      selectedSchemas.length === 0 && (
-                        <Admonition
-                          type="default"
-                          title="We recommend including schemas for better answers from the Assistant"
-                        />
-                      )}
-                  </Message>
-                )
-              })}
-              {assistantError !== undefined && (
-                <Message
-                  key="assistant-error"
-                  role="assistant"
-                  variant="warning"
-                  createdAt={new Date().getTime()}
-                  content={`Sorry! We ran into the following error while trying to respond to your message: ${assistantError}. Please try again shortly or reach out to us via support if the issue still persists!`}
-                >
-                  <Button asChild type="default" className="w-min">
-                    <Link
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`/support/new?ref=${ref}&category=dashboard_bug&subject=Error%20with%20assistant%20response&message=Assistant%20error:%20${assistantError}`}
-                    >
-                      Contact support
-                    </Link>
+              <div className="text-sm flex-1">Assistant</div>
+              <div className="flex gap-4 items-center">
+                <Tooltip_Shadcn_ delayDuration={100}>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Info size={14} className="text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ className="w-80">
+                    The Assistant is in Alpha and your prompts might be rate limited.{' '}
+                    {includeSchemaMetadata
+                      ? 'Project metadata is being shared to improve Assistant responses.'
+                      : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+
+                {(hasMessages || suggestions || sqlSnippets) && (
+                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
+                    Reset
                   </Button>
-                </Message>
-              )}
-              {!isLoading && !pendingReply && assistantError === undefined && (
-                <p className="px-content text-xs text-right text-foreground-lighter pb-2">
-                  Please verify all responses as the Assistant can make mistakes
-                </p>
-              )}
-              {pendingChatReply && (
-                <Message key="thinking" role="assistant" content="Thinking..." />
+                )}
+              </div>
+            </div>
+            {!includeSchemaMetadata && (
+              <Admonition
+                type="default"
+                title="Project metadata is not shared"
+                description={
+                  hasHipaaAddon
+                    ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
+                    : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
+                }
+                className="border-0 border-b rounded-none"
+              >
+                {!hasHipaaAddon && (
+                  <Button
+                    type="default"
+                    className="w-fit mt-4"
+                    onClick={() => setIsConfirmOptInModalOpen(true)}
+                  >
+                    Update AI settings
+                  </Button>
+                )}
+              </Admonition>
+            )}
+          </div>
+          {!hasMessages && (
+            <div className="h-48 flex-0 m-8">
+              <DotGrid rows={10} columns={10} count={33} />
+            </div>
+          )}
+          {hasMessages ? (
+            <motion.div className="w-full p-5">
+              {renderedMessages}
+              {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
+                <div className="flex gap-4 w-auto overflow-hidden">
+                  <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                    <span>Thinking</span>
+                    <div className="flex gap-1">
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                      >
+                        .
+                      </motion.span>
+                    </div>
+                  </motion.div>
+                </div>
               )}
               <div ref={bottomRef} className="h-1" />
             </motion.div>
+          ) : suggestions ? (
+            <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
+              <h3 className="text-foreground-light font-mono text-sm uppercase mb-3">
+                Suggestions
+              </h3>
+              {suggestions.title && <p>{suggestions.title}</p>}
+              <div className="-mx-3 mt-4 mb-12">
+                {suggestions?.prompts?.map((prompt, idx) => (
+                  <Button
+                    key={`suggestion-${idx}`}
+                    size="small"
+                    icon={<FileText strokeWidth={1.5} size={16} />}
+                    type="text"
+                    className="w-full justify-start py-1 h-auto"
+                    onClick={() => {
+                      setValue(prompt)
+                      if (inputRef.current) {
+                        inputRef.current.focus()
+                        inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
+                      }
+                    }}
+                  >
+                    {prompt}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          ) : isLoadingTables ? (
+            <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
+              {/* [Joshen] We could try play around with a custom loader for the assistant here */}
+              <GenericSkeletonLoader className="w-4/5" />
+            </div>
+          ) : (tables ?? [])?.length > 0 ? (
+            <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
+          ) : (
+            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
+              <h2 className="text-base mb-2">Welcome to Supabase!</h2>
+              <p className="text-sm text-foreground-lighter mb-6">
+                This is the Supabase assistant which will help you create, debug and modify tables,
+                policies, functions and more. You can even use it to query your data using just your
+                words. It looks like we have a blank canvas though, so what are you looking to
+                build? Here are some ideas.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => setValue('Generate a database schema for ...')}
+                  className="rounded-full"
+                >
+                  Generate a ...
+                </Button>
+                {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
+                  <TooltipProvider_Shadcn_>
+                    <Tooltip_Shadcn_>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button
+                          type="outline"
+                          className="rounded-full"
+                          onClick={() => {
+                            setMessages([
+                              {
+                                id: uuidv4(),
+                                role: 'user',
+                                createdAt: new Date(Date.now() - 3000),
+                                content: qs.description,
+                              },
+                              {
+                                id: uuidv4(),
+                                role: 'assistant',
+                                createdAt: new Date(),
+                                content: `Sure! I can help you with that. Here is a starting point you can run directly or customize further. Would you like to make any changes?  \n\n\`\`\`sql\n-- props: {"title": "${qs.title}"}\n${qs.sql}\n\`\`\``,
+                              },
+                            ])
+                          }}
+                        >
+                          {qs.title}
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_>
+                        <p>{qs.description}</p>
+                      </TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                  </TooltipProvider_Shadcn_>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <AnimatePresence>
+          {showFade && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none z-10 -mt-24"
+            >
+              <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="p-5 pt-0 z-20 relative">
+          {sqlSnippets && sqlSnippets.length > 0 && (
+            <div className="mb-2">
+              {sqlSnippets.map((snippet, index) => (
+                <CollapsibleCodeBlock
+                  key={index}
+                  hideLineNumbers
+                  value={snippet}
+                  onRemove={() => {
+                    const newSnippets = [...sqlSnippets]
+                    newSnippets.splice(index, 1)
+                    setAiAssistantPanel({ sqlSnippets: newSnippets })
+                  }}
+                  className="text-xs"
+                />
+              ))}
+            </div>
+          )}
+          {disablePrompts && (
+            <Admonition
+              showIcon={false}
+              type="default"
+              title="Assistant has been temporarily disabled"
+              description="We're currently looking into getting it back online"
+            />
           )}
 
-          <div
+          {!isApiKeySet && (
+            <Admonition
+              type="default"
+              title="OpenAI API key not set"
+              description={
+                <Markdown
+                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                />
+              }
+            />
+          )}
+
+          <AssistantChatForm
+            textAreaRef={inputRef}
             className={cn(
-              'w-full px-content py-content',
-              hasMessages ? 'sticky flex-0 border-t' : 'flex flex-col gap-y-4'
+              'z-20 [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
             )}
-          >
-            <AnimatePresence>
-              {!hasMessages && (
-                <motion.div
-                  exit={{ opacity: 0 }}
-                  initial={{ opacity: 100 }}
-                  transition={{ duration: ANIMATION_DURATION }}
-                >
-                  <p className="text-center text-base text-foreground-light">
-                    How can I help you
-                    {!!entityContext ? (
-                      <>
-                        {' '}
-                        with{' '}
-                        <span className="text-foreground">
-                          {entityContext.id === 'rls-policies'
-                            ? entityContext.label
-                            : `Database ${entityContext.label}`}
-                        </span>
-                      </>
-                    ) : (
-                      ' today'
-                    )}
-                    ?
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-            <div className="flex flex-col gap-y-2">
-              {disablePrompts && (
-                <Admonition
-                  type="default"
-                  title="Assistant has been temporarily disabled"
-                  description="Give us a moment while we work on bringing the Assistant back online"
-                />
-              )}
-              {!isApiKeySet && (
-                <Admonition
-                  type="warning"
-                  title="OpenAI API key not set"
-                  description={
-                    <Markdown
-                      content={
-                        'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'
-                      }
-                    />
-                  }
-                />
-              )}
-              <div className="w-full border rounded">
-                <div className="py-2 px-3 border-b flex gap-2 flex-wrap">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<Plus />}
-                            className={cn(noContextAdded ? '' : 'px-1.5 !space-x-0')}
-                          >
-                            <span className={noContextAdded ? '' : 'sr-only'}>Add context</span>
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side={hasMessages ? 'top' : 'bottom'}>
-                          Add context for the assistant
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="w-[310px]">
-                      <DropdownMenuLabel>
-                        Improve the output quality of the assistant by giving it context about what
-                        you need help with
-                      </DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      {editor === null && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>
-                            <div className="flex flex-col gap-y-1">
-                              <p>Database Entity</p>
-                              <p className="text-foreground-lighter">
-                                Inform about what you're working with
-                              </p>
-                            </div>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuSubContent>
-                            <DropdownMenuRadioGroup
-                              value={selectedDatabaseEntity}
-                              onValueChange={(value) =>
-                                setSelectedDatabaseEntity(value as SupportedAssistantEntities)
-                              }
-                            >
-                              {ASSISTANT_SUPPORT_ENTITIES.map((x) => (
-                                <DropdownMenuRadioItem key={x.id} value={x.id}>
-                                  {x.label}
-                                </DropdownMenuRadioItem>
-                              ))}
-                            </DropdownMenuRadioGroup>
-                          </DropdownMenuSubContent>
-                        </DropdownMenuSub>
-                      )}
-                      {includeSchemaMetadata && (
-                        <>
-                          <DropdownMenuSub>
-                            <DropdownMenuSubTrigger className="gap-x-2">
-                              <div className="flex flex-col gap-y-1">
-                                <p>Schemas</p>
-                                <p className="text-foreground-lighter">
-                                  Share table definitions in the selected schemas
-                                </p>
-                              </div>
-                            </DropdownMenuSubTrigger>
-                            <DropdownMenuSubContent className="p-0 w-52">
-                              <SchemasDropdownMenu
-                                selectedSchemas={selectedSchemas}
-                                onToggleSchema={toggleSchema}
-                              />
-                            </DropdownMenuSubContent>
-                          </DropdownMenuSub>
-                          {selectedSchemas.length > 0 && (
-                            <DropdownMenuSub>
-                              <DropdownMenuSubTrigger className="gap-x-2">
-                                <div className="flex flex-col gap-y-1">
-                                  <p>Tables</p>
-                                  <p className="text-foreground-lighter">
-                                    Select specific tables to share definitions for
-                                  </p>
-                                </div>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuSubContent className="p-0 w-52">
-                                <EntitiesDropdownMenu
-                                  selectedSchemas={selectedSchemas}
-                                  selectedEntities={selectedTables}
-                                  onToggleEntity={toggleEntity}
-                                />
-                              </DropdownMenuSubContent>
-                            </DropdownMenuSub>
-                          )}
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-
-                  {!!entityContext && (
-                    <ContextBadge
-                      label="Entity"
-                      value={entityContext.label}
-                      onRemove={editor === null ? () => setSelectedDatabaseEntity('') : undefined}
-                    />
-                  )}
-
-                  {selectedSchemas.length > 0 && (
-                    <ContextBadge
-                      label="Schemas"
-                      value={`${selectedSchemas.slice(0, 2).join(', ')}${selectedSchemas.length > 2 ? ` and ${selectedSchemas.length - 2} other${selectedSchemas.length > 3 ? 's' : ''}` : ''}`}
-                      onRemove={() => {
-                        setSelectedSchemas([])
-                        setSelectedTables([])
-                      }}
-                      tooltip={
-                        selectedSchemas.length > 2 ? (
-                          <>
-                            <p className="text-foreground-light">
-                              {selectedSchemas.length} schemas selected:
-                            </p>
-                            <ul className="list-disc pl-4">
-                              {selectedSchemas.map((x) => (
-                                <li key={x}>{x}</li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : undefined
-                      }
-                    />
-                  )}
-
-                  {selectedTables.length > 0 && (
-                    <ContextBadge
-                      label="Tables"
-                      value={`${selectedTables
-                        .slice(0, 2)
-                        .map((x) => x.name)
-                        .join(
-                          ', '
-                        )}${selectedTables.length > 2 ? ` and ${selectedTables.length - 2} other${selectedTables.length > 3 ? 's' : ''}` : ''}`}
-                      onRemove={() => setSelectedTables([])}
-                      tooltip={
-                        selectedTables.length > 2 ? (
-                          <>
-                            <p className="text-foreground-light">
-                              {selectedTables.length} tables selected:
-                            </p>
-                            <ul className="list-disc pl-4">
-                              {selectedTables.map((x) => (
-                                <li key={`${x.schema}.${x.name}`}>
-                                  {x.schema}.{x.name}
-                                </li>
-                              ))}
-                            </ul>
-                          </>
-                        ) : undefined
-                      }
-                    />
-                  )}
-                </div>
-
-                <AssistantChatForm
-                  textAreaRef={inputRef}
-                  className={cn(
-                    '[&>textarea]:rounded-none [&>textarea]:border-0 [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0'
-                  )}
-                  loading={isLoading}
-                  disabled={!isApiKeySet || disablePrompts || isLoading}
-                  placeholder={
-                    hasMessages ? 'Reply to the assistant...' : 'How can we help you today?'
-                  }
-                  value={value}
-                  onValueChange={(e) => setValue(e.target.value)}
-                  onSubmit={(event) => {
-                    event.preventDefault()
-                    sendMessageToAssistant(value)
-                  }}
-                />
-                {!hasMessages && IS_PLATFORM && (
-                  <div className="text-xs text-foreground-lighter text-opacity-60 bg-control px-3 pb-2">
-                    The Assistant is in Alpha and your prompts might be rate limited
-                  </div>
-                )}
-              </div>
-
-              <AnimatePresence>
-                {!hasMessages && (
-                  <motion.div
-                    exit={{ opacity: 0 }}
-                    initial={{ opacity: 100 }}
-                    transition={{ duration: ANIMATION_DURATION }}
-                    className={cn('w-full')}
-                  >
-                    <div
-                      className={cn(
-                        'flex items-center gap-x-2 transition',
-                        entityContext !== undefined ? 'opacity-100' : 'opacity-0'
-                      )}
-                    >
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<WandSparkles />}
-                            onClick={() => onClickQuickPrompt('suggest')}
-                          >
-                            Suggest
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Suggest some{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<FileText />}
-                            onClick={() => onClickQuickPrompt('examples')}
-                          >
-                            Examples
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          Provide some examples of{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      <Tooltip_Shadcn_>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            icon={<MessageCircleMore />}
-                            onClick={() => onClickQuickPrompt('ask')}
-                          >
-                            Ask
-                          </Button>
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
-                          What are{' '}
-                          {entityContext?.id === 'rls-policies'
-                            ? entityContext.label
-                            : `database ${entityContext?.label.toLowerCase()}`}
-                          ?
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                      {docsUrl !== undefined && <DocsButton href={docsUrl} />}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </SheetSection>
+            loading={isChatLoading}
+            disabled={!isApiKeySet || disablePrompts || isChatLoading}
+            placeholder={
+              hasMessages
+                ? 'Reply to the assistant...'
+                : (sqlSnippets ?? [])?.length > 0
+                  ? 'Ask a question or make a change...'
+                  : 'Chat to Postgres...'
+            }
+            value={value}
+            onValueChange={(e) => setValue(e.target.value)}
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (includeSchemaMetadata) {
+                const sqlSnippetsString =
+                  sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
+                const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
+                sendMessageToAssistant(valueWithSnippets)
+              } else {
+                sendMessageToAssistant(value)
+              }
+            }}
+          />
+        </div>
       </div>
+
       <ConfirmationModal
         visible={isConfirmOptInModalOpen}
         size="large"

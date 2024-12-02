@@ -49,7 +49,7 @@ export const generateRowFields = (
   const { primary_keys } = table
   const primaryKeyColumns = primary_keys.map((key) => key.name)
 
-  return table.columns!.map((column) => {
+  return (table.columns ?? []).map((column) => {
     const value = getRowValue({ column, row })
     const foreignKey = foreignKeys.find((fk) => {
       return fk.columns.map((x) => x.source).includes(column.name)
@@ -210,7 +210,6 @@ export const generateRowObjectFromFields = (
         rowObject[field.name] = tryParseJson(value)
       }
     } else if (field.format === 'bool' && value) {
-      if (field.name === 'bool_default_true') console.log(field)
       if (value === 'null') rowObject[field.name] = null
       else rowObject[field.name] = value === 'true'
     } else if (DATETIME_TYPES.includes(field.format)) {

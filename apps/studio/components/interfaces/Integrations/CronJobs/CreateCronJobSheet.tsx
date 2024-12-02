@@ -32,19 +32,26 @@ import { Admonition } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
-import { buildCronQuery, buildHttpRequestCommand, parseCronJobCommand } from './CronJobs.utils'
+import {
+  buildCronQuery,
+  buildHttpRequestCommand,
+  cronPattern,
+  parseCronJobCommand,
+  secondsPattern,
+} from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
+import { HttpBodyFieldSection } from './HttpBodyFieldSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
-import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 
 export interface CreateCronJobSheetProps {
   selectedCronJob?: Pick<CronJob, 'jobname' | 'schedule' | 'active' | 'command'>
+  supportsSeconds: boolean
   isClosing: boolean
   setIsClosing: (v: boolean) => void
   onClose: () => void
@@ -56,7 +63,7 @@ const edgeFunctionSchema = z.object({
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z.string().trim(),
 })
 
 const httpRequestSchema = z.object({
@@ -70,7 +77,7 @@ const httpRequestSchema = z.object({
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z.string().trim(),
 })
 
 const sqlFunctionSchema = z.object({
@@ -83,27 +90,45 @@ const sqlSnippetSchema = z.object({
   snippet: z.string().trim().min(1),
 })
 
-const FormSchema = z.object({
-  name: z.string().trim().min(1, 'Please provide a name for your cron job'),
-  schedule: z
-    .string()
-    .trim()
-    .min(1)
-    .refine((value) => {
-      try {
-        CronToString(value)
-      } catch {
+const FormSchema = z
+  .object({
+    name: z.string().trim().min(1, 'Please provide a name for your cron job'),
+    supportsSeconds: z.boolean(),
+    schedule: z
+      .string()
+      .trim()
+      .min(1)
+      .refine((value) => {
+        if (cronPattern.test(value)) {
+          try {
+            CronToString(value)
+            return true
+          } catch {
+            return false
+          }
+        } else if (secondsPattern.test(value)) {
+          return true
+        }
         return false
+      }, 'Invalid Cron format'),
+    values: z.discriminatedUnion('type', [
+      edgeFunctionSchema,
+      httpRequestSchema,
+      sqlFunctionSchema,
+      sqlSnippetSchema,
+    ]),
+  })
+  .superRefine((data, ctx) => {
+    if (!cronPattern.test(data.schedule)) {
+      if (!(data.supportsSeconds && secondsPattern.test(data.schedule))) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Seconds are supported only in pg_cron v1.5.0+. Please use a valid Cron format.',
+          path: ['schedule'],
+        })
       }
-      return true
-    }, 'The schedule needs to be in a Cron format.'),
-  values: z.discriminatedUnion('type', [
-    edgeFunctionSchema,
-    httpRequestSchema,
-    sqlFunctionSchema,
-    sqlSnippetSchema,
-  ]),
-})
+    }
+  })
 
 export type CreateCronJobForm = z.infer<typeof FormSchema>
 export type CronJobType = CreateCronJobForm['values']
@@ -112,11 +137,14 @@ const FORM_ID = 'create-cron-job-sidepanel'
 
 export const CreateCronJobSheet = ({
   selectedCronJob,
+  supportsSeconds,
   isClosing,
   setIsClosing,
   onClose,
 }: CreateCronJobSheetProps) => {
+  const { project } = useProjectContext()
   const isEditing = !!selectedCronJob?.jobname
+
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
@@ -131,12 +159,12 @@ export const CreateCronJobSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: selectedCronJob?.jobname || '',
-      schedule: selectedCronJob?.schedule || '',
+      schedule: selectedCronJob?.schedule || '*/5 * * * *',
+      supportsSeconds,
       values: cronJobValues,
     },
   })
 
-  const { project } = useProjectContext()
   const isEdited = form.formState.isDirty
 
   // if the form hasn't been touched and the user clicked esc or the backdrop, close the sheet
@@ -159,7 +187,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.edgeFunctionName,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'http_request') {
@@ -167,7 +195,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.endpoint,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'sql_function') {
@@ -228,16 +256,19 @@ export const CreateCronJobSheet = ({
                   control={form.control}
                   name="name"
                   render={({ field }) => (
-                    <FormItemLayout label="Name" layout="vertical" className="gap-1">
+                    <FormItemLayout label="Name" layout="vertical" className="gap-1 relative">
                       <FormControl_Shadcn_>
-                        <Input_Shadcn_ {...field} />
+                        <Input_Shadcn_ {...field} disabled={isEditing} />
                       </FormControl_Shadcn_>
+                      <span className="text-foreground-lighter text-xs absolute top-0 right-0">
+                        Cron jobs cannot be renamed once created
+                      </span>
                     </FormItemLayout>
                   )}
                 />
               </SheetSection>
               <Separator />
-              <CronJobScheduleSection form={form} />
+              <CronJobScheduleSection form={form} supportsSeconds={supportsSeconds} />
               <Separator />
               <SheetSection>
                 <FormField_Shadcn_
@@ -336,7 +367,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'edge_function' && (
@@ -345,7 +376,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'sql_function' && <SqlFunctionSection form={form} />}
