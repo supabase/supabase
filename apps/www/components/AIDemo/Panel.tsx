@@ -129,18 +129,6 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
         <div className="z-30 border-b border-b-muted flex items-center gap-x-3 px-5 h-[46px]">
           <AiIconAnimation loading={false} allowHoverEffect />
           <div className="text-sm flex-1">Assistant</div>
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-            <Button
-              type="default"
-              onClick={() => {
-                setMessages([])
-                setIsComplete(true)
-                setPendingMessages([])
-              }}
-            >
-              Reset
-            </Button>
-          </motion.div>
         </div>
 
         {/* Messages */}
