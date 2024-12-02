@@ -1,0 +1,82 @@
+---
+title: 'Introducing Assistant V2'
+description: An evolution of how we approach AI within the Supabase dashboard'
+author: saxon_fletcher
+image: launch-week-13/assistant/header.png
+thumb: launch-week-13/assistant/header.png
+categories:
+  - developers
+  - postgres
+tags:
+  - AI
+  - postgres
+date: '2024-12-02'
+toc_depth: 3
+---
+
+Nearly 12 months ago we introduced the original Supabase Assistant, an AI copilot with basic text-to-sql abilities. We received some great feedback, and signs it could be a real efficiency multiplier and empower people who were previously limited due to their technical knowledge. Today we are announcing an evolution of this product with several new abilities:
+
+- Postgres schema design
+- Data queries and charting
+- Error debugging
+- Postgres RLS Policies: create and edit
+- Postgres Functions: create and edit
+- Postgres Triggers: create and edit
+
+## A new, unified approach to AI
+
+Previously, there were several ways you could interact with AI in the dashboard. This iteration unifies these experiences into a global Assistant.
+
+For our team, this meant designing a flexible system of components, tools and API’s for providing context manually (e.g. an RLS Policy) or automatic context based on where you are in the dashboard (e.g. the table you have open).
+
+The result is a single assistant panel that’s persistent across the entire dashboard. It sits alongside your workspace and can be called upon when needed (`cmd+i`!). It automatically retrieves context (e.g. schema, tables, policies) for your prompt and can be given extra context to work with, such as a policy, function, or any kind of SQL statement.
+
+## New abilities in Supabase Assistant v2
+
+Let’s take a look at how the new assistant can help you in your database journey.
+
+### Schema design
+
+First off, if you are creating something new, let the assistant guide or inspire you with how to structure your database, as well as generate the queries required to set it up.
+
+<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/design.png" />
+
+### Writing SQL
+
+Like our previous Assistant, the new Assistant will help you write queries based on your schema.
+
+### Debug your queries
+
+Sometimes you or the assistant will write an invalid query. Like previous versions, you can use the assistant to attempt to debug what’s wrong, either through the SQL Editor or within the assistant panel via the query blocks directly.
+
+<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/debug.png" />
+
+### Discover data insights
+
+Since you can now run queries directly within the assistant, it can be a useful (and fun) way to query your data through natural language. Basic select queries are run automatically, and results are displayed to you within the conversation, either in tabular form or chart form. Chart axis are picked by the assistant. Importantly, your data is not sent to the underlying LLM model, only information about your schema. This is an incredibly helpful tool for folks who are interested in analyzing the data, but may not feel comfortable writing SQL.
+
+<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/query.png" />
+
+### RLS Policies: Protect your database
+
+Use the assistant to suggest, create or modify RLS Policies. To create a new policy, just explain what kind of behavior you want and the assistant will retrieve knowledge around your database schema and existing policies. To edit an existing policy, click “edit with assistant” within your policy list and the assistant will be given the appropriate context and starting prompt for you to modify. Run the generated queries to create or modify your policies.
+
+<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/policy.png" />
+
+### Postgres Functions and Triggers
+
+Suggest, create or update functions and triggers in a similar way to policies. Just describe what you want or select “edit with assistant” from your function or trigger list.
+
+### SQL to REST
+
+Once your database is set up, you’ll most likely want to connect to it, either directly or through one of our client libraries. If you’re using our `supabase-js` library, we’ve added a helpful tool to convert an SQL query to supabase-js client code. Simply ask the assistant to convert a query, and it will respond with either a complete snippet for you to copy or a combination of function + RPC call. This is powered by the [sql-to-rest](https://github.com/supabase-community/sql-to-rest) library.
+
+<Img alt="Disk management" src="/images/blog/launch-week-13/assistant/js.png" />
+
+## Feedback
+
+This release gives us a foundation to build off and incorporate into other parts of your database journey. Where are you struggling the most when using Postgres? How might the assistant help you? We welcome all feedback and ideas from the community on how to expand or improve the assistant.
+
+## How to access
+
+V2 is currently a feature preview which you can access via your profile menu. Once you enable it you’ll see the assistant icon in your toolbar, or alternatively hit `cmd + i` anywhere in the dashboard.
