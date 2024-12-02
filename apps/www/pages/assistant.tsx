@@ -683,11 +683,11 @@ function Assistant() {
                   {!isUserLoading &&
                     (isLoggedIn ? (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
+                        <Link href="/dashboard/project/_">Dashboard</Link>
                       </Button>
                     ) : (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard">Start your project</Link>
+                        <Link href="https://supabase.com/dashboard/project/_">Start your project</Link>
                       </Button>
                     ))}
                 </div>
