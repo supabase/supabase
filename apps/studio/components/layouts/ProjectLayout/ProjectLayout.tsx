@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -13,6 +13,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -92,6 +93,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const [aiQueryParam, setAiQueryParam] = useQueryState(
+      'aiAssistantPanelOpen',
+      parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+    )
     const { open } = aiAssistantPanel
 
     const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -122,6 +127,28 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
+
+    // the following code is to sync the query param with the app state. It handles initial render and sync on each open/close.
+    const queryInitialized = useRef<boolean>(false)
+    useEffect(() => {
+      if (!router.isReady) {
+        return
+      }
+
+      // when the query param is set, set the app state but only during the first render
+      if (!queryInitialized.current) {
+        if (aiQueryParam !== aiAssistantPanel.open) {
+          setAiAssistantPanel({ open: aiQueryParam })
+        }
+        queryInitialized.current = true
+        return
+      }
+
+      // otherwise, just sync the query param with the app state
+      if (queryInitialized.current && aiQueryParam !== aiAssistantPanel.open) {
+        setAiQueryParam(aiAssistantPanel.open)
+      }
+    }, [router.isReady, aiQueryParam, aiAssistantPanel.open])
 
     return (
       <AppLayout>
