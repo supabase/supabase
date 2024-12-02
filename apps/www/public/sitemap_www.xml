@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://supabase.com/assistant</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/aup</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -181,13 +187,13 @@
   </url>
 
   <url>
-    <loc>https://supabase.com/contact/sales</loc>
+    <loc>https://supabase.com/events</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://supabase.com/events</loc>
+    <loc>https://supabase.com/contact/sales</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -229,6 +235,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/launch-week/12</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/launch-week/7</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -236,12 +248,6 @@
 
   <url>
     <loc>https://supabase.com/launch-week/8</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
-  <url>
-    <loc>https://supabase.com/launch-week/12</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2085,7 +2091,19 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/blog/orioledb-launch</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/blog/supabase-ai-assistant-v2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/blog/supabase-assistant</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -2289,6 +2307,30 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/features/client-library-flutter</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/client-library-javascript</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/client-library-python</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/client-library-swift</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/features/custom-domains</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -2421,6 +2463,12 @@
   </url>
 
   <url>
+    <loc>https://supabase.com/features/realtime-broadcast-authorization</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
     <loc>https://supabase.com/features/realtime-broadcast</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -2428,6 +2476,12 @@
 
   <url>
     <loc>https://supabase.com/features/realtime-postgres-changes</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://supabase.com/features/realtime-presence-authorization</loc>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
