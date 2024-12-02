@@ -317,6 +317,8 @@ export interface paths {
     post: operations['OrganizationsController_createOrganizationWithTier']
   }
   '/platform/organizations/{slug}': {
+    /** Gets a specific organization that belongs to the authenticated user */
+    get: operations['OrganizationSlugController_getOrganization']
     /** Deletes organization */
     delete: operations['OrganizationSlugController_deleteOrganization']
     /** Updates organization */
@@ -1195,9 +1197,13 @@ export interface paths {
     /** Updates the database password */
     patch: operations['DatabasePasswordController_updatePassword']
   }
+  '/system/email/send': {
+    /** Send email using Postmark template */
+    post: operations['SystemEmailController_sendEmail']
+  }
   '/system/github-secret-alert': {
-    /** Reset JWT if leaked keys found by GitHub secret scanning */
-    post: operations['GithubSecretAlertController_resetJwt']
+    /** Respond to GitHub secret scanning webhook request */
+    post: operations['GithubSecretAlertController_githubSecretScanningEndpoint']
   }
   '/system/health': {
     /** Get API health status */
@@ -1499,6 +1505,8 @@ export interface paths {
     post: operations['OrganizationsController_createOrganizationWithTier']
   }
   '/v0/organizations/{slug}': {
+    /** Gets a specific organization that belongs to the authenticated user */
+    get: operations['OrganizationSlugController_getOrganization']
     /** Deletes organization */
     delete: operations['OrganizationSlugController_deleteOrganization']
     /** Updates organization */
@@ -3597,6 +3605,7 @@ export interface components {
       query: string
     }
     FunctionResponse: {
+      compute_multiplier?: number
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -3604,7 +3613,6 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
-      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -3614,6 +3622,7 @@ export interface components {
       version: number
     }
     FunctionSlugResponse: {
+      compute_multiplier?: number
       /** Format: int64 */
       created_at: number
       entrypoint_path?: string
@@ -3621,7 +3630,6 @@ export interface components {
       import_map?: boolean
       import_map_path?: string
       name: string
-      resource_multiplier?: string
       slug: string
       /** @enum {string} */
       status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
@@ -4429,20 +4437,55 @@ export interface components {
       name: string
       project_ids: number[] | null
     }
-    OrganizationSlugAvailableVersionsBody: {
+    OrganizationSlugAvailableVersionsBodyDto: {
       provider: string
       region: string
     }
     OrganizationSlugAvailableVersionsResponse: {
       available_versions: components['schemas']['ProjectCreationVersionInfo'][]
     }
+    OrganizationSlugProject: {
+      cloud_provider: string
+      disk_volume_size_gb?: number
+      engine?: string
+      id: number
+      /** @enum {string} */
+      infra_compute_size?:
+        | 'nano'
+        | 'micro'
+        | 'small'
+        | 'medium'
+        | 'large'
+        | 'xlarge'
+        | '2xlarge'
+        | '4xlarge'
+        | '8xlarge'
+        | '12xlarge'
+        | '16xlarge'
+      inserted_at: string | null
+      is_branch_enabled: boolean
+      is_physical_backups_enabled: boolean | null
+      name: string
+      organization_id: number
+      organization_slug: string
+      preview_branch_refs: string[]
+      ref: string
+      region: string
+      status: string
+      subscription_id: string | null
+    }
     OrganizationSlugResponse: {
-      billing_email?: string
+      billing_email: string | null
+      billing_metadata?: Record<string, never>
+      has_oriole_project: boolean
       id: number
       name: string
       opt_in_tags: string[]
+      projects: components['schemas']['OrganizationSlugProject'][]
+      restriction_data: unknown
+      /** @enum {string|null} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       slug: string
-      stripe_customer_id?: string
     }
     OrgDocumentUrlResponse: {
       fileUrl: string
@@ -4640,7 +4683,7 @@ export interface components {
       work_mem?: string
     }
     /** @enum {string} */
-    PostgresEngine: '15'
+    PostgresEngine: '15' | '17-oriole'
     PostgresExtension: {
       comment: string | null
       default_version: string
@@ -5199,7 +5242,7 @@ export interface components {
       target_table_schema: string
     }
     /** @enum {string} */
-    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+    ReleaseChannel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     RemoveNetworkBanRequest: {
       ipv4_addresses: string[]
     }
@@ -5441,6 +5484,16 @@ export interface components {
       page: string
       team?: string
       title: string
+    }
+    SendEmailBodyDto: {
+      addresses: string[]
+      custom_properties: {
+        [key: string]: unknown
+      }
+      template_alias: string
+    }
+    SendEmailResponseBodyDto: {
+      message: string
     }
     SendExitSurveyBody: {
       additionalFeedback?: string
@@ -5730,7 +5783,7 @@ export interface components {
       db_pass: string
       db_pass_supabase: string
       jwt_secret: string
-      /** @description Name of your project, should not contain dots */
+      /** @description Name of your project */
       name: string
       /** @description Slug of your organization */
       organization_id: string
@@ -6416,10 +6469,19 @@ export interface components {
     UpdateNotificationsBodyV1: {
       ids: string[]
     }
-    UpdateOrganizationBody: {
-      billing_email: string
+    UpdateOrganizationBodyDto: {
+      /** Format: email */
+      billing_email?: string
+      name?: string
+      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
+    }
+    UpdateOrganizationResponse: {
+      billing_email?: string
+      id: number
       name: string
       opt_in_tags: string[]
+      slug: string
+      stripe_customer_id?: string
     }
     UpdatePasswordBody: {
       password: string
@@ -6813,8 +6875,8 @@ export interface components {
     }
     V1CreateFunctionBody: {
       body: string
+      compute_multiplier?: number
       name: string
-      resource_multiplier?: string
       slug: string
       verify_jwt?: boolean
     }
@@ -6838,7 +6900,7 @@ export interface components {
        * @description This field is deprecated and is ignored in this request
        */
       kps_enabled?: boolean
-      /** @description Name of your project, should not contain dots */
+      /** @description Name of your project */
       name: string
       /** @description Slug of your organization */
       organization_id: string
@@ -6852,7 +6914,7 @@ export interface components {
        * @description Postgres engine version. If not provided, the latest version will be used.
        * @enum {string}
        */
-      postgres_engine?: '15'
+      postgres_engine?: '15' | '17-oriole'
       /**
        * @description Region you want your server to reside in
        * @enum {string}
@@ -6880,7 +6942,7 @@ export interface components {
        * @description Release channel. If not provided, GA will be used.
        * @enum {string}
        */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn'
+      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
       /**
        * Format: uri
        * @description Template URL used to create the project from the CLI.
@@ -7038,8 +7100,8 @@ export interface components {
     }
     V1UpdateFunctionBody: {
       body?: string
+      compute_multiplier?: number
       name?: string
-      resource_multiplier?: string
       verify_jwt?: boolean
     }
     ValidateQueryBody: {
@@ -7048,7 +7110,7 @@ export interface components {
     ValidateQueryResponse: {
       valid: boolean
     }
-    ValidateSpamBody: {
+    ValidateSpamBodyDto: {
       content: string
       subject: string
     }
@@ -7773,7 +7835,7 @@ export interface operations {
   ValidateController_validateSpam: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['ValidateSpamBody']
+        'application/json': components['schemas']['ValidateSpamBodyDto']
       }
     }
     responses: {
@@ -8663,11 +8725,25 @@ export interface operations {
       }
     }
   }
+  /** Gets a specific organization that belongs to the authenticated user */
+  OrganizationSlugController_getOrganization: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationSlugResponse']
+        }
+      }
+    }
+  }
   /** Deletes organization */
   OrganizationSlugController_deleteOrganization: {
     parameters: {
       path: {
-        /** @description Organization slug */
         slug: string
       }
     }
@@ -8688,19 +8764,18 @@ export interface operations {
   OrganizationSlugController_updateOrganization: {
     parameters: {
       path: {
-        /** @description Organization slug */
         slug: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateOrganizationBody']
+        'application/json': components['schemas']['UpdateOrganizationBodyDto']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['OrganizationSlugResponse']
+          'application/json': components['schemas']['UpdateOrganizationResponse']
         }
       }
       /** @description Failed to update organization */
@@ -8742,13 +8817,12 @@ export interface operations {
   OrganizationSlugController_getAvailableImageVersions: {
     parameters: {
       path: {
-        /** @description Organization slug */
         slug: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['OrganizationSlugAvailableVersionsBody']
+        'application/json': components['schemas']['OrganizationSlugAvailableVersionsBodyDto']
       }
     }
     responses: {
@@ -14771,25 +14845,26 @@ export interface operations {
       }
     }
   }
-  /** Reset JWT if leaked keys found by GitHub secret scanning */
-  GithubSecretAlertController_resetJwt: {
-    parameters: {
-      header: {
-        'github-public-key-identifier': string
-        'github-public-key-signature': string
-      }
-    }
+  /** Send email using Postmark template */
+  SystemEmailController_sendEmail: {
     requestBody: {
       content: {
-        'application/json': string
+        'application/json': components['schemas']['SendEmailBodyDto']
       }
     }
     responses: {
-      200: {
-        content: never
+      /** @description Email queued successfully */
+      201: {
+        content: {
+          'application/json': components['schemas']['SendEmailResponseBodyDto']
+        }
       }
-      /** @description Failed to reset JWT */
-      500: {
+    }
+  }
+  /** Respond to GitHub secret scanning webhook request */
+  GithubSecretAlertController_githubSecretScanningEndpoint: {
+    responses: {
+      200: {
         content: never
       }
     }
@@ -15383,7 +15458,7 @@ export interface operations {
         import_map?: boolean
         entrypoint_path?: string
         import_map_path?: string
-        resource_multiplier?: string
+        compute_multiplier?: number
       }
       path: {
         /** @description Project ref */
@@ -15464,7 +15539,7 @@ export interface operations {
         import_map?: boolean
         entrypoint_path?: string
         import_map_path?: string
-        resource_multiplier?: string
+        compute_multiplier?: number
       }
       path: {
         /** @description Project ref */
@@ -17400,7 +17475,7 @@ export interface operations {
   'v1-get-a-snippet': {
     parameters: {
       path: {
-        id: Record<string, never>
+        id: string
       }
     }
     responses: {

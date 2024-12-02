@@ -54,42 +54,60 @@ export const PostgresVersionSelector = ({
   field,
   form,
 }: PostgresVersionSelectorProps) => {
-  const { data, isLoading: isLoadingProjectVersions } = useProjectCreationPostgresVersionsQuery({
+  const {
+    data,
+    isLoading: isLoadingProjectVersions,
+    isSuccess,
+  } = useProjectCreationPostgresVersionsQuery({
     cloudProvider,
     dbRegion,
     organizationSlug,
   })
+  const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
+    a.version.localeCompare(b.version)
+  )
 
   useEffect(() => {
-    const defaultValue = data?.available_versions?.[0]
-      ? formatValue(data.available_versions[0])
-      : undefined
+    const defaultValue = availableVersions[0] ? formatValue(availableVersions[0]) : undefined
     form.setValue('postgresVersionSelection', defaultValue)
-  }, [data, form])
+  }, [isSuccess, form])
 
   return (
     <FormItemLayout layout="horizontal" label="Postgres Version">
       <Select_Shadcn_
         value={field.value}
         onValueChange={field.onChange}
-        disabled={isLoadingProjectVersions}
+        disabled={availableVersions.length <= 1 || isLoadingProjectVersions}
       >
-        <SelectTrigger_Shadcn_>
+        <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
           <SelectValue_Shadcn_ placeholder="Select a Postgres version for your project" />
         </SelectTrigger_Shadcn_>
         <SelectContent_Shadcn_>
           <SelectGroup_Shadcn_>
-            {(data?.available_versions || [])?.map((value) => {
-              const postgresVersion = value.version.split('supabase-postgres-')[1]
+            {availableVersions.map((value) => {
+              const postgresVersion = value.version
+                .split('supabase-postgres-')[1]
+                .replace('-orioledb', '')
               return (
-                <SelectItem_Shadcn_ key={formatValue(value)} value={formatValue(value)}>
-                  <div className="flex items-center gap-3">
+                <SelectItem_Shadcn_
+                  key={formatValue(value)}
+                  value={formatValue(value)}
+                  className="w-full [&>:nth-child(2)]:w-full"
+                >
+                  <div className="flex flex-row items-center justify-between w-full">
                     <span className="text-foreground">{postgresVersion}</span>
-                    {value.release_channel !== 'ga' && (
-                      <Badge variant="warning" className="mr-1 capitalize">
-                        {value.release_channel}
-                      </Badge>
-                    )}
+                    <div>
+                      {value.release_channel !== 'ga' && (
+                        <Badge variant="warning" className="mr-1 capitalize">
+                          {value.release_channel}
+                        </Badge>
+                      )}
+                      {value.postgres_engine.includes('oriole') && (
+                        <Badge variant="default" className="mr-1">
+                          OrioleDB
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </SelectItem_Shadcn_>
               )

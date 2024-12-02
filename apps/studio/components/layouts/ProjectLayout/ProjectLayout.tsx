@@ -114,7 +114,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI') {
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()

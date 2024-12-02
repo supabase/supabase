@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 
 export type ValidateSpamVariables = {
   projectRef: string
-  template: components['schemas']['ValidateSpamBody']
+  template: components['schemas']['ValidateSpamBodyDto']
 }
 export type ValidateSpamResponse = components['schemas']['ValidateSpamResponse']
 
