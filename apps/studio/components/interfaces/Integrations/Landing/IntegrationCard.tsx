@@ -1,10 +1,10 @@
+import { BadgeCheck } from 'lucide-react'
 import Link from 'next/link'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Badge, cn, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { Badge, cn } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { IntegrationDefinition } from './Integrations.constants'
-import { BadgeCheck, Maximize } from 'lucide-react'
 
 type IntegrationCardProps = IntegrationDefinition & {
   isInstalled?: boolean
