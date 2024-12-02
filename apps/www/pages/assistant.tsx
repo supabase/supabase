@@ -679,7 +679,7 @@ function Assistant() {
                   Generate, run and debug queries, chart your data, create functions, policies and
                   more. The Assistant is here to help.
                 </p>
-                <div className="min-h-12">
+                <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading &&
                     (isLoggedIn ? (
                       <Button type="primary" size="medium" asChild>
@@ -692,6 +692,15 @@ function Assistant() {
                         </Link>
                       </Button>
                     ))}
+                  <Button type="default" size="medium" asChild>
+                    <Link
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      href="https://supabase.com/blog/supabase-ai-assistant-v2"
+                    >
+                      Blog Post
+                    </Link>
+                  </Button>
                 </div>
               </div>
 
