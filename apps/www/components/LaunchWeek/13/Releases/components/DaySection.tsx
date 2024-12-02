@@ -7,11 +7,11 @@ import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
 import { WeekDayProps } from '../data'
-// import CountdownComponent from '../../Countdown'
+import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
-  const isMobile = useBreakpoint(639)
+  const isMobile = useBreakpoint('sm')
   const cssGroup = 'group/d' + day.d
 
   return (
@@ -53,10 +53,10 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             href={day.blog!}
             className={cn(
               `
-              bg-default sm:!bg-transparent
+              bg-surface-75
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
-              rounded-xl text-2xl bg-contain shadow-lg`,
+              rounded-xl text-2xl bg-contain shadow-sm`,
               cssGroup
             )}
           >
@@ -71,18 +71,19 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
               </h2>
             </div>
             <div className="relative z-10 border-b border-muted/40 sm:border-none w-full order-first aspect-[2/1] sm:aspect-auto sm:absolute sm:inset-0">
+              <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-background-surface-75 from-0% via-background-surface-75 via-20% to-transparent to-75% w-full h-full z-0" />
               {day.steps[0]?.bg_layers &&
                 day.steps[0]?.bg_layers?.map((layer, i) => (
                   <>
                     {!!layer.img && (
                       <div
-                        key={`${day.title}-image-${i}`}
-                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
+                        key={`${day.title}-image-${i}?v=3`}
+                        className="absolute transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
                       >
                         <Image
                           src={!!layer.mobileImg && isMobile ? layer.mobileImg : layer.img}
                           className={`
-                            hidden dark:block absolute md:opacity-50 lg:opacity-100 object-cover
+                            hidden dark:block absolute object-cover
                             w-full h-full z-0 transition-all duration-300
                             object-center sm:object-right
                           `}
@@ -95,7 +96,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                     )}
                     {!!layer.imgLight && (
                       <div
-                        key={`${day.title}-image-${i}`}
+                        key={`${day.title}-image-${i}-light`}
                         className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
                       >
                         <Image
@@ -146,7 +147,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                   />
                 </g>
               </svg>
-              {/* {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />} */}
+              {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
             </div>
             <div>
               <Skeleton className="w-full h-3 max-w-xs rounded-full will-change-contents" />
