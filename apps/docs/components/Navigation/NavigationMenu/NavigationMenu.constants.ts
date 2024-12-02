@@ -70,6 +70,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'local_development',
           },
           {
+            label: 'Deployment',
+            icon: 'deployment',
+            href: '/guides/deployment',
+            level: 'deployment',
+          },
+          {
             label: 'Self-Hosting',
             icon: 'self-hosting',
             href: '/guides/self-hosting',
@@ -81,12 +87,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations',
             level: 'integrations',
-          },
-          {
-            label: 'Deployment',
-            icon: 'deployment',
-            href: '/guides/deployment',
-            level: 'deployment',
           },
         ],
       ],
@@ -2132,6 +2132,7 @@ export const deployment: NavMenuConstant = {
       name: 'Environments',
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
         { name: 'Branching', url: '/guides/deployment/branching' },
       ],
     },

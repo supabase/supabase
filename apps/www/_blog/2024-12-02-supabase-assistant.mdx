@@ -1,0 +1,89 @@
+---
+title: 'Supabase AI Assistant v2'
+description: An evolution of how we approach AI within the Supabase dashboard'
+author: saxon_fletcher
+image: launch-week-13/assistant/header.png
+thumb: launch-week-13/assistant/header.png
+categories:
+  - developers
+  - postgres
+tags:
+  - AI
+  - postgres
+date: '2024-12-02'
+toc_depth: 3
+---
+
+Today we releasing Supabase Assistant v2 in the dashboard - a global assistant with several new abilities:
+
+1. Postgres schema design
+1. Data queries and charting
+1. Error debugging
+1. Postgres RLS Policies: create and edit
+1. Postgres Functions: create and edit
+1. Postgres Triggers: create and edit
+1. SQL to `supabase-js` conversion
+
+## A new, unified approach to AI
+
+The new Assistant is built off a flexible system of components, tools and API’s we can use to more easily extend what it can do, and to provide context either manually (e.g. an RLS Policy) or automatically based on where you are in the dashboard (e.g. the table you have open).
+
+The result is a single panel that’s persistent across the entire dashboard. It sits alongside your workspace and can be called upon when needed (`cmd+i`!). It automatically retrieves context (e.g. schema, tables, policies) for your prompt and can be given extra context to work with, such as a policy, function, or any kind of SQL statement.
+
+## New abilities in Supabase Assistant v2
+
+Let’s take a look at how the new Assistant can help you in your database journey.
+
+### Schema design
+
+First off, if you are creating something new, let the Assistant guide or inspire you with how to structure your database, as well as generate the queries required to set it up.
+
+<Img alt="Design new database schemas" src="/images/blog/launch-week-13/assistant/design.png" />
+
+### Writing SQL
+
+Like our previous Assistant, the new Assistant will help you write queries based on your schema.
+
+### Debug your queries
+
+Sometimes you or the Assistant will write an invalid query. Like previous versions, you can use the Assistant to attempt to debug what’s wrong, either through the SQL Editor or within the Assistant panel via the query blocks directly.
+
+<Img alt="Debug your queries with AI" src="/images/blog/launch-week-13/assistant/debug.png" />
+
+### Discover data insights
+
+Since you can now run queries directly within the Assistant, it can be a useful (and fun) way to query your data through natural language. Basic select queries are run automatically, and results are displayed to you within the conversation, either in tabular form or chart form. Chart axis are picked by the Assistant. Importantly, your data is not sent to the underlying LLM model, only information about your schema. This is an incredibly helpful tool for folks who are interested in analyzing the data, but may not feel comfortable writing SQL.
+
+<Img alt="Query data with AI" src="/images/blog/launch-week-13/assistant/query.png" />
+
+### SQL to REST
+
+Once your database is set up, you’ll most likely want to connect to it, either directly or through one of our client libraries. If you’re using our `supabase-js` library, we’ve added a helpful tool to convert an SQL query to supabase-js client code. Simply ask the Assistant to convert a query, and it will respond with either a complete snippet for you to copy or a combination of function + RPC call. This is powered by the [sql-to-rest](https://github.com/supabase-community/sql-to-rest) library.
+
+<Img alt="Convert SQL to supabase-js code" src="/images/blog/launch-week-13/assistant/js.png" />
+
+### RLS Policies: Protect your database
+
+Use the Assistant to suggest, create or modify RLS Policies. To create a new policy, just explain what kind of behavior you want and the Assistant will retrieve knowledge around your database schema and existing policies. To edit an existing policy, click “edit with Assistant” within your policy list and the Assistant will be given the appropriate context and starting prompt for you to modify. Run the generated queries to create or modify your policies.
+
+<Img
+  alt="Create and edit RLS Policies with AI"
+  src="/images/blog/launch-week-13/assistant/policy.png"
+/>
+
+### Postgres Functions and Triggers
+
+Suggest, create or update functions and triggers in a similar way to policies. Just describe what you want or select “edit with Assistant” from your function or trigger list.
+
+<Img
+  alt="Create and edit functions and triggers with AI"
+  src="/images/blog/launch-week-13/assistant/functions.png"
+/>
+
+## Feedback
+
+This release gives us a foundation to build off and incorporate into other parts of your database journey. Where are you struggling the most when using Postgres? How might the Assistant help you? Send us your thoughts, ideas, concerns via the feedback form within the dashboard.
+
+## How to access
+
+V2 is currently a feature preview which you can access via your Profile menu → Feature previews → Supabase AI Assistant V2 → Enable. Once you enable it you’ll see the assistant icon in your toolbar, or alternatively hit `cmd + i` anywhere in the dashboard.

@@ -14,21 +14,23 @@ import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useCloneBackupsQuery } from 'data/projects/clone-query'
 import { useCloneStatusQuery } from 'data/projects/clone-status-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useProjectsQuery } from 'data/projects/projects-query'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -57,6 +59,7 @@ const RestoreToNewProject = () => {
   const organization = useSelectedOrganization()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const isFreePlan = subscription?.plan?.id === 'free'
+  const isOrioleDb = useIsOrioleDb()
 
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
   const [selectedBackupId, setSelectedBackupId] = useState<number | null>(null)
@@ -112,6 +115,18 @@ const RestoreToNewProject = () => {
   const clonedProject = projects?.find(
     (p) => p.ref === cloneStatus?.clones?.[0]?.target_project.ref
   )
+
+  if (isOrioleDb) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to new projects are not available for OrioleDB"
+        description="OrioleDB is currently in preview and projects created are strictly ephemeral with no database backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
+      </Admonition>
+    )
+  }
 
   if (isLoading) {
     return <GenericSkeletonLoader />
