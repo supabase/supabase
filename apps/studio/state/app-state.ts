@@ -74,6 +74,9 @@ const getInitialState = () => {
   const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
   const storedDashboardHistory = localStorage.getItem(LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY)
 
+  const urlParams = new URLSearchParams(window.location.search)
+  const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
+
   const parsedAiAssistant = stored
     ? JSON.parse(stored, (key, value) => {
         if (key === 'createdAt' && value) {
@@ -84,7 +87,13 @@ const getInitialState = () => {
     : INITIAL_AI_ASSISTANT
 
   return {
-    aiAssistantPanel: parsedAiAssistant,
+    aiAssistantPanel: {
+      ...parsedAiAssistant,
+      open:
+        aiAssistantPanelOpenParam !== null
+          ? aiAssistantPanelOpenParam === 'true'
+          : parsedAiAssistant.open,
+    },
     dashboardHistory: storedDashboardHistory
       ? JSON.parse(storedDashboardHistory)
       : EMPTY_DASHBOARD_HISTORY,
