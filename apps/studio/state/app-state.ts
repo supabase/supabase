@@ -76,14 +76,20 @@ const getInitialState = () => {
   const urlParams = new URLSearchParams(window.location.search)
   const aiAssistantPanelOpenParam = urlParams.get('aiAssistantPanelOpen')
 
-  const parsedAiAssistant = stored
-    ? JSON.parse(stored, (key, value) => {
+  let parsedAiAssistant = INITIAL_AI_ASSISTANT
+
+  try {
+    if (stored) {
+      parsedAiAssistant = JSON.parse(stored, (key, value) => {
         if (key === 'createdAt' && value) {
           return new Date(value)
         }
         return value
       })
-    : INITIAL_AI_ASSISTANT
+    }
+  } catch {
+    // Ignore parsing errors
+  }
 
   return {
     aiAssistantPanel: {
