@@ -651,7 +651,7 @@ parameters:
     title: 'auth.enable_manual_linking'
     tags: ['auth', 'local']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Allow testing manual linking of accounts
     links:
@@ -662,7 +662,7 @@ parameters:
     title: 'auth.enable_refresh_token_rotation'
     tags: ['auth', 'local']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       If disabled, the refresh token will never expire.
     links:
@@ -1118,7 +1118,7 @@ parameters:
     title: 'auth.mfa.totp.enroll_enabled'
     tags: ['auth', 'local']
     required: false
-    default: 'false'
+    default: 'true'
     description: |
       Enable TOTP enrollment for multi-factor authentication.
     links:
@@ -1129,7 +1129,7 @@ parameters:
     title: 'auth.mfa.totp.verify_enabled'
     tags: ['auth', 'local']
     required: false
-    default: 'false'
+    default: 'true'
     description: |
       Enable TOTP verification for multi-factor authentication.
     links:
