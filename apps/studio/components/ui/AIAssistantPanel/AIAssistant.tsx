@@ -135,7 +135,6 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    // [Joshen] Not currently used atm, but initialMessages will be for...
     initialMessages,
     body: {
       includeSchemaMetadata,
@@ -143,6 +142,11 @@ export const AIAssistant = ({
       connectionString: project?.connectionString,
       schema: currentSchema,
       table: currentTable?.name,
+    },
+    onFinish: (message) => {
+      setAiAssistantPanel({
+        messages: [...chatMessages, message],
+      })
     },
   })
 
@@ -185,7 +189,7 @@ export const AIAssistant = ({
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ sqlSnippets: undefined })
+    setAiAssistantPanel({ sqlSnippets: undefined, messages: [...messages, payload] })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)

@@ -7,20 +7,9 @@ import type { Message as MessageType } from 'ai/react'
 
 export const AiAssistantPanel = () => {
   const { aiAssistantPanel, resetAiAssistantPanel } = useAppStateSnapshot()
-  const [initialMessages, setInitialMessages] = useState<MessageType[] | undefined>(undefined)
-
-  useEffect(() => {
-    // set initial state of local messages to the global state if it exists
-    if (aiAssistantPanel.messages) {
-      const messagesCopy = aiAssistantPanel.messages.map((msg) => ({
-        content: msg.content,
-        createdAt: msg.createdAt,
-        role: msg.role,
-        id: msg.id,
-      }))
-      setInitialMessages(messagesCopy)
-    }
-  }, [])
+  const [initialMessages, setInitialMessages] = useState<MessageType[] | undefined>(
+    aiAssistantPanel.messages?.length > 0 ? aiAssistantPanel.messages : undefined
+  )
 
   const { open } = aiAssistantPanel
   const [chatId, setChatId] = useState(() => uuidv4())

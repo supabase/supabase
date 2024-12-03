@@ -1,17 +1,8 @@
-import { proxy, snapshot, useSnapshot } from 'valtio'
-
+import { proxy, subscribe, snapshot, useSnapshot } from 'valtio'
+import type { Message as MessageType } from 'ai/react'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
-import type { Message as MessageType } from 'ai/react'
-
-const EMPTY_DASHBOARD_HISTORY: {
-  sql?: string
-  editor?: string
-} = {
-  sql: undefined,
-  editor: undefined,
-}
 
 export type CommonDatabaseEntity = {
   id: number
@@ -27,7 +18,7 @@ export type SuggestionsType = {
 
 type AiAssistantPanelType = {
   open: boolean
-  messages?: MessageType[] | undefined
+  messages: MessageType[]
   initialInput: string
   sqlSnippets?: string[]
   suggestions?: SuggestionsType
@@ -39,9 +30,14 @@ type AiAssistantPanelType = {
   tables: { schema: string; name: string }[]
 }
 
+type DashboardHistoryType = {
+  sql?: string
+  editor?: string
+}
+
 const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   open: false,
-  messages: undefined,
+  messages: [],
   sqlSnippets: undefined,
   initialInput: '',
   suggestions: undefined,
@@ -51,16 +47,67 @@ const INITIAL_AI_ASSISTANT: AiAssistantPanelType = {
   tables: [],
 }
 
+const EMPTY_DASHBOARD_HISTORY: DashboardHistoryType = {
+  sql: undefined,
+  editor: undefined,
+}
+
+const getInitialState = () => {
+  if (typeof window === 'undefined') {
+    return {
+      aiAssistantPanel: INITIAL_AI_ASSISTANT,
+      dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+      activeDocsSection: ['introduction'],
+      docsLanguage: 'js',
+      showProjectApiDocs: false,
+      isOptedInTelemetry: false,
+      showEnableBranchingModal: false,
+      showFeaturePreviewModal: false,
+      selectedFeaturePreview: '',
+      showAiSettingsModal: false,
+      showGenerateSqlModal: false,
+      navigationPanelOpen: false,
+      navigationPanelJustClosed: false,
+    }
+  }
+
+  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE)
+  const storedDashboardHistory = localStorage.getItem(LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY)
+
+  const parsedAiAssistant = stored
+    ? JSON.parse(stored, (key, value) => {
+        if (key === 'createdAt' && value) {
+          return new Date(value)
+        }
+        return value
+      })
+    : INITIAL_AI_ASSISTANT
+
+  return {
+    aiAssistantPanel: parsedAiAssistant,
+    dashboardHistory: storedDashboardHistory
+      ? JSON.parse(storedDashboardHistory)
+      : EMPTY_DASHBOARD_HISTORY,
+    activeDocsSection: ['introduction'],
+    docsLanguage: 'js',
+    showProjectApiDocs: false,
+    isOptedInTelemetry: false,
+    showEnableBranchingModal: false,
+    showFeaturePreviewModal: false,
+    selectedFeaturePreview: '',
+    showAiSettingsModal: false,
+    showGenerateSqlModal: false,
+    navigationPanelOpen: false,
+    navigationPanelJustClosed: false,
+  }
+}
+
 export const appState = proxy({
-  // [Joshen] Last visited "entity" for any page that we wanna track
-  dashboardHistory: EMPTY_DASHBOARD_HISTORY,
+  ...getInitialState(),
+
   setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
-      localStorage.setItem(
-        LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref),
-        JSON.stringify(appState.dashboardHistory)
-      )
     }
   },
 
@@ -84,22 +131,27 @@ export const appState = proxy({
       localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
+
   showEnableBranchingModal: false,
   setShowEnableBranchingModal: (value: boolean) => {
     appState.showEnableBranchingModal = value
   },
+
   showFeaturePreviewModal: false,
   setShowFeaturePreviewModal: (value: boolean) => {
     appState.showFeaturePreviewModal = value
   },
+
   selectedFeaturePreview: '',
   setSelectedFeaturePreview: (value: string) => {
     appState.selectedFeaturePreview = value
   },
+
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
   },
+
   showGenerateSqlModal: false,
   setShowGenerateSqlModal: (value: boolean) => {
     appState.showGenerateSqlModal = value
@@ -109,18 +161,14 @@ export const appState = proxy({
   navigationPanelJustClosed: false,
   setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {
     if (value === false) {
-      // If closing navigation panel by clicking on icon/button, nav bar should not open again until mouse leaves nav bar
       if (trackJustClosed) {
         appState.navigationPanelOpen = false
         appState.navigationPanelJustClosed = true
       } else {
-        // If closing navigation panel by leaving nav bar, nav bar can open again when mouse re-enter
         appState.navigationPanelOpen = false
         appState.navigationPanelJustClosed = false
       }
     } else {
-      // If opening nav panel, check if it was just closed by a nav icon/button click
-      // If yes, do not open nav panel, otherwise open as per normal
       if (appState.navigationPanelJustClosed === false) {
         appState.navigationPanelOpen = true
       }
@@ -137,7 +185,6 @@ export const appState = proxy({
     }
   },
 
-  aiAssistantPanel: INITIAL_AI_ASSISTANT as AiAssistantPanelType,
   setAiAssistantPanel: (value: Partial<AiAssistantPanelType>) => {
     const hasEntityChanged = value.entity?.id !== appState.aiAssistantPanel.entity?.id
 
@@ -148,6 +195,20 @@ export const appState = proxy({
     }
   },
 })
+
+// Set up localStorage subscription
+if (typeof window !== 'undefined') {
+  subscribe(appState, () => {
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE,
+      JSON.stringify(appState.aiAssistantPanel)
+    )
+    localStorage.setItem(
+      LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY,
+      JSON.stringify(appState.dashboardHistory)
+    )
+  })
+}
 
 export const getAppStateSnapshot = () => snapshot(appState)
 
