@@ -63,7 +63,19 @@ const edgeFunctionSchema = z.object({
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpBody: z.string().trim(),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const httpRequestSchema = z.object({
@@ -77,7 +89,19 @@ const httpRequestSchema = z.object({
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpBody: z.string().trim(),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const sqlFunctionSchema = z.object({
