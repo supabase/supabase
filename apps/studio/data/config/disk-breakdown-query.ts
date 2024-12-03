@@ -34,10 +34,10 @@ export async function getDiskBreakdown(
       pg_database
   ),
   (
-    SELECT
-      SUM(size)
+    SELECTUM(size)
     FROM
       pg_ls_waldir()
+      S
   ) AS wal_size_bytes`,
     },
     signal
