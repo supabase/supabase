@@ -662,7 +662,7 @@ parameters:
     title: 'auth.enable_refresh_token_rotation'
     tags: ['auth']
     required: false
-    default: 'false'
+    default: 'true'
     description: |
       If disabled, the refresh token will never expire.
     links:
@@ -1135,7 +1135,7 @@ parameters:
         link: 'https://supabase.com/docs/reference/auth'
 
   - id: 'auth.mfa.max_enrolled_factors'
-    title: 'auth.mfa.totp.verify_enabled'
+    title: 'auth.mfa.max_enrolled_factors'
     tags: ['auth']
     required: false
     default: '10'
@@ -1241,7 +1241,7 @@ parameters:
     required: false
     default: 'false'
     description: |
-      User Pool ID for AWS Cognito (Amplify)
+      User Pool ID for AWS Cognito (Amplify) that you are integrating with
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
@@ -1252,7 +1252,7 @@ parameters:
     required: false
     default: 'false'
     description: |
-      User Pool region for AWS Cognito (Amplify). Example values: 'ap-southeast-1', 'us-east-1'
+      User Pool region for AWS Cognito (Amplify) that you are integrating with. Example values: 'ap-southeast-1', 'us-east-1'
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
