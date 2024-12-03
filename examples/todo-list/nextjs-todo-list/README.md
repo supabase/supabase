@@ -33,32 +33,6 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 ## Supabase details
 
-### Local Development Stack
-
-1. Clone the repository:
-
-```bash
-git clone <repository-url>
-```
-
-2. Set up environment variables:
-
-```bash
-cp .env.local.example .env.local
-```
-
-3. Start Supabase stack:
-
-```bash
-npx supabase@latest start
-```
-
-4. Start the development server:
-
-```bash
-npm run dev
-```
-
 ### Using a Remote Supabase Project
 
 1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
