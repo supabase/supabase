@@ -404,7 +404,7 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts?.map((prompt, idx) => (
+                {suggestions?.prompts?.map((prompt: string, idx: number) => (
                   <Button
                     key={`suggestion-${idx}`}
                     size="small"
@@ -500,7 +500,7 @@ export const AIAssistant = ({
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
             <div className="mb-2">
-              {sqlSnippets.map((snippet, index) => (
+              {sqlSnippets.map((snippet: string, index: number) => (
                 <CollapsibleCodeBlock
                   key={index}
                   hideLineNumbers
@@ -556,7 +556,9 @@ export const AIAssistant = ({
               event.preventDefault()
               if (includeSchemaMetadata) {
                 const sqlSnippetsString =
-                  sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
+                  sqlSnippets
+                    ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
+                    .join('\n') || ''
                 const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
                 sendMessageToAssistant(valueWithSnippets)
               } else {
