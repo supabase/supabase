@@ -40,7 +40,7 @@ function VectorPage() {
           url: `https://supabase.com/modules/vector`,
           images: [
             {
-              url: `https://supabase.com${basePath}${meta_image}`,
+              url: meta_image,
             },
           ],
         }}

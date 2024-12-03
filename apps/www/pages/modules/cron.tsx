@@ -32,7 +32,7 @@ function CronPage() {
           url: `https://supabase.com/modules/cron`,
           images: [
             {
-              url: `https://supabase.com${basePath}${pageData.metaImage}`,
+              url: pageData.metaImage,
             },
           ],
         }}
