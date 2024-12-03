@@ -349,13 +349,14 @@ Using `--schema`
 
 If the local `supabase/migrations` directory is empty, the db pull command will ignore the `--schema` parameter.
 
-</Admonition>
+To fix this, you can pull twice:
 
-To fix this, you can run the following command:
 ```bash
 supabase db pull
 supabase db pull --schema <schema_name>
 ```
+
+</Admonition>
 
 ## Limitations and considerations
 
