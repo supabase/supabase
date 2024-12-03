@@ -1,7 +1,8 @@
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
+import { useParams } from 'common'
+import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
 import OrganizationDropdown from 'components/layouts/AppLayout/OrganizationDropdown'
@@ -17,14 +18,11 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -127,7 +125,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
           </div>
         </div>
       </div>
-      {isAssistantV2Enabled && !!projectRef && (
+      {!!projectRef && (
         <div className="border-l flex-0 h-full">
           <AssistantButton />
         </div>

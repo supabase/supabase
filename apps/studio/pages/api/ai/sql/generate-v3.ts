@@ -76,9 +76,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Always use semicolons
       - Output as markdown
       - Always include code snippets if available
-      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
+      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
       - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
       - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
+      - Only set runQuery to true if the query has no risk of writing data and is not a debugging request. Set it to false if there are any values that need to be replaced with real data.
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
@@ -118,8 +119,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
-      ${schema !== undefined ? `The user is currently looking at the ${schema} schema.` : ''}
-      ${table !== undefined ? `The user is currently looking at the ${table} table.` : ''}
+      ${schema !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${schema} schema.` : ''}
+      ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
       `,
     messages,
     tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),

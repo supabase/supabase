@@ -3,7 +3,6 @@ import { noop, partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlphaPreview from 'components/to-be-cleaned/AlphaPreview'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
@@ -34,6 +33,7 @@ const TriggersList = ({
   deleteTrigger = noop,
 }: TriggersListProps) => {
   const { project } = useProjectContext()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [filterString, setFilterString] = useState<string>('')
 
@@ -58,9 +58,6 @@ const TriggersList = ({
   })
 
   const canCreateTriggers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'triggers')
-
-  const { setAiAssistantPanel } = useAppStateSnapshot()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   if (isLoading) {
     return <GenericSkeletonLoader />
@@ -126,37 +123,35 @@ const TriggersList = ({
                 >
                   Create a new trigger
                 </ButtonTooltip>
-                {isAssistantV2Enabled && (
-                  <ButtonTooltip
-                    type="default"
-                    disabled={!canCreateTriggers}
-                    className="px-1 pointer-events-auto"
-                    icon={<AiIconAnimation size={16} />}
-                    onClick={() =>
-                      setAiAssistantPanel({
-                        open: true,
-                        initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
-                        suggestions: {
-                          title:
-                            'I can help you create a new trigger, here are a few example prompts to get you started:',
-                          prompts: [
-                            'Create a trigger that logs changes to the users table',
-                            'Create a trigger that updates updated_at timestamp',
-                            'Create a trigger that validates email format before insert',
-                          ],
-                        },
-                      })
-                    }
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canCreateTriggers
-                          ? 'You need additional permissions to create triggers'
-                          : 'Create with Supabase Assistant',
+                <ButtonTooltip
+                  type="default"
+                  disabled={!canCreateTriggers}
+                  className="px-1 pointer-events-auto"
+                  icon={<AiIconAnimation size={16} />}
+                  onClick={() =>
+                    setAiAssistantPanel({
+                      open: true,
+                      initialInput: `Create a new trigger for the schema ${selectedSchema} that does ...`,
+                      suggestions: {
+                        title:
+                          'I can help you create a new trigger, here are a few example prompts to get you started:',
+                        prompts: [
+                          'Create a trigger that logs changes to the users table',
+                          'Create a trigger that updates updated_at timestamp',
+                          'Create a trigger that validates email format before insert',
+                        ],
                       },
-                    }}
-                  />
-                )}
+                    })
+                  }
+                  tooltip={{
+                    content: {
+                      side: 'bottom',
+                      text: !canCreateTriggers
+                        ? 'You need additional permissions to create triggers'
+                        : 'Create with Supabase Assistant',
+                    },
+                  }}
+                />
               </div>
             )}
           </div>

@@ -62,6 +62,7 @@ const SqlSnippetWrapper = ({
         isChart={props.isChart === 'true'}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
+        runQuery={props.runQuery === 'true'}
         title={title}
         readOnly={readOnly}
         isLoading={isLoading}
@@ -76,6 +77,7 @@ interface ParsedSqlProps {
   isLoading?: boolean
   readOnly?: boolean
   isChart: boolean
+  runQuery?: boolean
   xAxis: string
   yAxis: string
 }
@@ -83,6 +85,7 @@ interface ParsedSqlProps {
 export const SqlCard = ({
   sql,
   isChart,
+  runQuery = false,
   xAxis,
   yAxis,
   title,
@@ -100,7 +103,7 @@ export const SqlCard = ({
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
 
-  const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
+  const [showCode, setShowCode] = useState(readOnly || !runQuery || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
@@ -163,11 +166,11 @@ export const SqlCard = ({
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   useEffect(() => {
-    if (isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
+    if (runQuery && isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
       handleExecute()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, readOnly, isLoading])
+  }, [sql, readOnly, isLoading, runQuery])
 
   return (
     <div className="overflow-hidden rounded border w-auto bg-surface-100">

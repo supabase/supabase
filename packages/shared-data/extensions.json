@@ -230,8 +230,8 @@
     "tags": ["Utility"],
     "link": "/guides/database/extensions/pg_cron",
     "github_url": "https://github.com/citusdata/pg_cron",
-    "product": "Supabase Cron Jobs",
-    "product_url": "/project/{ref}/integrations/cron-jobs"
+    "product": "Supabase Cron",
+    "product_url": "/project/{ref}/integrations/cron"
   },
   {
     "name": "pg_freespacemap",

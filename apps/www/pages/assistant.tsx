@@ -53,7 +53,7 @@ const welcomeMessages = [
           </g>
         </svg>
         <p>
-          Welcome Product Hunter! 👋 Thanks for checking out the Supabase assistant. Let me show you
+          Welcome Product Hunter! 👋 Thanks for checking out the Supabase Assistant. Let me show you
           what I can do!
         </p>
       </div>
@@ -103,6 +103,67 @@ LIMIT 12;`}
               { name: 'Nov 2023', value: 934 },
               { name: 'Dec 2023', value: 1023 },
             ]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    label: 'Latest Products',
+    messages: [
+      {
+        id: '23',
+        role: 'user' as const,
+        content: 'Show me our latest products',
+        createdAt: new Date(),
+      },
+      {
+        id: '24',
+        role: 'assistant' as const,
+        content: 'Here are the 5 most recently added products:',
+        createdAt: new Date(),
+        render: (
+          <SqlSnippet
+            id="latest-products"
+            title="Latest Products"
+            sql={`SELECT
+product_id,
+name,
+price,
+category,
+created_at,
+stock_level
+FROM products
+ORDER BY created_at DESC
+LIMIT 5;`}
+            mockData={{
+              rows: [
+                {
+                  product_id: 'PROD-001',
+                  name: 'Wireless Earbuds Pro',
+                  price: 199.99,
+                  category: 'Electronics',
+                  created_at: '2024-01-15T16:30:00Z',
+                  stock_level: 45,
+                },
+                {
+                  product_id: 'PROD-002',
+                  name: 'Smart Home Hub',
+                  price: 299.99,
+                  category: 'Smart Home',
+                  created_at: '2024-01-15T15:45:00Z',
+                  stock_level: 32,
+                },
+                {
+                  product_id: 'PROD-003',
+                  name: 'Fitness Tracker Elite',
+                  price: 149.99,
+                  category: 'Wearables',
+                  created_at: '2024-01-15T14:20:00Z',
+                  stock_level: 78,
+                },
+              ],
+            }}
           />
         ),
       },
@@ -424,55 +485,7 @@ ORDER BY last_login DESC;`}
       },
     ],
   },
-  {
-    label: 'Storage Usage',
-    messages: [
-      {
-        id: '9',
-        role: 'user' as const,
-        content: 'What is our current storage usage?',
-        createdAt: new Date(),
-      },
-      {
-        id: '10',
-        role: 'assistant' as const,
-        content: 'Here is the storage usage by table:',
-        createdAt: new Date(),
-        render: (
-          <SqlSnippet
-            id="storage-usage"
-            title="Database Storage Usage"
-            sql={`SELECT
-schemaname,
-tablename,
-pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) as total_size
-FROM pg_tables
-WHERE schemaname = 'public'
-ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;`}
-            mockData={{
-              rows: [
-                {
-                  schemaname: 'public',
-                  tablename: 'users',
-                  total_size: '1.2 GB',
-                },
-                {
-                  schemaname: 'public',
-                  tablename: 'orders',
-                  total_size: '856 MB',
-                },
-                {
-                  schemaname: 'public',
-                  tablename: 'products',
-                  total_size: '234 MB',
-                },
-              ],
-            }}
-          />
-        ),
-      },
-    ],
-  },
+
   {
     label: 'Daily Page Views',
     messages: [
@@ -557,54 +570,6 @@ ORDER BY error_count DESC;`}
               { name: 'API Error', value: 76 },
               { name: 'Other', value: 45 },
             ]}
-          />
-        ),
-      },
-    ],
-  },
-  {
-    label: 'Database Performance',
-    messages: [
-      {
-        id: '1',
-        role: 'user' as const,
-        content: 'Show me database performance metrics',
-        createdAt: new Date(),
-      },
-      {
-        id: '16',
-        role: 'assistant' as const,
-        content: 'Here are the current database performance metrics:',
-        createdAt: new Date(),
-        render: (
-          <SqlSnippet
-            id="db-performance"
-            title="Database Performance"
-            sql={`SELECT
-datname,
-numbackends,
-xact_commit,
-xact_rollback,
-blks_read,
-blks_hit,
-tup_returned,
-tup_fetched
-FROM pg_stat_database
-WHERE datname = current_database();`}
-            mockData={{
-              rows: [
-                {
-                  datname: 'production_db',
-                  numbackends: 50,
-                  xact_commit: 1500000,
-                  xact_rollback: 1200,
-                  blks_read: 25000,
-                  blks_hit: 980000,
-                  tup_returned: 15000000,
-                  tup_fetched: 2500000,
-                },
-              ],
-            }}
           />
         ),
       },
@@ -712,19 +677,30 @@ function Assistant() {
                 <h1 className="text-4xl sm:text-5xl sm:leading-none">Chat with Postgres</h1>
                 <p className="p text-lg !m-0">
                   Generate, run and debug queries, chart your data, create functions, policies and
-                  more. The assistant is here to help.
+                  more. The Assistant is here to help.
                 </p>
-                <div className="min-h-12">
+                <div className="min-h-12 flex items-center gap-x-2">
                   {!isUserLoading &&
                     (isLoggedIn ? (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
+                        <Link href="/dashboard/project/_">Dashboard</Link>
                       </Button>
                     ) : (
                       <Button type="primary" size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard">Start your project</Link>
+                        <Link href="https://supabase.com/dashboard/project/_">
+                          Start your project
+                        </Link>
                       </Button>
                     ))}
+                  <Button type="default" size="medium" asChild>
+                    <Link
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      href="https://supabase.com/blog/supabase-ai-assistant-v2"
+                    >
+                      Blog Post
+                    </Link>
+                  </Button>
                 </div>
               </div>
 
