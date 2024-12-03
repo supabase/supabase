@@ -1,6 +1,5 @@
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import CronPageData from '~/data/products/modules/cron'
@@ -17,8 +16,6 @@ const ImageLeftSection = dynamic(() => import('~/components/Modules/Cron/ImageLe
 const ImageRightSection = dynamic(() => import('~/components/Modules/Cron/ImageRightSection'))
 
 function CronPage() {
-  // base path for images
-  const { basePath } = useRouter()
   const pageData = CronPageData()
 
   return (
@@ -40,12 +37,12 @@ function CronPage() {
       <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
-        <SectionContainer className="">{pageData.video.image}</SectionContainer>
+        <SectionContainer>{pageData.video.image}</SectionContainer>
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CronSQLSection {...pageData.section1} />
         <ImageLeftSection {...pageData.section2} className="!py-0" />
         <ImageRightSection {...pageData.section3} className="!pb-0" />
-        <ImageLeftSection {...pageData.section4} className="" />
+        <ImageLeftSection {...pageData.section4} />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
