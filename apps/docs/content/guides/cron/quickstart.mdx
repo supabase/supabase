@@ -190,6 +190,13 @@ select cron.alter_job(
 2. Click on the three vertical dots menu on the right side of the Job and click `Delete cron job`.
 3. Confirm deletion by entering the Job name.
 
+<Image
+  alt="Cron Unschedule"
+  src="/docs/img/guides/database/cron/cron-unschedule.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
+
 </TabPanel>
 <TabPanel id="sql-delete-job" label="SQL">
 
@@ -219,13 +226,6 @@ Unchscheduling a Job will permanently delete the Job from `cron.job` table but i
 
 1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section and find the Job you want to see the runs of.
 2. Click on the `History` button next to the Job name.
-
-<Image
-  alt="Cron Unschedule"
-  src="/docs/img/guides/database/cron/cron-unschedule.png"
-  className="max-w-[700px] !mx-auto border rounded-md"
-  zoomable
-/>
 
 </TabPanel>
 <TabPanel id="sql-runs-job" label="SQL">
