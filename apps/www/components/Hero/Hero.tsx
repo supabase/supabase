@@ -26,8 +26,8 @@ const Hero = () => {
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
                       url="/launch-week#day-2"
-                      badge="Launch Week 13"
-                      announcement="Day 2: Supabase Functions v3"
+                      badge="LW13: Day 2"
+                      announcement="Background Tasks and WebSockets"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

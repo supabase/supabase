@@ -102,19 +102,19 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/edge-functions-background-tasks-websockets',
     date: '3 December',
     published_at: '2024-12-03T08:00:00.000-07:00',
-    title: 'Supabase Functions v3: Background tasks',
+    title: 'Supabase Functions: Background Tasks and WebSockets',
     description: (
       <>
-        Supabase Functions v3: <br className="hidden sm:block" /> Background tasks
+        Supabase Functions: <br className="hidden sm:block" /> Background Tasks and WebSockets
       </>
     ),
     links: [
       {
         type: 'video',
-        href: '',
+        href: 'envrsJ8VfAU',
       },
       {
         type: 'xSpace',
@@ -124,8 +124,6 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     steps: [
       {
         title: 'TBD',
-        url: '#',
-        blog: '#',
         bg_layers: [
           {
             img: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-dark.svg',
