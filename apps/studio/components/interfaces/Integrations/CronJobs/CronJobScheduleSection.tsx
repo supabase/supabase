@@ -19,38 +19,40 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   SheetSection,
   Switch,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
+import { getScheduleMessage, secondsPattern } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
-import { secondsPattern } from './CronJobs.utils'
 
 interface CronJobScheduleSectionProps {
   form: UseFormReturn<CreateCronJobForm>
+  supportsSeconds: boolean
 }
 
-const PRESETS = [
-  { name: 'Every minute', expression: '* * * * *' },
-  { name: 'Every 5 minutes', expression: '*/5 * * * *' },
-  { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
-  { name: 'Every night at midnight', expression: '0 0 * * *' },
-  { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
-  { name: 'Every 30 seconds', expression: '30 seconds' },
-] as const
-
-export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) => {
+export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobScheduleSectionProps) => {
   const { project } = useProjectContext()
   const initialValue = form.getValues('schedule')
-  const { schedule } = form.watch()
+  const schedule = form.watch('schedule')
 
   const [presetValue, setPresetValue] = useState<string>(initialValue)
   const [inputValue, setInputValue] = useState(initialValue)
   const [debouncedValue] = useDebounce(inputValue, 750)
   const [useNaturalLanguage, setUseNaturalLanguage] = useState(false)
   const [scheduleString, setScheduleString] = useState('')
+
+  const PRESETS = [
+    ...(supportsSeconds ? [{ name: 'Every 30 seconds', expression: '30 seconds' }] : []),
+    { name: 'Every minute', expression: '* * * * *' },
+    { name: 'Every 5 minutes', expression: '*/5 * * * *' },
+    { name: 'Every first of the month, at 00:00', expression: '0 0 1 * *' },
+    { name: 'Every night at midnight', expression: '0 0 * * *' },
+    { name: 'Every Monday at 2 AM', expression: '0 2 * * 1' },
+  ] as const
 
   const { complete: generateCronSyntax, isLoading: isGeneratingCron } = useCompletion({
     api: `${BASE_PATH}/api/ai/sql/cron`,
@@ -102,10 +104,18 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
     }
 
     try {
+      // Don't allow seconds-based schedules if seconds aren't supported
+      if (!supportsSeconds && secondsPattern.test(schedule)) {
+        setScheduleString('Invalid cron expression')
+        return
+      }
+
       setScheduleString(CronToString(schedule))
     } catch (error) {
+      setScheduleString('Invalid cron expression')
       console.error('Error converting cron expression to string:', error)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schedule])
 
   return (
@@ -116,10 +126,15 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
         render={({ field }) => {
           return (
             <FormItem_Shadcn_ className="flex flex-col gap-1">
-              <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
-              <FormLabel_Shadcn_ className="text-foreground-lighter">
-                {useNaturalLanguage ? 'Describe your schedule in words' : 'Enter a cron expression'}
-              </FormLabel_Shadcn_>
+              <div className="flex flex-row justify-between">
+                <FormLabel_Shadcn_>Schedule</FormLabel_Shadcn_>
+                <span className="text-foreground-lighter text-xs">
+                  {useNaturalLanguage
+                    ? 'Describe your schedule in words'
+                    : 'Enter a cron expression'}
+                </span>
+              </div>
+
               <FormControl_Shadcn_>
                 <div className="flex flex-col gap-y-2">
                   {useNaturalLanguage ? (
@@ -146,6 +161,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                       }}
                     />
                   )}
+                  <FormMessage_Shadcn_ />
 
                   <div className="flex items-center gap-2 mt-2">
                     <Switch
@@ -170,6 +186,7 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                             onClick={() => {
                               setUseNaturalLanguage(false)
                               form.setValue('schedule', preset.expression)
+                              form.trigger('schedule')
                               setPresetValue(preset.expression)
                             }}
                           >
@@ -218,20 +235,8 @@ export const CronJobScheduleSection = ({ form }: CronJobScheduleSectionProps) =>
                   <span className="text-sm text-foreground-light flex items-center gap-2">
                     {isGeneratingCron ? (
                       <LoadingDots />
-                    ) : scheduleString === '' ? ( // set a min length before showing invalid message
-                      'Enter a valid cron expression above'
-                    ) : scheduleString.includes('Invalid cron expression') ? (
-                      'Invalid cron expression'
                     ) : (
-                      <>
-                        The cron will be run{' '}
-                        {secondsPattern.test(schedule)
-                          ? 'every ' + schedule
-                          : scheduleString
-                              .split(' ')
-                              .map((s, i) => (i === 0 ? s.toLocaleLowerCase() : s))
-                              .join(' ') + '.'}
-                      </>
+                      getScheduleMessage(scheduleString, schedule)
                     )}
                   </span>
                 )}

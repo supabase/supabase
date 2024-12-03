@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -42,13 +41,6 @@ const FeaturePreviewModal = () => {
       label: selectedFeatureKey,
       value: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
     })
-
-    if (
-      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2 &&
-      isSelectedFeatureEnabled
-    ) {
-      snap.setAiAssistantPanel({ open: false })
-    }
   }
 
   function handleCloseFeaturePreviewModal() {

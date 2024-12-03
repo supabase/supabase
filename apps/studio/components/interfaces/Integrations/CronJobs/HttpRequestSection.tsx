@@ -51,7 +51,9 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
         name="values.endpoint"
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Endpoint URL" className="gap-1">
-            <Input {...rest} placeholder="https://api.example.com/endpoint" />
+            <FormControl_Shadcn_>
+              <Input {...rest} placeholder="https://api.example.com/endpoint" />
+            </FormControl_Shadcn_>
           </FormItemLayout>
         )}
       />
