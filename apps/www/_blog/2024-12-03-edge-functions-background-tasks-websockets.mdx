@@ -19,21 +19,23 @@ Starting today, you can use these features in any project. Let's explore what ex
 
 ## Background Tasks
 
-Sometimes, you want to use Edge Functions to do more than respond to a request. For example, you may want it to process a bunch of files and upload the results to Storage or read multiple entries from a database table and generate embeddings for them. With the introduction of background tasks, executing these long-running workloads with Edge Functions is super easy.
+Sometimes you need a backend logic to do more than respond to a request. For example, you might want to process a batch of files and upload the results to Supabase Storage. Or read multiple entries from a database table and generate embeddings for each entry. 
+
+With the introduction of background tasks, executing these long-running workloads with Edge Functions is super easy.
 
 We've introduced a new method called `EdgeRuntime.waitUntil` , which accepts a promise. This ensures that the function isn't terminated until the promise is resolved.
 
 Free projects can run background tasks for a maximum of 150 seconds (2m 30s). If you are on a paid plan, this limit increases to 400 seconds (6m 40s). We plan to introduce more flexible limits in the coming months.
 
-You can get notified when the function is about to be shutdown by listening to `beforeunload` event. Read the guide for more details on [how to use background tasks](https://supabase.com/docs/guides/functions/background-tasks).
+You can subscribe to notifications when the function is about to be shut down by listening to `beforeunload` event. Read the guide for more details on [how to use background tasks](/docs/guides/functions/background-tasks).
 
 ## Ephemeral Storage
 
 Edge Function invocations now have access to ephemeral storage. This is useful for background tasks, as it allows you to read and write files in the `/tmp` directory to store intermediate results.
 
-Check the guide on how to access [ephemeral storage](https://supabase.com/docs/guides/functions/ephemeral-storage).
+Check the guide on how to access [ephemeral storage](/docs/guides/functions/ephemeral-storage).
 
-### Example: Extracting a zip file and uploading its content to Storage
+### Example: Extracting a zip file and uploading its content to Supabase Storage
 
 Let's look at a real-world example using Background Tasks and Ephemeral Storage.
 
@@ -81,7 +83,7 @@ Deno.serve(async (req) => {
 
 If you test out the streaming version, it will run into memory limit errors when you try to upload zip files over 100MB. This is because the streaming version has to keep every file in a zip archive in memory.
 
-We can modify it instead to write the zip file to a temporary file. Then, use a background task to extract and upload it to Storage. This way we only read parts of the zip file to the memory.
+We can modify it instead to write the zip file to a temporary file. Then, use a background task to extract and upload it to Supabase Storage. This way, we only read parts of the zip file to the memory.
 
 ```jsx
 import { BlobWriter, ZipReader, ZipReaderStream } from 'https://deno.land/x/zipjs/index.js'
@@ -165,9 +167,9 @@ Edge Functions now support establishing both inbound (server) and outbound (clie
 
 ### Example: Building an authenticated relay to OpenAI Realtime API
 
-OpenAI recently introduced a [Realtime API](https://openai.com/index/introducing-the-realtime-api/), which uses WebSockets. This is tricky to implement purely client-side because you'd have to expose your OpenAI key publicly and OpenAI [recommends](https://platform.openai.com/docs/guides/realtime/overview?text-generation-quickstart-example=audio) building a server to authenticate requests.
+OpenAI recently introduced a [Realtime API](https://openai.com/index/introducing-the-realtime-api/), which uses WebSockets. This is tricky to implement purely client-side because you'd need to expose your OpenAI key publicly. OpenAI [recommends](https://platform.openai.com/docs/guides/realtime/overview?text-generation-quickstart-example=audio) building a server to authenticate requests.
 
-With Supabase Edge functions support for WebSockets, you can easily do this without standing up any infrastructure. Additionally, you can use [Supabase Auth](https://supabase.com/docs/guides/auth) to authenticate users making the requests.
+With our new support for WebSockets, you can easily do this in Edge Functions without standing up any infrastructure. Additionally, you can use [Supabase Auth](https://supabase.com/docs/guides/auth) to authenticate users and protect your OpenAI usage from being abused.
 
 ```jsx
 import { createClient } from 'jsr:@supabase/supabase-js@2'
@@ -251,7 +253,7 @@ Deno.serve(async (req) => {
   return response // 101 (Switching Protocols)
 })
 ```
-## Perfomance and stability
+## Performance and stability
 
 In the past few months, we have made many [performance, stability,](https://supabase.com/blog/edge-functions-faster-smaller) and [DX improvements](https://github.com/orgs/supabase/discussions/30307) to Edge Functions. While these improvements often aren't visible to the end-users, they are the foundation of the new features we are announcing today.
 
