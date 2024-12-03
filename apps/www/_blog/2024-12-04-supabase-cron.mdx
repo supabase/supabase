@@ -1,6 +1,6 @@
 ---
 title: 'Supabase Cron'
-description: Schedule and automate tasks using Postgres
+description: Schedule Recurring Jobs in Postgres
 author: ivasilov,oli_rice,saltcod
 image: launch-week-13/day-3-supabase-cron/og.jpg
 thumb: launch-week-13/day-3-supabase-cron/thumb.jpg
@@ -15,11 +15,13 @@ toc_depth: 3
 launchweek: '13'
 ---
 
-Today we're releasing Supabase Cron, a new module that makes scheduling and managing database tasks simple and intuitive. It's designed to work seamlessly with the entire Supabase platform. Create Jobs to call Database Functions, Edge Functions, and even remote webhooks.
+Today we're releasing Supabase Cron, a new Postgres Module that makes scheduling recurring Jobs simple and intuitive inside your database.
+
+It's designed to work seamlessly with the entire Supabase platform. Create recurring Jobs to run SQL snippets and call database functions, Supabase Edge Functions, and even remote webhooks.
 
 ### What's a Cron?
 
-[**Cron**](https://en.wikipedia.org/wiki/Cron) is a tool for scheduling tasks at specified intervals. These periodic tasks are called “Cron Jobs”. Common use-cases include:
+[**Cron**](https://en.wikipedia.org/wiki/Cron) is a tool for scheduling recurring tasks that run at specified intervals. These periodic tasks are called “Cron Jobs”. Common use-cases include:
 
 - **Maintenance:** delete or archive old data.
 - **Reporting and analytics:** save daily or weekly reports for analysis.
@@ -39,38 +41,30 @@ Today we're releasing Supabase Cron, a new module that makes scheduling and mana
   />
 </div>
 
-Supabase Cron stores the scheduling logic within Postgres and integrates with the rest of the Supabase primitives - the Dashboard, Edge Functions, and AI Assistant.
+Supabase Cron stores the scheduling logic within Postgres and runs your Jobs accordingly while integrating with the rest of the Supabase primitives - Dashboard, Edge Functions, and AI Assistant.
 
 ## How Do You Use Supabase Cron?
-You can create Jobs with SQL or the Dashboard.
 
-
+You can create Jobs either via the Dashboard or SQL.
 
 <Admonition>
 
-For this post we'll focus on the Dashboard. You can refer to the [documentation](https://supabase.com/docs/guides/database/cron) for SQL.
-
+For this post we'll focus on the Dashboard. You can refer to the [documentation](https://supabase.com/docs/guides/cron/quickstart) for SQL.
 
 </Admonition>
 
-
-
- Within the Dashboard you can define schedules using standard cron syntax, natural language, or the special `pg_cron` seconds-level syntax.
+Within the Dashboard you can define schedules using standard cron syntax and the special `pg_cron` seconds syntax for sub-minute schedules or use natural language.
 
 <Img
   alt="Natural language scheduling"
   src="/images/blog/launch-week-13/day-3-supabase-cron/natural-language.jpg"
 />
 
+## Job Types
 
-## Job types
-You can choose between four types of jobs based on what you need to execute:
+You can choose between four types of Jobs based on what you need to execute:
 
-<Img
-  alt="Job types"
-  src="/images/blog/launch-week-13/day-3-supabase-cron/job-types.jpg"
-/>
-
+<Img alt="Job types" src="/images/blog/launch-week-13/day-3-supabase-cron/job-types.jpg" />
 
 ### SQL Snippets
 
@@ -106,32 +100,28 @@ Run a serverless function to execute custom logic. Examples include:
 
 These options cover a wide range of use cases, helping with everything from database management to external integrations.
 
+### Observe and Debug Jobs
 
-### Observe and debug jobs
-Wondering why a job failed? You can view the history of all jobs and their logs in the Dashboard. You can see when a job started, how long it took, and what the result was.
+Wondering why a Job failed? You can view the history of all Jobs and their logs in the Dashboard. You can see when a Job started, how long it took, and what the result was.
 
 <Img
-  alt="View job history"
+  alt="View Job history"
   src="/images/blog/launch-week-13/day-3-supabase-cron/history-button.jpg"
 />
 
 <Img
-  alt="Observe and debug jobs"
+  alt="Observe and debug Jobs"
   src="/images/blog/launch-week-13/day-3-supabase-cron/history.jpg"
 />
- For a deeper dive, you can view jobs in the [Logs Explorer](https://supabase.com/dashboard/project/_zvmkyvanngopzqaabmvx_/logs/pgcron-logs).
-<Img
-  alt="View cron logs"
-  src="/images/blog/launch-week-13/day-3-supabase-cron/logs.jpg"
-/>
-
+For a deeper dive, you can view Jobs in the [Logs Explorer](https://supabase.com/dashboard/project/_zvmkyvanngopzqaabmvx_/logs/pgcron-logs).
+<Img alt="View cron logs" src="/images/blog/launch-week-13/day-3-supabase-cron/logs.jpg" />
 
 ### Try Supabase Cron today
 
 Getting started is easy:
 
 1. Visit the new [Integrations page](https://supabase.com/dashboard/project/_/integrations) in your project.
-2. Enable the **Cron** Module.
+2. Enable the **Cron** Postgres Module.
 3. Create your first scheduled Job.
 
 <Img
@@ -139,10 +129,6 @@ Getting started is easy:
   src="/images/blog/launch-week-13/day-3-supabase-cron/integrations.jpg"
 />
 
-<Img
-  alt="Create a new job"
-  src="/images/blog/launch-week-13/day-3-supabase-cron/create-job.jpg"
-/>
+<Img alt="Create a new Job" src="/images/blog/launch-week-13/day-3-supabase-cron/create-job.jpg" />
 
 We're looking forward to seeing how you use Supabase Cron to help automate your workflows!
-
