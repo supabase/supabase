@@ -1217,6 +1217,7 @@ parameters:
     required: false
     description: |
       Specify the Deno import map file to use for the Function.
+      When not specified, defaults to `supabase/functions/<function_name>/deno.json`.
 
       Note that the `--import-map` flag overrides this configuration.
     links:
