@@ -214,25 +214,21 @@ export default () => ({
         draggable={false}
       />
     ),
-    // cta: {
-    //   label: 'Start scheduling',
-    //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
-    // },
   },
   section3: {
     id: 'UI-Job-Observability',
-    label: 'UI',
+    label: 'Cron Logs',
     heading: <>Job Observability</>,
     subheading:
       'Track and investigate recurring Jobs and their historical runs in the Cron UI and Cron logs.',
     image: (
       <Image
         src={{
-          dark: '/images/modules/cron/cron-ui-dark.png',
-          light: '/images/modules/cron/cron-ui-light.png',
+          dark: '/images/modules/cron/cron-logs-dark.png',
+          light: '/images/modules/cron/cron-logs-light.png',
         }}
         alt="Cron Jobs UI"
-        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
+        className="w-full max-w-[490px] aspect-[1/0.71] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}
