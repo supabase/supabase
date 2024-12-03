@@ -146,10 +146,10 @@ You can check the distribution of your disk size on your [project's compute and 
 ![Disk Size Distribution](/docs/img/guides/platform/database-size/disk-size-distribution.png)
 
 Your disk size usage falls in three categories:
+
 - **Database** - Disk usage by the database. This includes the actual data, indexes, materialized views, ...
 - **WAL** - Disk usage by the write-ahead log. The usage depends on your WAL settings and the amount of data being written to the database.
 - **System** - Disk usage reserved by the system to ensure the database can operate smoothly. Users cannot modify this and it should only take very little space.
-
 
 ### Reducing disk size
 
