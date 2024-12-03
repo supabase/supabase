@@ -5,10 +5,7 @@ import { useTheme } from 'next-themes'
 import { UseFormReturn } from 'react-hook-form'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useRemainingDurationForDiskAttributeUpdate } from 'data/config/disk-attributes-query'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
-import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import { GB } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'
 import {
@@ -20,6 +17,9 @@ import {
 } from 'ui'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { AUTOSCALING_THRESHOLD } from './DiskManagement.constants'
+import { useDiskBreakdownQuery } from 'data/config/disk-breakdown-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useMemo } from 'react'
 
 interface DiskSpaceBarProps {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -30,6 +30,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
   const { resolvedTheme } = useTheme()
   const { formState, watch } = form
   const isDarkMode = resolvedTheme?.includes('dark')
+  const project = useSelectedProject()
 
   const {
     data: diskUtil,
@@ -38,30 +39,54 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
     projectRef: ref,
   })
 
-  const usedSize = Math.round(((diskUtil?.metrics.fs_used_bytes ?? 0) / GB) * 100) / 100
-  const totalSize = formState.defaultValues?.totalSize || 0
-  const show = formState.dirtyFields.totalSize !== undefined && usedSize
-  const newTotalSize = watch('totalSize')
-
-  const usedPercentage = (usedSize / totalSize) * 100
-  const resizePercentage = AUTOSCALING_THRESHOLD * 100
-
-  const newUsedPercentage = (usedSize / newTotalSize) * 100
-  const newResizePercentage = AUTOSCALING_THRESHOLD * 100
-
-  const { project } = useProjectContext()
-  const { data } = useDatabaseSizeQuery({
-    projectRef: project?.ref,
+  const { data: diskBreakdown } = useDiskBreakdownQuery({
+    projectRef: ref,
     connectionString: project?.connectionString,
   })
-  const { remainingDuration } = useRemainingDurationForDiskAttributeUpdate({ projectRef: ref })
 
-  const databaseSizeBytes = data ?? 0
+  const diskBreakdownBytes = useMemo(() => {
+    return {
+      availableBytes: diskUtil?.metrics.fs_avail_bytes ?? 0,
+      totalUsedBytes: diskUtil?.metrics.fs_used_bytes ?? 0,
+      totalDiskSizeBytes: diskUtil?.metrics.fs_size_bytes,
+      dbSizeBytes: Math.max(0, diskBreakdown?.db_size_bytes ?? 0),
+      walSizeBytes: Math.max(0, diskBreakdown?.wal_size_bytes ?? 0),
+      systemBytes: Math.max(
+        0,
+        (diskUtil?.metrics.fs_used_bytes ?? 0) -
+          (diskBreakdown?.db_size_bytes ?? 0) -
+          (diskBreakdown?.wal_size_bytes ?? 0)
+      ),
+    }
+  }, [diskUtil, diskBreakdown])
+
+  const show = formState.dirtyFields.totalSize !== undefined && diskBreakdown
+  const newTotalSize = watch('totalSize')
+
+  const totalSize = formState.defaultValues?.totalSize || 0
+  const usedSizeTotal = Math.round(((diskBreakdownBytes?.totalUsedBytes ?? 0) / GB) * 100) / 100
+  const usedTotalPercentage = Math.min((usedSizeTotal / totalSize) * 100, 100)
+
+  const usedSizeDatabase = Math.round(((diskBreakdownBytes?.dbSizeBytes ?? 0) / GB) * 100) / 100
+  const usedPercentageDatabase = Math.min((usedSizeDatabase / totalSize) * 100, 100)
+  const newUsedPercentageDatabase = Math.min((usedSizeDatabase / newTotalSize) * 100, 100)
+
+  const usedSizeWAL = Math.round(((diskBreakdownBytes?.walSizeBytes ?? 0) / GB) * 100) / 100
+  const usedPercentageWAL = Math.min((usedSizeWAL / totalSize) * 100, 100)
+  const newUsedPercentageWAL = Math.min((usedSizeWAL / newTotalSize) * 100, 100)
+
+  const usedSizeSystem = Math.round(((diskBreakdownBytes?.systemBytes ?? 0) / GB) * 100) / 100
+  const usedPercentageSystem = Math.min((usedSizeSystem / totalSize) * 100, 100)
+  const newUsedPercentageSystem = Math.min((usedSizeSystem / newTotalSize) * 100, 100)
+
+  const resizePercentage = AUTOSCALING_THRESHOLD * 100
+  const newResizePercentage = AUTOSCALING_THRESHOLD * 100
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center h-6 gap-3">
         <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-          {usedSize.toFixed(2)}
+          {usedSizeTotal.toFixed(2)}
           <span>GB used of </span>
           <span className="text-foreground font-semibold -mt-[2px]">
             <MotionNumber value={newTotalSize} style={{ lineHeight: 0.8 }} className="font-mono" />
@@ -89,13 +114,10 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
               >
                 <div className="h-full flex">
                   <div
-                    className={cn(
-                      usedPercentage >= 90 && remainingDuration > 0
-                        ? 'bg-destructive'
-                        : 'bg-foreground',
-                      'relative overflow-hidden transition-all duration-500 ease-in-out'
-                    )}
-                    style={{ width: `${usedPercentage >= 100 ? 100 : usedPercentage}%` }}
+                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-foreground"
+                    style={{
+                      width: `${usedPercentageDatabase}%`,
+                    }}
                   >
                     <div
                       className="absolute inset-0"
@@ -110,10 +132,25 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                       }}
                     />
                   </div>
+
                   <div
-                    className="bg-transparent border-r transition-all duration-500 ease-in-out"
+                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
                     style={{
-                      width: `${resizePercentage - usedPercentage <= 0 ? 0 : resizePercentage - usedPercentage}%`,
+                      width: `${usedPercentageWAL}%`,
+                    }}
+                  />
+
+                  <div
+                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-destructive-500"
+                    style={{
+                      width: `${usedPercentageSystem}%`,
+                    }}
+                  />
+
+                  <div
+                    className="bg-transparent-800 border-r transition-all duration-500 ease-in-out"
+                    style={{
+                      width: `${resizePercentage - usedTotalPercentage <= 0 ? 0 : resizePercentage - usedTotalPercentage}%`,
                     }}
                   />
                 </div>
@@ -131,7 +168,9 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                 <div className="h-full flex">
                   <div
                     className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{ width: `${newUsedPercentage >= 100 ? 100 : newUsedPercentage}%` }}
+                    style={{
+                      width: `${newUsedPercentageDatabase >= 100 ? 100 : newUsedPercentageDatabase}%`,
+                    }}
                   >
                     <div
                       className="absolute inset-0"
@@ -146,6 +185,20 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
                       }}
                     />
                   </div>
+
+                  <div
+                    className="bg-_secondary relative overflow-hidden transition-all duration-500 ease-in-out"
+                    style={{
+                      width: `${newUsedPercentageWAL}%`,
+                    }}
+                  />
+
+                  <div
+                    className="bg-destructive-500 relative overflow-hidden transition-all duration-500 ease-in-out"
+                    style={{
+                      width: `${newUsedPercentageSystem}%`,
+                    }}
+                  />
                 </div>
               </motion.div>
             )}
@@ -203,23 +256,74 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
         </AnimatePresence>
       </div>
       {!show && (
-        <div className="flex items-center space-x-4 text-xs text-foreground-lighter">
-          <div className="flex items-center">
-            <div className="w-2 h-2 rounded-full bg-foreground mr-2" />
-            <span>Used Space</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 rounded-full bg-border border border-strong mr-2" />
-            <span>Available space</span>
-          </div>
+        <div className="flex items-center space-x-3 text-xs text-foreground-lighter">
+          <LegendItem
+            name="Database"
+            size={diskBreakdownBytes.dbSizeBytes}
+            color="bg-foreground"
+            description="Total space on disk used by your database (tables, indexes, data, ...)."
+          />
+          <LegendItem
+            name="WAL"
+            size={diskBreakdownBytes.walSizeBytes}
+            color="bg-_secondary"
+            description="Total space on disk used by the write-ahead log."
+          />
+
+          <LegendItem
+            name="System"
+            size={diskBreakdownBytes.systemBytes}
+            color="bg-destructive-500"
+            description="Reserved space for the system to ensure your database runs smoothly. You cannot modify this."
+          />
+
+          <LegendItem
+            name="Available space"
+            size={diskBreakdownBytes.availableBytes}
+            color="bg-border"
+            description="Total available space on the disk left."
+          />
         </div>
       )}
       <p className="text-xs text-foreground-lighter my-4">
         <span className="font-semibold">Note:</span> Disk Size refers to the total space your
         project occupies on disk, including the database itself (currently{' '}
-        <span>{formatBytes(databaseSizeBytes, 2, 'GB')}</span>), additional files like the
-        write-ahead log (WAL), and other internal resources.
+        <span>{formatBytes(diskBreakdownBytes?.dbSizeBytes, 2, 'GB')}</span>), additional files like
+        the write-ahead log (currently{' '}
+        <span>{formatBytes(diskBreakdownBytes?.walSizeBytes, 2, 'GB')}</span>), and other system
+        resources (currently <span>{formatBytes(diskBreakdownBytes?.systemBytes, 2, 'GB')}</span>).
+        Data can take 5 minutes to refresh.
       </p>
     </div>
   )
 }
+
+const LegendItem = ({
+  name,
+  description,
+  color,
+  size,
+}: {
+  name: string
+  description: string
+  color: string
+  size: number
+}) => (
+  <Tooltip_Shadcn_>
+    <TooltipTrigger_Shadcn_ asChild>
+      <div className="flex items-center hover:cursor-help z-10">
+        <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
+        <span>{name}</span>
+      </div>
+    </TooltipTrigger_Shadcn_>
+    <TooltipContent_Shadcn_ side="bottom" className="flex flex-col gap-y-1 max-w-xs">
+      <div className="flex items-center">
+        <div className={cn('w-2 h-2 rounded-full mr-2', color)} />
+        <span>
+          {name} - {formatBytes(size, 2, 'GB')}
+        </span>
+      </div>
+      <p>{description}</p>
+    </TooltipContent_Shadcn_>
+  </Tooltip_Shadcn_>
+)
