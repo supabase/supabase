@@ -44,8 +44,8 @@ site_url = "http://localhost:3000"
 additional_redirect_urls = [
     "https://localhost:3000",
     # Add your Vercel deployed app specific URLs such as:
-    # "https://<your-vercel-project-name>.*<your-vercel-org-name>.vercel.app/"
-    # "https://<your-vercel-project-name>.*<your-vercel-org-name>.vercel.app/**"
+    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/"
+    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/**"
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
