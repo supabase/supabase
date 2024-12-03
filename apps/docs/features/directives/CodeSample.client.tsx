@@ -4,6 +4,17 @@ import Link from 'next/link'
 import { useState, type PropsWithChildren } from 'react'
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
+export function CodeSampleDummy() {
+  return (
+    <Admonition type="caution" title="Local development warning">
+      The <code>$CodeSample</code> directive with external repos is not supported in local
+      development because it relies on a GitHub API key. Please check the preview site to see the
+      final UI.
+    </Admonition>
+  )
+}
 
 export function CodeSampleWrapper({
   children,
