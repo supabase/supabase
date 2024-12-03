@@ -45,7 +45,7 @@ site_url = "env(NEXT_SITE_URL)"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
     # Will be localhost:3000 in development or the URL of your deployed app in production.
-    "env(NEXT_SITE_URL)",
+    "env(NEXT_REDIRECT_URLS)",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
