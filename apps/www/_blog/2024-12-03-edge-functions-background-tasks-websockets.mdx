@@ -2,8 +2,8 @@
 title: 'Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets'
 description: Edge functions can be used for workloads outside the request-response lifecycle
 author: laktek,nyannyacha
-image: launch-week-13/day-1-ai-assistant-v2/og.jpg
-thumb: launch-week-13/day-1-ai-assistant-v2/thumb.jpg
+image: launch-week-13/day-2-functions-background-tasks/og.jpg
+thumb: launch-week-13/day-2-functions-background-tasks/thumb.jpg
 categories:
   - product
 tags:
@@ -19,7 +19,7 @@ Starting today, you can use these features in any project. Let's explore what ex
 
 ## Background Tasks
 
-Sometimes you need a backend logic to do more than respond to a request. For example, you might want to process a batch of files and upload the results to Supabase Storage. Or read multiple entries from a database table and generate embeddings for each entry. 
+Sometimes you need a backend logic to do more than respond to a request. For example, you might want to process a batch of files and upload the results to Supabase Storage. Or read multiple entries from a database table and generate embeddings for each entry.
 
 With the introduction of background tasks, executing these long-running workloads with Edge Functions is super easy.
 
@@ -253,6 +253,7 @@ Deno.serve(async (req) => {
   return response // 101 (Switching Protocols)
 })
 ```
+
 ## Performance and stability
 
 In the past few months, we have made many [performance, stability,](https://supabase.com/blog/edge-functions-faster-smaller) and [DX improvements](https://github.com/orgs/supabase/discussions/30307) to Edge Functions. While these improvements often aren't visible to the end-users, they are the foundation of the new features we are announcing today.
