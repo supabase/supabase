@@ -13,17 +13,15 @@ date: '2024-12-03'
 toc_depth: 3
 ---
 
-In the past couple of months, we have made many [performance, stability,](https://supabase.com/blog/edge-functions-faster-smaller) and [DX improvements](https://github.com/orgs/supabase/discussions/30307) to Edge Functions.
+We are excited to announce three long-awaited features: Background Tasks, Ephemeral File Storage, and WebSockets.
 
-Built on those bases, we are excited to announce three long-awaited features: Background Tasks, Ephemeral File Storage, and WebSockets.
-
-Starting today, you can use these features in any project. Let’s explore what exciting things you can build with them.
+Starting today, you can use these features in any project. Let's explore what exciting things you can build with them.
 
 ## Background Tasks
 
 Sometimes, you want to use Edge Functions to do more than respond to a request. For example, you may want it to process a bunch of files and upload the results to Storage or read multiple entries from a database table and generate embeddings for them. With the introduction of background tasks, executing these long-running workloads with Edge Functions is super easy.
 
-We’ve introduced a new method called `EdgeRuntime.waitUntil` , which accepts a promise. This ensures that the function isn’t terminated until the promise is resolved.
+We've introduced a new method called `EdgeRuntime.waitUntil` , which accepts a promise. This ensures that the function isn't terminated until the promise is resolved.
 
 Free projects can run background tasks for a maximum of 150 seconds (2m 30s). If you are on a paid plan, this limit increases to 400 seconds (6m 40s). We plan to introduce more flexible limits in the coming months.
 
@@ -37,9 +35,9 @@ Check the guide on how to access [ephemeral storage](https://supabase.com/docs/g
 
 ### Example: Extracting a zip file and uploading its content to Storage
 
-Let’s look at a real-world example using Background Tasks and Ephemeral Storage.
+Let's look at a real-world example using Background Tasks and Ephemeral Storage.
 
-Imagine you’re building a Photo Album app. You want your users to upload photos as a zip file. You would extract them in an Edge Function and upload them to storage.
+Imagine you're building a Photo Album app. You want your users to upload photos as a zip file. You would extract them in an Edge Function and upload them to storage.
 
 One of the most straightforward ways to implement is using streams:
 
@@ -167,7 +165,7 @@ Edge Functions now support establishing both inbound (server) and outbound (clie
 
 ### Example: Building an authenticated relay to OpenAI Realtime API
 
-OpenAI recently introduced a [Realtime API](https://openai.com/index/introducing-the-realtime-api/), which uses WebSockets. This is tricky to implement purely client-side because you’d have to expose your OpenAI key publicly and OpenAI [recommends](https://platform.openai.com/docs/guides/realtime/overview?text-generation-quickstart-example=audio) building a server to authenticate requests.
+OpenAI recently introduced a [Realtime API](https://openai.com/index/introducing-the-realtime-api/), which uses WebSockets. This is tricky to implement purely client-side because you'd have to expose your OpenAI key publicly and OpenAI [recommends](https://platform.openai.com/docs/guides/realtime/overview?text-generation-quickstart-example=audio) building a server to authenticate requests.
 
 With Supabase Edge functions support for WebSockets, you can easily do this without standing up any infrastructure. Additionally, you can use [Supabase Auth](https://supabase.com/docs/guides/auth) to authenticate users making the requests.
 
@@ -253,8 +251,11 @@ Deno.serve(async (req) => {
   return response // 101 (Switching Protocols)
 })
 ```
+## Perfomance and stability
 
-## What’s next?
+In the past few months, we have made many [performance, stability,](https://supabase.com/blog/edge-functions-faster-smaller) and [DX improvements](https://github.com/orgs/supabase/discussions/30307) to Edge Functions. While these improvements often aren't visible to the end-users, they are the foundation of the new features we are announcing today.
+
+## What's next?
 
 We have a very exciting roadmap planned for 2025. One of the main priorities is to provide customizable compute limits (memory, CPU, and execution duration). We will soon announce an update on it.
 
