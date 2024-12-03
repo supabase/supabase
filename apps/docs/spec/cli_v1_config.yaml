@@ -636,9 +636,31 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.enable_anonymous_sign_ins'
+    title: 'auth.enable_anonymous_sign_ins'
+    tags: ['auth', 'local']
+    required: false
+    default: 'true'
+    description: |
+      Allow anonymous sign-ins to your project
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.enable_manual_linking'
+    title: 'auth.enable_manual_linking'
+    tags: ['auth', 'local']
+    required: false
+    default: 'true'
+    description: |
+      Allow testing manual linking of accounts
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.enable_refresh_token_rotation'
     title: 'auth.enable_refresh_token_rotation'
-    tags: ['auth']
+    tags: ['auth', 'local']
     required: false
     default: 'true'
     description: |
@@ -646,6 +668,8 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
+
+
 
   - id: 'auth.refresh_token_reuse_interval'
     title: 'auth.refresh_token_reuse_interval'
@@ -1022,11 +1046,11 @@ parameters:
       - `google`
       - `kakao`
       - `keycloak`
-      - `linkedin`
+      - `linkedin_oidc`
       - `notion`
       - `twitch`
       - `twitter`
-      - `slack`
+      - `slack_oidc`
       - `spotify`
       - `workos`
       - `zoom`
@@ -1090,6 +1114,50 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.mfa.totp.enroll_enabled'
+    title: 'auth.mfa.totp.enroll_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable TOTP enrollment for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.totp.verify_enabled'
+    title: 'auth.mfa.totp.verify_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable TOTP verification for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.phone.enroll_enabled'
+    title: 'auth.mfa.phone.enroll_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable Phone enrollment for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.phone.verify_enabled'
+    title: 'auth.mfa.phone.verify_enabled'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable Phone verification for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.mfa.web_authn.enroll_enabled'
     title: 'auth.mfa.web_authn.enroll_enabled'
     tags: ['auth', 'local']
@@ -1108,6 +1176,17 @@ parameters:
     default: 'false'
     description: |
       Enable WebAuthn verification for multi-factor authentication.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.aws_cognito'
+    title: 'auth.third_party.aws_cognito'
+    tags: ['auth', 'local']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with AWS Cognito
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
