@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -110,6 +110,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
         if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
@@ -195,7 +201,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       )}
                     </main>
                   </ResizablePanel>
-                  {aiAssistantPanel.open && (
+                  {isClient && aiAssistantPanel.open && (
                     <>
                       <ResizableHandle />
                       <ResizablePanel
