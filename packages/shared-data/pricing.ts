@@ -69,6 +69,19 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        title: 'Advanced disk config',
+        tooltips: {
+          main: 'Each project comes with a dedicated SSD disk. The disk can be scaled up to 64 TB, 80,000 IOPS and 4,000 Mbps throughput.',
+        },
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         title: 'Automatic backups',
         tooltips: {
           main: 'Backups are entire copies of your database that can be restored in the future.',
