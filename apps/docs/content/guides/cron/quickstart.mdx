@@ -317,6 +317,6 @@ This requires [`pg_net` extension](/docs/guides/database/extensions/pg_net) to b
 
 Be extremely careful when setting up Jobs for system maintenance tasks as they can have unintended consequences.
 
-For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
+For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting, such as `idle_session_timeout`, that can perform these common maintenance tasks without the risk.
 
 Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.
