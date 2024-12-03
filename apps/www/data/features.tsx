@@ -37,7 +37,7 @@ import {
   PRODUCT,
   PRODUCT_MODULE,
   PRODUCT_MODULES_SHORTNAMES,
-  PRODUCT_SHORTNAMES
+  PRODUCT_SHORTNAMES,
 } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
