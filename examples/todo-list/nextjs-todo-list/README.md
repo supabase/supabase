@@ -36,22 +36,23 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 ### Using a Remote Supabase Project
 
 1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
-2. Link the local project and merge the local configuration with the remote one for some values such as `additional_redirect_urls`:
+2. Copy and fill the dotenv template `cp .env.production.example .env.production`
+3. Link the local project and merge the local configuration with the remote one:
 
 ```bash
-npx supabase@latest link --project-ref <your-project-ref>
+SUPABASE_ENV=production npx supabase@latest link --project-ref <your-project-ref>
 ```
 
 3. Sync the configuration:
 
 ```bash
-npx supabase@latest config push
+SUPABASE_ENV=production npx supabase@latest config push
 ```
 
 4. Sync the database schema:
 
 ```bash
-npx supabase@latest db push
+SUPABASE_ENV=production npx supabase@latest db push
 ```
 
 ## Vercel Preview with Branching
