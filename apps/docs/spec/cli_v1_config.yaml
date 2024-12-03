@@ -638,9 +638,9 @@ parameters:
 
   - id: 'auth.enable_anonymous_sign_ins'
     title: 'auth.enable_anonymous_sign_ins'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Allow anonymous sign-ins to your project
     links:
@@ -649,7 +649,7 @@ parameters:
 
   - id: 'auth.enable_manual_linking'
     title: 'auth.enable_manual_linking'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -660,7 +660,7 @@ parameters:
 
   - id: 'auth.enable_refresh_token_rotation'
     title: 'auth.enable_refresh_token_rotation'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -668,8 +668,6 @@ parameters:
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
-
-
 
   - id: 'auth.refresh_token_reuse_interval'
     title: 'auth.refresh_token_reuse_interval'
@@ -1116,7 +1114,7 @@ parameters:
 
   - id: 'auth.mfa.totp.enroll_enabled'
     title: 'auth.mfa.totp.enroll_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'true'
     description: |
@@ -1127,7 +1125,7 @@ parameters:
 
   - id: 'auth.mfa.totp.verify_enabled'
     title: 'auth.mfa.totp.verify_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'true'
     description: |
@@ -1136,9 +1134,20 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.mfa.max_enrolled_factors'
+    title: 'auth.mfa.totp.verify_enabled'
+    tags: ['auth']
+    required: false
+    default: '10'
+    description: |
+      Control how many MFA factors can be enrolled at once per user.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.mfa.phone.enroll_enabled'
     title: 'auth.mfa.phone.enroll_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -1147,9 +1156,44 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.mfa.phone.otp_length'
+    title: 'auth.mfa.phone.otp_length'
+    tags: ['auth']
+    required: false
+    default: '6'
+    description: |
+      Length of OTP code sent when using phone multi-factor authentication
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.phone.max_frequency'
+    title: 'auth.mfa.phone.max_frequency'
+    tags: ['auth']
+    required: false
+    default: '10s'
+    description: |
+      The minimum amount of time that must pass between phone requests.
+      Helps prevent spam by limiting how frequently messages can be sent.
+      Example values: "10s", "20s", "1m"
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.mfa.phone.otp_length'
+    title: 'auth.mfa.phone.otp_length'
+    tags: ['auth']
+    required: false
+    default: '6'
+    description: |
+      Length of OTP sent when using phone multi-factor authentication
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.mfa.phone.verify_enabled'
     title: 'auth.mfa.phone.verify_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -1160,7 +1204,7 @@ parameters:
 
   - id: 'auth.mfa.web_authn.enroll_enabled'
     title: 'auth.mfa.web_authn.enroll_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -1171,7 +1215,7 @@ parameters:
 
   - id: 'auth.mfa.web_authn.verify_enabled'
     title: 'auth.mfa.web_authn.verify_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
@@ -1180,13 +1224,90 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.third_party.aws_cognito'
-    title: 'auth.third_party.aws_cognito'
-    tags: ['auth', 'local']
+  - id: 'auth.third_party.aws_cognito.enabled'
+    title: 'auth.third_party.aws_cognito.enabled'
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
-      Enable third party auth with AWS Cognito
+      Enable third party auth with AWS Cognito (Amplify)
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.aws_cognito.user_pool_id'
+    title: 'auth.third_party.aws_cognito.user_pool_id'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      User Pool ID for AWS Cognito (Amplify)
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.aws_cognito.user_pool_region'
+    title: 'auth.third_party.aws_cognito.user_pool_region'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      User Pool region for AWS Cognito (Amplify). Example values: 'ap-southeast-1', 'us-east-1'
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.auth0.enabled'
+    title: 'auth.third_party.auth0.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with Auth0
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.auth0.tenant'
+    title: 'auth.third_party.auth0.tenant'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Tenant Identifier for Auth0 instance that you are integrating with
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.auth0.tenant_region'
+    title: 'auth.third_party.tenant_region'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Tenant region for Auth0 instance that you are integrating with
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.firebase.enabled'
+    title: 'auth.third_party.firebase.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with Firebase
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
+  - id: 'auth.third_party.firebase.project_id'
+    title: 'auth.third_party.firebase.project_id'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Project ID for Firebase instance that you are integrating with
     links:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
