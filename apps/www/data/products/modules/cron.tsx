@@ -4,8 +4,9 @@ import BrowserFrame from '../../../components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
-  metaTitle: 'Supabase Cron | Schedule and Automate Tasks',
-  metaDescription: 'Schedule and Automate Tasks at Scale',
+  metaTitle: 'Supabase Cron | Schedule and Automate Tasks Using Postgres',
+  metaDescription:
+    'Supabase Cron is a Postgres module that uses the pg_cron database extension to manage recurring tasks. Manage your Cron Jobs using any Postgres tooling.',
   metaImage: '/images/modules/cron/og.png',
   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
   docsUrl: '/docs/guides/cron',
