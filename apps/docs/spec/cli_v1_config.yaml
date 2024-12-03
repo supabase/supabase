@@ -592,8 +592,8 @@ parameters:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
 
-  - id: 'buckets.bucket_name.public'
-    title: 'buckets.<bucket_name>.public'
+  - id: 'storage.buckets.bucket_name.public'
+    title: 'storage.buckets.<bucket_name>.public'
     tags: ['storage']
     required: false
     default: 'false'
@@ -603,8 +603,8 @@ parameters:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
 
-  - id: 'buckets.bucket_name.file_size_limit'
-    title: 'buckets.<bucket_name>.file_size_limit'
+  - id: 'storage.buckets.bucket_name.file_size_limit'
+    title: 'storage.buckets.<bucket_name>.file_size_limit'
     tags: ['storage']
     required: false
     description: |
@@ -613,8 +613,8 @@ parameters:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
 
-  - id: 'buckets.bucket_name.allowed_mime_types'
-    title: 'buckets.<bucket_name>.allowed_mime_types'
+  - id: 'storage.buckets.bucket_name.allowed_mime_types'
+    title: 'storage.buckets.<bucket_name>.allowed_mime_types'
     tags: ['storage']
     required: false
     description: |
@@ -623,8 +623,8 @@ parameters:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
 
-  - id: 'buckets.bucket_name.objects_path'
-    title: 'buckets.<bucket_name>.objects_path'
+  - id: 'storage.buckets.bucket_name.objects_path'
+    title: 'storage.buckets.<bucket_name>.objects_path'
     tags: ['storage']
     required: false
     description: |
