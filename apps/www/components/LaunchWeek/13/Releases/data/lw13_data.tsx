@@ -128,10 +128,12 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d2/d2-functions-dark.png',
-            mobileImg: '/images/launchweek/13/releases/d2/d2-functions-mobile-dark.png',
-            imgLight: '/images/launchweek/13/releases/d2/d2-functions-light.png',
-            mobileImgLight: '/images/launchweek/13/releases/d2/d2-functions-mobile-light.png',
+            img: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-dark.svg',
+            mobileImg:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-dark.svg',
+            imgLight: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-light.svg',
+            mobileImgLight:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-light.svg',
           },
         ],
       },
