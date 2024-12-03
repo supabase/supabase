@@ -65,11 +65,5 @@ max_frequency = "1m0s"
 otp_length = 6
 otp_expiry = 86400
 
-# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
-# `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin`, `notion`, `twitch`,
-# `twitter`, `slack`, `spotify`, `workos`, `zoom`.
-[auth.external.apple]
-enabled = false
-
 [analytics]
 enabled = false
