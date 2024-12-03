@@ -33,8 +33,10 @@ enabled = false
 
 [storage.buckets.my-bucket]
 [storage.buckets.videos]
-[storage.buckets.public]
+
+[storage.buckets.images]
 public = true
+objects_path = "./buckets/images"
 
 [functions.auth-hook-react-email-resend]
 [functions.background-upload-storage]
