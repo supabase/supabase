@@ -272,7 +272,7 @@ select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 
 ### Call a database function every 5 minutes
 
-Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
+Create a [`hello_world()`](/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
 
 ```sql
 select cron.schedule('call-db-function', '*/5 * * * *', 'SELECT hello_world()');
