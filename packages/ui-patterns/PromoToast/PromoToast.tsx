@@ -46,8 +46,8 @@ const PromoToast = () => {
       <div className="relative z-10 text-foreground-lighter leading-3 flex flex-col font-mono uppercase tracking-wide w-full text-xs">
         {announcement.text}
       </div>
-      <div className="relative z-10 text-foreground uppercase flex flex-col text-xl w-full font-mono -mt-1">
-        Supabase Functions - Background Tasks and WebSockets
+      <div className="relative z-10 text-foreground flex flex-col text-xl w-full -mt-1">
+        Supabase Functions — Background Tasks and WebSockets
       </div>
 
       <div className="relative z-10 flex items-center space-x-2 mt-2">
