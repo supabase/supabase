@@ -7,7 +7,7 @@ project_id = "nextjs-user-management"
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. public and storage are always included.
-schemas = ["public", "graphql_public"]
+schemas = ["public"]
 # Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
@@ -28,6 +28,7 @@ port = 54323
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
 [inbucket]
+enabled = true
 # Port to use for the email testing server web interface.
 port = 54324
 smtp_port = 54325
@@ -40,13 +41,11 @@ file_size_limit = "50MiB"
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-site_url = "http://localhost:3000"
+site_url = "env(NEXT_SITE_URL)"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
-    "https://localhost:3000",
-    # Add your Vercel deployed app specific URLs such as:
-    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/"
-    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/**"
+    # Will be localhost:3000 in development or the URL of your deployed app in production.
+    "env(NEXT_SITE_URL)",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
@@ -74,12 +73,6 @@ content_path = "./supabase/auth/email/confirmation.html"
 subject = "Your Magic Link"
 content_path = "./supabase/auth/email/magic-link.html"
 
-# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
-# `discord`, `facebook`, `github`, `gitlab`, `google`, `twitch`, `twitter`, `slack`, `spotify`.
-[auth.external.apple]
-enabled = false
-client_id = ""
-secret = ""
-# Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
-# or any other third-party OIDC providers.
-url = ""
+[storage.buckets.avatars]
+public = false
+allowed_mime_types = ["image/*"]
