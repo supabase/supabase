@@ -3,9 +3,11 @@ title: Timeouts
 subtitle: Extend database timeouts to execute longer transactions
 ---
 
-Requests made through the Supabase API and Dashboard have a timeout of 60 seconds. The database also has a global default timeout of 2 minutes.
+<Admonition type="note">
 
-To execute longer transactions, connect to your database using [Supavisor](/docs/guides/database/connecting-to-postgres#connection-pooler) or the [direct connection string](/docs/guides/database/connecting-to-postgres#direct-connections), and change the timeout settings.
+Dashboard and [Client](/docs/guides/api/rest/client-libs) queries have a max-configurable timeout of 60 seconds. For longer transactions, use [Supavisor or a direct connection](/docs/guides/database/connecting-to-postgres#quick-summary).
+
+</Admonition>
 
 ## Change Postgres timeout
 
