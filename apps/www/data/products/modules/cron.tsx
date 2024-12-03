@@ -203,8 +203,8 @@ export default () => ({
     image: (
       <Image
         src={{
-          dark: '/images/auth-ui/modules/cron/cron-ui-dark.png',
-          light: '/images/auth-ui/modules/cron/cron-ui-light.png',
+          dark: '/images/modules/cron/cron-ui-dark.png',
+          light: '/images/modules/cron/cron-ui-light.png',
         }}
         alt="Cron Jobs UI"
         className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
@@ -228,8 +228,8 @@ export default () => ({
     image: (
       <Image
         src={{
-          dark: '/images/auth-ui/modules/cron/cron-ui-dark.png',
-          light: '/images/auth-ui/modules/cron/cron-ui-light.png',
+          dark: '/images/modules/cron/cron-ui-dark.png',
+          light: '/images/modules/cron/cron-ui-light.png',
         }}
         alt="Cron Jobs UI"
         className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
@@ -249,8 +249,8 @@ export default () => ({
     image: (
       <Image
         src={{
-          dark: '/images/auth-ui/modules/cron/cron-extensible-dark.png',
-          light: '/images/auth-ui/modules/cron/cron-extensible-light.png',
+          dark: '/images/modules/cron/cron-extensible-dark.png',
+          light: '/images/modules/cron/cron-extensible-light.png',
         }}
         alt="Cron Jobs UI"
         containerClassName="bg-cover object-cover"
