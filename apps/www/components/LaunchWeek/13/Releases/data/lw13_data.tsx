@@ -148,11 +148,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '',
     date: '4 December',
     published_at: '2024-12-04T08:00:00.000-07:00',
-    title: 'Supabase Cron: Job Scheduling in Postgres',
+    title: 'Supabase Cron: Schedule Recurring Jobs in Postgres',
     description: (
       <>
         Supabase Cron:
-        <br className="hidden sm:block" /> Job Scheduling in Postgres
+        <br className="hidden sm:block" /> Schedule Recurring Jobs in Postgres
       </>
     ),
     links: [
