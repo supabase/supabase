@@ -108,6 +108,10 @@ export const appState = proxy({
   setDashboardHistory: (ref: string, key: 'sql' | 'editor', id: string) => {
     if (appState.dashboardHistory[key] !== id) {
       appState.dashboardHistory[key] = id
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY(ref),
+        JSON.stringify(appState.dashboardHistory)
+      )
     }
   },
 
@@ -202,10 +206,6 @@ if (typeof window !== 'undefined') {
     localStorage.setItem(
       LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE,
       JSON.stringify(appState.aiAssistantPanel)
-    )
-    localStorage.setItem(
-      LOCAL_STORAGE_KEYS.DASHBOARD_HISTORY,
-      JSON.stringify(appState.dashboardHistory)
     )
   })
 }
