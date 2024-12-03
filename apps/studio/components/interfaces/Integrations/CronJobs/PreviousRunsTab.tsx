@@ -65,7 +65,7 @@ const cronJobColumns = [
     id: 'status',
     name: 'Status',
     minWidth: 75,
-    value: (row: CronJobRun) => renderStatus(row.status),
+    value: (row: CronJobRun) => <StatusBadge status={row.status} />,
   },
   {
     id: 'start_time',
@@ -293,7 +293,11 @@ export const PreviousRunsTab = () => {
   )
 }
 
-function renderStatus(status: string) {
+interface StatusBadgeProps {
+  status: string
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
       <span className="text-brand-600 flex items-center gap-1">
@@ -317,4 +321,6 @@ function renderStatus(status: string) {
       </span>
     )
   }
+
+  return null
 }
