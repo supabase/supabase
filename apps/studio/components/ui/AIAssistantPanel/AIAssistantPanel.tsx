@@ -1,3 +1,4 @@
+import type { Message as MessageType } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
 import { useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -6,8 +7,8 @@ import { AIAssistant } from './AIAssistant'
 
 export const AiAssistantPanel = () => {
   const { aiAssistantPanel, resetAiAssistantPanel } = useAppStateSnapshot()
-  const [initialMessages, setInitialMessages] = useState(
-    aiAssistantPanel.messages?.length > 0 ? aiAssistantPanel.messages : undefined
+  const [initialMessages, setInitialMessages] = useState<MessageType[] | undefined>(
+    aiAssistantPanel.messages?.length > 0 ? (aiAssistantPanel.messages as any) : undefined
   )
 
   const { open } = aiAssistantPanel
