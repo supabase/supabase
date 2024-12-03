@@ -10,6 +10,7 @@ export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Vector | The Postgres Vector database.',
   metaDescription:
     'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.',
+  metaImage: '/images/modules/vector/og.png',
   docsUrl: '/docs/guides/ai',
   heroSection: {
     announcement: {
@@ -21,10 +22,10 @@ export default (isMobile?: boolean) => ({
     },
     title: 'Supabase Vector',
     h1: (
-      <span key={'vector-h1'} className="heading-gradient">
+      <>
         The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
-      </span>
+      </>
     ),
     subheader: (
       <>

@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 
 import { useBreakpoint } from 'common'
-import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import vectorPageData from '~/data/products/modules/vector'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
@@ -28,6 +27,7 @@ function VectorPage() {
   const pageData = vectorPageData(isXs)
   const meta_title = pageData.metaTitle
   const meta_description = pageData.metaDescription
+  const meta_image = pageData.metaImage
 
   return (
     <>
@@ -37,10 +37,10 @@ function VectorPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/vector`,
+          url: `https://supabase.com/modules/vector`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
+              url: `https://supabase.com${basePath}${meta_image}`,
             },
           ],
         }}

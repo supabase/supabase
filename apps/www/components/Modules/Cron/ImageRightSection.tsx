@@ -16,7 +16,7 @@ interface Props {
   }
 }
 
-const CronExtensibleSection: FC<Props> = (props) => {
+const ImageRightSection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -33,11 +33,11 @@ const CronExtensibleSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden">
+      <div className="w-full max-w-md md:max-w-xl h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden">
         {props.image}
       </div>
     </SectionContainer>
   )
 }
 
-export default CronExtensibleSection
+export default ImageRightSection

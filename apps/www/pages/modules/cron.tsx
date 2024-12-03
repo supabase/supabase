@@ -7,16 +7,14 @@ import CronPageData from '~/data/products/modules/cron'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import CTABanner from '~/components/CTABanner'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import ProductModulesHeader from '~/components/Sections/ProductModulesHeader'
 
 import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
 
-const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
 const CronSQLSection = dynamic(() => import('~/components/Modules/Cron/CronSQLSection'))
-const CronUISection = dynamic(() => import('~/components/Modules/Cron/CronUISection'))
-const CronExtensibleSection = dynamic(
-  () => import('~/components/Modules/Cron/CronExtensibleSection')
-)
+const ImageLeftSection = dynamic(() => import('~/components/Modules/Cron/ImageLeftSection'))
+const ImageRightSection = dynamic(() => import('~/components/Modules/Cron/ImageRightSection'))
 
 function CronPage() {
   // base path for images
@@ -31,10 +29,10 @@ function CronPage() {
         openGraph={{
           title: pageData.metaTitle,
           description: pageData.metaDescription,
-          url: `https://supabase.com/modules/cron-jobs`,
+          url: `https://supabase.com/modules/cron`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
+              url: `https://supabase.com${basePath}${pageData.metaImage}`,
             },
           ],
         }}
@@ -43,12 +41,11 @@ function CronPage() {
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <SectionContainer className="">{pageData.video.image}</SectionContainer>
-        {/* <CenteredImage {...pageData.centeredImage} /> */}
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CronSQLSection {...pageData.section1} />
-        <CronUISection {...pageData.section2} className="!py-0" />
-        <CronExtensibleSection {...pageData.section3} className="!pb-0" />
-        <CronUISection {...pageData.section4} className="" />
+        <ImageLeftSection {...pageData.section2} className="!py-0" />
+        <ImageRightSection {...pageData.section3} className="!pb-0" />
+        <ImageLeftSection {...pageData.section4} className="" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>

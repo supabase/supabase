@@ -6,15 +6,12 @@ import { Image } from 'ui'
 export default () => ({
   metaTitle: 'Supabase Cron | Schedule and Automate Tasks',
   metaDescription: 'Schedule and Automate Tasks at Scale',
+  metaImage: '/images/modules/cron/og.png',
   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
   docsUrl: '/docs/guides/cron',
   heroSection: {
     title: 'Supabase Cron',
-    h1: (
-      <span key={'vector-h1'} className="heading-gradient">
-        Schedule and Automate Tasks Using Postgres
-      </span>
-    ),
+    h1: <>Schedule and Automate Tasks Using Postgres</>,
     subheader: (
       <>
         Supabase Cron is a Postgres module that uses the pg_cron database extension to manage
@@ -189,10 +186,6 @@ export default () => ({
     heading: <>SQL-Based Approach</>,
     subheading:
       'Create and manage Jobs using simple SQL commands for ease of use. Track changes to your cron jobs using Postgres migrations stored in source control.',
-    // cta: {
-    //   label: 'Start scheduling',
-    //   url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
-    // },
   },
   section2: {
     id: 'UI-Scheduling-Interface',
@@ -228,7 +221,7 @@ export default () => ({
           light: '/images/modules/cron/cron-logs-light.png',
         }}
         alt="Cron Jobs UI"
-        className="w-full max-w-[490px] aspect-[1/0.71] object-cover bg-cover"
+        className="w-full max-w-[590px] aspect-[1/0.71] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}

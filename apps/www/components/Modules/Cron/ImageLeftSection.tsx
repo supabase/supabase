@@ -16,7 +16,7 @@ interface Props {
   }
 }
 
-const CronUISection: FC<Props> = (props) => {
+const ImageLeftSection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -40,4 +40,4 @@ const CronUISection: FC<Props> = (props) => {
   )
 }
 
-export default CronUISection
+export default ImageLeftSection
