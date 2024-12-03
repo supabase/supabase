@@ -44,9 +44,9 @@ export const generateProjectIntegrationsMenu = (
         ...(!!cronUiEnabled
           ? [
               {
-                name: 'Cron Jobs',
+                name: 'Cron',
                 key: 'cron-jobs',
-                url: `/project/${ref}/integrations/cron-jobs`,
+                url: `/project/${ref}/integrations/cron`,
                 items: [],
               },
             ]

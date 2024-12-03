@@ -1,43 +1,55 @@
+import { FunctionComponent } from 'react'
 import {
-  ChartScatter,
-  Database,
-  FileCode2,
-  Lock,
-  Cloud,
-  UploadCloud,
-  Image,
-  MessageCircle,
-  ShieldCheck,
-  Package,
-  Users,
-  Folders,
-  RectangleEllipsis,
-  Braces,
-  Globe,
-  UserX,
-  GitBranch,
-  DatabaseZap,
-  Mail,
-  Smartphone,
-  Server,
   Activity,
   BarChart,
+  Braces,
   Brain,
-  Puzzle,
+  ChartScatter,
+  Cloud,
+  Database,
   DatabaseBackup,
+  DatabaseZap,
+  Eye,
+  FileCode2,
+  Folders,
+  GitBranch,
+  Globe,
+  Image,
+  Lock,
+  Mail,
+  MessageCircle,
+  Package,
+  Puzzle,
+  RectangleEllipsis,
+  Server,
+  Shield,
+  ShieldCheck,
   ShieldPlus,
+  Smartphone,
   Terminal,
+  UploadCloud,
+  Users,
+  UserX,
   Zap,
 } from 'lucide-react'
+import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
 import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
-  PLATFORM = 'platform management',
+  PLATFORM = 'platform',
   STUDIO = 'studio',
 }
 
 export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
+
+export enum PRODUCT_STAGES {
+  PRIVATE_ALPHA = 'Private Alpha',
+  PUBLIC_ALPHA = 'Public Alpha',
+  BETA = 'Beta',
+  PUBLIC_BETA = 'Public Beta',
+  GA = 'General Availability',
+}
 
 export type FeatureType = {
   /**
@@ -59,7 +71,7 @@ export type FeatureType = {
   /**
    * icon will be displayed in the feature card
    */
-  icon: string | LucideIcon
+  icon: string | LucideIcon | FunctionComponent
   /**
    * Each feature belongs to one or more products
    */
@@ -79,6 +91,17 @@ export type FeatureType = {
    * url to docs or blog page for this feature
    */
   docsUrl?: string
+  /**
+   * feature metadata on its status
+   */
+  status?: {
+    stage: PRODUCT_STAGES
+    availableOnSelfHosted: boolean
+    selfHostedTooling?: {
+      label: string
+      link: string
+    }
+  }
 }
 
 export const features: FeatureType[] = [
@@ -106,6 +129,10 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     heroImageLight: '/images/features/postgres-database-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/overview',
     slug: 'postgres-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vector database',
@@ -127,6 +154,10 @@ Supabase provides an open source toolkit for developing AI applications using Po
     heroImage: 'https://www.youtube-nocookie.com/embed/ibzlEQmgPPY',
     docsUrl: 'https://supabase.com/docs/guides/ai',
     slug: 'vector-database',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated REST API via PostgREST',
@@ -149,6 +180,10 @@ Supabase automatically generates a comprehensive RESTful API from your database 
     heroImageLight: '/images/features/auto-generated-rest-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/api#rest-api-overview',
     slug: 'auto-generated-rest-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Auto-generated GraphQL API via pg_graphql',
@@ -178,6 +213,10 @@ Supabase offers lightning-fast GraphQL APIs through its custom-built Postgres Gr
     heroImageLight: '/images/features/auto-generated-graphql-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/graphql/api',
     slug: 'auto-generated-graphql-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database backups',
@@ -213,6 +252,14 @@ Supabase's backup solutions provide a balance of security, flexibility, and ease
     heroImageLight: '/images/features/backups-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/backups',
     slug: 'database-backups',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'wal-g',
+        link: 'https://github.com/wal-g/wal-g',
+      },
+    },
   },
   {
     title: 'Custom domains',
@@ -238,6 +285,10 @@ By using custom domains, you create a more cohesive brand experience and gain fl
     heroImageLight: '/images/features/custom-domains-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/custom-domains',
     slug: 'custom-domains',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Network restrictions',
@@ -271,6 +322,10 @@ By implementing Network Restrictions, you create a more secure environment for y
     heroImageLight: '/images/features/network-restrictions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/network-restrictions',
     slug: 'network-restrictions',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'SSL enforcement',
@@ -306,6 +361,10 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
     heroImageLight: '/images/features/ssl-enforcement-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/ssl-enforcement',
     slug: 'ssl-enforcement',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Branching',
@@ -338,6 +397,10 @@ Supabase Branching allows you to create and test changes in separate, temporary 
     heroImageLight: '/images/features/branching-light.png',
     docsUrl: 'https://supabase.com/docs/guides/platform/branching',
     slug: 'branching',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Terraform provider',
@@ -374,6 +437,10 @@ By adopting the Supabase Terraform provider, teams can implement GitOps practice
     heroImageLight: '/images/features/terraform-provider-light.png',
     docsUrl: 'https://supabase.com/docs/guides/deployment/terraform',
     slug: 'terraform-provider',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Read replicas',
@@ -409,6 +476,10 @@ By leveraging Read Replicas, you can achieve consistent low-latency performance 
     heroImage: 'https://www.youtube-nocookie.com/embed/PX3R1fXjJ2M',
     docsUrl: 'https://supabase.com/docs/guides/platform/read-replicas',
     slug: 'read-replicas',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Fly Postgres',
@@ -443,6 +514,10 @@ By leveraging Fly Postgres, you can achieve improved global performance for your
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/platform/fly-postgres',
     slug: 'fly-postgres',
+    status: {
+      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      availableOnSelfHosted: false,
+    },
   },
   {
     title: 'Postgres Extensions',
@@ -483,6 +558,10 @@ By leveraging these extensions, you can implement complex features more easily, 
     heroImageLight: '/images/features/postgres-extensions-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions',
     slug: 'postgres-extensions',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Database Webhooks',
@@ -505,6 +584,10 @@ This feature is particularly useful for developers looking to automate workflows
     heroImageLight: '/images/features/database-webhooks-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/webhooks',
     slug: 'database-webhooks',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Vault',
@@ -526,6 +609,10 @@ This feature is particularly useful for teams looking to enhance their security 
     heroImage: 'https://supabase.com/docs/img/guides/database/vault-hello-compressed.mp4',
     docsUrl: 'https://supabase.com/docs/guides/database/vault',
     slug: 'vault',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Supavisor',
@@ -547,10 +634,14 @@ This feature is particularly valuable for teams looking to optimize their databa
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
     docsUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Realtime
   {
-    title: 'Realtime Postgres changes',
+    title: 'Realtime - Postgres changes',
     subtitle: 'Receive your database changes through websockets.',
     description: `
 Supabase's Realtime Postgres Changes feature allows you to listen to database changes in real-time using the Realtime system. This capability enables you to build responsive, live-updating applications that reflect database changes instantly.
@@ -582,9 +673,13 @@ Supabase's Realtime Postgres Changes feature provides a powerful tool for creati
     heroImage: 'https://www.youtube-nocookie.com/embed/2rUjcmgZDwQ',
     docsUrl: 'https://supabase.com/docs/guides/realtime/postgres-changes',
     slug: 'realtime-postgres-changes',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
-    title: 'Realtime Broadcast',
+    title: 'Realtime - Broadcast',
     subtitle: 'Send messages between connected users through websockets.',
     description: `
 Supabase's Realtime Broadcast feature enables real-time communication between connected clients using the Realtime system. This functionality allows you to build interactive, collaborative applications where users can instantly share messages or data in real-time.
@@ -619,9 +714,13 @@ Supabase's Realtime Broadcast feature provides a powerful tool for creating resp
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/broadcast',
     slug: 'realtime-broadcast',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
-    title: 'Realtime Presence',
+    title: 'Realtime - Presence',
     subtitle: 'Synchronize shared state between users through websockets.',
     description: `
 Supabase's Realtime Presence feature allows you to track and synchronize shared state between connected users in real-time. This capability enables you to build collaborative applications where users can see each other's status, actions, or any custom state information instantly.
@@ -655,6 +754,59 @@ Supabase's Realtime Presence feature provides a powerful tool for creating inter
     heroImage: 'https://www.youtube-nocookie.com/embed/BelYEMJ2N00',
     docsUrl: 'https://supabase.com/docs/guides/realtime/presence',
     slug: 'realtime-presence',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Broadcast Authorization',
+    subtitle: 'Control access to broadcast channels in real-time.',
+    description: `
+The Realtime Broadcast Authorization feature allows you to manage access permissions for broadcast channels in your application. This functionality ensures that only authorized users can listen to specific channels, enhancing security and control over real-time data streams.
+
+Key benefits:
+1. Secure Access Control: Implement fine-grained access control over who can receive broadcast messages in real-time.
+2. Customizable Permissions: Define specific authorization rules based on user roles or attributes.
+3. Enhanced User Experience: Ensure that users only receive relevant updates based on their permissions.
+4. Easy Integration with Existing Systems: Seamlessly integrate broadcast authorization into your current application architecture.
+5. Comprehensive Documentation Available: Access detailed guides on how to implement broadcast authorization effectively.
+
+This feature is particularly valuable for applications that require controlled access to live data streams, such as chat applications or collaborative tools.
+`,
+    icon: Shield,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#broadcast',
+    slug: 'realtime-broadcast-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Realtime - Presence Authorization',
+    subtitle: 'Manage presence information securely in real-time.',
+    description: ` 
+The Realtime Presence Authorization feature enables you to control access permissions related to presence information in your application. This allows you to manage who can see the online status of other users in real-time, enhancing privacy and security within collaborative environments.
+
+Key benefits:
+1. Controlled Visibility of Presence Data: Ensure that only authorized users can view the online status of others, protecting user privacy.
+2. Customizable Presence Rules: Define specific rules based on user roles or attributes for who can see presence information.
+3. Improved User Experience: Enhance collaboration by providing relevant presence information while maintaining security protocols.
+4. Seamless Integration: Easily incorporate presence authorization into existing systems without significant overhead.
+5. Detailed Implementation Guides: Access comprehensive documentation on how to implement presence authorization effectively.
+
+This feature is particularly useful for collaborative applications where knowing the online status of team members is crucial while ensuring privacy and security are maintained.`,
+    icon: Eye,
+    products: [PRODUCT_SHORTNAMES.REALTIME, PRODUCT_SHORTNAMES.AUTHENTICATION],
+    heroImage: 'https://www.youtube-nocookie.com/embed/IXRrU9MpA8Q',
+    docsUrl: 'https://supabase.com/docs/guides/realtime/authorization#presence',
+    slug: 'realtime-presence-authorization',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Auth
   {
@@ -691,6 +843,10 @@ Supabase's Email Login provides a robust foundation for user authentication, all
     heroImageLight: '/images/features/email-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/passwords',
     slug: 'email-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Social login',
@@ -726,6 +882,10 @@ Supabase's Social Login feature allows you to improve user experience and potent
     heroImageLight: '/images/features/social-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/social-login',
     slug: 'social-login',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Phone logins',
@@ -760,6 +920,10 @@ Supabase's Phone Login feature enables a seamless authentication experience, par
     heroImageLight: '/images/features/phone-login-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/phone-login',
     slug: 'phone-logins',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Passwordless login via Magic Links',
@@ -795,6 +959,10 @@ Supabase's Magic Links feature offers a secure and user-friendly authentication 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-email-passwordless',
     slug: 'passwordless-login-via-magicklink',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Multi-Factor Authentication (MFA)',
@@ -830,6 +998,10 @@ Supabase's MFA feature provides a robust tool for enhancing application security
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-mfa',
     slug: 'multi-factor-authentication',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Authorization via Row Level Security',
@@ -865,6 +1037,10 @@ Supabase's RLS feature provides a powerful tool for implementing sophisticated a
     heroImage: `https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/marketing/website/supabase-rls.mp4`,
     docsUrl: 'https://supabase.com/docs/guides/auth/row-level-security',
     slug: 'row-level-security',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Captcha protection',
@@ -900,6 +1076,10 @@ Supabase's Captcha Protection feature provides a powerful tool for enhancing app
     heroImageLight: '/images/features/auth-captcha-protection-light.png',
     docsUrl: 'https://supabase.com/docs/guides/auth/auth-captcha',
     slug: 'auth-captcha-protection',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Server-side Auth',
@@ -934,6 +1114,10 @@ Supabase's Server-side Auth feature allows developers to create more secure and 
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/auth/server-side',
     slug: 'server-side-auth',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Storage
   {
@@ -971,6 +1155,10 @@ Supabase Storage simplifies adding robust file management to your applications, 
     heroImageLight: '/images/features/file-storage-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage',
     slug: 'file-storage',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Content Delivery Network',
@@ -1006,6 +1194,14 @@ Supabase's CDN significantly improves the performance and user experience of you
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn',
     slug: 'cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Smart Content Delivery Network',
@@ -1041,6 +1237,14 @@ Supabase's Smart CDN optimizes both performance and content accuracy, providing 
     heroImage: 'https://www.youtube-nocookie.com/embed/NpEl20iuOtg',
     docsUrl: 'https://supabase.com/docs/guides/storage/cdn/smart-cdn',
     slug: 'smart-cdn',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'Cloudflare',
+        link: 'https://www.cloudflare.com',
+      },
+    },
   },
   {
     title: 'Image transformations',
@@ -1077,6 +1281,10 @@ Supabase's Image Transformations feature enables you to efficiently manage and s
     heroImage: 'https://www.youtube-nocookie.com/embed/dLqSmxX3r7I',
     docsUrl: 'https://supabase.com/docs/guides/storage/image-transformations',
     slug: 'image-transformations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Resumable uploads',
@@ -1113,6 +1321,10 @@ Supabase's Resumable Uploads feature significantly improves the reliability and 
     heroImage: 'https://www.youtube-nocookie.com/embed/pT2PcZFq_M0',
     docsUrl: 'https://supabase.com/docs/guides/storage/uploads/resumable-uploads',
     slug: 'resumable-uploads',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'S3 compatibility',
@@ -1150,6 +1362,10 @@ Supabase's S3 compatibility allows seamless integration with existing workflows 
     heroImageLight: '/images/features/s3-compatibility-light.png',
     docsUrl: 'https://supabase.com/docs/guides/storage/s3/compatibility',
     slug: 's3-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   // Functions
   {
@@ -1189,6 +1405,10 @@ Supabase's Deno Edge Functions enable you to build responsive, globally distribu
     heroImage: 'https://www.youtube-nocookie.com/embed/5OWH9c4u68M',
     docsUrl: 'https://supabase.com/docs/guides/functions',
     slug: 'deno-edge-functions',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Regional invocations',
@@ -1220,6 +1440,10 @@ By leveraging Supabase's Regional Invocations, you can significantly enhance the
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/functions/regional-invocation',
     slug: 'regional-invocations',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'NPM compatibility',
@@ -1251,6 +1475,10 @@ By leveraging NPM Compatibility in Supabase Edge Functions, you can take advanta
     heroImage: 'https://www.youtube-nocookie.com/embed/eCbiywoDORw',
     docsUrl: 'https://supabase.com/blog/edge-functions-node-npm',
     slug: 'npm-compatibility',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   // Vector
   {
@@ -1283,6 +1511,10 @@ By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sop
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   // Platform
   {
@@ -1316,6 +1548,10 @@ By leveraging the Supabase CLI, you can significantly improve your development w
     docsUrl:
       'https://supabase.com/docs/guides/local-development?queryGroups=package-manager&package-manager=pnpm',
     slug: 'cli',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Management API',
@@ -1348,6 +1584,10 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/guides/project-management/api',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Role-Based Access Control (RBAC)',
@@ -1380,6 +1620,10 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
     slug: 'role-based-access-control',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   // Analytics
   {
@@ -1412,6 +1656,10 @@ By leveraging Supabase Reports, you gain a understanding of your project's perfo
     heroImageLight: '/images/features/reports-and-metrics-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-reports-and-metrics',
     slug: 'reports-and-metrics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SOC 2 Compliance',
@@ -1449,6 +1697,10 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/security/compliance',
     slug: 'soc-2-compliance',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
   },
   // Studio
   {
@@ -1472,6 +1724,10 @@ This feature is especially beneficial for teams looking to improve their databas
     docsUrl:
       'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
     slug: 'ai-query-assistance',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Logs & Analytics',
@@ -1494,6 +1750,10 @@ This feature is particularly valuable for teams looking to enhance their applica
     heroImageLight: '/images/features/logs-analytics-light.png',
     docsUrl: 'https://supabase.com/docs/guides/monitoring-troubleshooting/logs',
     slug: 'logs-analytics',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Visual Schema Designer',
@@ -1516,6 +1776,10 @@ This feature is particularly valuable for teams engaged in agile development pro
     heroImageLight: '/images/features/visual-schema-designer-light.png',
     docsUrl: 'https://supabase.com/blog/supabase-studio-3-0#schema-visualizer',
     slug: 'visual-schema-designer',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Policy Templates',
@@ -1538,6 +1802,10 @@ This feature is essential for organizations looking to maintain robust security 
     heroImageLight: '/images/features/policy-templates-light.png',
     docsUrl: '',
     slug: 'policy-templates',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'SQL Editor',
@@ -1560,6 +1828,10 @@ This feature is particularly valuable for developers looking to streamline their
     heroImageLight: '/images/features/sql-editor-light.png',
     docsUrl: '',
     slug: 'sql-editor',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Security & Performance Advisor',
@@ -1582,6 +1854,10 @@ This feature is essential for organizations aiming to maintain high security sta
     heroImageLight: '/images/features/security-and-performance-advisor-light.png',
     docsUrl: 'https://supabase.com/blog/security-and-performance-advisor',
     slug: 'security-and-performance-advisor',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Postgres Roles',
@@ -1604,6 +1880,10 @@ This feature is particularly valuable for teams looking to implement robust secu
     heroImageLight: '/images/features/postgres-roles-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/postgres/roles',
     slug: 'postgres-roles',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Foreign Key Selector',
@@ -1626,6 +1906,10 @@ This feature is particularly beneficial for developers working with complex data
       'https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/fk-lookup.mp4',
     docsUrl: 'https://supabase.com/blog/supabase-studio-2.0#foreign-key-selector',
     slug: 'foreign-key-selector',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Log Drains',
@@ -1647,5 +1931,109 @@ This feature is particularly useful for teams seeking to enhance their observabi
     heroImage: 'https://www.youtube-nocookie.com/embed/A4GFmvgxS-E',
     docsUrl: 'https://supabase.com/blog/log-drains',
     slug: 'log-drains',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - JavaScript',
+    subtitle: 'Easily integrate Supabase with your JavaScript applications.',
+    description: `
+The Supabase JavaScript Client Library provides a straightforward way to interact with your Supabase database and services directly from your JavaScript applications. This library simplifies the process of making API calls, managing authentication, and handling real-time updates, making it an essential tool for developers working with Supabase.
+
+Key benefits:
+1. Simplified API Interaction: Easily connect to your Supabase backend with minimal setup.
+2. Built-in Authentication: Manage user authentication seamlessly within your JavaScript applications.
+3. Real-Time Capabilities: Subscribe to changes in your database and receive updates in real-time.
+4. Comprehensive Documentation: Access detailed guides and examples to help you get started quickly.
+5. Community Support: Join a growing community of developers using the JavaScript Client Library for various projects.
+
+This feature is particularly valuable for developers looking to build dynamic web applications that leverage the power of Supabase as a backend service.
+`,
+    icon: JsIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/javascript/start',
+    slug: 'client-library-javascript',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Flutter',
+    subtitle: 'Integrate Supabase into your Flutter applications effortlessly.',
+    description: `
+The Supabase Flutter Client Library allows developers to easily integrate Supabase into their Flutter applications. This library provides a comprehensive set of tools for managing database interactions, user authentication, and real-time data updates, all tailored for the Flutter framework.
+
+Key benefits:
+1. Seamless Integration: Connect your Flutter app to Supabase with minimal configuration.
+2. User Authentication: Manage user sign-ups, logins, and sessions directly within your Flutter application.
+3. Real-Time Updates: Receive live updates from your database, enhancing user experience.
+4. Detailed Documentation: Access extensive resources and examples to facilitate development.
+5. Active Community: Engage with other Flutter developers leveraging Supabase for their projects.
+
+This feature is particularly useful for Flutter developers aiming to create responsive mobile applications backed by a powerful database solution.
+`,
+    icon: FlutterIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/dart/start',
+    slug: 'client-library-flutter',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Swift',
+    subtitle: 'Effortlessly connect your Swift applications to Supabase.',
+    description: `
+The Supabase Swift Client Library provides an easy way for developers to integrate their iOS applications with Supabase services. This library simplifies database access, user authentication, and real-time data handling, making it an essential tool for Swift developers.
+
+Key benefits:
+1. Easy Integration: Quickly connect your Swift app to Supabase with straightforward setup instructions.
+2. Authentication Management: Handle user authentication seamlessly within your iOS applications.
+3. Real-Time Data Handling: Subscribe to changes in your database and receive updates instantly.
+4. Comprehensive Guides: Utilize detailed documentation and examples to streamline development.
+5. Supportive Community: Join a community of Swift developers using Supabase for their app development needs.
+
+This feature is particularly valuable for iOS developers looking to leverage the capabilities of Supabase in their mobile applications.
+`,
+    icon: SwiftIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/swift/start',
+    slug: 'client-library-swift',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Client Library - Python',
+    subtitle: 'Integrate Supabase easily into your Python applications.',
+    description: `
+The Supabase Python Client Library enables developers to connect their Python applications with Supabase effortlessly. This library provides tools for interacting with the database, managing user authentication, and handling real-time updates, tailored specifically for Python developers.
+
+Key benefits:
+1. Simple Connection Setup: Easily connect your Python application to Supabase with minimal configuration.
+2. User Authentication Support: Manage user accounts and sessions directly within your Python code.
+3. Real-Time Data Updates: Subscribe to changes in your database and receive live updates as they occur.
+4. In-Depth Documentation: Access comprehensive guides and examples to assist in development.
+5. Engaged Community Support: Connect with other Python developers utilizing Supabase in their projects.
+
+This feature is especially beneficial for Python developers looking to build robust applications powered by a scalable backend service like Supabase.
+`,
+    icon: PythonIcon,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/reference/python/start',
+    slug: 'client-library-python',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
   },
 ]

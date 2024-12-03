@@ -12,16 +12,26 @@ import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectL
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Badge,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
 
+  const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
 
@@ -44,6 +54,27 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <div className="flex flex-row items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
+          {isOrioleDb && (
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
+                <Badge variant="warning">OrioleDB</Badge>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
+                This project is using Postgres with OrioleDB which is currently in preview and not
+                suitable for production workloads. View our{' '}
+                {/* [Refactor] Make this into a reusable component to use links inline */}
+                <a
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
+                  href="https://supabase.com/docs/guides/database/orioledb"
+                >
+                  documentation
+                </a>{' '}
+                for all limitations.
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          )}
           <ComputeBadgeWrapper
             project={{
               ref: project?.ref,
