@@ -57,7 +57,7 @@ const FormSchema = z.object({
     .trim()
     .min(1, 'Please provide a name for your queue')
     .max(47, "The name can't be longer than 47 characters")
-    .regex(/^[a-z]+$/, 'Name must contain only lowercase letters'),
+    .regex(/^[a-z_-]+$/, 'Name must contain only lowercase letters, hyphens, and underscores'),
   enableRls: z.boolean(),
   values: z.discriminatedUnion('type', [
     normalQueueSchema,
