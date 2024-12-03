@@ -2036,4 +2036,61 @@ This feature is especially beneficial for Python developers looking to build rob
       availableOnSelfHosted: true,
     },
   },
+  {
+    title: 'Background Tasks',
+    subtitle: 'Run background tasks in an Edge Function outside of the request handler',
+    description: `
+    Edge Function instances can process background tasks outside of the request handler. Background tasks are useful for asynchronous operations like uploading a file to Storage, updating a database, or sending events to a logging service. You can respond to the request immediately and leave the task running in the background.
+`,
+    icon: FileCode2,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/functions/background-tasks',
+    slug: 'background-tasks',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Websocket Connections',
+    subtitle: 'Handle WebSocket connections in Edge Functions',
+    description: `
+Edge Functions now support establishing both inbound (server) and outbound (client) WebSocket connections. This enables a variety of new use cases.
+`,
+    icon: FileCode2,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/functions/websockets',
+    slug: 'websockets',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Ephemeral Storage',
+    subtitle: 'Read and write from temporary directory with Edge Functions',
+    description: `
+Edge Functions provides ephemeral file storage. You can read and write files to the /tmp directory.
+
+Ephemeral storage will reset on each function invocation. This means the files you write during an invocation can only be read within the same invocation.
+
+Use cases#
+Here are some use cases where ephemeral storage can be useful:
+
+Unzip an archive of CSVs and then add them as records to the DB
+Custom image manipulation workflows (using MagickWasm)
+You can use Background Tasks to handle slow file processing outside of a request.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.FUNCTIONS, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/functions/ephemeral-storage',
+    slug: 'ephemeral-storage',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_BETA,
+      availableOnSelfHosted: true,
+    },
+  },
 ]
