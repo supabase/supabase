@@ -79,7 +79,7 @@ const LWXStickyNav: FC = () => {
               <li>
                 <Link
                   href="#build-stage"
-                  className="p-1 transition-colors hover:text-foreground pointer-events-auto"
+                  className="p-1 transition-colors hover:text-foreground pointer-events-auto lw-sticky-nav"
                 >
                   Build <span className="hidden sm:inline">Stage</span>
                 </Link>

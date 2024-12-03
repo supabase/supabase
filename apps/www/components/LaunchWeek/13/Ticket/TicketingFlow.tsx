@@ -109,7 +109,7 @@ const TicketingFlow = () => {
                   initial={initial}
                   animate={animate}
                   exit={exit}
-                  className="w-full max-w-5xl mx-auto lg:min-h-[400px] lg:pl-12 h-full flex flex-col lg:flex-row items-center lg:justify-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
+                  className="w-full max-w-5xl mx-auto lg:min-h-[400px] xl:pl-8 h-full flex flex-col lg:flex-row items-center lg:justify-start gap-8 md:gap-10 lg:gap-32 text-foreground text-center md:text-left"
                 >
                   <div className="order-first lg:h-full w-full max-w-md xl:max-w-2xl gap-8 flex flex-col items-center justify-center lg:items-start lg:justify-center text-center lg:text-left">
                     <div className="flex flex-col gap-1 max-w-md">

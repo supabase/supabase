@@ -25,11 +25,15 @@ export interface AdventLink {
 export const days: AdventDay[] = [
   {
     title: 'OrioleDB Public Alpha',
-    description: 'Postgres storage extension with better performance over default Heap storage',
+    description: 'Launching OrioleDB Public Alpha',
     id: 'orioledb',
     is_shipped: true,
     links: [
-      { url: 'https://supabase.com/blog/orioledb-launch', label: 'Blog post', target: '_blank' },
+      {
+        url: '/blog/orioledb-launch',
+        label: 'Blog post',
+        target: '_blank',
+      },
     ],
     icon: (
       <svg

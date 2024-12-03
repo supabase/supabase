@@ -62,7 +62,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     blog: '/blog/supabase-ai-assistant-v2',
     hasCountdown: false,
     date: '2 December',
@@ -76,7 +76,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       },
       {
         type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb ',
+        href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb',
       },
     ],
     steps: [
@@ -99,25 +99,43 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/edge-functions-background-tasks-websockets',
     date: '3 December',
     published_at: '2024-12-03T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Functions: Background Tasks and WebSockets',
+    description: (
+      <>
+        Supabase Functions: <br className="hidden sm:block" /> Background Tasks and WebSockets
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'envrsJ8VfAU',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-dark.png',
+            mobileImg:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-light.png',
+            mobileImgLight:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-3',
@@ -125,7 +143,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Wed',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '4 December',
     published_at: '2024-12-04T08:00:00.000-07:00',

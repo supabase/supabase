@@ -587,7 +587,48 @@ parameters:
     required: false
     default: '"50MiB"'
     description: |
+      The maximum file size allowed for all buckets in the project.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.public'
+    title: 'storage.buckets.<bucket_name>.public'
+    tags: ['storage']
+    required: false
+    default: 'false'
+    description: |
+      Enable public access to the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.file_size_limit'
+    title: 'storage.buckets.<bucket_name>.file_size_limit'
+    tags: ['storage']
+    required: false
+    description: |
       The maximum file size allowed (e.g. "5MB", "500KB").
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.allowed_mime_types'
+    title: 'storage.buckets.<bucket_name>.allowed_mime_types'
+    tags: ['storage']
+    required: false
+    description: |
+      The list of allowed MIME types for objects in the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.objects_path'
+    title: 'storage.buckets.<bucket_name>.objects_path'
+    tags: ['storage']
+    required: false
+    description: |
+      The local directory to upload objects to the bucket.
     links:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
@@ -1176,6 +1217,7 @@ parameters:
     required: false
     description: |
       Specify the Deno import map file to use for the Function.
+      When not specified, defaults to `supabase/functions/<function_name>/deno.json`.
 
       Note that the `--import-map` flag overrides this configuration.
     links:
