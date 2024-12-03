@@ -1,19 +1,23 @@
 ---
-title: 'Install the Cron Jobs Module'
+title: 'Install'
 ---
 
-Install the Cron Jobs Module to schedule background jobs.
+Install the Supabase Cron Postgres Module to begin scheduling recurring Jobs.
 
-## Install using the Dashboard
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
 
-1. Go to the [Integrations page](/dashboard/project/_/integrations).
-1. Select the `Postgres Extensions` tab.
-1. Select `Cron Jobs`.
-1. Click `Enable pg_cron`.
+1. Go to the [Cron Postgres Module](https://supabase.com/dashboard/project/_/integrations/cron/overview) under Integrations in the Dashboard.
+2. Enable `pg_cron` extension.
 
-## Install using SQL
-
-You can install the Cron Jobs module by enabling `pg_cron`:
+</TabPanel>
+<TabPanel id="sql" label="SQL">
 
 ```sql
 create extension pg_cron with schema pg_catalog;
@@ -22,10 +26,19 @@ grant usage on schema cron to postgres;
 grant all privileges on all tables in schema cron to postgres;
 ```
 
+</TabPanel>
+</Tabs>
+
 ## Uninstall
 
-Uninstall the Cron Jobs module by disabling `pg_cron`:
+Uninstall Supabase Cron by disabling the `pg_cron` extension:
 
 ```sql
 drop extension if exists pg_cron;
 ```
+
+<Admonition type="warning">
+
+Disabling the `pg_cron` extension will permanently delete all Jobs.
+
+</Admonition>

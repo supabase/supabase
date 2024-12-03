@@ -1,19 +1,33 @@
 ---
-title: 'Cron Jobs'
-subtitle: 'Schedule jobs to run regularly'
+title: 'Cron'
+subtitle: 'Schedule Recurring Jobs with Cron Syntax in Postgres'
 ---
 
-Schedule regularly running background jobs with the Cron Jobs integration.
+Supabase Cron is a Postgres Module that simplifies scheduling recurring Jobs with cron syntax and monitoring Job runs inside Postgres.
 
-## About
+Cron Jobs can be created via SQL or Cron interface inside of Supabase Dashboard and can run anywhere from every second to once a year depending on your use case.
 
-Under the hood, the Cron Jobs Module uses the [`pg_cron`](https://github.com/citusdata/pg_cron) Postgres extension.
+Every Job can run SQL snippets or database functions with zero network latency or make an HTTP request, such as invoking a Supabase Edge Function, with ease.
+
+<Admonition type="note">
+
+For the best performance, we recommend no more than 8 Jobs run concurrently and each Job should run no more than 10 minutes.
+
+</Admonition>
+
+## How does Cron work?
+
+Under the hood, Supabase Cron uses the [`pg_cron`](https://github.com/citusdata/pg_cron) Postgres database extension which is the scheduling and execution engine for your Jobs.
 
 <Admonition type="note">
 
 `pg_cron` is not fully supported on Fly Postgres. Learn more about [Fly Postgres limitations](/docs/guides/platform/fly-postgres#limitations).
 
 </Admonition>
+
+The extension creates a `cron` schema in your database and all Jobs are stored on the `cron.job` table and every Job's run and its status is recorded on the `cron.job_run_details` table.
+
+This is paired with a friendly interface in the Supabase Dashboard to schedule your Jobs as well as real-time monitoring of current and historical runs.
 
 ## Resources
 
