@@ -27,7 +27,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-3"
                       badge="LW13: Day 3"
-                      announcement="Supabase Cron"
+                      announcement="Schedule Recurring Jobs in Postgres"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
