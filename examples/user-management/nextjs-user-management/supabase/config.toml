@@ -19,7 +19,7 @@ max_rows = 1000
 port = 54322
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 14
+major_version = 15
 
 [studio]
 # Port to use for Supabase Studio.
@@ -42,7 +42,12 @@ file_size_limit = "50MiB"
 # in emails.
 site_url = "http://localhost:3000"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3000"]
+additional_redirect_urls = [
+    "https://localhost:3000",
+    # Add your Vercel deployed app specific URLs such as:
+    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/"
+    # "https://<your-vercel-project-name>.<your-vercel-org-name>.vercel.app/**"
+]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
 # week).
 jwt_expiry = 3600
@@ -56,7 +61,10 @@ enable_signup = true
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
 # If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
+enable_confirmations = true
+max_frequency = "1m0s"
+otp_length = 6
+otp_expiry = 86400
 
 [auth.email.template.confirmation]
 subject = "Confirm Your Email"
