@@ -411,8 +411,8 @@ const nextConfig = {
       },
       {
         permanent: true,
-        source: '/project/:ref/.....',
-        destination: '/project/:ref/integrations/cron-jobs',
+        source: '/project/:ref/database/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
       },
       {
         permanent: true,
