@@ -7,7 +7,7 @@ import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default (isMobile?: boolean) => ({
-  metaTitle: 'Supabase Vector | The Postgres Vector database.',
+  metaTitle: 'Supabase Vector | The Postgres Vector database and AI Toolkit',
   metaDescription:
     'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.',
   metaImage: '/images/modules/vector/og.png',

@@ -2,7 +2,6 @@ import 'swiper/css'
 
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 
 import { useBreakpoint } from 'common'
@@ -23,7 +22,6 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 function VectorPage() {
   // base path for images
   const isXs = useBreakpoint(640)
-  const { basePath } = useRouter()
   const pageData = vectorPageData(isXs)
   const meta_title = pageData.metaTitle
   const meta_description = pageData.metaDescription
