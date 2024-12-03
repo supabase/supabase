@@ -9,7 +9,7 @@ import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useState } from 'react'
@@ -170,6 +170,12 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+
+  const { data: cronJobs } = useCronJobsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
   const canToggleExtensions = useCheckPermissions(
@@ -205,6 +211,19 @@ export const CreateCronJobSheet = ({
   }
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
+    // job names should be unique
+    const nameExists = cronJobs?.some(
+      (job) =>
+        job.jobname.toLowerCase() === name.toLowerCase() && job.jobname !== selectedCronJob?.jobname
+    )
+    if (nameExists) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'A cron job with this name already exists',
+      })
+      return
+    }
+
     let command = ''
     if (values.type === 'edge_function') {
       command = buildHttpRequestCommand(
