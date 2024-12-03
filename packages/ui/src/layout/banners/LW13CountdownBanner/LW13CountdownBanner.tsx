@@ -36,7 +36,9 @@ export function LW13CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
-          <div className="hidden sm:block text-foreground-lighter">AI Assistant v2</div>
+          <div className="hidden sm:block text-foreground-lighter">
+            Supabase Functions: Background Tasks and WebSockets
+          </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
           </Button>

@@ -5,19 +5,19 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 02 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Tue, 03 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/edge-functions-background-tasks-websockets</guid>
+  <title>Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets</title>
+  <link>https://supabase.com/blog/edge-functions-background-tasks-websockets</link>
+  <description>Edge functions can be used for workloads outside the request-response lifecycle</description>
+  <pubDate>Tue, 03 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-ai-assistant-v2</guid>
   <title>Supabase AI Assistant v2</title>
   <link>https://supabase.com/blog/supabase-ai-assistant-v2</link>
-  <description>An evolution of how we approach AI within the Supabase dashboard</description>
-  <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/supabase-assistant</guid>
-  <title>Supabase AI Assistant v2</title>
-  <link>https://supabase.com/blog/supabase-assistant</link>
   <description>An evolution of how we approach AI within the Supabase dashboard</description>
   <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
 </item>
