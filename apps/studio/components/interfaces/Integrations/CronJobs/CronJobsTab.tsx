@@ -56,7 +56,7 @@ export const CronjobsTab = () => {
       </div>
     )
 
-  const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj.jobname.includes(searchQuery))
+  const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
 
   return (
     <>

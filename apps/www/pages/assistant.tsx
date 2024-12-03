@@ -1,14 +1,14 @@
-import { Button } from 'ui'
-import dynamic from 'next/dynamic'
-import { AIDemoPanel } from '~/components/AIDemo/Panel'
-import { useEffect, useState } from 'react'
-import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
-import { NextSeo } from 'next-seo'
-import { motion } from 'framer-motion'
-import { useRouter } from 'next/router'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { motion } from 'framer-motion'
+import { NextSeo } from 'next-seo'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { Button } from 'ui'
 import DotGrid from '~/components/AIDemo/DotGrid'
+import { AIDemoPanel } from '~/components/AIDemo/Panel'
+import { SqlSnippet } from '~/components/AIDemo/SqlSnippet'
 import { EASE_OUT } from '../lib/animations'
 
 const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
@@ -680,18 +680,13 @@ function Assistant() {
                   more. The Assistant is here to help.
                 </p>
                 <div className="min-h-12 flex items-center gap-x-2">
-                  {!isUserLoading &&
-                    (isLoggedIn ? (
-                      <Button type="primary" size="medium" asChild>
-                        <Link href="/dashboard/project/_">Dashboard</Link>
-                      </Button>
-                    ) : (
-                      <Button type="primary" size="medium" asChild>
-                        <Link href="https://supabase.com/dashboard/project/_">
-                          Start your project
-                        </Link>
-                      </Button>
-                    ))}
+                  {!isUserLoading && (
+                    <Button type="primary" size="medium" asChild>
+                      <Link href="/dashboard/project/_?aiAssistantPanelOpen=true">
+                        {isLoggedIn ? 'Dashboard' : 'Start your project'}
+                      </Link>
+                    </Button>
+                  )}
                   <Button type="default" size="medium" asChild>
                     <Link
                       target="_blank"
