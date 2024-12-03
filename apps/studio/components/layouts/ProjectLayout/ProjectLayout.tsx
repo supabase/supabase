@@ -1,14 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import {
-  forwardRef,
-  Fragment,
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-} from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -96,11 +88,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
-    const { ref: projectRef, aiAssistantPanelOpen = false } = useParams()
+    const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
-
     const { open } = aiAssistantPanel
 
     const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -131,47 +122,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
-
-    // the following code is to save the current state of the ai assistant panel in the query params. nuqs doesn't work
-    // well in the playwright tests.
-    const setAiAssistantPanelOpen = useCallback(
-      (open: boolean) => {
-        let pathname = location.pathname
-        if (process.env.NEXT_PUBLIC_BASE_PATH) {
-          pathname = pathname.replace(process.env.NEXT_PUBLIC_BASE_PATH, '')
-        }
-        const params = new URLSearchParams(location.search)
-        if (open) {
-          params.set('aiAssistantPanelOpen', 'true')
-        } else {
-          params.delete('aiAssistantPanelOpen')
-        }
-        router.push(`${pathname}?${params.toString()}`)
-      },
-      [router]
-    )
-
-    // the following code is to sync the query param with the app state. It handles initial render and sync on each open/close.
-    const queryInitialized = useRef<boolean>(false)
-    useEffect(() => {
-      if (!router.isReady) {
-        return
-      }
-
-      // when the query param is set, set the app state but only during the first render
-      if (!queryInitialized.current) {
-        if (aiAssistantPanelOpen !== aiAssistantPanel.open) {
-          setAiAssistantPanel({ open: !!aiAssistantPanelOpen })
-        }
-        queryInitialized.current = true
-        return
-      }
-
-      // otherwise, just sync the query param with the app state
-      if (queryInitialized.current && aiAssistantPanelOpen !== aiAssistantPanel.open) {
-        setAiAssistantPanelOpen(aiAssistantPanel.open)
-      }
-    }, [router.isReady, aiAssistantPanelOpen, aiAssistantPanel.open])
 
     return (
       <AppLayout>
