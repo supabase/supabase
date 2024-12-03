@@ -19,9 +19,9 @@ const ProductModules: ProductType = {
     label: '',
     url: '/modules/vector',
   },
-  [PRODUCT_MODULES_SHORTNAMES.CRON_JOBS]: {
-    name: PRODUCT_MODULES_NAMES.CRON_JOBS,
-    icon: PRODUCT_MODULES['cron-jobs'].icon[24],
+  [PRODUCT_MODULES_SHORTNAMES.CRON]: {
+    name: PRODUCT_MODULES_NAMES.CRON,
+    icon: PRODUCT_MODULES['cron'].icon[24],
     description: (
       <>
         Integrate your favorite ML-models to{' '}
@@ -30,7 +30,7 @@ const ProductModules: ProductType = {
     ),
     description_short: 'Schedule and manage recurring Jobs',
     label: '',
-    url: '/modules/cron-jobs',
+    url: '/modules/cron',
   },
 }
 

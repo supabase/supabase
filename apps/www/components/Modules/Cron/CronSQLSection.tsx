@@ -30,11 +30,11 @@ const CronSQLSection: FC<Props> = (props) => {
     <SectionContainer
       id={props.id}
       className={cn(
-        'max-w-6xl flex flex-col xl:flex-row justify-between gap-4 md:gap-8',
+        'mx-auto lg:max-w-6xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8',
         props.className
       )}
     >
-      <div className="flex flex-col gap-2 max-w-xl">
+      <div className="flex flex-col gap-2 max-w-md">
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>
@@ -42,7 +42,7 @@ const CronSQLSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <ul className="w-full flex-grow rounded-lg">
+      <ul className="w-full flex-grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
             code={ciCode}

@@ -6,9 +6,9 @@ import DefaultLayout from '~/components/Layouts/Default'
 import CronPageData from '~/data/products/modules/cron'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import CTABanner from '~/components/CTABanner'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
-import SectionContainer from '../../components/Layouts/SectionContainer'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
@@ -17,7 +17,6 @@ const CronUISection = dynamic(() => import('~/components/Modules/Cron/CronUISect
 const CronExtensibleSection = dynamic(
   () => import('~/components/Modules/Cron/CronExtensibleSection')
 )
-const CenteredImage = dynamic(() => import('~/components/Sections/CenteredImage'))
 
 function CronPage() {
   // base path for images
@@ -41,15 +40,15 @@ function CronPage() {
         }}
       />
       <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
-        <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON_JOBS} docsUrl={pageData.docsUrl} />
+        <ModulesNav activePage={PRODUCT_MODULES_NAMES.CRON} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <SectionContainer className="">{pageData.video.image}</SectionContainer>
         {/* <CenteredImage {...pageData.centeredImage} /> */}
         <HighlightCards {...(pageData.highlightsSection as any)} />
         <CronSQLSection {...pageData.section1} />
         <CronUISection {...pageData.section2} className="!py-0" />
-        <CronUISection {...pageData.section3} className="!py-0" />
-        <CronExtensibleSection {...pageData.section4} className="!pb-0" />
+        <CronExtensibleSection {...pageData.section3} className="!pb-0" />
+        <CronUISection {...pageData.section4} className="" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
