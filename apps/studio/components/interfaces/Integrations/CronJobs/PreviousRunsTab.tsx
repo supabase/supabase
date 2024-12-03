@@ -1,5 +1,5 @@
 import { toString as CronToString } from 'cronstrue'
-import { List } from 'lucide-react'
+import { CircleCheck, CircleX, List, Loader } from 'lucide-react'
 import Link from 'next/link'
 import { UIEvent, useCallback, useEffect, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
@@ -12,7 +12,6 @@ import {
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import {
-  Badge,
   Button,
   cn,
   LoadingLine,
@@ -66,9 +65,7 @@ const cronJobColumns = [
     id: 'status',
     name: 'Status',
     minWidth: 75,
-    value: (row: CronJobRun) => (
-      <Badge variant={row.status === 'succeeded' ? 'success' : 'warning'}>{row.status}</Badge>
-    ),
+    value: (row: CronJobRun) => <StatusBadge status={row.status} />,
   },
   {
     id: 'start_time',
@@ -80,7 +77,9 @@ const cronJobColumns = [
     id: 'end_time',
     name: 'End Time',
     minWidth: 120,
-    value: (row: CronJobRun) => <div className="text-xs">{formatDate(row.end_time)}</div>,
+    value: (row: CronJobRun) => (
+      <div className="text-xs">{row.status === 'succeeded' ? formatDate(row.end_time) : '-'}</div>
+    ),
   },
 
   {
@@ -88,7 +87,9 @@ const cronJobColumns = [
     name: 'Duration',
     minWidth: 100,
     value: (row: CronJobRun) => (
-      <div className="text-xs">{calculateDuration(row.start_time, row.end_time)}</div>
+      <span className="text-xs">
+        {row.status === 'succeeded' ? calculateDuration(row.start_time, row.end_time) : ''}
+      </span>
     ),
   },
 ]
@@ -215,7 +216,7 @@ export const PreviousRunsTab = () => {
         />
       </div>
 
-      <div className="px-6 py-6 flex gap-12 border-t">
+      <div className="px-6 py-6 flex gap-12 border-t bg sticky bottom-0">
         {isLoadingCronJobs ? (
           <GenericSkeletonLoader />
         ) : (
@@ -290,4 +291,36 @@ export const PreviousRunsTab = () => {
       </div>
     </div>
   )
+}
+
+interface StatusBadgeProps {
+  status: string
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  if (status === 'succeeded') {
+    return (
+      <span className="text-brand-600 flex items-center gap-1">
+        <CircleCheck size={14} /> Succeeded
+      </span>
+    )
+  }
+
+  if (status === 'failed') {
+    return (
+      <span className="text-destructive flex items-center gap-1">
+        <CircleX size={14} /> Failed
+      </span>
+    )
+  }
+
+  if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
+    return (
+      <span className="text-_secondary flex items-center gap-1">
+        <Loader size={14} className="animate-spin" /> Running
+      </span>
+    )
+  }
+
+  return null
 }

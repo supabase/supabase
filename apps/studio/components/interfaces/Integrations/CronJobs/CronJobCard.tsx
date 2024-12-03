@@ -69,9 +69,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
               <Button type="default" icon={<History />}>
-                <Link href={`/project/${ref}/integrations/cron/cron-jobs/${job.jobname}`}>
-                  History
-                </Link>
+                <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
