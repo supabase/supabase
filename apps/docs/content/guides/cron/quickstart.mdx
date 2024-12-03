@@ -27,6 +27,13 @@ Attempting to create a second Job with the same name (and case) will overwrite t
 4. Choose a schedule for your Job by inputting cron syntax (refer to the syntax chart in the form) or natural language.
 5. Input SQL snippet or select a Database function, HTTP request, or Supabase Edge Function.
 
+<Image
+  alt="Cron Create"
+  src="/docs/img/guides/database/cron/cron-create.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
+
 </TabPanel>
 <TabPanel id="sql-schedule-job" label="SQL">
 
@@ -92,6 +99,13 @@ You can input seconds for your Job schedule interval as long as you're on Postgr
 2. Click on the three vertical dots menu on the right side of the Job and click `Edit cron job`.
 3. Make your changes and then click `Save cron job`.
 
+<Image
+  alt="Cron Edit"
+  src="/docs/img/guides/database/cron/cron-edit.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
+
 </TabPanel>
 <TabPanel id="sql-edit-job" label="SQL">
 
@@ -133,6 +147,13 @@ It is also possible to modify a job by using the `cron.schedule()` function by i
 
 1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to unschedule.
 2. Toggle the `Active`/`Inactive` switch next to Job name.
+
+<Image
+  alt="Cron Toggle"
+  src="/docs/img/guides/database/cron/cron-toggle.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-unschedule-job" label="SQL">
@@ -198,6 +219,13 @@ Unchscheduling a Job will permanently delete the Job from `cron.job` table but i
 
 1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you want to see the runs of.
 2. Click on `History` button next to the Job name.
+
+<Image
+  alt="Cron Unschedule"
+  src="/docs/img/guides/database/cron/cron-unschedule.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-runs-job" label="SQL">
