@@ -159,7 +159,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                           if (useNaturalLanguage) {
                             setUseNaturalLanguage(false)
                           }
-                          form.setValue('schedule', preset.expression)
+                          form.setValue('schedule', preset.expression, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                            shouldTouch: true,
+                          })
                         }}
                       >
                         {preset.name}
