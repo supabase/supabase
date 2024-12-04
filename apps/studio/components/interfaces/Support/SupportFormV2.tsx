@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
-import { ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
+import { ChevronDown, ExternalLink, Loader2, Mail, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -23,6 +23,9 @@ import {
   Button,
   Checkbox_Shadcn_,
   cn,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Form_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -633,20 +636,33 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 label="Allow Supabase Support to access your project temporarily"
                 description={
                   <>
-                    By checking this box, you grant permission for our support team to access your
-                    project temporarily and, if applicable, to use AI tools to assist in diagnosing
-                    and resolving issues. This access may involve analyzing database configurations,
-                    query performance, and other relevant data to expedite troubleshooting and
-                    enhance support accuracy. We are committed to maintaining strict data privacy
-                    and security standards in all support activities.{' '}
-                    <Link
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      href="https://supabase.com/privacy"
-                      className="text-foreground-light underline hover:text-foreground underline-offset-2 transition"
-                    >
-                      Privacy Policy
-                    </Link>
+                    <Collapsible_Shadcn_>
+                      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 [&[data-state=open]>svg]:!-rotate-180">
+                        More information about temporary access
+                        <ChevronDown
+                          className="transition-transform duration-200"
+                          strokeWidth={1.5}
+                          size={14}
+                        />
+                      </CollapsibleTrigger_Shadcn_>
+                      <CollapsibleContent_Shadcn_>
+                        By checking this box, you grant permission for our support team to access
+                        your project temporarily and, if applicable, to use AI tools to assist in
+                        diagnosing and resolving issues. This access may involve analyzing database
+                        configurations, query performance, and other relevant data to expedite
+                        troubleshooting and enhance support accuracy. We are committed to
+                        maintaining strict data privacy and security standards in all support
+                        activities.{' '}
+                        <Link
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          href="https://supabase.com/privacy"
+                          className="text-foreground-light underline hover:text-foreground underline-offset-2 transition"
+                        >
+                          Privacy Policy
+                        </Link>
+                      </CollapsibleContent_Shadcn_>
+                    </Collapsible_Shadcn_>
                   </>
                 }
               >
