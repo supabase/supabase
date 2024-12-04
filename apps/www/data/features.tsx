@@ -2040,7 +2040,7 @@ This feature is especially beneficial for Python developers looking to build rob
     title: 'Background Tasks',
     subtitle: 'Run background tasks in an Edge Function outside of the request handler',
     description: `
-    Edge Function instances can process background tasks outside of the request handler. Background tasks are useful for asynchronous operations like uploading a file to Storage, updating a database, or sending events to a logging service. You can respond to the request immediately and leave the task running in the background.
+Edge Function instances can process background tasks outside of the request handler. Background tasks are useful for asynchronous operations like uploading a file to Storage, updating a database, or sending events to a logging service. You can respond to the request immediately and leave the task running in the background.
 `,
     icon: FileCode2,
     products: [PRODUCT_SHORTNAMES.FUNCTIONS, ADDITIONAL_PRODUCTS.PLATFORM],
