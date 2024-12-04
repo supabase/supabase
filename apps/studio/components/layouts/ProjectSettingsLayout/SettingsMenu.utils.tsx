@@ -15,7 +15,6 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     warehouse?: boolean
-    logDrains?: boolean
     diskAndCompute?: boolean
   }
 ): ProductMenuGroup[] => {
@@ -26,7 +25,6 @@ export const generateSettingsMenu = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const warehouseEnabled = features?.warehouse ?? false
-  const logDrainsEnabled = features?.logDrains ?? false
   const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
@@ -136,7 +134,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && logDrainsEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: `Log Drains`,
