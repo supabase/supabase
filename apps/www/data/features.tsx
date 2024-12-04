@@ -1710,30 +1710,28 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
   },
   // Studio
   {
-    title: 'AI-Powered Query Assistance',
-    subtitle: 'Get help crafting complex SQL queries effortlessly.',
+    title: 'Supabase AI Assistant',
+    subtitle: 'Your intelligent companion for managing Postgres databases.',
     description: `
-The AI-Powered Query Assistance feature in Supabase provides users with intelligent suggestions for writing SQL queries based on natural language input. This tool is designed to enhance productivity and streamline the development process, making it easier for both novice and experienced developers to interact with their databases. By transforming user queries into optimized SQL commands, it reduces the time spent on query formulation and minimizes errors.
+Supabase AI Assistant is integrated into the Supabase Dashboard to drastically improve your database management experience. This tool helps streamline your workflow, significantly reducing the time it takes to transition from concept to product.
 
-## Key benefits
-1. User-Friendly: Simplifies the query-writing process by allowing users to express their needs in plain language.
-2. Time-Saving: Accelerates development by quickly generating accurate SQL queries.
-3. Learning Tool: Acts as a learning resource for new developers to understand SQL syntax and best practices.
-4. Error Reduction: Minimizes common mistakes in query formulation through intelligent suggestions.
-5. Integration: Seamlessly integrates with existing Supabase projects, enhancing the overall user experience.
+The AI Assistant can save you hours of work by automating repetitive tasks and providing context-aware support. For instance, when designing a new database schema, it can generate all necessary SQL queries based on your specifications, allowing you to focus on the bigger picture rather than getting bogged down in details. If you encounter an error in your SQL code, the Assistant can quickly analyze the issue and suggest solutions, enabling you to resolve problems efficiently without losing your train of thought. Additionally, while working on a specific table, the Assistant can provide instant feedback and recommendations tailored to that context, ensuring that you always have relevant information at your fingertips.
 
-This feature is especially beneficial for teams looking to improve their database interaction efficiency while ensuring that all members can contribute effectively, regardless of their SQL expertise.
+Key benefits:
+1. Schema Design Assistance: Receive guidance on structuring your database and generating SQL queries.
+2. Enhanced Query Writing: Get precise suggestions for writing SQL queries based on your schema.
+3. Error Debugging: Identify and resolve SQL errors directly within the SQL Editor.
+4. Data Insights Discovery: Execute queries using natural language and view results in a clear format.
+5. RLS Policies Management: Create and modify Row Level Security (RLS) Policies according to your requirements.
+6. Functions and Triggers Support: Easily suggest, create, or update Postgres Functions and Triggers.
+
+With Supabase AI Assistant, you gain a powerful ally in your development process, helping you work more efficiently and effectively while keeping you focused on your goals.
 `,
     icon: Brain,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: 'https://www.youtube-nocookie.com/embed/hu2SQjvCXIw',
-    docsUrl:
-      'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
-    slug: 'ai-query-assistance',
-    status: {
-      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
-      availableOnSelfHosted: true,
-    },
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
+    docsUrl: '/blog/supabase-ai-assistant-v2',
+    slug: 'ai-assistant',
   },
   {
     title: 'Logs & Analytics',
