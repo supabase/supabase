@@ -2067,4 +2067,35 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
       availableOnSelfHosted: true,
     },
   },
+  {
+    title: 'OrioleDB',
+    subtitle: "New Postgres storage engine that's better than Heap storage.",
+    description: `
+OrioleDB is a PostgreSQL storage extension built on its pluggable storage framework. Serving as a direct replacement for PostgreSQL's Heap storage, it addresses scalability challenges while harnessing the full power of modern hardware. Designed to integrate effortlessly with PostgreSQL, OrioleDB enhances performance, efficiency, and scalability, all while maintaining the reliability and robustness PostgreSQL users depend on.
+
+## Key benefits:
+1. Fully Integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
+2. Enhanced Scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
+3. Superior Performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+4. Reduced Maintenance Overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
+5. Efficient Storage Management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
+6. Modern Write-Ahead Logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
+7. Optimized for Large Datasets: Index-organized tables improve data locality, reducing disk I/O for workloads exceeding memory cache capacity.
+
+## Roadmap Features:
+1. Decoupled storage and compute with S3 integration for unlimited scalability.
+2. Planned columnar indexes to enable hybrid OLTP and OLAP workloads on the same system.
+3. Multi-master replication for better availability and fault tolerance.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/orioledb.png',
+    heroImageLight: '/images/features/orioledb-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
+    slug: 'orioledb',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
 ]
