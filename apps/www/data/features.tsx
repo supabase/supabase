@@ -1732,6 +1732,10 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
     docsUrl: '/blog/supabase-ai-assistant-v2',
     slug: 'ai-assistant',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
   },
   {
     title: 'Logs & Analytics',
