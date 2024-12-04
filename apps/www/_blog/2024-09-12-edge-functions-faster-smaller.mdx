@@ -44,7 +44,7 @@ Deno.serve(async (_req) => {
       throw error
     }
 
-    return new Response(JSON.stringify({ data }), {
+    return new Response(JSON.stringify({ _req.data }), {
       headers: { 'Content-Type': 'application/json' },
       status: 200,
     })
