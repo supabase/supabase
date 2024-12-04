@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/supabase-cron</guid>
   <title>Supabase Cron</title>
   <link>https://supabase.com/blog/supabase-cron</link>
-  <description>An evolution of how we approach AI within the Supabase dashboard</description>
+  <description>Schedule Recurring Jobs in Postgres</description>
   <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>

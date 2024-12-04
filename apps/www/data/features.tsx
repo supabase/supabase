@@ -5,6 +5,7 @@ import {
   Braces,
   Brain,
   ChartScatter,
+  Clock,
   Cloud,
   Database,
   DatabaseBackup,
@@ -2036,6 +2037,31 @@ This feature is especially beneficial for Python developers looking to build rob
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
     slug: 'client-library-python',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Supabase Cron',
+    subtitle: 'Schedule recurring Jobs in Postgres.',
+    description: `
+Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron syntax directly within your database. Seamlessly integrated into the Supabase ecosystem, it allows users to automate tasks like executing SQL snippets, calling Database Functions, triggering Supabase Edge Functions, or syncing with external systems via webhooks.
+
+## Key benefits:
+1. Just Postgres: Jobs and run details are stored and executed entirely in the database by leveraging the pg_cron database extension.
+4. Versatile Scheduling Options: Supports standard cron syntax, sub-minute intervals, and natural language scheduling.
+2. Supabase Integration: Integrates seamlessly with the rest of the Supabase platform, including Supabase Edge Functions and Database Webhooks.
+3. Zero Network Latency: Jobs are run directly in your database, eliminating network latency when executing SQL Snippets or calling Database Functions.
+6. Enhanced Observability: Monitor job history, debug errors, and review logs directly from the Supabase Dashboard.
+5. Broad Use Cases: Automate a wide range of tasks, including database maintenance, analytics, performance optimizations, and syncing with remote systems.
+7. Ease of Use: Leverage an intuitive UI or SQL for scheduling, managing, and monitoring Jobs.
+`,
+    icon: Clock,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    docsUrl: 'https://supabase.com/docs/guides/cron',
+    slug: 'supabase-cron',
     status: {
       stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: true,
