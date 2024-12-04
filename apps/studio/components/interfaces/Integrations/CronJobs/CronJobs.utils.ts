@@ -160,7 +160,7 @@ export function getScheduleMessage(scheduleString: string) {
 
   // if the schedule is in seconds format, scheduleString is same as the schedule
   if (secondsPattern.test(scheduleString)) {
-    return `The cron will be run every ${scheduleString}`
+    return `The cron will run every ${scheduleString}`
   }
 
   if (scheduleString.includes('Invalid cron expression')) {
@@ -172,5 +172,5 @@ export function getScheduleMessage(scheduleString: string) {
     .map((s, i) => (i === 0 ? s.toLowerCase() : s))
     .join(' ')
 
-  return `The cron will be run ${readableSchedule}.`
+  return `The cron will run ${readableSchedule}.`
 }
