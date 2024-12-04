@@ -33,13 +33,13 @@ In the last 2 years, the CLI has grown to more than 180,000 weekly installs. Nea
 - **Reproducibility**: You can recreate environments from code, avoiding manual drift.
 - **Automation**: Tools apply configurations automatically, reducing human error.
 
+</ BlogCollapsible >
+
 Our CLI’s Configuration as Code feature is an opinionated setup using a human readable `config.toml` file.
 
 You can make deployments consistent and repeatable by promoting Edge Functions, Storage objects, and other services from preview environments to staging and production.
 
 To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
-
-</ BlogCollapsible >
 
 <Admonition type="tip" title="Detecting config drift">
 
@@ -75,11 +75,11 @@ verify_jwt = false
 
 If you are using a monorepo (like the [@supabase/supabase](https://github.com/supabase/supabase) Github repository), you may also want to customize the paths to your function’s entrypoint and import map files. This is especially useful for code sharing between your frontend application and Edge Functions.
 
-<aside>
+<Admonition type="tip" title="Setting Edge Function secrets">
 
-💡 Function secrets must be manually added to branches as of this release. We plan to support setting Function secrets at deploy time in the near future.
+Edge Function secrets must be manually added to branches as of this release. We plan to support setting Function secrets at deploy time in the near future.
 
-</aside>
+</Admonition>
 
 View the [Edge Functions config](/docs/guides/local-development/cli/config#edge-functions-config) docs.
 
