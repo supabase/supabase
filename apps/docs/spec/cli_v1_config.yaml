@@ -1291,7 +1291,7 @@ parameters:
     title: 'auth.sessions.timebox'
     tags: ['auth']
     required: false
-    default: '24h'
+    default: ''
     description: |
       Force log out after the specified duration. Sample values include: '50m', '20h'.
     links:
@@ -1302,7 +1302,7 @@ parameters:
     title: 'auth.sessions.inactivity_timeout'
     tags: ['auth']
     required: false
-    default: '8h'
+    default: ''
     description: |
       Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
     links:
