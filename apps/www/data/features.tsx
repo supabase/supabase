@@ -2082,7 +2082,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
 6. Modern Write-Ahead Logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
 7. Optimized for Large Datasets: Index-organized tables improve data locality, reducing disk I/O for workloads exceeding memory cache capacity.
 
-## Future-Proof Features:
+## Roadmap Features:
 1. Decoupled storage and compute with S3 integration for unlimited scalability.
 2. Planned columnar indexes to enable hybrid OLTP and OLAP workloads on the same system.
 3. Multi-master replication for better availability and fault tolerance.
