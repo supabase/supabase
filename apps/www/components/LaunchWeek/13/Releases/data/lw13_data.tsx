@@ -170,10 +170,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         title: '',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d3/d3-cron-dark.png',
-            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.png',
-            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.png',
-            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.png',
+            img: '/images/launchweek/13/releases/d3/d3-cron-dark.svg',
+            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.svg',
+            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.svg',
+            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.svg',
           },
         ],
       },
