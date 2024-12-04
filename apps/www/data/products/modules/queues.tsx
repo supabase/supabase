@@ -238,7 +238,7 @@ export default () => ({
           dark: '/images/modules/queues/queues-ui-dark.png',
           light: '/images/modules/queues/queues-ui-light.png',
         }}
-        alt="Queues via dashboard UI"
+        alt="Queues via Dashboard UI"
         className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
