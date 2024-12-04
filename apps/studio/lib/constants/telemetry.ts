@@ -39,10 +39,11 @@ export enum TELEMETRY_VALUES {
   /**
    * Track events for cron jobs
    * @context Cron Jobs
-   * @purpose TBD (Eventually moving to a shared telemetry library across all apps)
+   * @purpose TBD (Joshen just adding these here as we needed some telemetry, but ideally we think this properly through and come up with purposes)
    */
   CRON_JOB_CREATED = 'cron-job-created',
   CRON_JOB_UPDATED = 'cron-job-updated',
+  CRON_JOB_DELETED = 'cron-job-deleted',
   CRON_JOB_DELETE_CLICKED = 'cron-job-delete-clicked',
   CRON_JOB_UPDATE_CLICKED = 'cron-job-update-clicked',
   CRON_JOB_CREATE_CLICKED = 'cron-job-create-clicked',
