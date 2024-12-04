@@ -165,9 +165,9 @@ export function LogsSidebarMenuV2() {
       items: [],
     },
     {
-      name: 'Cron Jobs',
-      key: 'cron-logs',
-      url: `/project/${ref}/logs/cron-logs`,
+      name: 'Cron',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
   ]

@@ -135,7 +135,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
-                  Hardware resources allocated to your postgres database
+                  Hardware resources allocated to your Postgres database
                 </p>
                 <NoticeBar
                   showIcon={false}

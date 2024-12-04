@@ -21,7 +21,7 @@ import { TableRowsData } from 'data/table-rows/table-rows-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import useLatest from 'hooks/misc/useLatest'
 import { useUrlState } from 'hooks/ui/useUrlState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -125,7 +125,7 @@ const TableGridEditor = ({
 
   const isViewSelected = isView(selectedTable) || isMaterializedView(selectedTable)
   const isTableSelected = isTableLike(selectedTable)
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable?.schema ?? '')
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canEditViaTableEditor = isTableSelected && !isLocked
 
   const gridTable = parseSupaTable(selectedTable)

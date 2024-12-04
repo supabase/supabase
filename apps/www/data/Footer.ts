@@ -58,10 +58,6 @@ const footerData = [
         url: '/partners/integrations',
       },
       {
-        text: 'Experts',
-        url: '/partners/experts',
-      },
-      {
         text: 'Brand Assets / Logos',
         url: '/brand-assets',
       },

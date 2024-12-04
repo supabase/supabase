@@ -70,6 +70,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'local_development',
           },
           {
+            label: 'Deployment',
+            icon: 'deployment',
+            href: '/guides/deployment',
+            level: 'deployment',
+          },
+          {
             label: 'Self-Hosting',
             icon: 'self-hosting',
             href: '/guides/self-hosting',
@@ -81,12 +87,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations',
             level: 'integrations',
-          },
-          {
-            label: 'Deployment',
-            icon: 'deployment',
-            href: '/guides/deployment',
-            level: 'deployment',
           },
         ],
       ],
@@ -346,6 +346,16 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift',
+        },
+      ],
+    },
+    {
+      name: 'AI Prompts',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/getting-started/ai-prompts',
         },
       ],
     },
@@ -701,6 +711,50 @@ export const auth = {
   ],
 }
 
+const ormQuickstarts: NavMenuSection = {
+  name: 'ORM Quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'Prisma',
+      url: '/guides/database/prisma',
+      items: [
+        {
+          name: 'Prisma troubleshooting',
+          url: '/guides/database/prisma/prisma-troubleshooting',
+        },
+      ],
+    },
+    {
+      name: 'Drizzle',
+      url: '/guides/database/drizzle',
+    },
+    {
+      name: 'Postgres.js',
+      url: '/guides/database/postgres-js',
+    },
+  ],
+}
+
+const guiQuickstarts: NavMenuSection = {
+  name: 'GUI quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'pgAdmin',
+      url: '/guides/database/pgadmin',
+    },
+    {
+      name: 'PSQL',
+      url: '/guides/database/psql',
+    },
+    {
+      name: 'DBeaver',
+      url: '/guides/database/dbeaver',
+    },
+  ],
+}
+
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
@@ -714,12 +768,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
-          items: [
-            {
-              name: 'Serverless Drivers',
-              url: '/guides/database/connecting-to-postgres/serverless-drivers',
-            },
-          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -777,6 +825,16 @@ export const database: NavMenuConstant = {
         {
           name: 'Managing connections',
           url: '/guides/database/connection-management',
+        },
+      ],
+    },
+    {
+      name: 'OrioleDB',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/orioledb',
         },
       ],
     },
@@ -864,48 +922,8 @@ export const database: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'ORM Quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'Prisma',
-          url: '/guides/database/prisma',
-          items: [
-            {
-              name: 'Prisma troubleshooting',
-              url: '/guides/database/prisma/prisma-troubleshooting',
-            },
-          ],
-        },
-        {
-          name: 'Drizzle',
-          url: '/guides/database/drizzle',
-        },
-        {
-          name: 'Postgres.js',
-          url: '/guides/database/postgres-js',
-        },
-      ],
-    },
-    {
-      name: 'GUI quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'pgAdmin',
-          url: '/guides/database/pgadmin',
-        },
-        {
-          name: 'PSQL',
-          url: '/guides/database/psql',
-        },
-        {
-          name: 'DBeaver',
-          url: '/guides/database/dbeaver',
-        },
-      ],
-    },
+    ormQuickstarts,
+    guiQuickstarts,
     {
       name: 'Extensions',
       url: undefined,
@@ -1253,6 +1271,14 @@ export const functions: NavMenuConstant = {
         {
           name: 'Background Tasks',
           url: '/guides/functions/background-tasks',
+        },
+        {
+          name: 'Ephemeral Storage',
+          url: '/guides/functions/ephemeral-storage',
+        },
+        {
+          name: 'WebSockets',
+          url: '/guides/functions/websockets',
         },
         {
           name: 'Running AI Models',
@@ -2124,6 +2150,7 @@ export const deployment: NavMenuConstant = {
       name: 'Environments',
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
         { name: 'Branching', url: '/guides/deployment/branching' },
       ],
     },
@@ -2540,4 +2567,6 @@ export const navDataForMdx = {
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialLoginItems: SocialLoginItems,
+  ormQuickstarts,
+  guiQuickstarts,
 }

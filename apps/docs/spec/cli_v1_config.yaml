@@ -554,6 +554,22 @@ parameters:
       - name: 'Inbucket documentation'
         link: 'https://www.inbucket.org'
 
+  - id: 'inbucket.admin_email'
+    title: 'inbucket.admin_email'
+    tags: ['local']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'inbucket.sender_name'
+    title: 'inbucket.sender_name'
+    tags: ['local']
+    required: false
+    default: 'Admin'
+    description: |
+      Display name used as the sender for emails sent from the application.
+
   - id: 'storage.enabled'
     title: 'storage.enabled'
     tags: ['storage']
@@ -571,7 +587,48 @@ parameters:
     required: false
     default: '"50MiB"'
     description: |
+      The maximum file size allowed for all buckets in the project.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.public'
+    title: 'storage.buckets.<bucket_name>.public'
+    tags: ['storage']
+    required: false
+    default: 'false'
+    description: |
+      Enable public access to the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.file_size_limit'
+    title: 'storage.buckets.<bucket_name>.file_size_limit'
+    tags: ['storage']
+    required: false
+    description: |
       The maximum file size allowed (e.g. "5MB", "500KB").
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.allowed_mime_types'
+    title: 'storage.buckets.<bucket_name>.allowed_mime_types'
+    tags: ['storage']
+    required: false
+    description: |
+      The list of allowed MIME types for objects in the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.objects_path'
+    title: 'storage.buckets.<bucket_name>.objects_path'
+    tags: ['storage']
+    required: false
+    description: |
+      The local directory to upload objects to the bucket.
     links:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
@@ -1096,6 +1153,35 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'edge_runtime.enabled'
+    title: 'edge_runtime.enabled'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Edge Runtime service for Edge Functions.
+    links: []
+
+  - id: 'edge_runtime.policy'
+    title: 'edge_runtime.policy'
+    tags: ['edge-functions']
+    required: false
+    default: '"oneshot"'
+    description: |
+      Configure the request handling policy for Edge Functions. Available options:
+      - `oneshot`: Recommended for development with hot reload support
+      - `per_worker`: Recommended for load testing scenarios
+    links: []
+
+  - id: 'edge_runtime.inspector_port'
+    title: 'edge_runtime.inspector_port'
+    tags: ['edge-functions']
+    required: false
+    default: '8083'
+    description: |
+      Port to attach the Chrome inspector for debugging Edge Functions.
+    links: []
+
   - id: 'functions.function_name.enabled'
     title: 'functions.<function_name>.enabled'
     tags: ['edge-functions']
@@ -1131,6 +1217,7 @@ parameters:
     required: false
     description: |
       Specify the Deno import map file to use for the Function.
+      When not specified, defaults to `supabase/functions/<function_name>/deno.json`.
 
       Note that the `--import-map` flag overrides this configuration.
     links:
