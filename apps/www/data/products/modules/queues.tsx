@@ -61,7 +61,7 @@ export default () => ({
       },
       {
         title: 'Exactly Once Message Delivery',
-        paragraph: 'Supabase Queues delivers a message exactly once within a visibility timeout.',
+        paragraph: 'Supabase Queues delivers a message exactly once within a visibility window.',
         svg: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
