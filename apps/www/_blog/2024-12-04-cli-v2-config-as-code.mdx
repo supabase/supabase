@@ -30,6 +30,8 @@ Over the last 2 years the CLI has grown to more than 180,000 weekly installs. Cl
 
 ## Configuration as Code using the Supabase CLI
 
+<BlogCollapsible title="What is Configuration as Code?" containerClassName="mb-4">
+
 **Configuration as Code** is a practice where infrastructure configuration is managed and versioned in source control using code or declarative files. It allows for automation, consistency, and repeatability. Some examples include Terraform and Docker Compose. It offers several key features:
 
 - **Version Control**: Configurations are stored in repositories like Git, enabling collaboration and history tracking.
@@ -42,11 +44,15 @@ You can make deployments consistent and repeatable by promoting Edge Functions, 
 
 To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
 
-<aside>
+</ BlogCollapsible >
 
-💡 Before changing any project configuration, it’s a good idea to verify that your remote config has not drifted. This can be done by running `supabase link` command locally which diffs your entire local `config.toml` with your remote project settings.
+<Admonition type="tip" title="Detecting config drift">
 
-</aside>
+Before changing any project configuration, it’s a good idea to verify that your remote config has not drifted.
+
+This can be done by running `supabase link` command locally which diffs your entire local `config.toml` with your remote project settings.
+
+</Admonition>
 
 ### Managing Auth Config
 
