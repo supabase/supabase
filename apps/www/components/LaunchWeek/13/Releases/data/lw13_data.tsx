@@ -86,10 +86,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.svg',
-            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.svg',
-            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.svg',
-            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.svg',
+            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.png',
           },
         ],
       },
@@ -170,10 +170,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         title: '',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d3/d3-cron-dark.svg',
-            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.svg',
-            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.svg',
-            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.svg',
+            img: '/images/launchweek/13/releases/d3/d3-cron-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.png',
           },
         ],
       },
