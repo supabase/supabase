@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
+import { GitBranch } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -63,12 +64,19 @@ export const days: AdventDay[] = [
     ),
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
+    title: 'Supabase CLI v2: Config as Code',
+    description:
+      'Commit the configuration for all of your Projects and Branches into version control.',
+    id: 'cli',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/cli-v2-config-as-code',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <GitBranch />,
   },
   {
     title: '',

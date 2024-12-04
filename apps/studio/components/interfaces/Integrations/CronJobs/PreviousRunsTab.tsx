@@ -181,42 +181,40 @@ export const PreviousRunsTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mt-4 h-full">
-        <LoadingLine loading={isFetching} />
-        <DataGrid
-          className="flex-grow h-full"
-          rowHeight={44}
-          headerRowHeight={36}
-          onScroll={handleScroll}
-          columns={columns}
-          rows={cronJobRuns ?? []}
-          rowClass={() => {
-            const isSelected = false
-            return cn([
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'}  `,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-              '[&>.rdg-cell:first-child>div]:ml-4',
-            ])
-          }}
-          renderers={{
-            renderRow(_idx, props) {
-              return <Row key={props.row.job_pid} {...props} />
-            },
-            noRowsFallback: isLoadingCronJobRuns ? (
-              <div className="absolute top-14 px-6 w-full">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center w-full col-span-6">
-                <CronJobsEmptyState page="runs" />
-              </div>
-            ),
-          }}
-        />
-      </div>
+      <LoadingLine loading={isFetching} />
+      <DataGrid
+        className="flex-grow"
+        rowHeight={44}
+        headerRowHeight={36}
+        onScroll={handleScroll}
+        columns={columns}
+        rows={cronJobRuns ?? []}
+        rowClass={() => {
+          const isSelected = false
+          return cn([
+            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'}  `,
+            `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell:first-child>div]:ml-4',
+          ])
+        }}
+        renderers={{
+          renderRow(_idx, props) {
+            return <Row key={props.row.job_pid} {...props} />
+          },
+          noRowsFallback: isLoadingCronJobRuns ? (
+            <div className="absolute top-14 px-6 w-full">
+              <GenericSkeletonLoader />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full col-span-6">
+              <CronJobsEmptyState page="runs" />
+            </div>
+          ),
+        }}
+      />
 
-      <div className="px-6 py-6 flex gap-12 border-t bg sticky bottom-0">
+      <div className="px-6 py-6 flex gap-12 border-t bg">
         {isLoadingCronJobs ? (
           <GenericSkeletonLoader />
         ) : (
@@ -239,7 +237,7 @@ export const PreviousRunsTab = () => {
               </p>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-y-2">
               <h3 className="text-sm">Command</h3>
               <Tooltip_Shadcn_>
                 <TooltipTrigger_Shadcn_ className=" text-left p-0! cursor-pointer truncate max-w-[300px] h-12 relative">
@@ -266,18 +264,9 @@ export const PreviousRunsTab = () => {
                   </SimpleCodeBlock>
                 </TooltipContent_Shadcn_>
               </Tooltip_Shadcn_>
-              {/* <div className="text-xs text-foreground-light">
-                <SimpleCodeBlock
-                  showCopy={false}
-                  className="sql"
-                  parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
-                >
-                  {currentJobState?.command}
-                </SimpleCodeBlock>
-              </div> */}
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-y-2">
               <h3 className="text-sm">Explore</h3>
               <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
                 {/* [Terry] need to link to the exact jobid, but not currently supported */}

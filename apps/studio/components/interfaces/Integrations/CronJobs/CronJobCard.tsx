@@ -8,6 +8,8 @@ import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlC
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import {
   Button,
   DropdownMenu,
@@ -28,9 +30,12 @@ interface CronJobCardProps {
 }
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
-  const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
   const { ref } = useParams()
   const { project: selectedProject } = useProjectContext()
+
+  const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
+
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
 
   // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
@@ -68,7 +73,18 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 checked={job.active}
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
-              <Button type="default" icon={<History />}>
+              <Button
+                asChild
+                type="default"
+                icon={<History />}
+                onClick={() => {
+                  sendEvent({
+                    action: TELEMETRY_EVENTS.CRON_JOBS,
+                    value: TELEMETRY_VALUES.CRON_JOBS_VIEW_PREVIOUS_RUNS,
+                    label: 'User clicked view previous runs button',
+                  })
+                }}
+              >
                 <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
               </Button>
               <DropdownMenu>
@@ -76,11 +92,29 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <Button type="default" icon={<MoreVertical />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem onClick={() => onEditCronJob(job)}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.CRON_JOBS,
+                        value: TELEMETRY_VALUES.CRON_JOB_UPDATE_CLICKED,
+                        label: 'User clicked edit cron job button',
+                      })
+                      onEditCronJob(job)
+                    }}
+                  >
                     Edit cron job
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => onDeleteCronJob(job)}>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      sendEvent({
+                        action: TELEMETRY_EVENTS.CRON_JOBS,
+                        value: TELEMETRY_VALUES.CRON_JOB_DELETE_CLICKED,
+                        label: 'User clicked delete cron job button',
+                      })
+                      onDeleteCronJob(job)
+                    }}
+                  >
                     Delete cron job
                   </DropdownMenuItem>
                 </DropdownMenuContent>
