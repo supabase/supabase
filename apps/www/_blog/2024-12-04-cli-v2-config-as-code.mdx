@@ -13,13 +13,15 @@ toc_depth: 3
 launchweek: '13'
 ---
 
-The Supabase CLI v2 was released today, adding support for Configuration as Code. This means you can commit the configuration for all of your Projects and Branches into version control (like git) for reproducible environments for your entire team.
+We have released Supabase CLI v2 today, adding support for Configuration as Code. 
+
+This means you can commit the configuration for all of your Projects and Branches into version control (like git) for reproducible environments for your entire team.
 
 ## Using the CLI in CI/CD pipelines
 
-The Supabase CLI started out as a way to bootstrap the entire Supabase stack on your local machine. The CLI uses exactly the same infra as our hosted platform, giving you unlimited Supabase projects for local testing and offline usage.
+The Supabase CLI started as a way to bootstrap the entire Supabase stack on your local machine. It uses exactly the same infra as our hosted platform, giving you unlimited Supabase projects for local testing and offline usage.
 
-Over the last 2 years the CLI has grown to more than 180,000 weekly installs. Close to 85% of the downloads come from Continuous Integration/Deployment environments like GitHub Actions. Some of the popular CI/CD use cases include migrating production database, deploying functions, and running pgTAP tests. With this in mind, we started focusing on the CLI as a deployment tool for the v2 release.
+In the last 2 years, the CLI has grown to more than 180,000 weekly installs. Nearly 85% of these come from Continuous Integration/Deployment environments like GitHub Actions. Some of the popular CI/CD use cases include migrating production databases, deploying functions, and running pgTAP tests. With this in mind, we started focusing on the CLI as a deployment tool for the v2 release.
 
 <Img
   alt="cli-downloads"
@@ -50,7 +52,7 @@ To demonstrate this workflow, let’s use the `supabase.com` website as an examp
 
 ### Managing Auth Config
 
-Since our frontend uses Vercel Preview, we want to configure the Auth service of Supabase branches to support login for any Vercel preview URL. This can be achieved by declaring a wildcard for the `additional_redirect_urls` in auth config:
+We use Vercel Previews for our frontend. To configure the Auth service of Supabase branches to support login for any Vercel preview URL, we declare a wildcard for the `additional_redirect_urls` in auth config:
 
 ```toml
 [auth]
