@@ -74,6 +74,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
               <Button
+                asChild
                 type="default"
                 icon={<History />}
                 onClick={() => {
