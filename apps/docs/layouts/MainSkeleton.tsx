@@ -30,6 +30,10 @@ const levelsData = {
     icon: 'database',
     name: 'Database',
   },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
   api: {
     icon: 'rest',
     name: 'REST API',
