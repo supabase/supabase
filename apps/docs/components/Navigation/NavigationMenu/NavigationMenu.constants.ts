@@ -977,7 +977,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
-          name: 'pg_cron: Job Scheduling',
+          name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron',
         },
         {
@@ -1318,6 +1318,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Ephemeral Storage',
           url: '/guides/functions/ephemeral-storage',
+        },
+        {
+          name: 'WebSockets',
+          url: '/guides/functions/websockets',
         },
         {
           name: 'Running AI Models',

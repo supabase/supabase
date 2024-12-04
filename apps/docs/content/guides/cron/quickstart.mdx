@@ -21,11 +21,18 @@ Attempting to create a second Job with the same name (and case) will overwrite t
 >
 <TabPanel id="dashboard-schedule-job" label="Dashboard">
 
-1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section to schedule your first Job.
-2. Click on `Create job` button or navigate to the new Cron Job form [here](https://supabase.com/dashboard/project/_/integrations/cron/jobs?dialog-shown=true).
+1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section to schedule your first Job.
+2. Click on `Create job` button or navigate to the new Cron Job form [here](/dashboard/project/_/integrations/cron/jobs?dialog-shown=true).
 3. Name your Cron Job.
 4. Choose a schedule for your Job by inputting cron syntax (refer to the syntax chart in the form) or natural language.
 5. Input SQL snippet or select a Database function, HTTP request, or Supabase Edge Function.
+
+<Image
+  alt="Cron Create"
+  src="/docs/img/guides/database/cron/cron-create.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-schedule-job" label="SQL">
@@ -88,9 +95,16 @@ You can input seconds for your Job schedule interval as long as you're on Postgr
 >
 <TabPanel id="dashboard-edit-job" label="Dashboard">
 
-1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to edit.
+1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to edit.
 2. Click on the three vertical dots menu on the right side of the Job and click `Edit cron job`.
 3. Make your changes and then click `Save cron job`.
+
+<Image
+  alt="Cron Edit"
+  src="/docs/img/guides/database/cron/cron-edit.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-edit-job" label="SQL">
@@ -131,8 +145,15 @@ It is also possible to modify a job by using the `cron.schedule()` function by i
 >
 <TabPanel id="dashboard-unschedule-job" label="Dashboard">
 
-1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to unschedule.
+1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to unschedule.
 2. Toggle the `Active`/`Inactive` switch next to Job name.
+
+<Image
+  alt="Cron Toggle"
+  src="/docs/img/guides/database/cron/cron-toggle.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-unschedule-job" label="SQL">
@@ -165,9 +186,16 @@ select cron.alter_job(
 >
 <TabPanel id="dashboard-delete-job" label="Dashboard">
 
-1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to delete.
+1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section and find the Job you'd like to delete.
 2. Click on the three vertical dots menu on the right side of the Job and click `Delete cron job`.
 3. Confirm deletion by entering the Job name.
+
+<Image
+  alt="Cron Unschedule"
+  src="/docs/img/guides/database/cron/cron-unschedule.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-delete-job" label="SQL">
@@ -178,7 +206,7 @@ select cron.unschedule('permanent-cron-job-name');
 
 <Admonition type="warning">
 
-Unchscheduling a Job will permanently delete the Job from `cron.job` table but its run history remain in `cron.job_run_details` table.
+Unscheduling a Job will permanently delete the Job from `cron.job` table but its run history remain in `cron.job_run_details` table.
 
 </Admonition>
 
@@ -196,8 +224,15 @@ Unchscheduling a Job will permanently delete the Job from `cron.job` table but i
 >
 <TabPanel id="dashboard-runs-job" label="Dashboard">
 
-1. Go to the [Jobs](https://supabase.com/dashboard/project/_/integrations/cron/jobs) section and find the Job you want to see the runs of.
-2. Click on `History` button next to the Job name.
+1. Go to the [Jobs](/dashboard/project/_/integrations/cron/jobs) section and find the Job you want to see the runs of.
+2. Click on the `History` button next to the Job name.
+
+<Image
+  alt="Cron Job Runs"
+  src="/docs/img/guides/database/cron/cron-history.png"
+  className="max-w-[700px] !mx-auto border rounded-md"
+  zoomable
+/>
 
 </TabPanel>
 <TabPanel id="sql-runs-job" label="SQL">
@@ -213,7 +248,7 @@ limit 10;
 
 <Admonition type="warning">
 
-The records in `cron.job_run_details` table are not cleaned up automatically nor when Jobs are unscheduled which will take up disk space in your database.
+The records in the `cron.job_run_details` table are not cleaned up automatically. They are also not removed when jobs are unscheduled, which will take up disk space in your database.
 
 </Admonition>
 
@@ -224,19 +259,27 @@ The records in `cron.job_run_details` table are not cleaned up automatically nor
 
 ### Delete data every week
 
-Delete old data every Saturday at 3:30am (GMT):
+{/* <!-- vale off --> */}
+
+Delete old data every Saturday at 3:30AM (GMT):
+
+{/* <!-- vale on --> */}
 
 ```sql
 select cron.schedule (
   'saturday-cleanup', -- name of the cron job
-  '30 3 * * 6', -- Saturday at 3:30am (GMT)
+  '30 3 * * 6', -- Saturday at 3:30AM (GMT)
   $$ delete from events where event_time < now() - interval '1 week' $$
 );
 ```
 
 ### Run a vacuum every day
 
-Vacuum every day at 3:00am (GMT):
+{/* <!-- vale off --> */}
+
+Vacuum every day at 3:00AM (GMT):
+
+{/* <!-- vale on --> */}
 
 ```sql
 select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
@@ -244,7 +287,7 @@ select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 
 ### Call a database function every 5 minutes
 
-Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
+Create a [`hello_world()`](/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
 
 ```sql
 select cron.schedule('call-db-function', '*/5 * * * *', 'SELECT hello_world()');
@@ -281,7 +324,7 @@ select
 
 <Admonition type="note">
 
-This requires [`pg_net` extension](/docs/guides/database/extensions/pg_net) to be enabled.
+This requires the [`pg_net` extension](/docs/guides/database/extensions/pg_net) to be enabled.
 
 </Admonition>
 
@@ -289,6 +332,6 @@ This requires [`pg_net` extension](/docs/guides/database/extensions/pg_net) to b
 
 Be extremely careful when setting up Jobs for system maintenance tasks as they can have unintended consequences.
 
-For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
+For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting, such as `idle_session_timeout`, that can perform these common maintenance tasks without the risk.
 
 Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.

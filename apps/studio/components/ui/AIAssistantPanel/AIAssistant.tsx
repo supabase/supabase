@@ -40,10 +40,10 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import DotGrid from '../DotGrid'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import DotGrid from '../DotGrid'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -135,7 +135,6 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    // [Joshen] Not currently used atm, but initialMessages will be for...
     initialMessages,
     body: {
       includeSchemaMetadata,
@@ -143,6 +142,11 @@ export const AIAssistant = ({
       connectionString: project?.connectionString,
       schema: currentSchema,
       table: currentTable?.name,
+    },
+    onFinish: (message) => {
+      setAiAssistantPanel({
+        messages: [...chatMessages, message],
+      })
     },
   })
 
@@ -185,7 +189,7 @@ export const AIAssistant = ({
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ sqlSnippets: undefined })
+    setAiAssistantPanel({ sqlSnippets: undefined, messages: [...messages, payload] })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
@@ -400,7 +404,7 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts?.map((prompt, idx) => (
+                {suggestions?.prompts?.map((prompt: string, idx: number) => (
                   <Button
                     key={`suggestion-${idx}`}
                     size="small"
@@ -444,7 +448,7 @@ export const AIAssistant = ({
                   Generate a ...
                 </Button>
                 {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider_Shadcn_>
+                  <TooltipProvider_Shadcn_ key={qs.title}>
                     <Tooltip_Shadcn_>
                       <TooltipTrigger_Shadcn_ asChild>
                         <Button
@@ -496,7 +500,7 @@ export const AIAssistant = ({
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
             <div className="mb-2">
-              {sqlSnippets.map((snippet, index) => (
+              {sqlSnippets.map((snippet: string, index: number) => (
                 <CollapsibleCodeBlock
                   key={index}
                   hideLineNumbers
@@ -552,7 +556,9 @@ export const AIAssistant = ({
               event.preventDefault()
               if (includeSchemaMetadata) {
                 const sqlSnippetsString =
-                  sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
+                  sqlSnippets
+                    ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
+                    .join('\n') || ''
                 const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
                 sendMessageToAssistant(valueWithSnippets)
               } else {

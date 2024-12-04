@@ -83,7 +83,7 @@ const postgresIntegrations = [
     title: 'Queues',
     icon: 'queue',
     href: '/guides/queue',
-    description: 'Postgres-native pull queues',
+    description: 'Message Queues with guarenteed delivery',
   },
 ]
 

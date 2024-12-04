@@ -62,7 +62,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 1,
     dd: 'Mon',
     shipped: true,
-    isToday: true,
+    isToday: false,
     blog: '/blog/supabase-ai-assistant-v2',
     hasCountdown: false,
     date: '2 December',
@@ -76,7 +76,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       },
       {
         type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb ',
+        href: 'https://twitter.com/i/spaces/1OyKAZyeQyWGb',
       },
     ],
     steps: [
@@ -86,10 +86,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.svg',
-            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.svg',
-            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.svg',
-            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.svg',
+            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.png',
           },
         ],
       },
@@ -99,73 +99,126 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    shipped: false,
+    shipped: true,
     isToday: false,
-    hasCountdown: true,
-    blog: '',
+    hasCountdown: false,
+    blog: '/blog/edge-functions-background-tasks-websockets',
     date: '3 December',
     published_at: '2024-12-03T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Functions: Background Tasks and WebSockets',
+    description: (
+      <>
+        Supabase Functions:
+        <br className="hidden sm:block" /> Background Tasks and WebSockets
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'envrsJ8VfAU',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1yoJMyjzVWRJQ',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-dark.png',
+            mobileImg:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d2/d2-functions-background-tasks-light.png',
+            mobileImgLight:
+              '/images/launchweek/13/releases/d2/d2-functions-background-tasks-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/supabase-cron',
     date: '4 December',
     published_at: '2024-12-04T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Cron: Schedule Recurring Jobs in Postgres',
+    description: (
+      <>
+        Supabase Cron:
+        <br className="hidden sm:block" /> Schedule Recurring Jobs in Postgres
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'miRQPbIJOuQ',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1eaKbaOAOdaxX',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d3/d3-cron-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
-    isToday: false,
+    shipped: true,
+    isToday: true,
     hasCountdown: false,
     blog: '',
     date: '5 December',
     published_at: '2024-12-05T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Queues',
+    description: (
+      <>
+        Supabase Queues:
+        <br className="hidden sm:block" /> Message Queues with Guaranteed Delivery
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '-E',
-      // },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ynKODOwObyGR',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d4/d4-queues-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d4/d4-queues-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d4/d4-queues-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d4/d4-queues-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-5',
@@ -173,7 +226,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Fri',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '6 December',
     published_at: '2024-12-06T08:00:00.000-07:00',

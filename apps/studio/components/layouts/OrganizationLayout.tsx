@@ -7,13 +7,11 @@ import { useVercelRedirectQuery } from 'data/integrations/vercel-redirect-query'
 import { useCurrentPath } from 'hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useFlag } from 'hooks/ui/useFlag'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
 import AccountLayout from './AccountLayout/AccountLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
-import SettingsLayout from './SettingsLayout/SettingsLayout'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
@@ -23,15 +21,9 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
   const invoicesEnabled = invoicesEnabledOnProfileLevel
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
-
   const { data, isSuccess } = useVercelRedirectQuery({
     installationId: selectedOrganization?.partner_id,
   })
-
-  if (navLayoutV2) {
-    return <SettingsLayout>{children}</SettingsLayout>
-  }
 
   const navMenuItems = [
     {
