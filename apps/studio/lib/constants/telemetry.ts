@@ -4,6 +4,7 @@
 export enum TELEMETRY_EVENTS {
   FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
   AI_ASSISTANT_V2 = 'AI Assistant V2',
+  CRON_JOBS = 'Cron Jobs',
 }
 
 // [Joshen] Values refer to the "action" of the "event"
@@ -35,4 +36,16 @@ export enum TELEMETRY_VALUES {
    * @purpose Indication of interest for wanting to expand from a SQL suggestion, aid in deciding the priority for an inline editor
    * */
   EDIT_IN_SQL_EDITOR = 'edit-in-sql-editor',
+  /**
+   * Track events for cron jobs
+   * @context Cron Jobs
+   * @purpose TBD (Joshen just adding these here as we needed some telemetry, but ideally we think this properly through and come up with purposes)
+   */
+  CRON_JOB_CREATED = 'cron-job-created',
+  CRON_JOB_UPDATED = 'cron-job-updated',
+  CRON_JOB_DELETED = 'cron-job-deleted',
+  CRON_JOB_DELETE_CLICKED = 'cron-job-delete-clicked',
+  CRON_JOB_UPDATE_CLICKED = 'cron-job-update-clicked',
+  CRON_JOB_CREATE_CLICKED = 'cron-job-create-clicked',
+  CRON_JOBS_VIEW_PREVIOUS_RUNS = 'view-previous-runs-clicked',
 }

@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.226.3
+  version: 2.0.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -3538,10 +3538,6 @@ commands:
         name: --persistent
         description: Switch between ephemeral and persistent branch.
         default_value: 'false'
-      - id: reset-on-push
-        name: --reset-on-push
-        description: Reset the preview branch on git push.
-        default_value: 'false'
       - id: status
         name: --status <string>
         description: Override the current branch status.
@@ -3661,101 +3657,47 @@ commands:
         description: Select a region to deploy the branch database.
         default_value: ''
         accepted_values:
-          - id: ams
-            name: ams
+          - id: ap-northeast-1
+            name: ap-northeast-1
             type: string
-          - id: arn
-            name: arn
+          - id: ap-northeast-2
+            name: ap-northeast-2
             type: string
-          - id: bog
-            name: bog
+          - id: ap-south-1
+            name: ap-south-1
             type: string
-          - id: bos
-            name: bos
+          - id: ap-southeast-1
+            name: ap-southeast-1
             type: string
-          - id: cdg
-            name: cdg
+          - id: ap-southeast-2
+            name: ap-southeast-2
             type: string
-          - id: den
-            name: den
+          - id: ca-central-1
+            name: ca-central-1
             type: string
-          - id: dfw
-            name: dfw
+          - id: eu-central-1
+            name: eu-central-1
             type: string
-          - id: ewr
-            name: ewr
+          - id: eu-west-1
+            name: eu-west-1
             type: string
-          - id: fra
-            name: fra
+          - id: eu-west-2
+            name: eu-west-2
             type: string
-          - id: gdl
-            name: gdl
+          - id: eu-west-3
+            name: eu-west-3
             type: string
-          - id: gig
-            name: gig
+          - id: sa-east-1
+            name: sa-east-1
             type: string
-          - id: gru
-            name: gru
+          - id: us-east-1
+            name: us-east-1
             type: string
-          - id: hkg
-            name: hkg
+          - id: us-west-1
+            name: us-west-1
             type: string
-          - id: iad
-            name: iad
-            type: string
-          - id: jnb
-            name: jnb
-            type: string
-          - id: lax
-            name: lax
-            type: string
-          - id: lhr
-            name: lhr
-            type: string
-          - id: maa
-            name: maa
-            type: string
-          - id: mad
-            name: mad
-            type: string
-          - id: mia
-            name: mia
-            type: string
-          - id: nrt
-            name: nrt
-            type: string
-          - id: ord
-            name: ord
-            type: string
-          - id: otp
-            name: otp
-            type: string
-          - id: qro
-            name: qro
-            type: string
-          - id: scl
-            name: scl
-            type: string
-          - id: sea
-            name: sea
-            type: string
-          - id: sin
-            name: sin
-            type: string
-          - id: sjc
-            name: sjc
-            type: string
-          - id: syd
-            name: syd
-            type: string
-          - id: waw
-            name: waw
-            type: string
-          - id: yul
-            name: yul
-            type: string
-          - id: yyz
-            name: yyz
+          - id: us-west-2
+            name: us-west-2
             type: string
       - id: size
         name: --size <string>
