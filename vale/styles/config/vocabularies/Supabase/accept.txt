@@ -9,6 +9,7 @@ Colab
 [Cc]omposable
 [Cc]onfigs?
 CPUs?
+Cron
 CTEs?
 DBeaver
 [Dd]eclarative(ly)?
