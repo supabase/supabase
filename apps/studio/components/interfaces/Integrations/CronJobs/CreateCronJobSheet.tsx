@@ -215,8 +215,7 @@ export const CreateCronJobSheet = ({
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
     // job names should be unique
     const nameExists = cronJobs?.some(
-      (job) =>
-        job.jobname.toLowerCase() === name.toLowerCase() && job.jobname !== selectedCronJob?.jobname
+      (job) => job.jobname === name && job.jobname !== selectedCronJob?.jobname
     )
     if (nameExists) {
       form.setError('name', {
