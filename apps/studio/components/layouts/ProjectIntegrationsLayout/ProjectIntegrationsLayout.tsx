@@ -16,7 +16,7 @@ export interface ProjectIntegrationsLayoutProps {
 
 const ProjectIntegrationsMenu = () => {
   // if running on self-hosted, cron UI should be always enabled
-  const cronUiEnabled = useFlag('cronUi') || !IS_PLATFORM
+  const cronUiEnabled = !IS_PLATFORM
   const queuesUiEnabled = useFlag('queues')
   const project = useSelectedProject()
 
