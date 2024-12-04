@@ -1735,6 +1735,10 @@ With Supabase AI Assistant, you gain a powerful ally in your development process
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'OpenAI API Key',
+        link: 'https://platform.openai.com/docs/quickstart#create-and-export-an-api-key://platform.openai.com/api-keys',
+      },
     },
   },
   {
