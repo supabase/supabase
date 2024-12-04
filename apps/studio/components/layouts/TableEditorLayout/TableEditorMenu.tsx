@@ -41,6 +41,7 @@ import {
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from '../explorer/TableMenuEmptyState'
+import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -243,30 +244,7 @@ const TableEditorMenu = () => {
             </Popover_Shadcn_>
           </InnerSideBarFilters>
 
-          {isLoading && (
-            <div className="flex flex-col gap-y-1">
-              <div className="flex flex-row h-6 px-4 items-center gap-2">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-4 items-center gap-2">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-32 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-75">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-50">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-4 items-center gap-2 opacity-25">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-            </div>
-          )}
+          {isLoading && <SkeletonMenuList />}
 
           {isError && (
             <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />

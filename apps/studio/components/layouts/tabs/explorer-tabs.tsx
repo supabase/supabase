@@ -188,9 +188,6 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
   const hasNewTab = router.asPath.includes('/new')
   const isOnNewPage = router.pathname.endsWith('/explorer/new')
 
-  console.log('hasNewTab', hasNewTab)
-  console.log('router', router.pathname)
-
   return (
     <Tabs_Shadcn_
       value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}

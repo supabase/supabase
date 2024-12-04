@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
+import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
@@ -31,7 +32,8 @@ import {
   useSnippets,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { Separator, Skeleton, TreeView } from 'ui'
+import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
+import { Separator, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -40,10 +42,10 @@ import {
   InnerSideMenuSeparator,
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSnapshot } from 'valtio'
+import { EmptyPrivateQueriesPanel } from '../private-sql-snippet-empty'
 import { ROOT_NODE, formatFolderResponseForTreeView } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
-import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
-import { useSnapshot } from 'valtio'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -501,34 +503,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
         />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {!snapV2.loaded[projectRef as string] ? (
-            <>
-              <div className="flex flex-row h-6 px-3 items-center gap-3">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-32 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-75">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-50">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-40 h-4" />
-              </div>
-              <div className="flex flex-row h-6 px-3 items-center gap-3 opacity-25">
-                <Skeleton className="h-4 w-5" />
-                <Skeleton className="w-20 h-4" />
-              </div>
-            </>
+            <SkeletonMenuList />
           ) : folders.length === 0 && numPrivateSnippets === 0 ? (
-            <InnerSideBarEmptyPanel
-              className="mx-3 px-4"
-              title="No queries created yet"
-              description="Queries will be automatically saved once you start writing in the editor"
-            />
+            <EmptyPrivateQueriesPanel />
           ) : (
             <TreeView
               multiSelect
