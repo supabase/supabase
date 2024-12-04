@@ -1,7 +1,12 @@
-import { products } from 'shared-data'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { products, PRODUCT_MODULES } from 'shared-data'
+import {
+  PRODUCT_MODULES_NAMES,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_NAMES,
+  PRODUCT_SHORTNAMES,
+} from 'shared-data/products'
 
-export type SolutionsType = {
+export type ProductType = {
   [key: string]: {
     name: string
     icon: string
@@ -12,7 +17,7 @@ export type SolutionsType = {
   }
 }
 
-const solutions: SolutionsType = {
+const MainProducts: ProductType = {
   [PRODUCT_SHORTNAMES.DATABASE]: {
     name: PRODUCT_NAMES.DATABASE,
     icon: products.database.icon[24],
@@ -74,19 +79,19 @@ const solutions: SolutionsType = {
     label: '',
     url: '/realtime',
   },
-  [PRODUCT_SHORTNAMES.VECTOR]: {
-    name: PRODUCT_NAMES.VECTOR,
-    icon: products.vector.icon[24],
-    description: (
-      <>
-        Integrate your favorite ML-models to{' '}
-        <strong>store, index and search vector embeddings</strong>.
-      </>
-    ),
-    description_short: 'AI toolkit to manage embeddings',
-    label: '',
-    url: '/vector',
-  },
+  // [PRODUCT_MODULES_SHORTNAMES.VECTOR]: {
+  //   name: PRODUCT_MODULES_NAMES.VECTOR,
+  //   icon: PRODUCT_MODULES.vector.icon[24],
+  //   description: (
+  //     <>
+  //       Integrate your favorite ML-models to{' '}
+  //       <strong>store, index and search vector embeddings</strong>.
+  //     </>
+  //   ),
+  //   description_short: 'AI toolkit to manage embeddings',
+  //   label: '',
+  //   url: '/vector',
+  // },
 }
 
-export default solutions
+export default MainProducts

@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 03 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 04 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-cron</guid>
+  <title>Supabase Cron</title>
+  <link>https://supabase.com/blog/supabase-cron</link>
+  <description>Schedule Recurring Jobs in Postgres</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/cli-v2-config-as-code</guid>
+  <title>Supabase CLI v2: Config as Code</title>
+  <link>https://supabase.com/blog/cli-v2-config-as-code</link>
+  <description>Commit the configuration for all of your Projects and Branches into version control.</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/edge-functions-background-tasks-websockets</guid>
   <title>Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets</title>
   <link>https://supabase.com/blog/edge-functions-background-tasks-websockets</link>

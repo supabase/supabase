@@ -9,6 +9,7 @@ Colab
 [Cc]omposable
 [Cc]onfigs?
 CPUs?
+[Cc]ron
 CTEs?
 DBeaver
 [Dd]eclarative(ly)?
@@ -90,6 +91,7 @@ Terraform
 unnesting
 unnested
 [Uu]npaus(e|es|ed|ing)
+[Uu]nschedul(e|es|ed|ing)
 [Uu]psert(s|ed|ing)?
 [Uu]pvot(es|ed|ing)
 Vercel

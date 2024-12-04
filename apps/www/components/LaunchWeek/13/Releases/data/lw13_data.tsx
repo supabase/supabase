@@ -86,10 +86,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         blog: '#',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.svg',
-            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.svg',
-            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.svg',
-            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.svg',
+            img: '/images/launchweek/13/releases/d1/d1-assistant-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d1/d1-assistant-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d1/d1-assistant-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d1/d1-assistant-mobile-light.png',
           },
         ],
       },
@@ -100,7 +100,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 2,
     dd: 'Tue',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/edge-functions-background-tasks-websockets',
     date: '3 December',
@@ -108,7 +108,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: 'Supabase Functions: Background Tasks and WebSockets',
     description: (
       <>
-        Supabase Functions: <br className="hidden sm:block" /> Background Tasks and WebSockets
+        Supabase Functions:
+        <br className="hidden sm:block" /> Background Tasks and WebSockets
       </>
     ),
     links: [
@@ -141,25 +142,42 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-cron',
     date: '4 December',
     published_at: '2024-12-04T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Cron: Schedule Recurring Jobs in Postgres',
+    description: (
+      <>
+        Supabase Cron:
+        <br className="hidden sm:block" /> Schedule Recurring Jobs in Postgres
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'miRQPbIJOuQ',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1eaKbaOAOdaxX',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d3/d3-cron-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d3/d3-cron-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d3/d3-cron-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d3/d3-cron-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-4',
@@ -167,7 +185,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Thu',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '5 December',
     published_at: '2024-12-05T08:00:00.000-07:00',
@@ -176,7 +194,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       // {
       //   type: 'video',
-      //   href: '-E',
+      //   href: '',
       // },
       {
         type: 'xSpace',
