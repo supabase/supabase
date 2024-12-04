@@ -27,7 +27,6 @@ import {
 } from './ThirdPartyAuthForm.utils'
 
 export const ThirdPartyAuthForm = () => {
-  const thirdPartyAuthEnabled = useFlag('thirdPartyAuth')
   const { ref: projectRef } = useParams()
   const {
     data: integrationsData,
@@ -44,10 +43,6 @@ export const ThirdPartyAuthForm = () => {
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-
-  if (!thirdPartyAuthEnabled) {
-    return null
-  }
 
   if (isError) {
     return (
