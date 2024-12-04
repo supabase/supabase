@@ -140,7 +140,7 @@ sql_paths = ["./seeds/staging.sql"]
 Since the `project_id` field must refer to an existing branch, you won’t be able to provision and configure a persistent branch in the same commit. Instead, always provision a persistent branch first using the CLI command so you can add the project ID returned to `config.toml`.
 
 ```bash
-$ supabase branches create --persistent
+$ supabase --experimental branches create --persistent
 Do you want to create a branch named develop? [Y/n]
 ```
 
