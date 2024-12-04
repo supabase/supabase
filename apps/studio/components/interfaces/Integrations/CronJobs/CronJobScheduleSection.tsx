@@ -84,7 +84,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   const schedule = form.watch('schedule')
   let scheduleString = ''
   try {
-    scheduleString = CronToString(schedule)
+    if (secondsPattern.test(schedule)) {
+      scheduleString = schedule
+    } else {
+      scheduleString = CronToString(schedule)
+    }
   } catch {}
 
   return (
@@ -193,11 +197,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   </span>
                 ) : (
                   <span className="text-sm text-foreground-light flex items-center gap-2">
-                    {isGeneratingCron ? (
-                      <LoadingDots />
-                    ) : (
-                      getScheduleMessage(scheduleString, schedule)
-                    )}
+                    {isGeneratingCron ? <LoadingDots /> : getScheduleMessage(scheduleString)}
                   </span>
                 )}
               </div>

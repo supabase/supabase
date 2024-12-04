@@ -153,13 +153,14 @@ export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim())
 }
 
-export function getScheduleMessage(scheduleString: string, schedule: string) {
+export function getScheduleMessage(scheduleString: string) {
   if (!scheduleString) {
     return 'Enter a valid cron expression above'
   }
 
-  if (secondsPattern.test(schedule)) {
-    return `The cron will be run every ${schedule}`
+  // if the schedule is in seconds format, scheduleString is same as the schedule
+  if (secondsPattern.test(scheduleString)) {
+    return `The cron will be run every ${scheduleString}`
   }
 
   if (scheduleString.includes('Invalid cron expression')) {
