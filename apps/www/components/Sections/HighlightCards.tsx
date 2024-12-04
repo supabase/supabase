@@ -4,6 +4,7 @@ import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { cn } from 'ui'
 
 interface Highlight {
   image?: React.ReactNode
@@ -12,11 +13,24 @@ interface Highlight {
   paragraph: string | React.ReactNode
 }
 
-const HighlightCards = ({ highlights }: { highlights: Highlight[] }) => {
+const HighlightCards = ({
+  highlights,
+  className,
+  cols = 4,
+}: {
+  highlights: Highlight[]
+  className?: string
+  cols?: number
+}) => {
   return (
-    <SectionContainer>
+    <SectionContainer className={className}>
       <LazyMotion features={domAnimation}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div
+          className={cn(
+            'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4',
+            cols === 3 && 'xl:grid-cols-3'
+          )}
+        >
           {highlights.map((highlight, i) => (
             <HighlightCard highlight={highlight} index={i} key={highlight.title} />
           ))}
@@ -32,7 +46,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
   const isInView = useInView(ref, { once: true })
 
   const initial = INITIAL_BOTTOM
-  const animate = getAnimation({ delay: 0.4 + index * 0.1 })
+  const animate = getAnimation({})
 
   const Img: any = highlight.image
 
@@ -43,21 +57,28 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
+      className="will-change-transform h-full"
     >
-      <Panel hasShimmer innerClassName="flex flex-col !bg-alternative">
-        <div className="relative w-full aspect-[1.35/1] mb-4">
-          <div
-            className="absolute inset-0 w-full h-full z-10"
-            style={{
-              background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
-            }}
-          />
-          {highlight.image && <Img isHovered={isHovered} />}
-          {highlight.svg && highlight.svg}
-        </div>
-        <div className="p-8">
-          <h3 className="text-lg text-foreground mb-2">{highlight.title}</h3>
-          <p className="text-foreground-lighter">{highlight.paragraph}</p>
+      <Panel innerClassName="flex flex-col !bg-alternative" outerClassName="h-full">
+        {highlight.image && (
+          <div className="relative w-full aspect-[1.35/1] mb-4">
+            <div
+              className="absolute inset-0 w-full h-full z-10"
+              style={{
+                background: `radial-gradient(100% 50% at 50% 50%, transparent, hsl(var(--background-alternative-default)))`,
+              }}
+            />
+            {highlight.image && <Img isHovered={isHovered} />}
+          </div>
+        )}
+        <div className="p-4 md:p-8">
+          {highlight.svg && (
+            <div className="relative w-6 aspect-square mb-4 text-foreground-light">
+              {highlight.svg}
+            </div>
+          )}
+          <h3 className="text-lg text-foreground md:mb-2">{highlight.title}</h3>
+          <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
         </div>
       </Panel>
     </m.div>

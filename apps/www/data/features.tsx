@@ -33,7 +33,12 @@ import {
   Zap,
 } from 'lucide-react'
 import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
-import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import {
+  PRODUCT,
+  PRODUCT_MODULE,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_SHORTNAMES,
+} from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
@@ -41,7 +46,7 @@ enum ADDITIONAL_PRODUCTS {
   STUDIO = 'studio',
 }
 
-export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
+export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
 
 export enum PRODUCT_STAGES {
   PRIVATE_ALPHA = 'Private Alpha',
@@ -1507,7 +1512,7 @@ Supabase's AI Integrations feature provides seamless connectivity with leading A
 By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sophisticated AI-powered applications. This feature bridges the gap between powerful AI models and your application data, enabling you to create more intelligent, responsive, and personalized user experiences without the complexity of managing separate AI infrastructure.
 `,
     icon: Brain,
-    products: [PRODUCT_SHORTNAMES.VECTOR],
+    products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
