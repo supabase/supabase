@@ -1710,29 +1710,35 @@ By building on Supabase's SOC 2 compliant platform, you gain a significant advan
   },
   // Studio
   {
-    title: 'AI-Powered Query Assistance',
-    subtitle: 'Get help crafting complex SQL queries effortlessly.',
+    title: 'Supabase AI Assistant',
+    subtitle: 'Your intelligent companion for managing Postgres databases.',
     description: `
-The AI-Powered Query Assistance feature in Supabase provides users with intelligent suggestions for writing SQL queries based on natural language input. This tool is designed to enhance productivity and streamline the development process, making it easier for both novice and experienced developers to interact with their databases. By transforming user queries into optimized SQL commands, it reduces the time spent on query formulation and minimizes errors.
+Supabase AI Assistant is integrated into the Supabase Dashboard to drastically improve your database management experience. This tool helps streamline your workflow, significantly reducing the time it takes to transition from concept to product.
 
-## Key benefits
-1. User-Friendly: Simplifies the query-writing process by allowing users to express their needs in plain language.
-2. Time-Saving: Accelerates development by quickly generating accurate SQL queries.
-3. Learning Tool: Acts as a learning resource for new developers to understand SQL syntax and best practices.
-4. Error Reduction: Minimizes common mistakes in query formulation through intelligent suggestions.
-5. Integration: Seamlessly integrates with existing Supabase projects, enhancing the overall user experience.
+The AI Assistant can save you hours of work by automating repetitive tasks and providing context-aware support. For instance, when designing a new database schema, it can generate all necessary SQL queries based on your specifications, allowing you to focus on the bigger picture rather than getting bogged down in details. If you encounter an error in your SQL code, the Assistant can quickly analyze the issue and suggest solutions, enabling you to resolve problems efficiently without losing your train of thought. Additionally, while working on a specific table, the Assistant can provide instant feedback and recommendations tailored to that context, ensuring that you always have relevant information at your fingertips.
 
-This feature is especially beneficial for teams looking to improve their database interaction efficiency while ensuring that all members can contribute effectively, regardless of their SQL expertise.
+Key benefits:
+1. Schema Design Assistance: Receive guidance on structuring your database and generating SQL queries.
+2. Enhanced Query Writing: Get precise suggestions for writing SQL queries based on your schema.
+3. Error Debugging: Identify and resolve SQL errors directly within the SQL Editor.
+4. Data Insights Discovery: Execute queries using natural language and view results in a clear format.
+5. RLS Policies Management: Create and modify Row Level Security (RLS) Policies according to your requirements.
+6. Functions and Triggers Support: Easily suggest, create, or update Postgres Functions and Triggers.
+
+With Supabase AI Assistant, you gain a powerful ally in your development process, helping you work more efficiently and effectively while keeping you focused on your goals.
 `,
     icon: Brain,
-    products: [ADDITIONAL_PRODUCTS.STUDIO],
-    heroImage: 'https://www.youtube-nocookie.com/embed/hu2SQjvCXIw',
-    docsUrl:
-      'https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant',
-    slug: 'ai-query-assistance',
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/_fdP-aaTHgw',
+    docsUrl: '/blog/supabase-ai-assistant-v2',
+    slug: 'ai-assistant',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
+      selfHostedTooling: {
+        label: 'OpenAI API Key',
+        link: 'https://platform.openai.com/docs/quickstart#create-and-export-an-api-key://platform.openai.com/api-keys',
+      },
     },
   },
   {
@@ -2064,6 +2070,37 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
     slug: 'supabase-cron',
     status: {
       stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'OrioleDB',
+    subtitle: "New Postgres storage engine that's better than Heap storage.",
+    description: `
+OrioleDB is a PostgreSQL storage extension built on its pluggable storage framework. Serving as a direct replacement for PostgreSQL's Heap storage, it addresses scalability challenges while harnessing the full power of modern hardware. Designed to integrate effortlessly with PostgreSQL, OrioleDB enhances performance, efficiency, and scalability, all while maintaining the reliability and robustness PostgreSQL users depend on.
+
+## Key benefits:
+1. Fully Integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
+2. Enhanced Scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
+3. Superior Performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+4. Reduced Maintenance Overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
+5. Efficient Storage Management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
+6. Modern Write-Ahead Logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
+7. Optimized for Large Datasets: Index-organized tables improve data locality, reducing disk I/O for workloads exceeding memory cache capacity.
+
+## Roadmap Features:
+1. Decoupled storage and compute with S3 integration for unlimited scalability.
+2. Planned columnar indexes to enable hybrid OLTP and OLAP workloads on the same system.
+3. Multi-master replication for better availability and fault tolerance.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/orioledb.png',
+    heroImageLight: '/images/features/orioledb-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
+    slug: 'orioledb',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,
     },
   },
