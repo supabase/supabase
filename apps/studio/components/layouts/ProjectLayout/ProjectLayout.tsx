@@ -1,9 +1,8 @@
-import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
@@ -96,7 +95,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { open } = aiAssistantPanel
 
     const navLayoutV2 = useFlag('navigationLayoutV2')
-    const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -112,14 +110,24 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI') setAiAssistantPanel({ open: !open })
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+          setAiAssistantPanel({ open: !open })
+          e.preventDefault()
+          e.stopPropagation()
+        }
       }
-      if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+      window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAssistantV2Enabled, open])
+    }, [open])
 
     return (
       <AppLayout>
@@ -193,7 +201,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       )}
                     </main>
                   </ResizablePanel>
-                  {aiAssistantPanel.open && (
+                  {isClient && aiAssistantPanel.open && (
                     <>
                       <ResizableHandle />
                       <ResizablePanel

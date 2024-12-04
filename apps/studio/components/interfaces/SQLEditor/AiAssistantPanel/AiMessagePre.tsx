@@ -20,6 +20,7 @@ interface AiMessagePreProps {
   className?: string
 }
 
+// [DEPRECATED] To delete
 export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps) => {
   const [copied, setCopied] = useState(false)
 

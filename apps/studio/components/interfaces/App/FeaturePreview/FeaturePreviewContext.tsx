@@ -5,16 +5,8 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
-import { AssistantV2Preview } from './AssistantV2Preview'
 
 export const FEATURE_PREVIEWS = [
-  {
-    key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2,
-    name: 'Supabase AI Assistant V2',
-    content: <AssistantV2Preview />,
-    discussionsUrl: undefined,
-    isNew: true,
-  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',
@@ -84,9 +76,4 @@ export const useIsAPIDocsSidePanelEnabled = () => {
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
-}
-
-export const useIsAssistantV2Enabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2]
 }

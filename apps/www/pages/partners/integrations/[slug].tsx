@@ -326,7 +326,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     .eq('slug', params!.slug as string)
     .single()
 
-  if (!partner) {
+  if (!partner || partner.type === 'expert') {
     return {
       notFound: true,
     }

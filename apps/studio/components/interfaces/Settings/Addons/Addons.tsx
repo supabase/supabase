@@ -31,7 +31,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useProjectByRef } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useProjectByRef } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -44,6 +44,7 @@ import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
 import { NoticeBar } from 'components/interfaces/DiskManagement/ui/NoticeBar'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -54,6 +55,7 @@ const Addons = () => {
   const parentProject = useProjectByRef(selectedProject?.parent_project_ref)
   const isBranch = parentProject !== undefined
   const isProjectActive = useIsProjectActive()
+  const isOrioleDb = useIsOrioleDb()
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
@@ -568,6 +570,20 @@ const Addons = () => {
                           </Button>
                         </AlertDescription_Shadcn_>
                       </Alert_Shadcn_>
+                    ) : isOrioleDb ? (
+                      <ButtonTooltip
+                        disabled
+                        type="default"
+                        className="mt-2"
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: 'Point in time recovery is not supported with OrioleDB',
+                          },
+                        }}
+                      >
+                        Change point in time recovery
+                      </ButtonTooltip>
                     ) : (
                       <ProjectUpdateDisabledTooltip
                         projectUpdateDisabled={projectUpdateDisabled}
