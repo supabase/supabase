@@ -3,7 +3,7 @@
 This is a full-stack Slack clone example using:
 
 - Frontend:
-  - Next.js.
+  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
   - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
 - Backend:
   - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
@@ -14,13 +14,13 @@ This is a full-stack Slack clone example using:
 
 ![Demo animation gif](./public/slack-clone-demo.gif)
 
+## Deploy with Vercel
 
-## Instant deploy
+The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀
 
-The Vercel deployment will guide you through creating a Supabase account and project. After installation of the Supabase integration, all relevant environment variables will be set up so that the project is usable immediately after deployment 🚀.
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&project-name=supabase-nextjs-slack-clone&repository-name=supabase-nextjs-slack-clone&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone)
 
-## Deploy your own
+## Build from scratch
 
 ### 1. Create new project
 
@@ -58,46 +58,49 @@ On [supabase.com/dashboard](https://supabase.com/dashboard), you can go to Authe
 
 Here, you can also enable external oauth providers, such as Google and GitHub.
 
-## How to use
-
-### Using this repo
-
-Simply clone this repo locally and proceed to the next section.
-
-### Required configuration
-
-Copy the `.env.example` file into a file named `.env.local` in the root directory of the example:
-
-```bash
-cp .env.example .env.local
-```
-
-Set your Supabase details from [step 3](#3-get-the-url-and-key) above:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=<replace-with-your-API-url>
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<replace-with-your-anon-key>
-```
-
-### Change authentication settings if necessary
-
-Follow [Step #5](#5-change-authentication-settings-if-necessary) above if you want to change the auth settings.
-
-### Run the development server
-
-Now install the dependencies and start the development server.
-
-```bash
-npm install
-npm run dev
-# or
-yarn
-yarn dev
-```
-
-Visit http://localhost:3000 and start chatting! Open a channel across two browser tabs to see everything getting updated in realtime 🥳
-
 ## Supabase details
+
+### Using a Remote Supabase Project
+
+1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
+2. Copy and fill the dotenv template `cp .env.production.example .env.production`
+3. Link the local project and merge the local configuration with the remote one:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest link --project-ref <your-project-ref>
+```
+
+3. Sync the configuration:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest config push
+```
+
+4. Sync the database schema:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest db push
+```
+
+## Vercel Preview with Branching
+
+Supabase integrates seamlessly with Vercel's preview branches, giving each branch a dedicated Supabase project. This setup allows testing database migrations or service configurations safely before applying them to production.
+
+### Steps
+
+1. Ensure the Vercel project is linked to a Git repository.
+2. Configure the "Preview" environment variables in Vercel:
+
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+3. Create a new branch, make changes (e.g., update `max_frequency`), and push the branch to Git.
+   - Open a pull request to trigger Vercel + Supabase integration.
+   - Upon successful deployment, the preview environment reflects the changes.
+
+![Preview Checks](https://github.com/user-attachments/assets/db688cc2-60fd-4463-bbed-e8ecc11b1a39)
+
+---
 
 ### Role-based access control (RBAC)
 
