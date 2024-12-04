@@ -7,12 +7,15 @@ import { toast } from 'sonner'
 import z from 'zod'
 
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,
@@ -28,13 +31,9 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,

@@ -1,3 +1,5 @@
+import { toString as CronToString } from 'cronstrue'
+
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader } from './CronJobs.constants'
 
@@ -75,6 +77,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
+        // @ts-ignore
         timeoutMs: +matches[5] ?? 1000,
       }
     }
@@ -85,6 +88,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       endpoint: url,
       httpHeaders: headersObjs,
       httpBody: body,
+      // @ts-ignore
       timeoutMs: +matches[5] ?? 1000,
     }
   }
@@ -153,13 +157,14 @@ export function isSecondsFormat(schedule: string): boolean {
   return secondsPattern.test(schedule.trim())
 }
 
-export function getScheduleMessage(scheduleString: string, schedule: string) {
+export function getScheduleMessage(scheduleString: string) {
   if (!scheduleString) {
     return 'Enter a valid cron expression above'
   }
 
-  if (secondsPattern.test(schedule)) {
-    return `The cron will be run every ${schedule}`
+  // if the schedule is in seconds format, scheduleString is same as the schedule
+  if (secondsPattern.test(scheduleString)) {
+    return `The cron will run every ${scheduleString}`
   }
 
   if (scheduleString.includes('Invalid cron expression')) {
@@ -171,5 +176,17 @@ export function getScheduleMessage(scheduleString: string, schedule: string) {
     .map((s, i) => (i === 0 ? s.toLowerCase() : s))
     .join(' ')
 
-  return `The cron will be run ${readableSchedule}.`
+  return `The cron will run ${readableSchedule}.`
+}
+
+export const formatScheduleString = (value: string) => {
+  try {
+    if (secondsPattern.test(value)) {
+      return value
+    } else {
+      return CronToString(value)
+    }
+  } catch (error) {
+    return ''
+  }
 }
