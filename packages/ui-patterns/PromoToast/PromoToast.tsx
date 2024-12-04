@@ -47,7 +47,7 @@ const PromoToast = () => {
         {announcement.text}
       </div>
       <div className="relative z-10 text-foreground flex flex-col text-xl w-full -mt-1">
-        Supabase Functions — Background Tasks and WebSockets
+        Supabase Cron: Schedule Recurring Jobs in Postgres
       </div>
 
       <div className="relative z-10 flex items-center space-x-2 mt-2">
