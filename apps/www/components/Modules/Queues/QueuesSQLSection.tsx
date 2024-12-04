@@ -5,7 +5,14 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
 const codeSnippet = `
-TBD
+select pgmq.create('my_special_queue');
+
+select * from pgmq.send(
+  queue_name  => 'my_special_queue',
+  msg         => '{"hello": "world"}',
+);
+
+select * from pgmq.pop('my_special_queue');
 `
 interface Props {
   id: string
