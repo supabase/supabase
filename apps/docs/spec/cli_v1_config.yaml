@@ -636,17 +636,6 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
-  - id: 'auth.enable_anonymous_sign_ins'
-    title: 'auth.enable_anonymous_sign_ins'
-    tags: ['auth']
-    required: false
-    default: 'false'
-    description: |
-      Allow anonymous sign-ins to your project
-    links:
-      - name: 'Anonymous Sign Ins'
-        link: 'https://supabase.com/docs/guides/auth/auth-anonymous'
-
   - id: 'auth.enable_manual_linking'
     title: 'auth.enable_manual_linking'
     tags: ['auth']
@@ -699,8 +688,8 @@ parameters:
     description: |
       Allow/disallow anonymous sign-ins to your project.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Anonymous Sign Ins'
+        link: 'https://supabase.com/docs/guides/auth/auth-anonymous'
 
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
@@ -1120,8 +1109,8 @@ parameters:
     description: |
       Enable TOTP enrollment for multi-factor authentication.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
 
   - id: 'auth.mfa.totp.verify_enabled'
     title: 'auth.mfa.totp.verify_enabled'
@@ -1131,8 +1120,8 @@ parameters:
     description: |
       Enable TOTP verification for multi-factor authentication.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
 
   - id: 'auth.mfa.max_enrolled_factors'
     title: 'auth.mfa.max_enrolled_factors'
@@ -1142,8 +1131,8 @@ parameters:
     description: |
       Control how many MFA factors can be enrolled at once per user.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
 
   - id: 'auth.mfa.phone.enroll_enabled'
     title: 'auth.mfa.phone.enroll_enabled'
