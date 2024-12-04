@@ -22,12 +22,7 @@ const ProductModules: ProductType = {
   [PRODUCT_MODULES_SHORTNAMES.CRON]: {
     name: PRODUCT_MODULES_NAMES.CRON,
     icon: PRODUCT_MODULES['cron'].icon[24],
-    description: (
-      <>
-        Integrate your favorite ML-models to{' '}
-        <strong>store, index and search vector embeddings</strong>.
-      </>
-    ),
+    description: <>Schedule and manage recurring Jobs.</>,
     description_short: 'Schedule and manage recurring Jobs',
     label: '',
     url: '/modules/cron',
@@ -37,11 +32,11 @@ const ProductModules: ProductType = {
     icon: PRODUCT_MODULES.queues.icon[24],
     description: (
       <>
-        Native Postgres queuing solution for dedicated message queues with the simplicity of SQL and
-        // zero additional infrastructure
+        Native Postgres queuing solution for dedicated message queues with the simplicity of SQL and{' '}
+        zero additional infrastructure.
       </>
     ),
-    description_short: 'Message Queues with Guaranteed Delivery',
+    description_short: 'Message Queues with guaranteed delivery',
     label: '',
     url: '/modules/queues',
   },
