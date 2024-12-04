@@ -70,21 +70,18 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 checked={job.active}
                 onCheckedChange={() => showToggleConfirmationModal(true)}
               />
-              <Button type="default" icon={<History />}>
-                <Button
-                  asChild
-                  onClick={() => {
-                    sendEvent({
-                      category: 'cron_jobs',
-                      action: 'view_previous_runs_clicked',
-                      label: 'user clicked view previous runs button',
-                    })
-                  }}
-                >
-                  <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>
-                    History
-                  </Link>
-                </Button>
+              <Button
+                type="default"
+                icon={<History />}
+                onClick={() => {
+                  sendEvent({
+                    category: 'cron_jobs',
+                    action: 'view_previous_runs_clicked',
+                    label: 'user clicked view previous runs button',
+                  })
+                }}
+              >
+                <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
