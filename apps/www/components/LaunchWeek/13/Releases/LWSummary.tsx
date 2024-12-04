@@ -1,21 +1,21 @@
 import React from 'react'
 import Link from 'next/link'
-import { buildDays, mainDays } from './Releases/data'
+import { buildDays, mainDays } from './data'
 
-const LW11Summary = () => {
+const LW13Summary = () => {
   const days = mainDays()
 
   return (
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
         <Link
-          href="/launch-week/12"
+          href="/launch-week"
           className="flex items-center text-foreground font-medium gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
         >
           Launch Week
-          <span className="font-mono">12</span>
+          <span className="font-mono">13</span>
         </Link>
-        <div className="font-mono uppercase tracking-wide text-xs">12-16 August</div>
+        <div className="font-mono uppercase tracking-wide text-xs">2-6 December 24</div>
       </div>
       <div className="pb-4 border-t p-4">
         <ul className="flex flex-col gap-2">
@@ -61,7 +61,7 @@ const LW11Summary = () => {
             )}
             <ol className="border-t pt-4 mt-2">
               <Link
-                href="/launch-week#meetups"
+                href="/events?category=meetup"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
                 Community Meetups
@@ -74,4 +74,4 @@ const LW11Summary = () => {
   )
 }
 
-export default LW11Summary
+export default LW13Summary
