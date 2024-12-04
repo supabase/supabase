@@ -1,3 +1,5 @@
+import { toString as CronToString } from 'cronstrue'
+
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader } from './CronJobs.constants'
 
@@ -177,10 +179,14 @@ export function getScheduleMessage(scheduleString: string) {
   return `The cron will run ${readableSchedule}.`
 }
 
-export const checkIsSeconds = (value: string) => {
+export const formatScheduleString = (value: string) => {
   try {
-    return secondsPattern.test(value)
+    if (secondsPattern.test(value)) {
+      return value
+    } else {
+      return CronToString(value)
+    }
   } catch (error) {
-    return false
+    return ''
   }
 }

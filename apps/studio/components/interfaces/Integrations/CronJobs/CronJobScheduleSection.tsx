@@ -26,7 +26,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { checkIsSeconds, getScheduleMessage, secondsPattern } from './CronJobs.utils'
+import { formatScheduleString, getScheduleMessage, secondsPattern } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
@@ -86,7 +86,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
   }, [debouncedValue, useNaturalLanguage])
 
   const schedule = form.watch('schedule')
-  const scheduleString = checkIsSeconds(schedule) ? schedule : CronToString(schedule)
+  const scheduleString = formatScheduleString(schedule)
 
   return (
     <SheetSection>
