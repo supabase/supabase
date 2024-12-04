@@ -4,7 +4,7 @@ import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
@@ -212,7 +212,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                           '2xl:min-w-[500px] 2xl:max-w-[600px]'
                         )}
                       >
-                        <AiAssistantPanel />
+                        <AIAssistantPanel />
                       </ResizablePanel>
                     </>
                   )}

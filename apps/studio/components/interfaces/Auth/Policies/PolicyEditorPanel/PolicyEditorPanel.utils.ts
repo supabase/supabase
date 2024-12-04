@@ -1,30 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { isEqual } from 'lodash'
 
-import type { Message } from 'ai/react'
-import { uuidv4 } from 'lib/helpers'
-
-export type MessageWithDebug = Message & { isDebug: boolean }
-
-export const generateThreadMessage = ({
-  id,
-  content,
-  isDebug,
-}: {
-  id?: string
-  content: string
-  isDebug: boolean
-}) => {
-  const message: MessageWithDebug = {
-    id: id ?? uuidv4(),
-    role: 'assistant',
-    content,
-    createdAt: new Date(),
-    isDebug: isDebug,
-  }
-  return message
-}
-
+// [Joshen] Not used but keeping this for now in case we do an inline editor
 export const generatePlaceholder = (policy?: PostgresPolicy) => {
   if (policy === undefined) {
     return `
@@ -69,17 +46,6 @@ COMMIT;
   }
 }
 
-export const generatePolicyDefinition = (policy: PostgresPolicy) => {
-  return `
-CREATE POLICY "${policy.name}" on "${policy.schema}"."${policy.table}"
-AS ${policy.action} FOR ${policy.command}
-TO ${policy.roles.join(', ')}
-${policy.definition ? `USING (${policy.definition})` : ''}
-${policy.check ? `WITH CHECK (${policy.check})` : ''}
-;
-`.trim()
-}
-
 export const generateCreatePolicyQuery = ({
   name,
   schema,
@@ -105,34 +71,6 @@ export const generateCreatePolicyQuery = ({
       ? `${querySkeleton} with check (${check});`
       : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
   return query
-}
-
-export const generateAlterPolicyQuery = ({
-  name,
-  newName,
-  schema,
-  table,
-  command,
-  roles,
-  using,
-  check,
-}: {
-  name: string
-  newName: string
-  schema: string
-  table: string
-  command: string
-  roles: string
-  using: string
-  check: string
-}) => {
-  const querySkeleton = `alter policy "${name}" on "${schema}"."${table}" to ${roles}`
-  const query =
-    command === 'insert'
-      ? `${querySkeleton} with check (${check});`
-      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
-  if (newName === name) return query
-  else return `${query}\n${querySkeleton} rename to "${newName}"`
 }
 
 export const checkIfPolicyHasChanged = (
