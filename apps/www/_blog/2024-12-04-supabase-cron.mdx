@@ -10,7 +10,7 @@ categories:
 tags:
   - cron
   - postgres
-date: '2024-12-04'
+date: '2024-12-04T00:00:01'
 toc_depth: 3
 launchweek: '13'
 ---
@@ -18,6 +18,23 @@ launchweek: '13'
 Today we're releasing Supabase Cron, a new Postgres Module that makes scheduling recurring Jobs simple and intuitive inside your database.
 
 It's designed to work seamlessly with the entire Supabase platform. Create recurring Jobs to run SQL snippets and call database functions, Supabase Edge Functions, and even remote webhooks.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
+    title="Introducing Supabase Cron"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+<Admonition>
+
+Supabase Cron is built on the powerful [`pg_cron`](https://github.com/citusdata/pg_cron) extension by the team at [Citus Data](https://github.com/citusdata). It's Supabase's policy to [support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) wherever possible, and the Citus team have generously licensed their extension with the OSI-comptible [PostgreSQL license](https://github.com/citusdata/pg_cron?tab=PostgreSQL-1-ov-file). We're very thankful to all the contributors and we look forward to working with the community.
+
+</Admonition>
+
 
 ### What's a Cron?
 
@@ -29,17 +46,6 @@ It's designed to work seamlessly with the entire Supabase platform. Create recur
 - **Monitoring**: perform health checks on your database and log the results.
 - **Performance:** automate vacuuming tables and rebuilding indexes.
 
-**[update video]**
-
-<div className="video-container">
-  <iframe
-    className="w-full"
-    src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
-    title="Introducing Supabase Cron"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
-    allowfullscreen
-  />
-</div>
 
 Supabase Cron stores the scheduling logic within Postgres and runs your Jobs accordingly while integrating with the rest of the Supabase primitives - Dashboard, Edge Functions, and AI Assistant.
 

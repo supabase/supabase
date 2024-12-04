@@ -793,7 +793,7 @@ This feature is particularly valuable for applications that require controlled a
   {
     title: 'Realtime - Presence Authorization',
     subtitle: 'Manage presence information securely in real-time.',
-    description: ` 
+    description: `
 The Realtime Presence Authorization feature enables you to control access permissions related to presence information in your application. This allows you to manage who can see the online status of other users in real-time, enhancing privacy and security within collaborative environments.
 
 Key benefits:
@@ -2059,7 +2059,7 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
 `,
     icon: Clock,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
+    heroImage: 'https://youtu.be/miRQPbIJOuQ',
     docsUrl: 'https://supabase.com/docs/guides/cron',
     slug: 'supabase-cron',
     status: {
