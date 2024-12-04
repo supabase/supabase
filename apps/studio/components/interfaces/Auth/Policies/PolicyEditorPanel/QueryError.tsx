@@ -2,11 +2,7 @@ import { initial, last } from 'lodash'
 import { Dispatch, SetStateAction } from 'react'
 
 import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { QueryResponseError } from 'data/sql/execute-sql-mutation'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -17,24 +13,15 @@ import {
   cn,
 } from 'ui'
 
-const QueryError = ({
+export const QueryError = ({
   error,
   open,
   setOpen,
-  onSelectDebug,
 }: {
   error: QueryResponseError
   open: boolean
   setOpen: Dispatch<SetStateAction<boolean>>
-  onSelectDebug: () => void
 }) => {
-  // Customers on HIPAA plans should not have access to Supabase AI
-  const organization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
@@ -72,27 +59,6 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              {/* [Joshen] Temp hidden as new assistant doesnt support this. Current assistant's UX is not great too tbh so okay to hide this */}
-              {/* {!hasHipaaAddon && (
-                <Button
-                  size="tiny"
-                  type="default"
-                  className={cn(
-                    'group',
-                    styles['ai-icon__container--allow-hover-effect h-[21px] !py-0']
-                  )}
-                  onClick={() => {
-                    onSelectDebug()
-                    sendEvent({
-                      category: 'rls_editor',
-                      action: 'ai_debugger_requested',
-                      label: 'rls-ai-assistant',
-                    })
-                  }}
-                >
-                  Fix with Assistant
-                </Button>
-              )} */}
             </div>
             <CollapsibleContent_Shadcn_ className="overflow-auto">
               {formattedError.length > 0 ? (
@@ -137,5 +103,3 @@ const QueryError = ({
     </div>
   )
 }
-
-export default QueryError

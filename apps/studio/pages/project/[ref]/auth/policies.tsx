@@ -4,7 +4,7 @@ import { partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -156,7 +156,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         />
       )}
 
-      <AIPolicyEditorPanel
+      <PolicyEditorPanel
         visible={showPolicyAiEditor}
         schema={schema}
         searchString={searchString}

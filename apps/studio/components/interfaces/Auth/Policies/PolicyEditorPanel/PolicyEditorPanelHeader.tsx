@@ -15,14 +15,14 @@ import {
   cn,
 } from 'ui'
 
-export const AIPolicyHeader = ({
+export const PolicyEditorPanelHeader = ({
   selectedPolicy,
-  assistantVisible,
-  setAssistantVisible,
+  showTools,
+  setShowTools,
 }: {
   selectedPolicy?: PostgresPolicy
-  assistantVisible: boolean
-  setAssistantVisible: (v: boolean) => void
+  showTools: boolean
+  setShowTools: (v: boolean) => void
 }) => {
   const [showDetails, setShowDetails] = useState(false)
 
@@ -106,15 +106,15 @@ export const AIPolicyHeader = ({
       <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
           <button
-            aria-expanded={assistantVisible}
+            aria-expanded={showTools}
             aria-controls="ai-chat-assistant"
             className={cn(
-              !assistantVisible ? 'text-foreground-lighter' : 'text-light',
+              !showTools ? 'text-foreground-lighter' : 'text-light',
               'mt-1 hover:text-foreground transition'
             )}
-            onClick={() => setAssistantVisible(!assistantVisible)}
+            onClick={() => setShowTools(!showTools)}
           >
-            {!assistantVisible ? (
+            {!showTools ? (
               <PanelLeftClose size={19} strokeWidth={1} />
             ) : (
               <PanelRightClose size={19} strokeWidth={1} />
@@ -122,7 +122,7 @@ export const AIPolicyHeader = ({
           </button>
         </TooltipTrigger_Shadcn_>
         <TooltipContent_Shadcn_ side="left">
-          {assistantVisible ? 'Hide' : 'Show'} tools
+          {showTools ? 'Hide' : 'Show'} tools
         </TooltipContent_Shadcn_>
       </Tooltip_Shadcn_>
     </SheetHeader>
