@@ -29,10 +29,9 @@ interface RLSCodeEditorProps {
 
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
   monacoRef?: MutableRefObject<Monaco>
-  editView: 'templates' | 'conversation' // someone help
 }
 
-const RLSCodeEditor = ({
+export const RLSCodeEditor = ({
   id,
   defaultValue,
   wrapperClassName,
@@ -48,7 +47,6 @@ const RLSCodeEditor = ({
 
   editorRef,
   monacoRef,
-  editView,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
   const monaco = useMonaco()
@@ -199,5 +197,3 @@ const RLSCodeEditor = ({
     </>
   )
 }
-
-export default RLSCodeEditor

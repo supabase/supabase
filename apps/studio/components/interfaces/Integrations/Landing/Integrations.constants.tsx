@@ -1,10 +1,10 @@
 import { Clock5, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
-import dynamic from 'next/dynamic'
 import { cn } from 'ui'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -120,7 +120,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     description: 'Schedule and automate tasks to run maintenance routines at specified intervals.',
     docsUrl: 'https://github.com/citusdata/pg_cron',
     author: {
-      name: 'pg_cron',
+      name: 'Citus Data',
       websiteUrl: 'https://github.com/citusdata/pg_cron',
     },
     navigation: [

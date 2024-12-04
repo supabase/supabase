@@ -50,7 +50,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { DiffActionBar } from './DiffActionBar'
 import {
   ROWS_PER_PAGE_OPTIONS,
@@ -82,7 +81,7 @@ const DiffEditor = dynamic(
   { ssr: false }
 )
 
-const SQLEditor = () => {
+export const SQLEditor = () => {
   const router = useRouter()
   const { ref, id: urlId } = useParams()
 
@@ -101,13 +100,10 @@ const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
-  const { open } = appSnap.aiAssistantPanel
-
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
@@ -457,11 +453,10 @@ const SQLEditor = () => {
       sendEvent({
         category: 'sql_editor',
         action: 'ai_suggestion_accepted',
-        label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+        label: 'edit_snippet',
       })
 
       setSelectedDiffType(DiffType.Modification)
-      setDebugSolution(undefined)
       setSourceSqlDiff(undefined)
       setPendingTitle(undefined)
     } finally {
@@ -472,7 +467,6 @@ const SQLEditor = () => {
     selectedDiffType,
     handleNewQuery,
     generateSqlTitle,
-    debugSolution,
     router,
     id,
     pendingTitle,
@@ -483,13 +477,12 @@ const SQLEditor = () => {
     sendEvent({
       category: 'sql_editor',
       action: 'ai_suggestion_rejected',
-      label: debugSolution ? 'debug_snippet' : 'edit_snippet',
+      label: 'edit_snippet',
     })
 
-    setDebugSolution(undefined)
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
-  }, [debugSolution, router])
+  }, [router])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -659,39 +652,26 @@ const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {(open || isDiffOpen) && !hasHipaaAddon && (
-              <AISchemaSuggestionPopover
-                onClickSettings={() => {
-                  appSnap.setShowAiSettingsModal(true)
-                }}
-              >
-                {isDiffOpen && (
-                  <motion.div
-                    key="ask-ai-input-container"
-                    layoutId="ask-ai-input-container"
-                    variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                    initial={isFirstRender ? 'visible' : 'hidden'}
-                    animate="visible"
-                    className={cn(
-                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                      'bg-brand-200 border-b border-brand-400  !shadow-none'
-                    )}
-                  >
-                    {debugSolution && (
-                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
-                        {debugSolution}
-                      </div>
-                    )}
-                    <DiffActionBar
-                      loading={isAcceptDiffLoading}
-                      selectedDiffType={selectedDiffType || DiffType.Modification}
-                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                      onAccept={acceptAiHandler}
-                      onCancel={discardAiHandler}
-                    />
-                  </motion.div>
+            {!hasHipaaAddon && isDiffOpen && (
+              <motion.div
+                key="ask-ai-input-container"
+                layoutId="ask-ai-input-container"
+                variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
+                initial={isFirstRender ? 'visible' : 'hidden'}
+                animate="visible"
+                className={cn(
+                  'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
+                  'bg-brand-200 border-b border-brand-400  !shadow-none'
                 )}
-              </AISchemaSuggestionPopover>
+              >
+                <DiffActionBar
+                  loading={isAcceptDiffLoading}
+                  selectedDiffType={selectedDiffType || DiffType.Modification}
+                  onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
+                  onAccept={acceptAiHandler}
+                  onCancel={discardAiHandler}
+                />
+              </motion.div>
             )}
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
@@ -830,5 +810,3 @@ const SQLEditor = () => {
     </>
   )
 }
-
-export default SQLEditor

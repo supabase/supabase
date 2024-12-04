@@ -37,9 +37,16 @@ const LinkComponent = (props: PropsWithChildren<HTMLAnchorElement>) => (
   </a>
 )
 
-const BlogCollapsible = ({ title, ...props }: { title: string }) => {
+const BlogCollapsible = ({
+  title,
+  containerClassName,
+  ...props
+}: {
+  title: string
+  containerClassName?: string
+}) => {
   return (
-    <Collapsible_Shadcn_>
+    <Collapsible_Shadcn_ className={containerClassName}>
       <CollapsibleTrigger_Shadcn_
         className="
         data-[state=open]:text

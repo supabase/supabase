@@ -150,8 +150,8 @@ const ThreeTicketCanvas: React.FC<{
       bumpMap: IS_SECRET ? goldTexture : IS_PLATINUM ? metalTexture : undefined,
       metalnessMap: IS_SECRET ? goldTexture : metalTexture,
       // roughnessMap: IS_SECRET ? goldTexture : metalTexture,
-      metalness: IS_SECRET ? 0.8 : IS_PLATINUM ? 0.8 : isDarkTheme ? 0.2 : 0.9,
-      roughness: IS_SECRET ? 0.12 : IS_PLATINUM ? 0.12 : isDarkTheme ? 0.2 : 0.5,
+      metalness: IS_SECRET ? 0.8 : IS_PLATINUM ? 1.0 : isDarkTheme ? 0.2 : 0.9,
+      roughness: IS_SECRET ? 0.12 : IS_PLATINUM ? 0.22 : isDarkTheme ? 0.2 : 0.5,
       bumpScale: IS_SECRET ? 0.02 : IS_PLATINUM ? 0.0045 : undefined,
     })
 
@@ -293,7 +293,7 @@ const ThreeTicketCanvas: React.FC<{
     scene.add(ambientLight)
 
     const spotLight = new THREE.SpotLight(0xffffff, isDarkTheme ? 0.8 : 0.2)
-    spotLight.position.z = ticketGroup.position.z + 4
+    spotLight.position.z = ticketGroup.position.z + 8
     spotLight.position.x = ticketGroup.position.x + 10
     spotLight.angle = (Math.PI / 2) * 0.5
     spotLight.castShadow = true

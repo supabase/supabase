@@ -1,18 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useState } from 'react'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,
@@ -28,11 +31,9 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
@@ -170,6 +171,13 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+
+  const { data: cronJobs } = useCronJobsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
   const canToggleExtensions = useCheckPermissions(
@@ -205,6 +213,19 @@ export const CreateCronJobSheet = ({
   }
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
+    // job names should be unique
+    const nameExists = cronJobs?.some(
+      (job) =>
+        job.jobname.toLowerCase() === name.toLowerCase() && job.jobname !== selectedCronJob?.jobname
+    )
+    if (nameExists) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'A cron job with this name already exists',
+      })
+      return
+    }
+
     let command = ''
     if (values.type === 'edge_function') {
       command = buildHttpRequestCommand(
@@ -243,6 +264,20 @@ export const CreateCronJobSheet = ({
           } else {
             toast.success(`Successfully created cron job ${name}`)
           }
+
+          // We should allow sending custom properties with events
+          sendEvent({
+            action: TELEMETRY_EVENTS.CRON_JOBS,
+            value: isEditing
+              ? TELEMETRY_VALUES.CRON_JOB_UPDATED
+              : TELEMETRY_VALUES.CRON_JOB_CREATED,
+            label: isEditing ? 'Cron job was updated' : 'Cron job was created',
+            properties: {
+              cron_job_type: values.type,
+              cron_job_schedule: schedule,
+            },
+          })
+
           onClose()
         },
       }

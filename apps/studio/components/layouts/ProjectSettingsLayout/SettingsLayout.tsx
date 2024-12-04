@@ -47,7 +47,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   ])
 
   const warehouseEnabled = useFlag('warehouse')
-  const logDrainsEnabled = useFlag('logdrains')
   const diskAndComputeEnabled = useFlag('diskAndComputeForm')
 
   const menuRoutes = generateSettingsMenu(ref, project, organization, {
@@ -56,7 +55,6 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
     storage: storageEnabled,
     invoices: invoicesEnabled,
     warehouse: warehouseEnabled,
-    logDrains: logDrainsEnabled,
     diskAndCompute: diskAndComputeEnabled,
   })
 
