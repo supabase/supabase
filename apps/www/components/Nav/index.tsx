@@ -153,7 +153,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
+          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />
