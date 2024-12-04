@@ -60,7 +60,11 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
       if (response.ok) {
         // remove quotes from the cron expression
         const expression = (await response.text()).trim().replace(/^"|"$/g, '')
-        form.setValue('schedule', expression)
+        form.setValue('schedule', expression, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        })
       }
     },
     onError: (error) => {
