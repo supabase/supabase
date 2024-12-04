@@ -9,7 +9,7 @@ port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
 # endpoints. `public` and `graphql_public` are included by default.
 schemas = ["public", "graphql_public"]
-# Extra schemas to add to the search_path of every request. `public` is always included.
+# Extra schemas to add to the search_path of every request.
 extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
@@ -57,5 +57,7 @@ enable_confirmations = true
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
 max_frequency = "1m0s"
+# Number of characters used in the email OTP.
 otp_length = 6
-otp_expiry = 86400
+# Number of seconds before the email OTP expires (defaults to 1 hour).
+otp_expiry = 3600
