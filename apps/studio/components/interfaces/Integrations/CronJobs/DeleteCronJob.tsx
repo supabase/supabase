@@ -11,7 +11,7 @@ interface DeleteCronJobProps {
   onClose: () => void
 }
 
-const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
+export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
   const { project } = useProjectContext()
 
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
@@ -56,5 +56,3 @@ const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps) => {
     />
   )
 }
-
-export default DeleteCronJob
