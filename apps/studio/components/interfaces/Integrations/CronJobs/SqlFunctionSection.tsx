@@ -22,6 +22,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
           <FormItemLayout label="Schema" className="gap-1">
             <SchemaSelector
               size="small"
+              className="w-60"
               selectedSchemaName={field.value}
               onSelectSchema={(name) => {
                 field.onChange(name)
@@ -40,6 +41,7 @@ export const SqlFunctionSection = ({ form }: SqlFunctionSectionProps) => {
           <FormItemLayout label="Function name" className="gap-1">
             <FunctionSelector
               size="small"
+              className="w-60"
               schema={schema}
               value={field.value}
               onChange={(name) => field.onChange(name)}
