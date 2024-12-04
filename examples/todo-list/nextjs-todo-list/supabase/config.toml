@@ -24,6 +24,13 @@ shadow_port = 54320
 # server_version;` on the remote database to check.
 major_version = 15
 
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
+enabled = false
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory. For example:
+# sql_paths = ['./seeds/*.sql', '../project-src/seeds/*-load-testing.sql']
+
 [auth]
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
