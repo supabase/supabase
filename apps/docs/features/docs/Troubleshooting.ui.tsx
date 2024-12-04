@@ -36,7 +36,7 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
       <div className="flex flex-wrap items-start gap-x-2 gap-y-4 justify-between">
         <div className="flex-grow flex flex-col gap-2">
           <Link
-            href={`/guides/troubleshooting/${getArticleSlug(entry.data)}`}
+            href={`/guides/troubleshooting/${getArticleSlug(entry)}`}
             className={cn('visited:text-foreground-lighter', 'before:absolute before:inset-0')}
           >
             <h3

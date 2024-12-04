@@ -2,7 +2,7 @@ type PostTypes = {
   slug?: string
   type: 'casestudy' | 'blog' | 'event'
   title: string
-  date?: string
+  date: string
   formattedDate?: string
   coverImage?: string
   author?: string

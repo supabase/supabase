@@ -59,11 +59,11 @@ export const IntegrationOverviewTab = ({
                 src={`${router.basePath}/img/supabase-logo.svg`}
                 className=" h-2.5 cursor-pointer rounded"
               />
-              <span>Database Extension</span>
+              <span>Postgres Module</span>
             </Badge>
             <Markdown
               className="max-w-full"
-              content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')} 
+              content={`This integration uses the ${integration.requiredExtensions.map((x) => `\`${x}\``).join(', ')}
               extension${integration.requiredExtensions.length > 1 ? 's' : ''} directly in your Postgres database.
               ${hasMissingExtensions ? `Install ${integration.requiredExtensions.length > 1 ? 'these' : 'this'} database extension${integration.requiredExtensions.length > 1 ? 's' : ''} to use ${integration.name} in your project.` : ''}
               `}

@@ -3,28 +3,25 @@ import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
 
+import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
 import Success from 'components/interfaces/Support/Success'
 import { SupportFormV2 } from 'components/interfaces/Support/SupportFormV2'
+import CopyButton from 'components/ui/CopyButton'
+import InformationBox from 'components/ui/InformationBox'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
-import InformationBox from 'components/ui/InformationBox'
 import { toast } from 'sonner'
-import { useRouter } from 'next/router'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@ui/components/shadcn/ui/tooltip'
-import CopyButton from 'components/ui/CopyButton'
+import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
   const [selectedProject, setSelectedProject] = useState<string>('no-project')
   const { data, isLoading } = usePlatformStatusQuery()
   const isHealthy = data?.isHealthy
-  const router = useRouter()
-  const { ref } = router.query
 
-  const { data: projectsData, isLoading: isLoadingProjects } = useProjectsQuery()
+  const { data: projectsData } = useProjectsQuery()
 
   return (
     <div className="relative flex overflow-y-auto overflow-x-hidden">

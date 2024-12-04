@@ -11,14 +11,12 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
-  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface FunctionListProps {
   schema: string
@@ -38,7 +36,6 @@ const FunctionList = ({
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   const { data: functions } = useDatabaseFunctionsQuery({
     projectRef: selectedProject?.ref,
@@ -111,10 +108,7 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        side="left"
-                        className={cn(isAssistantV2Enabled ? 'w-52' : 'w-40')}
-                      >
+                      <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
@@ -128,30 +122,28 @@ const FunctionList = ({
                           <Edit2 size={14} />
                           <p>Edit function</p>
                         </DropdownMenuItem>
-                        {isAssistantV2Enabled && (
-                          <DropdownMenuItem
-                            className="space-x-2"
-                            onClick={() => {
-                              setAiAssistantPanel({
-                                open: true,
-                                initialInput: 'Update this function to do...',
-                                suggestions: {
-                                  title:
-                                    'I can help you make a change to this function, here are a few example prompts to get you started:',
-                                  prompts: [
-                                    'Rename this function to ...',
-                                    'Modify this function so that it ...',
-                                    'Add a trigger for this function that calls it when ...',
-                                  ],
-                                },
-                                sqlSnippets: [x.complete_statement],
-                              })
-                            }}
-                          >
-                            <Edit size={14} />
-                            <p>Edit function with Assistant</p>
-                          </DropdownMenuItem>
-                        )}
+                        <DropdownMenuItem
+                          className="space-x-2"
+                          onClick={() => {
+                            setAiAssistantPanel({
+                              open: true,
+                              initialInput: 'Update this function to do...',
+                              suggestions: {
+                                title:
+                                  'I can help you make a change to this function, here are a few example prompts to get you started:',
+                                prompts: [
+                                  'Rename this function to ...',
+                                  'Modify this function so that it ...',
+                                  'Add a trigger for this function that calls it when ...',
+                                ],
+                              },
+                              sqlSnippets: [x.complete_statement],
+                            })
+                          }}
+                        >
+                          <Edit size={14} />
+                          <p>Edit function with Assistant</p>
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem className="space-x-2" onClick={() => deleteFunction(x)}>
                           <Trash size={14} className="text-destructive" />

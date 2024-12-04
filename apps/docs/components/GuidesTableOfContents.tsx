@@ -32,6 +32,10 @@ const formatTOCHeader = (content: string) => {
         begin = false
         res.push(`</code>`)
       }
+    } else if (x === '<') {
+      res.push('&lt')
+    } else if (x === '>') {
+      res.push('&gt')
     } else {
       res.push(x)
     }

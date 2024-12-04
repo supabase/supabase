@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { Settings } from 'lucide-react'
+import { HelpCircle, Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -20,6 +20,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Button,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -35,10 +38,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
+import { getQueueFunctionsMapping } from './Queue.utils'
+import { Admonition } from 'ui-patterns'
+import Link from 'next/link'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
+const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
 type Privileges = { select?: boolean; insert?: boolean; update?: boolean; delete?: boolean }
 
 interface QueueSettingsProps {}
@@ -51,11 +62,18 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
   const [isSaving, setIsSaving] = useState(false)
   const [privileges, setPrivileges] = useState<{ [key: string]: Privileges }>({})
 
+  const { data: isExposed } = useQueuesExposePostgrestStatusQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
   const { data, error, isLoading, isSuccess, isError } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const roles = (data ?? []).sort((a, b) => a.name.localeCompare(b.name))
+  const roles = (data ?? [])
+    .filter((x) => ROLES.includes(x.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const { data: queueTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -223,20 +241,79 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
         <SheetHeader>
           <SheetTitle>Manage queue permissions on {name}</SheetTitle>
           <SheetDescription>
-            Configure permissions for each role to grant access to the relevant actions on the queue
+            Configure permissions for the following roles to grant access to the relevant actions on
+            the queue.{' '}
+            {isExposed && (
+              <>
+                These will also determine access to each function available from the{' '}
+                <code className="text-xs">pgmq_public</code> schema.
+              </>
+            )}
           </SheetDescription>
         </SheetHeader>
 
         <SheetSection className="p-0 flex-grow">
+          {!isExposed ? (
+            <Admonition
+              type="default"
+              className="rounded-none border-x-0 border-t-0"
+              title="Queue permissions are only relevant if exposure through PostgREST has been enabled"
+              description={
+                <>
+                  You may opt to manage your queues via any Supabase client libraries or PostgREST
+                  endpoints by enabling this in the{' '}
+                  <Link
+                    href={`/project/${project?.ref}/integrations/queues/settings`}
+                    className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
+                  >
+                    queues settings
+                  </Link>
+                </>
+              }
+            />
+          ) : (
+            <Admonition
+              type="default"
+              className="rounded-none border-x-0 border-t-0"
+              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+            />
+          )}
           <Table>
             <TableHeader className="[&_th]:h-8">
               <TableRow className="py-2">
                 <TableHead>Role</TableHead>
-                {ACTIONS.map((x) => (
-                  <TableHead key={x} className="capitalize">
-                    {x}
-                  </TableHead>
-                ))}
+                {ACTIONS.map((x) => {
+                  const relatedFunctions = getQueueFunctionsMapping(x)
+                  return (
+                    <TableHead key={x}>
+                      <Tooltip_Shadcn_>
+                        <TooltipTrigger_Shadcn_ className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
+                          {x}
+                          {isExposed && <HelpCircle size={14} strokeWidth={1.5} />}
+                        </TooltipTrigger_Shadcn_>
+                        {isExposed && (
+                          <TooltipContent_Shadcn_
+                            side="bottom"
+                            className="w-64 flex flex-col gap-y-1"
+                          >
+                            <p>
+                              Required for{' '}
+                              {relatedFunctions.length === 6
+                                ? 'all'
+                                : `the following ${relatedFunctions.length}`}{' '}
+                              functions:
+                            </p>
+                            <div className="max-w-full flex flex-wrap gap-x-0.5 gap-y-1">
+                              {relatedFunctions.map((y) => (
+                                <code key={`${x}_${y}`}>{y}</code>
+                              ))}
+                            </div>
+                          </TooltipContent_Shadcn_>
+                        )}
+                      </Tooltip_Shadcn_>
+                    </TableHead>
+                  )
+                })}
               </TableRow>
             </TableHeader>
             <TableBody className="[&_td]:py-2">
@@ -272,7 +349,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                     <TableRow key={role.id}>
                       <TableCell>{role.name}</TableCell>
                       {ACTIONS.map((x) => (
-                        <TableCell key={x}>
+                        <TableCell key={x} className="text-center">
                           <Switch
                             checked={
                               (privileges[role.name] as Privileges)?.[x as keyof Privileges] ??

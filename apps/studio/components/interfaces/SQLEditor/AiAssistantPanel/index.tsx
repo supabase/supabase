@@ -51,6 +51,7 @@ interface AiAssistantPanelProps {
   onClose: () => void
 }
 
+// [DEPRECATED] To delete
 export const AiAssistantPanel = ({
   selectedMessage,
   existingSql,

@@ -20,10 +20,6 @@ const DotGrid = ({ rows, columns, count }: DotGridProps) => {
 
   const item = {
     hidden: { opacity: 0 },
-    visible: { opacity: 0.5 },
-  }
-
-  const highlightedVariants = {
     visible: {
       opacity: [1, 0.5, 1],
       transition: {
@@ -60,7 +56,7 @@ const DotGrid = ({ rows, columns, count }: DotGridProps) => {
           return (
             <motion.div
               key={index}
-              variants={isHighlighted ? highlightedVariants : item}
+              variants={item}
               className={`w-[1px] h-[1px] rounded-full bg-foreground`}
             />
           )

@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -12,7 +13,6 @@ import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/databa
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useState } from 'react'
 import {
   Button,
   Form_Shadcn_,
@@ -33,6 +33,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
@@ -43,8 +45,8 @@ import {
 } from './CronJobs.utils'
 import { CronJobScheduleSection } from './CronJobScheduleSection'
 import { EdgeFunctionSection } from './EdgeFunctionSection'
+import { HttpBodyFieldSection } from './HttpBodyFieldSection'
 import { HTTPHeaderFieldsSection } from './HttpHeaderFieldsSection'
-import { HTTPParameterFieldsSection } from './HttpParameterFieldsSection'
 import { HttpRequestSection } from './HttpRequestSection'
 import { SqlFunctionSection } from './SqlFunctionSection'
 import { SqlSnippetSection } from './SqlSnippetSection'
@@ -63,7 +65,19 @@ const edgeFunctionSchema = z.object({
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const httpRequestSchema = z.object({
@@ -77,7 +91,19 @@ const httpRequestSchema = z.object({
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpParameters: z.array(z.object({ name: z.string(), value: z.string() })),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const sqlFunctionSchema = z.object({
@@ -146,6 +172,7 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
   const canToggleExtensions = useCheckPermissions(
@@ -187,7 +214,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.edgeFunctionName,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'http_request') {
@@ -195,7 +222,7 @@ export const CreateCronJobSheet = ({
         values.method,
         values.endpoint,
         values.httpHeaders,
-        values.httpParameters,
+        values.httpBody,
         values.timeoutMs
       )
     } else if (values.type === 'sql_function') {
@@ -219,6 +246,20 @@ export const CreateCronJobSheet = ({
           } else {
             toast.success(`Successfully created cron job ${name}`)
           }
+
+          // We should allow sending custom properties with events
+          sendEvent({
+            action: TELEMETRY_EVENTS.CRON_JOBS,
+            value: isEditing
+              ? TELEMETRY_VALUES.CRON_JOB_UPDATED
+              : TELEMETRY_VALUES.CRON_JOB_CREATED,
+            label: isEditing ? 'Cron job was updated' : 'Cron job was created',
+            properties: {
+              cron_job_type: values.type,
+              cron_job_schedule: schedule,
+            },
+          })
+
           onClose()
         },
       }
@@ -367,7 +408,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'edge_function' && (
@@ -376,7 +417,7 @@ export const CreateCronJobSheet = ({
                   <Separator />
                   <HTTPHeaderFieldsSection variant={cronType} />
                   <Separator />
-                  <HTTPParameterFieldsSection variant={cronType} />
+                  <HttpBodyFieldSection form={form} />
                 </>
               )}
               {cronType === 'sql_function' && <SqlFunctionSection form={form} />}

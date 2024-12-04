@@ -19,6 +19,7 @@ export type SendEventVariables = {
   label?: string
   /** To deprecate - seems unnecessary */
   category?: string
+  properties?: Record<string, any>
 }
 
 type SendEventPayload = any
