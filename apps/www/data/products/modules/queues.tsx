@@ -1,40 +1,49 @@
-// import Image from 'next/image'
 import { PRODUCT_MODULES } from 'shared-data/products'
 import BrowserFrame from '../../../components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
-  metaTitle: 'Supabase Cron | Schedule Recurring Jobs in Postgres',
+  metaTitle: 'Supabase Queues | Message Queues with Guaranteed Delivery',
   metaDescription:
-    'Supabase Cron is a Postgres Module that uses the pg_cron database extension to manage recurring tasks. Manage your Cron Jobs using any Postgres tooling.',
-  metaImage: '/images/modules/cron/og.png',
-  url: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
-  docsUrl: '/docs/guides/cron',
+    'Postgres module that uses the pgmq database extension to manage Message Queues with guaranteed delivery.',
+  metaImage: '/images/modules/queues/og.png',
+  url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+  docsUrl: '/docs/guides/queues',
   heroSection: {
-    title: 'Supabase Cron',
-    h1: <>Schedule and Recurring Jobs in Postgres</>,
+    title: 'Supabase Queues',
+    h1: <>Create and Manage Message Queues using Postgres</>,
     subheader: (
       <>
-        Supabase Cron is a Postgres Module that uses the pg_cron database extension to manage
-        recurring Jobs. Manage your Cron Jobs using any Postgres tooling.
+        Supabase Queues is a Postgres module that uses the pgmq database extension to manage Message
+        Queues with guaranteed delivery. Manage your Queues using any Postgres tooling.
       </>
     ),
-    icon: PRODUCT_MODULES['cron'].icon[24],
+    icon: PRODUCT_MODULES.queues.icon[24],
     cta: {
-      label: 'Schedule your first Job',
-      link: 'https://supabase.com/dashboard/project/_/integrations/cron-jobs/overview',
+      label: 'Create your first Queue',
+      link: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
     secondaryCta: {
       label: 'Explore documentation',
-      link: '/docs/guides/cron',
+      link: '/docs/guides/queues',
     },
+    className: '[&_h1]:max-w-2xl',
   },
   highlightsSection: {
-    className: '!py-4 [&_.highlights-grid]:xl:grid-cols-3',
+    className: `
+        !py-4
+        [&_.highlights-grid]:sm:grid-cols-2
+        [&_.highlight-card]:sm:col-span-1
+        [&_.highlight-card:nth-child(1)]:sm:col-span-2
+        [&_.highlights-grid]:lg:grid-cols-6
+        [&_.highlight-card]:lg:col-span-2
+        [&_.highlight-card:nth-child(1)]:lg:col-span-3
+        [&_.highlight-card:nth-child(2)]:lg:col-span-3
+      `,
     highlights: [
       {
         title: 'Postgres Native',
-        paragraph: 'Schedule and run Jobs directly within your database.',
+        paragraph: 'Create and Manage Queues directly within your database.',
         svg: (
           <svg
             width="25"
@@ -51,8 +60,8 @@ export default () => ({
         ),
       },
       {
-        title: 'Cron Syntax and Natural Language',
-        paragraph: 'Use familiar cron syntax or natural language to define your job run interval.',
+        title: 'Exactly Once Message Delivery',
+        paragraph: 'Supabase Queues delivers a message exactly once within a visibility timeout.',
         svg: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -65,15 +74,16 @@ export default () => ({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M12 6v12" />
-            <path d="M17.196 9 6.804 15" />
-            <path d="m6.804 9 10.392 6" />
+            <path d="M10 2h4" />
+            <path d="M12 14v-4" />
+            <path d="M4 13a8 8 0 0 1 8-7 8 8 0 1 1-5.3 14L4 17.6" />
+            <path d="M9 17H4v5" />
           </svg>
         ),
       },
       {
-        title: 'Sub-Minute Scheduling',
-        paragraph: 'Schedule recurring Jobs that run every 1-59 seconds.',
+        title: 'Message Archival',
+        paragraph: 'Messages in Queues can be archived instead of deleted for future reference.',
         svg: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -86,15 +96,15 @@ export default () => ({
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <line x1="10" x2="14" y1="2" y2="2"></line>
-            <line x1="12" x2="15" y1="14" y2="11"></line>
-            <circle cx="12" cy="14" r="8"></circle>
+            <circle cx="16" cy="16" r="6" />
+            <path d="M7 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2" />
+            <path d="M16 14v2l1 1" />
           </svg>
         ),
       },
       {
         title: 'Real-Time Monitoring',
-        paragraph: "Track and debug scheduled Jobs with Supabase's observability tools.",
+        paragraph: "Track and manage messages in your Queues with Supabase's observability tools.",
         svg: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -120,28 +130,6 @@ export default () => ({
         ),
       },
       {
-        title: 'Extensible Toolkit',
-        paragraph: 'Works with Database Functions, Edge Functions, and HTTP Webhooks.',
-        svg: (
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M3.44434 12.228C3.44434 13.5631 3.74202 14.8288 4.27463 15.9622M12.2346 3.43774C10.8739 3.43774 9.58552 3.74688 8.43571 4.29875M21.0248 12.228C21.0248 10.8794 20.7211 9.60178 20.1784 8.45974M12.2346 21.0182C13.5925 21.0182 14.8785 20.7103 16.0266 20.1605M16.0266 20.1605C16.5683 20.9408 17.4708 21.4517 18.4927 21.4517C20.1495 21.4517 21.4927 20.1085 21.4927 18.4517C21.4927 16.7948 20.1495 15.4517 18.4927 15.4517C16.8358 15.4517 15.4927 16.7948 15.4927 18.4517C15.4927 19.0867 15.69 19.6756 16.0266 20.1605ZM4.27463 15.9622C3.47509 16.501 2.94922 17.4149 2.94922 18.4517C2.94922 20.1085 4.29236 21.4517 5.94922 21.4517C7.60607 21.4517 8.94922 20.1085 8.94922 18.4517C8.94922 16.7948 7.60607 15.4517 5.94922 15.4517C5.32908 15.4517 4.7529 15.6398 4.27463 15.9622ZM8.43571 4.29875C7.89644 3.5017 6.98401 2.97778 5.94922 2.97778C4.29236 2.97778 2.94922 4.32093 2.94922 5.97778C2.94922 7.63464 4.29236 8.97778 5.94922 8.97778C7.60607 8.97778 8.94922 7.63464 8.94922 5.97778C8.94922 5.35572 8.75989 4.77789 8.43571 4.29875ZM20.1784 8.45974C20.9717 7.9199 21.4927 7.00968 21.4927 5.97778C21.4927 4.32093 20.1495 2.97778 18.4927 2.97778C16.8358 2.97778 15.4927 4.32093 15.4927 5.97778C15.4927 7.63464 16.8358 8.97778 18.4927 8.97778C19.1176 8.97778 19.698 8.78669 20.1784 8.45974Z"
-              stroke="currentColor"
-              strokeMiterlimit="10"
-              strokeLinejoin="round"
-              strokeLinecap="round"
-              strokeWidth="1.5"
-            />
-          </svg>
-        ),
-      },
-      {
         title: '100% Open Source',
         paragraph: 'Built on trusted, community-driven technology.',
         svg: (
@@ -163,6 +151,10 @@ export default () => ({
       },
     ],
   },
+  // oss: {
+  //   title: '100% Open Source',
+  //   paragraph: 'Built on trusted, community-driven technology.',
+  // },
   videoSection: {
     video: (
       <BrowserFrame
@@ -172,7 +164,7 @@ export default () => ({
       >
         <div className="video-container !border-none !rounded-none">
           <iframe
-            src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
+            src="https://www.youtube-nocookie.com/embed/"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
@@ -183,28 +175,19 @@ export default () => ({
   section1: {
     id: 'sql',
     label: 'SQL',
-    heading: <>SQL-Based Approach</>,
-    subheading:
-      'Create and manage Jobs using simple SQL commands for ease of use. Track changes to your recurring Jobs using Postgres migrations stored in source control.',
+    heading: <>Manage via SQL</>,
+    subheading: 'Create Queues and manage messages using SQL with any Postgres client.',
     cta: {
-      label: 'Start scheduling',
-      url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
+      label: 'Start message queuing',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
     },
-    reverse: true,
-  },
-  section2: {
-    id: 'UI-Scheduling-Interface',
-    label: 'UI',
-    heading: <>Intuitive Scheduling Interface</>,
-    subheading:
-      'Supabase Cron provides a clean and simple interface, including cron syntax and natural language options, to create Jobs with ease.',
     image: (
       <Image
         src={{
-          dark: '/images/modules/cron/cron-ui-dark.png',
-          light: '/images/modules/cron/cron-ui-light.png',
+          dark: '/images/modules/queues/queues-sql-dark.png',
+          light: '/images/modules/queues/queues-sql-light.png',
         }}
-        alt="Cron Jobs UI"
+        alt="Queues SQL"
         className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
@@ -212,50 +195,51 @@ export default () => ({
         draggable={false}
       />
     ),
-    cta: {
-      label: 'Start scheduling',
-      url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
-    },
-    className: '!py-0',
   },
-  section3: {
-    id: 'UI-Job-Observability',
-    label: 'Cron Logs',
-    heading: <>Job Observability</>,
+  section2: {
+    id: 'api',
+    label: 'API',
+    heading: <>Manage via API</>,
     subheading:
-      'Track and investigate recurring Jobs and their historical runs in the Cron UI and Cron logs.',
+      'Create and manage messages either server-side or client-side via PostgREST using any Supabase client library.',
+    cta: {
+      label: 'Start message queuing',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+    },
+    reverse: true,
     image: (
       <Image
         src={{
-          dark: '/images/modules/cron/cron-logs-dark.png',
-          light: '/images/modules/cron/cron-logs-light.png',
+          dark: '/images/modules/queues/queues-api-dark.png',
+          light: '/images/modules/queues/queues-api-light.png',
         }}
-        alt="Cron Jobs UI"
-        className="w-full max-w-[590px] aspect-[1/0.71] object-cover bg-cover"
+        alt="Queues API"
+        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}
         draggable={false}
       />
     ),
-    className: '!pb-0 [&_.image-container]:md:max-w-xl',
-    reverse: true,
   },
-  section4: {
-    id: 'extensible',
-    label: 'Extensible',
-    heading: <>Designed to Just Work</>,
+  section3: {
+    id: 'ui',
+    label: 'UI',
+    heading: <>Manage and Monitor via Dashboard</>,
     subheading:
-      'Supabase Cron is integrated with the entire Supabase suite of tools. Create Jobs to call Database Functions, Supabase Edge Functions, and even remote webhooks.',
+      'Create Queues and manage messages in the Dashboard as well as monitor your Queues and message processing in real-time.',
+    cta: {
+      label: 'Start message queuing',
+      url: 'https://supabase.com/dashboard/project/_/integrations/queues/overview',
+    },
     image: (
       <Image
         src={{
-          dark: '/images/modules/cron/cron-extensible-dark.png',
-          light: '/images/modules/cron/cron-extensible-light.png',
+          dark: '/images/modules/queues/queues-ui-dark.png',
+          light: '/images/modules/queues/queues-ui-light.png',
         }}
-        alt="Cron Jobs UI"
-        containerClassName="bg-cover object-cover"
-        className="w-full max-w-[490px] aspect-[1/0.99] object-cover bg-cover rounded-lg overflow-hidden"
+        alt="Queues via dashboard UI"
+        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}

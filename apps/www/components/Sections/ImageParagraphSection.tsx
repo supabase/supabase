@@ -9,11 +9,13 @@ interface Props {
   heading: string | JSX.Element
   subheading: string | JSX.Element
   image?: any
+  imageContainerClassName?: string
   className?: string
   cta?: {
     label: string
     url: string
   }
+  reverse?: boolean
 }
 
 const ImageLeftSection: FC<Props> = (props) => {
@@ -25,10 +27,15 @@ const ImageLeftSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden">
+      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden image-container">
         {props.image}
       </div>
-      <div className="flex order-first md:order-last flex-grow flex-col gap-2 max-w-md">
+      <div
+        className={cn(
+          'flex order-first md:order-last flex-grow flex-col gap-2 max-w-md paragraph-container',
+          props.reverse && 'md:order-first'
+        )}
+      >
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>

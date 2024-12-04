@@ -5,7 +5,7 @@ import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
-const ciCode = `
+const codeSnippet = `
 select
   cron.schedule(
     'call-hello-world-every-5-minutes',
@@ -45,7 +45,7 @@ const CronSQLSection: FC<Props> = (props) => {
       <ul className="w-full flex-grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
-            code={ciCode}
+            code={codeSnippet}
             lang="sql"
             className="
               h-full xl:!text-lg
