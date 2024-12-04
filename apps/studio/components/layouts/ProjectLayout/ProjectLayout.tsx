@@ -11,7 +11,6 @@ import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWar
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -94,8 +93,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
-    const navLayoutV2 = useFlag('navigationLayoutV2')
-
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
 
@@ -176,7 +173,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 disabled={resizableSidebar ? false : true}
               />
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
-                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+                {!hideHeader && IS_PLATFORM && <LayoutHeader />}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"
                   direction="horizontal"
