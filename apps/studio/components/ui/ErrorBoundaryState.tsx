@@ -19,15 +19,13 @@ export type FallbackProps = {
 
 export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps) => {
   const router = useRouter()
+  const checkIsError = isError(error)
 
-  let errorMessage = ''
-  let urlMessage = ''
-  let isRemoveChildError = false
-  if (isError(error)) {
-    errorMessage = error.message
-    urlMessage = `Path name: ${router.pathname}\n\n${error?.stack}`
-    isRemoveChildError = errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
-  }
+  const errorMessage = checkIsError ? error.message : ''
+  const urlMessage = checkIsError ? `Path name: ${router.pathname}\n\n${error?.stack}` : ''
+  const isRemoveChildError = checkIsError
+    ? errorMessage.includes("Failed to execute 'removeChild' on 'Node'")
+    : false
 
   return (
     <div className="w-screen h-screen flex items-center justify-center flex-col gap-y-3">

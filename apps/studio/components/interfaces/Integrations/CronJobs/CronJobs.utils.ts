@@ -75,6 +75,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
         edgeFunctionName: url,
         httpHeaders: headersObjs,
         httpBody: body,
+        // @ts-ignore
         timeoutMs: +matches[5] ?? 1000,
       }
     }
@@ -85,6 +86,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
       endpoint: url,
       httpHeaders: headersObjs,
       httpBody: body,
+      // @ts-ignore
       timeoutMs: +matches[5] ?? 1000,
     }
   }
@@ -173,4 +175,12 @@ export function getScheduleMessage(scheduleString: string) {
     .join(' ')
 
   return `The cron will run ${readableSchedule}.`
+}
+
+export const checkIsSeconds = (value: string) => {
+  try {
+    return secondsPattern.test(value)
+  } catch (error) {
+    return false
+  }
 }
