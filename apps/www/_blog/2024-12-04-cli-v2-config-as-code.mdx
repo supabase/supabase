@@ -30,11 +30,11 @@ Over the last 2 years the CLI has grown to more than 180,000 weekly installs. Cl
 
 ## Configuration as Code using the Supabase CLI
 
-- **What is Configuration as Code?**
-  **Configuration as Code** is a practice where infrastructure configuration is managed and versioned in source control using code or declarative files. It allows for automation, consistency, and repeatability. Some examples include Terraform and Docker Compose. It offers several key features:
-  - **Version Control**: Configurations are stored in repositories like Git, enabling collaboration and history tracking.
-  - **Reproducibility**: You can recreate environments from code, avoiding manual drift.
-  - **Automation**: Tools apply configurations automatically, reducing human error.
+**Configuration as Code** is a practice where infrastructure configuration is managed and versioned in source control using code or declarative files. It allows for automation, consistency, and repeatability. Some examples include Terraform and Docker Compose. It offers several key features:
+
+- **Version Control**: Configurations are stored in repositories like Git, enabling collaboration and history tracking.
+- **Reproducibility**: You can recreate environments from code, avoiding manual drift.
+- **Automation**: Tools apply configurations automatically, reducing human error.
 
 Our CLI’s Configuration as Code feature is an opinionated setup using a human readable `config.toml` file.
 
@@ -123,7 +123,7 @@ View the [Database config](/docs/guides/local-development/cli/config#database-co
 
 If you have [Branching](/docs/guides/deployment/branching#enable-supabase-branching) enabled in your project, your settings in `config.toml` are automatically synced to all your ephemeral branches. This works because we maintain a one-to-one mapping between your git branch and Supabase branch.
 
-If you make a change to your `config.toml` and push to GitHub, our runner picks up the diff and applies it on the corresponding Supabase branch.
+To make a config change to your Supabase branch, simply update config.toml and push to GitHub. Our runner will pick up the diff and apply it to the corresponding Supabase branch.
 
 If you need to configure specific settings for a single persistent branch, you can declare them using `[remotes]` block of your config by providing its project ID. For example, the following config declares a separate seed script just for your staging environment.
 
@@ -135,22 +135,22 @@ project_id = "your-project-ref"
 sql_paths = ["./seeds/staging.sql"]
 ```
 
-Since the `project_id` field can only refer to an existing branch, you won’t be able to provision and configure a persistent branch in the same commit. Instead, always provision a persistent branch first using the CLI command so you can add the project ID returned to `config.toml`.
+Since the `project_id` field must refer to an existing branch, you won’t be able to provision and configure a persistent branch in the same commit. Instead, always provision a persistent branch first using the CLI command so you can add the project ID returned to `config.toml`.
 
 ```bash
-$ supabase --experimental branches create --persistent
+$ supabase branches create --persistent
 Do you want to create a branch named develop? [Y/n]
 ```
 
 When merging a PR to any persistent branch, our runner checks and logs any configuration changes before applying them to the target remote. If you didn’t declare any remotes or provided the the wrong project ID, the whole configuration step would be skipped.
 
-All other config options are also available in remotes block.
+All other config options are also available in the remotes block.
 
 ## Getting started
 
-To start using configuration as code, simply follow [our guide](/docs/guides/deployment/branching#how-to-use-supabase-branching) to connect a GitHub repository to your Supabase project and enable Supabase Branching.
+To start using configuration as code, you may follow [our guide](/docs/guides/deployment/branching#how-to-use-supabase-branching) to connect a GitHub repository to your Supabase project and enable Supabase Branching.
 
-Alternatively, you can get started with the Supabase CLI today:
+Alternatively, you can get started with the Supabase CLI today: `supabase config push`
 
 ### Installing
 
