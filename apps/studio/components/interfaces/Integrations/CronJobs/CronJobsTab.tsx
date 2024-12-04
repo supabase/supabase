@@ -1,3 +1,5 @@
+import { Search } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { CreateCronJobSheet } from 'components/interfaces/Integrations/CronJobs/CreateCronJobSheet'
@@ -5,11 +7,11 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { Search } from 'lucide-react'
-import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 import { Button, Input, Sheet, SheetContent } from 'ui'
-import { CronJobCard } from '../CronJobs/CronJobCard'
-import DeleteCronJob from '../CronJobs/DeleteCronJob'
+import { CronJobCard } from './CronJobCard'
+import { DeleteCronJob } from './DeleteCronJob'
 
 const EMPTY_CRON_JOB = {
   jobname: '',
@@ -44,6 +46,8 @@ export const CronjobsTab = () => {
     connectionString: project?.connectionString,
   })
 
+  const { mutate: sendEvent } = useSendEventMutation()
+
   // check pg_cron version to see if it supports seconds
   const pgCronExtension = (extensions ?? []).find((ext) => ext.name === 'pg_cron')
   const installedVersion = pgCronExtension?.installed_version
@@ -58,17 +62,22 @@ export const CronjobsTab = () => {
 
   const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
 
+  const onOpenCreateJobSheet = () => {
+    sendEvent({
+      action: TELEMETRY_EVENTS.CRON_JOBS,
+      value: TELEMETRY_VALUES.CRON_JOB_CREATE_CLICKED,
+      label: 'User clicked create job',
+    })
+    setCreateCronJobSheetShown(true)
+  }
+
   return (
     <>
       <div className="w-full space-y-4 p-10">
         {(cronJobs ?? []).length == 0 ? (
-          <div
-            className={
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed'
-            }
-          >
+          <div className="border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4 border-dashed">
             <p className="text-sm text-foreground">No cron jobs created yet</p>
-            <Button onClick={() => setCreateCronJobSheetShown(true)}>Create job</Button>
+            <Button onClick={onOpenCreateJobSheet}>Create job</Button>
           </div>
         ) : (
           <div className="w-full space-y-4">
@@ -82,7 +91,7 @@ export const CronjobsTab = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
 
-              <Button onClick={() => setCreateCronJobSheetShown(true)}>Create job</Button>
+              <Button onClick={onOpenCreateJobSheet}>Create job</Button>
             </div>
             {filteredCronJobs.length === 0 ? (
               <div
