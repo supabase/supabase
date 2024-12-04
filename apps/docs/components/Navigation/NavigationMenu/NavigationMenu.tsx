@@ -15,6 +15,7 @@ enum MenuId {
   Realtime = 'realtime',
   Storage = 'storage',
   Ai = 'ai',
+  Cron = 'cron',
   Platform = 'platform',
   Deployment = 'deployment',
   MonitoringTroubleshooting = 'monitoring_troubleshooting',
@@ -101,6 +102,7 @@ const menus: Menu[] = [
     id: MenuId.Ai,
     type: 'guide',
   },
+  { id: MenuId.Cron, type: 'guide' },
   {
     id: MenuId.Platform,
     type: 'guide',

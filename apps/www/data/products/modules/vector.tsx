@@ -1,13 +1,16 @@
-import Link from 'next/link'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
 import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
+import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default (isMobile?: boolean) => ({
-  metaTitle: '',
-  metaDescription: '',
+  metaTitle: 'Supabase Vector | The Postgres Vector database and AI Toolkit',
+  metaDescription:
+    'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.',
+  metaImage: '/images/modules/vector/og.png',
+  docsUrl: '/docs/guides/ai',
   heroSection: {
     announcement: {
       url: 'https://youtu.be/qw4PrtyvJI0?t=10584',
@@ -18,10 +21,10 @@ export default (isMobile?: boolean) => ({
     },
     title: 'Supabase Vector',
     h1: (
-      <span key={'vector-h1'} className="heading-gradient">
+      <>
         The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
-      </span>
+      </>
     ),
     subheader: (
       <>
@@ -30,7 +33,8 @@ export default (isMobile?: boolean) => ({
         our AI toolkit to build AI applications with Hugging Face and OpenAI.
       </>
     ),
-    image: '/images/product/vector/vector-hero.svg',
+    // image: '/images/product/vector/vector-hero.svg',
+    icon: PRODUCT_MODULES.vector.icon[24],
     cta: {
       label: 'Launch a free database',
       link: '/dashboard',
@@ -39,6 +43,7 @@ export default (isMobile?: boolean) => ({
       label: 'Explore documentation',
       link: '/docs/guides/ai',
     },
+    className: '[&_h1]:max-w-2xl',
   },
   highlightsSection: {
     highlights: [

@@ -5,6 +5,7 @@ import {
   Braces,
   Brain,
   ChartScatter,
+  Clock,
   Cloud,
   Database,
   DatabaseBackup,
@@ -33,7 +34,12 @@ import {
   Zap,
 } from 'lucide-react'
 import { FlutterIcon, JsIcon, PythonIcon, SwiftIcon } from '~/components/svg-icons'
-import { PRODUCT, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import {
+  PRODUCT,
+  PRODUCT_MODULE,
+  PRODUCT_MODULES_SHORTNAMES,
+  PRODUCT_SHORTNAMES,
+} from 'shared-data/products'
 import type { LucideIcon } from 'lucide-react'
 
 enum ADDITIONAL_PRODUCTS {
@@ -41,7 +47,7 @@ enum ADDITIONAL_PRODUCTS {
   STUDIO = 'studio',
 }
 
-export type FeatureProductType = PRODUCT | ADDITIONAL_PRODUCTS
+export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
 
 export enum PRODUCT_STAGES {
   PRIVATE_ALPHA = 'Private Alpha',
@@ -787,7 +793,7 @@ This feature is particularly valuable for applications that require controlled a
   {
     title: 'Realtime - Presence Authorization',
     subtitle: 'Manage presence information securely in real-time.',
-    description: ` 
+    description: `
 The Realtime Presence Authorization feature enables you to control access permissions related to presence information in your application. This allows you to manage who can see the online status of other users in real-time, enhancing privacy and security within collaborative environments.
 
 Key benefits:
@@ -1507,7 +1513,7 @@ Supabase's AI Integrations feature provides seamless connectivity with leading A
 By leveraging Supabase's AI Integrations, you can rapidly develop and deploy sophisticated AI-powered applications. This feature bridges the gap between powerful AI models and your application data, enabling you to create more intelligent, responsive, and personalized user experiences without the complexity of managing separate AI infrastructure.
 `,
     icon: Brain,
-    products: [PRODUCT_SHORTNAMES.VECTOR],
+    products: [PRODUCT_MODULES_SHORTNAMES.VECTOR],
     heroImage: 'https://www.youtube-nocookie.com/embed/OgnYxRkxEUw',
     docsUrl: 'https://supabase.com/docs/guides/ai/examples/huggingface-image-captioning',
     slug: 'ai-integrations',
@@ -2031,6 +2037,31 @@ This feature is especially beneficial for Python developers looking to build rob
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/reference/python/start',
     slug: 'client-library-python',
+    status: {
+      stage: PRODUCT_STAGES.BETA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Supabase Cron',
+    subtitle: 'Schedule recurring Jobs in Postgres.',
+    description: `
+Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron syntax directly within your database. Seamlessly integrated into the Supabase ecosystem, it allows users to automate tasks like executing SQL snippets, calling Database Functions, triggering Supabase Edge Functions, or syncing with external systems via webhooks.
+
+## Key benefits:
+1. Just Postgres: Jobs and run details are stored and executed entirely in the database by leveraging the pg_cron database extension.
+4. Versatile Scheduling Options: Supports standard cron syntax, sub-minute intervals, and natural language scheduling.
+2. Supabase Integration: Integrates seamlessly with the rest of the Supabase platform, including Supabase Edge Functions and Database Webhooks.
+3. Zero Network Latency: Jobs are run directly in your database, eliminating network latency when executing SQL Snippets or calling Database Functions.
+6. Enhanced Observability: Monitor job history, debug errors, and review logs directly from the Supabase Dashboard.
+5. Broad Use Cases: Automate a wide range of tasks, including database maintenance, analytics, performance optimizations, and syncing with remote systems.
+7. Ease of Use: Leverage an intuitive UI or SQL for scheduling, managing, and monitoring Jobs.
+`,
+    icon: Clock,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/miRQPbIJOuQ',
+    docsUrl: 'https://supabase.com/docs/guides/cron',
+    slug: 'supabase-cron',
     status: {
       stage: PRODUCT_STAGES.BETA,
       availableOnSelfHosted: true,
