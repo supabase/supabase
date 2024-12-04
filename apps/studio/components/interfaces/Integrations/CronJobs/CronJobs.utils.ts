@@ -9,7 +9,7 @@ export const buildHttpRequestCommand = (
   method: 'GET' | 'POST',
   url: string,
   headers: HTTPHeader[],
-  body: string,
+  body: string | undefined,
   timeout: number
 ) => {
   return `$$
@@ -20,7 +20,7 @@ export const buildHttpRequestCommand = (
             .filter((v) => v.name && v.value)
             .map((v) => `'${v.name}', '${v.value}'`)
             .join(', ')}),
-          ${method === 'POST' ? `body:='${body}',` : ''}
+          ${method === 'POST' && body ? `body:='${body}',` : ''}
           timeout_milliseconds:=${timeout}
       );
     $$`
@@ -117,7 +117,12 @@ export function calculateDuration(start: string, end: string): string {
   const startTime = new Date(start).getTime()
   const endTime = new Date(end).getTime()
   const duration = endTime - startTime
-  return isNaN(duration) ? 'Invalid Date' : `${duration} ms`
+
+  if (isNaN(duration)) return 'Invalid Date'
+
+  if (duration < 1000) return `${duration}ms`
+  if (duration < 60000) return `${(duration / 1000).toFixed(1)}s`
+  return `${(duration / 60000).toFixed(1)}m`
 }
 
 export function formatDate(dateString: string): string {

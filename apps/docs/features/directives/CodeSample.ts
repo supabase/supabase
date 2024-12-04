@@ -48,7 +48,7 @@ import { z, type SafeParseError } from 'zod'
 import { fetchWithNextOptions } from '~/features/helpers.fetch'
 import { EXAMPLES_DIRECTORY } from '~/lib/docs'
 
-const ALLOW_LISTED_GITHUB_ORGS = ['supabase'] as [string, ...string[]]
+const ALLOW_LISTED_GITHUB_ORGS = ['supabase', 'supabase-community'] as [string, ...string[]]
 
 const linesSchema = z.array(z.tuple([z.coerce.number(), z.coerce.number()]))
 const linesValidator = z

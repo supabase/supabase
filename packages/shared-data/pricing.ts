@@ -428,9 +428,9 @@ export const pricing: Pricing = {
       {
         title: 'Script size',
         plans: {
-          free: '10 MB',
-          pro: '10 MB',
-          team: '10 MB',
+          free: '20 MB',
+          pro: '20 MB',
+          team: '20 MB',
           enterprise: 'Custom',
         },
         usage_based: false,

@@ -7,7 +7,7 @@ import { Edit } from 'lucide-react'
 import { useBreakpoint } from 'common'
 
 import { WeekDayProps } from '../data'
-import CountdownComponent from '../../Countdown'
+// import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
@@ -146,7 +146,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                   />
                 </g>
               </svg>
-              {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />}
+              {/* {day.hasCountdown && <CountdownComponent date={day.published_at} showCard={false} />} */}
             </div>
             <div>
               <Skeleton className="w-full h-3 max-w-xs rounded-full will-change-contents" />

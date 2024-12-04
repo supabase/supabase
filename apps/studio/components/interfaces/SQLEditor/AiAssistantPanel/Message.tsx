@@ -21,6 +21,7 @@ interface MessageProps {
   action?: React.ReactNode
 }
 
+// [DEPRECATED] To delete
 const Message = memo(function Message({
   name,
   role,
