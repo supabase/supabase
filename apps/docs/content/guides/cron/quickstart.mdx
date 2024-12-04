@@ -206,7 +206,7 @@ select cron.unschedule('permanent-cron-job-name');
 
 <Admonition type="warning">
 
-Unchscheduling a Job will permanently delete the Job from `cron.job` table but its run history remain in `cron.job_run_details` table.
+Unscheduling a Job will permanently delete the Job from `cron.job` table but its run history remain in `cron.job_run_details` table.
 
 </Admonition>
 
@@ -259,19 +259,27 @@ The records in the `cron.job_run_details` table are not cleaned up automatically
 
 ### Delete data every week
 
-Delete old data every Saturday at 3:30am (GMT):
+{/* <!-- vale off --> */}
+
+Delete old data every Saturday at 3:30AM (GMT):
+
+{/* <!-- vale on --> */}
 
 ```sql
 select cron.schedule (
   'saturday-cleanup', -- name of the cron job
-  '30 3 * * 6', -- Saturday at 3:30am (GMT)
+  '30 3 * * 6', -- Saturday at 3:30AM (GMT)
   $$ delete from events where event_time < now() - interval '1 week' $$
 );
 ```
 
 ### Run a vacuum every day
 
-Vacuum every day at 3:00am (GMT):
+{/* <!-- vale off --> */}
+
+Vacuum every day at 3:00AM (GMT):
+
+{/* <!-- vale on --> */}
 
 ```sql
 select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
