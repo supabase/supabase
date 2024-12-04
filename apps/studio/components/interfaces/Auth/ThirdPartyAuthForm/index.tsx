@@ -12,7 +12,6 @@ import {
   useThirdPartyAuthIntegrationsQuery,
 } from 'data/third-party-auth/integrations-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import { cn } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AddIntegrationDropdown } from './AddIntegrationDropdown'
