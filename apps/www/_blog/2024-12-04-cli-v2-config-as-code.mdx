@@ -42,7 +42,7 @@ Our CLI’s Configuration as Code feature is an opinionated setup using a human 
 
 You can make deployments consistent and repeatable by promoting Edge Functions, Storage objects, and other services from preview environments to staging and production. 
 
-To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](https://supabase.com/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
+To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
 
 <aside>
 
@@ -63,7 +63,7 @@ additional_redirect_urls = [
 ]
 ```
 
-View the [Auth config](https://supabase.com/docs/guides/local-development/cli/config#auth-config) docs.
+View the [Auth config](/docs/guides/local-development/cli/config#auth-config) docs.
 
 ### Managing Edge Functions
 
@@ -82,7 +82,7 @@ If you are using a monorepo (like the [@supabase/supabase](https://github.com/su
 
 </aside>
 
-View the [Edge Functions config](https://supabase.com/docs/guides/local-development/cli/config#edge-functions-config) docs.
+View the [Edge Functions config](/docs/guides/local-development/cli/config#edge-functions-config) docs.
 
 ### Managing Storage Objects
 
@@ -97,7 +97,7 @@ objects_path = "./assets"
 
 In our case, the assets are small enough (< 1MB) to be committed and tracked in git. This allows branching to automatically seed these objects to Supabase Storage for preview. Larger files like videos are best uploaded to Supabase Storage via AWS S3 CLI.
 
-View the [Storage config](https://supabase.com/docs/guides/local-development/cli/config#storage-config) docs.
+View the [Storage config](/docs/guides/local-development/cli/config#storage-config) docs.
 
 ### Managing Database Settings and Webhooks
 
@@ -119,11 +119,11 @@ enabled = true
 
 To create a webhook, simply add a new [schema migration](https://github.com/supabase/supabase/tree/master/supabase/migrations) file with the before or after triggers for the tables you want to listen on.
 
-View the [Database config](https://supabase.com/docs/guides/local-development/cli/config#database-config) docs.
+View the [Database config](/docs/guides/local-development/cli/config#database-config) docs.
 
 ## Managing Branches and multiple “remotes”
 
-If you have [Branching](https://supabase.com/docs/guides/deployment/branching#enable-supabase-branching) enabled in your project, your settings in `config.toml` are automatically synced to all your ephemeral branches. This works because we maintain a one-to-one mapping between your git branch and Supabase branch. 
+If you have [Branching](/docs/guides/deployment/branching#enable-supabase-branching) enabled in your project, your settings in `config.toml` are automatically synced to all your ephemeral branches. This works because we maintain a one-to-one mapping between your git branch and Supabase branch.
 
 If you make a change to your `config.toml` and push to GitHub, our runner picks up the diff and applies it on the corresponding Supabase branch.
 
@@ -150,17 +150,17 @@ All other config options are also available in remotes block.
 
 ## Getting started
 
-To start using configuration as code, simply follow [our guide](https://supabase.com/docs/guides/deployment/branching#how-to-use-supabase-branching) to connect a GitHub repository to your Supabase project and enable Supabase Branching.
+To start using configuration as code, simply follow [our guide](/docs/guides/deployment/branching#how-to-use-supabase-branching) to connect a GitHub repository to your Supabase project and enable Supabase Branching.
 
 Alternatively, you can get started with the Supabase CLI today:
 
 ### Installing
 
-Install the Supabase CLI: [docs](https://supabase.com/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli).
+Install the Supabase CLI: [docs](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli).
 
 ### Upgrading
 
-Upgrade your CLI: [docs](https://supabase.com/docs/guides/local-development/cli/getting-started#updating-the-supabase-cli).
+Upgrade your CLI: [docs](/docs/guides/local-development/cli/getting-started#updating-the-supabase-cli).
 
 ### Breaking changes
 
