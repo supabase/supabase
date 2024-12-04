@@ -1,9 +1,9 @@
 ---
 title: 'Supabase CLI v2: Config as Code'
 description: Edge functions can be used for workloads outside the request-response lifecycle
-author: qiao,avallete
-image: launch-week-13/day-2-functions-background-tasks/og.jpg
-thumb: launch-week-13/day-2-functions-background-tasks/thumb.jpg
+author: qiao
+image: launch-week-13/supabase-cli-v2-config-as-code/og.jpg
+thumb: launch-week-13/supabase-cli-v2-config-as-code/thumb.jpg
 categories:
   - product
 tags:
@@ -31,16 +31,14 @@ Over the last 2 years the CLI has grown to more than 180,000 weekly installs. Cl
 ## Configuration as Code using the Supabase CLI
 
 - **What is Configuration as Code?**
-    
-    **Configuration as Code** is a practice where infrastructure configuration is managed and versioned in source control using code or declarative files. It allows for automation, consistency, and repeatability. Some examples include Terraform and Docker Compose. It offers several key features:
-    
-    - **Version Control**: Configurations are stored in repositories like Git, enabling collaboration and history tracking.
-    - **Reproducibility**: You can recreate environments from code, avoiding manual drift.
-    - **Automation**: Tools apply configurations automatically, reducing human error.
+  **Configuration as Code** is a practice where infrastructure configuration is managed and versioned in source control using code or declarative files. It allows for automation, consistency, and repeatability. Some examples include Terraform and Docker Compose. It offers several key features:
+  - **Version Control**: Configurations are stored in repositories like Git, enabling collaboration and history tracking.
+  - **Reproducibility**: You can recreate environments from code, avoiding manual drift.
+  - **Automation**: Tools apply configurations automatically, reducing human error.
 
-Our CLI’s Configuration as Code feature is an opinionated setup using a human readable `config.toml` file. 
+Our CLI’s Configuration as Code feature is an opinionated setup using a human readable `config.toml` file.
 
-You can make deployments consistent and repeatable by promoting Edge Functions, Storage objects, and other services from preview environments to staging and production. 
+You can make deployments consistent and repeatable by promoting Edge Functions, Storage objects, and other services from preview environments to staging and production.
 
 To demonstrate this workflow, let’s use the `supabase.com` website as an example. It’s hosted on Vercel with [Supabase Branching](/docs/guides/deployment/branching) enabled for development. If you are not using Branching, a similar setup can be achieved using GitHub Actions.
 
