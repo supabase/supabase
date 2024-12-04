@@ -2059,7 +2059,7 @@ Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron
 `,
     icon: Clock,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://youtu.be/miRQPbIJOuQ',
+    heroImage: 'https://www.youtube-nocookie.com/embed/miRQPbIJOuQ',
     docsUrl: 'https://supabase.com/docs/guides/cron',
     slug: 'supabase-cron',
     status: {
