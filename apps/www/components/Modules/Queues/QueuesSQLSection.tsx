@@ -2,13 +2,16 @@ import React, { FC } from 'react'
 
 import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import CodeWindow from '~/components/CodeWindow'
 
+const codeSnippet = `
+TBD
+`
 interface Props {
   id: string
   label: string | JSX.Element
   heading: string | JSX.Element
   subheading: string | JSX.Element
-  image?: any
   className?: string
   cta?: {
     label: string
@@ -16,7 +19,7 @@ interface Props {
   }
 }
 
-const ImageRightSection: FC<Props> = (props) => {
+const QueuesSQLSection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -25,19 +28,29 @@ const ImageRightSection: FC<Props> = (props) => {
         props.className
       )}
     >
+      <ul className="w-full flex-grow rounded-lg max-w-md">
+        <div className="w-full h-full relative">
+          <CodeWindow
+            code={codeSnippet}
+            lang="sql"
+            className="
+              h-full xl:!text-lg
+              [&_.synthax-highlighter]:!pb-8
+              [&_.synthax-highlighter]:xl:min-h-[240px]
+            "
+          />
+        </div>
+      </ul>
       <div className="flex flex-col gap-2 max-w-md">
-        {props.label && <span className="label">{props.label}</span>}
+        <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>
         {props.cta && (
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <div className="w-full max-w-md md:max-w-xl h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden">
-        {props.image}
-      </div>
     </SectionContainer>
   )
 }
 
-export default ImageRightSection
+export default QueuesSQLSection

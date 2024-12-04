@@ -1,24 +1,21 @@
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import CronPageData from '~/data/products/modules/queues'
 import ModulesNav from '~/components/Modules/ModulesNav'
-import CTABanner from '~/components/CTABanner'
+import ProductModulesHeader from '~/components/Sections/ProductModulesHeader'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
+import QueuesPageData from '~/data/products/modules/queues'
 
-const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
-const Section1 = dynamic(() => import('~/components/Modules/Cron/Section1'))
-const Section2 = dynamic(() => import('~/components/Modules/Cron/Section2'))
-const CenteredImage = dynamic(() => import('~/components/Sections/CenteredImage'))
+const QueuesSQLSection = dynamic(() => import('~/components/Modules/Queues/QueuesSQLSection'))
+const ImageParagraphSection = dynamic(() => import('~/components/Sections/ImageParagraphSection'))
+const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 function CronPage() {
-  // base path for images
-  const { basePath } = useRouter()
-  const pageData = CronPageData()
+  const pageData = QueuesPageData()
 
   return (
     <>
@@ -31,7 +28,7 @@ function CronPage() {
           url: `https://supabase.com/modules/queues`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
+              url: pageData.metaImage,
             },
           ],
         }}
@@ -39,11 +36,17 @@ function CronPage() {
       <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.QUEUES} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
-        <CenteredImage {...pageData.centeredImage} />
-        <HighlightCards {...(pageData.highlightsSection as any)} />
-        <Section1 {...pageData.section1} />
-        <Section2 {...pageData.section2} className="!pt-0" />
-        <Section2 {...pageData.section3} className="!pt-0" />
+        <SectionContainer>{pageData.videoSection.video}</SectionContainer>
+        <HighlightCards {...pageData.highlightsSection} />
+        {/* <SectionContainer className="flex items-center justify-center text-center !pt-4 !pb-0">
+          <div className="p-4 md:p-8 border-b w-full">
+            <h3 className="text-lg text-foreground">{pageData.oss.title}</h3>
+            <p className="text-foreground-lighter text-sm">{pageData.oss.paragraph}</p>
+          </div>
+        </SectionContainer> */}
+        <QueuesSQLSection {...pageData.section1} />
+        <ImageParagraphSection {...pageData.section2} className="!pt-0" />
+        <ImageParagraphSection {...pageData.section3} className="!pt-0" />
         <div className="bg-gradient-to-t from-alternative to-transparent mt-8 lg:mt-24">
           <CTABanner />
         </div>
