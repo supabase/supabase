@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
 
 export const getTools = ({
   projectRef,
@@ -44,6 +45,25 @@ export const getTools = ({
         } catch (error) {
           console.error('Failed to execute SQL:', error)
           return `Failed to fetch schema: ${error}`
+        }
+      },
+    }),
+    convertSqlToSupabaseJs: tool({
+      description: 'Convert an sql query into supabase-js client code',
+      parameters: z.object({
+        sql: z
+          .string()
+          .describe(
+            'The sql statement to convert. Only a subset of statements are supported currently. '
+          ),
+      }),
+      execute: async ({ sql }) => {
+        try {
+          const statement = await processSql(sql)
+          const { code } = await renderSupabaseJs(statement)
+          return code
+        } catch (error) {
+          return `Failed to convert SQL: ${error}`
         }
       },
     }),

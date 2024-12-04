@@ -2,11 +2,9 @@ import 'swiper/css'
 
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 
 import { useBreakpoint } from 'common'
-import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import vectorPageData from '~/data/products/modules/vector'
 import ModulesNav from '~/components/Modules/ModulesNav'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
@@ -24,10 +22,10 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 function VectorPage() {
   // base path for images
   const isXs = useBreakpoint(640)
-  const { basePath } = useRouter()
   const pageData = vectorPageData(isXs)
   const meta_title = pageData.metaTitle
   const meta_description = pageData.metaDescription
+  const meta_image = pageData.metaImage
 
   return (
     <>
@@ -37,10 +35,10 @@ function VectorPage() {
         openGraph={{
           title: meta_title,
           description: meta_description,
-          url: `https://supabase.com/vector`,
+          url: `https://supabase.com/modules/vector`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/vector/og.png`,
+              url: meta_image,
             },
           ],
         }}

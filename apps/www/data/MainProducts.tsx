@@ -79,19 +79,19 @@ const MainProducts: ProductType = {
     label: '',
     url: '/realtime',
   },
-  [PRODUCT_MODULES_SHORTNAMES.VECTOR]: {
-    name: PRODUCT_MODULES_NAMES.VECTOR,
-    icon: PRODUCT_MODULES.vector.icon[24],
-    description: (
-      <>
-        Integrate your favorite ML-models to{' '}
-        <strong>store, index and search vector embeddings</strong>.
-      </>
-    ),
-    description_short: 'AI toolkit to manage embeddings',
-    label: '',
-    url: '/vector',
-  },
+  // [PRODUCT_MODULES_SHORTNAMES.VECTOR]: {
+  //   name: PRODUCT_MODULES_NAMES.VECTOR,
+  //   icon: PRODUCT_MODULES.vector.icon[24],
+  //   description: (
+  //     <>
+  //       Integrate your favorite ML-models to{' '}
+  //       <strong>store, index and search vector embeddings</strong>.
+  //     </>
+  //   ),
+  //   description_short: 'AI toolkit to manage embeddings',
+  //   label: '',
+  //   url: '/vector',
+  // },
 }
 
 export default MainProducts

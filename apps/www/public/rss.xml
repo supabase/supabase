@@ -5,9 +5,44 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 13 Nov 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 04 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-cron</guid>
+  <title>Supabase Cron</title>
+  <link>https://supabase.com/blog/supabase-cron</link>
+  <description>Schedule Recurring Jobs in Postgres</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/cli-v2-config-as-code</guid>
+  <title>Supabase CLI v2: Config as Code</title>
+  <link>https://supabase.com/blog/cli-v2-config-as-code</link>
+  <description>Commit the configuration for all of your Projects and Branches into version control.</description>
+  <pubDate>Wed, 04 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/edge-functions-background-tasks-websockets</guid>
+  <title>Supabase Edge Functions: Introducing Background Tasks, Ephemeral Storage, and WebSockets</title>
+  <link>https://supabase.com/blog/edge-functions-background-tasks-websockets</link>
+  <description>Edge functions can be used for workloads outside the request-response lifecycle</description>
+  <pubDate>Tue, 03 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-ai-assistant-v2</guid>
+  <title>Supabase AI Assistant v2</title>
+  <link>https://supabase.com/blog/supabase-ai-assistant-v2</link>
+  <description>An evolution of how we approach AI within the Supabase dashboard</description>
+  <pubDate>Mon, 02 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/orioledb-launch</guid>
+  <title>OrioleDB Public Alpha</title>
+  <link>https://supabase.com/blog/orioledb-launch</link>
+  <description>Launching OrioleDB Public Alpha</description>
+  <pubDate>Sun, 01 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-dynamic-functions</guid>
   <title>Executing Dynamic JavaScript Code on Supabase with Edge Functions</title>
   <link>https://supabase.com/blog/supabase-dynamic-functions</link>

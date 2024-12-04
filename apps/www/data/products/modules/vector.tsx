@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
@@ -7,9 +6,10 @@ import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import { PRODUCT_MODULES } from 'shared-data/products'
 
 export default (isMobile?: boolean) => ({
-  metaTitle: 'Supabase Vector | The Postgres Vector database.',
+  metaTitle: 'Supabase Vector | The Postgres Vector database and AI Toolkit',
   metaDescription:
     'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.',
+  metaImage: '/images/modules/vector/og.png',
   docsUrl: '/docs/guides/ai',
   heroSection: {
     announcement: {
@@ -21,10 +21,10 @@ export default (isMobile?: boolean) => ({
     },
     title: 'Supabase Vector',
     h1: (
-      <span key={'vector-h1'} className="heading-gradient">
+      <>
         The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
-      </span>
+      </>
     ),
     subheader: (
       <>

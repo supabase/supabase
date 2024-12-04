@@ -462,22 +462,37 @@ if (typeof window !== 'undefined') {
       const folder = state.folders[id]
 
       if (snippet) {
-        debouncedUpdateSnippet(id, snippet.projectRef, {
-          id,
-          type: 'sql',
-          name: snippet.snippet.name ?? 'Untitled',
-          description: snippet.snippet.description ?? '',
-          visibility: snippet.snippet.visibility ?? 'user',
-          project_id: snippet.snippet.project_id ?? 0,
-          owner_id: snippet.snippet.owner_id,
-          folder_id: snippet.snippet.folder_id,
-          content: {
-            ...snippet.snippet.content,
-            content_id: id,
-            favorite: snippet.snippet.favorite,
-          },
-        })
-        sqlEditorState.needsSaving.delete(id)
+        const {
+          name,
+          description,
+          visibility,
+          project_id,
+          owner_id,
+          folder_id,
+          content,
+          favorite,
+        } = snippet.snippet
+
+        if (visibility === 'project' && !!folder_id) {
+          toast.error('Shared snippet cannot be within a folder')
+        } else {
+          debouncedUpdateSnippet(id, snippet.projectRef, {
+            id,
+            type: 'sql',
+            name: name ?? 'Untitled',
+            description: description ?? '',
+            visibility: visibility ?? 'user',
+            project_id: project_id ?? 0,
+            owner_id: owner_id,
+            folder_id: folder_id,
+            content: {
+              ...content,
+              content_id: id,
+              favorite: favorite,
+            },
+          })
+          sqlEditorState.needsSaving.delete(id)
+        }
       } else if (folder) {
         upsertFolder(id, folder.projectRef, folder.folder.name)
         sqlEditorState.needsSaving.delete(id)

@@ -27,7 +27,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
@@ -133,7 +133,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
   )
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const {
     tableCheckedStates,
