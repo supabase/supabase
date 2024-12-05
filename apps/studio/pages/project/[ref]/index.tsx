@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
-import Connect from 'components/interfaces/Home/Connect/Connect'
+import Connect from 'components/interfaces/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'

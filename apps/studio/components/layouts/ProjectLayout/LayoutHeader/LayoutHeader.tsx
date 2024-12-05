@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 
 import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import Connect from 'components/interfaces/Home/Connect/Connect'
+import Connect from 'components/interfaces/Connect/Connect'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'

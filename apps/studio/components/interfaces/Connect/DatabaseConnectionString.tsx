@@ -27,7 +27,11 @@ import {
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { CONNECTION_PARAMETERS, CONNECTION_TYPES, ConnectionType } from './Connect.constants'
+import {
+  CONNECTION_PARAMETERS,
+  DATABASE_CONNECTION_TYPES,
+  DatabaseConnectionType,
+} from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
 import { getConnectionStrings, getPoolerTld } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
@@ -49,7 +53,7 @@ export const DatabaseConnectionString = () => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const [selectedTab, setSelectedTab] = useState<ConnectionType>('uri')
+  const [selectedTab, setSelectedTab] = useState<DatabaseConnectionType>('uri')
 
   const {
     data: poolingInfo,
@@ -89,7 +93,7 @@ export const DatabaseConnectionString = () => {
   const connectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
 
   const handleCopy = (id: string) => {
-    const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label
+    const labelValue = DATABASE_CONNECTION_TYPES.find((type) => type.id === id)?.label
     sendEvent({
       category: 'settings',
       action: 'copy_connection_string',
@@ -152,9 +156,9 @@ export const DatabaseConnectionString = () => {
   //   // }
   // }, [poolingConfiguration?.pool_mode])
 
-  const lang = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
+  const lang = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.lang ?? 'bash'
   const contentType =
-    CONNECTION_TYPES.find((type) => type.id === selectedTab)?.contentType ?? 'input'
+    DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.contentType ?? 'input'
 
   const example: Example | undefined = examples[selectedTab as keyof typeof examples]
 
@@ -162,7 +166,7 @@ export const DatabaseConnectionString = () => {
   const exampleInstallCommands = example?.installCommands
   const examplePostInstallCommands = example?.postInstallCommands
   const hasCodeExamples = exampleFiles || exampleInstallCommands
-  const fileTitle = CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
+  const fileTitle = DATABASE_CONNECTION_TYPES.find((type) => type.id === selectedTab)?.fileTitle
 
   // [Refactor] See if we can do this in an immutable way, technically not a good practice to do this
   let stepNumber = 0
@@ -176,13 +180,15 @@ export const DatabaseConnectionString = () => {
           </span>
           <Select_Shadcn_
             value={selectedTab}
-            onValueChange={(connectionType: ConnectionType) => setSelectedTab(connectionType)}
+            onValueChange={(connectionType: DatabaseConnectionType) =>
+              setSelectedTab(connectionType)
+            }
           >
             <SelectTrigger_Shadcn_ size="small" className="w-auto rounded-l-none">
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
-              {CONNECTION_TYPES.map((type) => (
+              {DATABASE_CONNECTION_TYPES.map((type) => (
                 <SelectItem_Shadcn_ key={type.id} value={type.id}>
                   {type.label}
                 </SelectItem_Shadcn_>
