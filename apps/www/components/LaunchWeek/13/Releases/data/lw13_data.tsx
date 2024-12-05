@@ -193,7 +193,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     description: (
       <>
         Supabase Queues:
-        <br className="hidden sm:block" /> Message Queues with Guaranteed Delivery
+        <br className="hidden sm:block" /> Durable Message Queues with Guaranteed Delivery
       </>
     ),
     links: [

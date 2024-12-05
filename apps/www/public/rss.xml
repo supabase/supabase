@@ -11,7 +11,7 @@
   <guid>https://supabase.com/blog/supabase-queues</guid>
   <title>Supabase Queues</title>
   <link>https://supabase.com/blog/supabase-queues</link>
-  <description>Burable background task processing</description>
+  <description>Durable Message Queues with Guaranteed Delivery in Postgres</description>
   <pubDate>Thu, 05 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
