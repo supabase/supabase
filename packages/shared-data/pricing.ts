@@ -71,7 +71,7 @@ export const pricing: Pricing = {
       {
         title: 'Advanced disk config',
         tooltips: {
-          main: 'Each project comes with a dedicated SSD disk. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 Mbps throughput.',
+          main: 'Supabase databases are backed by high performance SSD disks. The disk can be scaled up to 60 TB, 80,000 IOPS and 4,000 Mbps throughput.',
         },
         plans: {
           free: false,
