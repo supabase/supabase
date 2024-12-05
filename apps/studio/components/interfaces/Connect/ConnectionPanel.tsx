@@ -1,4 +1,6 @@
 import { ChevronRight, FileCode, X } from 'lucide-react'
+import Link from 'next/link'
+
 import {
   Button,
   cn,
@@ -11,7 +13,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConnectionParameters } from './ConnectionParameters'
-import { DirectConnectionIcon, TransactionIcon } from './pooler-icons-v2'
+import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
 interface ConnectionPanelProps {
   type?: 'direct' | 'transaction' | 'session'
@@ -101,7 +103,6 @@ export const ConnectionPanel = ({
   ipv4Status,
   notice,
   parameters = [],
-  contentType = 'input',
   lang = 'bash',
   fileTitle,
 }: ConnectionPanelProps) => {
@@ -111,7 +112,7 @@ export const ConnectionPanel = ({
         <h1 className="text-sm mb-2">{title}</h1>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
-          {/* {contentType === 'input' ? ( */}
+          {/* [JOSHEN TODO] Is this supposed to be hard-coded? */}
           {false ? (
             <Input
               copy
@@ -184,11 +185,6 @@ export const ConnectionPanel = ({
               {ipv4Status.description && (
                 <span className="text-xs text-foreground-lighter">{ipv4Status.description}</span>
               )}
-              {/* {ipv4Status.type === 'success' && type !== 'transaction' && (
-                  <span className="text-xs text-foreground-lighter">
-                    Use Direct Connection if on a IPv6 network
-                  </span>
-                )} */}
               {ipv4Status.type === 'error' && (
                 <span className="text-xs text-foreground-lighter">
                   Use Session Pooler if on a IPv4 network or purchase IPv4 addon
@@ -197,12 +193,12 @@ export const ConnectionPanel = ({
               {ipv4Status.link && (
                 <div className="mt-2">
                   <Button className="" type="default" size="tiny">
-                    <a
+                    <Link
                       href={ipv4Status.link.url}
                       className="text-xs text-light hover:text-foreground"
                     >
                       {ipv4Status.link.text}
-                    </a>
+                    </Link>
                   </Button>
                 </div>
               )}
@@ -235,7 +231,6 @@ export const ConnectionPanel = ({
                   className="text-foreground-lighter !bg-dash-sidebar"
                   icon={
                     <ChevronRight
-                      size={12}
                       className={cn(
                         'group-data-[state=open]/collapse:rotate-90 text-foreground-muted transition-transform'
                       )}
@@ -257,13 +252,13 @@ export const ConnectionPanel = ({
                     <div className="text-foreground text-xs">Retool</div>
                   </div>
                   <p className="text-xs text-foreground-lighter max-w-xs">
-                    If you wish to use a Direct Connection with these please purchase{' '}
-                    <a
-                      href={ipv4Status?.link?.url}
+                    If you wish to use a Direct Connection with these, please purchase{' '}
+                    <Link
+                      href={ipv4Status.link?.url ?? '/'}
                       className="text-xs text-light hover:text-foreground"
                     >
                       IPv4 support
-                    </a>
+                    </Link>
                     .
                   </p>
                   <p className="text-xs text-foreground-lighter max-w-xs">
