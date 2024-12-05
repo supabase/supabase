@@ -2121,7 +2121,7 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: 'https://www.youtube-nocookie.com/embed/[INSERT_VIDEO_ID]',
+    heroImage: 'https://www.youtube-nocookie.com/embed/UEwfaElBnZk',
     docsUrl: 'https://supabase.com/docs/guides/queues',
     slug: 'queues',
     status: {
