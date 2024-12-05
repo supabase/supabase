@@ -11,7 +11,11 @@ Supabase Queues is a pull-based Message Queue consisting of three main component
 
 ### Pull-Based Queue
 
+{/* <!-- vale off --> */}
+
 A pull-based Queue is a Message storage and delivery system where consumers actively fetch Messages when they're ready to process them - similar to constantly refreshing a webpage to display the latest updates. Our pull-based Queues process Messages in a First-In-First-Out (FIFO) manner without priority levels.
+
+{/* <!-- vale on --> */}
 
 ### Message
 
@@ -23,7 +27,9 @@ Supabase Queues offers three types of Queues:
 
 - **Basic Queue**: A durable Queue that stores Messages in a logged table.
 - **Unlogged Queue**: A transient Queue that stores Messages in an unlogged table for better performance but may result in loss of enqueued Messages.
+  {/* <!-- vale off --> */}
 - **Partitioned Queue** (_Coming Soon_): A durable and scalable Queue that stores Messages in multiple table partitions for better performance.
+  {/* <!-- vale on --> */}
 
 ## Create Queues
 
@@ -87,9 +93,10 @@ Queues, by default, are not exposed over Supabase Data API and are only accessib
 
 However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of database functions in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
 
+{/* <!-- vale off --> */}
 This is to prevent direct access to the `pgmq` schema and its tables (RLS is not enabled by default on any tables) and database functions.
-
-To get started, navigate to the Queues [Settings page](/dashboard/project/_/integrations/queues/settings) and toggle on “Expose Queues via PostgREST”. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing databae function wrappers to a subset of `pgmq`'s database functions.
+{/* <!-- vale on --> */}
+To get started, navigate to the Queues [Settings page](/dashboard/project/_/integrations/queues/settings) and toggle on “Expose Queues via PostgREST”. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing database function wrappers to a subset of `pgmq`'s database functions.
 
 <Image
   alt="Screenshot of Queues settings with toggle to expose to PostgREST"
@@ -101,8 +108,9 @@ To get started, navigate to the Queues [Settings page](/dashboard/project/_/inte
 
 ### Enable RLS on your tables in `pgmq` schema
 
+{/* <!-- vale off --> */}
 For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if the Data API is enabled.
-
+{/* <!-- vale on --> */}
 You’ll want to create RLS policies for any Queues you want your client-side consumers to interact with.
 
 <Image

@@ -11,7 +11,7 @@ const codeSnippet = `const queues = createClient(supabaseUrl, supabaseKey, {
 
 const send = await queues.rpc("send", {
   queue_name: "subscribers",
-  msg: '{ "email": "hello@example.com" }'
+  message: { "email": "hello@example.com" }
 });
 
 
