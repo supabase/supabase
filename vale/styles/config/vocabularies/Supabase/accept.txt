@@ -17,6 +17,7 @@ DBeaver
 [Dd]eeplinks?
 [Dd]egit
 [Dd]eserializ(e|ed|es|ing)
+[Ee]nqueu(e|ed|es|ing)
 Deno
 [Dd]ev
 [Dd]otenv
@@ -53,6 +54,7 @@ OpenAI
 pg_plan_filter
 PGAudit
 pgAdmin
+pgmq
 PGroonga
 pgvector
 Pinecone

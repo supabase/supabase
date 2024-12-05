@@ -1,18 +1,24 @@
 import React, { FC } from 'react'
-import type { LucideIcon } from 'lucide-react'
 
 import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
-const codeSnippet = `
-select
-  cron.schedule(
-    'call-hello-world-every-5-minutes',
-    '*/5 * * * *',
-    'select hello_world()'
-  );
-`
+const codeSnippet = `const queues = createClient(supabaseUrl, supabaseKey, {
+    db: { schema: "pgmq_public" },
+  }
+);
+
+const send = await queues.rpc("send", {
+  queue_name: "subscribers",
+  message: { "email": "hello@example.com" }
+});
+
+
+const message = await queues.rpc("pop", {
+  queue_name: "subscribers"
+});`
+
 interface Props {
   id: string
   label: string | JSX.Element
@@ -25,7 +31,7 @@ interface Props {
   }
 }
 
-const CronSQLSection: FC<Props> = (props) => {
+const QueuesAPISection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -42,21 +48,19 @@ const CronSQLSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
-      <ul className="w-full flex-grow rounded-lg max-w-md">
-        <div className="w-full h-full relative">
-          <CodeWindow
-            code={codeSnippet}
-            lang="sql"
-            className="
+      <div className="w-full flex-grow rounded-lg max-w-lg">
+        <CodeWindow
+          code={codeSnippet}
+          lang="js"
+          className="
               h-full xl:!text-lg
               [&_.synthax-highlighter]:!pb-8
               [&_.synthax-highlighter]:xl:min-h-[240px]
             "
-          />
-        </div>
-      </ul>
+        />
+      </div>
     </SectionContainer>
   )
 }
 
-export default CronSQLSection
+export default QueuesAPISection

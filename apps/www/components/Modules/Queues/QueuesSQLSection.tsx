@@ -1,17 +1,18 @@
 import React, { FC } from 'react'
-import type { LucideIcon } from 'lucide-react'
 
 import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
 const codeSnippet = `
-select
-  cron.schedule(
-    'call-hello-world-every-5-minutes',
-    '*/5 * * * *',
-    'select hello_world()'
-  );
+select pgmq.create('my_special_queue');
+
+select * from pgmq.send(
+  queue_name  => 'my_special_queue',
+  msg         => '{"hello": "world"}',
+);
+
+select * from pgmq.pop('my_special_queue');
 `
 interface Props {
   id: string
@@ -25,7 +26,7 @@ interface Props {
   }
 }
 
-const CronSQLSection: FC<Props> = (props) => {
+const QueuesSQLSection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -34,14 +35,6 @@ const CronSQLSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <div className="flex flex-col gap-2 max-w-md">
-        <span className="label">{props.label}</span>
-        <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p !text-foreground-lighter">{props.subheading}</p>
-        {props.cta && (
-          <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
-        )}
-      </div>
       <ul className="w-full flex-grow rounded-lg max-w-md">
         <div className="w-full h-full relative">
           <CodeWindow
@@ -55,8 +48,16 @@ const CronSQLSection: FC<Props> = (props) => {
           />
         </div>
       </ul>
+      <div className="flex order-first md:order-last flex-col gap-2 max-w-md">
+        <span className="label">{props.label}</span>
+        <h2 className="h2 !m-0">{props.heading}</h2>
+        <p className="p !text-foreground-lighter">{props.subheading}</p>
+        {props.cta && (
+          <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
+        )}
+      </div>
     </SectionContainer>
   )
 }
 
-export default CronSQLSection
+export default QueuesSQLSection

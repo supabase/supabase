@@ -1,0 +1,62 @@
+---
+title: API
+---
+
+{/* <!-- vale off --> */}
+When you create a Queue in Supabase, you can choose to create helper database functions in the `pgmq_public` schema. This schema exposes operations to manage Queue Messages to consumers client-side, but does not expose functions for creating or dropping Queues.
+
+Database functions in `pgmq_public` can be exposed via Supabase Data API so consumers client-side can call them. Visit the [Quickstart](/docs/guides/queues/quickstart) for an example.
+
+## `pgmq_public.pop(queue_name)`
+
+Retrieves the next available message and deletes it from the specified Queue.
+
+- `queue_name` (text): Queue name
+
+---
+
+### `pgmq_public.send(queue_name, message, sleep_seconds)`
+
+Adds a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
+
+- `queue_name` (text): Queue name
+- `message` (jsonb): Message payload to send
+- `sleep_seconds` (integer, optional): Delay message visibility by specified seconds. Defaults to 0
+
+---
+
+### `pgmq_public.send_batch(queue_name, messages, sleep_seconds)`
+
+Adds a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
+
+- `queue_name` (text): Queue name
+- `messages` (jsonb[]): Array of message payloads to send
+- `sleep_seconds` (integer, optional): Delay messages visibility by specified seconds. Defaults to 0
+
+---
+
+### `pgmq_public.archive(queue_name, message_id)`
+
+Archives a Message by moving it from the Queue table to the Queue's archive table.
+
+- `queue_name` (text): Queue name
+- `message_id` (bigint): ID of the Message to archive
+
+---
+
+### `pgmq_public.delete(queue_name, message_id)`
+
+Permanently deletes a Message from the specified Queue.
+
+- `queue_name` (text): Queue name
+- `message_id` (bigint): ID of the Message to delete
+
+---
+
+### `pgmq_public.read(queue_name, sleep_seconds, n)`
+
+Reads up to "n" Messages from the specified Queue with an optional "sleep_seconds" (visibility timeout).
+
+- `queue_name` (text): Queue name
+- `sleep_seconds` (integer): Visibility timeout in seconds
+- `n` (integer): Maximum number of Messages to read
