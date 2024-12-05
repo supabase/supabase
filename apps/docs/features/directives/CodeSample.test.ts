@@ -14,10 +14,17 @@ const transformWithMock = codeSampleRemark({
 
 let env: NodeJS.Process['env']
 
+vi.mock('~/lib/constants', () => ({
+  IS_PLATFORM: true,
+}))
+
 describe('$CodeSample', () => {
   beforeAll(() => {
     env = process.env
-    process.env = { NODE_ENV: 'test', NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: '1234567890' }
+    process.env = {
+      NODE_ENV: 'test',
+      NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: '1234567890',
+    }
   })
 
   afterAll(() => {
