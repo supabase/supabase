@@ -67,8 +67,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '2 December',
     published_at: '2024-12-02T08:00:00.000-07:00',
-    title: 'Supabase AI Assistant V2',
-    description: 'Supabase AI Assistant V2',
+    title: 'Supabase AI Assistant v2',
+    description: 'Supabase AI Assistant v2',
     links: [
       {
         type: 'video',
@@ -227,14 +227,14 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/database-build-v2',
     date: '6 December',
     published_at: '2024-12-06T08:00:00.000-07:00',
-    title: 'database.build 2.0: Bring-your-own-LLM',
+    title: 'database.build v2: Bring-Your-Own-LLM',
     description: (
       <>
-        database.build 2.0: <br className="hidden sm:block" />
-        Bring-your-own-LLM
+        database.build v2: <br className="hidden sm:block" />
+        Bring-Your-Own-LLM
       </>
     ),
     links: [
@@ -252,10 +252,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         title: '',
         bg_layers: [
           {
-            img: '/images/launchweek/13/releases/d5/d5-database-build-dark.png',
-            mobileImg: '/images/launchweek/13/releases/d5/d5-database-build-mobile-dark.png',
-            imgLight: '/images/launchweek/13/releases/d5/d5-database-build-light.png',
-            mobileImgLight: '/images/launchweek/13/releases/d5/d5-database-build-mobile-light.png',
+            img: '/images/launchweek/13/releases/d5/d5-database-build-v2-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d5/d5-database-build-v2-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d5/d5-database-build-v2-light.png',
+            mobileImgLight:
+              '/images/launchweek/13/releases/d5/d5-database-build-v2-mobile-light.png',
           },
         ],
       },

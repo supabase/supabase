@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 05 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 06 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/database-build-v2</guid>
+  <title>database.build v2: Bring-Your-Own-LLM</title>
+  <link>https://supabase.com/blog/database-build-v2</link>
+  <description>Use any OpenAI API compatible LLMs in database.build</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-queues</guid>
   <title>Supabase Queues</title>
   <link>https://supabase.com/blog/supabase-queues</link>
