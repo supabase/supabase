@@ -2104,4 +2104,35 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
       availableOnSelfHosted: true,
     },
   },
+  {
+    title: 'Queues',
+    subtitle: 'Durable messages with guaranteed delivery.',
+    description: `
+    Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
+
+Supabase Queues provides the reliability of Postgres with the simplicity of Supabase's developer experience, enabling teams to manage queues without maintaining additional infrastructure.
+
+## Features:
+Battle-tested Infrastructure
+Built on PGMQ with proven production deployments and active maintenance
+Native PostgreSQL Integration
+Zero additional infrastructure, transactional consistency, and high performance
+Row Level Security Integration
+Native PostgreSQL RLS support for granular access control
+Visual Queue Management
+Built-in dashboard for queue monitoring and management
+Message Archival
+Built-in support for archiving processed messages for audit trails
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '',
+    heroImageLight: '',
+    docsUrl: 'https://supabase.com/docs/guides/queues',
+    slug: 'queues',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
 ]
