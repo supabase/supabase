@@ -32,9 +32,8 @@ import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
 const Connect = () => {
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
-
   const { ref: projectRef } = useParams()
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -151,7 +150,7 @@ const Connect = () => {
       <Dialog>
         <DialogTrigger asChild>
           <Button
-            type="default"
+            type={connectDialogUpdate ? 'default' : 'primary'}
             className={cn(connectDialogUpdate && 'rounded-full')}
             icon={<Plug className="rotate-90" />}
           >
