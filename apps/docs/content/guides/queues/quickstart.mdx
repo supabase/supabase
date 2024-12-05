@@ -158,7 +158,7 @@ const QueuesTest: React.FC = () => {
   const sendToQueue = async () => {
     const result = await supabase.rpc('send', {
       queue_name: 'foo',
-      msg: '{"hello": "world"}',
+      message: {"hello": "world"},
       sleep_seconds: 30,
     })
     console.log(result)
