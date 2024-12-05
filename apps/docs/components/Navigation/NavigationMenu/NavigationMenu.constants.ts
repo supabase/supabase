@@ -63,12 +63,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/cron',
             level: 'cron',
           },
-          // {
-          //   label: 'Queues',
-          //   icon: 'queue',
-          //   href: '/guides/queues',
-          //   level: 'queue',
-          // },
+          {
+            label: 'Queues',
+            icon: 'queues',
+            href: '/guides/queues',
+            level: 'queues',
+          },
         ],
       ],
     },
@@ -1142,6 +1142,25 @@ export const cron: NavMenuConstant = {
         { name: 'Install', url: '/guides/cron/install' },
         { name: 'Quickstart', url: '/guides/cron/quickstart' },
       ],
+    },
+  ],
+}
+
+export const queues: NavMenuConstant = {
+  icon: 'queues',
+  title: 'Queues',
+  url: '/guides/queues',
+  items: [
+    { name: 'Overview', url: '/guides/queues' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+    },
+    {
+      name: 'References',
+      url: undefined,
+      items: [{ name: 'API', url: '/guides/queues/api' }],
     },
   ],
 }

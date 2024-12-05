@@ -1,6 +1,7 @@
+import React from 'react'
+import { cn, IconDocumentation } from 'ui'
 import Link from 'next/link'
 import { PRODUCT_MODULES_NAMES } from 'shared-data/products'
-import { cn, IconDocumentation } from 'ui'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductModules from '~/data/ProductModules'

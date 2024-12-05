@@ -143,7 +143,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-cron',
     date: '4 December',
@@ -183,25 +183,42 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/supabase-queues',
     date: '5 December',
     published_at: '2024-12-05T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Queues',
+    description: (
+      <>
+        Supabase Queues:
+        <br className="hidden sm:block" /> Durable Message Queues with Guaranteed Delivery
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'UEwfaElBnZk',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ynKODOwObyGR',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d4/d4-queues-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d4/d4-queues-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d4/d4-queues-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d4/d4-queues-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-5',
@@ -209,7 +226,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Fri',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '',
     date: '6 December',
     published_at: '2024-12-06T08:00:00.000-07:00',
