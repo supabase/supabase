@@ -5,6 +5,7 @@ import {
   NetworkRestrictions,
 } from 'components/interfaces/Settings/Database'
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
+import { ConnectionStringMoved } from 'components/interfaces/Settings/Database/ConnectionStringMoved'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
@@ -15,11 +16,9 @@ import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/lay
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
-import { ConnectionStringMoved } from '../../../../components/interfaces/Settings/Database/connection-string-moved'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const diskManagementV2 = useFlag('diskManagementV2')
-  const showDiskAndComputeForm = useFlag('diskAndComputeForm')
   const connectDialogUpdate = useFlag('connectDialogUpdate')
   const project = useSelectedProject()
 

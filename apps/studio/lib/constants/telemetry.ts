@@ -4,12 +4,14 @@
 export enum TELEMETRY_EVENTS {
   FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
   AI_ASSISTANT_V2 = 'AI Assistant V2',
+  CONNECT_UI = 'Connect UI',
 }
 
 // [Joshen] Values refer to the "action" of the "event"
 // e.g prompt submitted (action) through the AI assistant (event)
 // e.g enabled feature x (action) via the feature preview (event)
 export enum TELEMETRY_VALUES {
+  COPY_CONNECTION_STRING = 'copy-connection-string',
   /**
    * Track whenever a prompt is submitted to the AI (excluding debug prompts)
    * @context AI Assistant V2
