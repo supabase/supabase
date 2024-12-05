@@ -32,17 +32,17 @@ When physical backups are enabled for a project Supabase triggers daily backups 
 - SSL enforcement configuration.
 - Network restrictions.
 
-Once the desired backup is chosen, a project name entered, and secure password set the whole process is automated. The length of time for a project to fully provision will depend on the size of the source project dataset, for smaller projects the process is very quick and the new project will be available in as little as 10 minutes. For larger datasets that run into the hundreds of gigabytes, or terabytes, the process will take longer.
+Once the desired backup is chosen, along with a new project name and secure password, the whole process is automated. The length of time for a project to fully provision will depend on the size of the source project dataset, for smaller projects the process is very quick and the new project will be available in as little as 10 minutes. For larger datasets that run into the hundreds of gigabytes, or terabytes, the process will take longer.
 
-The new project will be made available in the Supabase dashboard as soon as the process has completed. From this point the new project will behave exactly as any other Supabase project and is completely independent of the source.
+The new project will be made available in the Supabase dashboard as soon as the copy process has completed. From this point the new project will behave exactly as any other Supabase project and is completely independent of the source.
 
 ### Point-in-Time Recovery
 
-In addition to daily backups it is also possible to restore from a project with PITR enabled. This allows for very fine granularity when selecting the desired point to resotre from. The process is very similar to daily backup with the exception of being asked to select the time to restore from on the available days.
+In addition to daily backups it is possible to restore from a project with PITR enabled. This allows for very fine granularity when selecting the desired point to resotre from. The process is very similar as with daily backup with the exception of being asked to select a specific time to restore from.
 
 ## Unlimited Cloning from a Source Project
 
-To ensure maximum flexibility it is possible to restore data from a source project as many times as required, making it perfect for testing, development environments etc. However, please note that cloning from an already cloned project is not currently supported (this is in the works).
+To ensure maximum flexibility a source project can be _copied_ as many times as required, making the tool perfect for testing, development environments etc. However, please note that cloning from an already cloned project is not currently supported (this is in the works).
 
 <Admonition>
 
