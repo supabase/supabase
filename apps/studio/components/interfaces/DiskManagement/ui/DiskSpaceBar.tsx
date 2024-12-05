@@ -60,7 +60,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
     }
   }, [diskUtil, diskBreakdown])
 
-  const show = formState.dirtyFields.totalSize !== undefined && diskBreakdown
+  const showNewSize = formState.dirtyFields.totalSize !== undefined && diskBreakdown
   const newTotalSize = watch('totalSize')
 
   const totalSize = formState.defaultValues?.totalSize || 0
@@ -98,113 +98,67 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
         <div
           className={cn(
             'h-[35px] relative border rounded-sm w-full transition',
-            show ? 'bg-selection border border-brand-button' : 'bg-surface-300'
+            showNewSize ? 'bg-selection border border-brand-button' : 'bg-surface-300'
           )}
         >
           <AnimatePresence>
-            {!show ? (
-              <motion.div
-                key="currentBar"
-                initial={{ rotateY: 90, zIndex: 2 }}
-                animate={{ rotateY: 0, zIndex: 1 }}
-                exit={{ rotateY: -90, zIndex: 2 }}
-                transition={{ duration: 0.3 }}
-                style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-                className="absolute inset-0 rounded-sm overflow-hidden"
-              >
-                <div className="h-full flex">
+            <motion.div
+              key="currentBar"
+              initial={{ rotateY: 90, zIndex: 2 }}
+              animate={{ rotateY: 0, zIndex: 1 }}
+              exit={{ rotateY: -90, zIndex: 2 }}
+              transition={{ duration: 0.3 }}
+              style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
+              className="absolute inset-0 rounded-sm overflow-hidden"
+            >
+              <div className="h-full flex">
+                <div
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-foreground"
+                  style={{
+                    width: `${showNewSize ? newUsedPercentageDatabase : usedPercentageDatabase}%`,
+                  }}
+                >
                   <div
-                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-foreground"
+                    className="absolute inset-0"
                     style={{
-                      width: `${usedPercentageDatabase}%`,
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        backgroundImage: `repeating-linear-gradient(
+                      backgroundImage: `repeating-linear-gradient(
                             -45deg,
                             ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
                             ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
                             transparent 1px,
                             transparent 4px
                           )`,
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
-                    style={{
-                      width: `${usedPercentageWAL}%`,
                     }}
                   />
+                </div>
 
-                  <div
-                    className="relative overflow-hidden transition-all duration-500 ease-in-out bg-destructive-500"
-                    style={{
-                      width: `${usedPercentageSystem}%`,
-                    }}
-                  />
+                <div
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
+                  style={{
+                    width: `${showNewSize ? newUsedPercentageWAL : usedPercentageWAL}%`,
+                  }}
+                />
 
+                <div
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-destructive-500"
+                  style={{
+                    width: `${showNewSize ? newUsedPercentageSystem : usedPercentageSystem}%`,
+                  }}
+                />
+
+                {!showNewSize && (
                   <div
                     className="bg-transparent-800 border-r transition-all duration-500 ease-in-out"
                     style={{
                       width: `${resizePercentage - usedTotalPercentage <= 0 ? 0 : resizePercentage - usedTotalPercentage}%`,
                     }}
                   />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="newBar"
-                initial={{ rotateY: -90, zIndex: 2 }}
-                animate={{ rotateY: 0, zIndex: 1 }}
-                exit={{ rotateY: 90, zIndex: 2 }}
-                transition={{ duration: 0.3 }}
-                style={{ transformOrigin: 'left center', backfaceVisibility: 'hidden' }}
-                className="absolute inset-0 rounded-sm overflow-hidden"
-              >
-                <div className="h-full flex">
-                  <div
-                    className="bg-foreground relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{
-                      width: `${newUsedPercentageDatabase >= 100 ? 100 : newUsedPercentageDatabase}%`,
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0"
-                      style={{
-                        backgroundImage: `repeating-linear-gradient(
-                            -45deg,
-                            ${isDarkMode ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)'},
-                            ${isDarkMode ? 'rgba(0,0,0,0.1) 1px' : 'rgba(255,255,255,0.1) 1px'},
-                            transparent 1px,
-                            transparent 4px
-                          )`,
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    className="bg-_secondary relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{
-                      width: `${newUsedPercentageWAL}%`,
-                    }}
-                  />
-
-                  <div
-                    className="bg-destructive-500 relative overflow-hidden transition-all duration-500 ease-in-out"
-                    style={{
-                      width: `${newUsedPercentageSystem}%`,
-                    }}
-                  />
-                </div>
-              </motion.div>
-            )}
+                )}
+              </div>
+            </motion.div>
           </AnimatePresence>
           <AnimatePresence>
-            {show && (
+            {showNewSize && (
               <motion.span
                 initial={{ opacity: 0, x: 4 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -218,7 +172,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           </AnimatePresence>
         </div>
         <AnimatePresence initial={true}>
-          {!show && (
+          {!showNewSize && (
             <motion.div
               key="currentSize"
               initial={{ opacity: 0, y: -10 }}
@@ -229,7 +183,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
             >
               <div
                 className="absolute top-0 -left-0 h-full flex items-center transition-all duration-500 ease-in-out"
-                style={{ left: `${show ? newResizePercentage : resizePercentage}%` }}
+                style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
               >
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
@@ -255,7 +209,7 @@ export default function DiskSpaceBar({ form }: DiskSpaceBarProps) {
           )}
         </AnimatePresence>
       </div>
-      {!show && (
+      {!showNewSize && (
         <div className="flex items-center space-x-3 text-xs text-foreground-lighter">
           <LegendItem
             name="Database"
