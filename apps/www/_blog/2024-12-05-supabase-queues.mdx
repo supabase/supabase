@@ -66,7 +66,7 @@ In this scenario, Queues have improved your application's _performance_ and _res
 
 ## Creating Queues
 
-Queues can be created with the Dashboard or SQL.
+Queues can be created in the Dashboard or using SQL / database migrations.
 
 <Admonition>
   For this section we'll focus on the Dashboard. You can refer to the
@@ -75,7 +75,7 @@ Queues can be created with the Dashboard or SQL.
 
 ### Types of Queues
 
-Within the Dashboard you can create several types of queues:
+There are several types of queues available:
 
 <Img alt="Queue types" src="/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg" />
 
@@ -85,13 +85,13 @@ Within the Dashboard you can create several types of queues:
 
 **Partitioned Queues** (coming soon): Designed for high throughput and scalability, partitioned queues distribute messages across multiple partitions, enabling parallel processing and more efficient load handling.
 
-### Integration with Row-Level Security (RLS)
+### Queues with Postgres Row-Level Security
 
-Supabase Queues are compatible with Postgres Row-Level Security policies, allowing fine-grained access control over Queue data. You can define RLS policies to restrict which users or roles can insert, select, update, or delete messages in specific queues.
+Supabase Queues are compatible with Postgres Row-Level Security (RLS), providing fine-grained access control to Messages. RLS Policies restrict which users or roles can insert, select, update, or delete messages in specific queues.
 
 ## Adding Messages
 
-Once your Queue is set up you can begin adding Messages.
+Once your Queue is configured you can begin adding Messages.
 
 <Img alt="Add a message" src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg" />
 
