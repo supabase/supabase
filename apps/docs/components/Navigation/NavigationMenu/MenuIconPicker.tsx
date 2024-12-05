@@ -95,7 +95,7 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <Server width={width} height={height} className={className} />
     case 'cron':
       return <Clock width={width} height={height} className={className} />
-    case 'queue':
+    case 'queues':
       return <SquareStack width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
