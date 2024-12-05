@@ -3,7 +3,7 @@ import { Plug, GitBranch, ChevronsUpDown, Pointer } from 'lucide-react'
 
 export const ConnectionStringMoved = () => {
   return (
-    <div className="w-full flex flex-col xl:flex-row border border-muted py-10 pl-10 rounded-md">
+    <div className="w-full flex flex-col xl:flex-row border py-10 pl-10 rounded-md">
       <div className="flex flex-col gap-0 z-[2]">
         <p className="text-sm text-foreground">Connection string has moved</p>
         <p className="text-sm text-foreground-lighter">

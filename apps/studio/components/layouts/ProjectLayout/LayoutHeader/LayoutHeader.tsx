@@ -97,8 +97,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 )}
               </div>
 
-              {!isBranchingEnabled && <EnableBranchingButton />}
-              {connectDialogUpdate && <Connect />}
+              <div className="ml-3 flex items-center gap-x-3">
+                {!isBranchingEnabled && <EnableBranchingButton />}
+                {connectDialogUpdate && <Connect />}
+              </div>
             </>
           )}
 
