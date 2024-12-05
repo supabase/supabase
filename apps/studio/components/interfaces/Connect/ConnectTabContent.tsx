@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { forwardRef, HTMLAttributes } from 'react'
+import { forwardRef, HTMLAttributes, useMemo } from 'react'
 
 import { useParams } from 'common'
 import { getConnectionStrings } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseSettings.utils'
@@ -49,16 +49,15 @@ const ConnectTabContentNew = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const connectionStringPoolerTransaction = connectionStringsPooler.uri
     const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
 
-    const ContentFile = dynamic<ConnectContentTabProps>(
-      () => import(`./content/${filePath}/content`),
-      {
+    const ContentFile = useMemo(() => {
+      return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content`), {
         loading: () => (
           <div className="p-4 min-h-[331px]">
             <GenericSkeletonLoader />
           </div>
         ),
-      }
-    )
+      })
+    }, [filePath])
 
     return (
       <div ref={ref} {...props} className={cn('border rounded-lg', props.className)}>

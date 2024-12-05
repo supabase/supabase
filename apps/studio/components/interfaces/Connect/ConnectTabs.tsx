@@ -1,8 +1,7 @@
-import { Tabs_Shadcn_ } from 'ui'
 import { FileJson2 } from 'lucide-react'
-import { TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
-import { TabsContent_Shadcn_ } from 'ui'
-import React, { ReactNode } from 'react'
+import { isValidElement, ReactNode } from 'react'
+
+import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 
 interface ConnectTabTriggerProps {
   value: string
@@ -22,7 +21,7 @@ interface ConnectTabContentProps {
 const ConnectTabs = ({ children }: ConnectFileTabProps) => {
   const firstChild = children[0]
 
-  const defaultValue = React.isValidElement(firstChild)
+  const defaultValue = isValidElement(firstChild)
     ? (firstChild.props as any)?.children[0]?.props?.value || ''
     : null
 
@@ -57,4 +56,4 @@ export const ConnectTabContent = ({ value, children }: ConnectTabContentProps) =
   )
 }
 
-export { ConnectTabTrigger, ConnectTabTriggers, ConnectTabs }
+export { ConnectTabs, ConnectTabTrigger, ConnectTabTriggers }

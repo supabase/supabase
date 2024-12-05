@@ -30,8 +30,10 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
+import { useAppStateSnapshot } from 'state/app-state'
 
 const Connect = () => {
+  const state = useAppStateSnapshot()
   const { ref: projectRef } = useParams()
   const connectDialogUpdate = useFlag('connectDialogUpdate')
 
@@ -147,7 +149,7 @@ const Connect = () => {
 
   return (
     <>
-      <Dialog>
+      <Dialog open={state.showConnectDialog} onOpenChange={state.setShowConnectDialog}>
         <DialogTrigger asChild>
           <Button
             type={connectDialogUpdate ? 'default' : 'primary'}

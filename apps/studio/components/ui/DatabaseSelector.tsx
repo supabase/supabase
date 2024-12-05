@@ -26,6 +26,7 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
@@ -45,6 +46,7 @@ const DatabaseSelector = ({
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
 
+  const appState = useAppStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
   const selectedDatabaseId = state.selectedDatabaseId
 
@@ -201,7 +203,11 @@ const DatabaseSelector = ({
               >
                 <Link
                   href={`/project/${projectRef}/settings/infrastructure`}
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    setOpen(false)
+                    // [Joshen] This is used in the Connect UI which is available across all pages
+                    appState.setShowConnectDialog(false)
+                  }}
                   className="w-full flex items-center gap-2"
                 >
                   <Plus size={14} strokeWidth={1.5} />

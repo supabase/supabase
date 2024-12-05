@@ -51,11 +51,7 @@ export const getConnectionStrings = (
 
   const directUriString = `postgresql://${directUser}:${password}@${directHost}:${directPort}/${directName}`
 
-  const directGolangString = `user=${directUser} 
-password=${password} 
-host=${directHost} 
-port=${directPort} 
-dbname=${directName}`
+  const directGolangString = `DATABASE_URL=${poolingInfo.connectionString}`
 
   const directJdbcString = `jdbc:postgresql://${directHost}:${directPort}/${directName}?user=${directUser}&password=${password}`
 
