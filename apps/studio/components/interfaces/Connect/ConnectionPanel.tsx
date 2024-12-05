@@ -11,7 +11,6 @@ import {
   CollapsibleTrigger_Shadcn_,
   WarningIcon,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConnectionParameters } from './ConnectionParameters'
 import { DirectConnectionIcon, TransactionIcon } from './PoolerIcons'
 
@@ -20,7 +19,6 @@ interface ConnectionPanelProps {
   title: string
   description: string
   connectionString: string
-  onCopy: () => void
   ipv4Status: {
     type: 'error' | 'success'
     title: string
@@ -36,6 +34,7 @@ interface ConnectionPanelProps {
   contentType?: 'input' | 'code'
   lang?: CodeBlockLang
   fileTitle?: string
+  onCopyCallback: () => void
 }
 
 const IPv4StatusIcon = ({ className, active }: { className?: string; active: boolean }) => {
@@ -99,12 +98,12 @@ export const ConnectionPanel = ({
   title,
   description,
   connectionString,
-  onCopy,
   ipv4Status,
   notice,
   parameters = [],
   lang = 'bash',
   fileTitle,
+  onCopyCallback,
 }: ConnectionPanelProps) => {
   return (
     <div className="flex flex-col gap-5 lg:grid lg:grid-cols-2 lg:gap-20 w-full">
@@ -112,30 +111,18 @@ export const ConnectionPanel = ({
         <h1 className="text-sm mb-2">{title}</h1>
         <p className="text-sm text-foreground-light mb-4">{description}</p>
         <div className="flex flex-col -space-y-px">
-          {/* [JOSHEN TODO] Is this supposed to be hard-coded? */}
-          {false ? (
-            <Input
-              copy
-              readOnly
-              className="text-xs dark:bg-alternative font-mono input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 rounded-b-none"
-              value={connectionString}
-              onCopy={onCopy}
-            />
-          ) : (
-            <>
-              {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
-              <CodeBlock
-                wrapperClassName={cn(
-                  '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
-                  fileTitle && '[&_pre]:rounded-t-none'
-                )}
-                language={lang}
-                value={connectionString}
-                className="[&_code]:text-[12px] [&_code]:text-foreground"
-                hideLineNumbers
-              />
-            </>
-          )}
+          {fileTitle && <CodeBlockFileHeader title={fileTitle} />}
+          <CodeBlock
+            wrapperClassName={cn(
+              '[&_pre]:rounded-b-none [&_pre]:px-4 [&_pre]:py-3',
+              fileTitle && '[&_pre]:rounded-t-none'
+            )}
+            language={lang}
+            value={connectionString}
+            className="[&_code]:text-[12px] [&_code]:text-foreground"
+            hideLineNumbers
+            onCopyCallback={onCopyCallback}
+          />
           {notice && (
             <div className="border px-4 py-1 w-full justify-start rounded-t-none !last:rounded-b group-data-[state=open]:rounded-b-none border-light">
               {notice?.map((text: string) => (

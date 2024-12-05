@@ -269,7 +269,6 @@ export const DatabaseConnectionString = () => {
                 fileTitle={fileTitle}
                 description="Ideal for applications with persistent, long-lived connections, such as those running on virtual machines or long-standing containers."
                 connectionString={connectionStrings['direct'][selectedTab]}
-                onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: !ipv4Addon ? 'error' : 'success',
                   title: !ipv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
@@ -290,6 +289,7 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
                   { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
                 ]}
+                onCopyCallback={() => handleCopy(selectedTab)}
               />
               <ConnectionPanel
                 contentType={contentType}
@@ -299,7 +299,6 @@ export const DatabaseConnectionString = () => {
                 fileTitle={fileTitle}
                 description="Ideal for stateless applications like serverless functions where each interaction with Postgres is brief and isolated."
                 connectionString={connectionStrings['pooler'][selectedTab]}
-                onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: 'success',
                   title: 'IPv4 compatible',
@@ -324,6 +323,7 @@ export const DatabaseConnectionString = () => {
                     description: 'Each transaction uses a different connection',
                   },
                 ]}
+                onCopyCallback={() => handleCopy(selectedTab)}
               />
               {ipv4Addon && (
                 <Admonition
@@ -345,7 +345,6 @@ export const DatabaseConnectionString = () => {
                 fileTitle={fileTitle}
                 description="Only recommended as an alternative to Direct Connection, when connecting via an IPv4 network."
                 connectionString={connectionStrings['pooler'][selectedTab].replace('6543', '5432')}
-                onCopy={() => handleCopy(selectedTab)}
                 ipv4Status={{
                   type: 'success',
                   title: 'IPv4 compatible',
@@ -369,6 +368,7 @@ export const DatabaseConnectionString = () => {
                     description: 'Connection is reserved for the entire session',
                   },
                 ]}
+                onCopyCallback={() => handleCopy(selectedTab)}
               />
             </div>
           </div>

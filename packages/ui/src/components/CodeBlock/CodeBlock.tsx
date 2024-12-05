@@ -1,10 +1,12 @@
 'use client'
 
+import { noop } from 'lodash'
 import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
+
 import { cn } from '../../lib/utils/cn'
 import { Button } from '../Button/Button'
 import { monokaiCustomTheme } from './CodeBlock.utils'
@@ -13,16 +15,18 @@ import curl from 'highlightjs-curl'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import go from 'react-syntax-highlighter/dist/cjs/languages/hljs/go'
 import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
-import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import php from 'react-syntax-highlighter/dist/cjs/languages/hljs/php'
+import {
+  default as py,
+  default as python,
+} from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import php from 'react-syntax-highlighter/dist/cjs/languages/hljs/php'
-import python from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
-import go from 'react-syntax-highlighter/dist/cjs/languages/hljs/go'
 
 export type CodeBlockLang =
   | 'js'
@@ -59,6 +63,7 @@ export interface CodeBlockProps {
   children?: string
   renderer?: SyntaxHighlighterProps['renderer']
   focusable?: boolean
+  onCopyCallback?: () => void
 }
 
 /**
@@ -93,6 +98,7 @@ export const CodeBlock = ({
   hideLineNumbers = false,
   renderer,
   focusable = true,
+  onCopyCallback = noop,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -102,6 +108,7 @@ export const CodeBlock = ({
 
   const handleCopy = () => {
     setCopied(true)
+    onCopyCallback()
     setTimeout(() => {
       setCopied(false)
     }, 1000)
