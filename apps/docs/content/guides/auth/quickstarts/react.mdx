@@ -84,23 +84,14 @@ hideToc: true
 
         async function signInWithEmail() {
             setLoading(true);
-            const { error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-            });
+            const { error } = await supabase.auth.signInWithPassword({ email, password});
             if (error) alert(error.message);
             setLoading(false);
         }
 
         async function signUpWithEmail() {
             setLoading(true);
-            const {
-            data: { session },
-            error,
-            } = await supabase.auth.signUp({
-            email,
-            password,
-            });
+            const { data: { session }, error} = await supabase.auth.signUp({ email, password});
             if (error) alert(error.message);
             if (!session) alert('Please check your inbox for email verification!');
             setLoading(false);
