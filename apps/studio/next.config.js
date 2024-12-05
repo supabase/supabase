@@ -20,7 +20,7 @@ const SUPABASE_PROJECTS_URL_WS = 'wss://*.supabase.co'
 let SUPABASE_LOCAL_PROJECTS_URL_WS = ''
 if (SUPABASE_URL) {
   const url = new URL(SUPABASE_URL)
-  const wsUrl = `${url.hostname}:${url.port}`
+  const wsUrl = `${url.hostname}${url.port ? ':' + url.port : ''}`
   SUPABASE_LOCAL_PROJECTS_URL_WS = `ws://${wsUrl} wss://${wsUrl}`
 }
 
