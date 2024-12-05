@@ -2,7 +2,7 @@ import { StreamingTextResponse } from 'ai'
 import { chatRlsPolicy, chatSql } from 'ai-commands/edge'
 import { SupportedAssistantEntities } from 'components/ui/AIAssistantPanel/AIAssistant.types'
 import { DatabasePoliciesData } from 'data/database-policies/database-policies-query'
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 
 export const config = {
