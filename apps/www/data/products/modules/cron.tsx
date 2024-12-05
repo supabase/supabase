@@ -1,6 +1,6 @@
 // import Image from 'next/image'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import BrowserFrame from '../../../components/BrowserFrame'
+import BrowserFrame from '~/components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
