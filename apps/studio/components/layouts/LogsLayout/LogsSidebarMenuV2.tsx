@@ -242,14 +242,6 @@ export function LogsSidebarMenuV2() {
         >
           Templates
         </InnerSideMenuItem>
-        <InnerSideMenuItem
-          title="Settings"
-          isActive={isActive(`/project/${ref}/settings/warehouse`)}
-          href={`/project/${ref}/settings/warehouse`}
-        >
-          Settings
-          <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
-        </InnerSideMenuItem>
       </div>
       <Separator className="my-4" />
 

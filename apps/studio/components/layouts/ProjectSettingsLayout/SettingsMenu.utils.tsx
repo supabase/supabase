@@ -126,16 +126,6 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && warehouseEnabled
-          ? [
-              {
-                name: 'Warehouse',
-                key: 'warehouse',
-                url: `/project/${ref}/settings/warehouse`,
-                items: [],
-              },
-            ]
-          : []),
         ...(IS_PLATFORM && logDrainsEnabled
           ? [
               {
