@@ -74,99 +74,102 @@ hideToc: true
 
       ```js src/App.js
         import React, { useState } from 'react';
+        import { createClient } from '@supabase/supabase-js'
 
-        export default function Auth() {
-        const [email, setEmail] = useState('');
-        const [password, setPassword] = useState('');
-        const [loading, setLoading] = useState(false);
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        function App() {
+            const [email, setEmail] = useState('');
+            const [password, setPassword] = useState('');
+            const [loading, setLoading] = useState(false);
 
-        async function signInWithEmail() {
-            setLoading(true);
-            const { error } = await supabase.auth.signInWithPassword({ email, password});
-            if (error) alert(error.message);
-            setLoading(false);
-        }
+            const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-        async function signUpWithEmail() {
-            setLoading(true);
-            const { data: { session }, error} = await supabase.auth.signUp({ email, password});
-            if (error) alert(error.message);
-            if (!session) alert('Please check your inbox for email verification!');
-            setLoading(false);
-        }
-
-        const styles = {
-            container: {
-                maxWidth: '300px',
-                margin: '20px auto',
-                padding: '20px',
-            },
-            formGroup: {
-                marginBottom: '15px',
-            },
-            label: {
-                display: 'block',
-                marginBottom: '5px',
-            },
-            input: {
-                width: '100%',
-                padding: '8px',
-                marginBottom: '10px',
-            },
-            button: {
-                padding: '8px 16px',
-                marginRight: '10px',
-                cursor: 'pointer',
+            async function signInWithEmail() {
+                setLoading(true);
+                const { error } = await supabase.auth.signInWithPassword({ email, password});
+                if (error) alert(error.message);
+                setLoading(false);
             }
-        };
 
-        return (
-            <div style={styles.container}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>
-                  Email:
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@address.com"
-                    style={styles.input}
-                  />
-                </label>
-            </div>
+            async function signUpWithEmail() {
+                setLoading(true);
+                const { data: { session }, error} = await supabase.auth.signUp({ email, password});
+                if (error) alert(error.message);
+                if (!session) alert('Please check your inbox for email verification!');
+                setLoading(false);
+            }
 
-            <div style={styles.formGroup}>
-                <label style={styles.label}>
-                Password:
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    style={styles.input}
-                />
-                </label>
-            </div>
+            const styles = {
+                container: {
+                    maxWidth: '300px',
+                    margin: '20px auto',
+                    padding: '20px',
+                },
+                formGroup: {
+                    marginBottom: '15px',
+                },
+                label: {
+                    display: 'block',
+                    marginBottom: '5px',
+                },
+                input: {
+                    width: '100%',
+                    padding: '8px',
+                    marginBottom: '10px',
+                },
+                button: {
+                    padding: '8px 16px',
+                    marginRight: '10px',
+                    cursor: 'pointer',
+                }
+            };
 
-            <button
-                onClick={signInWithEmail}
-                disabled={loading}
-                style={styles.button}
-            >
-                Sign in
-            </button>
-            <button
-                onClick={signUpWithEmail}
-                disabled={loading}
-                style={styles.button}
-            >
-                Sign up
-            </button>
-            </div>
-        );
-      }
+            return (
+                <div style={styles.container}>
+                <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                    Email:
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="email@address.com"
+                        style={styles.input}
+                    />
+                    </label>
+                </div>
+
+                <div style={styles.formGroup}>
+                    <label style={styles.label}>
+                    Password:
+                    <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        style={styles.input}
+                    />
+                    </label>
+                </div>
+
+                <button
+                    onClick={signInWithEmail}
+                    disabled={loading}
+                    style={styles.button}
+                >
+                    Sign in
+                </button>
+                <button
+                    onClick={signUpWithEmail}
+                    disabled={loading}
+                    style={styles.button}
+                >
+                    Sign up
+                </button>
+                </div>
+            );
+        }
+      export default App
       ```
 
     </StepHikeCompact.Code>
