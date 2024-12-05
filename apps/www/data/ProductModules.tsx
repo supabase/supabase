@@ -36,7 +36,7 @@ const ProductModules: ProductType = {
         zero additional infrastructure.
       </>
     ),
-    description_short: 'Message Queues with guaranteed delivery',
+    description_short: 'Durable Message Queues with guaranteed delivery',
     label: '',
     url: '/modules/queues',
   },

@@ -198,11 +198,6 @@ input[type='number'] {
   display: none;
 }
 
-code {
-  // use supabase-ui code style
-  @apply text-code;
-}
-
 div[data-radix-portal]:not(.portal--toast) {
   z-index: 2147483646 !important;
 }

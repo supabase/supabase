@@ -4,6 +4,7 @@
 export enum TELEMETRY_EVENTS {
   FEATURE_PREVIEWS = 'Dashboard UI Feature Previews',
   AI_ASSISTANT_V2 = 'AI Assistant V2',
+  CONNECT_UI = 'Connect UI',
   CRON_JOBS = 'Cron Jobs',
 }
 
@@ -48,4 +49,5 @@ export enum TELEMETRY_VALUES {
   CRON_JOB_UPDATE_CLICKED = 'cron-job-update-clicked',
   CRON_JOB_CREATE_CLICKED = 'cron-job-create-clicked',
   CRON_JOBS_VIEW_PREVIOUS_RUNS = 'view-previous-runs-clicked',
+  COPY_CONNECTION_STRING = 'copy-connection-string',
 }

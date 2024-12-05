@@ -1,23 +1,23 @@
 ---
 title: 'Supabase Queues'
-description: Durable background task processing
+description: Durable Message Queues with Guaranteed Delivery in Postgres
 author: ivasilov,oli_rice
-image: launch-week-13/day-4-supabase-queues/og.jpg
-thumb: launch-week-13/day-4-supabase-queues/thumb.jpg
+image: launch-week-13/day-4-supabase-queues/og.png
+thumb: launch-week-13/day-4-supabase-queues/thumb.png
 categories:
   - developers
   - postgres
 tags:
   - queues
   - postgres
-date: '2024-12-05T00:00:01'
+date: '2024-12-05T00:00:02'
 toc_depth: 3
 launchweek: '13'
 ---
 
 Today we're releasing [Supabase Queues](/modules/queues), for durable background task processing.
 
-Supabase Queues is a Postgres-native Message Queue with guaranteed message delivery, improving the scalability and resiliency of your applications. It's designed to work seamlessly with the entire Supabase platform.
+Supabase Queues is a Postgres-native, durable Message Queue with guaranteed delivery, improving the scalability and resiliency of your applications. It's designed to work seamlessly with the entire Supabase platform.
 
 <div className="video-container mb-8">
   <iframe
@@ -30,60 +30,53 @@ Supabase Queues is a Postgres-native Message Queue with guaranteed message deliv
 </div>
 
 <Admonition>
+
 Supabase Queues is built on the [pgmq](https://github.com/tembo-io/pgmq) extension by the team at [Tembo](https://github.com/tembo-io).
 
-It's a Supabase policy to [support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) wherever possible, and the Tembo team have generously licensed their extension with the OSI-compatible [PostgreSQL license](https://github.com/tembo-io/pgmq?tab=PostgreSQL-1-ov-file).
+It's a Supabase policy to [support existing tools](/docs/guides/getting-started/architecture#support-existing-tools) wherever possible, and the Tembo team have generously licensed their extension with the OSI-compatible [PostgreSQL license](https://github.com/tembo-io/pgmq?tab=PostgreSQL-1-ov-file).
 
-We're very thankful to all the contributors and we look forward to our continued work with the community.
+We're very thankful to all the contributors and we look forward to working with the Tembo community.
+
 </Admonition>
 
+## Supabase Queues Features
 
-## Features
+1. **Postgres Native**: <br />Built on top of the open source `pgmq` database extension, create and manage Queues with any Postgres tooling.
+1. **Granular Authorization**: <br />Control client-side consumer access to Queues with API permissions and Row Level Security (RLS) policies.
+1. **Guaranteed Message Delivery**: <br />Messages enqueued are guaranteed to be delivered to your consumers.
+1. **Exactly Once Message Delivery**: <br />A Message is delivered exactly once to a consumer within a customizable visibility window.
+1. **Queue Management and Monitoring**: <br />Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
+1. **Message Durability and Archival**: <br />Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
+1. **Security or Granular Authorization**: <br />Native Postgres RLS support for granular access control.
 
-- **Postgres Native**: transactional guarantees with no additional infrastructure.
-- **Guaranteed Message Delivery**: Ensures that messages are reliably delivered to the queue.
-- **Exactly Once Message Delivery**: Prevents duplicate message processing, ensuring consistency.
-- **Message Archival**: Built-in support for archiving processed messages for audit trails.
-- **Queue Management and Monitoring Interface:** Built-in dashboard for queue monitoring and management.
-- **Security or Granular Authorization**: Native Postgres RLS support for granular access control.
-- **100% Open Source**: Built on top of pgmq, licensed under the PostgreSQL license.
+## Why Do You Need Queues?
 
- ## Why Do You  Need Queues?
-
-A Queue is used to manage and process tasks asynchronously. Typically, you use a Queue for long-running and/or burst tasks to ensure that your system is robust and stays performant.
+A Queue is used to manage and process tasks asynchronously. Typically, you use a Queue for long-running tasks to ensure that your application is robust.
 
 **For example, sending emails:**
 
-Let's say you want to send a confirmation email to a user after they register on your website. Instead of sending the email immediately within the registration process - which could slow down the user's experience - you can place the “email task” into a Queue.
+Let's say you want to send a welcome email to a user after they register on your website. Instead of sending the email immediately within the registration process - which could slow down the user's experience - you can place the “email task” into a Queue.A separate email service can then process this task, sending the email without affecting the registration flow. Even better: if the email bounces then the task could "reappear" in the Queue to get processed again.
 
-A separate email service can then process this task in the Queue, sending the email without affecting the registration flow. Even better: if the email bounces then you can add that to another Queue for processing later, such as adding the email to a suppression list.
-
-In this scenario, Queues have improved your applications *performance* and *resilience*.
-
-
-**Common use cases:**
+In this scenario, Queues have improved your application's _performance_ and _resilience_. Other cases include:
 
 - **Process tasks asynchronously**: offload time-consuming operations, like sending emails, processing images, and generating embeddings.
-- **Communication between services:**  decouple your services by passing messages through a central queue.
+- **Communication between services:** decouple your services by passing messages through a central queue.
 - **Load Balancing**: Distribute tasks evenly across multiple workers.
 
 ## Creating Queues
+
 Queues can be created with the Dashboard or SQL.
 
 <Admonition>
-For this section we'll focus on the Dashboard. You can refer to the documentation for SQL.
+  For this section we'll focus on the Dashboard. You can refer to the
+  [documentation](/docs/guides/queues/api) for SQL.
 </Admonition>
-
 
 ### Types of Queues
 
 Within the Dashboard you can create several types of queues:
 
-
-<Img
-  alt="Queue types"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg"
-/>
+<Img alt="Queue types" src="/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg" />
 
 **Basic Queues**: Simple, reliable queues with core functionality, ideal for most use cases. Messages are stored and processed within Postgres using standard transactional guarantees.
 
@@ -91,23 +84,19 @@ Within the Dashboard you can create several types of queues:
 
 **Partitioned Queues** (coming soon): Designed for high throughput and scalability, partitioned queues distribute messages across multiple partitions, enabling parallel processing and more efficient load handling.
 
-
- ### Integration with Row-Level Security (RLS)
+### Integration with Row-Level Security (RLS)
 
 Supabase Queues are compatible with Postgres Row-Level Security policies, allowing fine-grained access control over Queue data. You can define RLS policies to restrict which users or roles can insert, select, update, or delete messages in specific queues.
 
-## Creating Messages
-Once your Queue is set up you can start adding Messages.
+## Adding Messages
 
+Once your Queue is set up you can begin adding Messages.
 
-<Img
-  alt="Add a message"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg"
-/>
+<Img alt="Add a message" src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg" />
 
-### Creating messages from the Dashboard
+### Adding Messages from the Dashboard
 
-Let's create a new Basic queue and add a message to it.
+Let's create a new Basic Queue and add a Message.
 
 <Img
   alt="Create a queue"
@@ -115,7 +104,7 @@ Let's create a new Basic queue and add a message to it.
 />
 
 <Img
-  alt="Add a message"
+  alt="Enqueue a message"
   src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg"
 />
 
@@ -124,47 +113,62 @@ Let's create a new Basic queue and add a message to it.
   src="/images/blog/launch-week-13/day-4-supabase-queues/add-message-modal.jpg"
 />
 
+### Adding messages from the server
 
-### Creating messages from the server
-[TBD]
+If you're [connecting](/docs/guides/database/connecting-to-postgres) to your Postgres database from a server, you can add messages using SQL from any Postgres client:
 
-### Creating messages from the client
-One benefit of Postgres function permissions and Row Level Security is that you can allow your users to create and manage tasks using PostgREST our client libraries. You can interact with  Queues directly via the client libraries by calling send, send_batch , read, pop, archive, delete functions defined in the `pgmq_public` schema (docs). For example:
+```sql
+select * from pgmq.send(
+  queue_name  => 'foo',
+  msg         => '{ "hello": "world" }',
+);
+```
+
+### Adding messages from the client
+
+We have provided several functions that can be invoked from the [client libraries](/docs#client-libraries) if you need to add messages from a browser or mobile app. For example:
 
 ```tsx
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = "supabaseURL"
-const supabaseKey = "supabaseKey"
+const url = 'SUPABASE_URL'
+const key = 'SUPABASE_ANON_KEY'
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-	db: { schema: "pgmq_public" }
+const queues = createClient(url, key, {
+  db: { schema: 'pgmq_public' },
 })
 
-const { data, error } = await supabase.rpc("send", {
-  queue_name: "foo",
-  msg: '{"hello": "world"}',
+const { data, error } = await queues.rpc('send', {
+  queue_name: 'foo',
+  msg: '{ "hello": "world" }',
   delay: 30,
 })
 
 console.log('Message: ', data)
 ```
+
+For security, this feature is [disabled by default](#security-and-permissions). There are several functions defined in the `pgmq_public` schema: `send`, `send_batch`, `read`, `pop`, `archive`, `delete`. You can find more details in the [docs](/docs/guides/queues/api).
+
 ## Security and Permissions
-By default, Queues are not exposed over Data APIs and are only accessible via SQL. You can optionally enable Data APIs and use Row Level Security (RLS) to manage access.
 
-Beyond RLS policies, click the Settings icon for a queue to configure which roles should have access to each queue. For example, if anonymous users should be able to enqueue messages and authenticated users can fully manipulate messages, the permissions for the `anon` and `authenticated` roles could be set as shown below. The postgres and service_role roles receive permissions by default and should remain enabled.
+By default, Queues are only accessible via SQL and not exposed over the Supabase Data API. You can manage this in the Data API settings by [exposing the pgmq_public schema](/docs/guides/api/using-custom-schemas). If you expose this schema, you must use [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) to manage access to your queues.
 
+Beyond RLS, Postgres roles can be granted granular permissions to interact with Queues.
+
+For example, the following permissions allow authenticated users can fully manipulate messages, whereas anonymous users can only add/retrieve messages:
 
 <Img
   alt="Queue permissions"
   src="/images/blog/launch-week-13/day-4-supabase-queues/permissions.jpg"
 />
 
-## Monitoring Queues
+The `postgres` and `service_role` roles receive permissions by default and should remain enabled for server-side operations.
 
-You can use the Dashboard to inspect your Messages, including: status, number of retries, and the Message payload. You can also postpone, archive, or delete Messages at any time.
+## Monitoring Queues and Messages
 
-From the Queues page, just click on a Queue to inspect it. From there you can click on a Message to see more details:
+You can use the Dashboard to inspect your Messages, including: status, number of retries, and payload. You can also postpone, archive, or delete messages at any time.
+
+From the Queues page, just click on a Queue to inspect it. From there you can click on a message to see more details:
 
 <Img
   alt="Message details"
@@ -177,10 +181,7 @@ From the Queues page, just click on a Queue to inspect it. From there you can cl
 2. Enable the **Queues** Postgres Module.
 3. Create your first Queue.
 
-<Img
-  alt="Enable queues"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/integrations.jpg"
-/>
+<Img alt="Enable queues" src="/images/blog/launch-week-13/day-4-supabase-queues/integrations.jpg" />
 
 ## Postgres for Everything
 

@@ -3,7 +3,7 @@ import BrowserFrame from '../../../components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
-  metaTitle: 'Supabase Queues | Message Queues with Guaranteed Delivery',
+  metaTitle: 'Supabase Queues | Durable Message Queues with Guaranteed Delivery',
   metaDescription:
     'Postgres module that uses the pgmq database extension to manage Message Queues with guaranteed delivery.',
   metaImage: '/images/modules/queues/og.png',
