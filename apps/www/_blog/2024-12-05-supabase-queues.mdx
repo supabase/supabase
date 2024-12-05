@@ -1,0 +1,189 @@
+---
+title: 'Supabase Queues'
+description: Durable background task processing
+author: ivasilov,oli_rice
+image: launch-week-13/day-4-supabase-queues/og.jpg
+thumb: launch-week-13/day-4-supabase-queues/thumb.jpg
+categories:
+  - developers
+  - postgres
+tags:
+  - queues
+  - postgres
+date: '2024-12-05T00:00:01'
+toc_depth: 3
+launchweek: '13'
+---
+
+Today we're releasing [Supabase Queues](/modules/queues), for durable background task processing.
+
+Supabase Queues is a Postgres-native Message Queue with guaranteed message delivery, improving the scalability and resiliency of your applications. It's designed to work seamlessly with the entire Supabase platform.
+
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
+    title="Introducing Supabase Cron"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+<Admonition>
+Supabase Queues is built on the [pgmq](https://github.com/tembo-io/pgmq) extension by the team at [Tembo](https://github.com/tembo-io).
+
+It's a Supabase policy to [support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) wherever possible, and the Tembo team have generously licensed their extension with the OSI-compatible [PostgreSQL license](https://github.com/tembo-io/pgmq?tab=PostgreSQL-1-ov-file).
+
+We're very thankful to all the contributors and we look forward to our continued work with the community.
+</Admonition>
+
+
+## Features
+
+- **Postgres Native**: transactional guarantees with no additional infrastructure.
+- **Guaranteed Message Delivery**: Ensures that messages are reliably delivered to the queue.
+- **Exactly Once Message Delivery**: Prevents duplicate message processing, ensuring consistency.
+- **Message Archival**: Built-in support for archiving processed messages for audit trails.
+- **Queue Management and Monitoring Interface:** Built-in dashboard for queue monitoring and management.
+- **Security or Granular Authorization**: Native Postgres RLS support for granular access control.
+- **100% Open Source**: Built on top of pgmq, licensed under the PostgreSQL license.
+
+ ## Why Do You  Need Queues?
+
+A Queue is used to manage and process tasks asynchronously. Typically, you use a Queue for long-running and/or burst tasks to ensure that your system is robust and stays performant.
+
+**For example, sending emails:**
+
+Let's say you want to send a confirmation email to a user after they register on your website. Instead of sending the email immediately within the registration process - which could slow down the user's experience - you can place the “email task” into a Queue.
+
+A separate email service can then process this task in the Queue, sending the email without affecting the registration flow. Even better: if the email bounces then you can add that to another Queue for processing later, such as adding the email to a suppression list.
+
+In this scenario, Queues have improved your applications *performance* and *resilience*.
+
+
+**Common use cases:**
+
+- **Process tasks asynchronously**: offload time-consuming operations, like sending emails, processing images, and generating embeddings.
+- **Communication between services:**  decouple your services by passing messages through a central queue.
+- **Load Balancing**: Distribute tasks evenly across multiple workers.
+
+## Creating Queues
+Queues can be created with the Dashboard or SQL.
+
+<Admonition>
+For this section we'll focus on the Dashboard. You can refer to the documentation for SQL.
+</Admonition>
+
+
+### Types of Queues
+
+Within the Dashboard you can create several types of queues:
+
+
+<Img
+  alt="Queue types"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg"
+/>
+
+**Basic Queues**: Simple, reliable queues with core functionality, ideal for most use cases. Messages are stored and processed within Postgres using standard transactional guarantees.
+
+**Unlogged Queues**: Optimized for performance, unlogged queues avoid writing messages to disk, making them faster but less durable in case of a database crash. Suitable for transient or less critical workloads.
+
+**Partitioned Queues** (coming soon): Designed for high throughput and scalability, partitioned queues distribute messages across multiple partitions, enabling parallel processing and more efficient load handling.
+
+
+ ### Integration with Row-Level Security (RLS)
+
+Supabase Queues are compatible with Postgres Row-Level Security policies, allowing fine-grained access control over Queue data. You can define RLS policies to restrict which users or roles can insert, select, update, or delete messages in specific queues.
+
+## Creating Messages
+Once your Queue is set up you can start adding Messages.
+
+
+<Img
+  alt="Add a message"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg"
+/>
+
+### Creating messages from the Dashboard
+
+Let's create a new Basic queue and add a message to it.
+
+<Img
+  alt="Create a queue"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/create-a-queue.jpg"
+/>
+
+<Img
+  alt="Add a message"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg"
+/>
+
+<Img
+  alt="Message details"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message-modal.jpg"
+/>
+
+
+### Creating messages from the server
+[TBD]
+
+### Creating messages from the client
+One benefit of Postgres function permissions and Row Level Security is that you can allow your users to create and manage tasks using PostgREST our client libraries. You can interact with  Queues directly via the client libraries by calling send, send_batch , read, pop, archive, delete functions defined in the `pgmq_public` schema (docs). For example:
+
+```tsx
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = "supabaseURL"
+const supabaseKey = "supabaseKey"
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+	db: { schema: "pgmq_public" }
+})
+
+const { data, error } = await supabase.rpc("send", {
+  queue_name: "foo",
+  msg: '{"hello": "world"}',
+  delay: 30,
+})
+
+console.log('Message: ', data)
+```
+## Security and Permissions
+By default, Queues are not exposed over Data APIs and are only accessible via SQL. You can optionally enable Data APIs and use Row Level Security (RLS) to manage access.
+
+Beyond RLS policies, click the Settings icon for a queue to configure which roles should have access to each queue. For example, if anonymous users should be able to enqueue messages and authenticated users can fully manipulate messages, the permissions for the `anon` and `authenticated` roles could be set as shown below. The postgres and service_role roles receive permissions by default and should remain enabled.
+
+
+<Img
+  alt="Queue permissions"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/permissions.jpg"
+/>
+
+## Monitoring Queues
+
+You can use the Dashboard to inspect your Messages, including: status, number of retries, and the Message payload. You can also postpone, archive, or delete Messages at any time.
+
+From the Queues page, just click on a Queue to inspect it. From there you can click on a Message to see more details:
+
+<Img
+  alt="Message details"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/message-detail.jpg"
+/>
+
+### Try Supabase Queues Today
+
+1. Visit the [Integrations page](https://supabase.com/dashboard/project/_/integrations) in your project.
+2. Enable the **Queues** Postgres Module.
+3. Create your first Queue.
+
+<Img
+  alt="Enable queues"
+  src="/images/blog/launch-week-13/day-4-supabase-queues/integrations.jpg"
+/>
+
+## Postgres for Everything
+
+Using Postgres for your Queue system keeps your stack lean and familiar. You can enqueue jobs within the same transaction that modifies related data, preventing inconsistencies and reducing the need for additional coordination. Postgres' robust indexing, JSONB support, and partitioning also enable scalable, high-performance queue management directly in your database.
+
+By eliminating the need for separate infrastructure like RabbitMQ or Kafka, you reduce costs, streamline deployments, and leverage existing Postgres tools for monitoring, backups, and security. Features like Row-Level Security, rich SQL querying, and built-in archiving make Postgres a powerful, unified solution for both data storage and messaging.
