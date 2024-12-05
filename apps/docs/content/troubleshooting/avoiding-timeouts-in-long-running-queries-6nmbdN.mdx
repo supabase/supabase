@@ -1,0 +1,32 @@
+---
+title = "Avoiding timeouts in long running queries"
+github_url = "https://github.com/orgs/supabase/discussions/21133"
+date_created = "2024-02-09T02:46:42+00:00"
+topics = ["database", "platform"]
+keywords = ["timeout", "query", "database", "psql", "compute"]
+---
+
+> NOTE: If you are receiving timeout errors for normal REST operations from your application, you should check out this [guide](https://github.com/orgs/supabase/discussions/14256) instead
+
+Some queries, such as indexing a table or changing a column's data type are unavoidably time consuming. When you must execute long-running queries, there are a few steps that should be taken. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has an internal time limit of ~1 minute for queries, so it is necessary to execute your code through an external interface, such as PSQL.
+
+You can install PSQL in [macOS](https://stackoverflow.com/a/49689589/2188186) and [Windows](https://www.postgresql.org/download/windows/) by following these links and instructions. For Linux (Debian) you can run the following:
+
+```bash
+sudo apt-get update
+sudo apt-get install postgresql-client
+```
+
+Once installed, you can find your PSQL string from the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Please make sure if you are using the pooler connection that it is in session mode (port 5432).
+
+> If you are working in an [ IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, it is preferable to use the direct connection for these types of long running tasks
+
+Then you can increase the query timeout for your session:
+
+```sql
+set statement_timeout = '120min';
+```
+
+If your task is particularly long, you can may want to consider boosting your computing power temporarily. Compute size on Supabase is charged by the hour, so you can increase it for an hour or two, complete your task faster, then scale it back afterward.
+
+Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
