@@ -1,5 +1,7 @@
-import { ChevronRight, Copy, Check } from 'lucide-react'
+import { Check, ChevronRight, Copy } from 'lucide-react'
 import { useState } from 'react'
+
+import { copyToClipboard } from 'lib/helpers'
 import {
   Button,
   cn,
@@ -23,18 +25,6 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
   const [isOpen, setIsOpen] = useState(false)
   const [copiedMap, setCopiedMap] = useState<Record<string, boolean>>({})
 
-  const handleCopy = async (value: string, key: string) => {
-    try {
-      await navigator.clipboard.writeText(value)
-      setCopiedMap((prev) => ({ ...prev, [key]: true }))
-      setTimeout(() => {
-        setCopiedMap((prev) => ({ ...prev, [key]: false }))
-      }, 1000)
-    } catch (error) {
-      console.error('Failed to copy text: ', error)
-    }
-  }
-
   return (
     <Collapsible_Shadcn_ open={isOpen} onOpenChange={setIsOpen} className="group -space-y-px">
       <CollapsibleTrigger_Shadcn_
@@ -47,7 +37,6 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
           className="text-foreground-lighter !bg-dash-sidebar"
           icon={
             <ChevronRight
-              size={12}
               className={cn(
                 'text-foreground-muted transition-transform',
                 isOpen ? 'rotate-90' : ''
@@ -66,7 +55,14 @@ export const ConnectionParameters = ({ parameters }: ConnectionParametersProps) 
                 <span className="text-foreground-lighter">{param.key}: </span>
                 <span className="ml-1 text-foreground">{param.value}</span>
                 <button
-                  onClick={() => handleCopy(param.value, param.key)}
+                  onClick={() => {
+                    copyToClipboard(param.value, () => {
+                      setCopiedMap((prev) => ({ ...prev, [param.key]: true }))
+                      setTimeout(() => {
+                        setCopiedMap((prev) => ({ ...prev, [param.key]: false }))
+                      }, 1000)
+                    })
+                  }}
                   className={cn(
                     'text-foreground-lighter',
                     'ml-2 opacity-0 group-hover/param:opacity-100',

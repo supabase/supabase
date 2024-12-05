@@ -1,9 +1,8 @@
-'use client'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Fragment, useEffect, useState } from 'react'
 
-import React, { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { cn } from 'ui'
 import { Database } from 'icons'
+import { cn } from 'ui'
 
 // Add overall icon dimension controls
 const ICON_WIDTH = 48
@@ -243,7 +242,7 @@ export const TransactionIcon = () => {
     >
       <svg width={ICON_WIDTH} height={ICON_HEIGHT} viewBox={`0 0 ${ICON_WIDTH} ${ICON_HEIGHT}`}>
         {[0, 1, 2].map((index) => (
-          <React.Fragment key={index}>
+          <Fragment key={index}>
             <AnimatePresence>
               {dots[index] && (
                 <motion.circle
@@ -274,7 +273,7 @@ export const TransactionIcon = () => {
                 />
               )}
             </AnimatePresence>
-          </React.Fragment>
+          </Fragment>
         ))}
         <TopRect isActive={bottomLineActive} />
         <BottomRect isActive={true} />
@@ -367,7 +366,7 @@ export const SessionIcon = () => {
         <BottomRect isActive={bottomLineStates.some((state) => state)} />
       </svg>
       {[0, 1, 2].map((index) => (
-        <React.Fragment key={index}>
+        <Fragment key={index}>
           <FlowingLine
             x={CIRCLE_START_X + index * CIRCLE_SPACING}
             y1={TOP_LINE_START}
@@ -380,7 +379,7 @@ export const SessionIcon = () => {
             y2={BOTTOM_LINE_END}
             isActive={bottomLineStates[index]}
           />
-        </React.Fragment>
+        </Fragment>
       ))}
     </div>
   )
@@ -437,7 +436,7 @@ export const DirectConnectionIcon = () => {
     <div style={{ position: 'relative', width: ICON_WIDTH, height: ICON_HEIGHT }}>
       <svg width={ICON_WIDTH} height={ICON_HEIGHT} viewBox={`0 0 ${ICON_WIDTH} ${ICON_HEIGHT}`}>
         {[0, 1, 2].map((index) => (
-          <React.Fragment key={index}>
+          <Fragment key={index}>
             <AnimatePresence>
               {dots[index] && (
                 <motion.circle
@@ -468,7 +467,7 @@ export const DirectConnectionIcon = () => {
                 />
               )}
             </AnimatePresence>
-          </React.Fragment>
+          </Fragment>
         ))}
         <BottomRect isActive={lines.some((state) => state)} />
       </svg>
