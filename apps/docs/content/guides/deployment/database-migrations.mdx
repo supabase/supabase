@@ -13,17 +13,15 @@ To understand how database migrations work, it is useful to think of database sc
 
 ## Schema migrations
 
-For this guide, we'll create a table called `employees` and see how we can make changes to it. You will need to install the Supabase CLI and start the local development stack.
+For this guide, we'll create a table called `employees` and see how we can make changes to it.
 
-View the [quickstart](/docs/guides/local-development#quickstart) guide to setup your local environment.
+You will need to [install](/docs/guides/local-development#quickstart) the Supabase CLI and start the local development stack.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Create your first migration file">
-
       To get started, generate a [new migration](/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table.
-
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -65,7 +63,7 @@ create table employees (
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Apply your migration">
+    <StepHikeCompact.Details title="Apply your first migration">
       Run this migration to create the `employees` table.
 
       Now you can visit your new `employees` table in the local Dashboard.
@@ -86,7 +84,7 @@ supabase migration up
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Modify your employees table">
-      Next, let's modify your `employees` table by adding a column for department.
+      Next, modify your `employees` table by adding a column for `department`.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -104,7 +102,7 @@ supabase migration new add_department_column
 
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Add a new column to your table">
-      To that new migration file, add the SQL to create a new department column.
+      To that new migration file, add the SQL to create a new `department` column.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -122,10 +120,8 @@ add department text default 'Hooli';
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Apply your migration">
+    <StepHikeCompact.Details title="Apply your second migration">
       Run this migration to update your existing `employees` table.
-
-      Now you should see the department column added to your `employees` table in the local Dashboard.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -139,22 +135,26 @@ supabase migration up
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-### Add sample data
+Finally, you should see the `department` column added to your `employees` table in the local Dashboard.
+
+View the [complete code](https://github.com/supabase/supabase/tree/master/examples/database/employees) for this example.
+
+### Seeding data
 
 Now that you are managing your database with migrations scripts, it would be great have some seed data to use every time you reset the database.
-
-For this, you can create a seed script in `supabase/seed.sql`.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Populate your table">
-      Insert data into your `employees` table with your `supabase/seed.sql` file.
+      Create a seed script in supabase/seed.sql.
+
+      To that file, add the SQL to insert data into your `employees` table.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```sql
+```sql supabase/seed.sql
 insert into public.employees
   (name)
 values
@@ -172,7 +172,7 @@ values
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Reset your database">
-      Reset your database (apply current migrations), and populate with seed data
+      Reset your database to reapply migrations and populate with seed data.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -216,60 +216,62 @@ The last step is deploying these changes to a live Supabase project.
 
 ## Deploy your project
 
-You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
+You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users!
 
-### Log in to the Supabase CLI
+Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
 
-<CH.Code>
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Log in to the Supabase CLI">
+      [Login](/docs/reference/cli/usage#supabase-login) to the Supabase CLI using an auto-generated Personal Access Token.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
 
 ```bash Terminal
 supabase login
 ```
 
-```bash npx
-npx supabase login
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Link your project">
+      [Link](/docs/reference/cli/usage#supabase-link) to your remote project by selecting from the on-screen prompt.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase link
 ```
 
-</CH.Code>
+    </StepHikeCompact.Code>
 
-### Link your project
+  </StepHikeCompact.Step>
+</StepHikeCompact>
 
-Associate your project with your remote project using [`supabase link`](/docs/reference/cli/usage#supabase-link).
+<StepHikeCompact>
 
-```bash
-supabase link --project-ref <project-id>
-# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Deploy database changes">
+      [Push](/docs/reference/cli/usage#supabase-db-push) your migrations to the remote database.
+    </StepHikeCompact.Details>
 
-supabase db pull
-# Capture any changes that you have made to your remote database before you went through the steps above
-# If you have not made any changes to the remote database, skip this step
-```
+    <StepHikeCompact.Code>
 
-`supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
-This migration captures any changes required for your local database to match the schema of your remote Supabase project.
-
-Review the generated migration file and once happy, apply the changes to your local instance:
-
-```bash
-# To apply the new migration to your local database:
-supabase migration up
-
-# To reset your local database completely:
-supabase db reset
-```
-
-<Admonition type="note">
-
-There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
-
-</Admonition>
-
-### Deploy database changes
-
-Deploy any local database migrations using [`db push`](/docs/reference/cli/usage#supabase-db-push):
-
-```sh
+```bash Terminal
 supabase db push
 ```
 
-Visiting your live project on [Supabase](https://supabase.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+Visiting your live project on [Supabase](https://supabase.com/dashboard/project/_), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
