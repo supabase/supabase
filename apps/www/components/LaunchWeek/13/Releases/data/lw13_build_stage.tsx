@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
-import { GitBranch } from 'lucide-react'
+import { GitBranch, HardDrive } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -26,7 +26,7 @@ export interface AdventLink {
 export const days: AdventDay[] = [
   {
     title: 'OrioleDB Public Alpha',
-    description: 'Launching OrioleDB Public Alpha',
+    description: 'A better Postgres storage engine replacing Heap storage',
     id: 'orioledb',
     is_shipped: true,
     links: [
@@ -65,8 +65,7 @@ export const days: AdventDay[] = [
   },
   {
     title: 'Supabase CLI v2: Config as Code',
-    description:
-      'Commit the configuration for all of your Projects and Branches into version control.',
+    description: 'Version control the configuration of your Projects and Branches',
     id: 'cli',
     is_shipped: true,
     links: [
@@ -77,6 +76,20 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <GitBranch />,
+  },
+  {
+    title: 'High Performance Disks',
+    description: 'Store up to 60 TB of data with 100x improved durability and 5x more IOPS',
+    id: 'disk',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/high-performance-disks',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <HardDrive />,
   },
   {
     title: '',

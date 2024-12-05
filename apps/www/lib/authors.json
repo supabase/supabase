@@ -575,6 +575,22 @@
     "author_image_url": "https://github.com/saxonf.png"
   },
   {
+    "author_id": "gregpapas",
+    "author": "Greg Papas",
+    "username": "gregpapas",
+    "position": "Product",
+    "author_url": "https://github.com/sayil",
+    "author_image_url": "https://github.com/sayil.png"
+  },
+  {
+    "author_id": "pcnc",
+    "author": "Paul Cioanca",
+    "username": "pcnc",
+    "position": "Product",
+    "author_url": "https://github.com/pcnc",
+    "author_image_url": "https://github.com/pcnc.png"
+  },
+  {
     "author_id": "crispy1975",
     "author": "Paul Caselton",
     "username": "crispy1975",
