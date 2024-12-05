@@ -1,29 +1,31 @@
 ---
 title: Supabase Queues
-subtitle: 'Use Supabase Queues for reliable background job processing and service communication.'
+subtitle: 'Durable Message Queues with Guaranteed Delivery in Postgres'
 ---
 
-Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
+Supabase Queues is a Postgres-native durable Message Queue system with guaranteed delivery built on the [pgmq database extension](https://github.com/tembo-io/pgmq). It offers developers a seamless way to persist and process Messages in the background while improving the resiliency and scalability of their applications and services.
 
-Supabase Queues provides the reliability of Postgres with the simplicity of Supabase's developer experience, enabling teams to manage queues without maintaining additional infrastructure.
+Queues couples the reliability of Postgres with the simplicity Supabase's platform and developer experience, enabling developers to manage Background Tasks with zero configuration.
 
 ## Features
 
-- **Battle-tested Infrastructure**
+- **Postgres Native**
   <br />
-  Built on PGMQ with proven production deployments and active maintenance
-- **Native PostgreSQL Integration**
+  Built on top of the `pgmq` database extension, create and manage Queues with any Postgres tooling.
+- **Guaranteed Message Delivery**
   <br />
-  Zero additional infrastructure, transactional consistency, and high performance
-- **Row Level Security Integration**
+  Messages enqueued are guaranteed to be delivered to your consumers.
+- **Exactly Once Message Delivery**
+  <br />A Message is delivered exactly once to a consumer within a customizable visibility window.
+- **Message Durability and Archival**
   <br />
-  Native PostgreSQL RLS support for granular access control
-- **Visual Queue Management**
+  Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
+- **Granular Authorization**
   <br />
-  Built-in dashboard for queue monitoring and management
-- **Message Archival**
+  Control client-side consumer access to Queues with API permissions and Row Level Security (RLS) policies.
+- **Queue Management and Monitoring**
   <br />
-  Built-in support for archiving processed messages for audit trails
+  Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
 
 ## Resources
 

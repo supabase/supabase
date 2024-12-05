@@ -1,65 +1,61 @@
 ---
-title: Supabase Queues API
+title: API
 ---
 
-When you create a queue in Supabase, it creates both a private and public pgmq schema. The pgmq_public schema exposes common queue maintenance operations to clients, but does not expose functions for creating or dropping queues. Exposed functions are automatically available via PostgREST, and can be called with the supabase.rpc method.
+When you create a Queue in Supabase, you can choose to create helper database functions in the `pgmq_public` schema. This schema exposes operations to manage Queue Messages to consumers client-side, but does not expose functions for creating or dropping Queues.
 
-See the [Quickstart](/docs/guides/queues/quickstart) for an example.
+Database functions in `pgmq_public` can be exposed via Supabase Data API so consumers client-side can call them. Visit the [Quickstart](/docs/guides/queues/quickstart) for an example.
 
-The full list of available Queue functions is:
+## `pgmq_public.pop(queue_name)`
 
-## API Reference
+Retrieves the next available message and deletes it from the specified Queue.
 
-### `pop(queue_name)`
-
-Retrieves and locks the next message from the specified queue.
-
-- `queue_name` (string): Name of the queue to pop from
+- `queue_name` (text): Queue name
 
 ---
 
-### `send(queue_name, message, sleep_seconds?)`
+### `pgmq_public.send(queue_name, message, sleep_seconds)`
 
-Sends a message to the specified queue, optionally delaying its availability by a number of seconds.
+Enqueues a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
 
-- `queue_name` (string): Name of the queue to send to
-- `message` (json): Message payload to send
-- `sleep_seconds` (integer, optional): Delay message visibility by specified seconds
-
----
-
-### `send_batch(queue_name, messages, sleep_seconds?)`
-
-Sends a batch of messages to the specified queue, optionally delaying their availability by a number of seconds.
-
-- `queue_name` (string): Name of the queue to send to
-- `messages` (json[]): Array of message payloads to send
-- `sleep_seconds` (integer, optional): Delay messages visibility by specified seconds
+- `queue_name` (text): Queue name
+- `message` (jsonb): Message payload to send
+- `sleep_seconds` (integer, optional): Delay message visibility by specified seconds. Defaults to 0
 
 ---
 
-### `archive(queue_name, message_id)`
+### `pgmq_public.send_batch(queue_name, messages, sleep_seconds)`
 
-Archives a message by moving it from the queue to a permanent archive.
+Enqueues a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
 
-- `queue_name` (string): Name of the queue
-- `message_id` (bigint): ID of the message to archive
-
----
-
-### `delete(queue_name, message_id)`
-
-Permanently deletes a message from the specified queue.
-
-- `queue_name` (string): Name of the queue
-- `message_id` (bigint): ID of the message to delete
+- `queue_name` (text): Queue name
+- `messages` (jsonb[]): Array of message payloads to send
+- `sleep_seconds` (integer, optional): Delay messages visibility by specified seconds. Defaults to 0
 
 ---
 
-### `read(queue_name, sleep_seconds, n)`
+### `pgmq_public.archive(queue_name, message_id)`
 
-Reads up to "n" messages from the specified queue with an optional "sleep_seconds" (visibility timeout).
+Archives a Message by moving it from the Queue table to the Queue's archive table.
 
-- `queue_name` (string): Name of the queue to read from
+- `queue_name` (text): Queue name
+- `message_id` (bigint): ID of the Message to archive
+
+---
+
+### `pgmq_public.delete(queue_name, message_id)`
+
+Permanently deletes a Message from the specified Queue.
+
+- `queue_name` (text): Queue name
+- `message_id` (bigint): ID of the Message to delete
+
+---
+
+### `pgmq_public.read(queue_name, sleep_seconds, n)`
+
+Reads up to "n" Messages from the specified Queue with an optional "sleep_seconds" (visibility timeout).
+
+- `queue_name` (text): Queue name
 - `sleep_seconds` (integer): Visibility timeout in seconds
-- `n` (integer): Maximum number of messages to read
+- `n` (integer): Maximum number of Messages to read
