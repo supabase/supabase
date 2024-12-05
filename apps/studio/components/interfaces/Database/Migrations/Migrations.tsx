@@ -18,6 +18,7 @@ import {
 } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
 import { Search } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -47,26 +48,27 @@ const Migrations = () => {
 
       <div>
         {isError && (
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              Failed to retrieve migration history for database
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              <p className="mb-1">
-                Try refreshing your browser, but if the issue persists, please reach out to us via
-                support.
-              </p>
-              <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
-              <Button key="contact-support" asChild type="default">
-                <Link
-                  href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-                >
-                  Contact support
-                </Link>
-              </Button>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <Admonition
+            type="warning"
+            title="Failed to retrieve migration history for database"
+            description={
+              <>
+                <p className="mb-1">
+                  Try refreshing your browser, but if the issue persists, please reach out to us via
+                  support.
+                </p>
+                <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
+              </>
+            }
+          >
+            <Button key="contact-support" asChild type="default">
+              <Link
+                href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+              >
+                Contact support
+              </Link>
+            </Button>
+          </Admonition>
         )}
         {isSuccess && (
           <div>
