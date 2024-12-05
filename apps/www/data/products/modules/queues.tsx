@@ -160,7 +160,7 @@ export default () => ({
       >
         <div className="video-container !border-none !rounded-none">
           <iframe
-            src="https://www.youtube-nocookie.com/embed/"
+            src="https://www.youtube-nocookie.com/embed/UEwfaElBnZk"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
@@ -231,11 +231,11 @@ export default () => ({
     image: (
       <Image
         src={{
-          dark: '/images/modules/queues/queues-ui-dark.png',
-          light: '/images/modules/queues/queues-ui-light.png',
+          dark: '/images/blog/launch-week-13/day-4-supabase-queues/message-detail.jpg',
+          light: '/images/blog/launch-week-13/day-4-supabase-queues/message-detail-light.jpg',
         }}
         alt="Queues via Dashboard UI"
-        className="w-full max-w-[490px] aspect-[1/0.88] object-cover bg-cover"
+        className="w-full max-w-[490px] aspect-[1/1.14] object-cover bg-cover"
         fill
         sizes="100vw, (min-width: 768px) 50vw, (min-width: 1200px) 33vw"
         quality={100}

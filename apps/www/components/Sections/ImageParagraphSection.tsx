@@ -23,7 +23,7 @@ const ImageLeftSection: FC<Props> = (props) => {
     <SectionContainer
       id={props.id}
       className={cn(
-        'flex flex-col md:flex-row mx-auto lg:max-w-6xl justify-between items-center gap-4 md:gap-8',
+        'flex flex-col md:flex-row mx-auto lg:max-w-6xl justify-between items-center gap-8',
         props.className
       )}
     >

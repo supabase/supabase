@@ -31,7 +31,7 @@ const QueuesSQLSection: FC<Props> = (props) => {
     <SectionContainer
       id={props.id}
       className={cn(
-        'mx-auto lg:max-w-6xl flex flex-col md:flex-row justify-between items-center gap-4 md:gap-8',
+        'mx-auto lg:max-w-6xl flex flex-col md:flex-row justify-between items-center gap-8',
         props.className
       )}
     >

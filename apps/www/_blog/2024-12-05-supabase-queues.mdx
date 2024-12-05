@@ -22,7 +22,7 @@ Supabase Queues is a Postgres-native, durable Message Queue with guaranteed deli
 <div className="video-container mb-8">
   <iframe
     className="w-full"
-    src="https://www.youtube-nocookie.com/embed/miRQPbIJOuQ"
+    src="https://www.youtube-nocookie.com/embed/UEwfaElBnZk"
     title="Introducing Supabase Cron"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -59,9 +59,9 @@ Let's say you want to send a welcome email to a user after they register on your
 
 In this scenario, Queues have improved your application's _performance_ and _resilience_. Other cases include:
 
-* **Process tasks asynchronously**: offload time-consuming operations, like sending emails, processing images, and generating embeddings.
-* **Communication between services:** decouple your services by passing messages through a central queue.
-* **Load Balancing**: Distribute tasks evenly across multiple workers.
+- **Process tasks asynchronously**: offload time-consuming operations, like sending emails, processing images, and generating embeddings.
+- **Communication between services:** decouple your services by passing messages through a central queue.
+- **Load Balancing**: Distribute tasks evenly across multiple workers.
 
 ## Creating Queues
 
@@ -76,7 +76,13 @@ Queues can be created in the Dashboard or using SQL / database migrations.
 
 There are several types of queues available:
 
-<Img alt="Queue types" src="/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg" />
+<Img
+  alt="Queue types"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/queue-types.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/queue-types-light.jpg',
+  }}
+/>
 
 **Basic Queues**: Simple, reliable queues with core functionality, ideal for most use cases. Messages are stored and processed within Postgres using standard transactional guarantees.
 
@@ -92,7 +98,13 @@ Supabase Queues are compatible with Postgres Row-Level Security (RLS), providing
 
 Once your Queue is configured you can begin adding Messages.
 
-<Img alt="Add a message" src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg" />
+<Img
+  alt="Add a message"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+  }}
+/>
 
 ### Adding Messages from the Dashboard
 
@@ -100,17 +112,26 @@ Let's create a new Basic Queue and add a Message.
 
 <Img
   alt="Create a queue"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/create-a-queue.jpg"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/create-a-queue.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/create-a-queue-light.jpg',
+  }}
 />
 
 <Img
   alt="Enqueue a message"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+  }}
 />
 
 <Img
   alt="Message details"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/add-message-modal.jpg"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-modal.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-modal-light.jpg',
+  }}
 />
 
 ### Adding messages from the server
@@ -159,7 +180,10 @@ For example, the following permissions allow authenticated users can fully manip
 
 <Img
   alt="Queue permissions"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/permissions.jpg"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/permissions.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/permissions-light.jpg',
+  }}
 />
 
 The `postgres` and `service_role` roles receive permissions by default and should remain enabled for server-side operations.
@@ -172,7 +196,10 @@ From the Queues page, just click on a Queue to inspect it. From there you can cl
 
 <Img
   alt="Message details"
-  src="/images/blog/launch-week-13/day-4-supabase-queues/message-detail.jpg"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/message-detail.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/message-detail-light.jpg',
+  }}
 />
 
 ### Try Supabase Queues Today
@@ -181,7 +208,13 @@ From the Queues page, just click on a Queue to inspect it. From there you can cl
 2. Enable the **Queues** Postgres Module.
 3. Create your first Queue.
 
-<Img alt="Enable queues" src="/images/blog/launch-week-13/day-4-supabase-queues/integrations.jpg" />
+<Img
+  alt="Enable queues"
+  src={{
+    dark: '/images/blog/launch-week-13/day-4-supabase-queues/integrations.jpg',
+    light: '/images/blog/launch-week-13/day-4-supabase-queues/integrations-light.jpg',
+  }}
+/>
 
 ## Postgres for Everything
 
