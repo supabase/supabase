@@ -2049,7 +2049,7 @@ This feature is especially beneficial for Python developers looking to build rob
     },
   },
   {
-    title: 'Supabase Cron',
+    title: 'Cron',
     subtitle: 'Schedule recurring Jobs in Postgres.',
     description: `
 Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron syntax directly within your database. Seamlessly integrated into the Supabase ecosystem, it allows users to automate tasks like executing SQL snippets, calling Database Functions, triggering Supabase Edge Functions, or syncing with external systems via webhooks.
@@ -2099,6 +2099,31 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     heroImageLight: '/images/features/orioledb-light.png',
     docsUrl: 'https://supabase.com/docs/guides/database/orioledb',
     slug: 'orioledb',
+    status: {
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
+      availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Queues',
+    subtitle: 'Durable messages with guaranteed delivery.',
+    description: `
+Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
+
+Supabase Queues provides the reliability of Postgres with the simplicity of Supabase's developer experience, enabling teams to manage queues without maintaining additional infrastructure.
+
+## Features:
+1. Battle-tested Infrastructure: Built on PGMQ with proven production deployments and active maintenance.
+2. Native PostgreSQL Integration: Zero additional infrastructure, transactional consistency, and high performance.
+3. Row Level Security Integration: Native PostgreSQL RLS support for granular access control.
+4. Visual Queue Management: Built-in dashboard for queue monitoring and management.
+5. Message Archival: Built-in support for archiving processed messages for audit trails.
+`,
+    icon: Database,
+    products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: 'https://www.youtube-nocookie.com/embed/UEwfaElBnZk',
+    docsUrl: 'https://supabase.com/docs/guides/queues',
+    slug: 'queues',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: true,

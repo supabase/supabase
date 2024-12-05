@@ -14,6 +14,7 @@ interface Props {
     label: string
     url: string
   }
+  reverse?: boolean
 }
 
 const ImageLeftSection: FC<Props> = (props) => {
@@ -21,14 +22,19 @@ const ImageLeftSection: FC<Props> = (props) => {
     <SectionContainer
       id={props.id}
       className={cn(
-        'flex flex-col md:flex-row mx-auto lg:max-w-6xl justify-between items-center gap-4 md:gap-8',
+        'flex flex-col md:flex-row mx-auto lg:max-w-6xl justify-between items-center gap-8',
         props.className
       )}
     >
-      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden">
+      <div className="w-full max-w-md h-full object-cover flex-grow bg-200 shadow-lg border rounded-lg overflow-hidden image-container">
         {props.image}
       </div>
-      <div className="flex order-first md:order-last flex-grow flex-col gap-2 max-w-md">
+      <div
+        className={cn(
+          'flex order-first md:order-last flex-grow flex-col gap-2 max-w-md paragraph-container',
+          props.reverse && 'md:order-first'
+        )}
+      >
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>
