@@ -5,12 +5,12 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const WorkflowRunIdLogs: NextPageWithLayout = () => {
-  const project = useSelectedProject()
+  const { ref } = useParams()
   const { workflow_run_id } = useParams()
-  if (!project?.ref) {
+  if (!ref) {
     return null
   }
-  return <WorkflowLogsPage projectRef={project?.ref} workflowRunId={workflow_run_id} />
+  return <WorkflowLogsPage projectRef={ref} workflowRunId={workflow_run_id} />
 }
 
 WorkflowRunIdLogs.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
