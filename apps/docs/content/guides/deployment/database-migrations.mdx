@@ -45,9 +45,9 @@ supabase migration new create_employees_table
     <StepHikeCompact.Code>
 
 ```sql supabase/migrations/<timestamp>_create_employees_table.sql
-create table employees (
+create table if not exists employees (
   id bigint primary key generated always as identity,
-  name text,
+  name text not null,
   email text,
   created_at timestamptz default now()
 );
