@@ -17,7 +17,7 @@ export const UpgradeDatabaseAlert = () => {
       <div className="prose text-sm max-w-full">
         <p>
           This integration requires the <code>pgmq</code> extension which is not available on this
-          Database image. The extension is available on Databaseimage v15.6.1.143 and higher.
+          Database image. The extension is available on Database image v15.6.1.143 and higher.
         </p>
       </div>
       <Button color="primary" className="w-fit">
