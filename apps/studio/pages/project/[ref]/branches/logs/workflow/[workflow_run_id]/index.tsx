@@ -5,8 +5,7 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 
 const WorkflowRunIdLogs: NextPageWithLayout = () => {
-  const { ref } = useParams()
-  const { workflow_run_id } = useParams()
+  const { ref, workflow_run_id } = useParams()
   if (!ref) {
     return null
   }
