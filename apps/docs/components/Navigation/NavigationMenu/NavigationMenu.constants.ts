@@ -48,12 +48,27 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/realtime',
             level: 'realtime',
           },
+        ],
+        [
+          { label: 'Postgres Modules' },
           {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
             level: 'ai',
           },
+          {
+            label: 'Cron',
+            icon: 'cron',
+            href: '/guides/cron',
+            level: 'cron',
+          },
+          // {
+          //   label: 'Queues',
+          //   icon: 'queue',
+          //   href: '/guides/queues',
+          //   level: 'queue',
+          // },
         ],
       ],
     },
@@ -962,7 +977,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
-          name: 'pg_cron: Job Scheduling',
+          name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron',
         },
         {
@@ -1109,6 +1124,23 @@ export const database: NavMenuConstant = {
           name: 'Replicating from Supabase to External Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
+      ],
+    },
+  ],
+}
+
+export const cron: NavMenuConstant = {
+  icon: 'cron',
+  title: 'Cron',
+  url: '/guides/cron',
+  items: [
+    { name: 'Overview', url: '/guides/cron' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [
+        { name: 'Install', url: '/guides/cron/install' },
+        { name: 'Quickstart', url: '/guides/cron/quickstart' },
       ],
     },
   ],

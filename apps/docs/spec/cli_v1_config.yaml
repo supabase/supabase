@@ -1142,6 +1142,39 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.hook.<hook_name>.enabled'
+    title: 'auth.hook.<hook_name>.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable Auth Hook. Possible values for `hook_name` are: `custom_access_token`, `send_sms`, `send_email`, `mfa_verification_attempt`, and `password_verification_attempt`.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks'
+
+  - id: 'auth.hook.<hook_name>.uri'
+    title: 'auth.hook.<hook_name>.uri'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      URI of hook to invoke. Should be a http or https function or Postgres function taking the form: `pg-functions://<database>/<schema>/<function-name>`. For example, `pg-functions://postgres/auth/custom-access-token-hook`.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks'
+
+  - id: 'auth.hook.<hook_name>.secrets'
+    title: 'auth.hook.<hook_name>.secrets'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Configure when using a HTTP Hooks. Takes a list of base64 comma separated values to allow for secret rotation. Currently, Supabase Auth uses only the first value in the list.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks?queryGroups=language&language=http'
+
   - id: 'auth.mfa.totp.enroll_enabled'
     title: 'auth.mfa.totp.enroll_enabled'
     tags: ['auth']
@@ -1253,6 +1286,28 @@ parameters:
     links:
       - name: 'Auth Multi-Factor Authentication'
         link: 'https://supabase.com/docs/guides/auth/auth-mfa'
+
+  - id: 'auth.sessions.timebox'
+    title: 'auth.sessions.timebox'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Force log out after the specified duration. Sample values include: '50m', '20h'.
+    links:
+      - name: 'Auth Sessions'
+        link: 'https://supabase.com/docs/guides/auth/sessions'
+
+  - id: 'auth.sessions.inactivity_timeout'
+    title: 'auth.sessions.inactivity_timeout'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+    links:
+      - name: 'Auth Sessions'
+        link: 'https://supabase.com/docs/guides/auth/sessions'
 
   - id: 'auth.third_party.aws_cognito.enabled'
     title: 'auth.third_party.aws_cognito.enabled'

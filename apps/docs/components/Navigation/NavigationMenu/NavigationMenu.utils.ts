@@ -109,8 +109,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Api
     case pathname.startsWith('auth'):
       return MenuId.Auth
-    case pathname.startsWith('local-development'):
-      return MenuId.LocalDevelopment
+    case pathname.startsWith('cron'):
+      return MenuId.Cron
     case pathname.startsWith('database'):
       return MenuId.Database
     case pathname.startsWith('deployment'):
@@ -123,6 +123,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Graphql
     case pathname.startsWith('integrations'):
       return MenuId.Integrations
+    case pathname.startsWith('local-development'):
+      return MenuId.LocalDevelopment
     case pathname.startsWith('monitoring-troubleshooting'):
       return MenuId.MonitoringTroubleshooting
     case pathname.startsWith('platform'):
