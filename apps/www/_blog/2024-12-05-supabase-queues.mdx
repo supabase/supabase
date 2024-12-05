@@ -47,7 +47,6 @@ We're very thankful to all the contributors and we look forward to working with 
 1. **Exactly Once Message Delivery**: A Message is delivered exactly once to a consumer within a customizable visibility window.
 1. **Queue Management and Monitoring**: Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
 1. **Message Durability and Archival**: Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
-1. **Security or Granular Authorization**: Native Postgres RLS support for granular access control.
 
 ## Do You Need Queues?
 
@@ -162,7 +161,7 @@ const queues = createClient(url, key, {
 const { data, error } = await queues.rpc('send', {
   queue_name: 'foo',
   msg: '{ "hello": "world" }',
-  delay: 30,
+  sleep_seconds: 30,
 })
 
 console.log('Message: ', data)
