@@ -4,21 +4,21 @@ import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
-const codeSnippet = `const supabase = createClient(supabaseUrl, supabaseKey, {
+const codeSnippet = `const queues = createClient(supabaseUrl, supabaseKey, {
     db: { schema: "pgmq_public" },
   }
 );
 
-const { sendData, sendError } = await supabase.rpc("send", {
+const send = await queues.rpc("send", {
   queue_name: "subscribers",
   msg: '{ "email": "hello@example.com" }'
 });
 
 
-const { popData, popError } = await supabase.rpc("pop", {
+const message = await queues.rpc("pop", {
   queue_name: "subscribers"
-});
-`
+});`
+
 interface Props {
   id: string
   label: string | JSX.Element
