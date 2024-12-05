@@ -179,7 +179,7 @@ export const ConnectionPanel = ({
               )}
               {ipv4Status.link && (
                 <div className="mt-2">
-                  <Button className="" type="default" size="tiny">
+                  <Button asChild type="default" size="tiny">
                     <Link
                       href={ipv4Status.link.url}
                       className="text-xs text-light hover:text-foreground"
