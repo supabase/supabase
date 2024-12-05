@@ -7,15 +7,7 @@ import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  Input,
-  SidePanel,
-  WarningIcon,
-} from 'ui'
+import { Button, Input, SidePanel } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
 import { Search } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
