@@ -34,8 +34,8 @@ const levelsData = {
     icon: 'cron',
     name: 'Cron',
   },
-  queue: {
-    icon: 'queue',
+  queues: {
+    icon: 'queues',
     name: 'Queues',
   },
   api: {

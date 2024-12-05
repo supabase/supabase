@@ -129,8 +129,8 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.MonitoringTroubleshooting
     case pathname.startsWith('platform'):
       return MenuId.Platform
-    case pathname.startsWith('queue'):
-      return MenuId.Queue
+    case pathname.startsWith('queues'):
+      return MenuId.Queues
     case pathname.startsWith('realtime'):
       return MenuId.Realtime
     case pathname.startsWith('resources'):

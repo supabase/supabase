@@ -16,7 +16,7 @@ enum MenuId {
   Storage = 'storage',
   Ai = 'ai',
   Cron = 'cron',
-  Queue = 'queue',
+  Queues = 'queues',
   Platform = 'platform',
   Deployment = 'deployment',
   MonitoringTroubleshooting = 'monitoring_troubleshooting',
@@ -80,7 +80,7 @@ const menus: Menu[] = [
     type: 'guide',
   },
   {
-    id: MenuId.Queue,
+    id: MenuId.Queues,
     type: 'guide',
   },
   {
