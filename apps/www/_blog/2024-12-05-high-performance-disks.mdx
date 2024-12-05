@@ -2,8 +2,8 @@
 title: 'Scaling Database Storage: Introducing High Performance Disks'
 description: Store up to 60 TB of data with 100x improved durability and 5x more IOPS
 author: pcnc,jonny,gregpapas
-image: launch-week-13/day-3-supabase-cron/og.jpg
-thumb: launch-week-13/day-3-supabase-cron/thumb.jpg
+image: launch-week-13/high-performance-disks/og.jpg
+thumb: launch-week-13/high-performance-disks/thumb.jpg
 categories:
   - product
 tags:
@@ -50,27 +50,33 @@ With these advanced options comes complexity—both in the number of options ava
 
 <Img
   alt="Real-time cost updates as you adjust your disk configuration"
-  src="/images/blog/launch-week-13/disks/billing-1.png"
+  src="/images/blog/launch-week-13/high-performance-disks/high-performance-disks-billing-1.png"
 />
 
 - Clear breakdown of how each change affects your bill
 
 <Img
   alt="Clear breakdown of how each change affects your bill"
-  src="/images/blog/launch-week-13/disks/billing-2.png"
+  src="/images/blog/launch-week-13/high-performance-disks/high-performance-disks-billing-2.png"
 />
 
 ### Updated Disk Size Insights
 
 The Disk Size Usage graph breaks down the space used by the Database, Write-Ahead Log, and the System, rather than simply showing "used space."
 
-<Img alt="Updated disk size insights" src="/images/blog/launch-week-13/disks/insights.png" />
+<Img
+  alt="Updated disk size insights"
+  src="/images/blog/launch-week-13/high-performance-disks/high-performance-disks-insights.png"
+/>
 
 ### Preventing Footguns
 
 The effective IOPS is limited by both your compute add-on and disk configuration and it is technically possible to over provision the disk throughput and IOPS with the instance not being able to make full use of it. For example, to achieve maximum IOPS (80,000), you'll need a 16XL or larger compute instance. The dashboard warns you when it detects scenarios like these.
 
-<Img alt="Preventing footguns" src="/images/blog/launch-week-13/disks/footgun.png" />
+<Img
+  alt="Preventing footguns"
+  src="/images/blog/launch-week-13/high-performance-disks/high-performance-disks-footgun.png"
+/>
 
 ## Pricing
 

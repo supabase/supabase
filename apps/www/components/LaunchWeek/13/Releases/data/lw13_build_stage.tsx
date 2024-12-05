@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
-import { GitBranch } from 'lucide-react'
+import { GitBranch, HardDrive } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -76,6 +76,20 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <GitBranch />,
+  },
+  {
+    title: 'High Performance Disks',
+    description: 'Store up to 60 TB of data with 100x improved durability and 5x more IOPS',
+    id: 'disk',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/high-performance-disks',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <HardDrive />,
   },
   {
     title: '',
