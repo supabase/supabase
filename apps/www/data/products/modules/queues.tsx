@@ -1,5 +1,5 @@
 import { PRODUCT_MODULES } from 'shared-data/products'
-import BrowserFrame from '../../../components/BrowserFrame'
+import BrowserFrame from '~/components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
@@ -151,10 +151,6 @@ export default () => ({
       },
     ],
   },
-  // oss: {
-  //   title: '100% Open Source',
-  //   paragraph: 'Built on trusted, community-driven technology.',
-  // },
   videoSection: {
     video: (
       <BrowserFrame
