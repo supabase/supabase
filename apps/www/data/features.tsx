@@ -2049,7 +2049,7 @@ This feature is especially beneficial for Python developers looking to build rob
     },
   },
   {
-    title: 'Supabase Cron',
+    title: 'Cron',
     subtitle: 'Schedule recurring Jobs in Postgres.',
     description: `
 Supabase Cron is a Postgres module designed to schedule recurring Jobs with cron syntax directly within your database. Seamlessly integrated into the Supabase ecosystem, it allows users to automate tasks like executing SQL snippets, calling Database Functions, triggering Supabase Edge Functions, or syncing with external systems via webhooks.
@@ -2108,7 +2108,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
     title: 'Queues',
     subtitle: 'Durable messages with guaranteed delivery.',
     description: `
-    Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
+Supabase Queues is a native Postgres-based message queue system built on the PGMQ extension, offering developers a seamless way to persist and guarantee delivery of messages, which improves the scalability and resiliency of horizontally deployed services.
 
 Supabase Queues provides the reliability of Postgres with the simplicity of Supabase's developer experience, enabling teams to manage queues without maintaining additional infrastructure.
 
@@ -2121,8 +2121,7 @@ Supabase Queues provides the reliability of Postgres with the simplicity of Supa
 `,
     icon: Database,
     products: [PRODUCT_SHORTNAMES.DATABASE, ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage: '',
-    heroImageLight: '',
+    heroImage: 'https://www.youtube-nocookie.com/embed/[INSERT_VIDEO_ID]',
     docsUrl: 'https://supabase.com/docs/guides/queues',
     slug: 'queues',
     status: {
