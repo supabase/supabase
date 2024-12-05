@@ -51,7 +51,13 @@ export const DatabaseConnectionString = () => {
 
   const [selectedTab, setSelectedTab] = useState<ConnectionType>('uri')
 
-  const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
+  const {
+    data: poolingInfo,
+    error: poolingInfoError,
+    isLoading: isLoadingPoolingInfo,
+    isError: isErrorPoolingInfo,
+    isSuccess: isSuccessPoolingInfo,
+  } = usePoolingConfigurationQuery({
     projectRef,
   })
   const poolingConfiguration = poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
@@ -63,6 +69,11 @@ export const DatabaseConnectionString = () => {
     isError: isErrorReadReplicas,
     isSuccess: isSuccessReadReplicas,
   } = useReadReplicasQuery({ projectRef })
+
+  const error = poolingInfoError || readReplicasError
+  const isLoading = isLoadingPoolingInfo || isLoadingReadReplicas
+  const isError = isErrorPoolingInfo || isErrorReadReplicas
+  const isSuccess = isSuccessPoolingInfo && isSuccessReadReplicas
 
   const selectedDatabase = (databases ?? []).find(
     (db) => db.identifier === state.selectedDatabaseId
@@ -182,12 +193,19 @@ export const DatabaseConnectionString = () => {
         <DatabaseSelector buttonProps={{ size: 'small' }} />
       </div>
 
-      {isLoadingReadReplicas && <ShimmeringLoader className="h-8 w-full" />}
-      {isErrorReadReplicas && (
-        <AlertError error={readReplicasError} subject="Failed to retrieve database settings" />
+      {isLoading && (
+        <div className="p-7">
+          <ShimmeringLoader className="h-8 w-full" />
+        </div>
       )}
 
-      {isSuccessReadReplicas && (
+      {isError && (
+        <div className="p-7">
+          <AlertError error={error} subject="Failed to retrieve database settings" />
+        </div>
+      )}
+
+      {isSuccess && (
         <div className="flex flex-col divide-y divide-border">
           {/* // handle non terminal examples */}
           {hasCodeExamples && (

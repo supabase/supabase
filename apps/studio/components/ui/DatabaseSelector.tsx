@@ -63,7 +63,7 @@ const DatabaseSelector = ({
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <div className="flex items-center cursor-pointer">
+        <div className="flex cursor-pointer">
           <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             Source
           </span>

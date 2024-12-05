@@ -171,10 +171,7 @@ const Connect = () => {
             defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
-            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X)}>
-              <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
-                Connection String
-              </TabsTrigger_Shadcn_>
+            <TabsList_Shadcn_ className={cn('flex gap-x-4', DIALOG_PADDING_X)}>
               {CONNECTION_TYPES.map((type) => (
                 <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
                   {type.label}
@@ -190,6 +187,26 @@ const Connect = () => {
                 (connectionObject
                   .find((parent) => parent.key === selectedParent)
                   ?.children.find((child) => child.key === selectedChild)?.children.length || 0) > 0
+
+              if (type.key === 'direct') {
+                return (
+                  <TabsContent_Shadcn_
+                    key="direct"
+                    value="direct"
+                    className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
+                  >
+                    <div className={DIALOG_PADDING_Y}>
+                      {connectDialogUpdate ? (
+                        <DatabaseConnectionString />
+                      ) : (
+                        <div className="px-7">
+                          <OldDatabaseConnectionString appearance="minimal" />
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent_Shadcn_>
+                )
+              }
 
               return (
                 <TabsContent_Shadcn_
@@ -262,19 +279,6 @@ const Connect = () => {
                 </TabsContent_Shadcn_>
               )
             })}
-            <TabsContent_Shadcn_
-              key="direct"
-              value="direct"
-              className={cn('!mt-0', 'p-0', 'flex flex-col gap-6', DIALOG_PADDING_Y)}
-            >
-              {connectDialogUpdate ? (
-                <DatabaseConnectionString />
-              ) : (
-                <div className="px-7">
-                  <OldDatabaseConnectionString appearance="minimal" />
-                </div>
-              )}
-            </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
         </DialogContent>
       </Dialog>
