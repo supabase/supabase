@@ -1,14 +1,11 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { ArrowLeft, ArrowRight, HelpCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  getTableLikeFromTableEditor,
-  useTableEditorQuery,
-} from 'data/table-editor/table-editor-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { THRESHOLD_COUNT, useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -35,20 +32,18 @@ const Pagination = () => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const { data: tableData } = useTableEditorQuery({
+  const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-  const selectedTable = getTableLikeFromTableEditor(tableData)
 
-  // [Joshen] Only applicable to table entities
-  const rowsCountEstimate = (selectedTable as PostgresTable)?.live_rows_estimate ?? null
+  // rowsCountEstimate is only applicable to table entities
+  const rowsCountEstimate = isTableLike(selectedTable) ? selectedTable.live_rows_estimate : null
 
   const [{ filter }] = useUrlState({ arrayKeys: ['filter'] })
   const filters = formatFilterURLParams(filter as string[])
   const page = snap.page
-  const table = state.table ?? undefined
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
@@ -64,10 +59,9 @@ const Pagination = () => {
 
   const { data, isLoading, isSuccess, isError, isFetching } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,

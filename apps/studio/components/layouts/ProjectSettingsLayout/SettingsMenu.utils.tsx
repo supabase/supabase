@@ -1,9 +1,9 @@
+import { ArrowUpRight } from 'lucide-react'
+
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import type { Organization } from 'types'
-import { ArrowUpRight } from 'lucide-react'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -15,7 +15,6 @@ export const generateSettingsMenu = (
     storage?: boolean
     invoices?: boolean
     warehouse?: boolean
-    logDrains?: boolean
     diskAndCompute?: boolean
   }
 ): ProductMenuGroup[] => {
@@ -26,7 +25,7 @@ export const generateSettingsMenu = (
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
   const warehouseEnabled = features?.warehouse ?? false
-  const logDrainsEnabled = features?.logDrains ?? false
+  const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
     {
@@ -38,7 +37,7 @@ export const generateSettingsMenu = (
           url: `/project/${ref}/settings/general`,
           items: [],
         },
-        ...(IS_PLATFORM && features?.diskAndCompute
+        ...(IS_PLATFORM && newDiskComputeEnabled
           ? [
               {
                 name: 'Compute and Disk',
@@ -73,10 +72,10 @@ export const generateSettingsMenu = (
         {
           name: 'Vault',
           key: 'vault',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/secrets`,
+          url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'BETA',
+          label: 'Alpha',
         },
       ],
     },
@@ -135,7 +134,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && logDrainsEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: `Log Drains`,

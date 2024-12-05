@@ -1,6 +1,6 @@
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
-import Solutions from 'data/Solutions'
+import MainProducts from '~/data/MainProducts'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -62,8 +62,8 @@ function RealtimePage() {
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader
-          icon={Solutions['realtime']?.icon}
-          title={Solutions['realtime']?.name}
+          icon={MainProducts['realtime']?.icon}
+          title={MainProducts['realtime']?.name}
           h1={[<span key={'authentication-h1'}>Build modern web and mobile applications</span>]}
           subheader={['Sync client state globally over WebSockets in Realtime']}
           image={[

@@ -4,6 +4,7 @@ import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 
 export type BackupsVariables = {
   projectRef?: string
@@ -29,9 +30,13 @@ export type BackupsError = ResponseError
 export const useBackupsQuery = <TData = BackupsData>(
   { projectRef }: BackupsVariables,
   { enabled = true, ...options }: UseQueryOptions<BackupsData, BackupsError, TData> = {}
-) =>
-  useQuery<BackupsData, BackupsError, TData>(
+) => {
+  // [Joshen] Check for specifically false to account for project not loaded yet
+  const isOrioleDb = useIsOrioleDb()
+
+  return useQuery<BackupsData, BackupsError, TData>(
     databaseKeys.backups(projectRef),
     ({ signal }) => getBackups({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && isOrioleDb === false && typeof projectRef !== 'undefined', ...options }
   )
+}

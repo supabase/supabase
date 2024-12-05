@@ -12,7 +12,7 @@ Developing with Edge Functions is similar to developing with Node.js, but with a
 
 There are two ways to manage your dependencies in Supabase Edge Functions:
 
-### Using deno.json (Recommended)
+### Using deno.json (recommended)
 
 <Admonition type="info">
 
@@ -50,7 +50,7 @@ The recommended file structure when using `deno.json`:
     └── config.toml
 ```
 
-### Using Import Maps (Legacy)
+### Using import maps (legacy)
 
 Import Maps are a legacy way to manage dependencies, similar to a `package.json` file. While still supported, we recommend using `deno.json`. If both exist, `deno.json` takes precedence.
 
@@ -112,7 +112,7 @@ Supabase Edge Functions support several ways to import dependencies:
 - Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
 - Third party modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
 
-### NPM Modules
+### NPM modules
 
 You can import npm modules using the `npm:` specifier:
 
@@ -120,7 +120,7 @@ You can import npm modules using the `npm:` specifier:
 import { createClient } from 'npm:@supabase/supabase-js@2'
 ```
 
-### Node.js Built-ins
+### Node.js built-ins
 
 For Node.js built-in APIs, use the `node:` specifier:
 
@@ -129,6 +129,31 @@ import process from 'node:process'
 ```
 
 Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
+
+### Importing from private registries
+
+<Admonition type="info">
+
+This feature requires Supabase CLI version 1.207.9 or higher.
+
+</Admonition>
+
+Create a `.npmrc` file within `supabase/functions`. This will allow you to import the private packages into multiple functions. Alternatively, you can place the `.npmrc` file directly inside `supabase/functions/function-name` directory.)
+
+Add your registry details in the `.npmrc` file. Follow [this guide](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) to learn more about the syntax of npmrc files.
+
+```
+@myorg:registry=https://npm.registryhost.com
+//npm.registryhost.com/:_authToken=VALID_AUTH_TOKEN
+```
+
+After that, you can import the package directly in your function code or add it to the import_map.json (/docs/guides/functions/import-maps#using-import-maps).
+
+```ts
+import MyPackage from 'npm:@myorg/private-package@v1.0.1'
+
+// use MyPackage
+```
 
 ## Importing types
 

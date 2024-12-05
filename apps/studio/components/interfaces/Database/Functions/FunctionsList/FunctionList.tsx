@@ -108,7 +108,7 @@ const FunctionList = ({
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1" icon={<MoreVertical />} />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent side="left">
+                      <DropdownMenuContent side="left" className="w-52">
                         {isApiDocumentAvailable && (
                           <DropdownMenuItem
                             className="space-x-2"
@@ -125,7 +125,20 @@ const FunctionList = ({
                         <DropdownMenuItem
                           className="space-x-2"
                           onClick={() => {
-                            setAiAssistantPanel({ open: true, editor: 'functions', entity: x })
+                            setAiAssistantPanel({
+                              open: true,
+                              initialInput: 'Update this function to do...',
+                              suggestions: {
+                                title:
+                                  'I can help you make a change to this function, here are a few example prompts to get you started:',
+                                prompts: [
+                                  'Rename this function to ...',
+                                  'Modify this function so that it ...',
+                                  'Add a trigger for this function that calls it when ...',
+                                ],
+                              },
+                              sqlSnippets: [x.complete_statement],
+                            })
                           }}
                         >
                           <Edit size={14} />

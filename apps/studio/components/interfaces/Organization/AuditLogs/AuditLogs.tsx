@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
@@ -11,27 +10,28 @@ import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import {
   AuditLog,
   useOrganizationAuditLogsQuery,
 } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   WarningIcon,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 // [Joshen considerations]
 // - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
@@ -58,7 +58,7 @@ const AuditLogs = () => {
   const { data: projects } = useProjectsQuery()
   const { data: organizations } = useOrganizationsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
     useOrganizationAuditLogsQuery(
       {
@@ -96,7 +96,7 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  const roles = rolesData?.roles ?? []
+  const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
 
   const retentionPeriod = data?.retention_period ?? 0
   const logs = data?.result ?? []
@@ -229,16 +229,22 @@ const AuditLogs = () => {
                     }}
                     renderFooter={() => {
                       return (
-                        <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                          Your organization has a log retention period of{' '}
-                          <span className="text-brand">
-                            {retentionPeriod} day
-                            {retentionPeriod > 1 ? 's' : ''}
-                          </span>
-                          . You may only view logs from{' '}
-                          {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                          earliest date.
-                        </Alert>
+                        <Admonition
+                          showIcon={false}
+                          type="default"
+                          className="w-auto mx-2 px-3 py-2"
+                        >
+                          <div className="text-xs text-foreground-light">
+                            Your organization has a log retention period of{' '}
+                            <span className="text-brand">
+                              {retentionPeriod} day
+                              {retentionPeriod > 1 ? 's' : ''}
+                            </span>
+                            . You may only view logs from{' '}
+                            {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                            earliest date.
+                          </div>
+                        </Admonition>
                       )
                     }}
                   />
@@ -284,37 +290,24 @@ const AuditLogs = () => {
                       <div className="flex items-center space-x-2">
                         <p>Date</p>
 
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
-                            <Button
-                              type="text"
-                              className="px-1"
-                              icon={
-                                dateSortDesc ? (
-                                  <ArrowDown strokeWidth={1.5} size={14} />
-                                ) : (
-                                  <ArrowUp strokeWidth={1.5} size={14} />
-                                )
-                              }
-                              onClick={() => setDateSortDesc(!dateSortDesc)}
-                            />
-                          </Tooltip.Trigger>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="right">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Root>
+                        <ButtonTooltip
+                          type="text"
+                          className="px-1"
+                          icon={
+                            dateSortDesc ? (
+                              <ArrowDown strokeWidth={1.5} size={14} />
+                            ) : (
+                              <ArrowUp strokeWidth={1.5} size={14} />
+                            )
+                          }
+                          onClick={() => setDateSortDesc(!dateSortDesc)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                            },
+                          }}
+                        />
                       </div>
                     </Table.th>,
                     <Table.th key="actions" className="py-2"></Table.th>,

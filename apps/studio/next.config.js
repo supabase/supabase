@@ -402,17 +402,17 @@ const nextConfig = {
       {
         permanent: true,
         source: '/project/:ref/database/webhooks',
-        destination: '/project/:ref/integrations/webhooks',
+        destination: '/project/:ref/integrations/webhooks/overview',
       },
       {
         permanent: true,
         source: '/project/:ref/database/wrappers',
-        destination: '/project/:ref/integrations/wrappers',
+        destination: '/project/:ref/integrations?category=wrapper',
       },
       {
         permanent: true,
-        source: '/project/:ref/.....',
-        destination: '/project/:ref/integrations/cron-jobs',
+        source: '/project/:ref/database/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
       },
       {
         permanent: true,
@@ -428,6 +428,11 @@ const nextConfig = {
         permanent: true,
         source: '/project/:ref/settings/vault/keys',
         destination: '/project/:ref/integrations/vault/keys',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/integrations/cron-jobs',
+        destination: '/project/:ref/integrations/cron',
       },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
@@ -532,6 +537,12 @@ const nextConfig = {
           delete rule.issuer.and
         }
       })
+
+    // .md files to be loaded as raw text
+    config.module.rules.push({
+      test: /\.md$/,
+      type: 'asset/source',
+    })
 
     return config
   },
