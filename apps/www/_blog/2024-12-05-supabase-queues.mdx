@@ -2,8 +2,8 @@
 title: 'Supabase Queues'
 description: Durable Message Queues with Guaranteed Delivery in Postgres
 author: ivasilov,oli_rice
-image: launch-week-13/day-4-supabase-queues/og.jpg
-thumb: launch-week-13/day-4-supabase-queues/thumb.jpg
+image: launch-week-13/day-4-supabase-queues/og.png
+thumb: launch-week-13/day-4-supabase-queues/thumb.png
 categories:
   - developers
   - postgres
@@ -51,18 +51,17 @@ We're very thankful to all the contributors and we look forward to working with 
 
 ## Why Do You Need Queues?
 
-A Queue is used to manage and process tasks asynchronously. Typically, you use a Queue for long-running tasks to ensure that your application is robust. 
+A Queue is used to manage and process tasks asynchronously. Typically, you use a Queue for long-running tasks to ensure that your application is robust.
 
 **For example, sending emails:**
 
 Let's say you want to send a welcome email to a user after they register on your website. Instead of sending the email immediately within the registration process - which could slow down the user's experience - you can place the “email task” into a Queue.A separate email service can then process this task, sending the email without affecting the registration flow. Even better: if the email bounces then the task could "reappear" in the Queue to get processed again.
 
-In this scenario, Queues have improved your application's _performance_ and _resilience_. Other cases include: 
+In this scenario, Queues have improved your application's _performance_ and _resilience_. Other cases include:
 
 - **Process tasks asynchronously**: offload time-consuming operations, like sending emails, processing images, and generating embeddings.
 - **Communication between services:** decouple your services by passing messages through a central queue.
 - **Load Balancing**: Distribute tasks evenly across multiple workers.
-
 
 ## Creating Queues
 
@@ -150,12 +149,11 @@ console.log('Message: ', data)
 
 For security, this feature is [disabled by default](#security-and-permissions). There are several functions defined in the `pgmq_public` schema: `send`, `send_batch`, `read`, `pop`, `archive`, `delete`. You can find more details in the [docs](/docs/guides/queues/api).
 
-
 ## Security and Permissions
 
 By default, Queues are only accessible via SQL and not exposed over the Supabase Data API. You can manage this in the Data API settings by [exposing the pgmq_public schema](/docs/guides/api/using-custom-schemas). If you expose this schema, you must use [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) to manage access to your queues.
 
-Beyond RLS, Postgres roles can be granted granular permissions to interact with Queues. 
+Beyond RLS, Postgres roles can be granted granular permissions to interact with Queues.
 
 For example, the following permissions allow authenticated users can fully manipulate messages, whereas anonymous users can only add/retrieve messages:
 
