@@ -6,6 +6,7 @@ import { ComponentType, ReactNode } from 'react'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
 import { cn } from 'ui'
+import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
 
@@ -35,6 +36,8 @@ export type IntegrationDefinition = {
     websiteUrl: string
   }
   requiredExtensions: string[]
+  /** Optional component to render if the integration requires extensions that are not available on the current database image */
+  missingExtensionsAlert?: ReactNode
   navigation?: Navigation[]
   navigate: (
     id: string,
@@ -53,6 +56,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'queues',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pgmq'],
+    missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Queues`,
     icon: ({ className, ...props } = {}) => (
       <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
