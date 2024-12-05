@@ -10,6 +10,7 @@ import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -30,7 +31,6 @@ import { CONNECTION_TYPES, ConnectionType, FRAMEWORKS, MOBILES, ORMS } from './C
 import { getContentFilePath } from './Connect.utils'
 import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
-import { useAppStateSnapshot } from 'state/app-state'
 
 const Connect = () => {
   const state = useAppStateSnapshot()
