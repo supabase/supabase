@@ -9,13 +9,13 @@ const codeSnippet = `const supabase = createClient(supabaseUrl, supabaseKey, {
   }
 );
 
-const { data, error } = await supabase.rpc("send", {
+const { sendData, sendError } = await supabase.rpc("send", {
   queue_name: "subscribers",
   msg: '{ "email": "hello@example.com" }'
 });
 
 
-const { data, error } = await supabase.rpc("pop", {
+const { popData, popError } = await supabase.rpc("pop", {
   queue_name: "subscribers"
 });
 `
