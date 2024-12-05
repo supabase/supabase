@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common/hooks/useParams'
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'

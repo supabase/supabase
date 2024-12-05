@@ -1,7 +1,7 @@
 import { toString as CronToString } from 'cronstrue'
-import { List } from 'lucide-react'
+import { CircleCheck, CircleX, List, Loader } from 'lucide-react'
 import Link from 'next/link'
-import { UIEvent, useCallback, useMemo } from 'react'
+import { UIEvent, useCallback, useEffect, useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
@@ -12,7 +12,6 @@ import {
   useCronJobRunsInfiniteQuery,
 } from 'data/database-cron-jobs/database-cron-jobs-runs-infinite-query'
 import {
-  Badge,
   Button,
   cn,
   LoadingLine,
@@ -66,9 +65,7 @@ const cronJobColumns = [
     id: 'status',
     name: 'Status',
     minWidth: 75,
-    value: (row: CronJobRun) => (
-      <Badge variant={row.status === 'succeeded' ? 'success' : 'warning'}>{row.status}</Badge>
-    ),
+    value: (row: CronJobRun) => <StatusBadge status={row.status} />,
   },
   {
     id: 'start_time',
@@ -80,7 +77,9 @@ const cronJobColumns = [
     id: 'end_time',
     name: 'End Time',
     minWidth: 120,
-    value: (row: CronJobRun) => <div className="text-xs">{formatDate(row.end_time)}</div>,
+    value: (row: CronJobRun) => (
+      <div className="text-xs">{row.status === 'succeeded' ? formatDate(row.end_time) : '-'}</div>
+    ),
   },
 
   {
@@ -88,7 +87,9 @@ const cronJobColumns = [
     name: 'Duration',
     minWidth: 100,
     value: (row: CronJobRun) => (
-      <div className="text-xs">{calculateDuration(row.start_time, row.end_time)}</div>
+      <span className="text-xs">
+        {row.status === 'succeeded' ? calculateDuration(row.start_time, row.end_time) : ''}
+      </span>
     ),
   },
 ]
@@ -146,6 +147,7 @@ export const PreviousRunsTab = () => {
     data,
     isLoading: isLoadingCronJobRuns,
     fetchNextPage,
+    refetch,
     isFetching,
   } = useCronJobRunsInfiniteQuery(
     {
@@ -155,6 +157,15 @@ export const PreviousRunsTab = () => {
     },
     { enabled: !!currentJobState?.jobid, staleTime: 30 }
   )
+
+  useEffect(() => {
+    // Refetch only the first page
+    const timerId = setInterval(() => {
+      refetch({ refetchPage: (_page, index) => index === 0 })
+    }, 30000)
+
+    return () => clearInterval(timerId)
+  }, [refetch])
 
   const handleScroll = useCallback(
     (event: UIEvent<HTMLDivElement>) => {
@@ -170,42 +181,40 @@ export const PreviousRunsTab = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="mt-4 h-full">
-        <LoadingLine loading={isFetching} />
-        <DataGrid
-          className="flex-grow h-full"
-          rowHeight={44}
-          headerRowHeight={36}
-          onScroll={handleScroll}
-          columns={columns}
-          rows={cronJobRuns ?? []}
-          rowClass={() => {
-            const isSelected = false
-            return cn([
-              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'}  `,
-              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
-              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-              '[&>.rdg-cell:first-child>div]:ml-4',
-            ])
-          }}
-          renderers={{
-            renderRow(_idx, props) {
-              return <Row key={props.row.job_pid} {...props} />
-            },
-            noRowsFallback: isLoadingCronJobRuns ? (
-              <div className="absolute top-14 px-6 w-full">
-                <GenericSkeletonLoader />
-              </div>
-            ) : (
-              <div className="flex items-center justify-center w-full col-span-6">
-                <CronJobsEmptyState page="runs" />
-              </div>
-            ),
-          }}
-        />
-      </div>
+      <LoadingLine loading={isFetching} />
+      <DataGrid
+        className="flex-grow"
+        rowHeight={44}
+        headerRowHeight={36}
+        onScroll={handleScroll}
+        columns={columns}
+        rows={cronJobRuns ?? []}
+        rowClass={() => {
+          const isSelected = false
+          return cn([
+            `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'}  `,
+            `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell:first-child>div]:ml-4',
+          ])
+        }}
+        renderers={{
+          renderRow(_idx, props) {
+            return <Row key={props.row.job_pid} {...props} />
+          },
+          noRowsFallback: isLoadingCronJobRuns ? (
+            <div className="absolute top-14 px-6 w-full">
+              <GenericSkeletonLoader />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center w-full col-span-6">
+              <CronJobsEmptyState page="runs" />
+            </div>
+          ),
+        }}
+      />
 
-      <div className="px-6 py-6 flex gap-12 border-t">
+      <div className="px-6 py-6 flex gap-12 border-t bg">
         {isLoadingCronJobs ? (
           <GenericSkeletonLoader />
         ) : (
@@ -228,7 +237,7 @@ export const PreviousRunsTab = () => {
               </p>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-y-2">
               <h3 className="text-sm">Command</h3>
               <Tooltip_Shadcn_>
                 <TooltipTrigger_Shadcn_ className=" text-left p-0! cursor-pointer truncate max-w-[300px] h-12 relative">
@@ -255,18 +264,9 @@ export const PreviousRunsTab = () => {
                   </SimpleCodeBlock>
                 </TooltipContent_Shadcn_>
               </Tooltip_Shadcn_>
-              {/* <div className="text-xs text-foreground-light">
-                <SimpleCodeBlock
-                  showCopy={false}
-                  className="sql"
-                  parentClassName=" [&>div>span]:text-xs bg-alternative-200 !p-2 rounded-md"
-                >
-                  {currentJobState?.command}
-                </SimpleCodeBlock>
-              </div> */}
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-y-2">
               <h3 className="text-sm">Explore</h3>
               <Button asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
                 {/* [Terry] need to link to the exact jobid, but not currently supported */}
@@ -280,4 +280,36 @@ export const PreviousRunsTab = () => {
       </div>
     </div>
   )
+}
+
+interface StatusBadgeProps {
+  status: string
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  if (status === 'succeeded') {
+    return (
+      <span className="text-brand-600 flex items-center gap-1">
+        <CircleCheck size={14} /> Succeeded
+      </span>
+    )
+  }
+
+  if (status === 'failed') {
+    return (
+      <span className="text-destructive flex items-center gap-1">
+        <CircleX size={14} /> Failed
+      </span>
+    )
+  }
+
+  if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
+    return (
+      <span className="text-_secondary flex items-center gap-1">
+        <Loader size={14} className="animate-spin" /> Running
+      </span>
+    )
+  }
+
+  return null
 }

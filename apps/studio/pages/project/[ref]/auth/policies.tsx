@@ -4,8 +4,7 @@ import { partition } from 'lodash'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -20,7 +19,6 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
-import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
 
@@ -66,8 +64,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   }>()
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
-  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
@@ -160,7 +156,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         />
       )}
 
-      <AIPolicyEditorPanel
+      <PolicyEditorPanel
         visible={showPolicyAiEditor}
         schema={schema}
         searchString={searchString}

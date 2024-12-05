@@ -18,7 +18,8 @@ export type CronJobRun = {
   database: string
   username: string
   command: string
-  status: 'succeeded' | 'failed'
+  // statuses https://github.com/citusdata/pg_cron/blob/f5d111117ddc0f4d83a1bad34d61b857681b6720/include/job_metadata.h#L20
+  status: 'starting' | 'running' | 'sending' | 'connecting' | 'succeeded' | 'failed'
   return_message: string
   start_time: string
   end_time: string
@@ -35,9 +36,9 @@ export async function getDatabaseCronJobRuns({
   if (!projectRef) throw new Error('Project ref is required')
 
   let query = `
-    SELECT * FROM cron.job_run_details 
-    WHERE 
-      jobid = '${jobId}' 
+    SELECT * FROM cron.job_run_details
+    WHERE
+      jobid = '${jobId}'
       ${afterTimestamp ? `AND start_time < '${afterTimestamp}'` : ''}
     ORDER BY start_time DESC
     LIMIT ${CRON_JOB_RUNS_PAGE_SIZE}`

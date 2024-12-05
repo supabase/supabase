@@ -554,6 +554,22 @@ parameters:
       - name: 'Inbucket documentation'
         link: 'https://www.inbucket.org'
 
+  - id: 'inbucket.admin_email'
+    title: 'inbucket.admin_email'
+    tags: ['local']
+    required: false
+    default: 'admin@email.com'
+    description: |
+      Email used as the sender for emails sent from the application.
+
+  - id: 'inbucket.sender_name'
+    title: 'inbucket.sender_name'
+    tags: ['local']
+    required: false
+    default: 'Admin'
+    description: |
+      Display name used as the sender for emails sent from the application.
+
   - id: 'storage.enabled'
     title: 'storage.enabled'
     tags: ['storage']
@@ -571,7 +587,48 @@ parameters:
     required: false
     default: '"50MiB"'
     description: |
+      The maximum file size allowed for all buckets in the project.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.public'
+    title: 'storage.buckets.<bucket_name>.public'
+    tags: ['storage']
+    required: false
+    default: 'false'
+    description: |
+      Enable public access to the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.file_size_limit'
+    title: 'storage.buckets.<bucket_name>.file_size_limit'
+    tags: ['storage']
+    required: false
+    description: |
       The maximum file size allowed (e.g. "5MB", "500KB").
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.allowed_mime_types'
+    title: 'storage.buckets.<bucket_name>.allowed_mime_types'
+    tags: ['storage']
+    required: false
+    description: |
+      The list of allowed MIME types for objects in the bucket.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
+  - id: 'storage.buckets.bucket_name.objects_path'
+    title: 'storage.buckets.<bucket_name>.objects_path'
+    tags: ['storage']
+    required: false
+    description: |
+      The local directory to upload objects to the bucket.
     links:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
@@ -620,6 +677,17 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.enable_manual_linking'
+    title: 'auth.enable_manual_linking'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Allow testing manual linking of accounts
+    links:
+      - name: 'Anonymous Sign Ins (Manual Linking)'
+        link: 'https://supabase.com/docs/guides/auth/auth-anonymous?queryGroups=language&language=python#convert-an-anonymous-user-to-a-permanent-user'
+
   - id: 'auth.enable_refresh_token_rotation'
     title: 'auth.enable_refresh_token_rotation'
     tags: ['auth']
@@ -661,8 +729,8 @@ parameters:
     description: |
       Allow/disallow anonymous sign-ins to your project.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Anonymous Sign Ins'
+        link: 'https://supabase.com/docs/guides/auth/auth-anonymous'
 
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
@@ -1006,11 +1074,11 @@ parameters:
       - `google`
       - `kakao`
       - `keycloak`
-      - `linkedin`
+      - `linkedin_oidc`
       - `notion`
       - `twitch`
       - `twitter`
-      - `slack`
+      - `slack_oidc`
       - `spotify`
       - `workos`
       - `zoom`
@@ -1074,27 +1142,289 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.hook.<hook_name>.enabled'
+    title: 'auth.hook.<hook_name>.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable Auth Hook. Possible values for `hook_name` are: `custom_access_token`, `send_sms`, `send_email`, `mfa_verification_attempt`, and `password_verification_attempt`.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks'
+
+  - id: 'auth.hook.<hook_name>.uri'
+    title: 'auth.hook.<hook_name>.uri'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      URI of hook to invoke. Should be a http or https function or Postgres function taking the form: `pg-functions://<database>/<schema>/<function-name>`. For example, `pg-functions://postgres/auth/custom-access-token-hook`.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks'
+
+  - id: 'auth.hook.<hook_name>.secrets'
+    title: 'auth.hook.<hook_name>.secrets'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Configure when using a HTTP Hooks. Takes a list of base64 comma separated values to allow for secret rotation. Currently, Supabase Auth uses only the first value in the list.
+    links:
+      - name: 'Auth Hooks'
+        link: 'https://supabase.com/docs/guides/auth/auth-hooks?queryGroups=language&language=http'
+
+  - id: 'auth.mfa.totp.enroll_enabled'
+    title: 'auth.mfa.totp.enroll_enabled'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Enable TOTP enrollment for multi-factor authentication.
+    links:
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
+
+  - id: 'auth.mfa.totp.verify_enabled'
+    title: 'auth.mfa.totp.verify_enabled'
+    tags: ['auth']
+    required: false
+    default: 'true'
+    description: |
+      Enable TOTP verification for multi-factor authentication.
+    links:
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
+
+  - id: 'auth.mfa.max_enrolled_factors'
+    title: 'auth.mfa.max_enrolled_factors'
+    tags: ['auth']
+    required: false
+    default: '10'
+    description: |
+      Control how many MFA factors can be enrolled at once per user.
+    links:
+      - name: 'Auth Multi-Factor Authentication (TOTP)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/totp'
+
+  - id: 'auth.mfa.phone.enroll_enabled'
+    title: 'auth.mfa.phone.enroll_enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable Phone enrollment for multi-factor authentication.
+    links:
+      - name: 'Auth Multi-Factor Authentication (Phone)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/phone'
+
+  - id: 'auth.mfa.phone.otp_length'
+    title: 'auth.mfa.phone.otp_length'
+    tags: ['auth']
+    required: false
+    default: '6'
+    description: |
+      Length of OTP code sent when using phone multi-factor authentication
+    links:
+      - name: 'Auth Multi-Factor Authentication (Phone)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/phone'
+
+  - id: 'auth.mfa.phone.max_frequency'
+    title: 'auth.mfa.phone.max_frequency'
+    tags: ['auth']
+    required: false
+    default: '10s'
+    description: |
+      The minimum amount of time that must pass between phone requests.
+      Helps prevent spam by limiting how frequently messages can be sent.
+      Example values: "10s", "20s", "1m"
+    links:
+      - name: 'Auth Multi-Factor Authentication (Phone)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/phone'
+
+  - id: 'auth.mfa.phone.otp_length'
+    title: 'auth.mfa.phone.otp_length'
+    tags: ['auth']
+    required: false
+    default: '6'
+    description: |
+      Length of OTP sent when using phone multi-factor authentication
+    links:
+      - name: 'Auth Multi-Factor Authentication (Phone)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/phone'
+
+  - id: 'auth.mfa.phone.verify_enabled'
+    title: 'auth.mfa.phone.verify_enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable Phone verification for multi-factor authentication.
+    links:
+      - name: 'Auth Multi-Factor Authentication (Phone)'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa/phone'
+
   - id: 'auth.mfa.web_authn.enroll_enabled'
     title: 'auth.mfa.web_authn.enroll_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
       Enable WebAuthn enrollment for multi-factor authentication.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Auth Multi-Factor Authentication'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa'
 
   - id: 'auth.mfa.web_authn.verify_enabled'
     title: 'auth.mfa.web_authn.verify_enabled'
-    tags: ['auth', 'local']
+    tags: ['auth']
     required: false
     default: 'false'
     description: |
       Enable WebAuthn verification for multi-factor authentication.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Auth Multi-Factor Authentication'
+        link: 'https://supabase.com/docs/guides/auth/auth-mfa'
+
+  - id: 'auth.sessions.timebox'
+    title: 'auth.sessions.timebox'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Force log out after the specified duration. Sample values include: '50m', '20h'.
+    links:
+      - name: 'Auth Sessions'
+        link: 'https://supabase.com/docs/guides/auth/sessions'
+
+  - id: 'auth.sessions.inactivity_timeout'
+    title: 'auth.sessions.inactivity_timeout'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Force log out if the user has been inactive longer than the specified duration. Sample values include: '50m', '20h'.
+    links:
+      - name: 'Auth Sessions'
+        link: 'https://supabase.com/docs/guides/auth/sessions'
+
+  - id: 'auth.third_party.aws_cognito.enabled'
+    title: 'auth.third_party.aws_cognito.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with AWS Cognito (Amplify)
+    links:
+      - name: 'Third Party Auth (Cognito)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
+
+  - id: 'auth.third_party.aws_cognito.user_pool_id'
+    title: 'auth.third_party.aws_cognito.user_pool_id'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      User Pool ID for AWS Cognito (Amplify) that you are integrating with
+    links:
+      - name: 'Third Party Auth (Cognito)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
+
+  - id: 'auth.third_party.aws_cognito.user_pool_region'
+    title: 'auth.third_party.aws_cognito.user_pool_region'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      User Pool region for AWS Cognito (Amplify) that you are integrating with. Example values: 'ap-southeast-1', 'us-east-1'
+    links:
+      - name: 'Third Party Auth (Cognito)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/aws-cognito'
+
+  - id: 'auth.third_party.auth0.enabled'
+    title: 'auth.third_party.auth0.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with Auth0
+    links:
+      - name: 'Third Party Auth (Auth0)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
+
+  - id: 'auth.third_party.auth0.tenant'
+    title: 'auth.third_party.auth0.tenant'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Tenant Identifier for Auth0 instance that you are integrating with
+    links:
+      - name: 'Third Party Auth (Auth0)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
+
+  - id: 'auth.third_party.auth0.tenant_region'
+    title: 'auth.third_party.tenant_region'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Tenant region for Auth0 instance that you are integrating with
+    links:
+      - name: 'Third Party Auth (Auth0)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/auth0'
+
+  - id: 'auth.third_party.firebase.enabled'
+    title: 'auth.third_party.firebase.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable third party auth with Firebase
+    links:
+      - name: 'Third Party Auth (Firebase)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/firebase-auth'
+
+  - id: 'auth.third_party.firebase.project_id'
+    title: 'auth.third_party.firebase.project_id'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Project ID for Firebase instance that you are integrating with
+    links:
+      - name: 'Third Party Auth (Firebase)'
+        link: 'https://supabase.com/docs/guides/auth/third-party/firebase-auth'
+
+  - id: 'edge_runtime.enabled'
+    title: 'edge_runtime.enabled'
+    tags: ['edge-functions']
+    required: false
+    default: 'true'
+    description: |
+      Enable the local Edge Runtime service for Edge Functions.
+    links: []
+
+  - id: 'edge_runtime.policy'
+    title: 'edge_runtime.policy'
+    tags: ['edge-functions']
+    required: false
+    default: '"oneshot"'
+    description: |
+      Configure the request handling policy for Edge Functions. Available options:
+      - `oneshot`: Recommended for development with hot reload support
+      - `per_worker`: Recommended for load testing scenarios
+    links: []
+
+  - id: 'edge_runtime.inspector_port'
+    title: 'edge_runtime.inspector_port'
+    tags: ['edge-functions']
+    required: false
+    default: '8083'
+    description: |
+      Port to attach the Chrome inspector for debugging Edge Functions.
+    links: []
 
   - id: 'functions.function_name.enabled'
     title: 'functions.<function_name>.enabled'
@@ -1131,6 +1461,7 @@ parameters:
     required: false
     description: |
       Specify the Deno import map file to use for the Function.
+      When not specified, defaults to `supabase/functions/<function_name>/deno.json`.
 
       Note that the `--import-map` flag overrides this configuration.
     links:
