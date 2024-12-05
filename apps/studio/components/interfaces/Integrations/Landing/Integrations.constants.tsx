@@ -1,13 +1,13 @@
-import { Clock5, Layers, Vault, Webhook } from 'lucide-react'
+import { Clock5, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
 
-import { WRAPPERS } from 'components/interfaces/Database/Wrappers/Wrappers.constants'
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { BASE_PATH } from 'lib/constants'
-import dynamic from 'next/dynamic'
 import { cn } from 'ui'
+import { WRAPPERS } from '../Wrappers/Wrappers.constants'
+import { WrapperMeta } from '../Wrappers/Wrappers.types'
 
 export type Navigation = {
   route: string
@@ -26,7 +26,7 @@ const Loading = () => (
 export type IntegrationDefinition = {
   id: string
   name: string
-  beta?: boolean
+  status?: 'alpha' | 'beta'
   icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
   description: string
   docsUrl: string
@@ -76,14 +76,71 @@ const supabaseIntegrations: IntegrationDefinition[] = [
           <Layers size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
         ),
       },
+      {
+        route: 'settings',
+        label: 'Settings',
+      },
+    ],
+    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+      if (childId) {
+        return dynamic(() => import('../Queues/QueueTab').then((mod) => mod.QueueTab), {
+          loading: Loading,
+        })
+      }
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+                (mod) => mod.QueuesOverviewTab
+              ),
+            { loading: Loading }
+          )
+        case 'queues':
+          return dynamic(() => import('../Queues/QueuesTab').then((mod) => mod.QueuesTab), {
+            loading: Loading,
+          })
+        case 'settings':
+          return dynamic(
+            () => import('../Queues/QueuesSettings').then((mod) => mod.QueuesSettings),
+            { loading: Loading }
+          )
+      }
+      return null
+    },
+  },
+  {
+    id: 'cron',
+    type: 'postgres_extension' as const,
+    requiredExtensions: ['pg_cron'],
+    name: `Cron`,
+    icon: ({ className, ...props } = {}) => (
+      <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Schedule recurring Jobs in Postgres.',
+    docsUrl: 'https://github.com/citusdata/pg_cron',
+    author: {
+      name: 'Citus Data',
+      websiteUrl: 'https://github.com/citusdata/pg_cron',
+    },
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+      {
+        route: 'jobs',
+        label: 'Jobs',
+        hasChild: true,
+        childIcon: (
+          <Timer size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
+        ),
+      },
     ],
     navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
       if (childId) {
         return dynamic(
-          () =>
-            import('components/interfaces/Integrations/NewQueues/QueueTab').then(
-              (mod) => mod.QueueTab
-            ),
+          () => import('../CronJobs/PreviousRunsTab').then((mod) => mod.PreviousRunsTab),
           {
             loading: Loading,
           }
@@ -100,66 +157,10 @@ const supabaseIntegrations: IntegrationDefinition[] = [
               loading: Loading,
             }
           )
-        case 'queues':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewQueues/QueuesTab').then(
-                (mod) => mod.QueuesTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
-      }
-      return null
-    },
-  },
-  {
-    id: 'cron-jobs',
-    type: 'postgres_extension' as const,
-    requiredExtensions: ['pg_cron'],
-    name: `Cron Jobs`,
-    icon: ({ className, ...props } = {}) => (
-      <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
-    ),
-    description: 'Schedule and automate tasks to run maintenance routines at specified intervals.',
-    docsUrl: 'https://github.com/citusdata/pg_cron',
-    author: {
-      name: 'pg_cron',
-      websiteUrl: 'https://github.com/citusdata/pg_cron',
-    },
-    navigation: [
-      {
-        route: 'overview',
-        label: 'Overview',
-      },
-      {
-        route: 'cron-jobs',
-        label: 'Cron Jobs',
-      },
-    ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
-      switch (pageId) {
-        case 'overview':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
-        case 'cron-jobs':
-          return dynamic(
-            () =>
-              import('components/interfaces/Integrations/NewCronJobs/CronjobsTab').then(
-                (mod) => mod.CronjobsTab
-              ),
-            {
-              loading: Loading,
-            }
-          )
+        case 'jobs':
+          return dynamic(() => import('../CronJobs/CronJobsTab').then((mod) => mod.CronjobsTab), {
+            loading: Loading,
+          })
       }
       return null
     },
@@ -169,7 +170,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     type: 'postgres_extension' as const,
     requiredExtensions: ['supabase_vault'],
     name: `Vault`,
-    beta: true,
+    status: 'alpha',
     icon: ({ className, ...props } = {}) => (
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
@@ -205,7 +206,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
         case 'keys':
           return dynamic(
             () =>
-              import('components/interfaces/Settings/Vault').then(
+              import('../Vault/Keys/EncryptionKeysManagement').then(
                 (mod) => mod.EncryptionKeysManagement
               ),
             {
@@ -214,8 +215,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
           )
         case 'secrets':
           return dynamic(
-            () =>
-              import('components/interfaces/Settings/Vault').then((mod) => mod.SecretsManagement),
+            () => import('../Vault/Secrets/SecretsManagement').then((mod) => mod.SecretsManagement),
             {
               loading: Loading,
             }
@@ -226,8 +226,8 @@ const supabaseIntegrations: IntegrationDefinition[] = [
   },
   {
     id: 'webhooks',
-    type: 'custom' as const,
-    name: `Webhooks`,
+    type: 'postgres_extension' as const,
+    name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
       <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
@@ -276,7 +276,7 @@ const supabaseIntegrations: IntegrationDefinition[] = [
     id: 'graphiql',
     type: 'postgres_extension' as const,
     requiredExtensions: ['pg_graphql'],
-    name: `GraphiQL`,
+    name: `GraphQL`,
     icon: ({ className, ...props } = {}) => (
       <Image
         fill

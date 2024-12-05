@@ -1,9 +1,8 @@
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import Connect from 'components/interfaces/Connect/Connect'
+import { useParams } from 'common'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
@@ -44,7 +43,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -70,53 +68,59 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={cn(
-        'flex h-12 max-h-12 min-h-12 items-center justify-between py-2 px-5 bg-dash-sidebar',
+        'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar',
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      <div className="-ml-2 flex items-center text-sm gap-x-3">
-        {projectRef && (
-          <>
-            <div className="flex items-center">
-              <OrganizationDropdown />
-              <LayoutHeaderDivider />
-              <ProjectDropdown />
+      <div className="flex items-center justify-between py-2 px-3 flex-1">
+        <div className="flex items-center text-sm">
+          {projectRef && (
+            <>
+              <div className="flex items-center">
+                <OrganizationDropdown />
+                <LayoutHeaderDivider />
+                <ProjectDropdown />
 
-              {exceedingLimits && (
-                <div className="ml-2">
-                  <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                    <Badge variant="destructive">Exceeding usage limits</Badge>
-                  </Link>
-                </div>
-              )}
+                {exceedingLimits && (
+                  <div className="ml-2">
+                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                      <Badge variant="destructive">Exceeding usage limits</Badge>
+                    </Link>
+                  </div>
+                )}
 
-              {selectedProject && isBranchingEnabled && (
-                <>
-                  <LayoutHeaderDivider />
-                  <BranchDropdown />
-                </>
-              )}
-            </div>
+                {selectedProject && isBranchingEnabled && (
+                  <>
+                    <LayoutHeaderDivider />
+                    <BranchDropdown />
+                  </>
+                )}
+              </div>
 
-            {!isBranchingEnabled && <EnableBranchingButton />}
-            {connectDialogUpdate && <Connect />}
-          </>
-        )}
+              {!isBranchingEnabled && <EnableBranchingButton />}
+              {connectDialogUpdate && <Connect />}
+            </>
+          )}
 
-        {/* Additional breadcrumbs are supplied */}
-        <BreadcrumbsView defaultValue={breadcrumbs} />
+          {/* Additional breadcrumbs are supplied */}
+          <BreadcrumbsView defaultValue={breadcrumbs} />
+        </div>
+        <div className="flex items-center gap-x-2">
+          {customHeaderComponents && customHeaderComponents}
+          {IS_PLATFORM && (
+            <>
+              <FeedbackDropdown />
+              <NotificationsPopoverV2 />
+              <HelpPopover />
+            </>
+          )}
+        </div>
       </div>
-      <div className="flex items-center gap-x-2">
-        {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && (
-          <>
-            <FeedbackDropdown />
-            <NotificationsPopoverV2 />
-            <HelpPopover />
-            {isAssistantV2Enabled && !!projectRef && <AssistantButton />}
-          </>
-        )}
-      </div>
+      {!!projectRef && (
+        <div className="border-l flex-0 h-full">
+          <AssistantButton />
+        </div>
+      )}
     </div>
   )
 }

@@ -125,6 +125,7 @@ export async function getStaticProps() {
   const { data: meetups, error } = await supabase
     .from('meetups')
     .select('id, city, country, link, start_at, timezone, launch_week')
+    .eq('is_published', true)
 
   if (error) console.log('meetups error: ', error)
 

@@ -4,16 +4,16 @@ import { Edit, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import InputField from 'components/interfaces/Database/Wrappers/InputField'
-import WrapperTableEditor from 'components/interfaces/Database/Wrappers/WrapperTableEditor'
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
-import { makeValidateRequired } from 'components/interfaces/Database/Wrappers/Wrappers.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWCreateMutation } from 'data/fdw/fdw-create-mutation'
 import { Button, Form, Input, SheetFooter, SheetHeader, SheetTitle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import InputField from './InputField'
+import { WrapperMeta } from './Wrappers.types'
+import { makeValidateRequired } from './Wrappers.utils'
+import WrapperTableEditor from './WrapperTableEditor'
 
 export interface CreateWrapperSheetProps {
   isClosing: boolean

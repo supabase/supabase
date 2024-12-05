@@ -64,6 +64,7 @@ export interface CodeBlockProps {
   renderer?: SyntaxHighlighterProps['renderer']
   focusable?: boolean
   onCopyCallback?: () => void
+  wrapLines?: boolean
 }
 
 /**
@@ -96,6 +97,7 @@ export const CodeBlock = ({
   children,
   hideCopy = false,
   hideLineNumbers = false,
+  wrapLines = true,
   renderer,
   focusable = true,
   onCopyCallback = noop,
@@ -167,7 +169,7 @@ export const CodeBlock = ({
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
-            wrapLines={true}
+            wrapLines={wrapLines}
             // @ts-ignore
             style={monokaiTheme}
             className={cn(
