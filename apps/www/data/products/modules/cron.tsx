@@ -216,7 +216,7 @@ export default () => ({
       label: 'Start scheduling',
       url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
     },
-    className: '!py-0',
+    className: 'md:!py-0',
   },
   section3: {
     id: 'UI-Job-Observability',
@@ -238,7 +238,7 @@ export default () => ({
         draggable={false}
       />
     ),
-    className: '!pb-0 [&_.image-container]:md:max-w-xl',
+    className: 'md:!pb-0 [&_.image-container]:md:max-w-xl',
     reverse: true,
   },
   section4: {

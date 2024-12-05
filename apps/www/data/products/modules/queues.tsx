@@ -217,6 +217,7 @@ export default () => ({
         draggable={false}
       />
     ),
+    className: 'md:!pt-0',
   },
   section3: {
     id: 'ui',
@@ -242,5 +243,6 @@ export default () => ({
         draggable={false}
       />
     ),
+    className: 'md:!pt-0',
   },
 })

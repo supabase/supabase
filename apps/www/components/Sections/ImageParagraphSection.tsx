@@ -9,7 +9,6 @@ interface Props {
   heading: string | JSX.Element
   subheading: string | JSX.Element
   image?: any
-  imageContainerClassName?: string
   className?: string
   cta?: {
     label: string

@@ -4,15 +4,20 @@ import { cn, TextLink } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import CodeWindow from '~/components/CodeWindow'
 
-const codeSnippet = `
-select pgmq.create('my_special_queue');
-
-select * from pgmq.send(
-  queue_name  => 'my_special_queue',
-  msg         => '{"hello": "world"}',
+const codeSnippet = `const supabase = createClient(supabaseUrl, supabaseKey, {
+    db: { schema: "pgmq_public" },
+  }
 );
 
-select * from pgmq.pop('my_special_queue');
+const { data, error } = await supabase.rpc("send", {
+  queue_name: "subscribers",
+  msg: '{ "email": "hello@example.com" }'
+});
+
+
+const { data, error } = await supabase.rpc("pop", {
+  queue_name: "subscribers"
+});
 `
 interface Props {
   id: string
@@ -26,7 +31,7 @@ interface Props {
   }
 }
 
-const QueuesSQLSection: FC<Props> = (props) => {
+const QueuesAPISection: FC<Props> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -35,20 +40,7 @@ const QueuesSQLSection: FC<Props> = (props) => {
         props.className
       )}
     >
-      <ul className="w-full flex-grow rounded-lg max-w-md">
-        <div className="w-full h-full relative">
-          <CodeWindow
-            code={codeSnippet}
-            lang="sql"
-            className="
-              h-full xl:!text-lg
-              [&_.synthax-highlighter]:!pb-8
-              [&_.synthax-highlighter]:xl:min-h-[240px]
-            "
-          />
-        </div>
-      </ul>
-      <div className="flex order-first md:order-last flex-col gap-2 max-w-md">
+      <div className="flex flex-col gap-2 max-w-md">
         <span className="label">{props.label}</span>
         <h2 className="h2 !m-0">{props.heading}</h2>
         <p className="p !text-foreground-lighter">{props.subheading}</p>
@@ -56,8 +48,19 @@ const QueuesSQLSection: FC<Props> = (props) => {
           <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
         )}
       </div>
+      <div className="w-full flex-grow rounded-lg max-w-lg">
+        <CodeWindow
+          code={codeSnippet}
+          lang="js"
+          className="
+              h-full xl:!text-lg
+              [&_.synthax-highlighter]:!pb-8
+              [&_.synthax-highlighter]:xl:min-h-[240px]
+            "
+        />
+      </div>
     </SectionContainer>
   )
 }
 
-export default QueuesSQLSection
+export default QueuesAPISection
