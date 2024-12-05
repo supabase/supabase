@@ -23,6 +23,7 @@
     "last-changed:reset": "npm run last-changed -- --reset",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
+    "format": "prettier --write .",
     "clean": "rimraf node_modules ./docs/features/docs/generated"
   },
   "dependencies": {
