@@ -1,9 +1,10 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText } from 'ai'
-import { getTools } from './tools'
 import pgMeta from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import { executeSql } from 'data/sql/execute-sql-query'
+import { getTools } from './tools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
@@ -11,15 +12,9 @@ const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(400).json({
+      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+    })
   }
 
   const { method } = req
@@ -28,13 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'POST':
       return handlePost(req, res)
     default:
-      return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
-        {
-          status: 405,
-          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
-        }
-      )
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
