@@ -108,13 +108,14 @@ Be aware that increasing IOPS or throughput incurs additional charges.
 
 When selecting your disk, it's essential to focus on the performance needs of your workload. Here's a comparison of our available disk types:
 
-|                   | General Purpose SSD (gp3)                                              | High Performance SSD (io2)                                                   |
-| ----------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Use Case**      | General workloads, development environments, small to medium databases | High-performance needs, large-scale databases, mission-critical applications |
-| **Max Disk Size** | 16 TB                                                                  | 60 TB                                                                        |
-| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                       | 80,000 IOPS (at 80 GB disk size)                                             |
-| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                           | Automatically scales with IOPS                                               |
-| **Best For**      | Great value for most use cases                                         | Low latency and very high IOPS requirements                                  |
+|                   | General Purpose SSD (gp3)                                                                                                                     | High Performance SSD (io2)                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Use Case**      | General workloads, development environments, small to medium databases                                                                        | High-performance needs, large-scale databases, mission-critical applications                         |
+| **Max Disk Size** | 16 TB                                                                                                                                         | 60 TB                                                                                                |
+| **Max IOPS**      | 16,000 IOPS (at 32 GB disk size)                                                                                                              | 80,000 IOPS (at 80 GB disk size)                                                                     |
+| **Throughput**    | 125 MiB/s (default) to 1,000 MiB/s (maximum)                                                                                                  | Automatically scales with IOPS                                                                       |
+| **Best For**      | Great value for most use cases                                                                                                                | Low latency and very high IOPS requirements                                                          |
+| **Pricing**       | Disk: 8 GB included, then $0.125 per GB<br/>IOPS: 3,000 included, then $0.024 per IOPS<br/>Throughput: 125 Mbps included, then $0.95 per Mbps | Disk: $0.195 per GB<br/>IOPS: $0.119 per IOPS<br/>Throughput: Scales with IOPS at no additional cost |
 
 For general, day-to-day operations, gp3 should be more than enough. If you need high throughput and IOPS for critical systems, io2 will provide the performance required.
 

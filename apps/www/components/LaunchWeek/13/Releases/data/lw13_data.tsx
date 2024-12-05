@@ -186,7 +186,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     shipped: true,
     isToday: true,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/supabase-queues',
     date: '5 December',
     published_at: '2024-12-05T08:00:00.000-07:00',
     title: 'Supabase Queues',
