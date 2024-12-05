@@ -793,46 +793,28 @@ export const SQLEditor = () => {
             direction="vertical"
             autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
           >
-            {!hasHipaaAddon && isDiffOpen && (
-              <motion.div
-                key="ask-ai-input-container"
-                layoutId="ask-ai-input-container"
-                variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                initial={isFirstRender ? 'visible' : 'hidden'}
-                animate="visible"
-                className={cn(
-                  'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                  'bg-brand-200 border-b border-brand-400  !shadow-none'
-                )}
-              >
-                <DiffActionBar
-                  loading={isAcceptDiffLoading}
-                  selectedDiffType={selectedDiffType || DiffType.Modification}
-                  onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                  onAccept={acceptAiHandler}
-                  onCancel={discardAiHandler}
-                />
-              </motion.div>
-            )}
-
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {promptState.isOpen && (
+                {(promptState.isOpen || isDiffOpen) && (
                   <div className="bg border-b">
                     <div className="flex gap-4 pr-2 py-1 items-center">
-                      <Input
-                        className="flex-1"
-                        autoFocus
-                        inputClassName="bg-transparent border-none focus:ring-0 px-4"
-                        value={promptInput}
-                        onChange={(e) => setPromptInput(e.target.value)}
-                        placeholder="Edit your query..."
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && !e.shiftKey) {
-                            handlePrompt()
-                          }
-                        }}
-                      />
+                      <div className="flex-1">
+                        {promptState.isOpen && (
+                          <Input
+                            className="flex-1"
+                            autoFocus
+                            inputClassName="bg-transparent border-none focus:ring-0 px-4"
+                            value={promptInput}
+                            onChange={(e) => setPromptInput(e.target.value)}
+                            placeholder="Edit your query..."
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' && !e.shiftKey) {
+                                handlePrompt()
+                              }
+                            }}
+                          />
+                        )}
+                      </div>
                       <p className="text-foreground-muted text-xs">Escape to close</p>
                       {!sourceSqlDiff || isCompletionLoading ? (
                         <Button
@@ -843,32 +825,33 @@ export const SQLEditor = () => {
                           Submit edit
                         </Button>
                       ) : (
-                        <div className="flex gap-2">
-                          <Button
-                            onClick={handleAcceptPrompt}
-                            loading={isCompletionLoading}
-                            disabled={isCompletionLoading}
-                          >
-                            Accept
-                          </Button>
-                          <Button
-                            type="default"
-                            onClick={() => {
-                              discardAiHandler()
-                              setPromptInput('')
-                              setPromptState({
-                                isOpen: false,
-                                selection: '',
-                                beforeSelection: '',
-                                afterSelection: '',
-                                isLoading: false,
-                              })
-                            }}
-                            disabled={isCompletionLoading}
-                          >
-                            Reject
-                          </Button>
-                        </div>
+                        <DiffActionBar
+                          loading={isAcceptDiffLoading}
+                          selectedDiffType={selectedDiffType || DiffType.Modification}
+                          onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
+                          onAccept={() => {
+                            handleAcceptPrompt()
+                            setPromptInput('')
+                            setPromptState({
+                              isOpen: false,
+                              selection: '',
+                              beforeSelection: '',
+                              afterSelection: '',
+                              isLoading: false,
+                            })
+                          }}
+                          onCancel={() => {
+                            discardAiHandler()
+                            setPromptInput('')
+                            setPromptState({
+                              isOpen: false,
+                              selection: '',
+                              beforeSelection: '',
+                              afterSelection: '',
+                              isLoading: false,
+                            })
+                          }}
+                        />
                       )}
                     </div>
                   </div>
@@ -889,7 +872,7 @@ export const SQLEditor = () => {
                           onMount={(editor) => {
                             diffEditorRef.current = editor
                           }}
-                          options={{ fontSize: 13, renderSideBySide: !promptState.isOpen }}
+                          options={{ fontSize: 13, renderSideBySide: false }}
                         />
                       </div>
                     )}
