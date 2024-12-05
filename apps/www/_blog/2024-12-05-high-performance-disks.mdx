@@ -60,6 +60,12 @@ With these advanced options comes complexity—both in the number of options ava
   src="/images/blog/launch-week-13/disks/billing-2.png"
 />
 
+### Updated Disk Size Insights
+
+The Disk Size Usage graph breaks down the space used by the Database, Write-Ahead Log, and the System, rather than simply showing "used space."
+
+<Img alt="Updated disk size insights" src="/images/blog/launch-week-13/disks/insights.png" />
+
 ### Preventing Footguns
 
 The effective IOPS is limited by both your compute add-on and disk configuration and it is technically possible to over provision the disk throughput and IOPS with the instance not being able to make full use of it. For example, to achieve maximum IOPS (80,000), you'll need a 16XL or larger compute instance. The dashboard warns you when it detects scenarios like these.
