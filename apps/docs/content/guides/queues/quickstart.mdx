@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-subtitle: 'Learn how to use Supabase Queues to enqueue and read messages'
+subtitle: 'Learn how to use Supabase Queues to add and read messages'
 ---
 
 {/* <!-- vale off --> */}
@@ -23,7 +23,7 @@ A Message in a Queue is a json object that is stored until a consumer explicitly
 Supabase Queues offers three types of Queues:
 
 - **Basic Queue**: A durable Queue that stores Messages in a logged table.
-- **Unlogged Queue**: A transient Queue that stores Messages in an unlogged table for better performance but may result in loss of enqueued Messages.
+- **Unlogged Queue**: A transient Queue that stores Messages in an unlogged table for better performance but may result in loss of Queue Messages.
 
 - **Partitioned Queue** (_Coming Soon_): A durable and scalable Queue that stores Messages in multiple table partitions for better performance.
 
@@ -156,7 +156,7 @@ const supabaseKey = 'supabaseKey'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 const QueuesTest: React.FC = () => {
-  //Enqueue Message
+  //Add a Message
   const sendToQueue = async () => {
     const result = await supabase.rpc('send', {
       queue_name: 'foo',

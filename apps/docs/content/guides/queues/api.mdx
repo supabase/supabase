@@ -17,7 +17,7 @@ Retrieves the next available message and deletes it from the specified Queue.
 
 ### `pgmq_public.send(queue_name, message, sleep_seconds)`
 
-Enqueues a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
+Adds a Message to the specified Queue, optionally delaying its visibility to all consumers by a number of seconds.
 
 - `queue_name` (text): Queue name
 - `message` (jsonb): Message payload to send
@@ -27,7 +27,7 @@ Enqueues a Message to the specified Queue, optionally delaying its visibility to
 
 ### `pgmq_public.send_batch(queue_name, messages, sleep_seconds)`
 
-Enqueues a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
+Adds a batch of Messages to the specified Queue, optionally delaying their availability to all consumers by a number of seconds.
 
 - `queue_name` (text): Queue name
 - `messages` (jsonb[]): Array of message payloads to send

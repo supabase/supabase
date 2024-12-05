@@ -43,7 +43,7 @@ We're very thankful to all the contributors and we look forward to working with 
 
 1. **Postgres Native**: Built on top of the open source `pgmq` database extension, create and manage Queues with any Postgres tooling.
 1. **Granular Authorization**: Control client-side consumer access to Queues with API permissions and Row Level Security (RLS) policies.
-1. **Guaranteed Message Delivery**: Messages enqueued are guaranteed to be delivered to your consumers.
+1. **Guaranteed Message Delivery**: Messages added to Queues are guaranteed to be delivered to your consumers.
 1. **Exactly Once Message Delivery**: A Message is delivered exactly once to a consumer within a customizable visibility window.
 1. **Queue Management and Monitoring**: Create, manage, and monitor Queues and Messages in the Supabase Dashboard.
 1. **Message Durability and Archival**: Messages are stored in Postgres and you can choose to archive them for analytical or auditing purposes.
@@ -118,7 +118,7 @@ Let's create a new Basic Queue and add a Message.
 />
 
 <Img
-  alt="Enqueue a message"
+  alt="Add a message"
   src={{
     dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
     light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
@@ -216,6 +216,6 @@ From the Queues page, just click on a Queue to inspect it. From there you can cl
 
 ## Postgres for Everything
 
-Using Postgres for your Queue system keeps your stack lean and familiar. You can enqueue jobs within the same transaction that modifies related data, preventing inconsistencies and reducing the need for additional coordination. Postgres' robust indexing, JSONB support, and partitioning also enable scalable, high-performance queue management directly in your database.
+Using Postgres for your Queue system keeps your stack lean and familiar. You can add Messages to Queues within the same transaction that modifies related data, preventing inconsistencies and reducing the need for additional coordination. Postgres' robust indexing, JSONB support, and partitioning also enable scalable, high-performance queue management directly in your database.
 
 By eliminating the need for separate infrastructure like RabbitMQ or Kafka, you reduce costs, streamline deployments, and leverage existing Postgres tools for monitoring, backups, and security. Features like Row-Level Security, rich SQL querying, and built-in archiving make Postgres a powerful, unified solution for both data storage and messaging.
