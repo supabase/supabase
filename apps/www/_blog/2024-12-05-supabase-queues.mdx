@@ -161,7 +161,6 @@ const queues = createClient(url, key, {
 const { data, error } = await queues.rpc('send', {
   queue_name: 'foo',
   msg: '{ "hello": "world" }',
-  sleep_seconds: 30,
 })
 
 console.log('Message: ', data)
