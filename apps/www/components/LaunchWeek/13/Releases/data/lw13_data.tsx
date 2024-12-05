@@ -184,7 +184,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-queues',
     date: '5 December',
@@ -224,25 +224,42 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
     blog: '',
     date: '6 December',
     published_at: '2024-12-06T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'database.build 2.0: Bring-your-own-LLM',
+    description: (
+      <>
+        database.build 2.0: <br className="hidden sm:block" />
+        Bring-your-own-LLM
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1zqKVYOEODYxB',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d5/d5-database-build-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d5/d5-database-build-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d5/d5-database-build-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d5/d5-database-build-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
 ]
 
