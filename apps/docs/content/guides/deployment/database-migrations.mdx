@@ -9,11 +9,13 @@ tocVideo: 'Kx5nHBmIxyQ'
 
 Database migrations are SQL statements that create, update, or delete your existing database schemas. They are a common way of tracking changes to your database over time.
 
-To understand how database migrations work, it is useful to think of database schemas as interfaces in TypeScript. They define the structure of your tables, functions, and other database entities. When you change an interface in TypeScript, you need to update any code that accesses the changed fields. Similarly when you modify a database schema, you have to update all other entities that reference it.
+To understand how database migrations work, it is useful to think of database schemas as interfaces in TypeScript. You database schemas define the structure of your tables, functions, and other database entities. When you change an interface in TypeScript, you need to update any code that accesses the changed fields. Similarly when you modify a database schema, you have to update all other entities that reference it using a migration.
 
 ## Schema migrations
 
-For this guide, we'll create a table called `employees` and see how we can make changes to it.
+For this guide, we'll create a table called `employees` and see how we can make changes to it. You will need to install the Supabase CLI and start the local development stack.
+
+View the [quickstart](/docs/guides/local-development#quickstart) guide to setup your local environment.
 
 <StepHikeCompact>
 
@@ -26,7 +28,7 @@ For this guide, we'll create a table called `employees` and see how we can make 
 
     <StepHikeCompact.Code>
 
-```bash
+```bash Terminal
 supabase migration new create_employees_table
 ```
 
@@ -39,15 +41,14 @@ supabase migration new create_employees_table
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Add the SQL to your migration file">
-      This creates a new migration: supabase/migrations/\<timestamp\>
-        _create_employees_table.sql.
+      This creates a new migration file in supabase/migrations directory.
 
-        To that file, add the SQL to create this `employees` table
+      To that file, add the SQL to create this `employees` table.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```sql
+```sql supabase/migrations/<timestamp>_create_employees_table.sql
 create table employees (
   id bigint primary key generated always as identity,
   name text,
@@ -65,15 +66,15 @@ create table employees (
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Apply your migration">
-      Now that you have a migration file, you can run this migration and create the `employees` table.
+      Run this migration to create the `employees` table.
 
-      Use the `reset` command here to reset the database to the current migrations
+      Now you can visit your new `employees` table in the local Dashboard.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```bash
-supabase db reset
+```bash Terminal
+supabase migration up
 ```
 
     </StepHikeCompact.Code>
@@ -85,15 +86,13 @@ supabase db reset
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Modify your employees table">
-      Now you can visit your new `employees` table in the Dashboard.
-
-      Next, modify your `employees` table by adding a column for department. Create a new migration file for that.
+      Next, let's modify your `employees` table by adding a column for department.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```bash
-supabase migration new add_department_to_employees_table
+```bash Terminal
+supabase migration new add_department_column
 ```
 
     </StepHikeCompact.Code>
@@ -105,17 +104,34 @@ supabase migration new add_department_to_employees_table
 
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Add a new column to your table">
-      This creates a new migration file: supabase/migrations/\<timestamp\>
-        _add_department_to_employees_table.sql.
-
-        To that file, add the SQL to create a new department column
+      To that new migration file, add the SQL to create a new department column.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-```sql
+```sql supabase/migrations/<timestamp>_add_department_column.sql
 alter table if exists public.employees
 add department text default 'Hooli';
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Apply your migration">
+      Run this migration to update your existing `employees` table.
+
+      Now you should see the department column added to your `employees` table in the local Dashboard.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase migration up
 ```
 
     </StepHikeCompact.Code>
