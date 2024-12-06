@@ -269,7 +269,7 @@ table {
 }
 .next-image--dynamic-fill.wide,
 video.wide {
-  @apply my-0 max-w-none -mx-8 w-[calc(100%_+_4rem)];
+  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%_+_4rem)];
 }
 @media (min-width: 560px) {
   .next-image--dynamic-fill.wide,

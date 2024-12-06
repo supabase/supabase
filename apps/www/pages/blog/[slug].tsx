@@ -107,6 +107,9 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
   const nextPost = allPosts[currentIndex + 1]
   const prevPost = allPosts[currentIndex - 1]
 
+  const tocResult = toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 })
+  const processedContent = tocResult.content.replace(/%23/g, '')
+
   return {
     props: {
       prevPost: currentIndex === 0 ? null : prevPost ? prevPost : null,
@@ -117,7 +120,10 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         source: content,
         ...data,
         content: mdxSource,
-        toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
+        toc: {
+          ...tocResult,
+          content: processedContent,
+        },
       },
     },
   }
