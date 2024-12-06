@@ -103,7 +103,7 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
                       type="warning"
                       className="rounded-t-none [&>div]:text-xs"
                       title="OrioleDB is not production ready"
-                      description="Postgres with OrioleDB extension is currently in public alpha and not recommended for production usage yet."
+                      description="Postgres with OrioleDB extension is currently in Public Alpha and not recommended for production usage yet."
                     >
                       <DocsButton
                         className="mt-2"

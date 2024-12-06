@@ -2852,4 +2852,11 @@ module.exports = [
     source: '/changelogpod',
     destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
   },
+
+  // features
+  {
+    permanent: true,
+    source: '/features/ai-query-assistance',
+    destination: '/features/ai-assistant',
+  },
 ]
