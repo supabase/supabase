@@ -37,7 +37,7 @@ export function LW13CountdownBanner() {
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
           <div className="hidden sm:block text-foreground-lighter">
-            Supabase Queues: Durable Message Queues with Guaranteed Delivery
+            database.build v2: Bring-Your-Own-LLM
           </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
             <Link href={announcement.link}>{announcement.cta}</Link>
