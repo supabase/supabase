@@ -87,6 +87,18 @@ const LWXStickyNav: FC = () => {
               <div className="flex items-center justify-end gap-2 md:gap-4 flex-1">
                 <li>
                   <Link
+                    href="/events/launch-week-13-hackathon"
+                    target="_blank"
+                    className="p-1 transition-colors hover:text-foreground pointer-events-auto flex gap-1"
+                  >
+                    Hackathon{' '}
+                    <span>
+                      <ArrowUpRight className="w-4 h-5 text-foreground-muted" />
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/events?category=meetup"
                     target="_blank"
                     className="p-1 transition-colors hover:text-foreground pointer-events-auto flex gap-1"
