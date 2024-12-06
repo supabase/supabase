@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
 
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
-import { useFlag } from 'hooks/ui/useFlag'
 import { PROVIDERS } from 'lib/constants'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -28,17 +27,13 @@ interface RegionSelectorProps {
 
 export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
   const router = useRouter()
-  const newRegions = ['EAST_US_2', 'WEST_EU_3', 'CENTRAL_EU_2', 'NORTH_EU']
-  const enableNewRegions = useFlag('enableNewRegions')
 
   const showNonProdFields =
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
     process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
 
   const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
-  const regionsArray = enableNewRegions
-    ? Object.entries(availableRegions)
-    : Object.entries(availableRegions).filter(([key]) => !newRegions.includes(key))
+  const regionsArray = Object.entries(availableRegions)
 
   const { isLoading: isLoadingDefaultRegion } = useDefaultRegionQuery({
     cloudProvider,

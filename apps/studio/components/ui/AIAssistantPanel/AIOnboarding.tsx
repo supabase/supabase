@@ -1,7 +1,6 @@
 import { motion } from 'framer-motion'
 import { FileText, MessageCircleMore, WandSparkles } from 'lucide-react'
 
-import DotGrid from 'components/ui/DotGrid'
 import { Button } from 'ui'
 import {
   InnerSideMenuCollapsible,
@@ -20,10 +19,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
   }
 
   return (
-    <div className="w-full p-8 flex flex-col grow shrink-0 justify-end overflow-auto">
-      <div className="min-h-48 grow shrink-0">
-        <DotGrid rows={10} columns={10} count={33} />
-      </div>
+    <div className="w-full p-5 flex flex-col grow shrink-0 justify-end overflow-auto">
       <div className="shrink-0">
         <motion.div
           initial={{ x: -10, opacity: 0 }}
@@ -43,7 +39,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
             transition={{ delay: 0 }}
           >
             <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0" title="Tables" />
+              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Tables" />
               <InnerSideMenuCollapsibleContent>
                 <div className="mt-3 mb-1 space-y-1">
                   <Button
@@ -98,7 +94,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
             transition={{ delay: 0.1 }}
           >
             <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0" title="RLS Policies" />
+              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="RLS Policies" />
               <InnerSideMenuCollapsibleContent>
                 <div className="mt-3 mb-1 space-y-1">
                   <Button
@@ -147,7 +143,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
             transition={{ delay: 0.2 }}
           >
             <InnerSideMenuCollapsible className="border-b border-muted py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0" title="Functions" />
+              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Functions" />
               <InnerSideMenuCollapsibleContent>
                 <div className="mt-3 mb-1 space-y-1">
                   <Button
@@ -196,7 +192,7 @@ export default function AIOnboarding({ setMessages, onSendMessage }: AIOnboardin
             transition={{ delay: 0.3 }}
           >
             <InnerSideMenuCollapsible className="py-3">
-              <InnerSideMenuCollapsibleTrigger className="px-0" title="Triggers" />
+              <InnerSideMenuCollapsibleTrigger className="px-0 -mx-3" title="Triggers" />
               <InnerSideMenuCollapsibleContent>
                 <div className="mt-3 mb-1 space-y-1">
                   <Button

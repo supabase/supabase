@@ -24,7 +24,6 @@ import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
 import {
   Badge,
   Button,
@@ -114,14 +113,6 @@ export const BranchRow = ({
 
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
-
-  const branchingWorkflowLogsEnabled = useFlag('branchingWorkflowLogs')
-
-  const shouldRenderGitHubLogsButton =
-    !branchingWorkflowLogsEnabled &&
-    branch.pr_number !== undefined &&
-    branch.latest_check_run_id !== undefined
-  const checkRunLogsURL = `https://github.com/${repo}/pull/${branch.pr_number}/checks?check_run_id=${branch.latest_check_run_id}`
 
   const { ref, inView } = useInView()
   const { data } = useBranchQuery(
@@ -234,7 +225,7 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
-                {branchingWorkflowLogsEnabled && <WorkflowLogs projectRef={branch.project_ref} />}
+                <WorkflowLogs projectRef={branch.project_ref} />
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
@@ -281,17 +272,7 @@ export const BranchRow = ({
                 </Button>
               </div>
             )}
-
-            {shouldRenderGitHubLogsButton ? (
-              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
-                <Link passHref target="_blank" rel="noreferrer" href={checkRunLogsURL}>
-                  View Logs
-                </Link>
-              </Button>
-            ) : (
-              <WorkflowLogs projectRef={branch.project_ref} />
-            )}
-
+            <WorkflowLogs projectRef={branch.project_ref} />
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<MoreVertical />} className="px-1" />

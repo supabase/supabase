@@ -14,7 +14,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { readdir, readFile, stat } from 'node:fs/promises'
-import { join } from 'node:path'
+import { join, sep } from 'node:path'
 import toml from 'toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
@@ -176,10 +176,9 @@ export async function getAllTroubleshootingEntriesInternal() {
 }
 
 /**
- * @param {TroubleshootingMetadata} meta
+ * @param {TroubleshootingEntry} entry
  */
-export function getArticleSlug(meta) {
-  const slugifiedTitle = meta.title.toLowerCase().replace(/\s+/g, '-')
-  const escapedTitle = encodeURIComponent(slugifiedTitle)
-  return escapedTitle
+export function getArticleSlug(entry) {
+  const parts = entry.filePath.split(sep)
+  return parts[parts.length - 1].replace(/\.mdx$/, '')
 }

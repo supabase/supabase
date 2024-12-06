@@ -1,9 +1,8 @@
 import { isUndefined } from 'lodash'
+import { ArrowUpRight, LogOut } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 
-import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, LogOut } from 'lucide-react'
 import { Badge, cn, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
@@ -32,7 +31,6 @@ const WithSidebar = ({
   customSidebarContent,
 }: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
-  const navLayoutV2 = useFlag('navigationLayoutV2')
 
   return (
     <div className="flex h-full">
@@ -80,7 +78,7 @@ const WithSidebar = ({
         </div>
       )}
       <div className="flex flex-1 flex-col">
-        {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
+        <LayoutHeader breadcrumbs={breadcrumbs} />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
