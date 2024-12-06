@@ -105,4 +105,18 @@ export const days: AdventDay[] = [
     ],
     icon: <BookCopy />,
   },
+  {
+    title: 'Hack the Base! with Supabase',
+    description: 'Play cool games, win cool prizes',
+    id: 'hack',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/hack-the-base',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: null,
+  },
 ]
