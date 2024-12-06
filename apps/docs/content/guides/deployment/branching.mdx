@@ -6,7 +6,7 @@ subtitle: 'Use Supabase Branches to test and preview changes'
 
 Supabase Branching allows you to create separate, temporary instances of your project, similar to Git branching. This enables you to experiment with new configurations, database schemas, or features in isolation. When ready, you can merge your changes into your production instance.
 
-## How Branching Works
+## How branching works
 
 - **Separate Environments**: Each branch is a separate environment with its own Supabase instance and API credentials.
 - **Git Integration**: Branching works with Git, currently supporting GitHub repositories.
@@ -29,11 +29,11 @@ Supabase Branching allows you to create separate, temporary instances of your pr
   }}
 />
 
-### Branching Workflow
+### Branching workflow
 
 Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
 
-### Git Providers
+### Git providers
 
 To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
 
@@ -62,7 +62,7 @@ When you merge your Git branch into the production branch, all new migrations wi
 
 <Admonition type="note" label="Data changes are not merged into production." />
 
-### Preparing Your Git Repository
+### Preparing your Git repository
 
 You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory:
 
@@ -145,7 +145,7 @@ Push your new project to a GitHub repo. For more information, see the GitHub gui
 </TabPanel>
 </Tabs>
 
-### Enable Supabase Branching
+### Enable Supabase branching
 
 Once your repository is [correctly prepared](#preparing-your-git-repository), you can enable branching from the Supabase dashboard.
 
@@ -448,7 +448,7 @@ Dashboard changes aren't automatically reflected in your Git repository. If you'
 </TabPanel>
 </Tabs>
 
-### Disable Branching
+### Disable branching
 
 You can disable branching at any time. Navigate to the [Branches](/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
 
@@ -497,7 +497,7 @@ As branching integration is tied to the Preview Deployments feature in Vercel, t
 
 There are multiple alternative Git providers under consideration. If you're interested in branching for GitLab, Bitbucket, or some other provider, [join the GitHub discussion](https://github.com/orgs/supabase/discussions/18938).
 
-## Alternatives to Branching
+## Alternatives to branching
 
 Under the hood, you can see Supabase branching as a way to programmatically "duplicate" your Supabase project via git flow. This allows you to spawn a new configured (via [`config.toml`](/docs/guides/local-development/cli/config)) and seeded instance of your database and the adjacent Supabase services (buckets, edge-functions, etc.).
 When you create a new branch via a git flow, here is what happens on the Supabase side:
@@ -517,7 +517,7 @@ Branching is available on the Pro Plan and above. The price is:
 
 ## Troubleshooting
 
-### Rolling Back Migrations
+### Rolling back migrations
 
 You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
 
@@ -525,13 +525,13 @@ To fix this, push your latest changes, then delete the preview branch in Supabas
 
 The new preview branch is reseeded from your `./supabase/seed.sql` file by default. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
 
-### Deployment Failures
+### Deployment failures
 
 A deployment might fail for various reasons, including invalid SQL statements and schema conflicts in migrations. Errors within the `config.toml` config or something else.
 
 To check the error message, see the Supabase workflow run for your branch under the [View logs](/dashboard/project/_/branches) section.
 
-### Schema Drift Between Preview Branches
+### Schema drift between preview branches
 
 If you have multiple preview branches, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
 
@@ -539,7 +539,7 @@ When a preview branch is merged into the production branch, it creates a schema 
 
 You can solve these conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
-### Changing Production Branch
+### Changing production branch
 
 It's not possible to change the Git branch used as the Production branch for Supabase Branching. The only way to change it is to disable and re-enable branching. See [Disable Branching](#disable-branching).
 
