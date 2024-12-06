@@ -201,7 +201,7 @@ If your repository doesn't have all the migration files, your production branch 
 
 </StepHikeCompact>
 
-### Open a Pull Request
+### Open a pull request
 
 When you open a pull request on GitHub, the Supabase integration automatically checks for a matching preview branch. If one doesn't exist, it gets created.
 
@@ -217,7 +217,7 @@ A comment is added to your PR with the deployment status of your preview branch.
 
 Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
 
-### Preventing Migration Failures
+### Preventing migration mailures
 
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
@@ -452,19 +452,19 @@ Dashboard changes aren't automatically reflected in your Git repository. If you'
 
 You can disable branching at any time. Navigate to the [Branches](/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
 
-### Persistent Branches
+### Persistent branches
 
 Persistent branches are the type of branches that will remain active even after the underlying PR is closed.
 You can change any branch to be persistent on the [Branches](/dashboard/project/_/branches) page by clicking the triple dots icon next to the branch you want to modify, and selecting "Switch to persistent".
 All persistent branches can be toggled back to be an ephemeral branch in the exact same way.
 
-### Seeding Behavior
+### Seeding behavior
 
 Your Preview Branches are seeded with sample data using the same as [local seeding behavior](/docs/guides/local-development/seeding-your-database).
 
 The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it by closing, and reopening your pull request.
 
-## Branching and Hosting Providers
+## Branching and hosting providers
 
 Branching works with hosting providers that support preview deployments.
 
