@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
-import { GitBranch, HardDrive } from 'lucide-react'
+import { GitBranch, HardDrive, BookCopy, Flag } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -92,11 +92,31 @@ export const days: AdventDay[] = [
     icon: <HardDrive />,
   },
   {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
+    title: 'Restore to a New Project',
+    description: 'Effortlessly clone data into a new Supabase project',
+    id: 'restore',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/restore-to-a-new-project',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <BookCopy />,
+  },
+  {
+    title: 'Hack the Base! with Supabase',
+    description: 'Play cool games, win cool prizes',
+    id: 'hack',
+    is_shipped: true,
+    links: [
+      {
+        url: '/blog/hack-the-base',
+        label: 'Blog post',
+        target: '_blank',
+      },
+    ],
+    icon: <Flag />,
   },
 ]
