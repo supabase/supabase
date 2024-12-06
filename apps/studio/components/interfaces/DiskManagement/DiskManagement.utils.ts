@@ -104,9 +104,9 @@ export const calculateIOPSPrice = ({
       0,
       newProvisionedIOPS - DISK_LIMITS[DiskType.GP3].includedIops
     )
-    // @ts-expect-error
+    // @ts-ignore [Joshen] Not sure why but GH TS check fails here if we remove ?? 0
     const oldPrice = oldChargeableIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    // @ts-expect-error
+    // @ts-ignore
     const newPrice = newChargeableIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
 
     return {
@@ -118,9 +118,9 @@ export const calculateIOPSPrice = ({
       oldStorageType === 'gp3'
         ? (oldProvisionedIOPS - DISK_LIMITS[oldStorageType].includedIops) *
           DISK_PRICING[oldStorageType].iops
-        : // @ts-expect-error
+        : // @ts-ignore
           oldProvisionedIOPS * DISK_PRICING[oldStorageType]?.iops ?? 0
-    // @ts-expect-error
+    // @ts-ignore
     const newPrice = newProvisionedIOPS * DISK_PRICING[newStorageType]?.iops ?? 0
     return {
       oldPrice: (oldPrice * (1 + numReplicas)).toFixed(2),
