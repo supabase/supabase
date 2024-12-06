@@ -53,6 +53,7 @@ import {
   SEVERITY_OPTIONS,
 } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import { Admonition } from 'ui-patterns'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -68,7 +69,14 @@ interface SupportFormV2Props {
 export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFormV2Props) => {
   const { profile } = useProfile()
   const supabaseClient = useSupabaseClient()
-  const { ref, slug, category: urlCategory, subject: urlSubject, message: urlMessage } = useParams()
+  const {
+    ref,
+    slug,
+    category: urlCategory,
+    subject: urlSubject,
+    message: urlMessage,
+    error,
+  } = useParams()
 
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -203,7 +211,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
       organizationSlug: values.organizationSlug === 'no-org' ? undefined : values.organizationSlug,
       library:
         values.category === 'Problem' && selectedLibrary !== undefined ? selectedLibrary.key : '',
-      message: formatMessage(values.message, attachments),
+      message: formatMessage(values.message, attachments, error),
       verified: true,
       tags: ['dashboard-support-form'],
       siteUrl: '',
@@ -621,6 +629,15 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   placeholder="Describe the issue you're facing, along with any relevant information. Please be as detailed and specific as possible."
                 />
               </FormControl_Shadcn_>
+              {error !== undefined && (
+                <Admonition
+                  showIcon={false}
+                  type="default"
+                  className="mt-2"
+                  title="The error that you ran into will be included in your message for reference"
+                  description={`Error: ${error}`}
+                />
+              )}
             </FormItemLayout>
           )}
         />

@@ -26,7 +26,7 @@ const AlertError = ({
 
   if (projectRef) href += `&ref=${projectRef}`
   if (subjectString) href += `&subject=${subjectString}`
-  if (error) href += `&message=Error:%20${error.message}`
+  if (error) href += `&error=${error.message}`
 
   const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'

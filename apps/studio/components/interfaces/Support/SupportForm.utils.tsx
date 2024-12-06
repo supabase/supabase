@@ -56,12 +56,13 @@ export const uploadAttachments = async (ref: string, files: File[]) => {
   return data ? data.map((file) => file.signedUrl) : []
 }
 
-export const formatMessage = (message: string, attachments: string[]) => {
+export const formatMessage = (message: string, attachments: string[], error?: string) => {
+  const errorString = error !== undefined ? `\nError: ${error}` : ''
   if (attachments.length > 0) {
     const attachmentsImg = attachments.map((url) => `\n${url}`)
-    return `${message}\n${attachmentsImg.join('')}`
+    return `${message}\n${attachmentsImg.join('')}${errorString}`
   } else {
-    return message
+    return `${message}${errorString}`
   }
 }
 
