@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react'
 import { type ClassValue } from 'clsx'
-import { GitBranch, HardDrive } from 'lucide-react'
+import { GitBranch, HardDrive, BookCopy } from 'lucide-react'
 
 export interface AdventDay {
   icon?: ReactNode // use svg jsx with 34x34px viewport
@@ -103,6 +103,6 @@ export const days: AdventDay[] = [
         target: '_blank',
       },
     ],
-    icon: null,
+    icon: <BookCopy />,
   },
 ]
