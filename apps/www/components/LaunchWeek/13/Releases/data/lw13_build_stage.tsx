@@ -105,7 +105,6 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <BookCopy />,
-    className: 'xl:col-span-1',
   },
   {
     title: 'Hack the Base! with Supabase',
