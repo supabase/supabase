@@ -93,7 +93,7 @@ export const days: AdventDay[] = [
   },
   {
     title: 'Restore to a New Project',
-    description: 'Clone data from one Supabase project to another',
+    description: 'Effortlessly clone data into a new Supabase project',
     id: 'restore',
     is_shipped: true,
     links: [
