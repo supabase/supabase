@@ -567,6 +567,14 @@
     "author_image_url": "https://github.com/jgoux.png"
   },
   {
+    "author_id": "stephen_morgan",
+    "author": "Stephen Morgan",
+    "username": "stephen",
+    "position": "Security Engineer",
+    "author_url": "https://github.com/doublethink",
+    "author_image_url": "https://github.com/doublethink.png"
+  },
+  {
     "author_id": "saxon_fletcher",
     "author": "Saxon Fletcher",
     "username": "saxonf",
