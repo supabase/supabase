@@ -61,9 +61,9 @@ Deno.serve(async (req) => {
 })
 ```
 
-## Logging Tips
+## Logging tips
 
-### Logging Request Headers
+### Logging request headers
 
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 
@@ -88,7 +88,7 @@ The reason behind this behavior is that [Headers](https://developer.mozilla.org/
 
 However, `Headers` objects are iterable. You can utilize this feature to craft a couple of succinct one-liners for debugging and printing headers.
 
-### Convert headers into an object with Object.fromEntries:
+### Convert headers into an object with `Object.fromEntries`:
 
 You can use `Object.fromEntries` which is a call to convert the headers into an object:
 

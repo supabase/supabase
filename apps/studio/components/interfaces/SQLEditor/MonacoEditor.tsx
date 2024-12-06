@@ -12,7 +12,6 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { cn } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { useIsAssistantV2Enabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
@@ -42,7 +41,6 @@ const MonacoEditor = ({
   const project = useSelectedProject()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -77,24 +75,22 @@ const MonacoEditor = ({
       },
     })
 
-    if (isAssistantV2Enabled) {
-      editor.addAction({
-        id: 'explain-code',
-        label: 'Explain Code',
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          setAiAssistantPanel({
-            open: true,
-            sqlSnippets: [selectedValue],
-            initialInput: 'Can you explain this section to me in more detail?',
-          })
-        },
-      })
-    }
+    editor.addAction({
+      id: 'explain-code',
+      label: 'Explain Code',
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 1,
+      run: () => {
+        const selectedValue = (editorRef?.current as any)
+          .getModel()
+          .getValueInRange((editorRef?.current as any)?.getSelection())
+        setAiAssistantPanel({
+          open: true,
+          sqlSnippets: [selectedValue],
+          initialInput: 'Can you explain this section to me in more detail?',
+        })
+      },
+    })
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =

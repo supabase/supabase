@@ -34,9 +34,9 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
       {...attributes}
     >
       <div className="flex flex-wrap items-start gap-x-2 gap-y-4 justify-between">
-        <div className="flex-grow flex flex-col gap-2">
+        <div className="max-w-[60%] flex flex-col gap-2">
           <Link
-            href={`/guides/troubleshooting/${getArticleSlug(entry.data)}`}
+            href={`/guides/troubleshooting/${getArticleSlug(entry)}`}
             className={cn('visited:text-foreground-lighter', 'before:absolute before:inset-0')}
           >
             <h3
@@ -48,12 +48,15 @@ export async function TroubleshootingPreview({ entry }: { entry: ITroubleshootin
           </Link>
           {entry.data.errors?.length > 0 && (
             <span className="text-xs text-foreground-lighter">
-              {entry.data.errors.map((error, index) => (
-                <>
-                  <code key={index}>{formatError(error)}</code>
-                  {index < entry.data.errors.length - 1 && ', '}
-                </>
-              ))}
+              {entry.data.errors
+                .map(formatError)
+                .filter(Boolean)
+                .map((error, index) => (
+                  <>
+                    <code key={index}>{error}</code>
+                    {index < entry.data.errors.length - 1 ? ', ' : ''}
+                  </>
+                ))}
             </span>
           )}
         </div>

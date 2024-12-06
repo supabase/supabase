@@ -1,18 +1,16 @@
-import { useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
-import { AiAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
+import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
@@ -95,9 +93,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
-    const navLayoutV2 = useFlag('navigationLayoutV2')
-    const isAssistantV2Enabled = useIsAssistantV2Enabled()
-
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
 
@@ -112,18 +107,24 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
+    const [isClient, setIsClient] = useState(false)
+
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI') {
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
         }
       }
-      if (isAssistantV2Enabled) window.addEventListener('keydown', handler)
+      window.addEventListener('keydown', handler)
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAssistantV2Enabled, open])
+    }, [open])
 
     return (
       <AppLayout>
@@ -172,7 +173,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 disabled={resizableSidebar ? false : true}
               />
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
-                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+                {!hideHeader && IS_PLATFORM && <LayoutHeader />}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"
                   direction="horizontal"
@@ -197,7 +198,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       )}
                     </main>
                   </ResizablePanel>
-                  {aiAssistantPanel.open && (
+                  {isClient && aiAssistantPanel.open && (
                     <>
                       <ResizableHandle />
                       <ResizablePanel
@@ -208,7 +209,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                           '2xl:min-w-[500px] 2xl:max-w-[600px]'
                         )}
                       >
-                        <AiAssistantPanel />
+                        <AIAssistantPanel />
                       </ResizablePanel>
                     </>
                   )}

@@ -23,6 +23,7 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { NoticeBar } from '../ui/NoticeBar'
 import { InstanceSpecs } from 'lib/constants'
+import { DocsButton } from 'components/ui/DocsButton'
 
 /**
  * to do: this could be a type from api-types
@@ -135,8 +136,16 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   free={showUpgradeBadge && form.watch('computeSize') === 'ci_micro' ? true : false}
                 />
                 <p className="text-foreground-lighter">
-                  Hardware resources allocated to your postgres database
+                  Hardware resources allocated to your Postgres database
                 </p>
+
+                <div className="mt-3">
+                  <DocsButton
+                    abbrev={false}
+                    href="https://supabase.com/docs/guides/platform/compute-and-disk"
+                  />
+                </div>
+
                 <NoticeBar
                   showIcon={false}
                   type="default"
