@@ -5,7 +5,7 @@ import { type TOCHeader } from '~/components/GuidesTableOfContents'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
-import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
+import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 
 const meta = {
   title: 'Supabase CLI config',
