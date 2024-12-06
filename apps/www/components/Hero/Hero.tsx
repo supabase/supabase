@@ -27,7 +27,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week#day-5"
                       badge="LW13: Day 5"
-                      announcement="database.build 2.0"
+                      announcement="database.build v2"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
