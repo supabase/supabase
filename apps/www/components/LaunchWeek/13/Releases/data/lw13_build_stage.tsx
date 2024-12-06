@@ -99,12 +99,4 @@ export const days: AdventDay[] = [
     links: [],
     icon: null,
   },
-  {
-    title: '',
-    description: '',
-    id: '',
-    is_shipped: false,
-    links: [],
-    icon: null,
-  },
 ]

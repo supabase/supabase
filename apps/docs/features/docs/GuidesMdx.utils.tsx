@@ -35,6 +35,7 @@ const PUBLISHED_SECTIONS = [
   'local-development',
   'monitoring-troubleshooting',
   'platform',
+  'queues',
   'realtime',
   'resources',
   'self-hosting',

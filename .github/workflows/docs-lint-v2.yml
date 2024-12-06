@@ -45,6 +45,6 @@ jobs:
         run: |
           set -o pipefail
           git diff --name-only origin/$BASE_REF HEAD \
-            | grep -E "^apps/docs/content/guides/(getting-started|ai|api|auth|database|deployment|functions)/" \
+            | { grep -E "^apps/docs/content/guides/(getting-started|ai|api|auth|database|deployment|functions)/" || test $? = 1; } \
             | xargs -r supa-mdx-lint --format rdf \
             | reviewdog -f=rdjsonl -reporter=github-pr-review
