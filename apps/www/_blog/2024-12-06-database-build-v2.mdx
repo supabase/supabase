@@ -19,17 +19,15 @@ launchweek: '13'
 
 We've been hard at work since launching [database.build](https://database.build) (formerly postgres.new), and we're thrilled to unveil a lineup of new features, starting with: Bring-your-own-LLM.
 
-<video
-  className="overflow-hidden rounded-md border"
-  width="99%"
-  autoPlay
-  loop
-  muted
-  playsInline
-  controls={true}
->
-  <source src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.mp4" type="video/mp4" />
-</video>
+<div className="video-container mb-8">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/IQ8xqmht-gk"
+    title="3 AI models tried to build my database"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
 
 You can now use your own Large Language Model (LLM) via any OpenAI-compatible provider.
 
@@ -42,6 +40,18 @@ With database.build, simply describe what you would like to build and AI will he
 Since day one, our goal has been to make database.build freely accessible to everyone. To achieve this while also mitigating abuse (and sky-high OpenAI bills), we required users to sign in with their GitHub accounts. We also introduced modest rate limits to throttle excessive AI usage and ensure fair access for everyone.
 
 Though this setup has worked well for most users, power users have reported regularly hitting these rate limits. Others have expressed interest in experimenting with alternative models or even running database.build entirely locally. These are all valid use cases we're excited to support. That's why today, we're introducing a new option: connect your own Large Language Model (LLM) via any OpenAI-compatible provider.
+
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
+  <source src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.mp4" type="video/mp4" />
+</video>
 
 When you bring your own LLM, you get:
 
