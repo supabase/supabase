@@ -1,0 +1,165 @@
+---
+title: 'SQL management'
+description: 'Manage your Queues using SQL'
+---
+
+You can manage your Queues using the Dashboard UI, or via SQL. See the [Quickstart](/guides/queues/quickstart) for Dashboard instructions.
+
+The following sections describe the SQL API for managing Queues, which uses [pgmq](https://github.com/tembo-io/pgmq) under the hood. Run the SQL in the [SQL Editor](/dashboard/project/_/sql/new) or via a Postgres client.
+
+## Install the Queues Module
+
+```sql
+create schema if not exists pgmq;
+create extension if not exists pgmq with schema pgmq;
+```
+
+## Create a queue
+
+Create a queue with `pgmq.create()`:
+
+```sql
+select pgmq.create('example_queue');
+```
+
+#### Parameters [#create-parameters]
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+### Create a partitioned queue
+
+Create a partitioned queue with `pgmq.create_partitioned()`:
+
+```sql
+select
+  pgmq.create_partitioned('example_partitioned_queue', '100000', '10000000');
+```
+
+#### Parameters [#create-partitioned-parameters]
+
+| Parameter          | Type | Description                                                                                                           |
+| :----------------- | :--- | :-------------------------------------------------------------------------------------------------------------------- |
+| queue_name         | text | The name of the queue                                                                                                 |
+| partition_interval | text | The number of messages per partition (default: `10000`)                                                               |
+| retention_interval | text | The number of messages to retain on old partitions. Partitions greater than this will be deleted. (default: `100000`) |
+
+## Create an unlogged table
+
+Creates an unlogged table. This is useful when write throughput is more important that durability.
+See the Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
+
+```sql
+select pgmq.create_unlogged('example_unlogged');
+```
+
+### Parameters [#create-unlogged-parameters]
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+## Detach archive
+
+Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
+
+```sql
+select pgmq.detach_archive('example_queue');
+```
+
+### Parameters [#detach-archive-parameters]
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+## Drop a queue
+
+Deletes a queue and its archive table.
+
+```sql
+select pgmq.drop_queue('example_queue');
+```
+
+### Parameters [#drop-queue-parameters]
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+## Utilities
+
+### Set visibility timeout
+
+Sets the visibility timeout of a message to a specified time duration in the future. Returns the record of the message that was updated.
+
+```sql
+select pgmq.set_vt('my_queue', 11, 30);
+```
+
+#### Parameters [#set-vt-parameters]
+
+| Parameter  | Type    | Description                                                           |
+| :--------- | :------ | :-------------------------------------------------------------------- |
+| queue_name | text    | The name of the queue                                                 |
+| msg_id     | bigint  | ID of the message to set visibility time                              |
+| vt_offset  | integer | Duration from now, in seconds, that the message's VT should be set to |
+
+### List queues
+
+List all the queues that currently exist.
+
+```sql
+select pgmq.list_queues();
+```
+
+Example response:
+
+```text
+      queue_name      |          created_at           | is_partitioned | is_unlogged
+----------------------+-------------------------------+----------------+-------------
+ my_queue             | 2023-10-28 14:13:17.092576-05 | f              | f
+ my_partitioned_queue | 2023-10-28 19:47:37.098692-05 | t              | f
+ my_unlogged          | 2023-10-28 20:02:30.976109-05 | f              | t
+```
+
+### Get metrics
+
+Get metrics for a specific queue.
+
+```sql
+select * from pgmq.metrics('example_queue');
+```
+
+#### Parameters [#metrics-parameters]
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+Example response:
+
+```text
+ queue_name | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
+------------+--------------+--------------------+--------------------+----------------+-------------------------------
+ my_queue   |           16 |               2445 |               2447 |             35 | 2023-10-28 20:23:08.406259-05
+```
+
+### Get all metrics
+
+Get metrics for all existing queues.
+
+```text
+select * from pgmq.metrics_all();
+```
+
+Example response:
+
+```text
+      queue_name      | queue_length | newest_msg_age_sec | oldest_msg_age_sec | total_messages |          scrape_time
+----------------------+--------------+--------------------+--------------------+----------------+-------------------------------
+ my_queue             |           16 |               2563 |               2565 |             35 | 2023-10-28 20:25:07.016413-05
+ my_partitioned_queue |            1 |                 11 |                 11 |              1 | 2023-10-28 20:25:07.016413-05
+ my_unlogged          |            1 |                  3 |                  3 |              1 | 2023-10-28 20:25:07.016413-05
+```

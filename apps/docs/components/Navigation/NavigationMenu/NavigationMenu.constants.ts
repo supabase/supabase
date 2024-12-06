@@ -1160,7 +1160,10 @@ export const queues: NavMenuConstant = {
     {
       name: 'References',
       url: undefined,
-      items: [{ name: 'API', url: '/guides/queues/api' }],
+      items: [
+        { name: 'SQL management', url: '/guides/queues/queue-management' },
+        { name: 'Public API', url: '/guides/queues/api' },
+      ],
     },
   ],
 }
