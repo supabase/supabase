@@ -78,8 +78,6 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
     error,
   } = useParams()
 
-  console.log(error)
-
   const uploadButtonRef = useRef(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [docsResults, setDocsResults] = useState<Page[]>([])
