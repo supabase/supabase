@@ -220,9 +220,9 @@ Finally you will be presented with connection strings and a password to connect 
 
 ### Behind the scenes
 
-Getting deployments to work took quite a bit more engineering than it might seem at first glance. To copy your in-browser database to the cloud accurately, we needed a way to dump and restore. ElectricSQL has been hard at work on a WASM version of `pg_dump` that can run directly in the browser—a mind-blowing feat in its own right—but unfortunately, it wasn't quite ready in time for this launch.
+Getting deployments to work took quite a bit more engineering than it might seem at first glance. To copy your in-browser database to the cloud accurately, we needed a way to dump and restore.
 
-In the meantime, we decided to piggyback on top of our existing Live Share feature, which creates a reverse connection between your in-browser database and an external PostgreSQL client. With Live Share enabled, we connect a server-side `pg_dump` program directly to your in-browser database. The resulting dump is then piped into `pg_restore`, which transfers it to your new cloud database.
+We decided to piggyback on top of our existing Live Share feature, which creates a reverse connection between your in-browser database and an external PostgreSQL client. With Live Share enabled, we connect a server-side `pg_dump` program directly to your in-browser database. The resulting dump is then piped into `pg_restore`, which transfers it to your new cloud database.
 
 <Img
   className="border-none"
@@ -234,7 +234,7 @@ In the meantime, we decided to piggyback on top of our existing Live Share featu
   wide
 />
 
-Yes, it's a lot of moving parts! But this approach let us deliver cloud deployments today while we wait for WASM `pg_dump` to be production-ready. Kudos to the ElectricSQL team for continually breaking new ground with embeddable Postgres. We can't wait to simplify this process even further in the future.
+Yes, it's a lot of moving parts! It's worth mentioning that Electric SQL [_just_](https://github.com/electric-sql/pglite/releases/tag/%40electric-sql%2Fpglite-tools%400.2.1) released a WASM version of `pg_dump` that we're excited to integrate in the future. Generating the dump directly in the browser will likely be faster and more reliable with less moving parts.
 
 ### What about serverless PGlite?
 
@@ -277,6 +277,14 @@ You've always been able to drag and drop CSV files into the chat, but what about
 </video>
 
 This can be useful if you have existing schema or migrations that were designed elsewhere that you wish to extend or ask questions about.
+
+## Download PGlite databases via `pg_dump`
+
+You can now dump your in-browser database to a SQL file using a WASM version of `pg_dump`.
+
+Previously when you went to download your database, we were exporting PGlite's internal `pgdata` directory as a `.tar.gz` file. This format was a bit cumbersome to work with, and was only compatible with other PGlite instances. Now when you hit **Download**, you'll get a `.sql` file that you can import into any Postgres database.
+
+Kudos to the ElectricSQL team for continually breaking new ground with embeddable Postgres. WASM `pg_dump` is a huge step forward for the project, and we're excited to see what other tools they bring to the browser in the future.
 
 ## Redesign
 
