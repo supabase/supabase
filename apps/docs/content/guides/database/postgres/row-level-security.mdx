@@ -278,6 +278,12 @@ Supabase will adhere to the RLS policy of the signed-in user, even if the client
 
 </Admonition>
 
+<Admonition type="caution">
+
+Using a Service client for auth-related operations (such as serviceClient.auth.signUp()) will cause the service client to embed the user session. This will prevent the service client from bypassing RLS in subsequent database operations that rely on the same client.
+
+</Admonition>
+
 You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
