@@ -1,6 +1,6 @@
 // import Image from 'next/image'
 import { PRODUCT_MODULES } from 'shared-data/products'
-import BrowserFrame from '../../../components/BrowserFrame'
+import BrowserFrame from '~/components/BrowserFrame'
 import { Image } from 'ui'
 
 export default () => ({
@@ -30,8 +30,7 @@ export default () => ({
     },
   },
   highlightsSection: {
-    className: '!py-4',
-    cols: 3,
+    className: '!py-4 [&_.highlights-grid]:xl:grid-cols-3',
     highlights: [
       {
         title: 'Postgres Native',
@@ -164,8 +163,8 @@ export default () => ({
       },
     ],
   },
-  video: {
-    image: (
+  videoSection: {
+    video: (
       <BrowserFrame
         className="overflow-hidden lg:order-last bg-default w-full max-w-6xl mx-auto"
         contentClassName="aspect-video border overflow-hidden rounded-lg"
@@ -191,6 +190,7 @@ export default () => ({
       label: 'Start scheduling',
       url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
     },
+    reverse: true,
   },
   section2: {
     id: 'UI-Scheduling-Interface',
@@ -216,6 +216,7 @@ export default () => ({
       label: 'Start scheduling',
       url: 'https://supabase.com/dashboard/project/_/integrations/cron/overview',
     },
+    className: 'md:!py-0',
   },
   section3: {
     id: 'UI-Job-Observability',
@@ -237,6 +238,8 @@ export default () => ({
         draggable={false}
       />
     ),
+    className: 'md:!pb-0 [&_.image-container]:md:max-w-xl',
+    reverse: true,
   },
   section4: {
     id: 'extensible',

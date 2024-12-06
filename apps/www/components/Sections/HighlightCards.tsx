@@ -4,7 +4,6 @@ import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { cn } from 'ui'
 
 interface Highlight {
   image?: React.ReactNode
@@ -16,7 +15,6 @@ interface Highlight {
 const HighlightCards = ({
   highlights,
   className,
-  cols = 4,
 }: {
   highlights: Highlight[]
   className?: string
@@ -25,12 +23,7 @@ const HighlightCards = ({
   return (
     <SectionContainer className={className}>
       <LazyMotion features={domAnimation}>
-        <div
-          className={cn(
-            'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4',
-            cols === 3 && 'xl:grid-cols-3'
-          )}
-        >
+        <div className="highlights-grid grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {highlights.map((highlight, i) => (
             <HighlightCard highlight={highlight} index={i} key={highlight.title} />
           ))}
@@ -57,7 +50,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       animate={isInView ? animate : initial}
-      className="will-change-transform h-full"
+      className="will-change-transform h-full highlight-card"
     >
       <Panel innerClassName="flex flex-col !bg-alternative" outerClassName="h-full">
         {highlight.image && (
@@ -73,7 +66,7 @@ const HighlightCard = ({ highlight, index }: { highlight: Highlight; index: numb
         )}
         <div className="p-4 md:p-8">
           {highlight.svg && (
-            <div className="relative w-6 aspect-square mb-4 text-foreground-light">
+            <div className="relative w-6 aspect-square mb-2 md:mb-4 text-foreground-light">
               {highlight.svg}
             </div>
           )}
