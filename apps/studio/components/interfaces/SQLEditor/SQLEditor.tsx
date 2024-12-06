@@ -76,6 +76,8 @@ import {
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 import { constructHeaders } from 'data/fetchers'
 import { useCompletion } from 'ai/react'
+import InlineWidget from './InlineWidget'
+import AskAIWidget from './AskAIWidget'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -483,6 +485,16 @@ export const SQLEditor = () => {
       label: 'edit_snippet',
     })
 
+    setPromptState({
+      isOpen: false,
+      selection: '',
+      beforeSelection: '',
+      afterSelection: '',
+      startLineNumber: 0,
+      endLineNumber: 0,
+    })
+    setPromptInput('')
+
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
   }, [router])
@@ -517,39 +529,48 @@ export const SQLEditor = () => {
     selection: string
     beforeSelection: string
     afterSelection: string
-    isLoading: boolean
+    startLineNumber: number
+    endLineNumber: number
   }>({
     isOpen: false,
     selection: '',
     beforeSelection: '',
     afterSelection: '',
-    isLoading: false,
+    startLineNumber: 0,
+    endLineNumber: 0,
   })
 
-  const [promptInput, setPromptInput] = useState('')
-
-  const handlePrompt = async () => {
+  const handlePrompt = async (
+    prompt: string,
+    context: {
+      beforeSelection: string
+      selection: string
+      afterSelection: string
+    }
+  ) => {
     try {
-      // Set loading state before starting completion
-      setPromptState((prev) => ({ ...prev, isLoading: true }))
+      setPromptState((prev) => ({
+        ...prev,
+        selection: context.selection,
+        beforeSelection: context.beforeSelection,
+        afterSelection: context.afterSelection,
+      }))
       const headerData = await constructHeaders()
 
-      await complete(promptInput, {
+      await complete(prompt, {
         headers: { Authorization: headerData.get('Authorization') ?? '' },
         body: {
           completionMetadata: {
-            textBeforeCursor: promptState.beforeSelection,
-            textAfterCursor: promptState.afterSelection,
+            textBeforeCursor: context.beforeSelection,
+            textAfterCursor: context.afterSelection,
             language: 'pgsql',
-            prompt: promptInput,
-            selection: promptState.selection,
+            prompt,
+            selection: context.selection,
           },
         },
       })
     } catch (error) {
-      // Clear loading state on error
       setPromptState((prev) => ({ ...prev, isLoading: false }))
-      // Error will be handled by onError callback
     }
   }
 
@@ -557,14 +578,15 @@ export const SQLEditor = () => {
     if (sourceSqlDiff?.modified) {
       acceptAiHandler()
       // Clear prompt and completion states
-      setPromptInput('')
       setPromptState({
         isOpen: false,
         selection: '',
         beforeSelection: '',
         afterSelection: '',
-        isLoading: false,
+        startLineNumber: 0,
+        endLineNumber: 0,
       })
+      setPromptInput('')
       // Clear completion state
       setSourceSqlDiff(undefined)
       setSelectedDiffType(undefined)
@@ -594,7 +616,8 @@ export const SQLEditor = () => {
               selection: '',
               beforeSelection: '',
               afterSelection: '',
-              isLoading: false,
+              startLineNumber: 0,
+              endLineNumber: 0,
             })
           }
           return
@@ -602,23 +625,17 @@ export const SQLEditor = () => {
           if (isDiffOpen) {
             discardAiHandler()
             setPromptInput('')
-            setPromptState({
-              isOpen: false,
-              selection: '',
-              beforeSelection: '',
-              afterSelection: '',
-              isLoading: false,
-            })
           } else if (promptState.isOpen) {
             setPromptInput('')
-            setPromptState({
-              isOpen: false,
-              selection: '',
-              beforeSelection: '',
-              afterSelection: '',
-              isLoading: false,
-            })
           }
+          setPromptState({
+            isOpen: false,
+            selection: '',
+            beforeSelection: '',
+            afterSelection: '',
+            startLineNumber: 0,
+            endLineNumber: 0,
+          })
           return
       }
     }
@@ -721,10 +738,23 @@ export const SQLEditor = () => {
         modified: promptState.beforeSelection + completion + promptState.afterSelection,
       })
       setSelectedDiffType(DiffType.Modification)
-      // Set promptState.isLoading to false when completion is received
       setPromptState((prev) => ({ ...prev, isLoading: false }))
+
+      // scroll to the start line of the modification
+      if (diffEditorRef.current) {
+        const diffEditor = diffEditorRef.current
+        const modifiedEditor = diffEditor.getModifiedEditor()
+        const startLine = promptState.startLineNumber
+        modifiedEditor.revealLineInCenter(startLine)
+      }
     }
   }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
+
+  // Add a new state to track if diff editor is mounted
+  const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
+
+  // Add this new state near other state declarations
+  const [promptInput, setPromptInput] = useState('')
 
   return (
     <>
@@ -795,67 +825,6 @@ export const SQLEditor = () => {
           >
             <ResizablePanel maxSize={70}>
               <div className="flex-grow overflow-y-auto border-b h-full">
-                {(promptState.isOpen || isDiffOpen) && (
-                  <div className="bg border-b">
-                    <div className="flex gap-4 pr-2 py-1 items-center">
-                      <div className="flex-1">
-                        {promptState.isOpen && (
-                          <Input
-                            className="flex-1"
-                            autoFocus
-                            inputClassName="bg-transparent border-none focus:ring-0 px-4"
-                            value={promptInput}
-                            onChange={(e) => setPromptInput(e.target.value)}
-                            placeholder="Edit your query..."
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter' && !e.shiftKey) {
-                                handlePrompt()
-                              }
-                            }}
-                          />
-                        )}
-                      </div>
-                      <p className="text-foreground-muted text-xs">Escape to close</p>
-                      {!sourceSqlDiff || isCompletionLoading ? (
-                        <Button
-                          onClick={handlePrompt}
-                          loading={isCompletionLoading}
-                          disabled={isCompletionLoading}
-                        >
-                          Submit edit
-                        </Button>
-                      ) : (
-                        <DiffActionBar
-                          loading={isAcceptDiffLoading}
-                          selectedDiffType={selectedDiffType || DiffType.Modification}
-                          onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                          onAccept={() => {
-                            handleAcceptPrompt()
-                            setPromptInput('')
-                            setPromptState({
-                              isOpen: false,
-                              selection: '',
-                              beforeSelection: '',
-                              afterSelection: '',
-                              isLoading: false,
-                            })
-                          }}
-                          onCancel={() => {
-                            discardAiHandler()
-                            setPromptInput('')
-                            setPromptState({
-                              isOpen: false,
-                              selection: '',
-                              beforeSelection: '',
-                              afterSelection: '',
-                              isLoading: false,
-                            })
-                          }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                )}
                 {isLoading ? (
                   <div className="flex h-full w-full items-center justify-center">
                     <Loader2 className="animate-spin text-brand" />
@@ -871,9 +840,40 @@ export const SQLEditor = () => {
                           modified={defaultSqlDiff.modified}
                           onMount={(editor) => {
                             diffEditorRef.current = editor
+                            setIsDiffEditorMounted(true)
                           }}
-                          options={{ fontSize: 13, renderSideBySide: false }}
+                          options={{
+                            fontSize: 13,
+                            renderSideBySide: false,
+                            padding: { top: 16 },
+                            minimap: { enabled: false },
+                            wordWrap: 'on',
+                          }}
                         />
+                        {diffEditorRef.current && isDiffEditorMounted && (
+                          <InlineWidget
+                            editor={diffEditorRef.current}
+                            id="ask-ai-diff"
+                            beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
+                            heightInLines={3}
+                          >
+                            <AskAIWidget
+                              onSubmit={(prompt: string) => {
+                                handlePrompt(prompt, {
+                                  beforeSelection: promptState.beforeSelection,
+                                  selection: promptState.selection || defaultSqlDiff.modified,
+                                  afterSelection: promptState.afterSelection,
+                                })
+                              }}
+                              value={promptInput}
+                              onChange={setPromptInput}
+                              onAccept={handleAcceptPrompt}
+                              onReject={discardAiHandler}
+                              isDiffVisible={true}
+                              isLoading={isCompletionLoading}
+                            />
+                          </InlineWidget>
+                        )}
                       </div>
                     )}
                     <div key={id} className="w-full h-full relative">
@@ -884,23 +884,54 @@ export const SQLEditor = () => {
                         monacoRef={monacoRef}
                         executeQuery={executeQuery}
                         onHasSelection={setHasSelection}
-                        onPrompt={({ selection, beforeSelection, afterSelection }) => {
-                          setPromptState({
+                        onPrompt={({
+                          selection,
+                          beforeSelection,
+                          afterSelection,
+                          startLineNumber,
+                          endLineNumber,
+                        }) => {
+                          setPromptState((prev) => ({
+                            ...prev,
                             isOpen: true,
                             selection,
                             beforeSelection,
                             afterSelection,
-                            isLoading: false,
-                          })
+                            startLineNumber,
+                            endLineNumber,
+                          }))
                         }}
                       />
+                      {editorRef.current && promptState.isOpen && !isDiffOpen && (
+                        <InlineWidget
+                          editor={editorRef.current}
+                          id="ask-ai"
+                          afterLineNumber={promptState.endLineNumber}
+                          beforeLineNumber={Math.max(0, promptState.startLineNumber - 1)}
+                          heightInLines={2}
+                        >
+                          <AskAIWidget
+                            value={promptInput}
+                            onChange={setPromptInput}
+                            onSubmit={(prompt: string) => {
+                              handlePrompt(prompt, {
+                                beforeSelection: promptState.beforeSelection,
+                                selection: promptState.selection,
+                                afterSelection: promptState.afterSelection,
+                              })
+                            }}
+                            isDiffVisible={false}
+                            isLoading={isCompletionLoading}
+                          />
+                        </InlineWidget>
+                      )}
                       <AnimatePresence>
                         {!promptState.isOpen && !editorRef.current?.getValue() && (
                           <motion.p
                             initial={{ y: 5, opacity: 0 }}
                             animate={{ y: 0, opacity: 1 }}
                             exit={{ y: 5, opacity: 0 }}
-                            className="text-foreground-muted absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
+                            className="text-muted-foreground absolute bottom-4 left-4 z-10 font-mono text-xs flex items-center gap-1"
                           >
                             Hit <Command size={12} />K to edit with assistance
                           </motion.p>

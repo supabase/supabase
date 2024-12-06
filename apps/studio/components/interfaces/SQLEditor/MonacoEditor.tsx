@@ -24,7 +24,13 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
-  onPrompt?: (value: { selection: string; beforeSelection: string; afterSelection: string }) => void
+  onPrompt?: (value: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    startLineNumber: number
+    endLineNumber: number
+  }) => void
 }
 
 const MonacoEditor = ({
@@ -117,6 +123,8 @@ const MonacoEditor = ({
             selection: selectedText,
             beforeSelection,
             afterSelection,
+            startLineNumber: selection?.startLineNumber,
+            endLineNumber: selection?.endLineNumber,
           })
         },
       })
