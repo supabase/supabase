@@ -38,7 +38,7 @@ const AskAIWidget = ({
   }
 
   return (
-    <div className="rounded-md p-0 bg-popover border border-foreground/10 shadow-xl text-sm max-w-xl">
+    <div className="rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl">
       <Input
         inputRef={inputRef}
         size="xlarge"

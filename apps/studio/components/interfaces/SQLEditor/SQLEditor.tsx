@@ -78,6 +78,7 @@ import { constructHeaders } from 'data/fetchers'
 import { useCompletion } from 'ai/react'
 import InlineWidget from './InlineWidget'
 import AskAIWidget from './AskAIWidget'
+import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -105,12 +106,27 @@ export const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const queryClient = useQueryClient()
 
+  const {
+    sourceSqlDiff,
+    setSourceSqlDiff,
+    selectedDiffType,
+    setSelectedDiffType,
+    pendingTitle,
+    setPendingTitle,
+    isAcceptDiffLoading,
+    setIsAcceptDiffLoading,
+    isDiffOpen,
+    defaultSqlDiff,
+    closeDiff,
+  } = useSqlEditorDiff()
+
+  const { promptState, setPromptState, promptInput, setPromptInput, resetPrompt } =
+    useSqlEditorPrompt()
+
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
-  const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
@@ -132,11 +148,6 @@ export const SQLEditor = () => {
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
   const includeSchemaMetadata = isOptedInToAI || !IS_PLATFORM
 
-  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
-  const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
-
-  const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
-  const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
@@ -149,7 +160,6 @@ export const SQLEditor = () => {
   )
 
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
-  const isDiffOpen = !!sourceSqlDiff
 
   const limit = snapV2.limit
   const results = snapV2.results[id]?.[0]
@@ -370,32 +380,6 @@ export const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snapV2]
   )
 
-  const updateEditorWithCheckForDiff = useCallback(
-    ({ diffType, sql }: { diffType: DiffType; sql: string }) => {
-      const editorModel = editorRef.current?.getModel()
-      if (!editorModel) return
-
-      setAiQueryCount((count) => count + 1)
-
-      const existingValue = editorRef.current?.getValue() ?? ''
-      if (existingValue.length === 0) {
-        // if the editor is empty, just copy over the code
-        editorRef.current?.executeEdits('apply-ai-message', [
-          {
-            text: `${sql}`,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-      } else {
-        const currentSql = editorRef.current?.getValue()
-        const diff = { original: currentSql || '', modified: sql }
-        setSourceSqlDiff(diff)
-        setSelectedDiffType(diffType)
-      }
-    },
-    [setAiQueryCount]
-  )
-
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
@@ -462,8 +446,8 @@ export const SQLEditor = () => {
       })
 
       setSelectedDiffType(DiffType.Modification)
-      setSourceSqlDiff(undefined)
-      setPendingTitle(undefined)
+      resetPrompt()
+      closeDiff()
     } finally {
       setIsAcceptDiffLoading(false)
     }
@@ -485,18 +469,8 @@ export const SQLEditor = () => {
       label: 'edit_snippet',
     })
 
-    setPromptState({
-      isOpen: false,
-      selection: '',
-      beforeSelection: '',
-      afterSelection: '',
-      startLineNumber: 0,
-      endLineNumber: 0,
-    })
-    setPromptInput('')
-
-    setSourceSqlDiff(undefined)
-    setPendingTitle(undefined)
+    resetPrompt()
+    closeDiff()
   }, [router])
 
   const {
@@ -516,28 +490,9 @@ export const SQLEditor = () => {
         throw new Error('Failed to generate completion')
       }
     },
-    onFinish: (prompt, completion) => {
-      setAiQueryCount((count) => count + 1)
-    },
     onError: (error) => {
       toast.error('Failed to generate SQL')
     },
-  })
-
-  const [promptState, setPromptState] = useState<{
-    isOpen: boolean
-    selection: string
-    beforeSelection: string
-    afterSelection: string
-    startLineNumber: number
-    endLineNumber: number
-  }>({
-    isOpen: false,
-    selection: '',
-    beforeSelection: '',
-    afterSelection: '',
-    startLineNumber: 0,
-    endLineNumber: 0,
   })
 
   const handlePrompt = async (
@@ -574,32 +529,6 @@ export const SQLEditor = () => {
     }
   }
 
-  const handleAcceptPrompt = () => {
-    if (sourceSqlDiff?.modified) {
-      acceptAiHandler()
-      // Clear prompt and completion states
-      setPromptState({
-        isOpen: false,
-        selection: '',
-        beforeSelection: '',
-        afterSelection: '',
-        startLineNumber: 0,
-        endLineNumber: 0,
-      })
-      setPromptInput('')
-      // Clear completion state
-      setSourceSqlDiff(undefined)
-      setSelectedDiffType(undefined)
-    }
-  }
-
-  useEffect(() => {
-    // Reset prompt input whenever isOpen changes
-    if (!promptState.isOpen) {
-      setPromptInput('')
-    }
-  }, [promptState.isOpen])
-
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (!isDiffOpen && !promptState.isOpen) {
@@ -610,32 +539,14 @@ export const SQLEditor = () => {
         case 'Enter':
           if (e.shiftKey && isDiffOpen) {
             acceptAiHandler()
-            setPromptInput('')
-            setPromptState({
-              isOpen: false,
-              selection: '',
-              beforeSelection: '',
-              afterSelection: '',
-              startLineNumber: 0,
-              endLineNumber: 0,
-            })
+            resetPrompt()
           }
           return
         case 'Escape':
           if (isDiffOpen) {
             discardAiHandler()
-            setPromptInput('')
-          } else if (promptState.isOpen) {
-            setPromptInput('')
           }
-          setPromptState({
-            isOpen: false,
-            selection: '',
-            beforeSelection: '',
-            afterSelection: '',
-            startLineNumber: 0,
-            endLineNumber: 0,
-          })
+          resetPrompt()
           return
       }
     }
@@ -646,49 +557,19 @@ export const SQLEditor = () => {
   }, [isDiffOpen, promptState.isOpen, acceptAiHandler, discardAiHandler])
 
   useEffect(() => {
-    const applyDiff = ({ original, modified }: { original: string; modified: string }) => {
-      const model = diffEditorRef.current?.getModel()
+    if (isDiffOpen) {
+      const diffEditor = diffEditorRef.current
+      const model = diffEditor?.getModel()
       if (model && model.original && model.modified) {
-        model.original.setValue(original)
-        model.modified.setValue(modified)
+        model.original.setValue(defaultSqlDiff.original)
+        model.modified.setValue(defaultSqlDiff.modified)
+        // scroll to the start line of the modification
+        const modifiedEditor = diffEditor!.getModifiedEditor()
+        const startLine = promptState.startLineNumber
+        modifiedEditor.revealLineInCenter(startLine)
       }
-    }
-
-    const model = diffEditorRef.current?.getModel()
-    try {
-      if (model?.original && model.modified && sourceSqlDiff) {
-        switch (selectedDiffType) {
-          case DiffType.Modification: {
-            const transformedDiff = compareAsModification(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          case DiffType.Addition: {
-            const transformedDiff = compareAsAddition(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          case DiffType.NewSnippet: {
-            const transformedDiff = compareAsNewSnippet(sourceSqlDiff)
-            applyDiff(transformedDiff)
-            return
-          }
-
-          default:
-            throw new Error(`Unknown diff type '${selectedDiffType}'`)
-        }
-      }
-    } catch (e) {
-      console.log(e)
     }
   }, [selectedDiffType, sourceSqlDiff])
-
-  // Used for cleaner framer motion transitions
-  useEffect(() => {
-    setIsFirstRender(false)
-  }, [])
 
   useEffect(() => {
     if (isSuccessReadReplicas) {
@@ -699,37 +580,27 @@ export const SQLEditor = () => {
 
   useEffect(() => {
     if (snapV2.diffContent !== undefined) {
-      updateEditorWithCheckForDiff(snapV2.diffContent)
+      const { diffType, sql }: { diffType: DiffType; sql: string } = snapV2.diffContent
+      const editorModel = editorRef.current?.getModel()
+      if (!editorModel) return
+
+      const existingValue = editorRef.current?.getValue() ?? ''
+      if (existingValue.length === 0) {
+        // if the editor is empty, just copy over the code
+        editorRef.current?.executeEdits('apply-ai-message', [
+          {
+            text: `${sql}`,
+            range: editorModel.getFullModelRange(),
+          },
+        ])
+      } else {
+        const currentSql = editorRef.current?.getValue()
+        const diff = { original: currentSql || '', modified: sql }
+        setSourceSqlDiff(diff)
+        setSelectedDiffType(diffType)
+      }
     }
   }, [snapV2.diffContent])
-
-  const defaultSqlDiff = useMemo(() => {
-    if (!sourceSqlDiff) {
-      return { original: '', modified: '' }
-    }
-    switch (selectedDiffType) {
-      case DiffType.Modification: {
-        return compareAsModification(sourceSqlDiff)
-      }
-
-      case DiffType.Addition: {
-        return compareAsAddition(sourceSqlDiff)
-      }
-
-      case DiffType.NewSnippet: {
-        return compareAsNewSnippet(sourceSqlDiff)
-      }
-
-      default:
-        return { original: '', modified: '' }
-    }
-  }, [selectedDiffType, sourceSqlDiff])
-
-  useEffect(() => {
-    if (completionError) {
-      toast.error('Failed to generate SQL')
-    }
-  }, [completionError])
 
   useEffect(() => {
     if (completion && isCompletionLoading) {
@@ -739,22 +610,11 @@ export const SQLEditor = () => {
       })
       setSelectedDiffType(DiffType.Modification)
       setPromptState((prev) => ({ ...prev, isLoading: false }))
-
-      // scroll to the start line of the modification
-      if (diffEditorRef.current) {
-        const diffEditor = diffEditorRef.current
-        const modifiedEditor = diffEditor.getModifiedEditor()
-        const startLine = promptState.startLineNumber
-        modifiedEditor.revealLineInCenter(startLine)
-      }
     }
   }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
 
   // Add a new state to track if diff editor is mounted
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-
-  // Add this new state near other state declarations
-  const [promptInput, setPromptInput] = useState('')
 
   return (
     <>
@@ -867,7 +727,7 @@ export const SQLEditor = () => {
                               }}
                               value={promptInput}
                               onChange={setPromptInput}
-                              onAccept={handleAcceptPrompt}
+                              onAccept={acceptAiHandler}
                               onReject={discardAiHandler}
                               isDiffVisible={true}
                               isLoading={isCompletionLoading}
