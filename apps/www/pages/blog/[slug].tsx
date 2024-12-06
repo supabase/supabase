@@ -238,7 +238,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="overflow-x-hidden">
         <div
           className="
             container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16
@@ -310,7 +310,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-7 overflow-x-hidden">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
