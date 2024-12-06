@@ -1,4 +1,4 @@
-# Schema migrations example
+# Database Migrations
 
 This example uses Supabase CLI as a migration tool to manage your database schema changes.
 
