@@ -4,7 +4,7 @@ description: 'Use Supabase Branches to test and preview changes.'
 subtitle: 'Use Supabase Branches to test and preview changes'
 ---
 
-Supabase Branching allows you to create separate, temporary instances of your project, similar to Git branching. This enables you to experiment with new configurations, database schemas, or features in isolation. When ready, you can merge your changes into your production instance.
+Supabase Branching allows the creation of separate, temporary instances of a project, similar to Git branching. This enables experimentation with new configurations, database schemas, or features in isolation. When ready, changes can be merged into the production instance.
 
 ## How branching works
 
@@ -499,12 +499,11 @@ There are multiple alternative Git providers under consideration. If you're inte
 
 ## Alternatives to branching
 
-Under the hood, you can see Supabase branching as a way to programmatically "duplicate" your Supabase project via git flow. This allows you to spawn a new configured (via [`config.toml`](/docs/guides/local-development/cli/config)) and seeded instance of your database and the adjacent Supabase services (buckets, edge-functions, etc.).
-When you create a new branch via a git flow, here is what happens on the Supabase side:
+Under the hood, you can see Supabase branching as a way to programmatically "duplicate" your Supabase project via git flow. This allows spawning a new configured (via [`config.toml`](/docs/guides/local-development/cli/config)) and seeded instance of the database and the adjacent Supabase services (buckets, edge functions, etc.).
 
-1. We deploy a new project on your behalf on the Supabase side as the new "branch" if it doesn't already exist. This includes the database, storage, edge-function, and all Supabase-related services.
-2. We clone your branch and configure the new project based on the [`config.toml`](/docs/guides/local-development/cli/config) committed into this project branch.
-3. We apply migrations and run seeding scripts (the first time) for this branch.
+1. A new project is deployed on behalf of the user on the Supabase side as the new "branch" if it doesn't already exist. This includes the database, storage, edge-function, and all Supabase-related services.
+2. The branch is cloned and the new project is configured based on the [`config.toml`](/docs/guides/local-development/cli/config) committed into this project branch.
+3. Migrations are applied and seeding scripts are run (the first time) for this branch.
 
 You can make a similar setup with a distinct project for each environment. Or just have two environments, the localhost and the production one.
 
