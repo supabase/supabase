@@ -217,7 +217,7 @@ A comment is added to your PR with the deployment status of your preview branch.
 
 Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
 
-### Preventing migration mailures
+### Preventing migration failures
 
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
 
@@ -521,9 +521,9 @@ Branching is available on the Pro Plan and above. The price is:
 
 You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
 
-To fix this, push your latest changes, then delete the preview branch in Supabase and reopen it.
+To fix this, push the latest changes, then delete the preview branch in Supabase and reopen it.
 
-The new preview branch is reseeded from your `./supabase/seed.sql` file by default. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+The new preview branch is reseeded from the `./supabase/seed.sql` file by default. Any additional data changes made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
 
 ### Deployment failures
 
@@ -533,11 +533,11 @@ To check the error message, see the Supabase workflow run for your branch under 
 
 ### Schema drift between preview branches
 
-If you have multiple preview branches, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
+If multiple preview branches exist, each preview branch might contain different schema changes. This is similar to Git branches, where each branch might contain different code changes.
 
-When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches you haven't merged yet.
+When a preview branch is merged into the production branch, it creates a schema drift between the production branch and the preview branches that haven't been merged yet.
 
-You can solve these conflicts the way you would solve normal Git Conflicts: merge or rebase from your production Git branch to your preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
+These conflicts can be resolved in the same way as normal Git Conflicts: merge or rebase from the production Git branch to the preview Git branch. Since migrations are applied sequentially, ensure that migration files are timestamped correctly after the rebase. Changes that build on top of earlier changes should always have later timestamps.
 
 ### Changing production branch
 
@@ -545,6 +545,6 @@ It's not possible to change the Git branch used as the Production branch for Sup
 
 ## Feedback
 
-Supabase branching is a new and exciting part of the Supabase development ecosystem. We're monitoring its success and open to any feedback.
+Supabase branching is a new and exciting part of the Supabase development ecosystem. Feedback is welcome.
 
 You can join the [conversation over in GitHub discussions](https://github.com/orgs/supabase/discussions/18937).
