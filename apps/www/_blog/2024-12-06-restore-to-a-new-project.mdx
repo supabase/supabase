@@ -15,17 +15,19 @@ toc_depth: 3
 launchweek: '13'
 ---
 
-Today we’re adding [Restore to a New Project](https://supabase.com/docs/guides/platform/backups#restore-to-a-new-project) as a new tool to make life easier for those who need to copy data easily from an existing Supabase project to a new one. Restore to a New Project integrates seamlessly with daily physical backups and Point-in-Time Recovery (PITR) to provide flexible restoration options where historically there have been some pain points. It is now possible to copy data to a brand new Supabase project in a few clicks.
+Today we’re adding [Restore to a New Project](https://supabase.com/docs/guides/platform/backups#restore-to-a-new-project).
+
+You can use this new tool to copy data easily from an existing Supabase project to a new one. **Restore to a New Project** integrates seamlessly with daily physical backups and Point-in-Time Recovery (PITR) to provide flexible restoration options.
 
 <Admonition>
 
-Restore to a New Project requires physical backups to be enabled, and is only available to customers who are on a paid plan.
+Restore to a New Project requires physical backups to be enabled. It is available to all customers on a paid plan.
 
 </Admonition>
 
 ## How it Works
 
-When physical backups are enabled for a project Supabase triggers daily backups of project data. Using these snapshots a specific backup can be selected and restored to a new project that is provisioned specifically for the task. This new project will match the following source project attributes.
+When physical backups are enabled, Supabase triggers daily backups of project data. You can use this backup to restore to a new Supabase project. The new project should match the original project attributes:
 
 - Size of compute instance.
 - Disk settings; volume type, size, IOPS, and throughput.
@@ -33,9 +35,9 @@ When physical backups are enabled for a project Supabase triggers daily backups 
 - Network restrictions.
 - Cloud region.
 
-Once the desired backup is chosen, along with a new project name and secure password, the whole process is automated. The length of time for a new project to fully provision will depend on the size of the source dataset, for smaller projects the process is very quick and the new project will be available in as little as 10 minutes. For larger datasets that run into the hundreds of gigabytes, or terabytes, the process will take longer.
+After launching your restored project, the rest of the process is automated. The length of time for a new project to provision will depend on the size of the source dataset.
 
-The new project will be made available in the Supabase Dashboard as soon as the copy process has completed. From this point the new project will behave exactly as any other Supabase project and is completely independent of the source.
+The new project will be available in the Supabase Dashboard as soon as the copy process has completed. The new project will behave as any other Supabase project and is completely independent of the source.
 
 ### Point-in-Time Recovery
 
