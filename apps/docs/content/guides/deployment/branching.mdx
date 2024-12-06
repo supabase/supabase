@@ -7,12 +7,14 @@ subtitle: 'Use Supabase Branches to test and preview changes'
 Supabase Branching allows you to create separate, temporary instances of your project, similar to Git branching. This enables you to experiment with new configurations, database schemas, or features in isolation. When ready, you can merge your changes into your production instance.
 
 ## How Branching Works
+
 - **Separate Environments**: Each branch is a separate environment with its own Supabase instance and API credentials.
 - **Git Integration**: Branching works with Git, currently supporting GitHub repositories.
 - **Preview Branches**: You can create multiple Preview Branches for testing.
 - **Migrations and Seeding**: Branches run migrations from your repository and can seed data using a `seed.sql` file.
 
 ## Prerequisites
+
 - **Supabase Project**: You need an existing Supabase project.
 - **GitHub Repository**: Your project must be connected to a GitHub repository containing your Supabase directory.
 
@@ -35,15 +37,15 @@ Preview Branch instances contain no data by default. You must include a seed fil
 
 To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
 
-### Branching with GitHub
+## Branching with GitHub
 
 Supabase Branching uses the Supabase GitHub integration to read files from your GitHub repository. With this integration, Supabase watches all commits, branches, and pull requests of your GitHub repository.
 
-You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created and configured based on the [`config.toml`](/guides/local-development/cli/config) configuration on this branch, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
+You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created and configured based on the [`config.toml`](/docs/guides/local-development/cli/config) configuration on this branch, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
 
-The Preview Branch is also [seeded](/guides/local-development/seeding-your-database) with sample data based on `./supabase/seed.sql` by default, if that file exists.
+The Preview Branch is also [seeded](/docs/guides/local-development/seeding-your-database) with sample data based on `./supabase/seed.sql` by default, if that file exists.
 
-Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:   
+Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevelopment.com/) workflow, with one main Production branch and multiple development branches:
 
 <Image
   zoomable
@@ -56,13 +58,9 @@ Supabase Branching follows the [Trunk Based Development](https://trunkbaseddevel
   }}
 />
 
-When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment based on the changes made to your [`config.toml`](/guides/local-development/cli/config).
+When you merge your Git branch into the production branch, all new migrations will be applied to your Production environment based on the changes made to your [`config.toml`](/docs/guides/local-development/cli/config).
 
 <Admonition type="note" label="Data changes are not merged into production." />
-
-## How to Use Supabase Branching
-
-Supabase Branching requires a hosted [Git provider](#git-providers). Follow these steps to connect your Supabase project to a Git provider and enable branching.
 
 ### Preparing Your Git Repository
 
@@ -159,46 +157,22 @@ If your repository doesn't have all the migration files, your production branch 
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Inside Your Supabase Project, Click `Enable Branching`" fullWidth>
+        <StepHikeCompact.Details title="Install the GitHub Integration" fullWidth>
 
-            If you're prompted to join the waitlist, click `Join waitlist`. We're rolling out Branching to users in batches.
+            When clicking `Enable branching` you will see the following dialog:
 
             <figure className="max-w-[520px]">
-            <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
+                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.png?v=1" />
             </figure>
+
+            If you don't have the GitHub integration installed, click `Add new project connection`.
+
+            Follow the instructions to link your Supabase project to its GitHub repository.
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Install the GitHub Integration" fullWidth>
-
-            If you have been granted early access, once when clicking `Enable branching` you will see the following dialog:
-
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
-            </figure>
-
-            If you don't have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
-
-            You're taken to the GitHub integration page. Click `Install`.
-
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-permissions.jpg?v=1" />
-            </figure>
-
-            Follow the instructions to link your Supabase project to its GitHub repository.
-
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-integration-link.jpg?v=1" />
-            </figure>
-
-            Return to your project and re-click `Enable branching`.
-
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={3}>
         <StepHikeCompact.Details title="If You See the Following Dialog, You're in the Early Access Group" fullWidth>
 
             You should now see a popover with the GitHub Connection details shown.
@@ -227,7 +201,35 @@ If your repository doesn't have all the migration files, your production branch 
 
 </StepHikeCompact>
 
-### Create Your First Preview Branch
+### Open a Pull Request
+
+When you open a pull request on GitHub, the Supabase integration automatically checks for a matching preview branch. If one doesn't exist, it gets created.
+
+A comment is added to your PR with the deployment status of your preview branch. Statuses are shown separately for Database, Services, and APIs.
+
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt="GitHub view of the deployment status of your preview branch"
+  caption="Supabase GitHub integration will comment on your PR with the status of your Preview Branch, including whether migrations have successfully run."
+  src="/docs/img/guides/platform/branching/develop-your-app-open-pull-request-github.jpg?v=1"
+/>
+
+Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
+
+### Preventing Migration Failures
+
+We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
+
+<Image
+  zoomable
+  className="max-w-[700px] !mx-auto"
+  alt='Check the "Require status checks to pass before merging" option.'
+  caption='Check the "Require status checks to pass before merging" option.'
+  src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
+/>
+
+### Manually create a preview branch
 
 Preview branches are automatically created for each pull request, but you can also manually create one.
 
@@ -241,15 +243,12 @@ Preview branches are automatically created for each pull request, but you can al
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-github.jpg?v=1" />
             <figcaption>You can use the GitHub dashboard or command line to create a new branch. In this example, the new branch is called `feat/add-members`.</figcaption>
           </figure>
-
-        You can use the GitHub dashboard or command line to create a new branch. In this example, the new branch is called `feat/add-members`.
-
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Navigate to the Branches Page in Your Supabase Dashboard." fullWidth>
 
-        In the Supabase dashboard, look for the branch dropdown on the right-hand side of the top bar. It should be set to your production branch by default. Open the dropdown and click `Manage branches`.
+        In the Supabase dashboard, look for the branch dropdown on the right-hand side of the top bar. It should be set to your production branch by default. Open the dropdown and click [`Manage branches`](/dashboard/project/_/branches).
 
         <figure className="max-w-[520px]">
         <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-branch-dropdown.jpg?v=1" />
@@ -275,16 +274,10 @@ Preview branches are automatically created for each pull request, but you can al
 
         </Admonition>
 
-        <figure className="max-w-[520px]">
-        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-choose-branch.jpg?v=1" />
-        </figure>
-
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
 </StepHikeCompact>
-
-### Make Changes to Your Branch
 
 The Git integration watches for changes in the `supabase` directory. This includes:
 
@@ -455,34 +448,6 @@ Dashboard changes aren't automatically reflected in your Git repository. If you'
 </TabPanel>
 </Tabs>
 
-### Open a Pull Request
-
-When you open a pull request on GitHub, the Supabase integration automatically checks for a matching preview branch. If one doesn't exist, it gets created.
-
-A comment is added to your PR with the deployment status of your preview branch. Statuses are shown separately for Database, Services, and APIs.
-
-<Image
-  zoomable
-  className="max-w-[700px] !mx-auto"
-  alt="GitHub view of the deployment status of your preview branch"
-  caption="Supabase GitHub integration will comment on your PR with the status of your Preview Branch, including whether migrations have successfully run."
-  src="/docs/img/guides/platform/branching/develop-your-app-open-pull-request-github.jpg?v=1"
-/>
-
-Every time a new commit is pushed that changes the migration files in `./supabase/migrations`, the new migrations are run against the preview branch. You can check the status of these runs in the comment's Tasks table.
-
-### Preventing Migration Failures
-
-We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
-
-<Image
-  zoomable
-  className="max-w-[700px] !mx-auto"
-  alt='Check the "Require status checks to pass before merging" option.'
-  caption='Check the "Require status checks to pass before merging" option.'
-  src="/docs/img/guides/platform/branching/github-required-check.jpg?v=1"
-/>
-
 ### Disable Branching
 
 You can disable branching at any time. Navigate to the [Branches](/dashboard/project/_/branches) page, which can be found via the Branches dropdown menu on the top navigation, then click "Manage Branches" in the menu. Click the 'Disable branching' button at the top of the Overview section.
@@ -495,7 +460,7 @@ All persistent branches can be toggled back to be an ephemeral branch in the exa
 
 ### Seeding Behavior
 
-Your Preview Branches are seeded with sample data using the same as [local seeding behavior](/guides/local-development/seeding-your-database).
+Your Preview Branches are seeded with sample data using the same as [local seeding behavior](/docs/guides/local-development/seeding-your-database).
 
 The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it by closing, and reopening your pull request.
 
@@ -532,10 +497,11 @@ A Netlify integration is under consideration. If you're interested in branching 
 
 ## Alternatives to Branching
 
-Under the hood, you can see Supabase branching as a way to programmatically "duplicate" your Supabase project via git flow. This allows you to spawn a new configured (via [`config.toml`](/guides/local-development/cli/config)) and seeded instance of your database and the adjacent Supabase services (buckets, edge-functions, etc.).
+Under the hood, you can see Supabase branching as a way to programmatically "duplicate" your Supabase project via git flow. This allows you to spawn a new configured (via [`config.toml`](/docs/guides/local-development/cli/config)) and seeded instance of your database and the adjacent Supabase services (buckets, edge-functions, etc.).
 When you create a new branch via a git flow, here is what happens on the Supabase side:
+
 1. We deploy a new project on your behalf on the Supabase side as the new "branch" if it doesn't already exist. This includes the database, storage, edge-function, and all Supabase-related services.
-2. We clone your branch and configure the new project based on the [`config.toml`](/guides/local-development/cli/config) committed into this project branch.
+2. We clone your branch and configure the new project based on the [`config.toml`](/docs/guides/local-development/cli/config) committed into this project branch.
 3. We apply migrations and run seeding scripts (the first time) for this branch.
 
 You can make a similar setup with a distinct project for each environment. Or just have two environments, the localhost and the production one.
