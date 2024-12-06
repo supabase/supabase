@@ -59,11 +59,13 @@ export const CreateDiskStorageSchema = (defaultTotalSize: number) => {
           const diskSizeRequiredForIopsWithIo2 =
             calculateDiskSizeRequiredForIopsWithIo2(provisionedIOPS)
 
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
-            path: ['provisionedIOPS'],
-          })
+          if (diskSizeRequiredForIopsWithIo2 > totalSize) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithIo2)} GB required. Current max is ${formatNumber(maxIOPSforDiskSizeWithio2)} IOPS.`,
+              path: ['provisionedIOPS'],
+            })
+          }
         } else {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
