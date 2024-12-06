@@ -105,7 +105,7 @@ Once your Queue is configured you can begin adding Messages.
   }}
 />
 
-### Adding Messages from the Dashboard
+### From the Dashboard
 
 Let's create a new Basic Queue and add a Message.
 
@@ -133,7 +133,7 @@ Let's create a new Basic Queue and add a Message.
   }}
 />
 
-### Adding messages from the server
+### From the server
 
 If you're [connecting](/docs/guides/database/connecting-to-postgres) to your Postgres database from a server, you can add messages using SQL from any Postgres client:
 
@@ -144,7 +144,7 @@ select * from pgmq.send(
 );
 ```
 
-### Adding messages from the client
+### From the client
 
 We have provided several functions that can be invoked from the [client libraries](/docs#client-libraries) if you need to add messages from a browser or mobile app. For example:
 
@@ -213,6 +213,12 @@ From the Queues page, just click on a Queue to inspect it. From there you can cl
     light: '/images/blog/launch-week-13/day-4-supabase-queues/integrations-light.jpg',
   }}
 />
+
+## Pricing
+
+Supabase Queues runs entirely in your database so there's no additional costs to use the functionality.
+
+We recommend you configure your database's Compute and Disk settings appropriately to support your Queues workload.
 
 ## Postgres for Everything
 
