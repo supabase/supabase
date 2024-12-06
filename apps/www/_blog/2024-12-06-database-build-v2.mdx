@@ -42,7 +42,7 @@ Since day one, our goal has been to make database.build freely accessible to eve
 Though this setup has worked well for most users, power users have reported regularly hitting these rate limits. Others have expressed interest in experimenting with alternative models or even running database.build entirely locally. These are all valid use cases we're excited to support. That's why today, we're introducing a new option: connect your own Large Language Model (LLM) via any OpenAI-compatible provider.
 
 <video
-  className="overflow-hidden rounded-md border"
+  className="overflow-hidden rounded-md border wide"
   width="99%"
   autoPlay
   loop
@@ -75,17 +75,21 @@ You might be wondering: does this mean you connect database.build locally to [Ol
 At the left of database.build's header you'll find a new button labeled **Bring your own LLM**. Tap this button to open a sidebar where you can connect your own LLM provider.
 
 <Img
+  className="border-none"
   alt="database.build v2 BYO-LLM"
   src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.png"
   zoommable
+  wide
 />
 
 From here, pass in your LLM provider's base URL, your associated API key, and the model you wish to use.
 
 <Img
+  className="border-none"
   alt="database.build v2 BYO-LLM API key"
   src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm-api-key.png"
   zoommable
+  wide
 />
 
 Note that all settings and keys are stored locally and never leave your browser. Even the API requests themselves are [sent directly from the browser](https://github.com/supabase-community/database-build/blob/5b23ed1a5bc306ed202dcc726dfeb5efe1696abc/apps/web/sw.ts) without a backend proxy - keep reading!
@@ -128,6 +132,7 @@ The challenge with Vercel's AI SDK for BYO-LLM is that the SDK expects a client-
 1. Otherwise, it forwards the request to our backend as it did before.
 
 <Img
+  className="border-none"
   alt="database.build v2 BYO-LLM API key"
   src={{
     dark: '/images/blog/launch-week-13/day-5-database-build-v2/llm-service-worker-dark.png',
@@ -153,7 +158,7 @@ Open-weight models are improving rapidly, and as consumer hardware continues to 
 Live Share allows you to connect to your in-browser PGlite databases from _outside the browser_—using any PostgreSQL client.
 
 <video
-  className="overflow-hidden rounded-md border"
+  className="overflow-hidden rounded-md border wide"
   width="99%"
   autoPlay
   loop
@@ -189,7 +194,7 @@ As a quick reminder - all database.build databases run directly in your browser 
 Now with deployments, you can deploy your database.build creations directly to a cloud database provider, starting with Supabase (and AWS coming soon).
 
 <video
-  className="overflow-hidden rounded-md border"
+  className="overflow-hidden rounded-md border wide"
   width="99%"
   autoPlay
   loop
@@ -220,11 +225,13 @@ Getting deployments to work took quite a bit more engineering than it might seem
 In the meantime, we decided to piggyback on top of our existing Live Share feature, which creates a reverse connection between your in-browser database and an external PostgreSQL client. With Live Share enabled, we connect a server-side `pg_dump` program directly to your in-browser database. The resulting dump is then piped into `pg_restore`, which transfers it to your new cloud database.
 
 <Img
+  className="border-none"
   alt="database.build v2 Deploy to Supabase"
   src={{
     dark: '/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase-dark.png',
     light: '/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase-light.png',
   }}
+  wide
 />
 
 Yes, it's a lot of moving parts! But this approach let us deliver cloud deployments today while we wait for WASM `pg_dump` to be production-ready. Kudos to the ElectricSQL team for continually breaking new ground with embeddable Postgres. We can't wait to simplify this process even further in the future.
@@ -240,7 +247,7 @@ While these challenges have pushed us to focus on alternative deployment options
 You've always been able to drag and drop CSV files into the chat, but what about SQL files? In this new release, simply dropping a SQL file onto that chat will automatically load its contents into your browser DB.
 
 <video
-  className="overflow-hidden rounded-md border"
+  className="overflow-hidden rounded-md border wide !mb-8"
   width="99%"
   autoPlay
   loop
@@ -255,7 +262,7 @@ You've always been able to drag and drop CSV files into the chat, but what about
 </video>
 
 <video
-  className="overflow-hidden rounded-md border"
+  className="overflow-hidden rounded-md border wide"
   width="99%"
   autoPlay
   loop
@@ -277,7 +284,13 @@ We're thrilled to announce a complete redesign of database.build, bringing a sle
 
 The update includes seamless support for both desktop and mobile platforms, ensuring a smooth and intuitive experience across all devices. Get ready to build your databases anytime, anywhere!
 
-![database.build v2 desktop support](/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.png)
+<Img
+  className="border-none"
+  alt="database.build v2 desktop support"
+  src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.png"
+  wide
+  zoomable
+/>
 
 ### Mobile support
 
@@ -285,7 +298,11 @@ Whether you're on the train, stuck in a meeting, or lounging on the couch, you c
 
 With mobile support, you officially have no excuse not to ship that feature you've been procrastinating on. We're excited to see what you build!
 
-![database.build v2 mobile support](/images/blog/launch-week-13/day-5-database-build-v2/mobile-support.png)
+<Img
+  className="border-none"
+  alt="database.build v2 mobile support"
+  src="/images/blog/launch-week-13/day-5-database-build-v2/mobile-support.png"
+/>
 
 ## Wrapping up
 
