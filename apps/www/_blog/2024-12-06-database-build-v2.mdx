@@ -19,7 +19,15 @@ launchweek: '13'
 
 We’ve been hard at work since launching [database.build](https://database.build) (formerly postgres.new), and we’re thrilled to unveil a lineup of new features, starting with: Bring-your-own-LLM.
 
-<video width="99%" autoPlay loop muted playsInline controls={true}>
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
   <source src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.mp4" type="video/mp4" />
 </video>
 
@@ -56,11 +64,19 @@ You might be wondering: does this mean you connect database.build locally to [Ol
 
 At the left of database.build’s header you’ll find a new button labeled **Bring your own LLM**. Tap this button to open a sidebar where you can connect your own LLM provider.
 
-![database.build v2 BYO-LLM](/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.png)
+<Img
+  alt="database.build v2 BYO-LLM"
+  src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm.png"
+  zoommable
+/>
 
 From here, pass in your LLM provider’s base URL, your associated API key, and the model you wish to use.
 
-![database.build v2 BYO-LLM API key](/images/blog/launch-week-13/day-5-database-build-v2/byo-llm-api-key.png)
+<Img
+  alt="database.build v2 BYO-LLM API key"
+  src="/images/blog/launch-week-13/day-5-database-build-v2/byo-llm-api-key.png"
+  zoommable
+/>
 
 Note that all settings and keys are stored locally and never leave your browser. Even the API requests themselves are [sent directly from the browser](https://github.com/supabase-community/database-build/blob/5b23ed1a5bc306ed202dcc726dfeb5efe1696abc/apps/web/sw.ts) without a backend proxy - keep reading!
 
@@ -101,7 +117,13 @@ The challenge with Vercel’s AI SDK for BYO-LLM is that the SDK expects a clien
 1. If detected, it serves a local HTTP handler on `/api/chat`, sending the request directly to your provider’s API.
 1. Otherwise, it forwards the request to our backend as it did before.
 
-![database.build v2 BYO-LLM API key](/images/blog/launch-week-13/day-5-database-build-v2/llm-service-worker-dark.png)
+<Img
+  alt="database.build v2 BYO-LLM API key"
+  src={{
+    dark: '/images/blog/launch-week-13/day-5-database-build-v2/llm-service-worker-dark.png',
+    light: '/images/blog/launch-week-13/day-5-database-build-v2/llm-service-worker-light.png',
+  }}
+/>
 
 Worth mentioning - we later learned that `useChat()` allows you to pass a custom `fetch` function directly to the hook which we could use to intercept API requests in the same way. We might switch to this approach in the future to simplify the solution with less moving parts.
 
@@ -120,7 +142,15 @@ Open-weight models are improving rapidly, and as consumer hardware continues to 
 
 Live Share allows you to connect to your in-browser PGlite databases from _outside the browser_—using any PostgreSQL client.
 
-<video width="99%" autoPlay loop muted playsInline controls={true}>
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
   <source
     src="/images/blog/launch-week-13/day-5-database-build-v2/live-share.mp4"
     type="video/mp4"
@@ -148,7 +178,15 @@ As a quick reminder - all database.build databases run directly in your browser 
 
 Now with deployments, you can deploy your database.build creations directly to a cloud database provider, starting with Supabase (and AWS coming soon).
 
-<video width="99%" autoPlay loop muted playsInline controls={true}>
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
   <source
     src="/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase.mp4"
     type="video/mp4"
@@ -171,7 +209,13 @@ Getting deployments to work took quite a bit more engineering than it might seem
 
 In the meantime, we decided to piggyback on top of our existing Live Share feature, which creates a reverse connection between your in-browser database and an external PostgreSQL client. With Live Share enabled, we connect a server-side `pg_dump` program directly to your in-browser database. The resulting dump is then piped into `pg_restore`, which transfers it to your new cloud database.
 
-![database.build v2 Deploy to Supabase](/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase-dark.png)
+<Img
+  alt="database.build v2 Deploy to Supabase"
+  src={{
+    dark: '/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase-dark.png',
+    light: '/images/blog/launch-week-13/day-5-database-build-v2/deploy-to-supabase-light.png',
+  }}
+/>
 
 Yes, it’s a lot of moving parts! But this approach let us deliver cloud deployments today while we wait for WASM `pg_dump` to be production-ready. Kudos to the ElectricSQL team for continually breaking new ground with embeddable Postgres. We can’t wait to simplify this process even further in the future.
 
@@ -185,14 +229,30 @@ While these challenges have pushed us to focus on alternative deployment options
 
 You’ve always been able to drag and drop CSV files into the chat, but what about SQL files? In this new release, simply dropping a SQL file onto that chat will automatically load its contents into your browser DB.
 
-<video width="99%" autoPlay loop muted playsInline controls={true}>
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
   <source
     src="/images/blog/launch-week-13/day-5-database-build-v2/drag-drop-sql-clip.mp4"
     type="video/mp4"
   />
 </video>
 
-<video width="99%" autoPlay loop muted playsInline controls={true}>
+<video
+  className="overflow-hidden rounded-md border"
+  width="99%"
+  autoPlay
+  loop
+  muted
+  playsInline
+  controls={true}
+>
   <source
     src="/images/blog/launch-week-13/day-5-database-build-v2/drag-drop-sql-direct-drop.mp4"
     type="video/mp4"
