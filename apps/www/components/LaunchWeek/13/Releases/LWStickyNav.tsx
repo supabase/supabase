@@ -80,15 +80,7 @@ const LWXStickyNav: FC = () => {
                   iconRight={<ChevronDown />}
                   className="md:hidden w-[200px] min-w-[150px] flex justify-between items-center py-2 pointer-events-auto"
                 >
-                  <span className="flex gap-1 items-center">
-                    {activeNavItem}
-                    {activeNavItem === 'Fri' && (
-                      <span
-                        title="Live"
-                        className="w-1 h-1 ml-1 animate-pulse rounded-full bg-brand mb-2 block"
-                      />
-                    )}
-                  </span>
+                  <span className="flex gap-1 items-center">{activeNavItem}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start" className="pointer-events-auto">
@@ -112,11 +104,11 @@ const LWXStickyNav: FC = () => {
             </DropdownMenu>
             <ul className="w-full lw-sticky-nav flex items-center gap-2 md:gap-4 text-foreground-lighter">
               {days.map((day: WeekDayProps) => (
-                <li key={day.id}>
+                <li key={day.id} className="hidden md:block">
                   <Link
                     href={`#${day.id}`}
                     className={cn(
-                      'hidden p-1 transition-colors text-foreground-muted hover:text-foreground md:flex items-center pointer-events-auto',
+                      'p-1 transition-colors text-foreground-muted hover:text-foreground md:flex items-center pointer-events-auto',
                       (day.isToday || day.shipped) && 'text-foreground-light'
                     )}
                   >
@@ -130,10 +122,10 @@ const LWXStickyNav: FC = () => {
                   </Link>
                 </li>
               ))}
-              <li>
+              <li className="hidden md:block">
                 <Link
                   href="#build-stage"
-                  className="hidden md:block p-1 transition-colors hover:text-foreground pointer-events-auto lw-sticky-nav"
+                  className="p-1 transition-colors hover:text-foreground pointer-events-auto lw-sticky-nav"
                 >
                   Build <span className="hidden sm:inline">Stage</span>
                 </Link>
@@ -146,9 +138,7 @@ const LWXStickyNav: FC = () => {
                     className="p-1 transition-colors hover:text-foreground pointer-events-auto flex gap-1"
                   >
                     Hackathon{' '}
-                    <span>
-                      <ArrowUpRight className="w-4 h-5 text-foreground-muted" />
-                    </span>
+                    <ArrowUpRight className="w-4 h-5 text-foreground-muted hidden sm:inline-block" />
                   </Link>
                 </li>
                 <li>
@@ -158,9 +148,7 @@ const LWXStickyNav: FC = () => {
                     className="p-1 transition-colors hover:text-foreground pointer-events-auto flex gap-1"
                   >
                     Meetups{' '}
-                    <span>
-                      <ArrowUpRight className="w-4 h-5 text-foreground-muted" />
-                    </span>
+                    <ArrowUpRight className="w-4 h-5 text-foreground-muted hidden sm:inline-block" />
                   </Link>
                 </li>
                 <li className="hidden sm:block">
