@@ -28,6 +28,7 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 import { Markdown } from 'components/interfaces/Markdown'
+import { Admonition } from 'ui-patterns'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -263,13 +264,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   ))}
 
                   {provider?.misc?.alert && (
-                    <Alert_Shadcn_ variant="warning">
-                      <WarningIcon />
-                      <AlertTitle_Shadcn_>{provider.misc.alert.title}</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
+                    <Admonition
+                      type="warning"
+                      title={provider.misc.alert.title}
+                      description={
+                        <>
+                          <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                        </>
+                      }
+                    />
                   )}
 
                   {provider.misc.requiresRedirect && (
