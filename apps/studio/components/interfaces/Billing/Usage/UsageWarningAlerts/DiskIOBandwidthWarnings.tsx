@@ -1,12 +1,5 @@
 import Link from 'next/link'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  CriticalIcon,
-  WarningIcon,
-} from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
