@@ -44,7 +44,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/high-performance-disks</guid>
-  <title>Scaling Database Storage: Introducing High Performance Disks</title>
+  <title>High Performance Disks</title>
   <link>https://supabase.com/blog/high-performance-disks</link>
   <description>Store up to 60 TB of data with 100x improved durability and 5x more IOPS</description>
   <pubDate>Thu, 05 Dec 2024 00:00:00 -0700</pubDate>
