@@ -27,7 +27,6 @@ const DiskIOBandwidthWarnings = ({
         title="Your Disk IO Budget has been used up"
         description={
           <>
-            {' '}
             <p className="mb-4">
               Your workload has used up all your Disk IO Budget and is now running at the baseline
               performance. If you need consistent disk performance, consider upgrading to a larger
@@ -98,7 +97,6 @@ const DiskIOBandwidthWarnings = ({
         title="You were close to using all your IO Budget at least once"
         description={
           <>
-            {' '}
             <p className="mb-4">
               Your workload has consumed {highestIoBudgetConsumption}% of your Disk IO budget during
               this billing cycle. If you use up all your Disk IO Budget, your instance will reverted
