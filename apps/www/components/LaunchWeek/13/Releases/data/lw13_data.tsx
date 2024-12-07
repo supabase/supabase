@@ -225,7 +225,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 5,
     dd: 'Fri',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/database-build-v2',
     date: '6 December',
