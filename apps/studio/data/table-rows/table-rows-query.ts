@@ -84,7 +84,18 @@ export const fetchAllTableRows = async ({
     .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
 
   filters
-    .filter((filter) => filter.value && filter.value !== '')
+    .filter((filter) => {
+      if (
+        filter.value === '' &&
+        filter.operator !== 'is' &&
+        filter.operator !== 'in' &&
+        table.columns.find((col) => col.name === filter.column)?.dataType.toLocaleLowerCase() ===
+          'text'
+      ) {
+        return true
+      }
+      return filter.value && filter.value !== ''
+    })
     .forEach((filter) => {
       const value = formatFilterValue(table, filter)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
@@ -156,7 +167,18 @@ export const getTableRowsSql = ({
     .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
 
   filters
-    .filter((x) => x.value && x.value != '')
+    .filter((filter) => {
+      if (
+        filter.value === '' &&
+        filter.operator !== 'is' &&
+        filter.operator !== 'in' &&
+        table.columns.find((col) => col.name === filter.column)?.dataType.toLocaleLowerCase() ===
+          'text'
+      ) {
+        return true
+      }
+      return filter.value && filter.value !== ''
+    })
     .forEach((x) => {
       const value = formatFilterValue(table, x)
       queryChains = queryChains.filter(x.column, x.operator, value)
