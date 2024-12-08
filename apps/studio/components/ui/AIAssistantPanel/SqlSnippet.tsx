@@ -27,6 +27,7 @@ import {
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import {
+  containsUnknownFunction,
   getContextualInvalidationKeys,
   identifyQueryType,
   isReadOnlySelect,
@@ -61,6 +62,7 @@ const SqlSnippetWrapper = ({
         isChart={props.isChart === 'true'}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
+        runQuery={props.runQuery === 'true'}
         title={title}
         readOnly={readOnly}
         isLoading={isLoading}
@@ -75,6 +77,7 @@ interface ParsedSqlProps {
   isLoading?: boolean
   readOnly?: boolean
   isChart: boolean
+  runQuery?: boolean
   xAxis: string
   yAxis: string
 }
@@ -82,6 +85,7 @@ interface ParsedSqlProps {
 export const SqlCard = ({
   sql,
   isChart,
+  runQuery = false,
   xAxis,
   yAxis,
   title,
@@ -99,11 +103,11 @@ export const SqlCard = ({
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
 
-  const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
+  const [showCode, setShowCode] = useState(readOnly || !runQuery || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
-  const [showWarning, setShowWarning] = useState(false)
+  const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -117,12 +121,12 @@ export const SqlCard = ({
 
       setShowResults(true)
       setResults(res.result)
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
     onError: (error) => {
       setError(error)
       setResults([])
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
   })
 
@@ -130,8 +134,10 @@ export const SqlCard = ({
     if (!project?.ref || !sql || readOnly) return
 
     if (!isReadOnlySelect(sql)) {
+      const hasUnknownFunctions = containsUnknownFunction(sql)
+
       setShowCode(true)
-      setShowWarning(true)
+      setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
       return
     }
 
@@ -160,24 +166,29 @@ export const SqlCard = ({
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   useEffect(() => {
-    if (isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
+    if (runQuery && isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
       handleExecute()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, readOnly, isLoading])
+  }, [sql, readOnly, isLoading, runQuery])
 
   return (
-    <div className="overflow-hidden rounded border w-auto">
+    <div className="overflow-hidden rounded border w-auto bg-surface-100">
       <div className={cn('flex items-center gap-2', showWarning ? '' : 'px-3 pr-1 py-1')}>
-        {showWarning ? (
+        {!!showWarning ? (
           <Admonition type="warning" className="mb-0 rounded-none border-0">
-            <p>This query contains write operations. Are you sure you want to execute it?</p>
+            <p>
+              {showWarning === 'hasWriteOperation'
+                ? 'This query contains write operations.'
+                : 'This query involves running a function.'}{' '}
+              Are you sure you want to execute it?
+            </p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
                 size="tiny"
                 className="w-full flex-1"
-                onClick={() => setShowWarning(false)}
+                onClick={() => setShowWarning(undefined)}
               >
                 Cancel
               </Button>
@@ -186,7 +197,7 @@ export const SqlCard = ({
                 size="tiny"
                 className="w-full flex-1"
                 onClick={() => {
-                  setShowWarning(false)
+                  setShowWarning(undefined)
                   executeSql({
                     sql: suffixWithLimit(sql, 100),
                     projectRef: project?.ref,

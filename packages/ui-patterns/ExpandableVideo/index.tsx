@@ -108,7 +108,7 @@ export function ExpandableVideo({
             >
               <p className="text-xs">Close</p>
             </button>
-            <div className="video-container !rounded overflow-hidden">
+            <div className="video-container !rounded-lg !border-none !overflow-hidden">
               <iframe
                 src={`https://www.youtube-nocookie.com/embed/${videoId}`}
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

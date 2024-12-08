@@ -9,6 +9,7 @@ const AssistantButton = () => {
       type="text"
       size="tiny"
       id="assistant-trigger"
+      className="h-full w-full rounded-none"
       onClick={() => {
         setAiAssistantPanel({ open: !aiAssistantPanel.open })
       }}

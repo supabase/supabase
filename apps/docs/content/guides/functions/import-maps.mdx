@@ -12,7 +12,7 @@ Developing with Edge Functions is similar to developing with Node.js, but with a
 
 There are two ways to manage your dependencies in Supabase Edge Functions:
 
-### Using deno.json (Recommended)
+### Using deno.json (recommended)
 
 <Admonition type="info">
 
@@ -50,7 +50,7 @@ The recommended file structure when using `deno.json`:
     └── config.toml
 ```
 
-### Using Import Maps (Legacy)
+### Using import maps (legacy)
 
 Import Maps are a legacy way to manage dependencies, similar to a `package.json` file. While still supported, we recommend using `deno.json`. If both exist, `deno.json` takes precedence.
 
@@ -112,7 +112,7 @@ Supabase Edge Functions support several ways to import dependencies:
 - Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
 - Third party modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
 
-### NPM Modules
+### NPM modules
 
 You can import npm modules using the `npm:` specifier:
 
@@ -120,7 +120,7 @@ You can import npm modules using the `npm:` specifier:
 import { createClient } from 'npm:@supabase/supabase-js@2'
 ```
 
-### Node.js Built-ins
+### Node.js built-ins
 
 For Node.js built-in APIs, use the `node:` specifier:
 
@@ -130,7 +130,7 @@ import process from 'node:process'
 
 Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
 
-### Importing from Private Registries
+### Importing from private registries
 
 <Admonition type="info">
 

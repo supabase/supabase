@@ -157,9 +157,9 @@ export const Header = forwardRef<HTMLDivElement, HeaderProps>(({ scroll }, ref) 
                       <div className="flex-col justify-start items-start flex">
                         <div className="text-foreground text-sm flex items-center gap-x-2">
                           <span>{integration.name}</span>
-                          {integration.beta && (
-                            <Badge variant="warning" className="py-0 px-1.5">
-                              Beta
+                          {integration.status && (
+                            <Badge variant="warning" className="py-0 px-1.5 capitalize">
+                              {integration.status}
                             </Badge>
                           )}
                         </div>

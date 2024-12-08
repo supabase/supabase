@@ -16,6 +16,7 @@ export const WRAPPER_HANDLERS = {
   PADDLE: 'wasm_fdw_handler',
   SNOWFLAKE: 'wasm_fdw_handler',
   CAL: 'wasm_fdw_handler',
+  CALENDLY: 'wasm_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -2284,6 +2285,243 @@ export const WRAPPERS: WrapperMeta[] = [
           {
             name: 'object',
             defaultValue: 'conferencing',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'calendly_wrapper',
+    description: 'Calendly is a scheduling platform',
+    handlerName: WRAPPER_HANDLERS.CALENDLY,
+    validatorName: 'wasm_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/calendly-icon.svg`,
+    extensionName: 'calendlyFdw',
+    label: 'Calendly',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/calendly',
+    minimumExtensionVersion: '0.4.0',
+    server: {
+      options: [
+        {
+          name: 'fdw_package_url',
+          label: 'FDW Package URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://github.com/supabase/wrappers/releases/download/wasm_calendly_fdw_v0.1.0/calendly_fdw.wasm',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_name',
+          label: 'FDW Package Name',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'supabase:calendly-fdw',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_version',
+          label: 'FDW Package Version',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: '0.1.0',
+          hidden: true,
+        },
+        {
+          name: 'fdw_package_checksum',
+          label: 'FDW Package Checksum',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'aa17f1ce2b48b5d8d6cee4f61df4d6b23e9a333c3e5c7a10cec9aae619c156b9',
+          hidden: true,
+        },
+        {
+          name: 'organization',
+          label: 'Organization URL',
+          required: true,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue:
+            'https://api.calendly.com/organizations/00000000-0000-0000-0000-000000000000',
+        },
+        {
+          name: 'api_url',
+          label: 'API URL',
+          required: false,
+          encrypted: false,
+          secureEntry: false,
+          defaultValue: 'https://api.calendly.com',
+        },
+        {
+          name: 'api_key_id',
+          label: 'API Key ID',
+          required: true,
+          encrypted: true,
+          secureEntry: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Current User',
+        description: 'Get the current user used for the API request',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'slug',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'current_user',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Event Types',
+        description: 'Shows your Event Types',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'event_types',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Groups',
+        description: 'Shows your groups',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'groups',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Organization Memberships',
+        description: 'Shows your Organization Memberships',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'organization_memberships',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+      {
+        label: 'Scheduled Events',
+        description: 'Shows your scheduled events',
+        availableColumns: [
+          {
+            name: 'uri',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'updated_at',
+            type: 'timestamp',
+          },
+          {
+            name: 'attrs',
+            type: 'jsonb',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'scheduled_events',
             editable: false,
             required: true,
             type: 'text',
