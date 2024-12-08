@@ -9,11 +9,18 @@ export interface AlertErrorProps {
   subject?: string
   error?: ResponseError | null
   className?: string
+  showIcon?: boolean
 }
 
 // [Joshen] To standardize the language for all error UIs
 
-const AlertError = ({ projectRef, subject, error, className }: AlertErrorProps) => {
+const AlertError = ({
+  projectRef,
+  subject,
+  error,
+  className,
+  showIcon = true,
+}: AlertErrorProps) => {
   const subjectString = subject?.replace(/ /g, '%20')
   let href = `/support/new?category=dashboard_bug`
 
@@ -27,7 +34,7 @@ const AlertError = ({ projectRef, subject, error, className }: AlertErrorProps) 
 
   return (
     <Alert_Shadcn_ className={className} variant="warning" title={subject}>
-      <WarningIcon className="h-4 w-4" strokeWidth={2} />
+      {showIcon && <WarningIcon className="h-4 w-4" strokeWidth={2} />}
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
         <div>

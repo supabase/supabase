@@ -36,7 +36,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -185,7 +185,7 @@ const TableList = ({
     (x) => visibleTypes.includes(x.type)
   )
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
@@ -203,11 +203,11 @@ const TableList = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex flex-col gap-y-4">
+      <div className="flex items-center gap-x-2 flex-wrap">
         <SchemaSelector
-          className="w-[260px]"
-          size="small"
+          className="w-[180px]"
+          size="tiny"
           showError={false}
           selectedSchemaName={selectedSchema}
           onSelectSchema={setSelectedSchema}
@@ -215,8 +215,9 @@ const TableList = ({
         <Popover_Shadcn_>
           <PopoverTrigger_Shadcn_ asChild>
             <Button
+              size="tiny"
               type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-              className="py-4 px-2"
+              className="px-1"
               icon={<Filter />}
             />
           </PopoverTrigger_Shadcn_>
@@ -259,8 +260,8 @@ const TableList = ({
         </Popover_Shadcn_>
 
         <Input
-          size="small"
-          className="w-64"
+          size="tiny"
+          className="w-52"
           placeholder="Search for a table"
           value={filterString}
           onChange={(e) => setFilterString(e.target.value)}
@@ -294,7 +295,7 @@ const TableList = ({
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <div className="my-4 w-full">
+        <div className="w-full">
           <Table
             head={[
               <Table.th key="icon" className="!px-0" />,

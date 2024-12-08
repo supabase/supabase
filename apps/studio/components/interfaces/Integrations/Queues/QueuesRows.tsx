@@ -1,12 +1,13 @@
 import dayjs from 'dayjs'
 import { includes, sortBy } from 'lodash'
-import { ChevronRight, Loader2 } from 'lucide-react'
+import { Check, ChevronRight, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useQueuesMetricsQuery } from 'data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from 'data/database-queues/database-queues-query'
+import { useTablesQuery } from 'data/tables/tables-query'
 import { DATETIME_FORMAT } from 'lib/constants'
 
 interface QueuesRowsProps {
@@ -18,6 +19,14 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
   const router = useRouter()
   const { project: selectedProject } = useProjectContext()
 
+  const { data: queueTables } = useTablesQuery({
+    projectRef: selectedProject?.ref,
+    connectionString: selectedProject?.connectionString,
+    schema: 'pgmq',
+  })
+  const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
+  const isRlsEnabled = !!queueTable?.rls_enabled
+
   const { data: metrics, isLoading } = useQueuesMetricsQuery(
     {
       queueName: queue.queue_name,
@@ -25,7 +34,7 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
       connectionString: selectedProject?.connectionString,
     },
     {
-      staleTime: 30 * 1000, // 60 seconds, talk with Oli whether this is ok to call every minute
+      staleTime: 30 * 1000, // 30 seconds, talk with Oli whether this is ok to call every minute
     }
   )
 
@@ -35,9 +44,10 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
     <Table.tr
       key={queue.queue_name}
       onClick={() => {
-        router.push(`/project/${selectedProject?.ref}/integrations/queues/${queue.queue_name}`)
+        router.push(
+          `/project/${selectedProject?.ref}/integrations/queues/queues/${queue.queue_name}`
+        )
       }}
-      className="hover:"
     >
       <Table.td className="truncate">
         <p title={queue.queue_name}>{queue.queue_name}</p>
@@ -46,6 +56,11 @@ const QueueRow = ({ queue }: { queue: PostgresQueue }) => {
         <p title={type.toLocaleLowerCase()} className="truncate">
           {type}
         </p>
+      </Table.td>
+      <Table.td className="table-cell">
+        <div className="flex justify-center">
+          {isRlsEnabled ? <Check size={14} className="text-brand" /> : <X size={14} />}
+        </div>
       </Table.td>
       <Table.td className="table-cell">
         <p title={queue.created_at}>{dayjs(queue.created_at).format(DATETIME_FORMAT)}</p>

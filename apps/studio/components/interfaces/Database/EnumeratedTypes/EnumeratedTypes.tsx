@@ -13,7 +13,7 @@ import {
   useEnumeratedTypesQuery,
 } from 'data/enumerated-types/enumerated-types-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
@@ -53,7 +53,7 @@ const EnumeratedTypes = () => {
       : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
   const protectedSchemas = (schemas ?? []).filter((schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
@@ -63,16 +63,16 @@ const EnumeratedTypes = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <SchemaSelector
-            className="w-[260px]"
-            size="small"
+            className="w-[180px]"
+            size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
             onSelectSchema={setSelectedSchema}
           />
           <Input
-            size="small"
+            size="tiny"
             value={search}
-            className="w-64"
+            className="w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
             icon={<Search size={14} />}

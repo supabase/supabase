@@ -51,7 +51,7 @@
   },
   "engines": {
     "npm": "^10.0.0",
-    "node": "^20.0.0"
+    "node": ">= 20"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "packageManager": "npm@10.7.0"
