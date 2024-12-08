@@ -1,37 +1,42 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { contentKeys } from './keys'
-import { components } from 'api-types'
 
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
 export type SnippetFolder = components['schemas']['UserContentFolder']
 export type Snippet = components['schemas']['UserContentObjectMeta']
-export type SnippetDetail = components['schemas']['UserContentObjectV2']
 
 export async function getSQLSnippetFolders(
-  { projectRef, folderId }: { projectRef?: string; folderId?: string },
+  { projectRef, folderId, cursor }: { projectRef?: string; folderId?: string; cursor?: string },
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
 
   if (folderId) {
     const { data, error } = await get('/platform/projects/{ref}/content/folders/{id}', {
-      params: { path: { ref: projectRef, id: folderId } },
+      params: { path: { ref: projectRef, id: folderId }, query: { cursor, limit: '3' } },
       signal,
     })
 
     if (error) throw handleError(error)
-    return data.data
+    return {
+      ...data.data,
+      cursor: data.cursor,
+    }
   } else {
     const { data, error } = await get('/platform/projects/{ref}/content/folders', {
-      params: { path: { ref: projectRef }, query: { type: 'sql' } },
+      params: { path: { ref: projectRef }, query: { type: 'sql', cursor, limit: '3' } },
       signal,
     })
 
     if (error) throw handleError(error)
-    return data.data
+    return {
+      ...data.data,
+      cursor: data.cursor,
+    }
   }
 }
 
@@ -43,10 +48,17 @@ export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<SQLSnippetFoldersData, SQLSnippetFoldersError, TData> = {}
+  }: UseInfiniteQueryOptions<SQLSnippetFoldersData, SQLSnippetFoldersError, TData> = {}
 ) =>
-  useQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>(
+  useInfiniteQuery<SQLSnippetFoldersData, SQLSnippetFoldersError, TData>(
     contentKeys.folders(projectRef, folderId),
-    ({ signal }) => getSQLSnippetFolders({ projectRef, folderId }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    ({ signal, pageParam }) =>
+      getSQLSnippetFolders({ projectRef, folderId, cursor: pageParam }, signal),
+    {
+      enabled: enabled && typeof projectRef !== 'undefined',
+      getNextPageParam(lastPage) {
+        return lastPage.cursor
+      },
+      ...options,
+    }
   )

@@ -12,7 +12,10 @@ import { Loading } from 'ui'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const { data, isLoading } = useContentQuery(ref)
+  const { data, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   if (isLoading) {
     return <Loading active={true}>{null}</Loading>

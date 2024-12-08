@@ -39,6 +39,7 @@ export const UpdateCustomReportModal = ({
       projectRef: ref,
       payload: {
         ...selectedReport,
+        owner_id: selectedReport.owner_id!,
         project_id: selectedReport.project_id,
         id: selectedReport.id,
         name: newVals.name,
