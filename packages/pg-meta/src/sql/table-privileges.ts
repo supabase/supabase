@@ -65,7 +65,8 @@ where c.relkind in ('r', 'v', 'm', 'f', 'p')
     pg_has_role(c.relowner, 'USAGE')
     or has_table_privilege(
       c.oid,
-      'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER, MAINTAIN'
+      'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
+      || case when current_setting('server_version_num')::int4 >= 170000 then ', MAINTAIN' else '' end
     )
     or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
   )
