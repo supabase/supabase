@@ -80,7 +80,7 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
 
 - **No automatic linking.**
-  Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `jane.doe@company.com` had signed up with a password, and then uses their company SSO login with your project, there will be two `jane.doe@company.com` user accounts in the system.
+  Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 - **Emails are not necessarily unique.**
   Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Please always use the user's UUID to correctly reference user accounts.
 - **Sessions may have a maximum duration.**
@@ -288,7 +288,7 @@ Given a SAML 2.0 assertion that includes these attributes:
     NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
     >
     <saml:AttributeValue xsi:type="xs:string">
-      jane.doe@company.com
+      valid.email@supabase.io
     </saml:AttributeValue>
   </saml:Attribute>
 
@@ -308,7 +308,7 @@ Will result in the following claims in the user's identity in the database and J
 
 ```json
 {
-  "email": "jane.doe@company.com",
+  "email": "valid.email@supabase.io",
   "custom_claims": {
     "first_name": "Jane Doe"
   }

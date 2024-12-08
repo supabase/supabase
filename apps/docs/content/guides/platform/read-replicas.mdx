@@ -142,7 +142,7 @@ const supabase = createClient(supabaseUrl, supabaseKey, {
 async function createUser() {
   // Make the Auth call to create a user
   const { data, error } = await supabase.auth.signUp({
-    email: 'my-new-user@example.com',
+    email: 'valid.email@supabase.io',
     password: 'my--really-strong-password',
   })
 

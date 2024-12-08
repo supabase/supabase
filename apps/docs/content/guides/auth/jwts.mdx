@@ -133,7 +133,7 @@ The `user access token` is the JWT issued when you call for example:
 
 ```js
 supabase.auth.signIn({
-  email: 'lao.gimmie@gov.sg',
+  email: 'valid.email@supabase.io',
   password: 'They_Live_1988!',
 })
 ```
@@ -153,7 +153,7 @@ You'll notice that this token is quite a bit longer, since it contains informati
   "aud": "authenticated",
   "exp": 1615824388,
   "sub": "0334744a-f2a2-4aba-8c8a-6e748f62a172",
-  "email": "d.l.solove@gmail.com",
+  "email": "valid.email@supabase.io",
   "app_metadata": {
     "provider": "email"
   },

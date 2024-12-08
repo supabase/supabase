@@ -116,7 +116,7 @@ Converting an anonymous user to a permanent user requires [linking an identity](
 You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
-const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+const { data, error } = await supabase.auth.updateUser({ email: 'valid.email@supabase.io' })
 
 // verify the user's email by clicking on the email change link
 // or entering the 6-digit OTP sent to the email address
@@ -131,7 +131,7 @@ const { data, error } = await supabase.auth.updateUser({ password: 'password' })
 You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```dart
-await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+await supabase.auth.updateUser(UserAttributes(email: 'valid.email@supabase.io'));
 ```
 
 </TabPanel>
@@ -141,7 +141,7 @@ You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method t
 
 ```swift
 try await supabase.auth.updateUser(
-  user: UserAttributes(email: "example@email.com")
+  user: UserAttributes(email: "valid.email@supabase.io")
 )
 ```
 
@@ -152,7 +152,7 @@ You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method 
 
 ```kotlin
 supabase.auth.updateUser {
-    email = "example@email.com"
+    email = "valid.email@supabase.io"
 }
 ```
 
@@ -163,7 +163,7 @@ You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method
 
 ```python
 response = supabase.auth.update_user({
-  'email': 'example@email.com',
+  'email': 'valid.email@supabase.io',
 })
 
 # verify the user's email by clicking on the email change link
@@ -274,7 +274,7 @@ const { data: anonData, error: anonError } = await supabase.auth.getSession()
 
 // 2. Attempt to update the user with the existing email
 const { data: updateData, error: updateError } = await supabase.auth.updateUser({
-  email: 'existing_user@example.com',
+  email: 'valid.email@supabase.io',
 })
 
 // 3. Handle the error (since the email belongs to an existing user)
@@ -286,7 +286,7 @@ if (updateError) {
     data: { user: existingUser },
     error: signInError,
   } = await supabase.auth.signInWithPassword({
-    email: 'existing_user@example.com',
+    email: 'valid.email@supabase.io',
     password: 'user_password',
   })
 
