@@ -3,6 +3,7 @@ import {
   DeleteProjectPanel,
   General,
   TransferProjectPanel,
+  ComplianceConfig,
 } from 'components/interfaces/Settings/General'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
@@ -26,6 +27,7 @@ const ProjectSettings: NextPageWithLayout = () => {
         <General />
         {!isBranch ? (
           <>
+            <ComplianceConfig />
             <CustomDomainConfig />
             {projectTransferEnabled && <TransferProjectPanel />}
             <DeleteProjectPanel />
