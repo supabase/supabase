@@ -113,7 +113,7 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2 overflow-x-auto min-h-[42px]">
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-4 overflow-x-auto min-h-[42px]">
         <div className="flex items-center gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-[1px]">Results</span>
