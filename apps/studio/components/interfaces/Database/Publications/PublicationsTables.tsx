@@ -7,7 +7,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
-import { Loading } from 'components/ui/Loading'
+import SkeletonTableRow from 'components/ui/SkeletonTableRow'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
@@ -17,7 +17,7 @@ import { ChevronLeft, Search, AlertCircle } from 'lucide-react'
 
 interface PublicationsTablesProps {
   selectedPublication: PostgresPublication
-  onSelectBack: () => void
+  onSelectBack?: () => void
 }
 
 const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsTablesProps) => {
@@ -56,12 +56,14 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
       <div className="mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Button
-              type="outline"
-              onClick={() => onSelectBack()}
-              icon={<ChevronLeft />}
-              style={{ padding: '5px' }}
-            />
+            {onSelectBack && (
+              <Button
+                type="outline"
+                onClick={() => onSelectBack()}
+                icon={<ChevronLeft />}
+                style={{ padding: '5px' }}
+              />
+            )}
             <div>
               <Input
                 size="small"
@@ -82,53 +84,64 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
           )}
         </div>
       </div>
-      {isLoading && (
-        <div className="mt-8">
-          <Loading />
-        </div>
-      )}
 
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
-      {isSuccess &&
-        (tables.length === 0 ? (
-          <NoSearchResults />
-        ) : (
-          <div>
-            <Table
-              head={[
-                <Table.th key="header-name">Name</Table.th>,
-                <Table.th key="header-schema">Schema</Table.th>,
-                <Table.th key="header-desc" className="hidden text-left lg:table-cell">
-                  Description
-                </Table.th>,
-                <Table.th key="header-all">
-                  {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
-              <div className="flex flex-row space-x-3 items-center justify-end">
-                <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
-                  All Tables
-                </div>
-                <Toggle
-                  size="tiny"
-                  align="right"
-                  error=""
-                  className="m-0 p-0 ml-2 mt-1 -mb-1"
-                  checked={enabledForAllTables}
-                  onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
-                />
-              </div> */}
-                </Table.th>,
-              ]}
-              body={tables.map((table) => (
-                <PublicationsTableItem
-                  key={table.id}
-                  table={table}
-                  selectedPublication={selectedPublication}
-                />
-              ))}
-            />
-          </div>
-        ))}
+      {isSuccess && tables?.length === 0 && <NoSearchResults />}
+
+      <Table
+        head={[
+          <Table.th key="header-name">Name</Table.th>,
+          <Table.th key="header-schema">Schema</Table.th>,
+          <Table.th key="header-desc" className="hidden text-left lg:table-cell">
+            Description
+          </Table.th>,
+          <Table.th key="header-all">
+            {/* Temporarily disable All tables toggle for publications. See https://github.com/supabase/supabase/pull/7233.
+            <div className="flex flex-row space-x-3 items-center justify-end">
+              <div className="text-xs leading-4 font-medium text-gray-400 text-right ">
+                All Tables
+              </div>
+              <Toggle
+                size="tiny"
+                align="right"
+                error=""
+                className="m-0 p-0 ml-2 mt-1 -mb-1"
+                checked={enabledForAllTables}
+                onChange={() => toggleReplicationForAllTables(publication, enabledForAllTables)}
+              />
+            </div> */}
+          </Table.th>,
+        ]}
+        body={
+          isLoading ? (
+            Array.from({ length: 5 }).map((_, i) => (
+              <SkeletonTableRow
+                key={i}
+                index={i}
+                columns={[
+                  { key: 'name', width: '25%' },
+                  { key: 'schema', width: '25%' },
+                  { key: 'description', width: '35%' },
+                  { key: 'toggle', width: '15%', isToggle: true, align: 'end' },
+                ]}
+              />
+            ))
+          ) : tables ? (
+            tables?.map((table: any) => (
+              <PublicationsTableItem
+                key={table.id}
+                table={table}
+                selectedPublication={selectedPublication}
+              />
+            ))
+          ) : (
+            <Table.tr>
+              <Table.td colSpan={4}>No tables found</Table.td>
+            </Table.tr>
+          )
+        }
+      />
     </>
   )
 }
