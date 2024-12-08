@@ -1,0 +1,20 @@
+---
+title = "Local development workflow is painfully slow."
+github_url = "https://github.com/orgs/supabase/discussions/14598"
+date_created = "2023-05-25T13:39:48+00:00"
+topics = ["database", "cli", "studio"]
+keywords = ["workflow", "performance", "database", "local"]
+
+[api]
+cli = ["supabase-db-reset"]
+---
+
+Maybe I'm doing this wrong but the workflow of making a single change to SQL and applying it to the local database takes forever.
+
+1. Make change to a SQL file
+1. `supabase db reset`
+1. Wait for 21 seconds while looking at `Restarting containers...` ( I actually timed that with a stop watch)
+
+Meanwhile, if you have a tool like pgadmin open, you need to renavigate to the table affected to see the changes as the entire database has been wiped and re-inited. If I try to use Supabase Studio, it's just as bad because I have my data in a different schema than public, and I have to scroll a million schemas in the menu to find. It's very tedious.
+
+Perhaps I'm doing it all wrong, or is this everyone else's DX as well?
