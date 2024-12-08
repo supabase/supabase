@@ -7,7 +7,11 @@ import type { ResponseError } from 'types'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { privilegeKeys } from './keys'
 
-export type TablePrivilegesRevoke = Parameters<typeof pgMeta.tablePrivileges.revoke>[0] extends (infer T)[] ? T : never
+export type TablePrivilegesRevoke = Parameters<
+  typeof pgMeta.tablePrivileges.revoke
+>[0] extends (infer T)[]
+  ? T
+  : never
 
 export type TablePrivilegesRevokeVariables = {
   projectRef: string

@@ -22,7 +22,12 @@ async function getTablePrivileges(
   signal?: AbortSignal
 ) {
   const { result } = await executeSql(
-    { projectRef, connectionString, sql: pgMetaTablePrivilegesList.sql, queryKey: ['table-privileges'] },
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaTablePrivilegesList.sql,
+      queryKey: ['table-privileges'],
+    },
     signal
   )
 
@@ -31,7 +36,10 @@ async function getTablePrivileges(
 
 export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
   { projectRef, connectionString }: TablePrivilegesVariables,
-  { enabled = true, ...options }: UseQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseQueryOptions<TablePrivilegesData, TablePrivilegesError, TData> = {}
 ) =>
   useQuery<TablePrivilegesData, TablePrivilegesError, TData>(
     privilegeKeys.tablePrivilegesList(projectRef),
@@ -42,6 +50,9 @@ export const useTablePrivilegesQuery = <TData = TablePrivilegesData>(
     }
   )
 
-export function invalidateTablePrivilegesQuery(client: QueryClient, projectRef: string | undefined) {
+export function invalidateTablePrivilegesQuery(
+  client: QueryClient,
+  projectRef: string | undefined
+) {
   return client.invalidateQueries(privilegeKeys.tablePrivilegesList(projectRef))
 }
