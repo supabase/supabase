@@ -1,4 +1,3 @@
-import { Sha256 } from '@aws-crypto/sha256-browser'
 import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
@@ -15,12 +14,13 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 const getAnonId = async (id: string) => {
-  const hash = new Sha256()
-  hash.update(id)
-  const u8Array = await hash.digest()
-  const binString = Array.from(u8Array, (byte) => String.fromCodePoint(byte)).join('')
-  const b64encoded = btoa(binString)
-  return b64encoded
+  const encoder = new TextEncoder()
+  const data = encoder.encode(id)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const base64String = btoa(hashArray.map((byte) => String.fromCharCode(byte)).join(''))
+
+  return base64String
 }
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {

@@ -58,8 +58,9 @@ const APIKeys = () => {
   const isNotUpdatingJwtSecret =
     jwtSecretUpdateStatus === undefined || jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updated
 
+  const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
-  const apiUrl = `https://${endpoint ?? '-'}`
+  const apiUrl = `${protocol}://${endpoint ?? '-'}`
   const apiKeys = settings?.service_api_keys ?? []
   const { anonKey } = getAPIKeys(settings)
 

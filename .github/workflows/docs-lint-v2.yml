@@ -1,0 +1,50 @@
+name: '[Docs] Lint v2'
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/docs-lint-v2.yml'
+      - 'supa-mdx-lint.config.toml'
+      - 'apps/docs/content/**'
+
+env:
+  CARGO_NET_GIT_FETCH_WITH_CLI: true
+
+jobs:
+  supa-mdx-lint:
+    name: supa-mdx-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            supa-mdx-lint.config.toml
+            supa-mdx-lint
+            apps/docs/content
+      - name: cache cargo
+        id: cache-cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+          key: 6435a4cd1eeea7c2bbd343731de7e8a5127cb2d1
+      - name: install linter
+        if: steps.cache-cargo.outputs.cache-hit != 'true'
+        run: cargo install --locked --git https://github.com/supabase-community/supa-mdx-lint --rev 6435a4cd1eeea7c2bbd343731de7e8a5127cb2d1
+      - name: install reviewdog
+        uses: reviewdog/action-setup@3f401fe1d58fe77e10d665ab713057375e39b887 # v1.3.0
+        with:
+          reviewdog_version: v0.20.2
+      - name: run linter
+        env:
+          BASE_REF: ${{ github.base_ref }}
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -o pipefail
+          git diff --name-only origin/$BASE_REF HEAD \
+            | { grep -E "^apps/docs/content/guides/(getting-started|ai|api|auth|database|deployment|functions)/" || test $? = 1; } \
+            | xargs -r supa-mdx-lint --format rdf \
+            | reviewdog -f=rdjsonl -reporter=github-pr-review

@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
@@ -7,11 +6,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import {
-  useIsAPIDocsSidePanelEnabled,
-  useIsDatabaseFunctionsAssistantEnabled,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'common'
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { ProjectIndexPageLink } from 'data/prefetchers/project.$ref'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -70,9 +68,7 @@ const NavigationBar = () => {
 
   const signOut = useSignOut()
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-  const isFunctionsAssistantEnabled = useIsDatabaseFunctionsAssistantEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const [allowNavPanelToExpand] = useLocalStorageQuery(
@@ -119,37 +115,7 @@ const NavigationBar = () => {
     )
   }
 
-  const CommandButton = !isFunctionsAssistantEnabled ? (
-    <NavigationIconButton
-      size="tiny"
-      onClick={() => {
-        setCommandMenuOpen(true)
-        snap.setNavigationPanelOpen(false)
-      }}
-      type="text"
-      icon={<Search size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-      rightText={
-        <div
-          className={cn(
-            'flex items-center gap-1',
-            'h-6 py-1.5 px-2 leading-none',
-            'bg-surface-100 text-foreground-lighter',
-            'border border-default rounded-md',
-            'shadow-xs shadow-background-surface-100'
-          )}
-        >
-          {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
-            <Command size={11.5} strokeWidth={1.5} />
-          ) : (
-            <p className="text-xs">CTRL</p>
-          )}
-          <p className="text-xs">K</p>
-        </div>
-      }
-    >
-      Search
-    </NavigationIconButton>
-  ) : (
+  const CommandButton = (
     <HoverCard_Shadcn_ openDelay={10}>
       <HoverCardTrigger_Shadcn_ asChild>
         <NavigationIconButton
@@ -180,7 +146,9 @@ const NavigationBar = () => {
           }
           label="Assistant"
           shortcut="I"
-          onClick={() => snap.setAiAssistantPanel({ open: true, editor: null })}
+          onClick={() => {
+            snap.setAiAssistantPanel({ open: !snap.aiAssistantPanel.open })
+          }}
         />
       </HoverCardContent_Shadcn_>
     </HoverCard_Shadcn_>
@@ -243,19 +211,17 @@ const NavigationBar = () => {
         }}
       >
         <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
-            <Link
-              href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="mx-2 flex items-center h-[40px]"
-              onClick={onCloseNavigationIconLink}
-            >
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className="absolute h-[40px] w-6 cursor-pointer rounded"
-              />
-            </Link>
-          )}
+          <Link
+            href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+            className="mx-2 flex items-center h-[40px]"
+            onClick={onCloseNavigationIconLink}
+          >
+            <img
+              alt="Supabase"
+              src={`${router.basePath}/img/supabase-logo.svg`}
+              className="absolute h-[40px] w-6 cursor-pointer rounded"
+            />
+          </Link>
           <NavigationIconLink
             isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
             route={{
@@ -263,6 +229,7 @@ const NavigationBar = () => {
               label: 'Home',
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
+              linkElement: <ProjectIndexPageLink projectRef={projectRef} />,
             }}
             onClick={onCloseNavigationIconLink}
           />

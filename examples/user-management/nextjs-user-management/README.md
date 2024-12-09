@@ -45,22 +45,47 @@ The `anon` key is your client-side API key. It allows "anonymous access" to your
 
 **_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
-### 4. Env vars
-
-Create a file in this folder `.env.local`
-
-```
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-```
-
-Populate this file with your URL and Key.
-
-### 5. Run the application
-
-Run the application: `npm run dev`. Open your browser to `https://localhost:3000/` and you are ready to go 🚀.
-
 ## Supabase details
+
+### Using a Remote Supabase Project
+
+1. Create or select a project on [Supabase Dashboard](https://supabase.com/dashboard).
+2. Copy and fill the dotenv template `cp .env.production.example .env.production`
+3. Link the remote project to your local environment:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest link --project-ref <your-project-ref>
+```
+
+3. Sync the configuration:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest config push
+```
+
+4. Sync the database schema:
+
+```bash
+SUPABASE_ENV=production npx supabase@latest db push
+```
+
+## Vercel Preview with Branching
+
+Supabase integrates seamlessly with Vercel's preview branches, giving each branch a dedicated Supabase project. This setup allows testing database migrations or service configurations safely before applying them to production.
+
+### Steps
+
+1. Ensure the Vercel project is linked to a Git repository.
+2. Configure the "Preview" environment variables in Vercel:
+
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+3. Create a new branch, make changes (e.g., update `max_frequency`), and push the branch to Git.
+   - Open a pull request to trigger Vercel + Supabase integration.
+   - Upon successful deployment, the preview environment reflects the changes.
+
+![Preview Checks](https://github.com/user-attachments/assets/db688cc2-60fd-4463-bbed-e8ecc11b1a39)
 
 ### Postgres Row level security
 

@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { ChevronDown, Plus, Trash } from 'lucide-react'
 import Link from 'next/link'
 
@@ -10,6 +9,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -157,7 +157,7 @@ const HTTPRequestFields = ({
                 type="default"
                 size="tiny"
                 icon={<Plus />}
-                className={clsx(type === 'supabase_function' && 'rounded-r-none px-3')}
+                className={cn(type === 'supabase_function' && 'rounded-r-none px-3')}
                 onClick={onAddHeader}
               >
                 Add a new header

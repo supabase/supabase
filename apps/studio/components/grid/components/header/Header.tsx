@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import saveAs from 'file-saver'
 import { ArrowUp, ChevronDown, FileText, Trash } from 'lucide-react'
 import Papa from 'papaparse'
@@ -8,7 +7,6 @@ import { toast } from 'sonner'
 
 import { useDispatch, useTrackedState } from 'components/grid/store/Store'
 import type { Filter, Sort, SupaTable } from 'components/grid/types'
-import { Markdown } from 'components/interfaces/Markdown'
 import { formatTableRowsToSQL } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -32,12 +30,22 @@ import {
 } from 'ui'
 import FilterPopover from './filter/FilterPopover'
 import { SortPopover } from './sort'
+import Link from 'next/link'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
 // exporting. Either that or export as multiple CSV sheets with max n rows each
 export const MAX_EXPORT_ROW_COUNT = 500000
-export const MAX_EXPORT_ROW_COUNT_MESSAGE = `Sorry! We're unable to support exporting row counts larger than ${MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using [pg_dump](https://supabase.com/docs/reference/cli/supabase-db-dump) via our CLI instead.`
+export const MAX_EXPORT_ROW_COUNT_MESSAGE = (
+  <>
+    Sorry! We're unable to support exporting row counts larger than $
+    {MAX_EXPORT_ROW_COUNT.toLocaleString()} at the moment. Alternatively, you may consider using
+    <Link href="https://supabase.com/docs/reference/cli/supabase-db-dump" target="_blank">
+      pg_dump
+    </Link>{' '}
+    via our CLI instead.
+  </>
+)
 
 export type HeaderProps = {
   table: SupaTable
@@ -196,7 +204,7 @@ const DefaultHeader = ({ table, onAddColumn, onAddRow, onImportData }: DefaultHe
                                 className="-translate-x-[2px]"
                               />
                               <ArrowUp
-                                className={clsx(
+                                className={cn(
                                   'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                                   'group-data-[highlighted]:translate-y-0 group-data-[highlighted]:text-brand group-data-[highlighted]:opacity-100'
                                 )}
@@ -240,10 +248,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
   const [isExporting, setIsExporting] = useState(false)
 
   const { data } = useTableRowsQuery({
-    queryKey: [table.schema, table.name],
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    table,
+    tableId: table.id,
     sorts,
     filters,
     page: snap.page,
@@ -253,10 +260,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
 
   const { data: countData } = useTableRowsCountQuery(
     {
-      queryKey: [table?.schema, table?.name, 'count-estimate'],
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      table,
+      tableId: table.id,
       filters,
       enforceExactCount: snap.enforceExactCount,
       impersonatedRole: roleImpersonationState.role,
@@ -293,7 +299,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      toast.error(<Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />)
+      toast.error(
+        <div className="prose text-sm text-foreground">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>
+      )
       return setIsExporting(false)
     }
 
@@ -334,7 +342,9 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
     setIsExporting(true)
 
     if (allRowsSelected && totalRows > MAX_EXPORT_ROW_COUNT) {
-      toast.error(<Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />)
+      toast.error(
+        <div className="prose text-sm text-foreground">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>
+      )
       return setIsExporting(false)
     }
 

@@ -6,7 +6,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from './DiskManagement.constants'
 
-export function DiskTypeReccomendationSection({
+export function DiskTypeRecommendationSection({
   actions,
   form,
 }: {
