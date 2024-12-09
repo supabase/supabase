@@ -137,18 +137,14 @@ export const compareAsModification = (sqlDiff: ContentDiff) => {
 
   return {
     original: sqlDiff.original,
-    modified: `${sqlAiDisclaimerComment}\n\n${formattedModified}`,
+    modified: `${formattedModified}`,
   }
 }
 
 export const compareAsAddition = (sqlDiff: ContentDiff) => {
   const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-  const newModified =
-    sqlAiDisclaimerComment +
-    '\n\n' +
-    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
-    formattedModified
+  const newModified = (formattedOriginal ? formattedOriginal + '\n\n' : '') + formattedModified
 
   return {
     original: sqlDiff.original,

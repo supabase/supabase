@@ -24,6 +24,13 @@ export type MonacoEditorProps = {
   autoFocus?: boolean
   executeQuery: () => void
   onHasSelection: (value: boolean) => void
+  onPrompt?: (value: {
+    selection: string
+    beforeSelection: string
+    afterSelection: string
+    startLineNumber: number
+    endLineNumber: number
+  }) => void
 }
 
 const MonacoEditor = ({
@@ -34,6 +41,7 @@ const MonacoEditor = ({
   className,
   executeQuery,
   onHasSelection,
+  onPrompt,
 }: MonacoEditorProps) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -91,6 +99,36 @@ const MonacoEditor = ({
         })
       },
     })
+
+    if (onPrompt) {
+      editor.addAction({
+        id: 'generate-sql',
+        label: 'General SQL',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        run: () => {
+          const selection = editor.getSelection()
+          const model = editor.getModel()
+          if (!model) return
+
+          const selectedText = selection ? model.getValueInRange(selection) : ''
+          const fullText = model.getValue()
+          const beforeSelection = selection
+            ? fullText.substring(0, model.getOffsetAt(selection.getStartPosition()))
+            : ''
+          const afterSelection = selection
+            ? fullText.substring(model.getOffsetAt(selection.getEndPosition()))
+            : ''
+
+          onPrompt({
+            selection: selectedText,
+            beforeSelection,
+            afterSelection,
+            startLineNumber: selection?.startLineNumber,
+            endLineNumber: selection?.endLineNumber,
+          })
+        },
+      })
+    }
 
     editor.onDidChangeCursorSelection(({ selection }) => {
       const noSelection =
@@ -171,7 +209,9 @@ const MonacoEditor = ({
         options={{
           tabSize: 2,
           fontSize: 13,
+          lineDecorationsWidth: 0,
           readOnly: disableEdit,
+          padding: { top: 16 },
           minimap: { enabled: false },
           wordWrap: 'on',
           // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
