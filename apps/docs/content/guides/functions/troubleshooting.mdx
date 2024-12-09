@@ -30,6 +30,8 @@ If your Edge Function takes too long to respond or times out:
   - If the boot times are similar, it’s likely an issue with your function’s code, such as a large dependency, a slow API call, or a complex computation. You can try to optimize your code, reduce the size of your dependencies, or use caching techniques to improve the performance of your function.
   - If only some of the `booted` events are slow, find the affected `region` in the metadata and submit a support request via the "Help" button at the top.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Receiving 546 Error Response
 
 The 546 error response might occur because:
@@ -47,7 +49,7 @@ The 546 error response might occur because:
 
 ## Advanced techniques
 
-### Monitoring Edge Function Resource Usage
+### Monitoring Edge Function resource usage
 
 To determine how much memory and CPU your Edge Function consumes, follow these steps:
 
@@ -62,7 +64,7 @@ To determine how much memory and CPU your Edge Function consumes, follow these s
   resources.
 </Admonition>
 
-### Understanding CPU soft and hard Limits
+### Understanding CPU soft and hard limits
 
 An isolate is like a worker that can handle multiple requests for a function. It works until a time limit of 400 seconds is reached. Now, there are two types of limits for the CPU.
 
@@ -89,7 +91,7 @@ When analyzing dependencies for your Supabase Edge Functions, it's essential to 
 By selectively importing only the required submodules, you can effectively reduce the size of your function's dependencies and optimize its performance.
 Before finalizing your imports, ensure to review both Deno and NPM dependencies, checking for any unnecessary or redundant dependencies that can be removed. Additionally, check for outdated dependencies and update to the latest versions if possible.
 
-#### Deno Dependencies
+#### Deno dependencies
 
 Run `deno info`, providing the path to your input map if you use one.
 Review the dependencies listed in the output. Pay attention to any significantly large dependencies, as they can contribute to increased bundle size and potential boot time issues.
@@ -99,7 +101,7 @@ Examine if there are any unnecessary or redundant dependencies that can be remov
 deno info --import-map=/path/to/import_map.json /path/to/function/index.ts
 ```
 
-#### NPM Dependencies
+#### NPM dependencies
 
 Additionally, if you utilize NPM modules in your Edge Functions, it's crucial to be mindful of their size and impact on the overall bundle size. While importing NPM modules, consider using the notation `import { submodule } from 'npm:package/submodule'` to selectively import specific submodules rather than importing the entire package. This approach can help minimize unnecessary overhead and streamline the execution of your function.
 

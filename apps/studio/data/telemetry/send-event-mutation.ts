@@ -1,19 +1,25 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
-import { isBrowser } from 'common'
+import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
 type SendEvent = components['schemas']['TelemetryEventBodyV2']
 
 export type SendEventVariables = {
+  /** Defines the name of the event, refer to TELEMETRY_EVENTS in lib/constants */
   action: string
-  category: string
-  label: string
+  /** These are all under the event's properties (customizable on the FE) */
+  /** value: refer to TELEMETRY_VALUES in lib/constants */
   value?: string
+  /** label: secondary tag to the event for further identification */
+  label?: string
+  /** To deprecate - seems unnecessary */
+  category?: string
+  properties?: Record<string, any>
 }
 
 type SendEventPayload = any
@@ -24,7 +30,7 @@ export async function sendEvent({ body }: { body: SendEventPayload }) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent) return undefined
+  if (!consent || !IS_PLATFORM) return undefined
 
   const headers = { Version: '2' }
   const { data, error } = await post(`/platform/telemetry/event`, { body, headers })

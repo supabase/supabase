@@ -95,9 +95,7 @@ const HookList = ({ schema, filterString, editHook = noop, deleteHook = noop }: 
                 {canUpdateWebhook ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <MoreVertical />
-                      </Button>
+                      <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="left">

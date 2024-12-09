@@ -335,6 +335,29 @@ This will upload files from `supabase/images` directory to a bucket named `image
 supabase seed buckets
 ```
 
+### Sync any schema with `--schema`
+
+You can synchronize your database with a specific schema using the `--schema` option as follows:
+
+```bash
+supabase db pull --schema <schema_name>
+```
+
+<Admonition type="warning">
+
+Using `--schema`
+
+If the local `supabase/migrations` directory is empty, the db pull command will ignore the `--schema` parameter.
+
+To fix this, you can pull twice:
+
+```bash
+supabase db pull
+supabase db pull --schema <schema_name>
+```
+
+</Admonition>
+
 ## Limitations and considerations
 
 The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:

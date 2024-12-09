@@ -12,7 +12,7 @@ import {
   AlertTitle_Shadcn_,
   AlertDescription_Shadcn_,
 } from 'ui'
-import MotionNumber from 'motion-number'
+import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -178,7 +178,7 @@ const DiskUsage = ({
                           {project.name}
                         </span>
                         <Button asChild type="default" size={'tiny'}>
-                          <Link href={`/project/${project.ref}/settings/database#disk-management`}>
+                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>
                         </Button>
@@ -190,9 +190,6 @@ const DiskUsage = ({
                               <MotionNumber
                                 value={totalDiskUsage}
                                 style={{ lineHeight: 0.8 }}
-                                transition={{
-                                  y: { type: 'spring', duration: 0.35, bounce: 0 },
-                                }}
                                 className="font-mono"
                               />
                             </span>{' '}

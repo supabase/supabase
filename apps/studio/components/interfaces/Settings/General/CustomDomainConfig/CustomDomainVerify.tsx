@@ -1,8 +1,9 @@
-import { AlertCircle, ExternalLink, HelpCircle, RefreshCw } from 'lucide-react'
+import { AlertCircle, HelpCircle, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
@@ -182,20 +183,13 @@ const CustomDomainVerify = ({ customDomain }: CustomDomainVerifyProps) => {
 
       <Panel.Content>
         <div className="flex items-center justify-between">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <Link
-              href="https://supabase.com/docs/guides/platform/custom-domains"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Documentation
-            </Link>
-          </Button>
+          <DocsButton href="https://supabase.com/docs/guides/platform/custom-domains" />
           <div className="flex items-center space-x-2">
             <Button
               type="default"
               onClick={onCancelCustomDomain}
-              disabled={isDeleting || isReverifyLoading || isValidating}
+              loading={isDeleting}
+              disabled={isReverifyLoading || isValidating}
               className="self-end"
             >
               Cancel

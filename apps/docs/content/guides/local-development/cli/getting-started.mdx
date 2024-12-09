@@ -131,7 +131,7 @@ If you have any Supabase containers running locally, stop them and delete their 
 Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
 ```sh
-supabase db diff my_schema
+supabase db diff -f my_schema
 supabase db dump --local --data-only > supabase/seed.sql
 supabase stop --no-backup
 ```

@@ -42,7 +42,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-studio;
+  @apply bg-studio relative;
   @apply text-foreground;
   height: 100%;
   padding: 0;
@@ -196,11 +196,6 @@ input[type='number'] {
   width: 0;
   height: 0;
   display: none;
-}
-
-code {
-  // use supabase-ui code style
-  @apply text-code;
 }
 
 div[data-radix-portal]:not(.portal--toast) {

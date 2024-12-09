@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
-import type { User } from './users-query'
+import type { User } from './users-infinite-query'
 
 export type UserSendOTPVariables = {
   projectRef: string

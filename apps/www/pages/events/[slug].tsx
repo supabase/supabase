@@ -49,6 +49,7 @@ type CTA = {
   url: string
   label?: string
   disabled_label?: string
+  disabled?: boolean
   target?: '_blank' | '_self'
 }
 
@@ -289,7 +290,9 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                     type="primary"
                     size="medium"
                     className="mt-2"
-                    disabled={!IS_REGISTRATION_OPEN}
+                    disabled={
+                      !IS_REGISTRATION_OPEN || event.main_cta?.disabled || event.main_cta?.disabled
+                    }
                     asChild
                   >
                     <Link
@@ -381,7 +384,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   type="primary"
                   size="medium"
                   className="mt-2"
-                  disabled={!IS_REGISTRATION_OPEN}
+                  disabled={!IS_REGISTRATION_OPEN || event.main_cta?.disabled}
                   asChild
                 >
                   <Link

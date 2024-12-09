@@ -22,6 +22,11 @@ This upgrade method is currently in Beta.
 
 </Admonition>
 
+<Admonition type="note">
+  For security purposes, passwords for custom roles are not backed up and, following a restore, they
+  would need to be reset. See [here](/docs/guides/platform/backups#daily-backups) for more details
+</Admonition>
+
 pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
 
 1. Plan for an appropriate downtime window, and ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
@@ -123,7 +128,7 @@ nix run 'github:supabase/postgres?ref=15.6.1.115#start-server' 15
 
 where `15` refers to the backup's Postgres major version.
 
-Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your roject's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
+Note that the earliest Supabase Postgres version that supports a direct reference is `15.6.1.115`. If you don't know your project's Postgres version or it is lower than `15.6.1.115` then omit the `ref` option to build our most recent image:
 
 ```sh
 nix run 'github:supabase/postgres#start-server' -- 15
