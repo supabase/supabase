@@ -336,7 +336,7 @@ export const AIAssistant = ({
                 )}
               </div>
             </div>
-            {!includeSchemaMetadata && (
+            {!includeSchemaMetadata && selectedOrganization && (
               <Admonition
                 type="default"
                 title="Project metadata is not shared"
@@ -345,7 +345,7 @@ export const AIAssistant = ({
                     ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
-                className="border-0 border-b rounded-none"
+                className="border-0 border-b rounded-none bg-background"
               >
                 {!hasHipaaAddon && (
                   <Button
