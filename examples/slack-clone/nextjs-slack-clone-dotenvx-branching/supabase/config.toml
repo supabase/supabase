@@ -84,5 +84,12 @@ port = 54324
 enabled = true
 uri = "pg-functions://postgres/public/custom_access_token_hook"
 
+[auth.external.github]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
+redirect_uri = "env(SUPABASE_AUTH_REDIRECT_URI)"
+
+
 [analytics]
 enabled = false

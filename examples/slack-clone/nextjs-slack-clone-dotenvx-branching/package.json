@@ -3,12 +3,14 @@
   "version": "0.2.0",
   "license": "MIT",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3456",
     "export": "next export",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
+    "@supabase/auth-ui-react": "^0.4.7",
+    "@supabase/auth-ui-shared": "^0.1.8",
     "@supabase/supabase-js": "^2.47.3",
     "jwt-decode": "^4.0.0",
     "next": "latest",
