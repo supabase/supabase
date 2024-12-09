@@ -146,3 +146,5 @@ At this time, Auth0 tenants with the following [signing algorithms](https://auth
 
 - HS256 (HMAC with SHA-256) -- also known as symmetric JWTs
 - PS256 (RSA-PSS with SHA-256)
+
+In addition, you will no longer be able to use `auth.uid()` in your RLS policies. Auth0 prepends all their uid's with auth0 and the connection type, which is incompatible with the `auth.uid()` function. Use `auth.jwt() -> 'sub'` instead.
