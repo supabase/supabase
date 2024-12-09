@@ -6,7 +6,7 @@
  * access to a function's type definition, given its name and module.
  */
 
-import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' assert { type: 'json' }
+import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' with { type: 'json' }
 
 // [Charis] 2024-07-10
 // Types are more trouble than they're worth here: manually defining the types
@@ -303,7 +303,11 @@ function parseMethod(
 function parseSignature(
   signature: any,
   map: Map<number, any>
-): { params: Array<FunctionParameterType>; ret: ReturnType; comment?: Comment } {
+): {
+  params: Array<FunctionParameterType>
+  ret: ReturnType
+  comment?: Comment
+} {
   const params: Array<FunctionParameterType> = (signature.parameters ?? []).map((param: any) => {
     const type = parseType(param.type, map)
 

@@ -2,7 +2,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 
 import { data as DevelopersData } from 'data/Developers'
-import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' assert { type: 'json' }
+import blogPosts from '~/.contentlayer/generated/LatestBlogPost/_index.json' with { type: 'json' }
 
 type LinkProps = {
   text: string

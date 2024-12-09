@@ -5,7 +5,7 @@ import Options from '~/components/Options'
 import Param from '~/components/Params'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
-import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
+import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yml' }
 import RefDetailCollapse from './RefDetailCollapse'
 
 export type Flag = {
