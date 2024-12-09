@@ -567,11 +567,43 @@
     "author_image_url": "https://github.com/jgoux.png"
   },
   {
+    "author_id": "stephen_morgan",
+    "author": "Stephen Morgan",
+    "username": "stephen",
+    "position": "Security Engineer",
+    "author_url": "https://github.com/doublethink",
+    "author_image_url": "https://github.com/doublethink.png"
+  },
+  {
     "author_id": "saxon_fletcher",
     "author": "Saxon Fletcher",
     "username": "saxonf",
     "position": "Product Design",
     "author_url": "https://github.com/saxonf",
     "author_image_url": "https://github.com/saxonf.png"
+  },
+  {
+    "author_id": "gregpapas",
+    "author": "Greg Papas",
+    "username": "gregpapas",
+    "position": "Product",
+    "author_url": "https://github.com/sayil",
+    "author_image_url": "https://github.com/sayil.png"
+  },
+  {
+    "author_id": "pcnc",
+    "author": "Paul Cioanca",
+    "username": "pcnc",
+    "position": "Engineering",
+    "author_url": "https://github.com/pcnc",
+    "author_image_url": "https://github.com/pcnc.png"
+  },
+  {
+    "author_id": "crispy1975",
+    "author": "Paul Caselton",
+    "username": "crispy1975",
+    "position": "Engineering",
+    "author_url": "https://github.com/crispy1975",
+    "author_image_url": "https://github.com/crispy1975.png"
   }
 ]
