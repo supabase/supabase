@@ -22,6 +22,114 @@ create extension pgmq;
 
 ## Usage [#get-usage]
 
+### Queue Management
+
+#### create
+
+Create a new queue.
+
+{/* prettier-ignore */}
+```sql
+pgmq.create(queue_name text)
+returns void
+```
+
+**Parameters:**
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+Example:
+
+{/* prettier-ignore */}
+```sql
+select from pgmq.create('my_queue');
+ create 
+--------
+```
+
+#### create_unlogged
+
+Creates an unlogged table. This is useful when write throughput is more important that durability.
+See Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
+
+{/* prettier-ignore */}
+```sql
+pgmq.create_unlogged(queue_name text)
+returns void
+```
+
+**Parameters:**
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+Example:
+
+{/* prettier-ignore */}
+```sql
+select pgmq.create_unlogged('my_unlogged');
+ create_unlogged 
+-----------------
+```
+
+---
+
+#### detach_archive
+
+Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
+This does not prevent the further archives() from appending to the archive table.
+
+{/* prettier-ignore */}
+```sql
+pgmq.detach_archive(queue_name text)
+```
+
+**Parameters:**
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+Example:
+
+{/* prettier-ignore */}
+```sql
+select * from pgmq.detach_archive('my_queue');
+ detach_archive 
+----------------
+```
+
+---
+
+#### drop_queue
+
+Deletes a queue and its archive table.
+
+{/* prettier-ignore */}
+```sql
+pgmq.drop_queue(queue_name text)
+returns boolean
+```
+
+**Parameters:**
+
+| Parameter  | Type | Description           |
+| :--------- | :--- | :-------------------- |
+| queue_name | text | The name of the queue |
+
+Example:
+
+{/* prettier-ignore */}
+```sql
+select * from pgmq.drop_queue('my_unlogged');
+ drop_queue 
+------------
+ t
+```
+
 ### Sending Messages
 
 #### send
@@ -380,114 +488,6 @@ select * from pgmq.archive('my_queue', array[4, 999]);
 ```
 
 ---
-
-### Queue Management
-
-#### create
-
-Create a new queue.
-
-{/* prettier-ignore */}
-```sql
-pgmq.create(queue_name text)
-returns void
-```
-
-**Parameters:**
-
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
-| queue_name | text | The name of the queue |
-
-Example:
-
-{/* prettier-ignore */}
-```sql
-select from pgmq.create('my_queue');
- create 
---------
-```
-
-#### create_unlogged
-
-Creates an unlogged table. This is useful when write throughput is more important that durability.
-See Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
-
-{/* prettier-ignore */}
-```sql
-pgmq.create_unlogged(queue_name text)
-returns void
-```
-
-**Parameters:**
-
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
-| queue_name | text | The name of the queue |
-
-Example:
-
-{/* prettier-ignore */}
-```sql
-select pgmq.create_unlogged('my_unlogged');
- create_unlogged 
------------------
-```
-
----
-
-#### detach_archive
-
-Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
-This does not prevent the further archives() from appending to the archive table.
-
-{/* prettier-ignore */}
-```sql
-pgmq.detach_archive(queue_name text)
-```
-
-**Parameters:**
-
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
-| queue_name | text | The name of the queue |
-
-Example:
-
-{/* prettier-ignore */}
-```sql
-select * from pgmq.detach_archive('my_queue');
- detach_archive 
-----------------
-```
-
----
-
-#### drop_queue
-
-Deletes a queue and its archive table.
-
-{/* prettier-ignore */}
-```sql
-pgmq.drop_queue(queue_name text)
-returns boolean
-```
-
-**Parameters:**
-
-| Parameter  | Type | Description           |
-| :--------- | :--- | :-------------------- |
-| queue_name | text | The name of the queue |
-
-Example:
-
-{/* prettier-ignore */}
-```sql
-select * from pgmq.drop_queue('my_unlogged');
- drop_queue 
-------------
- t
-```
 
 ### Utilities
 
