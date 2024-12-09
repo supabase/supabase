@@ -184,8 +184,7 @@ const Usage = () => {
           <Admonition
             type="default"
             title="Usage filtered by project"
-            description={`You are currently viewing usage for the "
-                  ${selectedProject?.name || selectedProjectRef}" project. Supabase uses organization-level billing and quotas. For billing purposes, we sum up usage from
+            description={`You are currently viewing usage for the "${selectedProject?.name || selectedProjectRef}" project. Supabase uses organization-level billing and quotas. For billing purposes, we sum up usage from
                   all your projects. To view your usage quota, set the project filter above back to
                   "All Projects".`}
           >
