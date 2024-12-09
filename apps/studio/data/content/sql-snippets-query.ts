@@ -11,10 +11,11 @@ interface GetSqlSnippetsVariables {
   cursor?: string
   visibility?: SqlSnippet['visibility']
   favorite?: boolean
+  name?: string
 }
 
 export async function getSqlSnippets(
-  { projectRef, cursor, visibility, favorite }: GetSqlSnippetsVariables,
+  { projectRef, cursor, visibility, favorite, name }: GetSqlSnippetsVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
@@ -24,7 +25,7 @@ export async function getSqlSnippets(
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: {
       path: { ref: projectRef },
-      query: { type: 'sql', cursor, visibility, favorite, limit: '3' },
+      query: { type: 'sql', cursor, visibility, favorite, name, limit: '3' },
     },
     signal,
   })

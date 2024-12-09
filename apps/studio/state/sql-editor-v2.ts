@@ -56,9 +56,12 @@ export const sqlEditorState = proxy({
   cursors: {} as {
     [projectRefAndParentId: string]: string | undefined
   },
-  // Private snippet count for each project
-  privateSnippetCount: {} as {
-    [projectRef: string]: number
+  snippetCounts: {} as {
+    [projectRef: string]: {
+      private: number
+      shared: number
+      favorited: number
+    }
   },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
@@ -128,8 +131,20 @@ export const sqlEditorState = proxy({
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
 
-  setPrivateSnippetCount: ({ projectRef, value }: { projectRef: string; value: number }) => {
-    sqlEditorState.privateSnippetCount[projectRef] = value
+  setSnippetCount: ({
+    projectRef,
+    key,
+    value,
+  }: {
+    projectRef: string
+    key: 'private' | 'shared' | 'favorited'
+    value: number
+  }) => {
+    if (!sqlEditorState.snippetCounts[projectRef]) {
+      sqlEditorState.snippetCounts[projectRef] = { private: 0, shared: 0, favorited: 0 }
+    }
+
+    sqlEditorState.snippetCounts[projectRef][key] = value
   },
 
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: SnippetWithContent }) => {
@@ -301,6 +316,17 @@ export const sqlEditorState = proxy({
       storeSnippet.snippet.content = snippetContent
       storeSnippet.snippet.visibility = visibility
       storeSnippet.snippet.folder_id = undefined
+
+      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
+      if (counts) {
+        if (visibility === 'user') {
+          counts.private += 1
+          counts.shared -= 1
+        } else if (visibility === 'project') {
+          counts.private -= 1
+          counts.shared += 1
+        }
+      }
 
       sqlEditorState.needsSaving.add(id)
     }
