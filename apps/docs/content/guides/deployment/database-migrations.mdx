@@ -135,7 +135,11 @@ supabase migration up
 
 Finally, you should see the `department` column added to your `employees` table in the local Dashboard.
 
-View the [complete code](https://github.com/supabase/supabase/tree/master/examples/database/employees) for this example.
+<Admonition type="info">
+
+View the [complete code](https://github.com/supabase/supabase/tree/master/examples/database/employees) for this example on GitHub.
+
+</Admonition>
 
 ### Seeding data
 
@@ -175,7 +179,7 @@ values
 
     <StepHikeCompact.Code>
 
-```bash
+```bash Terminal
 supabase db reset
 ```
 
@@ -190,25 +194,67 @@ You should now see the `employees` table, along with your seed data in the Dashb
 
 This workflow is great if you know SQL and are comfortable creating tables and columns. If not, you can still use the Dashboard to create tables and columns, and then use the CLI to diff your changes and create migrations.
 
-Create a new table called `cities`, with columns `id`, `name` and `population`. To see the corresponding SQL for this, you can use the `supabase db diff --schema public` command. This will show you the SQL that will be run to create the table and columns. The output of `supabase db diff` will look something like this:
+<StepHikeCompact>
 
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create your table from the Dashboard">
+      Create a new table called `cities`, with columns `id`, `name` and `population`.
+
+      Then generate a [schema diff](/docs/reference/cli/supabase-db-diff).
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase db diff -f create_cities_table
 ```
-Diffing schemas: public
-Finished supabase db diff on branch main.
 
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Add schema diff as a migration">
+      A new migration file is created for you.
+
+      Alternately, you can copy the table definitions directly from the Table Editor.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```sql supabase/migrations/<timestamp>_create_cities_table.sql
 create table "public"."cities" (
   "id" bigint primary key generated always as identity,
   "name" text,
   "population" bigint
 );
-
 ```
 
-Alternately, you can view your table definitions directly from the Table Editor:
+    </StepHikeCompact.Code>
 
-![SQL Definition](/docs/img/guides/cli/sql-definitions.png)
+  </StepHikeCompact.Step>
+</StepHikeCompact>
 
-You can then copy this SQL into a new migration file, and run `supabase db reset` to apply the changes.
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Test your migration">
+      Test your new migration file by resetting your local database.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash Terminal
+supabase db reset
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
 
 The last step is deploying these changes to a live Supabase project.
 
@@ -222,7 +268,7 @@ Head over to [Supabase](https://supabase.com/dashboard) and create a new project
 
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Log in to the Supabase CLI">
-      [Login](/docs/reference/cli/usage#supabase-login) to the Supabase CLI using an auto-generated Personal Access Token.
+      [Login](/docs/reference/cli/supabase-login) to the Supabase CLI using an auto-generated Personal Access Token.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -240,7 +286,7 @@ supabase login
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Link your project">
-      [Link](/docs/reference/cli/usage#supabase-link) to your remote project by selecting from the on-screen prompt.
+      [Link](/docs/reference/cli/supabase-link) to your remote project by selecting from the on-screen prompt.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
@@ -258,7 +304,7 @@ supabase link
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Deploy database changes">
-      [Push](/docs/reference/cli/usage#supabase-db-push) your migrations to the remote database.
+      [Push](/docs/reference/cli/supabase-db-push) your migrations to the remote database.
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
