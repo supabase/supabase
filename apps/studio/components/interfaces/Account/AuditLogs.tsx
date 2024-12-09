@@ -13,7 +13,8 @@ import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from 'data/profile/profile-audit-logs-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const AuditLogs = () => {
   const currentTime = dayjs().utc().set('millisecond', 0)
@@ -112,16 +113,23 @@ const AuditLogs = () => {
               }}
               renderFooter={() => {
                 return (
-                  <Alert title="" variant="info" className="mx-3 pl-2 pr-2 pt-1 pb-2">
-                    You have a log retention period of{' '}
-                    <span className="text-brand">
-                      {retentionPeriod} day
-                      {retentionPeriod > 1 ? 's' : ''}
-                    </span>
-                    . You may only view logs from{' '}
-                    {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                    earliest date.
-                  </Alert>
+                  <Admonition
+                    type="default"
+                    title=""
+                    showIcon={false}
+                    className="mx-3 pl-2 pr-2 pt-1 pb-2 w-auto"
+                  >
+                    <div className="text-xs">
+                      You have a log retention period of{' '}
+                      <span className="text-brand">
+                        {retentionPeriod} day
+                        {retentionPeriod > 1 ? 's' : ''}
+                      </span>
+                      . You may only view logs from{' '}
+                      {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
+                      earliest date.
+                    </div>
+                  </Admonition>
                 )
               }}
             />
