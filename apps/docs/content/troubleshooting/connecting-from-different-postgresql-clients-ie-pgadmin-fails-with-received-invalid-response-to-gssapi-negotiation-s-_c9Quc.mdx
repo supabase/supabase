@@ -1,0 +1,26 @@
+---
+title = 'Connecting from different PostgreSQL clients i.e. pgAdmin fails with "received invalid response to GSSAPI negotiation: S"'
+github_url = "https://github.com/orgs/supabase/discussions/30173"
+date_created = "2024-10-29T17:03:18+00:00"
+topics = ["database", "supavisor"]
+keywords = ["connections", "gssencmode"]
+
+[[errors]]
+message = "received invalid response to GSSAPI negotiation: S"
+---
+
+This error happens due to a missing parameter that needs to be set to disabled.
+
+There are few ways to disable the "gssencmode" parameter:
+
+1. Connection configuration file.
+
+- [ add gssencmode = 'disable'] to your configuration file
+
+2. In pgAdmin, when registering a server.
+
+- [ Go to Parameters ]
+- [ Click the + button ]
+- [ From the dropdown, select 'GSS encmode' ]
+- [ Set the value to 'disable' ]
+- [ Fill out all required connection details then save ]

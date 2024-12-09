@@ -62,16 +62,18 @@ export default async function TroubleshootingPage({ entry }: { entry: ITroublesh
                 <>
                   <h3 className="text-sm text-foreground-lighter mb-3">Related error codes</h3>
                   <div className="flex flex-wrap gap-0.5">
-                    {entry.data.errors.map((error, index) => (
-                      <Link
-                        key={index}
-                        href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [formatError(error)] })}`}
-                      >
-                        <PillTag className="hover:bg-200 focus-visible:bg-foreground-muted hover:border-control focus-visible:border-control transition-colors">
-                          {formatError(error)}
-                        </PillTag>
-                      </Link>
-                    ))}
+                    {entry.data.errors
+                      .filter((error) => error.code)
+                      .map((error, index) => (
+                        <Link
+                          key={index}
+                          href={`/guides/troubleshooting${serializeTroubleshootingSearchParams({ errorCodes: [formatError(error)] })}`}
+                        >
+                          <PillTag className="hover:bg-200 focus-visible:bg-foreground-muted hover:border-control focus-visible:border-control transition-colors">
+                            {formatError(error)}
+                          </PillTag>
+                        </Link>
+                      ))}
                   </div>
                   <hr className="my-6" aria-hidden />
                 </>
