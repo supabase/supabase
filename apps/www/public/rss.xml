@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Thu, 05 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 06 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/database-build-v2</guid>
+  <title>database.build v2: Bring-your-own-LLM</title>
+  <link>https://supabase.com/blog/database-build-v2</link>
+  <description>Use any OpenAI API compatible LLMs in database.build</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/restore-to-a-new-project</guid>
+  <title>Restore to a New Project</title>
+  <link>https://supabase.com/blog/restore-to-a-new-project</link>
+  <description>Effortlessly Clone Data into a New Supabase Project</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hack-the-base</guid>
+  <title>Hack the Base! with Supabase</title>
+  <link>https://supabase.com/blog/hack-the-base</link>
+  <description>Play cool games, win cool prizes.</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
+  <title>Top 10 Launches of Launch Week 13</title>
+  <link>https://supabase.com/blog/launch-week-13-top-10</link>
+  <description>Highlights from Launch Week 13</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/supabase-queues</guid>
   <title>Supabase Queues</title>
   <link>https://supabase.com/blog/supabase-queues</link>
@@ -93,7 +121,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/lw12-hackathon-winners</guid>
-  <title>Supabase Launch Week 12 Hackathon</title>
+  <title>Supabase Launch Week 12 Hackathon Winners</title>
   <link>https://supabase.com/blog/lw12-hackathon-winners</link>
   <description>Announcing the winners of the Supabase Launch Week 12 Hackathon.</description>
   <pubDate>Mon, 30 Sep 2024 00:00:00 -0700</pubDate>
