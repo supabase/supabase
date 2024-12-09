@@ -408,47 +408,6 @@ select from pgmq.create('my_queue');
 --------
 ```
 
----
-
-#### create_partitioned
-
-Create a partitioned queue.
-
-{/* prettier-ignore */}
-```sql
-pgmq.create_partitioned (
-    queue-ue_name text,
-    partition_interval text default '10000'::text,
-    retention_interval text default '100000'::text
-)
-returns void
-```
-
-**Parameters:**
-
-| Parameter          | Type | Description           |
-| :----------------- | :--- | :-------------------- |
-| queue_name         | text | The name of the queue |
-| partition_interval | text | The name of the queue |
-| retention_interval | text | The name of the queue |
-
-Example:
-
-Create a queue with 100,000 messages per partition, and will retain 10,000,000 messages on old partitions. Partitions greater than this will be deleted.
-
-{/* prettier-ignore */}
-```sql
-select * from pgmq.create_partitioned(
-    'my_partitioned_queue',
-    '100000',
-    '10000000'
-);
- create_partitioned 
---------------------
-```
-
----
-
 #### create_unlogged
 
 Creates an unlogged table. This is useful when write throughput is more important that durability.
