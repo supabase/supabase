@@ -13,6 +13,7 @@
   @apply text-grid;
   @apply border-secondary border-r border-b;
   @apply text-foreground;
+  @apply font-mono;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
