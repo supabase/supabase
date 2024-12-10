@@ -43,7 +43,7 @@ const HomePageActions = ({
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
 
   return (
-    <div className="flex gap-x-3">
+    <div className="flex flex-col gap-y-1 md:flex-row gap-x-3">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button type="primary">
@@ -77,7 +77,7 @@ const HomePageActions = ({
           size="tiny"
           placeholder="Search for a project"
           icon={<Search size={16} />}
-          className="w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
+          className="w-20 md:w-64 [&>div>div>div>input]:!pl-7 [&>div>div>div>div]:!pl-2"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
         />

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { Menu } from 'lucide-react'
 
 import Connect from 'components/interfaces/Connect/Connect'
 import { useParams } from 'common'
@@ -15,7 +16,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
-import { Badge, cn } from 'ui'
+import { Badge, buttonVariants, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
@@ -39,7 +40,12 @@ const LayoutHeaderDivider = () => (
   </span>
 )
 
-const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
+const LayoutHeader = ({
+  customHeaderComponents,
+  breadcrumbs = [],
+  headerBorder = true,
+  handleMobileMenu,
+}: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
@@ -74,6 +80,16 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     >
       <div className="flex items-center justify-between py-2 px-3 flex-1">
         <div className="flex items-center text-sm">
+          <button
+            title="Menu dropdown button"
+            className={cn(
+              buttonVariants({ type: 'default' }),
+              'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+            )}
+            onClick={() => handleMobileMenu()}
+          >
+            <Menu size={18} strokeWidth={1} />
+          </button>
           {projectRef && (
             <>
               <div className="flex items-center">
