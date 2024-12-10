@@ -12,7 +12,7 @@ Calling `signInAnonymously()` creates an anonymous user. It's just like a perman
 
 Like permanent users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
 
-This is different from the `anon` API key which does not create a user and can be used to implement public access to your database as it uses the `anonymous` Postgres role.
+This is different from the <LegacyApiKeys keyword='publishable' type='anon'/> API key which does not create a user and can be used to implement public access to your database as it uses the `anon` Postgres role.
 
 </Admonition>
 
