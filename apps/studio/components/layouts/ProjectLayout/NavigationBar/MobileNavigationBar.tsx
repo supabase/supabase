@@ -196,30 +196,25 @@ const NavigationBar = () => {
   )
 
   return (
-    <div className="w-14 h-full hidden md:flex flex-col">
+    <div className="h-14 w-full flex flex-row md:hidden">
       <nav
-        data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
-          'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
+          'group py-2 z-10 w-full h-14 data-[state=expanded]:w-[13rem]',
           'border-r bg-dash-sidebar border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
-          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
+          'hide-scrollbar flex flex-row justify-start overflow-x-auto'
         )}
-        onMouseEnter={() => allowNavPanelToExpand && snap.setNavigationPanelOpen(true)}
-        onMouseLeave={() => {
-          if (!userDropdownOpen && allowNavPanelToExpand) snap.setNavigationPanelOpen(false)
-        }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2 relative">
+        <ul className="flex flex-row gap-1 justify-start px-2 relative">
           <Link
             href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-            className="mx-2 flex items-center h-[40px]"
+            className="mx-2 flex items-center h-[40px] w-[40px] min-w-[40px]"
             onClick={onCloseNavigationIconLink}
           >
             <img
               alt="Supabase"
               src={`${router.basePath}/img/supabase-logo.svg`}
-              className="absolute h-[40px] w-6 cursor-pointer rounded"
+              className="absolute h-[40px] w-[40px] cursor-pointer rounded"
             />
           </Link>
           <NavigationIconLink
@@ -233,7 +228,7 @@ const NavigationBar = () => {
             }}
             onClick={onCloseNavigationIconLink}
           />
-          <Separator className="my-1 bg-border-muted" />
+          <Separator className="mx-1 bg-border-muted" />
           {toolRoutes.map((route) => (
             <NavigationIconLink
               key={route.key}
@@ -311,7 +306,7 @@ const NavigationBar = () => {
           })}
         </ul>
 
-        <ul className="flex flex-col px-2 gap-y-1">
+        <ul className="flex flex-row px-2 gap-1">
           {settingsRoutes.map((route) => (
             <NavigationIconLink
               key={route.key}

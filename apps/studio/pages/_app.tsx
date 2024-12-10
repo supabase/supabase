@@ -52,6 +52,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
+import { SheetProvider } from 'components/ui/Sheet'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -150,12 +151,14 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         <AppBannerContextProvider>
                           <CommandProvider>
                             <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <StudioCommandMenu />
-                                <GenerateSql />
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
+                              <SheetProvider>
+                                <FeaturePreviewContextProvider>
+                                  {getLayout(<Component {...pageProps} />)}
+                                  <StudioCommandMenu />
+                                  <GenerateSql />
+                                  <FeaturePreviewModal />
+                                </FeaturePreviewContextProvider>
+                              </SheetProvider>
                             </AppBannerWrapper>
                             <SonnerToaster position="top-right" />
                           </CommandProvider>

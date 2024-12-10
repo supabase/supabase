@@ -19,6 +19,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
+  Button,
   Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -27,8 +28,10 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { useSheet } from '../../../components/ui/Sheet'
 
 const Home: NextPageWithLayout = () => {
+  const { openSheet } = useSheet()
   const connectDialogUpdate = useFlag('connectDialogUpdate')
 
   const organization = useSelectedOrganization()
@@ -96,6 +99,7 @@ const Home: NextPageWithLayout = () => {
         </div>
       </div>
 
+      <Button onClick={openSheet}>Open Mobile Menu</Button>
       <div className="mx-6">
         <ProjectUpgradeFailedBanner />
       </div>

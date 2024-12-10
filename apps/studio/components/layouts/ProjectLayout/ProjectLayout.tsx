@@ -22,6 +22,7 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -32,6 +33,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
+import { useSheet } from 'components/ui/Sheet'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -92,6 +94,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const selectedProject = useSelectedProject()
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
+    const { openSheet, setMenu } = useSheet()
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -126,6 +129,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
+    // Handle mobile menu
+    const handleMobileMenu = () => {
+      setMenu(<ProductMenuBar title={product}>{productMenu}</ProductMenuBar>)
+      openSheet()
+    }
+
     return (
       <AppLayout>
         <ProjectContextProvider projectRef={projectRef}>
@@ -143,21 +152,38 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </title>
             <meta name="description" content="Supabase Studio" />
           </Head>
-          <div className="flex h-full">
+          <div className="flex flex-col md:flex-row h-full">
             {/* Left-most navigation side bar to access products */}
             {!hideIconBar && <NavigationBar />}
+            {/* Top Nav to access products from mobile */}
+            {!hideIconBar && <MobileNavigationBar />}
             {/* Product menu bar */}
             <ResizablePanelGroup
               className="flex h-full"
               direction="horizontal"
               autoSaveId="project-layout"
             >
+              {/* Show menu button on mobile */}
+              <div className="absolute inset-0 bottom-auto z-50 lg:hidden">
+                <button
+                  onClick={handleMobileMenu}
+                  className="p-4 text-foreground-light hover:text-foreground"
+                >
+                  Menu
+                </button>
+              </div>
+
+              {/* Existing desktop menu */}
               <ResizablePanel
                 id="panel-left"
-                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                  hidden: !showProductMenu || !productMenu,
-                })}
-                defaultSize={0} // forces panel to smallest width possible, at w-64
+                className={cn(
+                  'hidden md:block',
+                  resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
+                  {
+                    'hidden lg:block': !showProductMenu || !productMenu,
+                  }
+                )}
+                defaultSize={0}
               >
                 <MenuBarWrapper
                   isLoading={isLoading}
