@@ -28,11 +28,23 @@ Note that project migration is primarily for changing regions or upgrading to ne
 
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Restore your backup file to a new project" fullWidth>
-      If you have a backup file downloaded from the dashboard (*.backup), follow our [Dashboard backup restore guide here](/docs/guides/platform/migrating-within-supabase/restore)
+      If you have a backup file downloaded from the dashboard (*.backup), follow our [Dashboard backup restore guide here](/docs/guides/platform/migrating-within-supabase/dashboard_restore)
 
-      Otherwise, if you have a backup files from the Supabase CLI then follow our Supabase CLI backup restore guide here
+      Otherwise, if you have a backup files from the Supabase CLI then follow our [Supabase CLI backup restore guide here](/docs/guides/platform/migrating-within-supabase/cli_restore)
 
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+
+## Migrate Storage Objects to new Supabase project (optional)
+
+After restoring the project above, the metadata for the storage objects in the database will be present. The buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present.
+
+To migrate the actual file storage, you can use the following Google colab script and follow the instructions in the comments:
+
+## Frequently Asked Questions
+
+### There are various errors like "permission denied" or "must be member of role "supabase_admin"". Should I be concerned with them?
+
+In most cases these errors are expected and should not be a concern. If there are any issues with your new project, please reach out to our Support here.
