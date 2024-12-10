@@ -434,6 +434,11 @@ const nextConfig = {
         source: '/project/:ref/integrations/cron-jobs',
         destination: '/project/:ref/integrations/cron',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/settings/warehouse',
+        destination: '/project/:ref/settings/general',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
