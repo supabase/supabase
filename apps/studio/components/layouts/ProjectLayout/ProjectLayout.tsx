@@ -157,6 +157,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             {!hideIconBar && <NavigationBar />}
             {/* Top Nav to access products from mobile */}
             {!hideIconBar && <MobileNavigationBar />}
+            <MobileViewNav title={product} productMenu={productMenu} />
+
             {/* Product menu bar */}
             <ResizablePanelGroup
               className="flex h-full"
@@ -164,12 +166,12 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               autoSaveId="project-layout"
             >
               {/* Show menu button on mobile */}
-              <div className="absolute inset-0 bottom-auto z-50 lg:hidden">
+              <div className="absolute inset-0 top-16 bottom-auto z-50 lg:hidden">
                 <button
                   onClick={handleMobileMenu}
                   className="p-4 text-foreground-light hover:text-foreground"
                 >
-                  Menu
+                  View Menu
                 </button>
               </div>
 

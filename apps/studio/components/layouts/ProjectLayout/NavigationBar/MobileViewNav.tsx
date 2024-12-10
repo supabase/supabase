@@ -13,7 +13,7 @@ import { NavContent } from './NavigationBar'
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
-const MobileNavigationBar = () => {
+const MobileViewNav = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
@@ -91,4 +91,4 @@ const MobileNavigationBar = () => {
   )
 }
 
-export default MobileNavigationBar
+export default MobileViewNav
