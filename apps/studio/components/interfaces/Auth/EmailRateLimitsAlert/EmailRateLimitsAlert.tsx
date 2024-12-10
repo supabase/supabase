@@ -30,15 +30,6 @@ export function EmailRateLimitsAlert() {
           Set up a custom SMTP server now.
         </Link>
       </AlertDescription_Shadcn_>
-      <AlertDescription_Shadcn_ className="mt-2">
-        {after20240926
-          ? 'To fight abuse, Auth email messages are restricted '
-          : 'On 26th September: To fight abuse, Auth email messages will be restricted '}
-        to your project's organization members. For example, if your organization has 3 members with
-        addresses: <code>person-a@example.com</code>, <code>person-b@example.com</code> and{' '}
-        <code>person-c@example.com</code>, messages will be{' '}
-        <strong>sent to those addresses only.</strong> Set up custom SMTP to send to any user.
-      </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
 }
