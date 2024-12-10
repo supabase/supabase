@@ -43,13 +43,23 @@ Here are the steps necessary to restore your dashboard backup into a new project
           export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
           ```
         </StepHikeCompact.Code>
+      </StepHikeCompact.Details>
 
+    </StepHikeCompact.Step>
 
-        Open your terminal/shell/console and run the following command:
+      <StepHikeCompact.Step step={3}>
 
-        psql
+    <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-        if you get psql is not availble
+        Open your shell/terminal and run the following command:
+
+        <StepHikeCompact.Code>
+          ```sql
+            psql --version
+          ```
+        </StepHikeCompact.Code>
+
+        If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
       </StepHikeCompact.Details>
 
     </StepHikeCompact.Step>
