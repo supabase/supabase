@@ -34,6 +34,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { useSheet } from 'components/ui/Sheet'
+import MobileViewNav from './NavigationBar/MobileViewNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -129,12 +130,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    // Handle mobile menu
-    const handleMobileMenu = () => {
-      setMenu(<ProductMenuBar title={product}>{productMenu}</ProductMenuBar>)
-      openSheet()
-    }
-
     return (
       <AppLayout>
         <ProjectContextProvider projectRef={projectRef}>
@@ -157,7 +152,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             {!hideIconBar && <NavigationBar />}
             {/* Top Nav to access products from mobile */}
             {!hideIconBar && <MobileNavigationBar />}
-            <MobileViewNav title={product} productMenu={productMenu} />
+            {showProductMenu && productMenu && (
+              <MobileViewNav title={product} productMenu={productMenu} />
+            )}
 
             {/* Product menu bar */}
             <ResizablePanelGroup
@@ -165,16 +162,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               direction="horizontal"
               autoSaveId="project-layout"
             >
-              {/* Show menu button on mobile */}
-              <div className="absolute inset-0 top-16 bottom-auto z-50 lg:hidden">
-                <button
-                  onClick={handleMobileMenu}
-                  className="p-4 text-foreground-light hover:text-foreground"
-                >
-                  View Menu
-                </button>
-              </div>
-
               {/* Existing desktop menu */}
               <ResizablePanel
                 id="panel-left"
@@ -196,7 +183,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 </MenuBarWrapper>
               </ResizablePanel>
               <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu })}
+                className={cn('hidden md:flex', { hidden: !showProductMenu || !productMenu })}
                 withHandle
                 disabled={resizableSidebar ? false : true}
               />
@@ -207,7 +194,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className=" w-full min-w-[600px]">
+                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}

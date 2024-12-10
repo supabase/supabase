@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react'
+import { usePathname } from 'next/navigation'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { cn, Dialog, DialogContent } from 'ui'
 
@@ -20,11 +21,16 @@ export const useSheet = () => {
 }
 
 export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [menu, setMenu] = useState<React.ReactNode>(null)
 
   const openSheet = () => setIsOpen(true)
   const closeSheet = () => setIsOpen(false)
+
+  useEffect(() => {
+    setIsOpen(false)
+  }, [pathname])
 
   return (
     <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, setMenu }}>

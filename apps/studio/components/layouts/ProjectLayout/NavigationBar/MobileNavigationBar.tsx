@@ -28,7 +28,7 @@ const MobileNavigationBar = () => {
 
   const handleMobileMenu = () => {
     setMenu(
-      <div data-state={'expanded'} className="w-full h-full flex flex-col py-4">
+      <div data-state={'expanded'} className="w-full h-full flex flex-col py-2">
         <NavContent />
       </div>
     )
