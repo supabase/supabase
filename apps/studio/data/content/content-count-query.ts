@@ -3,20 +3,23 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { contentKeys } from './keys'
+import { SqlSnippet } from './sql-snippets-query'
 
 interface getContentCountVariables {
   projectRef?: string
   type: 'sql' | 'report' | 'log_sql'
+  visibility?: SqlSnippet['visibility']
+  favorite?: boolean
 }
 
 export async function getContentCount(
-  { projectRef, type }: getContentCountVariables,
+  { projectRef, type, visibility, favorite }: getContentCountVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
 
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
-    params: { path: { ref: projectRef }, query: { type } },
+    params: { path: { ref: projectRef }, query: { type, visibility, favorite } },
     signal,
   })
 
@@ -28,12 +31,15 @@ export type ContentIdData = Awaited<ReturnType<typeof getContentCount>>
 export type ContentIdError = ResponseError
 
 export const useContentCountQuery = <TData = ContentIdData>(
-  { projectRef, type }: getContentCountVariables,
+  { projectRef, type, visibility, favorite }: getContentCountVariables,
   { enabled = true, ...options }: UseQueryOptions<ContentIdData, ContentIdError, TData> = {}
 ) =>
   useQuery<ContentIdData, ContentIdError, TData>(
-    contentKeys.count(projectRef, type),
-    ({ signal }) => getContentCount({ projectRef, type }, signal),
+    contentKeys.count(projectRef, type, {
+      visibility,
+      favorite,
+    }),
+    ({ signal }) => getContentCount({ projectRef, type, visibility, favorite }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       ...options,

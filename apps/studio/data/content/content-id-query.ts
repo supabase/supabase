@@ -1,8 +1,17 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { components } from 'api-types'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
+import type { Content } from './content-query'
 import { contentKeys } from './keys'
+
+export type GetUserContentByIdResponse = Omit<
+  components['schemas']['GetUserContentByIdResponse'],
+  'content'
+> & {
+  content: Content['content']
+}
 
 export async function getContentById(
   { projectRef, id }: { projectRef?: string; id?: string },
@@ -17,7 +26,8 @@ export async function getContentById(
   })
 
   if (error) throw handleError(error)
-  return data
+  // override content type
+  return data as unknown as GetUserContentByIdResponse
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentById>>
