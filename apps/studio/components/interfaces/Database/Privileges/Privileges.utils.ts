@@ -15,7 +15,7 @@ import {
   TablePrivilegesGrant,
   grantTablePrivileges,
 } from 'data/privileges/table-privileges-grant-mutation'
-import type { TablePrivilege } from 'data/privileges/table-privileges-query'
+import type { PgTablePrivileges } from 'data/privileges/table-privileges-query'
 import {
   TablePrivilegesRevoke,
   revokeTablePrivileges,
@@ -35,7 +35,7 @@ export interface PrivilegeOperation {
   privilege_type: string
 }
 
-export function getDefaultTableCheckedStates(tablePrivilege: TablePrivilege) {
+export function getDefaultTableCheckedStates(tablePrivilege: PgTablePrivileges) {
   return Object.fromEntries(
     ALL_PRIVILEGE_TYPES.map((privilege) => [
       privilege,
@@ -286,16 +286,16 @@ export function useApplyPrivilegeOperations(callback?: () => void) {
       const grantTableOperations = tableOperations
         .filter((op) => op.type === 'grant')
         .map((op) => ({
-          relation_id: Number(op.id),
+          relationId: Number(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as TablePrivilegesGrant['privilege_type'],
+          privilegeType: op.privilege_type as TablePrivilegesGrant['privilegeType'],
         }))
       const revokeTableOperations = tableOperations
         .filter((op) => op.type === 'revoke')
         .map((op) => ({
-          relation_id: Number(op.id),
+          relationId: Number(op.id),
           grantee: op.grantee,
-          privilege_type: op.privilege_type as TablePrivilegesRevoke['privilege_type'],
+          privilegeType: op.privilege_type as TablePrivilegesRevoke['privilegeType'],
         }))
 
       const grantColumnOperations = columnOperations
