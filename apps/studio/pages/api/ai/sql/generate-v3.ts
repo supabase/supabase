@@ -104,7 +104,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # For all your abilities, follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-      - If the question is about users or involves creating a users table, also retrieve the auth schema. 
+      - If the question is about users or involves creating a users table, also retrieve the auth schema.
+      - If it a query is a destructive query e.g. table drop, ask for confirmation before writing the query. The user will still have to run the query once you create it
   
 
       Here are the existing database schema names you can retrieve: ${schemas}
