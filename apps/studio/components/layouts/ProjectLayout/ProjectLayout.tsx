@@ -166,10 +166,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizablePanel
                 id="panel-left"
                 className={cn(
-                  'hidden md:block',
+                  'hidden md:flex',
                   resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
                   {
-                    'hidden lg:block': !showProductMenu || !productMenu,
+                    '!hidden': !showProductMenu || !productMenu,
                   }
                 )}
                 defaultSize={0}
@@ -183,7 +183,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 </MenuBarWrapper>
               </ResizablePanel>
               <ResizableHandle
-                className={cn('hidden md:flex', { hidden: !showProductMenu || !productMenu })}
+                className={cn('hidden md:flex', { '!hidden': !showProductMenu || !productMenu })}
                 withHandle
                 disabled={resizableSidebar ? false : true}
               />
