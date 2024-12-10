@@ -21,50 +21,106 @@ Here are the steps necessary to restore your dashboard backup into a new project
       header="Install Postgresql which includes psql"
       id="item-1"
     >
-    <StepHikeCompact>
+      <Tabs
+        scrollable
+        size="small"
+        type="underlined"
+        defaultActiveId="js"
+        queryGroup="language"
+      >
+      <TabPanel id="windows" label="Windows">
+        <StepHikeCompact>
 
-  <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-      Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+        <StepHikeCompact.Step step={1}>
+          <StepHikeCompact.Details title="Install Postgresql" fullWidth>
+            Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 
-      Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
-    </StepHikeCompact.Details>
+            Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
+          </StepHikeCompact.Details>
 
-  </StepHikeCompact.Step>
+        </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={2}>
+        <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
-        For ease of use, you can add the installed postgres directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
+          <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
+              For ease of use, you can add the installed postgres directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
 
-        Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
-        <StepHikeCompact.Code>
-          ```sql
-          export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
-          ```
-        </StepHikeCompact.Code>
-      </StepHikeCompact.Details>
+              Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
+              <StepHikeCompact.Code>
+                ```sql
+                export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
+                ```
+              </StepHikeCompact.Code>
+            </StepHikeCompact.Details>
 
-    </StepHikeCompact.Step>
+          </StepHikeCompact.Step>
 
-      <StepHikeCompact.Step step={3}>
+            <StepHikeCompact.Step step={3}>
 
-    <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
+          <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-        Open your shell/terminal and run the following command:
+              Open your shell/terminal and run the following command:
 
-        <StepHikeCompact.Code>
-          ```sql
-            psql --version
-          ```
-        </StepHikeCompact.Code>
+              <StepHikeCompact.Code>
+                ```sql
+                  psql --version
+                ```
+              </StepHikeCompact.Code>
 
-        If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
-      </StepHikeCompact.Details>
+              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
+            </StepHikeCompact.Details>
 
-    </StepHikeCompact.Step>
+          </StepHikeCompact.Step>
 
-  </StepHikeCompact>
+        </StepHikeCompact>
+      </TabPanel>
+      <TabPanel id="mac" label="MacOS">
+              <StepHikeCompact>
+
+        <StepHikeCompact.Step step={1}>
+          <StepHikeCompact.Details title="Install Postgresql" fullWidth>
+            Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+
+            Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
+          </StepHikeCompact.Details>
+
+        </StepHikeCompact.Step>
+
+        <StepHikeCompact.Step step={2}>
+
+          <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
+              For ease of use, you can add the installed postgres directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
+
+              Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
+              <StepHikeCompact.Code>
+                ```sql
+                export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
+                ```
+              </StepHikeCompact.Code>
+            </StepHikeCompact.Details>
+
+          </StepHikeCompact.Step>
+
+            <StepHikeCompact.Step step={3}>
+
+          <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
+
+              Open your shell/terminal and run the following command:
+
+              <StepHikeCompact.Code>
+                ```sql
+                  psql --version
+                ```
+              </StepHikeCompact.Code>
+
+              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
+            </StepHikeCompact.Details>
+
+          </StepHikeCompact.Step>
+
+        </StepHikeCompact>
+      </TabPanel>
+      </Tabs>
     </AccordionItem>
 
   </div>
@@ -77,7 +133,7 @@ Here are the steps necessary to restore your dashboard backup into a new project
 
       <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create New project" fullWidth>
-          You can create a new [Supabase project here](database.new)
+          You can create a new [Supabase project here](https://database.new)
         </StepHikeCompact.Details>
       </StepHikeCompact.Step>
 
@@ -87,7 +143,7 @@ Here are the steps necessary to restore your dashboard backup into a new project
 
                 - If you were using Webhooks in your old project, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
                 - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
-                - If you were using Replication for Realtime, enable [Publication on the tables where you had it turned on](https://supabase.com/dashboard/project/_/database/publications)
+                - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
           </StepHikeCompact.Details>
 
         </StepHikeCompact.Step>
