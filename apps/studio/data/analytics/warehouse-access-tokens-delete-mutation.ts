@@ -8,7 +8,9 @@ export type DeleteAccessTokenArgs = {
   projectRef: string
   token: string
 }
-
+/**
+ * This will be deprecated or rewritten in favor of the new project API keys
+ */
 export async function deleteWarehouseAccessToken({ projectRef, token }: DeleteAccessTokenArgs) {
   const { data, error } = await del(
     '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}',

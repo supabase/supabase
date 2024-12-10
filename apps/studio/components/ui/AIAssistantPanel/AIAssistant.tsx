@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText, Info } from 'lucide-react'
+import { FileText, Info, X } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -201,6 +201,10 @@ export const AIAssistant = ({
     }
   }
 
+  const closeAssistant = () => {
+    setAiAssistantPanel({ open: false })
+  }
+
   const confirmOptInToShareSchemaData = async () => {
     if (!canUpdateOrganization) {
       return toast.error('You do not have the required permissions to update this organization')
@@ -328,15 +332,17 @@ export const AIAssistant = ({
                       : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
                   </TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
-
-                {(hasMessages || suggestions || sqlSnippets) && (
-                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
-                    Reset
-                  </Button>
-                )}
+                <div className="flex gap-2">
+                  {(hasMessages || suggestions || sqlSnippets) && (
+                    <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
+                      Reset
+                    </Button>
+                  )}
+                  <Button type="default" className="w-7" onClick={closeAssistant} icon={<X />} />
+                </div>
               </div>
             </div>
-            {!includeSchemaMetadata && (
+            {!includeSchemaMetadata && selectedOrganization && (
               <Admonition
                 type="default"
                 title="Project metadata is not shared"
@@ -345,7 +351,7 @@ export const AIAssistant = ({
                     ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
-                className="border-0 border-b rounded-none"
+                className="border-0 border-b rounded-none bg-background"
               >
                 {!hasHipaaAddon && (
                   <Button

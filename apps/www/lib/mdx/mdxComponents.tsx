@@ -112,12 +112,8 @@ export default function mdxComponents(type?: 'blog' | 'lp' | undefined) {
     Img: ({ zoomable = true, className, ...props }: ImageProps & { wide?: boolean }) => (
       <Image
         fill
-        className={cn(
-          'm-0 object-cover',
-          type === 'blog' ? 'rounded-md border' : '',
-          props.wide && 'wide',
-          className
-        )}
+        containerClassName={cn(props.wide && 'wide')}
+        className={cn('m-0 object-cover', type === 'blog' ? 'rounded-md border' : '', className)}
         zoomable={zoomable}
         {...props}
       />
