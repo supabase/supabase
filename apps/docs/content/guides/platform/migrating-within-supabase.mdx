@@ -3,282 +3,36 @@ title: Migrating within Supabase
 subtitle: Migrate from one Supabase project to another
 ---
 
-You can migrate your database to another project if you have a backup of your database. **One possible reason you may need to do this is if your project has been paused for longer than 90 days.**
+You can migrate your database to a different Supabase project. **One possible reason you may need to do this is if your project has been paused for longer than 90 days.**
 
 <Admonition type="tip">
   If you are on a Paid Plan and have physical backups enabled, you will instead need to use the
   [Restore to another project feature](https://supabase.com/blog/restore-to-a-new-project).
 </Admonition>
 
-## Restore Backup to a new Supabase project
+## Transfer to a different organization
 
-### Install Postgresql to get the psql tool
+Note that project migration is primarily for changing regions or upgrading to new versions of the platform from very old versions. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
+
+## Migrate to a new Supabase project
 
 <StepHikeCompact>
-
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-      Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
-
-      Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
+    <StepHikeCompact.Details title="Get your project backup file" fullWidth>
+    <Admonition type="caution">
+      Skip this step if you already have your backup file for your project from the dashboard!
+    </Admonition>
+      Follow with our [Backup guide using the Supabase CLI](/docs/guides/platform/migrating-within-supabase/backup)
     </StepHikeCompact.Details>
-
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Restore your backup file to a new project" fullWidth>
+      If you have a backup file downloaded from the dashboard (*.backup), follow our [Dashboard backup restore guide here](/docs/guides/platform/migrating-within-supabase/restore)
 
-    <StepHikeCompact.Details title="Add Postgresql to the system PATH environment variable" fullWidth>
-      For ease of use, you can add this directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
+      Otherwise, if you have a backup files from the Supabase CLI then follow our Supabase CLI backup restore guide here
 
-      Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
-      <StepHikeCompact.Code>
-        ```sql
-        export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
-        ```
-      </StepHikeCompact.Code>
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
-
-### Create a new Supabase project to restore the backup into
-
-<StepHikeCompact>
-
-{' '}
-
-<StepHikeCompact.Step step={1}>
-  <StepHikeCompact.Details title="Create a new Supabase project" fullWidth>
-    You can create a new [Supabase project here](database.new)
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Setup your new project" fullWidth>
-          In your new project:
-
-          - If you were using Webhooks in your old project, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
-          - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-
-### Restore your backup to your new Supabase project
-
-<StepHikeCompact>
-
-<StepHikeCompact.Step step={1}>
-  <StepHikeCompact.Details title="Get your Project ref" fullWidth>
-    You will need your Project ref (the project ref is the value between "https://" and ".supabase.co" in the URL) from your project URL below:
-
-    <ProjectConfigVariables variable="url" />
-
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={2}>
-  <StepHikeCompact.Details title="Get your database password" fullWidth>
-    If you do not have your database password, you can reset your database password in your
-    [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={3}>
-  <StepHikeCompact.Details title="Get your project Host Address" fullWidth>
-    You can find your Host Address under the Connection parameters section in your [Database
-    Settings](https://supabase.com/dashboard/project/_/settings/database)
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={4}>
-  <StepHikeCompact.Details title="Check your backup file format" fullWidth>
-    By default, your backup file might be gzipped and have a .gz file extension. You will need to decompress it and the file you use should look like this: **backup_name.backup**
-
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={5}>
-  <StepHikeCompact.Details title="Restore your backup" fullWidth>
-    Take the command below and replace the following values with the values you have gotten in the previous steps:
-
-     - [PROJECT-REF]
-     - [YOUR-PASSWORD]
-     - [HOST-ADDRESS]
-     - /path/to/your/file with relative path of your downloaded backup.
-
-
-
-      <StepHikeCompact.Code>
-
-      ```sql
-      psql -d "postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST-ADDRESS]:5432/postgres" -f /path/to/your/file
-      ```
-
-      <Admonition type="note">
-
-      For example, if you are running the command from your Desktop (Open terminal > run "cd Desktop") and your downloaded backup is in your Desktop folder, your /path/to/your/file could be "./db_cluster-29-05-2024@19-24-14.backup"
-
-      </Admonition>
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-</StepHikeCompact>
-
-## Frequently Asked Questions
-
-### There are various errors like "permission denied" or "must be member of role "supabase_admin"". Should I be concerned with them?
-
-In most cases these errors are expected and should not be a concern. If there are any issues with your new project, please reach out to our Support here.
-
-- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
-- Install the latest version of [Supabase CLI](/docs/guides/cli#installation).
-- Create a new [Supabase project](https://supabase.com/dashboard).
-- Install [Docker Desktop](https://www.docker.com) for your platform.
-- Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
-  To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look under `Connection string`. If your network provider supports IPv6, you can disable `Use connection pooling`. Otherwise, enable `Use connection pooling`. For the pooler mode, `Transaction` will work.
-
-### Backup your old database
-
-1. Run the following command from your terminal:
-
-```bash
-supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
-supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
-supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
-```
-
-### Restore to your new project
-
-In your new project:
-
-1. Enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks) if you enabled them in your old project.
-2. Enable any [extensions](https://supabase.com/dashboard/project/_/database/extensions) that were enabled in your old project.
-
-If you use [column encryption](/docs/guides/database/column-encryption), first copy the root encryption key to your new project using your [Personal Access Token](https://supabase.com/dashboard/account/tokens).
-
-```bash
-export OLD_PROJECT_REF="<old_project_ref>"
-export NEW_PROJECT_REF="<new_project_ref>"
-export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
-
-curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
-curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -X PUT --json @-
-```
-
-Then run the following command from your terminal:
-
-```bash
-psql \
-  --single-transaction \
-  --variable ON_ERROR_STOP=1 \
-  --file roles.sql \
-  --file schema.sql \
-  --command 'SET session_replication_role = replica' \
-  --file data.sql \
-  --dbname "$NEW_DB_URL"
-```
-
-Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
-
-Troubleshooting notes:
-
-- If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
-- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
-
-### Preserving migration history
-
-If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
-
-```bash
-supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
-supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
-psql \
-  --single-transaction \
-  --variable ON_ERROR_STOP=1 \
-  --file history_schema.sql \
-  --file history_data.sql \
-  --dbname "$NEW_DB_URL"
-```
-
-### Schema changes to `auth` and `storage`
-
-If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
-
-```bash
-supabase link --project-ref "$OLD_PROJECT_REF"
-supabase db diff --linked --schema auth,storage > changes.sql
-```
-
-### Enable publication on tables
-
-Replication for Realtime is disabled for all tables in your new project. On the [Publications](https://supabase.com/dashboard/project/_/database/publications) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
-
-### Migrate storage objects
-
-The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
-
-```js
-// npm install @supabase/supabase-js@1
-const { createClient } = require('@supabase/supabase-js')
-
-const OLD_PROJECT_URL = 'https://xxx.supabase.co'
-const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
-
-const NEW_PROJECT_URL = 'https://yyy.supabase.co'
-const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
-
-;(async () => {
-  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
-    db: {
-      schema: 'storage',
-    },
-  })
-  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
-  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
-
-  // make sure you update max_rows in postgrest settings if you have a lot of objects
-  // or paginate here
-  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
-  if (error) {
-    console.log('error getting objects from old bucket')
-    throw error
-  }
-
-  for (const objectData of oldObjects) {
-    console.log(`moving ${objectData.id}`)
-    try {
-      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .download(objectData.name)
-      if (downloadObjectError) {
-        throw downloadObjectError
-      }
-
-      const { _, error: uploadObjectError } = await newSupabaseClient.storage
-        .from(objectData.bucket_id)
-        .upload(objectData.name, data, {
-          upsert: true,
-          contentType: objectData.metadata.mimetype,
-          cacheControl: objectData.metadata.cacheControl,
-        })
-      if (uploadObjectError) {
-        throw uploadObjectError
-      }
-    } catch (err) {
-      console.log('error moving ', objectData)
-      console.log(err)
-    }
-  }
-})()
-```
-
-### Transfer to a different organization
-
-Note that project migration is for transferring your projects to different regions. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).

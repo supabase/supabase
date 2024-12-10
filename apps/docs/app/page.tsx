@@ -4,7 +4,10 @@ import { cn, IconBackground, TextLink } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import MenuIconPicker from '~/components/Navigation/NavigationMenu/MenuIconPicker'
-import { MIGRATION_PAGES } from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
+import {
+  MIGRATION_PAGES,
+  INTERNAL_MIGRATION_PAGES,
+} from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '~/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '~/features/ui/IconPanelWithIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
@@ -252,6 +255,17 @@ const HomePage = () => (
 
         <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
           {MIGRATION_PAGES.map((guide) => {
+            return (
+              <li key={guide.name} className="col-span-6 md:col-span-4">
+                <Link href={guide.url} passHref>
+                  <IconPanel {...guide} title={guide.name} background={true} showLink={false} />
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+        <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          {INTERNAL_MIGRATION_PAGES.map((guide) => {
             return (
               <li key={guide.name} className="col-span-6 md:col-span-4">
                 <Link href={guide.url} passHref>
