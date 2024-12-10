@@ -36,7 +36,7 @@ This workload evaluates the system's capacity to handle multiple concurrent WebS
   - A broadcast channel (6 users per channel) for group communication
 - Generates traffic by sending 2 messages per second to each joined channel for 10 minutes
 
-**Chart**
+![Broadcast Performance](/docs/img/guides/realtime/broadcast-performance.png)
 
 | Metric              | Value                     |
 | ------------------- | ------------------------- |
@@ -62,7 +62,17 @@ This workload tests the system's performance with different message payload size
 - Sends messages with payloads of 1KB, 10KB, and 50KB
 - Generates traffic by sending 2 messages per second to each joined channel for 5 minutes
 
-**Chart**
+#### 1KB Payload
+
+![1KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-1kb.png)
+
+#### 10KB Payload
+
+![10KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-10kb.png)
+
+#### 50KB Payload
+
+![50KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-50kb-small.png)
 
 | Metric             | 1KB Payload         | 10KB Payload      | 50KB Payload       | 50KB Payload (Reduced Load) |
 | ------------------ | ------------------- | ----------------- | ------------------ | --------------------------- |
@@ -86,7 +96,7 @@ This workload demonstrates Realtime's capability to handle high-scale scenarios 
   - Sends 1 message per minute to each joined channel
   - Each message is broadcasted to 100 other users
 
-**Chart**
+![Large Broadcast Performance](/docs/img/guides/realtime/broadcast-large.png)
 
 | Metric              | Value              |
 | ------------------- | ------------------ |
@@ -110,7 +120,7 @@ This workload demonstrates Realtime's capability to handle large amounts of new 
   - Sends 1 message per minute to each joined channel
   - Each message is broadcasted to 100 other users
 
-**Chart**
+![Broadcast Auth Performance](/docs/img/guides/realtime/broadcast-auth.png)
 
 | Metric              | Value             |
 | ------------------- | ----------------- |
