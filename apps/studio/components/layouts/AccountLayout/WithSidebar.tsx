@@ -84,7 +84,7 @@ export const SidebarContent = ({
         id="with-sidebar"
         className={[
           'h-full bg-dash-sidebar',
-          'hide-scrollbar w-64 overflow-auto md:border-r border-default',
+          'hide-scrollbar w-full md:w-64 overflow-auto md:border-r border-default',
         ].join(' ')}
       >
         {title && (
