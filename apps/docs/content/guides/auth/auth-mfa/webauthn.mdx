@@ -1,0 +1,370 @@
+---
+id: 'auth-mfa-webauthn'
+title: 'Multi-Factor Authentication (WebAuthn)'
+description: 'Add an additional layer of security with passwordless authentication using biometrics and security keys.'
+---
+
+## What is WebAuthn?
+
+WebAuthn (Web Authentication) is a web standard that enables secure, passwordless authentication using public-key cryptography. It allows users to log in to websites and applications using built-in authenticators like fingerprint sensors, facial recognition, or external devices like security keys.
+
+### When to Use WebAuthn?
+
+Consider implementing WebAuthn when:
+
+1. You want to enhance security beyond traditional passwords
+2. You aim to provide a more user-friendly authentication experience
+3. You need to reduce costs associated with SMS-based authentication
+4. You want to offer a hardware backup to existing authentication factors
+
+WebAuthn is particularly suitable for security-conscious applications that require a user-friendly, passwordless solution.
+
+### Pricing and Availability
+
+WebAuthn MFA is part of the Auth Advanced MFA Add-on. Here's the breakdown of pricing:
+
+- Cost: $75 per month for the first project in the organization
+- Additional projects: $10 per month each
+- Included in the Add-on: Phone and other advanced MFA features
+
+### Brower Support
+
+Most major browsers support WebAuthn. Check the [caniuse specification](https://caniuse.com/?search=webauthn) for details. On Firefox, enable support by visiting the `about:config` page and typing `webauthn` in the search bar of the screen that opens and toggle `security.webauth.webauthn` to true.
+
+## Types of Authenticators
+
+An authenticator is a component that securely generates and stores cryptographic keys associated with a particular relying party (web page origin) and a credential ID (a unique identifier for the key). The authenticator uses these keys to authenticate the user to the relying party without directly storing user-specific data like the user ID.
+
+There are two main types of authenticators:
+
+1. **Platform Authenticators**: Built into the user's device
+   - Examples:
+     - Desktop: Touch ID (macOS), Windows Hello (Windows)
+     - Mobile: Face ID (iOS), Biometrics (Android)
+2. **Roaming Authenticators**: Portable devices that work across multiple platforms
+   - Examples: YubiKey, Google Titan Security Key, Solokeys
+
+## Authentication Flows
+
+WebAuthn involves two primary processes: Enrollment and Login. Both follow a similar pattern:
+
+<Image
+  alt="Diagram showing the flow of Multi-Factor authentication"
+  src={{
+    light: '/docs/img/guides/auth-mfa/auth-mfa-webauthn-flow.svg',
+    dark: '/docs/img/guides/auth-mfa/auth-mfa-webauthn-flow.svg',
+  }}
+  containerClassName="max-w-[700px]"
+/>
+
+### Step-by-Step Explanation
+
+1. The user's device initiates the process by requesting a challenge from the server.
+2. The server generates and sends a unique challenge to the authenticator.
+3. The authenticator prompts the user for verification.
+4. The user provides the required verification (e.g., fingerprint, face scan).
+5. Upon successful user verification, the authenticator signs the challenge using its private key.
+6. The server validates the signed challenge using the corresponding public key.
+7. If the validation is successful, the authentication process is completed.
+
+This flow applies to both enrollment (when setting up WebAuthn) and login (when using WebAuthn to authenticate).
+
+**Navigator API**
+
+In both flows, WebAuthn interacts with the browser through the Navigator API, specifically using the `navigator.credentials` interface. This API provides methods like `create()` for registering new credentials and `get()` for authenticating existing ones. By handling the secure communication with authenticators (such as hardware tokens or biometrics), the Navigator API simplifies the implementation of WebAuthn, allowing developers to focus on integrating strong, passwordless authentication into their web applications.
+
+### Add enrollment flow
+
+An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
+
+1. Right after login or sign up.
+   This allows users quickly set up Multi Factor Authentication (MFA) post login or account creation. Where possible, encourage all users to set up MFA. Many applications offer this as an opt-in step in an
+   effort to reduce on-boarding friction.
+2. From within a settings page.
+   Allows users to set up, disable or modify their MFA settings.
+
+As far as possible, maintain a generic flow that you can reuse in both cases with minor modifications.
+
+You can enroll a WebAuthn factor with a single step:
+
+```ts
+import { browserSupportsWebAuthn } from '@supabase/supabase-js'
+if (browserSupportsWebAuthn()) {
+    const { data, error } = await supabase.auth.mfa.enroll({ factorType: 'webauthn', friendlyName: 'my-friendly-name'})
+}
+```
+
+Or in multiple-steps by setting the `useMultiStep` parameter to true.
+
+```ts
+const {
+  data: { factorId },
+  error,
+} = await supabase.auth.mfa.enroll({ factorType: 'webauthn', useMultiStep: true })
+
+const {
+  data: { options },
+  error,
+} = await supabase.auth.mfa.challenge({ factorId })
+
+let challengeOptions = challengeData?.credential_creation_options.publicKey
+
+// Modify challengeOptions as needed. See table below for full details.
+// challengeOptions.attestation = 'indirect'
+
+const credential = await supabase.auth.startAuthentication(challengeOptions)
+
+const { data, error } = await supabase.auth.mfa.verify({ factorId, credential })
+```
+
+Setting `useMultiStep` to false informs Auth to abstract away the complexities of interacting with the browser API. Multi Step enrollment is recommended only for Advanced Users who require more customization in their application.
+
+When using multi-step enroll there are a substantial number of fields to deal with. The configurable fields are highlighted below:
+
+| Field Name                | Description                                                           |
+| ------------------------- | --------------------------------------------------------------------- |
+| `attestation`             | Type of attestation requested (e.g., 'direct', 'indirect', 'none')    |
+| `authenticatorAttachment` | Preferred authenticator type ('platform' or 'cross-platform')         |
+| `requireResidentKey`      | Whether a resident key is required (true or false)                    |
+| `userVerification`        | User verification preference ('required', 'preferred', 'discouraged') |
+| `rp.name`                 | Human-readable name for the Relying Party                             |
+
+While configurable fields can be set by developers, it's important to choose appropriate values based on your security requirements and user experience considerations.
+
+Refer to the [MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/PublicKeyCredentialCreationOptions) for a full description of each field.
+
+## Add Login Flow
+
+Once a user has registered a factor, they can proceed to log in. In single-step mode this is accomplished with:
+
+```ts
+const { data, error } = await supabase.auth.mfa.verify({ factorType: 'webauthn' })
+```
+
+Here's an example login page:
+
+```tsx
+const MFAWebAuthn = ({ supabase }) => {
+  const [error, setError] = useState(null)
+  const [isVerifying, setIsVerifying] = useState(false)
+
+  const verify = async () => {
+    setIsVerifying(true)
+    setError(null)
+    try {
+      const { data, error } = await supabase.auth.mfa.verify({
+        factorType: 'webauthn',
+      })
+      if (error) throw error
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setIsVerifying(false)
+    }
+  }
+
+  // Start verification on mount
+  useEffect(() => {
+    verify()
+  }, [])
+
+  return (
+    <div>
+      <h2>Security Key Verification</h2>
+      <p>Follow your browser's instructions to continue</p>
+
+      {error && (
+        <div role="alert">
+          <p>Error: {error}</p>
+        </div>
+      )}
+
+      <button onClick={verify} disabled={isVerifying}>
+        {isVerifying ? 'Verifying...' : 'Try Again'}
+      </button>
+    </div>
+  )
+}
+```
+
+As with enrollment, developers have the option of performing verification over multiple steps.
+
+```ts
+const { data: factors, error } = await supabase.auth.mfa.listFactors()
+const { data: challengeData, error } = await supabase.auth.mfa.challenge({
+  factorId: factors.find((type) => type === 'webauthn'), // use first verified factor
+})
+
+let credential = await startRegistration(challengeData?.credential_creation_options.publicKey)
+
+const { data: factor, error } = await supabase.auth.mfa.verify({
+  factorId,
+  credential,
+  useMultiStep: true,
+})
+```
+
+Note that you do not have to specify a `factorId` parameter. Unlike MFA (Phone) and MFA (TOTP), authentication via the WebAuthn factor does not depend on the specific factor in use. Auth will check the assertion against all verified factors owned by the user, as well as the existing WebAuthn session, and make a decision on authentication based on the information given.
+
+Ensure that developers complete authentication within five seconds as there is a default timeout of five seconds for both `enroll` and `verify` calls.
+
+### Factor Selection
+
+When working with multiple types of MFA factors, you can build an intermediary page to allow users to select between factor types. Here's an example page which showcases how to switch between TOTP and WebAuthn factors.
+
+```tsx
+function MFASelectionPage() {
+  const [selectedMethod, setSelectedMethod] = useState(null)
+  const [rememberMethod, setRememberMethod] = useState(false)
+
+  const handleContinue = () => {
+    if (selectedMethod === 'totp') {
+      // Navigate to TOTP page
+      console.log('Navigate to /mfa-totp')
+    } else if (selectedMethod === 'webauthn') {
+      console.log('Navigate to /mfa-webauthn')
+    }
+  }
+
+  return (
+    <div>
+      <div>
+        <h2>Multi-factor Authentication</h2>
+        <p>
+          Your account is protected with multi-factor authentication (MFA). To finish signing in,
+          select a method to authenticate with.
+        </p>
+
+        <div>
+          <label>
+            <input
+              type="radio"
+              value="totp"
+              checked={selectedMethod === 'totp'}
+              onChange={(e) => setSelectedMethod(e.target.value)}
+            />
+            <div>
+              <div>TOTP Authenticator app</div>
+              <div>
+                Authenticate using a code generated by an app installed on your mobile device or
+                computer.
+              </div>
+            </div>
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              value="passkey"
+              checked={selectedMethod === 'webauthn'}
+              onChange={(e) => setSelectedMethod(e.target.value)}
+            />
+            <div>
+              <div>Security key</div>
+              <div>
+                Authenticate using your fingerprint, face, or PIN on your mobile device, computer or
+                FIDO2 security key.
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div>
+          <input
+            type="checkbox"
+            id="remember"
+            checked={rememberMethod}
+            onChange={(e) => setRememberMethod(e.target.checked)}
+          />
+          <label htmlFor="remember">Remember this method</label>
+        </div>
+
+        <button disabled={!selectedMethod} onClick={handleContinue}>
+          Continue
+        </button>
+
+        <a href="#" onClick={() => console.log('Sign in with different account')}>
+          Sign in to a different account
+        </a>
+      </div>
+    </div>
+  )
+}
+```
+
+Redirect the user to the appropriate authentication page based on the selected factor.
+
+## Factor Management
+
+As WebAuthn encompasses Platform and Roaming Authenticators, developers may wish to view the differing types of authenticators. Use the WebAuthn AAGUID to identify the type of authenticator used (e.g. Chrome Profile on Mac, Yubikey). There is a [community sourced JSON](https://github.com/passkeydeveloper/passkey-authenticator-aaguids) mapping from AAGUID to passkey name.
+
+```ts
+import aaguids from './aaguids.json' with { type: 'json' }
+...
+
+const WebAuthnFactors = ({ supabase }) => {
+  const [factors, setFactors] = useState([]);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFactors = async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      setFactors(data.webauthn);
+    };
+
+    fetchFactors();
+  }, [supabase]);
+
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div>
+      <h2>WebAuthn Factors</h2>
+      {factors.length > 0 ? (
+        <ul>
+          {factors.map(factor => (
+            <li key={factor.id}>
+              {factor.friendly_name && (
+                <>Name: {factor.friendly_name}<br /></>
+              )}
+              Provider: {aaguids[factor.webauthn_aaguid]?.name || 'Unknown'}
+              <br />
+              Status: {factor.status}
+              <br />
+              Created: {new Date(factor.created_at).toLocaleString()}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>No WebAuthn factors registered</p>
+      )}
+    </div>
+  );
+};
+```
+
+You can confirm that the mapping is accurate by using the helper site [on this page](https://passkeydeveloper.github.io/passkey-authenticator-aaguids/explorer/?combined)
+
+## Local Development
+
+Configure the following fields in `config.toml` to enable MFA for WebAuthn. Ensure that you have the latest version of the CLI installed.
+
+```
+[auth.mfa.web_authn]
+enroll_enabled = true
+verify_enabled = true
+```
+
+## Frequently Asked Questions
+
+### Is WebAuthn only for 2FA?
+
+For the moment, we do not support WebAuthn as a Sign In or Sign Up method. Check back in the future for updates.
+
+### Is WebAuthn Multi-Factor Authentication supported on the Supabase Dashboard?
+
+At the moment, support is limited to use on Supabase Projects. We do not support MFA for WebAuthn on the Suapbase dashboard.
