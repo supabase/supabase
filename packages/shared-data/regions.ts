@@ -5,7 +5,7 @@ export const AWS_REGIONS = {
   WEST_US: { code: 'us-west-1', displayName: 'West US (North California)' },
   EAST_US: { code: 'us-east-1', displayName: 'East US (North Virginia)' },
   EAST_US_2: { code: 'us-east-2', displayName: 'East US (Ohio)' },
-  CENTRAL_CANADA: { code: 'ca-central-1', displayName: 'Canada (Central)' },
+  CENTRAL_CANADA: { code: 'ca-central-1', displayName: 'Canada (Montreal)' },
   WEST_EU: { code: 'eu-west-1', displayName: 'West EU (Ireland)' },
   WEST_EU_2: { code: 'eu-west-2', displayName: 'West Europe (London)' },
   WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)' },
