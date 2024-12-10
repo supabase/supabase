@@ -1,5 +1,5 @@
 ---
-title: 'Dashboard backup restore guide'
+title: 'Restore Dashboard backup'
 subtitle: 'Guide on getting your dashboard backup restored to a new project'
 breadcrumb: 'Migrations'
 ---
@@ -21,106 +21,7 @@ Here are the steps necessary to restore your dashboard backup into a new project
       header="Install Postgresql which includes psql"
       id="item-1"
     >
-      <Tabs
-        scrollable
-        size="small"
-        type="underlined"
-        defaultActiveId="js"
-        queryGroup="language"
-      >
-      <TabPanel id="windows" label="Windows">
-        <StepHikeCompact>
-
-        <StepHikeCompact.Step step={1}>
-          <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-            Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
-
-            Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
-          </StepHikeCompact.Details>
-
-        </StepHikeCompact.Step>
-
-        <StepHikeCompact.Step step={2}>
-
-          <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
-              For ease of use, you can add the installed postgres directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
-
-              Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
-              <StepHikeCompact.Code>
-                ```sql
-                export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
-                ```
-              </StepHikeCompact.Code>
-            </StepHikeCompact.Details>
-
-          </StepHikeCompact.Step>
-
-            <StepHikeCompact.Step step={3}>
-
-          <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
-
-              Open your shell/terminal and run the following command:
-
-              <StepHikeCompact.Code>
-                ```sql
-                  psql --version
-                ```
-              </StepHikeCompact.Code>
-
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
-            </StepHikeCompact.Details>
-
-          </StepHikeCompact.Step>
-
-        </StepHikeCompact>
-      </TabPanel>
-      <TabPanel id="mac" label="MacOS">
-              <StepHikeCompact>
-
-        <StepHikeCompact.Step step={1}>
-          <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-            Get the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
-
-            Please take a look at this guide if you need any assistance with installing Postgresql: [Installation of PostgreSQL on Mac OS](https://www.enterprisedb.com/postgres-tutorials/installation-postgresql-mac-os)
-          </StepHikeCompact.Details>
-
-        </StepHikeCompact.Step>
-
-        <StepHikeCompact.Step step={2}>
-
-          <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
-              For ease of use, you can add the installed postgres directory to your PATH by adding a line to your ~/.bash_profile. If using zsh, add it instead to ~/.zshrc.
-
-              Alternatively, you can run this command each time you open your terminal/shell/console to add Postgresql to your current shell session:
-              <StepHikeCompact.Code>
-                ```sql
-                export PATH="/Library/PostgreSQL/<INSTALLED_POSTGRES_VERSION>/bin/:$PATH"
-                ```
-              </StepHikeCompact.Code>
-            </StepHikeCompact.Details>
-
-          </StepHikeCompact.Step>
-
-            <StepHikeCompact.Step step={3}>
-
-          <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
-
-              Open your shell/terminal and run the following command:
-
-              <StepHikeCompact.Code>
-                ```sql
-                  psql --version
-                ```
-              </StepHikeCompact.Code>
-
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
-            </StepHikeCompact.Details>
-
-          </StepHikeCompact.Step>
-
-        </StepHikeCompact>
-      </TabPanel>
-      </Tabs>
+      <PostgresInstallation />
     </AccordionItem>
 
   </div>
@@ -141,7 +42,7 @@ Here are the steps necessary to restore your dashboard backup into a new project
           <StepHikeCompact.Details title="Configure your new project" fullWidth>
                 In your new project:
 
-                - If you were using Webhooks in your old project, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
+                - If you were using Webhooks, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
                 - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
                 - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
           </StepHikeCompact.Details>
@@ -223,12 +124,12 @@ Here are the steps necessary to restore your dashboard backup into a new project
 
     <div className="border-b mt-3 pb-3">
     <AccordionItem
-      header="Migrate Storage Objects from S3 storage"
+      header="Migrate Storage Objects to S3 storage"
       id="item-4"
     >
       After restoring the project above, the metadata for the storage objects in the database will be present. The buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present.
 
-      To migrate the actual file storage, you can use the following Google colab script and follow the instructions in the comments:
+      To migrate downloaded storage objects to the new s3 buckets, you can use the following Google colab script and follow the instructions in the comments:
     </AccordionItem>
 
   </div>

@@ -1955,18 +1955,18 @@ export const INTERNAL_MIGRATION_PAGES: Partial<
   NavMenuSection & ComponentProps<typeof IconPanel>
 >[] = [
   {
-    name: 'Backup your project using the CLI',
+    name: 'Backup project using the CLI',
     icon: '/docs/img/icons/auth0-icon',
     url: '/guides/platform/migrating-within-supabase/backup',
     hasLightIcon: true,
   },
   {
-    name: 'Restore your project using the CLI',
+    name: 'Restore project using the CLI',
     icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-within-supabase/cli_restore',
   },
   {
-    name: 'Dashboard backup restore guide',
+    name: 'Restore Dashboard backup',
     icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-within-supabase/dashboard_restore',
   },

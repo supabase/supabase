@@ -48,6 +48,7 @@ import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
+import PostgresInstallation from './MDX/postgres_installation.mdx'
 
 // Icons
 import {
@@ -162,6 +163,7 @@ const components = {
   SharedData,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   table: Table,

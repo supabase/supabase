@@ -14,6 +14,7 @@ import QuickstartDbSetup from './quickstart_db_setup.mdx'
 import QuickstartIntro from './quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './social_provider_setup.mdx'
+import PostgresInstallation from './postgres_installation.mdx'
 
 export {
   AuthErrorCodesTable,
@@ -30,4 +31,5 @@ export {
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
 }
