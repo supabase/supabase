@@ -63,7 +63,11 @@ const DiskUsage = ({
 
             const isActiveProject = project.status !== PROJECT_STATUS.INACTIVE
 
-            return (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject
+            const isHostedOnAws = project.databases.every((db) => db.cloud_provider === 'AWS')
+
+            return (
+              (!project.is_branch || isBranchExceedingFreeQuota) && isActiveProject && isHostedOnAws
+            )
           })
           .filter((it) => it.ref === projectRef || !projectRef)
       : []
