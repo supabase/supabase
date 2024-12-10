@@ -101,7 +101,8 @@ const DeployNewReplicaPanel = ({
   const { size_gb, type, throughput_mbps, iops } = diskConfiguration?.attributes ?? {}
   const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
   const readReplicaDiskSizes = (size_gb ?? 0) * 1.25
-  const additionalCostDiskSize = readReplicaDiskSizes * DISK_PRICING[type as DiskType]?.storage ?? 0
+  const additionalCostDiskSize =
+    readReplicaDiskSizes * (DISK_PRICING[type as DiskType]?.storage ?? 0)
   const additionalCostIOPS = calculateIOPSPrice({
     oldStorageType: type as DiskType,
     newStorageType: type as DiskType,

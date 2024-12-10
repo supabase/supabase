@@ -56,6 +56,9 @@ interface DatabaseConnectionStringProps {
   appearance: 'default' | 'minimal'
 }
 
+/**
+ * @deprecated Will be removed once `connectDialogUpdate` flag is persisted
+ */
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const project = useSelectedProject()
   const { ref: projectRef, connectionString } = useParams()

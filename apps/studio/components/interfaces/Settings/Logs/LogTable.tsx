@@ -173,6 +173,9 @@ const LogTable = ({
       case 'auth':
         columns = AuthColumnRenderer
         break
+      case 'pg_cron':
+        columns = DatabasePostgresColumnRender
+        break
 
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {

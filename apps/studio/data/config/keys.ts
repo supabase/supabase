@@ -14,6 +14,8 @@ export const configKeys = {
     ['projects', projectRef, 'upgrade-status'] as const,
   diskAttributes: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-attributes'] as const,
+  diskBreakdown: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'disk-breakdown'] as const,
   diskUtilization: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-utilization'] as const,
   projectCreationPostgresVersions: (

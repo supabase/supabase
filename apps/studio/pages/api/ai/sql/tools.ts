@@ -5,6 +5,8 @@ import { z } from 'zod'
 import { getDatabasePolicies } from 'data/database-policies/database-policies-query'
 import { getEntityDefinitionsSql } from 'data/database/entity-definitions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+import { getDatabaseFunctions } from 'data/database-functions/database-functions-query'
 
 export const getTools = ({
   projectRef,
@@ -44,6 +46,25 @@ export const getTools = ({
         } catch (error) {
           console.error('Failed to execute SQL:', error)
           return `Failed to fetch schema: ${error}`
+        }
+      },
+    }),
+    convertSqlToSupabaseJs: tool({
+      description: 'Convert an sql query into supabase-js client code',
+      parameters: z.object({
+        sql: z
+          .string()
+          .describe(
+            'The sql statement to convert. Only a subset of statements are supported currently. '
+          ),
+      }),
+      execute: async ({ sql }) => {
+        try {
+          const statement = await processSql(sql)
+          const { code } = await renderSupabaseJs(statement)
+          return code
+        } catch (error) {
+          return `Failed to convert SQL: ${error}`
         }
       },
     }),
@@ -320,6 +341,50 @@ export const getTools = ({
 
           ${data.length > 0 ? `Here are my existing policies: ${formattedPolicies}` : ''}
         `
+      },
+    }),
+    getFunctions: tool({
+      description: 'Get database functions for one or more schemas',
+      parameters: z.object({
+        schemas: z.array(z.string()).describe('The schema names to get the functions for'),
+      }),
+      execute: async ({ schemas }) => {
+        try {
+          const data = includeSchemaMetadata
+            ? await getDatabaseFunctions(
+                {
+                  projectRef,
+                  connectionString,
+                },
+                undefined,
+                {
+                  'Content-Type': 'application/json',
+                  ...(authorization && { Authorization: authorization }),
+                }
+              )
+            : []
+
+          // Filter functions by requested schemas
+          const filteredFunctions = data.filter((func) => schemas.includes(func.schema))
+
+          const formattedFunctions = filteredFunctions
+            .map(
+              (func) => `
+          Function Name: "${func.name}"
+          Schema: ${func.schema}
+          Arguments: ${func.argument_types}
+          Return Type: ${func.return_type}
+          Language: ${func.language}
+          Definition: ${func.definition}
+        `
+            )
+            .join('\n')
+
+          return formattedFunctions
+        } catch (error) {
+          console.error('Failed to fetch functions:', error)
+          return `Failed to fetch functions: ${error}`
+        }
       },
     }),
   }
