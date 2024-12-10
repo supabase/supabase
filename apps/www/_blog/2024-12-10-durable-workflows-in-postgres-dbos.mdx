@@ -2,8 +2,8 @@
 title: 'Running Durable Workflows in Postgres using DBOS'
 description: Technical deep dive into the new DBOS integration for Supabase
 author: paul_copplestone
-image: dbos/og.jpg
-thumb: dbos/og.jpg
+image: dbos/og.png
+thumb: dbos/og.png
 categories:
   - developers
   - postgres
@@ -19,10 +19,10 @@ Michael Stonebraker is the inventor of Postgres and a Turing Award winner. His l
 The DBOS team have released a Supabase integration, so you can use your Postgres database as a durable workflow engine.
 
 <Img
-  alt="Add a message"
+  alt="DBOS Supabase integration"
   src={{
-    dark: '/images/blog/dbos/dbos-integration.jpg',
-    light: '/images/blog/dbos/dbos-integration.jpg',
+    dark: '/images/blog/dbos/dbos-integration.png',
+    light: '/images/blog/dbos/dbos-integration.png',
   }}
 />
 
@@ -30,7 +30,7 @@ The DBOS team have released a Supabase integration, so you can use your Postgres
 
 I really love the design of DBOS, so I'm going to write more below. Their design is aligned with our philosophy at Supabase: “just use Postgres”. I'll take you through the lower-level details in the rest of this post. If you just want to get started using DBOS with Supabase, get started using their tutorial:
 
-[Use DBOS With Supabase](https://docs.dbos.dev/integrations/supabase)
+[Use DBOS With Supabase →](https://docs.dbos.dev/integrations/supabase)
 
 ## What's a Durable Workflow engine?
 
@@ -39,8 +39,8 @@ Let's start with a common situation where a workflow is useful: you're running a
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/dbos/durable-workflow-engine-dark.jpg',
-    light: '/images/blog/dbos/durable-workflow-engine-light.jpg',
+    dark: '/images/blog/dbos/durable-workflow-engine-dark.svg',
+    light: '/images/blog/dbos/durable-workflow-engine-light.svg',
   }}
 />
 
@@ -61,15 +61,21 @@ DBOS is a platform where you can write your programming logic in serverless func
 
 One thing that's different to Supabase Edge Functions is the ability to add **decorators** to your Functions with `DBOS.step()` and `DBOS.workflow()`:
 
-https://lh7-rt.googleusercontent.com/docsz/AD_4nXedB64VpuqEfbGcc4PBYGJ7wGgy_jTLQOAszHQdpPuc1TdVXfscgG8bX4x7lGpjZBpUvJRFAsnB9l21Uv2bZNpXV5wgsOP33FLm8kMwHfcMaoV4h0nV6e377M7YOJxiZuehk3MwOBx5S1o2LI4Agk01ZGxU?key=ZQFovGLvo6xBe35yUccSZw
+<Img
+  alt="Add a message"
+  src={{
+    dark: '/images/blog/dbos/dbos-python.png',
+    light: '/images/blog/dbos/dbos-python.png',
+  }}
+/>
 
 When you do this, DBOS stores the “state” of every step in Postgres:
 
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
-    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+    dark: '/images/blog/dbos/dbos-state-in-pg-dark.svg',
+    light: '/images/blog/dbos/dbos-state-in-pg-light.svg',
   }}
 />
 
@@ -78,8 +84,8 @@ This is the part I find the most interesting! If you're a gamer, it's a bit like
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
-    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+    dark: '/images/blog/dbos/save-final-fantasy.svg',
+    light: '/images/blog/dbos/save-final-fantasy.svg',
   }}
 />
 
@@ -95,8 +101,8 @@ Using their “Widget Store” example, you can see two new databases -
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
-    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+    dark: '/images/blog/dbos/databases.png',
+    light: '/images/blog/dbos/databases.png',
   }}
 />
 
@@ -105,8 +111,8 @@ The `widget_store_dbos_sys` database holds the workflow state:
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
-    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+    dark: '/images/blog/dbos/schema.png',
+    light: '/images/blog/dbos/schema.png',
   }}
 />
 
@@ -139,8 +145,8 @@ Because a step transition is just a Postgres write (~1ms) versus an async dispat
 <Img
   alt="Add a message"
   src={{
-    dark: '/images/blog/launch-week-13/day-4-supabase-queues/add-message.jpg',
-    light: '/images/blog/launch-week-13/day-4-supabase-queues/add-message-light.jpg',
+    dark: '/images/blog/dbos/performance.png',
+    light: '/images/blog/dbos/performance.png',
   }}
 />
 
@@ -160,4 +166,4 @@ Since it's all in Postgres, you get all the tooling you're familiar with. Backup
 
 To get started with DBOS and Supabase, check out their official integration docs:
 
-[Use DBOS With Supabase](https://docs.dbos.dev/integrations/supabase)
+[Use DBOS With Supabase →](https://docs.dbos.dev/integrations/supabase)
