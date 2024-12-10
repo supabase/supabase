@@ -63,7 +63,7 @@ const ComplianceConfig = () => {
           title="High Compliance Configuration"
           description="For projects storing and processing sensitive data (HIPAA)"
         />
-        <DocsButton href="https://supabase.com/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data" />
+        <DocsButton href="https://supabase.com/docs/guides/platform/hipaa-projects" />
       </div>
       <FormPanel>
         <FormSection
