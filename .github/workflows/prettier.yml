@@ -28,7 +28,7 @@ jobs:
           npm ci
       - name: Run prettier
         run: |-
-          npm run test:prettier
+          npm run format:check
 
   # i18n is not a node package, so we handle that one separately
   format-i18n:
