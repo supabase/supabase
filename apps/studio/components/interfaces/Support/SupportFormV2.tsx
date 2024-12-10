@@ -686,7 +686,7 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   className="px-6"
                   layout="flex"
                   label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
-                  description="By checking this box, you grant permission for our support team to
+                  description="By enabling this, you grant permission for our support team to
                                 access your project temporarily and, if applicable, to use AI tools
                                 to assist in diagnosing and resolving issues."
                 >
