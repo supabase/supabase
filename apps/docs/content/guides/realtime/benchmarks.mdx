@@ -4,11 +4,11 @@ subtitle: 'Benchmark results for Supabase Realtime.'
 description: 'Check out reference numbers for Supabase Realtime performance.'
 ---
 
-Let's explore what can be expected from Realtime's Postgres Changes, broadcast and presence performance. We've run a set of load tests to help with understanding its scaling capabilities.
+This guide explores what can be expected from Realtime's Postgres Changes, broadcast and presence performance. A set of load tests demonstrates its scaling capabilities.
 
 ## Methodology
 
-The benchmarks were conducted using k6, an open-source load testing tool, against a Realtime Cluster deployed on AWS. The cluster configurations varied between 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project. The load generators (k6 servers) were also deployed on AWS to minimize network latency impact on the results. Tests were executed with the full load from the start without warm-up runs.
+The benchmarks were conducted using k6, an open-source load testing tool, against a Realtime Cluster deployed on AWS. The cluster configurations used 2-6 nodes, tested in both single-region and multi-region setups, all connected to a single Supabase project. The load generators (k6 servers) were also deployed on AWS to minimize network latency impact on the results. Tests were executed with the full load from the start without warm-up runs.
 
 The metrics collected include message throughput, latency percentiles, CPU and memory utilization, and connection success rates. It's worth noting that performance in production environments may vary based on factors such as network conditions, hardware specifications, and specific usage patterns.
 
@@ -16,10 +16,10 @@ The metrics collected include message throughput, latency percentiles, CPU and m
 
 The proposed workloads are designed to demonstrate Supabase Realtime's throughput and scalability capabilities. These benchmarks focus on core functionality and common usage patterns.
 
-We'll present the benchmarking results for the following workloads:
+The benchmarking results include the following workloads:
 
 1. **Broadcast Performance**
-2. **Payload Size Impact on Broacast**
+2. **Payload Size Impact on Broadcast**
 3. **Large-Scale Broadcasting**
 4. **Authentication and New Connection Rate**
 5. **Database Events**
@@ -102,7 +102,7 @@ This workload demonstrates Realtime's capability to handle high-scale scenarios 
 
 ### Realtime Auth
 
-This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication RLS enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications:
+This workload demonstrates Realtime's capability to handle large amounts of new connections per second and channel joins per second with Authentication Row Level Security (RLS) enabled for these channels. The test simulates a scenario where large volumes of users connect to realtime and participate in auth protected communications:
 
 - Each virtual user (VU):
   - Establishes and maintains a WebSocket connection (2.5 minutes)
@@ -140,4 +140,4 @@ Enter your database settings to estimate the maximum throughput for your instanc
 
 Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
 
-We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, please reach out using [Support Form](https://supabase.com/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+Supabase continues to make improvements to Realtime's Postgres Changes. If you are uncertain about your use case performance, reach out using the [Support Form](https://supabase.com/dashboard/support/new). The support team can advise on the best solution for each use-case.
