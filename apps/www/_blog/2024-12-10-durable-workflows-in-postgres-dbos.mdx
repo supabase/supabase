@@ -37,7 +37,7 @@ I really love the design of DBOS, so I'm going to write more below. Their design
 Let's start with a common situation where a workflow is useful: you're running an e-commerce platform where an order goes through multiple “steps”:
 
 <Img
-  alt="Add a message"
+  alt="Workflow steps"
   src={{
     dark: '/images/blog/dbos/durable-workflow-engine-dark.svg',
     light: '/images/blog/dbos/durable-workflow-engine-light.svg',
@@ -62,7 +62,7 @@ DBOS is a platform where you can write your programming logic in serverless func
 One thing that's different to Supabase Edge Functions is the ability to add **decorators** to your Functions with `DBOS.step()` and `DBOS.workflow()`:
 
 <Img
-  alt="Add a message"
+  alt="Python decorators"
   src={{
     dark: '/images/blog/dbos/dbos-python.png',
     light: '/images/blog/dbos/dbos-python.png',
@@ -72,7 +72,7 @@ One thing that's different to Supabase Edge Functions is the ability to add **de
 When you do this, DBOS stores the “state” of every step in Postgres:
 
 <Img
-  alt="Add a message"
+  alt="DBOS state in Postgres"
   src={{
     dark: '/images/blog/dbos/dbos-state-in-pg-dark.svg',
     light: '/images/blog/dbos/dbos-state-in-pg-light.svg',
@@ -82,10 +82,10 @@ When you do this, DBOS stores the “state” of every step in Postgres:
 This is the part I find the most interesting! If you're a gamer, it's a bit like having a “[save point](https://en.wikipedia.org/wiki/Saved_game)” in your programs. If a Function fails at any point, a new Function can start, picking up at the last checkpoint.
 
 <Img
-  alt="Add a message"
+  alt="DBOS save point"
   src={{
-    dark: '/images/blog/dbos/save-final-fantasy.svg',
-    light: '/images/blog/dbos/save-final-fantasy.svg',
+    dark: '/images/blog/dbos/save-final-fantasy.png',
+    light: '/images/blog/dbos/save-final-fantasy.png',
   }}
 />
 
@@ -99,7 +99,7 @@ Using their “Widget Store” example, you can see two new databases -
 2. `widget_store_dbos_sys`: for storing the workflow state.
 
 <Img
-  alt="Add a message"
+  alt="Postgres cluster"
   src={{
     dark: '/images/blog/dbos/databases.png',
     light: '/images/blog/dbos/databases.png',
@@ -109,7 +109,7 @@ Using their “Widget Store” example, you can see two new databases -
 The `widget_store_dbos_sys` database holds the workflow state:
 
 <Img
-  alt="Add a message"
+  alt="DBOS Schema"
   src={{
     dark: '/images/blog/dbos/schema.png',
     light: '/images/blog/dbos/schema.png',
