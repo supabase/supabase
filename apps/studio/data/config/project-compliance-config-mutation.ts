@@ -1,18 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { handleError, patch } from 'data/fetchers'
 
 export type ComplianceConfigUpdateVariables = {
   projectRef: string
   isSensitive: boolean
-}
-
-export type ComplianceConfigUpdateResponse = {
-  is_sensitive: boolean
-  error?: any
 }
 
 export async function updateComplianceConfig({
@@ -22,9 +17,7 @@ export async function updateComplianceConfig({
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await patch('/platform/projects/{ref}/settings/sensitivity', {
-    params: {
-      path: { ref: projectRef },
-    },
+    params: { path: { ref: projectRef } },
     body: { is_sensitive: isSensitive },
   })
 
@@ -49,7 +42,7 @@ export const useComplianceConfigUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(configKeys.projectComplianceConfig(projectRef))
+        await queryClient.invalidateQueries(configKeys.settingsV2(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

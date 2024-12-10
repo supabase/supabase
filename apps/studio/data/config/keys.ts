@@ -26,6 +26,4 @@ export const configKeys = {
     ['projects', organizationSlug, cloudProvider, dbRegion, 'available-creation-versions'] as const,
   projectUnpausePostgresVersions: (projectRef: string | undefined) =>
     ['projects', projectRef, 'available-unpause-versions'] as const,
-  projectComplianceConfig: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'compliance-config'] as const,
 }

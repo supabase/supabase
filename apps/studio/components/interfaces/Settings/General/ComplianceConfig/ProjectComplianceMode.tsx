@@ -9,26 +9,30 @@ import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useComplianceConfigUpdateMutation } from 'data/config/project-compliance-config-mutation'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-
 import { Switch, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 
 const ComplianceConfig = () => {
   const { ref } = useParams()
+  const { project } = useProjectContext()
   const [isSensitive, setIsSensitive] = useState(false)
-  const selectedOrganization = useSelectedOrganization()
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
-  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
+
+  const canUpdateComplianceConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: { project_id: project?.id },
+  })
+
   const {
     data: settings,
+    error,
+    isError,
     isLoading,
     isSuccess,
-  } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: hasHipaaAddon })
+  } = useProjectSettingsV2Query({ projectRef: ref })
+  const initialIsSensitive = settings?.is_sensitive || false
 
   const { mutate: updateComplianceConfig, isLoading: isSubmitting } =
     useComplianceConfigUpdateMutation({
@@ -41,58 +45,52 @@ const ComplianceConfig = () => {
       },
     })
 
-  const { project } = useProjectContext()
-  const canUpdateComplianceConfig = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
-  const initialIsSensitive = settings?.is_sensitive || false
-
-  useEffect(() => {
-    if (!isLoading) {
-      setIsSensitive(initialIsSensitive)
-    }
-  }, [isLoading])
-
   const toggleIsSensitive = async () => {
     if (!ref) return console.error('Project ref is required')
     setIsSensitive(!isSensitive)
     updateComplianceConfig({ projectRef: ref, isSensitive: !isSensitive })
   }
 
-  // this is only setable on compliance orgs, currently that means HIPAA orgs
-  if (!hasHipaaAddon) {
-    return
-  }
+  useEffect(() => {
+    if (!isLoading) setIsSensitive(initialIsSensitive)
+  }, [isLoading])
 
   return (
     <div id="compliance-configuration">
       <div className="flex items-center justify-between mb-6">
-        <FormHeader className="mb-0" title="High Compliance Configuration" description="" />
+        <FormHeader
+          className="mb-0"
+          title="High Compliance Configuration"
+          description="For projects storing and processing sensitive data (HIPAA)"
+        />
         <DocsButton href="https://supabase.com/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data" />
       </div>
       <FormPanel>
         <FormSection
           header={
             <FormSectionLabel
-              className="lg:col-span-7"
+              className="lg:col-span-9"
               description={
-                <div className="space-y-4">
-                  <p className="text-sm text-foreground-light">
-                    Apply additional compliance controls to this project
-                  </p>
-                </div>
+                <p className="text-sm text-foreground-light">
+                  Enable security warnings in the{' '}
+                  <InlineLink href={`/project/${ref}/advisors/security`}>
+                    Security Advisor
+                  </InlineLink>{' '}
+                  to enforce requirements for managing sensitive data
+                </p>
               }
             >
-              Project processes sensitive data (HIPAA)
+              Apply additional compliance controls to project
             </FormSectionLabel>
           }
         >
-          <FormSectionContent loading={false} className="lg:!col-span-5">
+          <FormSectionContent loading={false} className="lg:!col-span-3">
             <div className="flex items-center justify-end mt-2.5 space-x-2">
               {(isLoading || isSubmitting) && (
                 <Loader2 className="animate-spin" strokeWidth={1.5} size={16} />
+              )}
+              {isError && (
+                <AlertError error={error} subject="Failed to retrieve project settings" />
               )}
               {isSuccess && (
                 <Tooltip_Shadcn_>
