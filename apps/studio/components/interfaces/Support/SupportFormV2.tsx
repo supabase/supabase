@@ -675,6 +675,8 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
           </div>
         </div>
 
+        <Separator />
+
         {['Problem', 'Database_unresponsive', 'Performance'].includes(category) && (
           <>
             <FormField_Shadcn_
@@ -686,9 +688,41 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                   className="px-6"
                   layout="flex"
                   label="Allow Supabase Support and AI-Assisted Diagnostics access to your project"
-                  description="By enabling this, you grant permission for our support team to
-                                access your project temporarily and, if applicable, to use AI tools
-                                to assist in diagnosing and resolving issues."
+                  description={
+                    <Collapsible_Shadcn_>
+                      <div className="flex items-center gap-x-2">
+                        <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-2 ">
+                          <ChevronRight
+                            strokeWidth={2}
+                            size={14}
+                            className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter duration-200 -ml-1"
+                          />
+                          <p className="text-xs text-foreground-light underline">
+                            More information about temporary access
+                          </p>
+                        </CollapsibleTrigger_Shadcn_>
+                      </div>
+                      <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light mt-2 space-y-2">
+                        <p>
+                          By enabling this, you grant permission for our support team to access your
+                          project temporarily and, if applicable, to use AI tools to assist in
+                          diagnosing and resolving issues. This access may involve analyzing
+                          database configurations, query performance, and other relevant data to
+                          expedite troubleshooting and enhance support accuracy. We are committed to
+                          maintaining strict data privacy and security standards in all support
+                          activities.{' '}
+                          <Link
+                            href="https://supabase.com/privacy"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-foreground-light underline hover:text-foreground transition"
+                          >
+                            Privacy Policy
+                          </Link>
+                        </p>
+                      </CollapsibleContent_Shadcn_>
+                    </Collapsible_Shadcn_>
+                  }
                 >
                   <Switch
                     id="allowSupportAccess"
@@ -698,40 +732,10 @@ export const SupportFormV2 = ({ setSentCategory, setSelectedProject }: SupportFo
                 </FormItemLayout>
               )}
             />
-            <Collapsible_Shadcn_ className="px-16 -mt-6">
-              <div className="flex items-center gap-x-2">
-                <CollapsibleTrigger_Shadcn_ className="group flex items-center gap-x-2 ">
-                  <ChevronRight
-                    strokeWidth={2}
-                    size={14}
-                    className="transition-all group-data-[state=open]:rotate-90 text-foreground-lighter duration-200"
-                  />
-                  <p className="text-xs text-foreground-light underline">
-                    More information about temporary access
-                  </p>
-                </CollapsibleTrigger_Shadcn_>
-              </div>
-              <CollapsibleContent_Shadcn_ className="text-xs text-foreground-light mt-2 space-y-2">
-                <p>
-                  This access may involve analyzing database configurations, query performance, and
-                  other relevant data to expedite troubleshooting and enhance support accuracy. We
-                  are committed to maintaining strict data privacy and security standards in all
-                  support activities.{' '}
-                  <Link
-                    href="https://supabase.com/privacy"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-foreground-light underline hover:text-foreground transition"
-                  >
-                    Privacy Policy
-                  </Link>
-                </p>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
           </>
         )}
 
-        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3')}>
+        <div className={cn(CONTAINER_CLASSES, 'flex flex-col items-end gap-3 -mt-4')}>
           <Button
             htmlType="submit"
             size="large"
