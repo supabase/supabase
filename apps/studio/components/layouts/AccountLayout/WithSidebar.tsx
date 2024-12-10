@@ -59,6 +59,7 @@ const WithSidebar = ({
           subitems={subitems}
           subitemsParentKey={subitemsParentKey}
           customSidebarContent={customSidebarContent}
+          className="hidden md:block"
         />
       )}
       <div className="flex flex-1 flex-col">
@@ -77,15 +78,17 @@ export const SidebarContent = ({
   subitems,
   subitemsParentKey,
   customSidebarContent,
-}: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>>) => {
+  className,
+}: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
   return (
     <>
       <div
         id="with-sidebar"
-        className={[
+        className={cn(
           'h-full bg-dash-sidebar',
           'hide-scrollbar w-full md:w-64 overflow-auto md:border-r border-default',
-        ].join(' ')}
+          className
+        )}
       >
         {title && (
           <div className="hidden md:block mb-2">
