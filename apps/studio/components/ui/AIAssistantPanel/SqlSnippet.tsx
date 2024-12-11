@@ -183,6 +183,9 @@ export const SqlCard = ({
                 : 'This query involves running a function.'}{' '}
               Are you sure you want to execute it?
             </p>
+            <p className="text-foreground-light">
+              Make sure you are not accidentally removing something important.
+            </p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
@@ -193,7 +196,7 @@ export const SqlCard = ({
                 Cancel
               </Button>
               <Button
-                type="outline"
+                type="danger"
                 size="tiny"
                 className="w-full flex-1"
                 onClick={() => {
