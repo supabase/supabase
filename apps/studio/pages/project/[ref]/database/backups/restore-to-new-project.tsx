@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Loader2 } from 'lucide-react'
+import { ChevronRightIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -30,7 +30,8 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { getDatabaseMajorVersion } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition, TimestampInfo } from 'ui-patterns'
+import Panel from 'components/ui/Panel'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -115,6 +116,7 @@ const RestoreToNewProject = () => {
   const clonedProject = projects?.find(
     (p) => p.ref === cloneStatus?.clones?.[0]?.target_project.ref
   )
+  const previousClones = cloneStatus?.clones
 
   if (isOrioleDb) {
     return (
@@ -223,36 +225,36 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (lastClone?.status === 'FAILED') {
-    return (
-      <Admonition type="destructive" title="Failed to restore to new project">
-        <Markdown content="Sorry! The new project failed to be created, please reach out to support for assistance." />
-        <Button asChild type="default">
-          <Link
-            target="_blank"
-            rel="noreferrer noopener"
-            href={`/support/new?category=dashboard_bug&subject=Failed%20to%20restore%20to%20new%20project&message=Target%20project%20reference:%20${clonedProject?.ref ?? 'unknown'}`}
-          >
-            Contact support
-          </Link>
-        </Button>
-      </Admonition>
-    )
-  }
+  // if (lastClone?.status === 'FAILED') {
+  //   return (
+  //     <Admonition type="destructive" title="Failed to restore to new project">
+  //       <Markdown content="Sorry! The new project failed to be created, please reach out to support for assistance." />
+  //       <Button asChild type="default">
+  //         <Link
+  //           target="_blank"
+  //           rel="noreferrer noopener"
+  //           href={`/support/new?category=dashboard_bug&subject=Failed%20to%20restore%20to%20new%20project&message=Target%20project%20reference:%20${clonedProject?.ref ?? 'unknown'}`}
+  //         >
+  //           Contact support
+  //         </Link>
+  //       </Button>
+  //     </Admonition>
+  //   )
+  // }
 
-  if (lastClone?.status === 'COMPLETED') {
-    return (
-      <Admonition type="default" title="Restoration completed">
-        <Markdown
-          className="max-w-full"
-          content={`The new project${!!clonedProject ? ` ${clonedProject.name}` : ''} has been created. A project can only be restored to another project once.`}
-        />
-        <Button asChild type="default">
-          <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
-        </Button>
-      </Admonition>
-    )
-  }
+  // if (lastClone?.status === 'COMPLETED') {
+  //   return (
+  //     <Admonition type="default" title="Restoration completed">
+  //       <Markdown
+  //         className="max-w-full"
+  //         content={`The new project${!!clonedProject ? ` ${clonedProject.name}` : ''} has been created. A project can only be restored to another project once.`}
+  //       />
+  //       <Button asChild type="default">
+  //         <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
+  //       </Button>
+  //     </Admonition>
+  //   )
+  // }
 
   if (lastClone?.status === 'IN_PROGRESS') {
     return (
@@ -262,7 +264,7 @@ const RestoreToNewProject = () => {
         <AlertDescription_Shadcn_>
           <p>
             The new project{!!clonedProject ? ` ${clonedProject.name}` : ''} is currently being
-            created
+            created. You'll be able to restore again once the project is ready.
           </p>
           <Button asChild type="default" className="mt-2">
             <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
@@ -287,11 +289,19 @@ const RestoreToNewProject = () => {
   }
 
   if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
-    return <BackupsEmpty />
+    return (
+      <>
+        <Admonition
+          type="default"
+          title="No backups found"
+          description="Backups are enabled, but no backups were found. Check again tomorrow."
+        />
+      </>
+    )
   }
 
   return (
-    <>
+    <div className="flex flex-col gap-4">
       <ConfirmRestoreDialog
         open={showConfirmationDialog}
         onOpenChange={setShowConfirmationDialog}
@@ -311,6 +321,23 @@ const RestoreToNewProject = () => {
           setShowNewProjectDialog(false)
         }}
       />
+      {previousClones?.length ? (
+        <div className="flex flex-col gap-2">
+          <h3 className="text-sm font-medium">Previous restorations</h3>
+          <Panel className="flex flex-col divide-y divide-border">
+            {previousClones?.map((c) => (
+              <Link
+                key={c.inserted_at}
+                href={`/project/${c.target_project.ref}`}
+                className="flex flex-row items-center justify-between gap-2 text-sm p-4 group"
+              >
+                <TimestampInfo value={c.inserted_at ?? ''} />
+                <ChevronRightIcon className="size-4 text-foreground-light group-hover:text-foreground" />
+              </Link>
+            ))}
+          </Panel>
+        </div>
+      ) : null}
       {hasPITREnabled ? (
         <>
           <PITRForm
@@ -334,7 +361,7 @@ const RestoreToNewProject = () => {
           }}
         />
       )}
-    </>
+    </div>
   )
 }
 
