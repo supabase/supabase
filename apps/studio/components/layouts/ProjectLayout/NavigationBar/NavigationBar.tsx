@@ -327,7 +327,7 @@ export const NavContent = () => {
         })}
       </ul>
 
-      <ul className="flex flex-col px-2 gap-y-1">
+      <ul className="flex flex-col px-2 pb-4 md:pb-0 gap-y-1">
         {settingsRoutes.map((route) => (
           <NavigationIconLink
             key={route.key}
