@@ -41,7 +41,6 @@ export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) =>
 
   return (
     <FormItemLayout
-      layout="horizontal"
       label="Region"
       description={
         <>

@@ -73,7 +73,7 @@ export const PostgresVersionSelector = ({
   }, [isSuccess, form])
 
   return (
-    <FormItemLayout layout="horizontal" label="Postgres Version">
+    <FormItemLayout label="Postgres Version">
       <Select_Shadcn_
         value={field.value}
         onValueChange={field.onChange}
