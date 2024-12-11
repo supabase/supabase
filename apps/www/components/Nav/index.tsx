@@ -5,7 +5,7 @@ import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Button, buttonVariants, cn } from 'ui'
+import { Announcement, Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,6 +14,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
+import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 
 import ScrollProgress from '~/components/ScrollProgress'
 import { getMenu } from '~/data/nav'
@@ -25,9 +26,10 @@ import RightClickBrandLogo from './RightClickBrandLogo'
 
 interface Props {
   hideNavbar: boolean
+  stickyNavbar?: boolean
 }
 
-const Nav = (props: Props) => {
+const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -40,7 +42,7 @@ const Nav = (props: Props) => {
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isGAWeekSection = router.pathname.startsWith('/ga-week')
-  const hasStickySubnav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage
+  const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
   const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
 
   React.useEffect(() => {
@@ -57,7 +59,7 @@ const Nav = (props: Props) => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  if (props.hideNavbar) {
+  if (hideNavbar) {
     return null
   }
 
@@ -65,11 +67,8 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      {/* <Announcement>
-        Uncomment to show announcement banner
-      </Announcement> */}
       <div
-        className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
+        className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
@@ -154,7 +153,7 @@ const Nav = (props: Props) => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
+          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />

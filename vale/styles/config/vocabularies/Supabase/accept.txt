@@ -9,6 +9,7 @@ Colab
 [Cc]omposable
 [Cc]onfigs?
 CPUs?
+[Cc]ron
 CTEs?
 DBeaver
 [Dd]eclarative(ly)?
@@ -16,6 +17,7 @@ DBeaver
 [Dd]eeplinks?
 [Dd]egit
 [Dd]eserializ(e|ed|es|ing)
+[Ee]nqueu(e|ed|es|ing)
 Deno
 [Dd]ev
 [Dd]otenv
@@ -52,6 +54,7 @@ OpenAI
 pg_plan_filter
 PGAudit
 pgAdmin
+pgmq
 PGroonga
 pgvector
 Pinecone
@@ -90,6 +93,7 @@ Terraform
 unnesting
 unnested
 [Uu]npaus(e|es|ed|ing)
+[Uu]nschedul(e|es|ed|ing)
 [Uu]psert(s|ed|ing)?
 [Uu]pvot(es|ed|ing)
 Vercel

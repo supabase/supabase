@@ -9,8 +9,11 @@ import { PostgresQueueMessage } from 'data/database-queues/database-queue-messag
 import { Badge, Button, ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
+import { ResponseError } from 'types'
+import AlertError from 'components/ui/AlertError'
 
 interface QueueDataGridProps {
+  error?: ResponseError | null
   isLoading: boolean
   messages: PostgresQueueMessage[]
   showMessageModal: () => void
@@ -122,6 +125,7 @@ const columns = messagesCols.map((col) => {
 })
 
 export const QueueMessagesDataGrid = ({
+  error,
   isLoading,
   messages,
   showMessageModal,
@@ -130,7 +134,7 @@ export const QueueMessagesDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const router = useRouter()
 
-  const [selectedMessageId, setSelectedMessageId] = useQueryState('id', parseAsInteger)
+  const [selectedMessageId, setSelectedMessageId] = useQueryState('messageId', parseAsInteger)
 
   const handleScroll = (event: UIEvent<HTMLDivElement>) => {
     if (isLoading || !isAtBottom(event)) return
@@ -171,8 +175,8 @@ export const QueueMessagesDataGrid = ({
                   if (typeof idx === 'number' && idx >= 0) {
                     setSelectedMessageId(props.row.msg_id)
                     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-                    const { id, ...rest } = router.query
-                    router.push({ ...router, query: { ...rest, id: props.row.msg_id } })
+                    const { messageId, ...rest } = router.query
+                    router.push({ ...router, query: { ...rest, messageId: props.row.msg_id } })
                   }
                 }}
               />
@@ -181,6 +185,10 @@ export const QueueMessagesDataGrid = ({
           noRowsFallback: isLoading ? (
             <div className="absolute top-14 px-6 w-full">
               <GenericSkeletonLoader />
+            </div>
+          ) : !!error ? (
+            <div className="absolute top-16 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+              <AlertError subject="Failed to retrieve queue messages" error={error} />
             </div>
           ) : (
             <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">

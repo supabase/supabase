@@ -254,4 +254,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree }
+export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree, SQL_ICON }

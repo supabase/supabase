@@ -458,7 +458,15 @@
                         "type": "string"
                       }
                     },
-                    "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                    "required": [
+                      "id",
+                      "organization_id",
+                      "name",
+                      "region",
+                      "created_at",
+                      "database",
+                      "status"
+                    ]
                   }
                 }
               }
@@ -498,12 +506,12 @@
                   "plan": {
                     "type": "string",
                     "enum": ["free", "pro"],
-                    "description": "Subscription Plan is now set on organization level and is ignored in this request",
-                    "example": "free",
-                    "deprecated": true
+                    "deprecated": true,
+                    "description": "Subscription Plan is now set on organization level and is ignored in this request"
                   },
                   "region": {
                     "type": "string",
+                    "description": "Region you want your server to reside in",
                     "enum": [
                       "us-east-1",
                       "us-east-2",
@@ -523,9 +531,7 @@
                       "ca-central-1",
                       "ap-south-1",
                       "sa-east-1"
-                    ],
-                    "description": "Region you want your server to reside in",
-                    "example": "us-east-1"
+                    ]
                   },
                   "kps_enabled": {
                     "type": "boolean",
@@ -549,20 +555,23 @@
                   },
                   "template_url": {
                     "type": "string",
+                    "format": "uri",
                     "description": "Template URL used to create the project from the CLI.",
                     "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
                   },
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+                    "description": "Release channel. If not provided, GA will be used."
                   },
                   "postgres_engine": {
                     "type": "string",
-                    "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "enum": ["15"]
+                    "enum": ["15", "17-oriole"],
+                    "description": "Postgres engine version. If not provided, the latest version will be used."
                   }
                 },
-                "required": ["db_pass", "name", "organization_id", "region"]
+                "required": ["db_pass", "name", "organization_id", "region"],
+                "additionalProperties": false
               }
             }
           }
@@ -596,28 +605,6 @@
                       "type": "string",
                       "description": "Creation timestamp",
                       "example": "2023-03-29T16:32:59Z"
-                    },
-                    "database": {
-                      "type": "object",
-                      "properties": {
-                        "host": {
-                          "type": "string",
-                          "description": "Database host"
-                        },
-                        "version": {
-                          "type": "string",
-                          "description": "Database version"
-                        },
-                        "postgres_engine": {
-                          "type": "string",
-                          "description": "Database engine"
-                        },
-                        "release_channel": {
-                          "type": "string",
-                          "description": "Release channel"
-                        }
-                      },
-                      "required": ["host", "version", "postgres_engine", "release_channel"]
                     },
                     "status": {
                       "enum": [
@@ -709,7 +696,8 @@
                     "type": "string"
                   }
                 },
-                "required": ["name"]
+                "required": ["name"],
+                "additionalProperties": false
               }
             }
           }
@@ -1039,6 +1027,7 @@
             "required": true,
             "in": "path",
             "schema": {
+              "format": "uuid",
               "type": "string"
             }
           }
@@ -1172,6 +1161,14 @@
               "maxLength": 20,
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1184,6 +1181,11 @@
                   "items": {
                     "type": "object",
                     "properties": {
+                      "type": {
+                        "nullable": true,
+                        "type": "string",
+                        "enum": ["publishable", "secret", "legacy"]
+                      },
                       "name": {
                         "type": "string"
                       },
@@ -1193,10 +1195,6 @@
                       "id": {
                         "type": "string",
                         "nullable": true
-                      },
-                      "type": {
-                        "nullable": true,
-                        "type": "object"
                       },
                       "prefix": {
                         "type": "string",
@@ -1261,6 +1259,14 @@
               "maxLength": 20,
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -1306,6 +1312,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1315,10 +1326,6 @@
                     "id": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "type": {
-                      "nullable": true,
-                      "type": "object"
                     },
                     "prefix": {
                       "type": "string",
@@ -1392,6 +1399,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "requestBody": {
@@ -1432,6 +1447,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1442,9 +1462,108 @@
                       "type": "string",
                       "nullable": true
                     },
+                    "prefix": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "hash": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "secret_jwt_template": {
+                      "nullable": true,
+                      "allOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "role": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["role"]
+                        }
+                      ]
+                    },
+                    "inserted_at": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": ["name", "api_key"]
+                }
+              }
+            }
+          }
+        },
+        "tags": ["Secrets"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "getApiKey",
+        "summary": "[Alpha] Get API key",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
                     "type": {
                       "nullable": true,
-                      "type": "object"
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "api_key": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string",
+                      "nullable": true
                     },
                     "prefix": {
                       "type": "string",
@@ -1516,6 +1635,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "reveal",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -1526,6 +1653,11 @@
                 "schema": {
                   "type": "object",
                   "properties": {
+                    "type": {
+                      "nullable": true,
+                      "type": "string",
+                      "enum": ["publishable", "secret", "legacy"]
+                    },
                     "name": {
                       "type": "string"
                     },
@@ -1535,10 +1667,6 @@
                     "id": {
                       "type": "string",
                       "nullable": true
-                    },
-                    "type": {
-                      "nullable": true,
-                      "type": "object"
                     },
                     "prefix": {
                       "type": "string",
@@ -1739,12 +1867,12 @@
                   },
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   },
                   "postgres_engine": {
                     "type": "string",
                     "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "enum": ["15"]
+                    "enum": ["15", "17-oriole"]
                   },
                   "branch_name": {
                     "type": "string"
@@ -3238,7 +3366,15 @@
                       "type": "string"
                     }
                   },
-                  "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+                  "required": [
+                    "id",
+                    "organization_id",
+                    "name",
+                    "region",
+                    "created_at",
+                    "database",
+                    "status"
+                  ]
                 }
               }
             }
@@ -3917,7 +4053,7 @@
                 "properties": {
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   },
                   "target_version": {
                     "type": "string"
@@ -3987,7 +4123,7 @@
                   "properties": {
                     "current_app_version_release_channel": {
                       "type": "string",
-                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                     },
                     "duration_estimate_hours": {
                       "type": "integer"
@@ -4009,11 +4145,11 @@
                           "postgres_version": {
                             "type": "string",
                             "description": "Postgres engine version. If not provided, the latest version will be used.",
-                            "enum": ["15"]
+                            "enum": ["15", "17-oriole"]
                           },
                           "release_channel": {
                             "type": "string",
-                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                           },
                           "app_version": {
                             "type": "string"
@@ -8045,6 +8181,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "compute_multiplier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
+            }
           }
         ],
         "requestBody": {
@@ -8066,6 +8212,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8087,6 +8238,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8137,6 +8293,9 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -8228,6 +8387,9 @@
                       },
                       "import_map_path": {
                         "type": "string"
+                      },
+                      "compute_multiplier": {
+                        "type": "number"
                       }
                     },
                     "required": [
@@ -8330,6 +8492,9 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -8433,6 +8598,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "compute_multiplier",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
+            }
           }
         ],
         "requestBody": {
@@ -8450,6 +8625,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8466,6 +8646,11 @@
                   },
                   "verify_jwt": {
                     "type": "boolean"
+                  },
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8515,6 +8700,9 @@
                     },
                     "import_map_path": {
                       "type": "string"
+                    },
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -9786,7 +9974,7 @@
                       "type": "array",
                       "items": {
                         "type": "string",
-                        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                       }
                     },
                     "id": {
@@ -10018,7 +10206,7 @@
         },
         "required": ["host", "version", "postgres_engine", "release_channel"]
       },
-      "V1ProjectResponse": {
+      "V1ProjectWithDatabaseResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -10086,33 +10274,9 @@
             "type": "string"
           }
         },
-        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
+        "required": ["id", "organization_id", "name", "region", "created_at", "database", "status"]
       },
-      "DesiredInstanceSize": {
-        "type": "string",
-        "enum": [
-          "micro",
-          "small",
-          "medium",
-          "large",
-          "xlarge",
-          "2xlarge",
-          "4xlarge",
-          "8xlarge",
-          "12xlarge",
-          "16xlarge"
-        ]
-      },
-      "ReleaseChannel": {
-        "type": "string",
-        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
-      },
-      "PostgresEngine": {
-        "type": "string",
-        "description": "Postgres engine version. If not provided, the latest version will be used.",
-        "enum": ["15"]
-      },
-      "V1CreateProjectBody": {
+      "V1CreateProjectBodyDto": {
         "type": "object",
         "properties": {
           "db_pass": {
@@ -10130,12 +10294,12 @@
           "plan": {
             "type": "string",
             "enum": ["free", "pro"],
-            "description": "Subscription Plan is now set on organization level and is ignored in this request",
-            "example": "free",
-            "deprecated": true
+            "deprecated": true,
+            "description": "Subscription Plan is now set on organization level and is ignored in this request"
           },
           "region": {
             "type": "string",
+            "description": "Region you want your server to reside in",
             "enum": [
               "us-east-1",
               "us-east-2",
@@ -10155,9 +10319,7 @@
               "ca-central-1",
               "ap-south-1",
               "sa-east-1"
-            ],
-            "description": "Region you want your server to reside in",
-            "example": "us-east-1"
+            ]
           },
           "kps_enabled": {
             "type": "boolean",
@@ -10181,20 +10343,71 @@
           },
           "template_url": {
             "type": "string",
+            "format": "uri",
             "description": "Template URL used to create the project from the CLI.",
             "example": "https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone"
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
+            "description": "Release channel. If not provided, GA will be used."
           },
           "postgres_engine": {
             "type": "string",
-            "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15"]
+            "enum": ["15", "17-oriole"],
+            "description": "Postgres engine version. If not provided, the latest version will be used."
           }
         },
-        "required": ["db_pass", "name", "organization_id", "region"]
+        "required": ["db_pass", "name", "organization_id", "region"],
+        "additionalProperties": false
+      },
+      "V1ProjectResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id of your project"
+          },
+          "organization_id": {
+            "type": "string",
+            "description": "Slug of your organization"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of your project"
+          },
+          "region": {
+            "type": "string",
+            "description": "Region of your project",
+            "example": "us-east-1"
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Creation timestamp",
+            "example": "2023-03-29T16:32:59Z"
+          },
+          "status": {
+            "enum": [
+              "ACTIVE_HEALTHY",
+              "ACTIVE_UNHEALTHY",
+              "COMING_UP",
+              "GOING_DOWN",
+              "INACTIVE",
+              "INIT_FAILED",
+              "REMOVED",
+              "RESTARTING",
+              "UNKNOWN",
+              "UPGRADING",
+              "PAUSING",
+              "RESTORING",
+              "RESTORE_FAILED",
+              "PAUSE_FAILED",
+              "RESIZING"
+            ],
+            "type": "string"
+          }
+        },
+        "required": ["id", "organization_id", "name", "region", "created_at", "status"]
       },
       "OrganizationResponseV1": {
         "type": "object",
@@ -10208,14 +10421,15 @@
         },
         "required": ["id", "name"]
       },
-      "CreateOrganizationBodyV1": {
+      "CreateOrganizationV1Dto": {
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": ["name"],
+        "additionalProperties": false
       },
       "OAuthTokenBody": {
         "type": "object",
@@ -10577,6 +10791,11 @@
       "ApiKeyResponse": {
         "type": "object",
         "properties": {
+          "type": {
+            "nullable": true,
+            "type": "string",
+            "enum": ["publishable", "secret", "legacy"]
+          },
           "name": {
             "type": "string"
           },
@@ -10586,10 +10805,6 @@
           "id": {
             "type": "string",
             "nullable": true
-          },
-          "type": {
-            "nullable": true,
-            "type": "object"
           },
           "prefix": {
             "type": "string",
@@ -10679,6 +10894,30 @@
           }
         }
       },
+      "DesiredInstanceSize": {
+        "type": "string",
+        "enum": [
+          "micro",
+          "small",
+          "medium",
+          "large",
+          "xlarge",
+          "2xlarge",
+          "4xlarge",
+          "8xlarge",
+          "12xlarge",
+          "16xlarge"
+        ]
+      },
+      "ReleaseChannel": {
+        "type": "string",
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
+      },
+      "PostgresEngine": {
+        "type": "string",
+        "description": "Postgres engine version. If not provided, the latest version will be used.",
+        "enum": ["15", "17-oriole"]
+      },
       "CreateBranchBody": {
         "type": "object",
         "properties": {
@@ -10699,12 +10938,12 @@
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "postgres_engine": {
             "type": "string",
             "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15"]
+            "enum": ["15", "17-oriole"]
           },
           "branch_name": {
             "type": "string"
@@ -11421,7 +11660,7 @@
         "properties": {
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "target_version": {
             "type": "string"
@@ -11444,11 +11683,11 @@
           "postgres_version": {
             "type": "string",
             "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15"]
+            "enum": ["15", "17-oriole"]
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "app_version": {
             "type": "string"
@@ -11461,7 +11700,7 @@
         "properties": {
           "current_app_version_release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "duration_estimate_hours": {
             "type": "integer"
@@ -11483,11 +11722,11 @@
                 "postgres_version": {
                   "type": "string",
                   "description": "Postgres engine version. If not provided, the latest version will be used.",
-                  "enum": ["15"]
+                  "enum": ["15", "17-oriole"]
                 },
                 "release_channel": {
                   "type": "string",
-                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                 },
                 "app_version": {
                   "type": "string"
@@ -13596,6 +13835,11 @@
           },
           "verify_jwt": {
             "type": "boolean"
+          },
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         },
         "required": ["slug", "name", "body"]
@@ -13638,6 +13882,9 @@
           },
           "import_map_path": {
             "type": "string"
+          },
+          "compute_multiplier": {
+            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -13680,6 +13927,9 @@
           },
           "import_map_path": {
             "type": "string"
+          },
+          "compute_multiplier": {
+            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -13695,6 +13945,11 @@
           },
           "verify_jwt": {
             "type": "boolean"
+          },
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         }
       },
@@ -14714,7 +14969,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+              "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
             }
           },
           "id": {

@@ -5,6 +5,8 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
+
 import { useAppStateSnapshot } from 'state/app-state'
 import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
@@ -43,9 +45,9 @@ const FeaturePreviewModal = () => {
   const toggleFeature = () => {
     onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
     sendEvent({
-      category: 'ui_feature_previews',
-      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
+      action: TELEMETRY_EVENTS.FEATURE_PREVIEWS,
       label: selectedFeatureKey,
+      value: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
     })
 
     if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {

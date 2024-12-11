@@ -128,7 +128,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       })
       if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }
@@ -182,7 +182,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
       if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }

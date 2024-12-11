@@ -30,10 +30,11 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
 
+  AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
+
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
-  UI_PREVIEW_FUNCTIONS_ASSISTANT: 'supabase-ui-functions-assistant',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
 
   UI_TABLE_EDITOR_TABS: 'supabase-ui-table-editor-tabs',
@@ -75,8 +76,6 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
-  AUTH_EMAIL_WARNING_BANNER_ACKNOWLEDGE: (ref: string) =>
-    `supabase-auth-email-warning-banner-${ref}`,
 }
 
 export const OPT_IN_TAGS = {
@@ -86,22 +85,3 @@ export const OPT_IN_TAGS = {
 export const GB = 1024 * 1024 * 1024
 export const MB = 1024 * 1024
 export const KB = 1024
-
-// [Joshen] Just adding these to start consolidating our telemetry configs
-// may change depending on how we choose to standardize across all apps
-export enum TELEMETRY_CATEGORIES {
-  AI_ASSISTANT = 'ai-assistant',
-}
-
-export enum TELEMETRY_LABELS {
-  QUICK_SQL_EDITOR = 'quick-sql-editor',
-}
-
-export const TELEMETRY_ACTIONS = {
-  PROMPT_SUBMITTED: 'prompt-submitted',
-  QUICK_PROMPT_SELECTED: (type: string) => `quick-prompt-selected-${type}`,
-  SCHEMA_CONTEXT_ADDED: 'schema-context-added',
-  TABLE_CONTEXT_ADDED: 'table-context-added',
-  FIX_WITH_ASSISTANT: 'fix-with-assistant',
-  EXPLAIN_CODE: 'explain-code',
-}

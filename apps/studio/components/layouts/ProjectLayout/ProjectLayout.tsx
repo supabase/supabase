@@ -1,22 +1,24 @@
 import { useParams } from 'common'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useFlag } from 'hooks/ui/useFlag'
 import { useActionKey } from 'hooks/useActionKey'
-import { LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode, useEffect, useRef } from 'react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup, cn } from 'ui'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { useSnapshot } from 'valtio'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
+import { useEditorType } from '../editors/editors-layout.hooks'
 import { sidebarState } from '../tabs/sidebar-state'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
@@ -32,8 +34,9 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { useEditorType } from '../editors/editors-layout.hooks'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
+import { withAuth } from 'hooks/misc/withAuth'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -72,86 +75,110 @@ export interface ProjectLayoutProps {
   resizableSidebar?: boolean
 }
 
-const ProjectLayout = ({
-  title,
-  isLoading = false,
-  isBlocking = true,
-  product = '',
-  productMenu,
-  children,
-  hideHeader = false,
-  hideIconBar = false,
-  selectedTable,
-  resizableSidebar = false,
-}: PropsWithChildren<ProjectLayoutProps>) => {
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const projectName = selectedProject?.name
-  const organizationName = selectedOrganization?.name
+const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayoutProps>>(
+  (
+    {
+      title,
+      isLoading = false,
+      isBlocking = true,
+      product = '',
+      productMenu,
+      children,
+      hideHeader = false,
+      hideIconBar = false,
+      selectedTable,
+      resizableSidebar = false,
+    },
+    ref
+  ) => {
+    const router = useRouter()
+    const { ref: projectRef } = useParams()
+    const selectedOrganization = useSelectedOrganization()
+    const selectedProject = useSelectedProject()
+    const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const { open } = aiAssistantPanel
 
-  // tabs preview flag logic
-  const editor = useEditorType()
-  const { flags } = useFeaturePreviewContext()
-  const tableEditorTabsEnabled =
-    editor === 'table' && !flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
-  const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
-  const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
-  // end of tabs preview flag logic
+    // tabs preview flag logic
+    const editor = useEditorType()
+    const { flags } = useFeaturePreviewContext()
+    const tableEditorTabsEnabled =
+      editor === 'table' && !flags[LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS]
+    const sqlEditorTabsEnabled = editor === 'sql' && !flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+    const forceShowProductMenu = tableEditorTabsEnabled && !sqlEditorTabsEnabled
+    // end of tabs preview flag logic
+    const projectName = selectedProject?.name
+    const organizationName = selectedOrganization?.name
 
-  const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const showProductMenu = selectedProject
-    ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
-      (selectedProject.status === PROJECT_STATUS.COMING_UP &&
-        router.pathname.includes('/project/[ref]/settings'))
-    : true
+    const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
+    const showProductMenu = selectedProject
+      ? selectedProject.status === PROJECT_STATUS.ACTIVE_HEALTHY ||
+        (selectedProject.status === PROJECT_STATUS.COMING_UP &&
+          router.pathname.includes('/project/[ref]/settings'))
+      : true
 
-  const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
-  const showPausedState = isPaused && !ignorePausedState
+    const ignorePausedState =
+      router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
+    const showPausedState = isPaused && !ignorePausedState
 
-  const sidebar = useSnapshot(sidebarState)
-  const actionKey = useActionKey()
+    const [isClient, setIsClient] = useState(false)
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isActionKeyPressed = e.key === actionKey?.[1]
-      if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
-        e.preventDefault()
-        sidebarState.isOpen = !sidebar.isOpen
+    useEffect(() => {
+      setIsClient(true)
+    }, [])
+
+    useEffect(() => {
+      const handler = (e: KeyboardEvent) => {
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+          setAiAssistantPanel({ open: !open })
+          e.preventDefault()
+          e.stopPropagation()
+        }
       }
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [actionKey, sidebar.isOpen])
+      window.addEventListener('keydown', handler)
+      return () => window.removeEventListener('keydown', handler)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open])
 
-  const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
+    const sidebar = useSnapshot(sidebarState)
+    const actionKey = useActionKey()
 
-  return (
-    <AppLayout>
-      <ProjectContextProvider projectRef={projectRef}>
-        <Head>
-          <title>
-            {title
-              ? `${title} | Supabase`
-              : selectedTable
-                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                : projectName
-                  ? `${projectName} | ${organizationName} | Supabase`
-                  : organizationName
-                    ? `${organizationName} | Supabase`
-                    : 'Supabase'}
-          </title>
-          <meta name="description" content="Supabase Studio" />
-        </Head>
-        <div className="flex flex-col h-screen">
-          {!hideHeader && <LayoutHeader />}
-          <div className="flex flex-1 overflow-hidden">
-            {!hideIconBar && <NavigationBar />}
-            <AnimatePresence initial={false}>
+    useEffect(() => {
+      const handleKeyDown = (e: KeyboardEvent) => {
+        const isActionKeyPressed = e.key === actionKey?.[1]
+        if (e.key.toLowerCase() === 'b' && isActionKeyPressed) {
+          e.preventDefault()
+          sidebarState.isOpen = !sidebar.isOpen
+        }
+      }
+      document.addEventListener('keydown', handleKeyDown)
+      return () => document.removeEventListener('keydown', handleKeyDown)
+    }, [actionKey, sidebar.isOpen])
+
+    const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
+
+    return (
+      <AppLayout>
+        <ProjectContextProvider projectRef={projectRef}>
+          <Head>
+            <title>
+              {title
+                ? `${title} | Supabase`
+                : selectedTable
+                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                  : projectName
+                    ? `${projectName} | ${organizationName} | Supabase`
+                    : organizationName
+                      ? `${organizationName} | Supabase`
+                      : 'Supabase'}
+            </title>
+            <meta name="description" content="Supabase Studio" />
+          </Head>
+          <div className="flex flex-col h-screen">
+            {!hideHeader && IS_PLATFORM && <LayoutHeader />}
+            <div className="flex flex-row grow">
+              {!hideIconBar && <NavigationBar />}
               <ResizablePanelGroup
-                className="flex flex-1"
+                className="flex h-full"
                 direction="horizontal"
                 autoSaveId="project-layout"
               >
@@ -169,23 +196,11 @@ const ProjectLayout = ({
                     )}
                   >
                     {sideBarIsOpen && (
-                      <>
+                      <AnimatePresence>
                         <motion.div
-                          initial={{
-                            width: 0,
-                            opacity: 0,
-                            height: '100%',
-                          }}
-                          animate={{
-                            width: 'auto',
-                            opacity: 1,
-                            height: '100%',
-                          }}
-                          exit={{
-                            width: 0,
-                            opacity: 0,
-                            height: '100%',
-                          }}
+                          initial={{ width: 0, opacity: 0, height: '100%' }}
+                          animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                          exit={{ width: 0, opacity: 0, height: '100%' }}
                           className="h-full"
                           transition={{ duration: 0.12 }}
                         >
@@ -197,26 +212,70 @@ const ProjectLayout = ({
                             <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
                           </MenuBarWrapper>
                         </motion.div>
-                      </>
+                      </AnimatePresence>
                     )}
                   </ResizablePanel>
                 )}
                 {showProductMenu && productMenu && sideBarIsOpen && (
                   <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
                 )}
-                <ResizablePanel order={2}>{children}</ResizablePanel>
+                <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
+                  <ResizablePanelGroup
+                    className="h-full w-full overflow-x-hidden flex-1"
+                    direction="horizontal"
+                    autoSaveId="project-layout-content"
+                  >
+                    <ResizablePanel id="panel-content" className="w-full min-w-[600px]">
+                      <main
+                        className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
+                        ref={ref}
+                      >
+                        {showPausedState ? (
+                          <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                            <div className="w-full">
+                              <ProjectPausedState product={product} />
+                            </div>
+                          </div>
+                        ) : (
+                          <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                            <Fragment key={selectedProject?.ref}>
+                              <ResourceExhaustionWarningBanner />
+                              {children}
+                            </Fragment>
+                          </ContentWrapper>
+                        )}
+                      </main>
+                    </ResizablePanel>
+                    {isClient && aiAssistantPanel.open && (
+                      <>
+                        <ResizableHandle />
+                        <ResizablePanel
+                          id="panel-assistant"
+                          className={cn(
+                            'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
+                            'min-w-[400px] max-w-[500px]',
+                            '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                          )}
+                        >
+                          <AIAssistantPanel />
+                        </ResizablePanel>
+                      </>
+                    )}
+                  </ResizablePanelGroup>
+                </ResizablePanel>
               </ResizablePanelGroup>
-            </AnimatePresence>
+            </div>
           </div>
-        </div>
+          <EnableBranchingModal />
+          <AISettingsModal />
+          <ProjectAPIDocs />
+        </ProjectContextProvider>
+      </AppLayout>
+    )
+  }
+)
 
-        <EnableBranchingModal />
-        <AISettingsModal />
-        <ProjectAPIDocs />
-      </ProjectContextProvider>
-    </AppLayout>
-  )
-}
+ProjectLayout.displayName = 'ProjectLayout'
 
 export const ProjectLayoutWithAuth = withAuth(ProjectLayout)
 

@@ -1,0 +1,1 @@
+Queues uses the `pgmq` Postgres extension, which is a durable Message Queue, like [AWS SQS](https://aws.amazon.com/sqs/) and [RSMQ](https://github.com/smrchy/rsmq), with guaranteed delivery in Postgres.

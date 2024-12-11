@@ -1,7 +1,7 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
+import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import {
   ProjectContextFromParamsProvider,

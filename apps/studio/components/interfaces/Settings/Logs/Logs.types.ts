@@ -88,7 +88,7 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
-  | 'cron'
+  | 'pg_cron'
 
 export type Mode = 'simple' | 'custom'
 
