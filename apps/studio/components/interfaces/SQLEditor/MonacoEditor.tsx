@@ -103,7 +103,7 @@ const MonacoEditor = ({
     if (onPrompt) {
       editor.addAction({
         id: 'generate-sql',
-        label: 'General SQL',
+        label: 'Generate SQL',
         keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
         run: () => {
           const selection = editor.getSelection()
