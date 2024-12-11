@@ -6,7 +6,7 @@ import { PropsWithChildren, ReactNode } from 'react'
 import { Badge, cn, Menu } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
-import { useSheet } from 'components/ui/Sheet'
+import { useSheet } from 'ui-patterns/Sheet'
 
 interface WithSidebarProps {
   title: string

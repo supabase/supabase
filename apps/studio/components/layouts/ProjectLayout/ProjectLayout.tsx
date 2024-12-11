@@ -33,7 +33,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { useSheet } from 'components/ui/Sheet'
+import { useSheet } from 'ui-patterns/Sheet'
 import MobileViewNav from './NavigationBar/MobileViewNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
@@ -194,7 +194,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               />
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
                 {!hideHeader && IS_PLATFORM && (
-                  <LayoutHeader showProductMenu={showProductMenu} productMenu={productMenu} handleMobileMenu={handleMobileMenu} />
+                  <LayoutHeader
+                    showProductMenu={showProductMenu}
+                    productMenu={productMenu}
+                    handleMobileMenu={handleMobileMenu}
+                  />
                 )}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"

@@ -1,27 +1,11 @@
 import { usePathname } from 'next/navigation'
-import React, { createContext, useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
 import { cn, Dialog, DialogContent } from 'ui'
+import SheetContext from './SheetContext'
 
-interface SheetContextType {
-  openSheet: () => void
-  closeSheet: () => void
-  isOpen: boolean
-  setMenu: (menu: React.ReactNode) => void
-}
-
-const SheetContext = createContext<SheetContextType | undefined>(undefined)
-
-export const useSheet = () => {
-  const context = useContext(SheetContext)
-  if (!context) {
-    throw new Error('useSheet must be used within a SheetProvider')
-  }
-  return context
-}
-
-export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [menu, setMenu] = useState<React.ReactNode>(null)
@@ -71,3 +55,5 @@ export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </SheetContext.Provider>
   )
 }
+
+export default SheetProvider

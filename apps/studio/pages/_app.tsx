@@ -52,7 +52,7 @@ import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 import { SonnerToaster } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
-import { SheetProvider } from 'components/ui/Sheet'
+import { SheetProvider } from 'ui-patterns'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)

@@ -1,5 +1,5 @@
 import { cn } from 'ui'
-import { useSheet } from 'components/ui/Sheet'
+import { useSheet } from 'ui-patterns/Sheet'
 import { PropsWithChildren, ReactNode } from 'react'
 
 export const ICON_SIZE = 20

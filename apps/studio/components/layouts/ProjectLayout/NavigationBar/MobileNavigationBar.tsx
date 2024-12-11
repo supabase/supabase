@@ -7,7 +7,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { buttonVariants, cn } from 'ui'
 import { Search, Menu } from 'lucide-react'
 import { CommandMenuTrigger } from 'ui-patterns'
-import { useSheet } from 'components/ui/Sheet'
+import { useSheet } from 'ui-patterns/Sheet'
 import { NavContent } from './NavigationBar'
 
 export const ICON_SIZE = 20
