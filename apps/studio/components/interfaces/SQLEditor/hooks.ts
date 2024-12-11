@@ -1,6 +1,6 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -9,13 +9,13 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { ContentDiff, DiffType } from './SQLEditor.types'
 import {
-  createSqlSnippetSkeletonV2,
   compareAsAddition,
   compareAsModification,
   compareAsNewSnippet,
+  createSqlSnippetSkeletonV2,
 } from './SQLEditor.utils'
-import { ContentDiff, DiffType, IStandaloneDiffEditor } from './SQLEditor.types'
 
 export const useNewQuery = () => {
   const router = useRouter()

@@ -13,7 +13,7 @@ interface AskAIWidgetProps {
   isLoading?: boolean
 }
 
-const AskAIWidget = ({
+export const AskAIWidget = ({
   value,
   onChange,
   onSubmit,
@@ -43,7 +43,7 @@ const AskAIWidget = ({
         inputRef={inputRef}
         size="xlarge"
         inputClassName="bg-transparent border-none shadow-none gap-4 text-xs focus-visible:outline-none focus-visible:ring-0 py-2 pl-3"
-        placeholder="Ask Supabase AI to do something"
+        placeholder="Ask the Assistant to do something"
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -98,5 +98,3 @@ const AskAIWidget = ({
     </div>
   )
 }
-
-export default AskAIWidget

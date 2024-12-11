@@ -123,8 +123,8 @@ const MonacoEditor = ({
             selection: selectedText,
             beforeSelection,
             afterSelection,
-            startLineNumber: selection?.startLineNumber,
-            endLineNumber: selection?.endLineNumber,
+            startLineNumber: selection?.startLineNumber ?? 0,
+            endLineNumber: selection?.endLineNumber ?? 0,
           })
         },
       })
@@ -137,25 +137,13 @@ const MonacoEditor = ({
       onHasSelection(!noSelection)
     })
 
-    // add margin above first line
-    editorRef.current.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
-
     if (autoFocus) {
       if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
       editor.focus()
     }
   }
 
-  // [Joshen] Also needs updating here
-  const debouncedSetSql = debounce((id, value) => {
-    snapV2.setSql(id, value)
-  }, 1000)
+  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
     const snippetCheck = snapV2.snippets[id]
@@ -183,9 +171,7 @@ const MonacoEditor = ({
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
   useEffect(() => {
-    if (content && content.length > 0) {
-      handleEditorChange(content)
-    }
+    if (content && content.length > 0) handleEditorChange(content)
   }, [])
 
   return (
@@ -211,9 +197,9 @@ const MonacoEditor = ({
           fontSize: 13,
           lineDecorationsWidth: 0,
           readOnly: disableEdit,
-          padding: { top: 16 },
           minimap: { enabled: false },
           wordWrap: 'on',
+          padding: { top: 4 },
           // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
           // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
           // comment just in case anyone might be wondering. Relevant issues:
