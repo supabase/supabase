@@ -5,8 +5,10 @@ import {
 } from 'components/layouts/Scaffold'
 import { ExternalLink } from 'lucide-react'
 import { Button } from 'ui'
+import { usePhFlag } from 'hooks/ui/useFlag'
 
 const DPA = () => {
+  const flagValue = usePhFlag('project_creation_quickstart')
   return (
     <ScaffoldSection>
       <ScaffoldSectionDetail className="sticky space-y-6 top-12">
@@ -32,16 +34,22 @@ const DPA = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
-        <a
+        {/* <a
           href="https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf"
           target="_blank"
           rel="noreferrer noopener"
           download={true}
+        > */}
+        <Button
+          type="default"
+          onClick={() => {
+            console.log(flagValue)
+          }}
+          iconRight={<ExternalLink />}
         >
-          <Button type="default" iconRight={<ExternalLink />}>
-            View DPA
-          </Button>
-        </a>
+          View DPA
+        </Button>
+        {/* </a> */}
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )

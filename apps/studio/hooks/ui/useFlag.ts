@@ -1,6 +1,7 @@
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import FlagContext from 'components/ui/Flag/FlagContext'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { sendFeatureFlagTrack } from 'data/telemetry/send-feature-flags-track'
 
 export function useFlag<T = boolean>(name: string) {
   const project = useSelectedProject()
@@ -19,5 +20,23 @@ export function useFlag<T = boolean>(name: string) {
     console.error(`Flag key "${name}" does not exist in flagStore`)
     return false
   }
+  return store[name] as T
+}
+
+export function usePhFlag<T = string | boolean>(name: string) {
+  const [store, setStore] = useState({})
+  // const processFlags = async () => {
+  //   const flags = (await getFeatureFlags()) as CallFeatureFlagsResponse
+  //   setStore(flags)
+  // }
+  const isObjectEmpty = (objectName: Object) => {
+    return Object.keys(objectName).length === 0
+  }
+  if (!isObjectEmpty(store) && store[name] === undefined) {
+    console.error(`Flag key "${name}" does not exist in flagStore`)
+    return false
+  }
+  console.log(store, name)
+  //   sendFeatureFlagTrack(name, store[name])
   return store[name] as T
 }
