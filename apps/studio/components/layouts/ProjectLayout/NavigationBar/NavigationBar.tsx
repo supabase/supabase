@@ -198,7 +198,7 @@ export const NavContent = () => {
         </figure>
         <span
           className={cn(
-            'w-[8rem] flex flex-col items-start text-sm truncate',
+            'w-full md:w-[8rem] flex flex-col items-start text-sm truncate',
             'absolute left-10 md:left-7 group-data-[state=expanded]:left-10',
             'opacity-100 md:group-data-[state=collapsed]:opacity-0 md:group-data-[state=expanded]:opacity-100',
             'transition-all'
