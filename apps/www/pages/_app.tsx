@@ -80,14 +80,39 @@ export default function App({ Component, pageProps }: AppProps) {
   }, [router.events, consentValue])
 
   useEffect(() => {
-    if (blockEvents) return
-    /**
-     * Send page telemetry on first page load
-     */
-    if (router.isReady) {
-      handlePageTelemetry(window.location.href)
+    // Store current page telemetry data in session storage if consent not given
+    const TELEMETRY_KEY = 'telemetry_data'
+
+    if (!router.isReady) return
+
+    // store telemetry data locally if consent not given
+    if (blockEvents) {
+      const storedTelemetryData = sessionStorage.getItem(TELEMETRY_KEY)
+      if (storedTelemetryData) return
+
+      const telemetryData = {
+        page_url: window.location.href,
+        page_title: title,
+        pathname: router.pathname,
+        ph: {
+          referrer,
+          language,
+          search,
+          viewport_height,
+          viewport_width,
+          user_agent: navigator.userAgent,
+        },
+      }
+      sessionStorage.setItem(TELEMETRY_KEY, JSON.stringify(telemetryData))
+      return
     }
-  }, [router.isReady, consentValue])
+  }, [consentValue, router.isReady])
+
+  useEffect(() => {
+    if (!router.isReady) return
+    if (blockEvents) return
+    handlePageTelemetry(window.location.href)
+  }, [router.isReady])
 
   useEffect(() => {
     const handleBeforeUnload = async () => {

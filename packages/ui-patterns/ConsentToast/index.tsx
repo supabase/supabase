@@ -86,12 +86,39 @@ export const useConsent = () => {
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
+
+    const TELEMETRY_KEY = 'telemetry_data'
+
+    if (value === 'true') {
+      const storedTelemetry = sessionStorage.getItem(TELEMETRY_KEY)
+      if (storedTelemetry) {
+        try {
+          const telemetryData = JSON.parse(storedTelemetry)
+          handlePageTelemetry(
+            process.env.NEXT_PUBLIC_API_URL!,
+            window.location.pathname,
+            telemetryData
+          )
+          sessionStorage.removeItem(TELEMETRY_KEY)
+        } catch (error) {
+          console.error('Invalid telemetry data:', error)
+        }
+      } else {
+        console.log('telemetryProps else? ')
+        handlePageTelemetry(
+          process.env.NEXT_PUBLIC_API_URL!,
+          window.location.pathname,
+          telemetryProps
+        )
+      }
+    }
+
     setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
-    if (consentToastId.current) toast.dismiss(consentToastId.current)
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (consentToastId.current) {
+      toast.dismiss(consentToastId.current)
+    }
   }
 
   const triggerConsentToast = useCallback(() => {
