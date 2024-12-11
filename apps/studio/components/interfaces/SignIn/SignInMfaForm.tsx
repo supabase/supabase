@@ -141,8 +141,9 @@ const SignInMfaForm = () => {
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
-              >{`Authenticate using ${factors.totp.find((f) => f.id !== selectedFactor?.id)
-                ?.friendly_name}?`}</a>
+              >{`Authenticate using ${
+                factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
+              }?`}</a>
             </li>
           )}
           <li>
