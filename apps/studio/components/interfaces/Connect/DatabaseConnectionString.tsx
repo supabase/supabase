@@ -135,7 +135,6 @@ export const DatabaseConnectionString = () => {
     isSuccessPoolingInfo && poolingConfiguration !== undefined
       ? getPoolerTld(poolingConfiguration?.connectionString)
       : 'com'
-  console.log(connectionStrings)
 
   // @mildtomato - Possible reintroduce later
   //
