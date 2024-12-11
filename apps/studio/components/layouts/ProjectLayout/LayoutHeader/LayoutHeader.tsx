@@ -21,6 +21,7 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { useSheet } from 'components/ui/Sheet'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -44,11 +45,13 @@ const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
-  handleMobileMenu,
+  showProductMenu,
+  productMenu,
 }: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const { openSheet, setMenu } = useSheet()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -71,6 +74,11 @@ const LayoutHeader = ({
     }
   }, [orgUsage])
 
+  const handleMobileMenu = () => {
+    setMenu(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
+    openSheet()
+  }
+
   return (
     <div
       className={cn(
@@ -78,18 +86,20 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      <div className="flex items-center justify-between py-2 px-3 flex-1">
+      {showProductMenu && productMenu && (
+        <button
+          title="Menu dropdown button"
+          className={cn(
+            'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+          )}
+          onClick={() => handleMobileMenu()}
+        >
+          <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+          <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+        </button>
+      )}
+      <div className="flex items-center justify-between py-2 px-3 flex-1 overflow-hidden overflow-x-scroll">
         <div className="flex items-center text-sm">
-          <button
-            title="Menu dropdown button"
-            className={cn(
-              buttonVariants({ type: 'default' }),
-              'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
-            )}
-            onClick={() => handleMobileMenu()}
-          >
-            <Menu size={18} strokeWidth={1} />
-          </button>
           {projectRef && (
             <>
               <div className="flex items-center">
