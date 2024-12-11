@@ -78,6 +78,16 @@ test.describe('Table Editor page', () => {
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
 
+    // Need to first make it visible to test (it's hidden on mobile)
+    await page
+      .locator('div')
+      .filter({ hasText: /^Table Editor$/ })
+      .first()
+      .evaluate((el) => {
+        el.style.position = 'relative'
+        el.style.left = '0'
+        el.style.top = '0'
+      })
     // click away to close the sorting dialog
     await page
       .locator('div')
