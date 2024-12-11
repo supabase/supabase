@@ -195,8 +195,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
                 {!hideHeader && IS_PLATFORM && (
                   <LayoutHeader
-                    showProductMenu={showProductMenu}
-                    productMenu={productMenu}
+                    showProductMenu={!!(showProductMenu && productMenu)}
                     handleMobileMenu={handleMobileMenu}
                   />
                 )}

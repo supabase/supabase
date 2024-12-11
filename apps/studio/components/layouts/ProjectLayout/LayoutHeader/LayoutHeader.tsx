@@ -41,7 +41,6 @@ const LayoutHeaderDivider = () => (
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
-  productMenu?: ReactNode
   breadcrumbs?: any[]
   headerBorder?: boolean
   showProductMenu?: boolean
@@ -54,7 +53,6 @@ const LayoutHeader = ({
   breadcrumbs = [],
   headerBorder = true,
   showProductMenu,
-  productMenu,
   handleMobileMenu,
 }: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
@@ -89,7 +87,7 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      {showProductMenu && productMenu && (
+      {showProductMenu && (
         <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
