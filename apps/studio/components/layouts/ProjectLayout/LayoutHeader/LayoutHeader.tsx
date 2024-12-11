@@ -150,8 +150,8 @@ const LayoutHeader = ({
             )}
           </div>
         </div>
-        <div className="absolute md:hidden left-0 h-full w-6 bg-gradient-to-r from-background to-transparent pointer-events-none" />
-        <div className="absolute md:hidden right-0 h-full w-6 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+        <div className="absolute md:hidden left-0 h-full w-6 bg-gradient-to-r from-background-dash-sidebar to-transparent pointer-events-none" />
+        <div className="absolute md:hidden right-0 h-full w-6 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
         <div className="border-l flex-0 h-full">
