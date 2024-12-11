@@ -5,7 +5,6 @@ interface ResourceWarningMessage {
   bannerContent: {
     warning: { title: string; description: string }
     critical: { title?: string; description?: string }
-    allowDismissable?: boolean
   }
   cardContent: {
     warning: { title: string; description: string }
