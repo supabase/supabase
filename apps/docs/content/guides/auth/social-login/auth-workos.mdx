@@ -4,19 +4,7 @@ title: 'SSO and Social Login with WorkOS'
 description: 'Add WorkOS AuthKit to your Supabase project'
 ---
 
-## Choose which authentication method is right for you
-
-There are two ways to add authentication to your Supabase using WorkOS: 
-
-### [Option 1](#option-1-using-workos-as-a-provider-via-supabase-auth): Using WorkOS as a provider via Supabase auth 
-
-This method uses WorkOS as a provider you configure in your Supabase dashboard. You then use Supabase's auth code to connect to WorkOS. 
-
-### [Option 2](#option-2-using-authkit): Using AuthKit
-
-[WorkOS AuthKit](https://authkit.com) is the world's best login box. AuthKit provides email/password authentication and social login by default. Once AuthKit is installed, you can configure and deploy additional SSO providers via the WorkOS dashboard.
-
-## Option 1: Using WorkOS as a provider via Supabase auth 
+## Using WorkOS as a provider via Supabase auth 
 
 ### Step 1. Create a WorkOS organization
 
@@ -121,13 +109,6 @@ export async function GET(request: Request) {
 
 ```
 
-## Option 2: Using AuthKit
-
-### Step 1. Install and configure AuthKit
-
-Visit [the WorkOS AuthKit Quickstart Guide](https://workos.com/docs/user-management/nextjs) to get up and running with AuthKit, the world's best login box. 
-
 ## Resources
 
 - [WorkOS Documentation](https://workos.com/docs/sso/guide)
-- [AuthKit Documentation](https://authkit.com/)
