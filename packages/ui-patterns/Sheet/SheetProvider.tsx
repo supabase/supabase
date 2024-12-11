@@ -1,4 +1,6 @@
-import { usePathname } from 'next/navigation'
+'use client'
+
+import { useRouter } from 'next/compat/router'
 import React, { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
@@ -6,7 +8,7 @@ import { cn, Dialog, DialogContent } from 'ui'
 import SheetContext from './SheetContext'
 
 const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const pathname = usePathname()
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [menu, setMenu] = useState<React.ReactNode>(null)
   const { width } = useWindowSize()
@@ -16,7 +18,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     setIsOpen(false)
-  }, [pathname])
+  }, [router?.pathname])
 
   useEffect(() => {
     setIsOpen(false)
