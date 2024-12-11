@@ -130,6 +130,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
+    const handleMobileMenu = () => {
+      setMenu(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
+      openSheet()
+    }
+
     return (
       <AppLayout>
         <ProjectContextProvider projectRef={projectRef}>
@@ -189,7 +194,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               />
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
                 {!hideHeader && IS_PLATFORM && (
-                  <LayoutHeader showProductMenu={showProductMenu} productMenu={productMenu} />
+                  <LayoutHeader showProductMenu={showProductMenu} productMenu={productMenu} handleMobileMenu={handleMobileMenu} />
                 )}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"

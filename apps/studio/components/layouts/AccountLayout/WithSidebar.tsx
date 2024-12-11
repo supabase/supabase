@@ -63,7 +63,11 @@ const WithSidebar = ({
         />
       )}
       <div className="flex flex-1 flex-col">
-        <LayoutHeader breadcrumbs={breadcrumbs} handleMobileMenu={handleMobileMenu} />
+        <LayoutHeader
+          breadcrumbs={breadcrumbs}
+          showProductMenu
+          handleMobileMenu={handleMobileMenu}
+        />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>

@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { useMemo } from 'react'
-import { Menu } from 'lucide-react'
+import { ReactNode, useMemo } from 'react'
 
 import Connect from 'components/interfaces/Connect/Connect'
 import { useParams } from 'common'
@@ -16,12 +15,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
-import { Badge, buttonVariants, cn } from 'ui'
+import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
-import { useSheet } from 'components/ui/Sheet'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -41,17 +39,27 @@ const LayoutHeaderDivider = () => (
   </span>
 )
 
+interface LayoutHeaderProps {
+  customHeaderComponents?: ReactNode
+  productMenu?: ReactNode
+  breadcrumbs?: any[]
+  headerBorder?: boolean
+  showProductMenu?: boolean
+  customSidebarContent?: ReactNode
+  handleMobileMenu: Function
+}
+
 const LayoutHeader = ({
   customHeaderComponents,
   breadcrumbs = [],
   headerBorder = true,
   showProductMenu,
   productMenu,
-}: any) => {
+  handleMobileMenu,
+}: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const { openSheet, setMenu } = useSheet()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -74,11 +82,6 @@ const LayoutHeader = ({
     }
   }, [orgUsage])
 
-  const handleMobileMenu = () => {
-    setMenu(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
-    openSheet()
-  }
-
   return (
     <div
       className={cn(
@@ -86,7 +89,7 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      {showProductMenu && productMenu && (
+      {showProductMenu && (
         <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
