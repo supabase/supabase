@@ -95,7 +95,7 @@ export const SidebarContent = ({
         )}
       >
         {title && (
-          <div className="hidden md:block mb-2">
+          <div className="absolute -left-96 -top-96 md:left-auto md:top-auto md:relative block mb-2">
             <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
               <h4 className="mb-0 text-lg truncate" title={title}>
                 {title}

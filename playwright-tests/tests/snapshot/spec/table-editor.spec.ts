@@ -77,11 +77,13 @@ test.describe('Table Editor page', () => {
     await page.getByTestId('table-editor-pick-column-to-sort-button').click()
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
+
     // click away to close the sorting dialog
     await page
       .locator('div')
       .filter({ hasText: /^Table Editor$/ })
       .click()
+
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
     await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
