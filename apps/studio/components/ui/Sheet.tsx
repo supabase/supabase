@@ -1,6 +1,7 @@
 import { usePathname } from 'next/navigation'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
+import { useWindowSize } from 'react-use'
 import { cn, Dialog, DialogContent } from 'ui'
 
 interface SheetContextType {
@@ -24,6 +25,7 @@ export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
   const [menu, setMenu] = useState<React.ReactNode>(null)
+  const { width } = useWindowSize()
 
   const openSheet = () => setIsOpen(true)
   const closeSheet = () => setIsOpen(false)
@@ -31,6 +33,10 @@ export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     setIsOpen(false)
   }, [pathname])
+
+  useEffect(() => {
+    setIsOpen(false)
+  }, [width])
 
   return (
     <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, setMenu }}>
@@ -42,7 +48,7 @@ export const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           forceMount
           onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={() => setIsOpen(false)}
-          size={'small'}
+          size="large"
           className={cn(
             'relative flex flex-col my-0 mx-auto rounded-t-lg overflow-hidden overflow-y-scroll',
             'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',

@@ -86,7 +86,7 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      {productMenu && (
+      {showProductMenu && productMenu && (
         <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
@@ -101,7 +101,7 @@ const LayoutHeader = ({
         </div>
       )}
       <div className="relative flex flex-1 overflow-hidden">
-        <div className="flex w-full items-center justify-between py-2 px-1 md:px-3 flex-nowrap overflow-x-scroll">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-scroll">
           <div className="flex items-center text-sm">
             {projectRef && (
               <>
@@ -147,8 +147,8 @@ const LayoutHeader = ({
             )}
           </div>
         </div>
-        <div className="absolute md:hidden left-0 h-full aspect-square bg-gradient-to-r from-background to-transparent pointer-events-none" />
-        <div className="absolute md:hidden right-0 h-full aspect-square bg-gradient-to-l from-background to-transparent pointer-events-none" />
+        <div className="absolute md:hidden left-0 h-full w-6 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+        <div className="absolute md:hidden right-0 h-full w-6 bg-gradient-to-l from-background to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
         <div className="border-l flex-0 h-full">

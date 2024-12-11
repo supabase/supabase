@@ -34,6 +34,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { useSheet } from 'components/ui/Sheet'
+import MobileViewNav from './NavigationBar/MobileViewNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -151,6 +152,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             {!hideIconBar && <NavigationBar />}
             {/* Top Nav to access products from mobile */}
             {!hideIconBar && <MobileNavigationBar />}
+            {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
+              <MobileViewNav title={product} productMenu={productMenu} />
+            )}
 
             {/* Product menu bar */}
             <ResizablePanelGroup
