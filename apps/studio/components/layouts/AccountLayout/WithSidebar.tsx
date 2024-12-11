@@ -99,7 +99,7 @@ export const SidebarContent = ({
            * hide element offscreen from user on mobile but keep for test
            * playwright-tests/tests/snapshot/spec/table-editor.spec.ts
            * */
-          <div className="absolute opacity-0 -left-[9999px] -top-[9999px] md:left-auto md:top-auto md:relative md:opacity-100 block mb-2">
+          <div className="absolute -left-[9999px] -top-[9999px] md:left-auto md:top-auto md:relative block mb-2">
             <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
               <h4 className="mb-0 text-lg truncate" title={title}>
                 {title}
