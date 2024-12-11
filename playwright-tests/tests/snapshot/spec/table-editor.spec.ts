@@ -82,6 +82,7 @@ test.describe('Table Editor page', () => {
     await page
       .locator('div')
       .filter({ hasText: /^Table Editor$/ })
+      .first()
       .click()
 
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
