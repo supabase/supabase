@@ -4,14 +4,23 @@ import { useRouter } from 'next/compat/router'
 import React, { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { cn, Dialog, DialogContent } from 'ui'
+import { cn, CommandEmpty_Shadcn_, Dialog, DialogContent, DialogHeader } from 'ui'
 import SheetContext from './SheetContext'
+import useDragToClose from 'common/hooks/useDragToClose'
 
 const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [menu, setMenu] = useState<React.ReactNode>(null)
   const { width } = useWindowSize()
+  const {
+    ref: contentRef,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
+  } = useDragToClose({
+    onClose: () => setIsOpen(false),
+  })
 
   const openSheet = () => setIsOpen(true)
   const closeSheet = () => setIsOpen(false)
@@ -29,6 +38,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
+          ref={contentRef}
           id="command-menu-dialog-content"
           hideClose
           forceMount
@@ -51,7 +61,17 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             className: cn('overflow-hidden flex data-closed:delay-100'),
           }}
         >
-          <ErrorBoundary FallbackComponent={() => <div>Error</div>}>{menu}</ErrorBoundary>
+          <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>
+            <DialogHeader
+              className="pointer-events-auto cursor-grab pb-2 group/sheet-header"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <span className="w-full h-1 mx-auto max-w-[200px] rounded-full bg-foreground-muted/30 group-hover/sheet-header:bg-foreground-muted/50" />
+            </DialogHeader>
+            {menu}
+          </ErrorBoundary>
         </DialogContent>
       </Dialog>
     </SheetContext.Provider>
