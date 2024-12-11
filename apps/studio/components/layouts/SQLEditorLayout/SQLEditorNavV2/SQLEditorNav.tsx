@@ -1,3 +1,4 @@
+import { useDebounce } from '@uidotdev/usehooks'
 import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -15,7 +16,6 @@ import { getContentById } from 'data/content/content-id-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useProfile } from 'lib/profile'
 import uuidv4 from 'lib/uuid'
@@ -45,20 +45,21 @@ import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
   searchText: string
+  sort?: 'inserted_at' | 'name'
 }
 
-export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => {
+export const SQLEditorNav = ({
+  searchText: _searchText,
+  sort = 'inserted_at',
+}: SQLEditorNavProps) => {
   const searchText = _searchText.trim()
+  const debouncedSearchText = useDebounce(searchText, 250)
+
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
   const { ref: projectRef, id } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
-
-  const [sort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
-  useEffect(() => {
-    snapV2.setOrder(sort)
-  }, [sort])
 
   const [mountedId, setMountedId] = useState(false)
   const [showMoveModal, setShowMoveModal] = useState(false)
@@ -79,28 +80,20 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
   // =======================================================
-  const snippets = useSnippets(projectRef as string)
-  const folders = useSnippetFolders(projectRef as string)
-  const contents = useMemo(
-    () =>
-      snippets.filter((x) =>
-        searchText.length > 0 ? x.name.toLowerCase().includes(searchText.toLowerCase()) : true
-      ),
-    [searchText, snippets]
+  const privateSnippets = useSnippets(
+    projectRef as string,
+    ['private', sort, debouncedSearchText].filter(Boolean).join(':')
   )
+  const folders = useSnippetFolders(projectRef as string)
   const snippet = snapV2.snippets[id as string]?.snippet
 
-  const privateSnippets = useMemo(
-    () => contents.filter((snippet) => snippet.visibility === 'user'),
-    [contents]
-  )
   const numPrivateSnippets = snapV2.snippetCounts[projectRef as string]?.private
   const privateSnippetsTreeState = useMemo(
     () =>
-      folders.length === 0 && snippets.length === 0
+      folders.length === 0 && privateSnippets.length === 0
         ? [ROOT_NODE]
         : formatFolderResponseForTreeView({ folders, contents: privateSnippets }),
-    [folders, privateSnippets, snippets.length]
+    [folders, privateSnippets]
   )
 
   const privateSnippetsLastItemIds = useMemo(
@@ -108,12 +101,13 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     [privateSnippetsTreeState]
   )
 
+  const nestedFavoriteSnippets = useSnippets(
+    projectRef as string,
+    ['favorite', sort, debouncedSearchText].filter(Boolean).join(':')
+  )
   const favoriteSnippets = useMemo(
-    () =>
-      contents
-        .filter((snippet) => snippet.favorite)
-        .map((snippet) => ({ ...snippet, folder_id: undefined })),
-    [contents]
+    () => nestedFavoriteSnippets.map((snippet) => ({ ...snippet, folder_id: undefined })),
+    [nestedFavoriteSnippets]
   )
 
   const numFavoriteSnippets = snapV2.snippetCounts[projectRef as string]?.favorited
@@ -130,9 +124,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     [favoritesTreeState]
   )
 
-  const projectSnippets = useMemo(
-    () => contents.filter((snippet) => snippet.visibility === 'project'),
-    [contents]
+  const projectSnippets = useSnippets(
+    projectRef as string,
+    ['shared', sort, debouncedSearchText].filter(Boolean).join(':')
   )
   const numProjectSnippets = snapV2.snippetCounts[projectRef as string]?.shared
   const projectSnippetsTreeState = useMemo(
@@ -158,10 +152,10 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   useEffect(() => {
     setIsLoading(true)
 
-    fetchSQLSnippetFolders({ projectRef }).finally(() => {
+    fetchSQLSnippetFolders({ projectRef, sort, name: debouncedSearchText }).finally(() => {
       setIsLoading(false)
     })
-  }, [fetchSQLSnippetFolders, projectRef])
+  }, [fetchSQLSnippetFolders, projectRef, sort, debouncedSearchText])
 
   const {
     data: sharedSqlSnippetsData,
@@ -169,23 +163,34 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     hasNextPage: hasMoreSharedSqlSnippets,
     fetchNextPage: fetchNextSharedSqlSnippets,
     isFetchingNextPage: isFetchingMoreSharedSqlSnippets,
+    isSuccess: isSharedSqlSnippetsSuccess,
   } = useSqlSnippetsQuery(
     {
       projectRef,
       visibility: 'project',
+      name: debouncedSearchText,
+      sort,
     },
     { enabled: showSharedSnippets }
   )
 
   useEffect(() => {
-    if (projectRef === undefined) return
+    if (projectRef === undefined || !isSharedSqlSnippetsSuccess) return
 
-    sharedSqlSnippetsData?.pages.forEach((page) => {
-      page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({ projectRef, snippet })
-      })
+    const snippets = sharedSqlSnippetsData.pages.flatMap((page) => page.contents)
+
+    snapV2.addSnippets({
+      projectRef,
+      snippets,
+      key: ['shared', sort, debouncedSearchText].filter(Boolean).join(':'),
     })
-  }, [projectRef, sharedSqlSnippetsData?.pages])
+  }, [
+    debouncedSearchText,
+    isSharedSqlSnippetsSuccess,
+    projectRef,
+    sharedSqlSnippetsData?.pages,
+    sort,
+  ])
 
   const {
     data: favoriteSqlSnippetsData,
@@ -197,6 +202,8 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     {
       projectRef,
       favorite: true,
+      name: debouncedSearchText,
+      sort,
     },
     { enabled: showFavoriteSnippets }
   )
@@ -204,17 +211,21 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   useEffect(() => {
     if (projectRef === undefined) return
 
-    favoriteSqlSnippetsData?.pages.forEach((page) => {
-      page.contents?.forEach((snippet) => {
-        snapV2.addSnippet({ projectRef, snippet })
+    const snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents)
+    if (snippets !== undefined) {
+      snapV2.addSnippets({
+        projectRef,
+        snippets,
+        key: ['favorite', sort, debouncedSearchText].filter(Boolean).join(':'),
       })
-    })
-  }, [projectRef, favoriteSqlSnippetsData?.pages])
+    }
+  }, [projectRef, favoriteSqlSnippetsData?.pages, sort, debouncedSearchText])
 
   const { data: sharedSnippetCountData } = useContentCountQuery({
     projectRef,
     type: 'sql',
     visibility: 'project',
+    name: debouncedSearchText,
   })
   useEffect(() => {
     if (projectRef !== undefined && sharedSnippetCountData !== undefined) {
@@ -226,6 +237,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     projectRef,
     type: 'sql',
     favorite: true,
+    name: debouncedSearchText,
   })
   useEffect(() => {
     if (projectRef !== undefined && favoritedSnippetCountData !== undefined) {
@@ -241,6 +253,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     projectRef,
     type: 'sql',
     visibility: 'user',
+    name: debouncedSearchText,
   })
   useEffect(() => {
     if (projectRef !== undefined && privateSnippetCountData !== undefined) {
@@ -348,7 +361,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     if (!projectRef) return console.error('Project ref is required')
     if (selectedFolderToDelete === undefined) return console.error('No folder is selected')
 
-    const folderSnippets = contents.filter(
+    const folderSnippets = privateSnippets.filter(
       (content) => content.folder_id === selectedFolderToDelete.id
     )
     if (folderSnippets.length > 0) {
@@ -374,7 +387,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
   // We're only supporting shift clicks (not cmd/control click) - this is even with the react tree view component itself
   const onMultiSelect = (selectedId: string) => {
     // The base is always the current query thats selected
-    const contentIds = contents.map((x) => x.id)
+    const contentIds = privateSnippets.map((x) => x.id)
     const baseIndex = contentIds.indexOf(id as string)
     const targetIndex = contentIds.indexOf(selectedId)
 
@@ -382,11 +395,12 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
     const ceiling = Math.max(baseIndex, targetIndex)
 
     const _selectedSnippets = []
-    const sameFolder = contents[floor].folder_id === contents[ceiling].folder_id
+    const sameFolder = privateSnippets[floor].folder_id === privateSnippets[ceiling].folder_id
 
     for (let i = floor; i <= ceiling; i++) {
       if (sameFolder) {
-        if (contents[i].folder_id === contents[floor].folder_id) _selectedSnippets.push(contents[i])
+        if (privateSnippets[i].folder_id === privateSnippets[floor].folder_id)
+          _selectedSnippets.push(privateSnippets[i])
       } else {
         // [Joshen] Temp don't allow selecting across folders for now
         // _selectedSnippets.push(contents[i])
@@ -402,7 +416,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
 
   useEffect(() => {
     const loadFolderContents = async (folderId: string) => {
-      await fetchSQLSnippetFolders({ projectRef, folderId })
+      await fetchSQLSnippetFolders({ projectRef, folderId, sort, name: debouncedSearchText })
     }
 
     if (snippet !== undefined && !mountedId) {
@@ -415,7 +429,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
       // Only want to run this once when loading sql/[id] route
       setMountedId(true)
     }
-  }, [snippet, mountedId])
+  }, [snippet, mountedId, sort, debouncedSearchText])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
@@ -471,6 +485,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   hasNextPage={hasMoreSharedSqlSnippets}
                   fetchNextPage={fetchNextSharedSqlSnippets}
                   isFetchingNextPage={isFetchingMoreSharedSqlSnippets}
+                  paginationFilter="shared"
                 />
               )}
             />
@@ -532,6 +547,7 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                   hasNextPage={hasMoreFavoriteSqlSnippets}
                   fetchNextPage={fetchNextFavoriteSqlSnippets}
                   isFetchingNextPage={isFetchingMoreFavoriteSqlSnippets}
+                  paginationFilter="favorite"
                 />
               )}
             />
@@ -623,6 +639,9 @@ export const SQLEditorNav = ({ searchText: _searchText }: SQLEditorNavProps) => 
                       snapV2.saveFolder({ id: element.id as string, name })
                     }
                   }}
+                  paginationFilter="private"
+                  sort={sort}
+                  name={debouncedSearchText}
                 />
               )}
             />

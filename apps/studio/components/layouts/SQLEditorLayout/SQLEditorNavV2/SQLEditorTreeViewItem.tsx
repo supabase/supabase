@@ -46,6 +46,9 @@ interface SQLEditorTreeViewItemProps {
   hasNextPage?: boolean
   fetchNextPage?: () => void
   isFetchingNextPage?: boolean
+  paginationFilter?: string
+  sort?: 'inserted_at' | 'name'
+  name?: string
 }
 
 export const SQLEditorTreeViewItem = ({
@@ -71,6 +74,9 @@ export const SQLEditorTreeViewItem = ({
   hasNextPage: _hasNextPage,
   fetchNextPage: _fetchNextPage,
   isFetchingNextPage: _isFetchingNextPage,
+  paginationFilter,
+  sort,
+  name,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref } = useParams()
@@ -98,7 +104,12 @@ export const SQLEditorTreeViewItem = ({
   const hasNextPage =
     _hasNextPage !== undefined
       ? _hasNextPage
-      : ref && snapV2.hasNextPage({ projectRef: ref, parentId })
+      : ref &&
+        snapV2.hasNextPage({
+          projectRef: ref,
+          parentId,
+          filter: [paginationFilter, sort, name].filter(Boolean).join(':'),
+        })
 
   const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
 
@@ -115,7 +126,11 @@ export const SQLEditorTreeViewItem = ({
     fetchSQLSnippetFolders({
       projectRef: ref,
       folderId: parentId,
-      cursor: snapV2.getCursor({ projectRef: ref, parentId }),
+      cursor: snapV2.getCursor({
+        projectRef: ref,
+        parentId,
+        filter: [paginationFilter, sort, name].filter(Boolean).join(':'),
+      }),
     }).finally(() => {
       setIsFetchingNextPage(false)
     })
@@ -125,7 +140,7 @@ export const SQLEditorTreeViewItem = ({
     if (!ref) return console.error('Project ref is required')
 
     setIsFetchingFolder(true)
-    fetchSQLSnippetFolders({ projectRef: ref, folderId: id }).finally(() => {
+    fetchSQLSnippetFolders({ projectRef: ref, folderId: id, name, sort }).finally(() => {
       setIsFetchingFolder(false)
     })
   }

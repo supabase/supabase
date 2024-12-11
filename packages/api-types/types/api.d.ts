@@ -881,7 +881,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/platform/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/platform/projects/{ref}/content/folders': {
@@ -1895,7 +1895,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/v0/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/v0/projects/{ref}/content/item/{id}': {
@@ -12872,6 +12872,8 @@ export interface operations {
       query?: {
         cursor?: string
         limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         visibility?: 'user' | 'project' | 'org' | 'public'
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
@@ -12991,7 +12993,7 @@ export interface operations {
       }
     }
   }
-  /** Gets the count of a user's content by type */
+  /** Gets the count of a user's content */
   ContentController_getContentCount: {
     parameters: {
       query?: {
@@ -13022,6 +13024,8 @@ export interface operations {
       query?: {
         cursor?: string
         limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         visibility?: 'user' | 'project' | 'org' | 'public'
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
@@ -13092,6 +13096,8 @@ export interface operations {
       query?: {
         cursor?: string
         limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
       }
       path: {
         /** @description Content folder id */
@@ -17556,6 +17562,8 @@ export interface operations {
       query?: {
         cursor?: string
         limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         project_ref?: string
       }
     }

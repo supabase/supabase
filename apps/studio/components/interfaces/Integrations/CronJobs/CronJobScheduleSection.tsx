@@ -1,8 +1,7 @@
-import { toString as CronToString } from 'cronstrue'
+import { useDebounce } from '@uidotdev/usehooks'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
-import { useDebounce } from 'use-debounce'
 
 import { useCompletion } from 'ai/react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'

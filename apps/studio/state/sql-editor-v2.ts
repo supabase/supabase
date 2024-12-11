@@ -44,6 +44,13 @@ export const sqlEditorState = proxy({
   snippets: {} as {
     [snippetId: string]: StateSnippet
   },
+
+  snippetOrdering: {} as {
+    [projectRef: string]: {
+      [key: string]: string[]
+    }
+  },
+
   // Query results, if any, for a snippet
   results: {} as {
     [snippetId: string]: {
@@ -70,7 +77,6 @@ export const sqlEditorState = proxy({
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
   limit: 100,
-  order: 'inserted_at' as 'name' | 'inserted_at',
   // For handling renaming folder failed
   lastUpdatedFolderName: '',
 
@@ -129,8 +135,6 @@ export const sqlEditorState = proxy({
   setDiffContent: (sql: string, diffType: DiffType) =>
     (sqlEditorState.diffContent = { sql, diffType }),
 
-  setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
-
   setSnippetCount: ({
     projectRef,
     key,
@@ -153,6 +157,30 @@ export const sqlEditorState = proxy({
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
+  },
+
+  addSnippets: ({
+    projectRef,
+    snippets,
+    key,
+  }: {
+    projectRef: string
+    snippets: SnippetWithContent[]
+    key: string
+  }) => {
+    snippets.forEach((snippet) => {
+      sqlEditorState.addSnippet({ projectRef, snippet })
+    })
+
+    if (!sqlEditorState.snippetOrdering[projectRef]) {
+      sqlEditorState.snippetOrdering[projectRef] = {}
+    }
+
+    const previousSnippetIds = sqlEditorState.snippetOrdering[projectRef][key] ?? []
+
+    sqlEditorState.snippetOrdering[projectRef][key] = Array.from(
+      new Set([...previousSnippetIds, ...snippets.map((x) => x.id)])
+    )
   },
 
   updateSnippet: ({
@@ -372,19 +400,14 @@ export const useSnippetFolders = (projectRef: string) => {
   )
 }
 
-export const useSnippets = (projectRef: string) => {
+export const useSnippets = (projectRef: string, key: string) => {
   const snapshot = useSqlEditorV2StateSnapshot()
 
   return useMemo(
     () =>
-      Object.values(snapshot.snippets)
-        .filter((x) => x.projectRef === projectRef)
-        .map((x) => x.snippet)
-        .sort((a, b) => {
-          if (snapshot.order === 'name') return a.name.localeCompare(b.name)
-          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-        }),
-    [projectRef, snapshot.order, snapshot.snippets]
+      snapshot.snippetOrdering?.[projectRef]?.[key]?.map((id) => snapshot.snippets[id].snippet) ??
+      [],
+    [projectRef, key, snapshot.snippets, snapshot.snippetOrdering]
   )
 }
 

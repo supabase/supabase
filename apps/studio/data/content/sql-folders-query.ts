@@ -10,14 +10,31 @@ export type SnippetFolder = components['schemas']['UserContentFolder']
 export type Snippet = components['schemas']['UserContentObjectMeta']
 
 export async function getSQLSnippetFolders(
-  { projectRef, folderId, cursor }: { projectRef?: string; folderId?: string; cursor?: string },
+  {
+    projectRef,
+    folderId,
+    cursor,
+    sort,
+    name,
+  }: {
+    projectRef?: string
+    folderId?: string
+    cursor?: string
+    name?: string
+    sort?: 'name' | 'inserted_at'
+  },
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
 
+  const sortOrder = sort === 'name' ? 'asc' : 'desc'
+
   if (folderId) {
     const { data, error } = await get('/platform/projects/{ref}/content/folders/{id}', {
-      params: { path: { ref: projectRef, id: folderId }, query: { cursor, limit: '3' } },
+      params: {
+        path: { ref: projectRef, id: folderId },
+        query: { cursor, limit: '3', sort_by: sort, sort_order: sortOrder },
+      },
       signal,
     })
 
@@ -28,7 +45,10 @@ export async function getSQLSnippetFolders(
     }
   } else {
     const { data, error } = await get('/platform/projects/{ref}/content/folders', {
-      params: { path: { ref: projectRef }, query: { type: 'sql', cursor, limit: '3' } },
+      params: {
+        path: { ref: projectRef },
+        query: { type: 'sql', cursor, limit: '3', sort_by: sort, sort_order: sortOrder, name },
+      },
       signal,
     })
 

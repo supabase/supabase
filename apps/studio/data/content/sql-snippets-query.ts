@@ -12,20 +12,32 @@ interface GetSqlSnippetsVariables {
   visibility?: SqlSnippet['visibility']
   favorite?: boolean
   name?: string
+  sort?: 'name' | 'inserted_at'
 }
 
 export async function getSqlSnippets(
-  { projectRef, cursor, visibility, favorite, name }: GetSqlSnippetsVariables,
+  { projectRef, cursor, visibility, favorite, name, sort }: GetSqlSnippetsVariables,
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') {
     throw new Error('projectRef is required for getSqlSnippets')
   }
 
+  const sortOrder = sort === 'name' ? 'asc' : 'desc'
+
   const { data, error } = await get('/platform/projects/{ref}/content', {
     params: {
       path: { ref: projectRef },
-      query: { type: 'sql', cursor, visibility, favorite, name, limit: '3' },
+      query: {
+        type: 'sql',
+        cursor,
+        visibility,
+        favorite,
+        name,
+        limit: '3',
+        sort_by: sort,
+        sort_order: sortOrder,
+      },
     },
     signal,
   })
@@ -44,16 +56,16 @@ export type SqlSnippetsData = Awaited<ReturnType<typeof getSqlSnippets>>
 export type SqlSnippetsError = unknown
 
 export const useSqlSnippetsQuery = <TData = SqlSnippetsData>(
-  { projectRef, visibility, favorite }: Omit<GetSqlSnippetsVariables, 'cursor'>,
+  { projectRef, sort, name, visibility, favorite }: Omit<GetSqlSnippetsVariables, 'cursor'>,
   {
     enabled = true,
     ...options
   }: UseInfiniteQueryOptions<SqlSnippetsData, SqlSnippetsError, TData> = {}
 ) =>
   useInfiniteQuery<SqlSnippetsData, SqlSnippetsError, TData>(
-    contentKeys.sqlSnippets(projectRef, { visibility, favorite }),
+    contentKeys.sqlSnippets(projectRef, { sort, name, visibility, favorite }),
     ({ signal, pageParam: cursor }) =>
-      getSqlSnippets({ projectRef, cursor, visibility, favorite }, signal),
+      getSqlSnippets({ projectRef, cursor, sort, name, visibility, favorite }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
       getNextPageParam(lastPage) {

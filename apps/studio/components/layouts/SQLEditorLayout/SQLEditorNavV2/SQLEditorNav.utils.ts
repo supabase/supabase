@@ -85,20 +85,26 @@ export function useFetchSQLSnippetFolders() {
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const fetchSQLSnippetFolders = useCallback(
-    ({ projectRef, folderId, cursor }: Parameters<typeof getSQLSnippetFolders>[0]) => {
+    ({ projectRef, folderId, cursor, sort, name }: Parameters<typeof getSQLSnippetFolders>[0]) => {
       if (projectRef === undefined) return Promise.resolve()
 
-      return getSQLSnippetFolders({ projectRef, folderId, cursor })
+      return getSQLSnippetFolders({ projectRef, folderId, cursor, sort, name })
         .then((data) => {
-          data.contents?.forEach((snippet) => {
-            snapV2.addSnippet({ projectRef, snippet })
-          })
+          const key = ['private', sort, name].filter(Boolean).join(':')
+
+          if (data.contents !== undefined) {
+            snapV2.addSnippets({
+              projectRef,
+              snippets: data.contents,
+              key,
+            })
+          }
 
           data.folders?.forEach((folder) => {
             snapV2.addFolder({ projectRef, folder })
           })
 
-          snapV2.setCursor({ projectRef, parentId: folderId, cursor: data.cursor })
+          snapV2.setCursor({ projectRef, parentId: folderId, cursor: data.cursor, filter: key })
         })
         .catch((error) => {
           toast.error('Failed to fetch snippets: ' + error.message)
