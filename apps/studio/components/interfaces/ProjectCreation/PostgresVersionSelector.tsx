@@ -58,11 +58,16 @@ export const PostgresVersionSelector = ({
     data,
     isLoading: isLoadingProjectVersions,
     isSuccess,
-  } = useProjectCreationPostgresVersionsQuery({
-    cloudProvider,
-    dbRegion,
-    organizationSlug,
-  })
+  } = useProjectCreationPostgresVersionsQuery(
+    {
+      cloudProvider,
+      dbRegion,
+      organizationSlug,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  )
   const availableVersions = (data?.available_versions ?? []).sort((a, b) =>
     a.version.localeCompare(b.version)
   )
