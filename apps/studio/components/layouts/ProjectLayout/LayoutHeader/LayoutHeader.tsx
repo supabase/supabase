@@ -89,7 +89,7 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      {showProductMenu && (
+      {showProductMenu && productMenu && (
         <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
