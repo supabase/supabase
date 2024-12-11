@@ -1,11 +1,16 @@
 import Link from 'next/link'
 
 import { useParams } from 'common'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  WarningIcon,
+} from 'ui'
 
 export function EmailRateLimitsAlert() {
-  const { ref: projectRef } = useParams()
-  const after20240926 = Date.now() >= new Date('20240926T00:00:00Z').getTime()
+  const { ref } = useParams()
 
   return (
     <Alert_Shadcn_ variant="warning">
@@ -18,17 +23,16 @@ export function EmailRateLimitsAlert() {
           href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
           className="underline"
           target="_blank"
+          rel="noreferrer noopener"
         >
           documentation
         </a>{' '}
-        for an up-to-date information on the current rate limits.{' '}
-        <Link
-          className="underline"
-          target="_blank"
-          href={`/project/${projectRef}/settings/auth#auth-config-smtp-form`}
-        >
-          Set up a custom SMTP server now.
-        </Link>
+        for an up-to-date information on the current rate limits.
+        <Button asChild type="default" className="mt-2">
+          <Link target="_blank" href={`/project/${ref}/settings/auth#auth-config-smtp-form`}>
+            Set up custom SMTP server
+          </Link>
+        </Button>
       </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
