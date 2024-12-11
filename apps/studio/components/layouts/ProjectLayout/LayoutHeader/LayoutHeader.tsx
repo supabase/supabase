@@ -86,8 +86,8 @@ const LayoutHeader = ({
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      {showProductMenu && productMenu && (
-        <div className="border-r flex-0 md:hidden h-full aspect-square">
+      {productMenu && (
+        <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
           <button
             title="Menu dropdown button"
             className={cn(
@@ -100,50 +100,52 @@ const LayoutHeader = ({
           </button>
         </div>
       )}
-      <div className="relative flex items-center justify-between py-2 px-1 md:px-3 flex-1 overflow-hidden overflow-x-scroll">
-        <div className="flex items-center text-sm">
-          {projectRef && (
-            <>
-              <div className="flex items-center">
-                <OrganizationDropdown />
-                <LayoutHeaderDivider />
-                <ProjectDropdown />
+      <div className="relative flex flex-1 overflow-hidden">
+        <div className="flex w-full items-center justify-between py-2 px-1 md:px-3 flex-nowrap overflow-x-scroll">
+          <div className="flex items-center text-sm">
+            {projectRef && (
+              <>
+                <div className="flex items-center">
+                  <OrganizationDropdown />
+                  <LayoutHeaderDivider />
+                  <ProjectDropdown />
 
-                {exceedingLimits && (
-                  <div className="ml-2">
-                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge variant="destructive">Exceeding usage limits</Badge>
-                    </Link>
-                  </div>
-                )}
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive">Exceeding usage limits</Badge>
+                      </Link>
+                    </div>
+                  )}
 
-                {selectedProject && isBranchingEnabled && (
-                  <>
-                    <LayoutHeaderDivider />
-                    <BranchDropdown />
-                  </>
-                )}
-              </div>
+                  {selectedProject && isBranchingEnabled && (
+                    <>
+                      <LayoutHeaderDivider />
+                      <BranchDropdown />
+                    </>
+                  )}
+                </div>
 
-              <div className="ml-3 flex items-center gap-x-3">
-                {connectDialogUpdate && <Connect />}
-                {!isBranchingEnabled && <EnableBranchingButton />}
-              </div>
-            </>
-          )}
+                <div className="ml-3 flex items-center gap-x-3">
+                  {connectDialogUpdate && <Connect />}
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </div>
+              </>
+            )}
 
-          {/* Additional breadcrumbs are supplied */}
-          <BreadcrumbsView defaultValue={breadcrumbs} />
-        </div>
-        <div className="flex items-center gap-x-2">
-          {customHeaderComponents && customHeaderComponents}
-          {IS_PLATFORM && (
-            <>
-              <FeedbackDropdown />
-              <NotificationsPopoverV2 />
-              <HelpPopover />
-            </>
-          )}
+            {/* Additional breadcrumbs are supplied */}
+            <BreadcrumbsView defaultValue={breadcrumbs} />
+          </div>
+          <div className="flex items-center gap-x-2">
+            {customHeaderComponents && customHeaderComponents}
+            {IS_PLATFORM && (
+              <>
+                <FeedbackDropdown />
+                <NotificationsPopoverV2 />
+                <HelpPopover />
+              </>
+            )}
+          </div>
         </div>
         <div className="absolute md:hidden left-0 h-full aspect-square bg-gradient-to-r from-background to-transparent pointer-events-none" />
         <div className="absolute md:hidden right-0 h-full aspect-square bg-gradient-to-l from-background to-transparent pointer-events-none" />
