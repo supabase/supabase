@@ -6,7 +6,6 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
 
@@ -29,13 +28,9 @@ export const ProfileContext = createContext<ProfileContextType>({
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: sendIdentify } = useSendIdentifyMutation()
 
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
-    async onSuccess() {
-      sendEvent({ category: 'conversion', action: 'sign_up', label: '' })
-    },
     onError() {
       toast.error('Failed to create your profile. Please refresh to try again.')
     },

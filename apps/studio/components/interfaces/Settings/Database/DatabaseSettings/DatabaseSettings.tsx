@@ -20,8 +20,10 @@ import {
   IPv4DeprecationNotice,
 } from '../DatabaseConnectionNotices'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
-import ResetDbPassword from './ResetDbPassword'
 
+/**O
+ * @deprecated Will be removed once `connectDialogUpdate` flag is persisted
+ */
 const DatabaseSettings = () => {
   const { ref: projectRef, connectionString } = useParams()
   const snap = useDatabaseSettingsStateSnapshot()
@@ -80,13 +82,6 @@ const DatabaseSettings = () => {
         db_user: primaryConfig?.db_user,
       }
     : dbConnectionInfo
-
-  const handleCopy = (labelValue?: string) =>
-    sendEvent({
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ? labelValue : '',
-    })
 
   useEffect(() => {
     if (connectionString !== undefined && connectionStringsRef.current !== undefined) {
@@ -166,9 +161,6 @@ const DatabaseSettings = () => {
                 disabled
                 value={connectionInfo.db_host}
                 label="Host"
-                onCopy={() => {
-                  handleCopy('Host')
-                }}
               />
               <Input
                 className="input-mono"

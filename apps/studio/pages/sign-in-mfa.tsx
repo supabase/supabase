@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import SignInMfaForm from 'components/interfaces/SignIn/SignInMfaForm'
 import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
 
@@ -14,7 +13,6 @@ const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [loading, setLoading] = useState(true)
-  const { mutate: sendEvent } = useSendEventMutation()
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
@@ -41,7 +39,6 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            sendEvent({ category: 'account', action: 'sign_in', label: '' })
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return
