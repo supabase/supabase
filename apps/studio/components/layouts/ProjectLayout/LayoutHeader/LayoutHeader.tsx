@@ -87,18 +87,20 @@ const LayoutHeader = ({
       )}
     >
       {showProductMenu && productMenu && (
-        <button
-          title="Menu dropdown button"
-          className={cn(
-            'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
-          )}
-          onClick={() => handleMobileMenu()}
-        >
-          <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-          <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
-        </button>
+        <div className="border-r flex-0 md:hidden h-full aspect-square">
+          <button
+            title="Menu dropdown button"
+            className={cn(
+              'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+            )}
+            onClick={() => handleMobileMenu()}
+          >
+            <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+            <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+          </button>
+        </div>
       )}
-      <div className="flex items-center justify-between py-2 px-3 flex-1 overflow-hidden overflow-x-scroll">
+      <div className="relative flex items-center justify-between py-2 px-1 md:px-3 flex-1 overflow-hidden overflow-x-scroll">
         <div className="flex items-center text-sm">
           {projectRef && (
             <>
@@ -143,6 +145,8 @@ const LayoutHeader = ({
             </>
           )}
         </div>
+        <div className="absolute md:hidden left-0 h-full aspect-square bg-gradient-to-r from-background to-transparent pointer-events-none" />
+        <div className="absolute md:hidden right-0 h-full aspect-square bg-gradient-to-l from-background to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
         <div className="border-l flex-0 h-full">

@@ -3,7 +3,7 @@ import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
-import { useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -45,6 +45,7 @@ const TableEditorMenu = () => {
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint('md')
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -169,7 +170,7 @@ const TableEditorMenu = () => {
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
-              autoFocus
+              autoFocus={!isMobile}
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
