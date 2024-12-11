@@ -13098,6 +13098,7 @@ export interface operations {
         limit?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
+        name?: string
       }
       path: {
         /** @description Content folder id */

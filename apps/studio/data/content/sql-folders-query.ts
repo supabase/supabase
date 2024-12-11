@@ -33,7 +33,7 @@ export async function getSQLSnippetFolders(
     const { data, error } = await get('/platform/projects/{ref}/content/folders/{id}', {
       params: {
         path: { ref: projectRef, id: folderId },
-        query: { cursor, limit: '3', sort_by: sort, sort_order: sortOrder },
+        query: { cursor, limit: '3', sort_by: sort, sort_order: sortOrder, name },
       },
       signal,
     })
@@ -47,7 +47,15 @@ export async function getSQLSnippetFolders(
     const { data, error } = await get('/platform/projects/{ref}/content/folders', {
       params: {
         path: { ref: projectRef },
-        query: { type: 'sql', cursor, limit: '3', sort_by: sort, sort_order: sortOrder, name },
+        query: {
+          type: 'sql',
+          cursor,
+          limit: '3',
+          sort_by: sort,
+          sort_order: sortOrder,
+          name,
+          visibility: 'user',
+        },
       },
       signal,
     })

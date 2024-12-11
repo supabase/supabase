@@ -131,6 +131,8 @@ export const SQLEditorTreeViewItem = ({
         parentId,
         filter: [paginationFilter, sort, name].filter(Boolean).join(':'),
       }),
+      name,
+      sort,
     }).finally(() => {
       setIsFetchingNextPage(false)
     })

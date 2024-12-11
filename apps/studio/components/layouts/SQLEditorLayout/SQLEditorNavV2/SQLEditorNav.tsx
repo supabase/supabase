@@ -77,6 +77,10 @@ export const SQLEditorNav = ({
   const [selectedSnippetToDownload, setSelectedSnippetToDownload] = useState<Snippet>()
   const [selectedFolderToDelete, setSelectedFolderToDelete] = useState<SnippetFolder>()
 
+  useEffect(() => {
+    snapV2.setOrder(sort)
+  }, [sort])
+
   // =======================================================
   // [Joshen] Set up favorites, shared, and private snippets
   // =======================================================
