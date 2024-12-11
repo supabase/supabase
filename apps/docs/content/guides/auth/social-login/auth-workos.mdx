@@ -1,47 +1,44 @@
 ---
-id: 'auth-workos'
 title: 'SSO and Social Login with WorkOS'
-description: 'Add WorkOS AuthKit to your Supabase project'
 ---
 
-## Using WorkOS as a provider via Supabase auth 
+## Use Social Login with WorkOS
 
 ### Step 1. Create a WorkOS organization
 
-Log in to the WorkOS dashboard and visit the Organizations tab to create an organization
+Log in to the WorkOS dashboard and visit the Organizations tab to create an organization.
 ![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
 
-Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create)
+Alternatively, you can [create an organization via the WorkOS API](https://workos.com/docs/reference/organization/create).
 
 ## Step 2. Obtain your `Client ID` and `WORKOS_API_KEY` values
 
 ![Get your Environment's Client ID and Secret](/docs/img/guides/auth-workos/workos-dashboard-get-client-id-and-key.png)
 
-Visit the getting started page of the WorkOS dashboard, at [https://dashboard.workos.com/get-started](https://dashboard.workos.com/get-started), to obtain the following values from the Quickstart panel:
-* `WORKOS_CLIENT_ID`
-* `WORKOS_API_KEY`
+Visit the getting started page of the [WorkOS Dashboard](https://dashboard.workos.com/get-started). Copy the following values from the Quickstart panel:
 
-**Note**: You must be signed in to see these values.
+- `WORKOS_CLIENT_ID`
+- `WORKOS_API_KEY`
+
+<Admonition type="tip">
+
+You must be signed in to see these values.
+
+</Admonition>
 
 ## Step 3. Add your WorkOS credentials to your Supabase project
 
 ![Enter your WorkOS application details in your Supabase app's auth provider settings panel](/docs/img/guides/auth-workos/supabase-workos-configuration.png)
 
-1. Go to your Supabase Project Dashboard
-1. In the left sidebar, click the Authentication icon (near the top)
-1. Click on Providers under the Configuration section
-1. Click on WorkOS from the accordion list to expand
-1. Toggle the `WorkOS Enabled` switch to ON
-1. Enter `https://api.workos.com` in the WorkOS URL field
-1. Enter your WorkOS Client ID and WorkOS Client Secret saved in the previous step
-1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy
-1. Click Save
-
-**Note:** In order to successfully test locally, you must add the localhost equivalent redirect for your app. For example: 
-
-`http://localhost:3000/auth/v1/callback`
-
-Ensure this redirect URL exactly matches the route exposed by your application code.
+1. Go to your Supabase Project Dashboard.
+1. In the left sidebar, click the Authentication icon (near the top).
+1. Click on Providers under the Configuration section.
+1. Click on WorkOS from the accordion list to expand.
+1. Toggle the `WorkOS Enabled` switch to ON.
+1. Enter `https://api.workos.com` in the WorkOS URL field.
+1. Enter your WorkOS Client ID and WorkOS Client Secret saved in the previous step.
+1. Copy the `Callback URL (for OAuth)` value from the form and save it somewhere handy.
+1. Click Save.
 
 ## Step 4. Set your Supabase redirect URI in the WorkOS Dashboard
 
@@ -51,30 +48,35 @@ On the redirects page, enter your Supabase project's `Callback URL (for OAuth)` 
 
 ![Set your Supbase project redirect URL in the WorkOS dashboard](/docs/img/guides/auth-workos/workos-set-supabase-redirect.png)
 
-## Step 5. Add login code to your client app 
+## Step 5. Add login code to your client app
 
-When a user signs in, call signInWithOAuth with workos as the provider. 
+When a user signs in, call signInWithOAuth with `workos` as the provider.
 
 ```javascript
 async function signInWithWorkOS() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'workos',
     options: {
-      redirectTo: 'http://example.com/auth/v1/callback',
+      redirectTo: 'http://example.com/auth/v1/callback', // Make sure your redirect URL is configured in the Supabase Dashboard Auth settings
       queryParams: {
-        connection: '<connection_id>', 
+        connection: '<connection_id>',
       },
     },
-  });
+  })
 
   if (data.url) {
     redirect(data.url) // use the redirect API for your server or framework
-  } 
+  }
 }
 ```
-**Note**: In the above code, you can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
 
-Within your specified callback URL, you'll exchange the code for a logged in user profile: 
+<Admonition type="tip">
+
+You can find your `connection_id` in the WorkOS dashboard under the Organizations tab. Select your organization and then click View connection.
+
+</Admonition>
+
+Within your specified callback URL, you'll exchange the code for a logged-in user profile:
 
 ```javascript auth/v1/callback/route.ts
 import { NextResponse } from 'next/server'
