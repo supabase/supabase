@@ -19,6 +19,7 @@ export function EmailRateLimitsAlert() {
       <AlertDescription_Shadcn_>
         You're using the built-in email service. The service has rate limits and it's not meant to
         be used for production apps. Check the{' '}
+        {/* [Refactor] Swap for InlineLink component once https://github.com/supabase/supabase/pull/30494 is in */}
         <a
           href="https://supabase.com/docs/guides/platform/going-into-prod#auth-rate-limits"
           className="underline"
