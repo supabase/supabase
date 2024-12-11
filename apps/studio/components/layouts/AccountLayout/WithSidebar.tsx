@@ -35,7 +35,7 @@ const WithSidebar = ({
 
   const handleMobileMenu = () => {
     setSheetContent(
-      <div className="w-full h-full flex flex-col py-2">
+      <div className="w-full h-full flex flex-col pt-2 pb-6">
         <SidebarContent
           title={title}
           header={header}

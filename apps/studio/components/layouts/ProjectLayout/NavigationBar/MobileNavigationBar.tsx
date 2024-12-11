@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Search, Menu } from 'lucide-react'
 
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { buttonVariants, cn } from 'ui'
-import { Search, Menu } from 'lucide-react'
-import { CommandMenuTrigger } from 'ui-patterns'
 import { useSheet } from 'ui-patterns/Sheet'
+
+import { buttonVariants, cn } from 'ui'
+import { CommandMenuTrigger } from 'ui-patterns'
 import { NavContent } from './NavigationBar'
 
 export const ICON_SIZE = 20
@@ -28,7 +29,7 @@ const MobileNavigationBar = () => {
 
   const handleMobileMenu = () => {
     setSheetContent(
-      <div data-state={'expanded'} className="w-full h-full flex flex-col py-2">
+      <div data-state={'expanded'} className="w-full h-full flex flex-col pt-2 pb-6">
         <NavContent />
       </div>
     )

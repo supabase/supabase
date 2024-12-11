@@ -4,24 +4,14 @@ import { useRouter } from 'next/compat/router'
 import React, { useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { cn, CommandEmpty_Shadcn_, Dialog, DialogContent, DialogHeader } from 'ui'
+import { cn, CommandEmpty_Shadcn_, Dialog, DialogContent } from 'ui'
 import SheetContext from './SheetContext'
-import useDragToClose from 'common/hooks/useDragToClose'
 
 const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [sheetContent, setSheetContent] = useState<React.ReactNode>(null)
   const { width } = useWindowSize()
-  const {
-    ref: contentRef,
-    handleTouchStart,
-    handleTouchMove,
-    handleTouchEnd,
-  } = useDragToClose({
-    onClose: () => setIsOpen(false),
-  })
-
   const openSheet = () => setIsOpen(true)
   const closeSheet = () => setIsOpen(false)
 
@@ -38,13 +28,9 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
-          ref={contentRef}
           id="command-menu-dialog-content"
           hideClose
           forceMount
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
           onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={() => setIsOpen(false)}
           size="large"

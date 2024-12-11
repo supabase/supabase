@@ -23,6 +23,7 @@ import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
 import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
+import MobileViewNav from './NavigationBar/MobileViewNav'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -34,7 +35,6 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { useSheet } from 'ui-patterns/Sheet'
-import MobileViewNav from './NavigationBar/MobileViewNav'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -131,7 +131,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     }, [open])
 
     const handleMobileMenu = () => {
-      setSheetContent(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
+      setSheetContent(<div className="w-full h-full flex flex-col pt-2 pb-6">{productMenu}</div>)
       openSheet()
     }
 
