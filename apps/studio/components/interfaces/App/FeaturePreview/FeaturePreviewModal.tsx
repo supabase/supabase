@@ -12,16 +12,20 @@ import { getTabsStore, removePreviewTab, removeTabsByEditor } from 'state/tabs'
 import { useParams } from 'common'
 
 const FeaturePreviewModal = () => {
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
+
   const snap = useAppStateSnapshot()
   const { ref } = useParams()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+
   const isNotReleased =
     selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
@@ -60,6 +64,17 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
+  function isReleased(feature) {
+    switch (feature.key) {
+      case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
+        return enableFunctionsAssistant
+      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+        return isFeaturePreviewTabsTableEditorFlag
+      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+        return isFeaturePreviewTabsSqlEditorFlag
+    }
+  }
+
   return (
     <Modal
       hideFooter
@@ -74,7 +89,16 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.map((feature) => {
+              {FEATURE_PREVIEWS.filter((feature) => {
+                // const isTableEditor = feature.key === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS
+                // const isSqlEditor = feature.key === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS
+
+                // return (
+                //   (isTableEditor && isFeaturePreviewTabsTableEditorFlag) ||
+                //   (isSqlEditor && isFeaturePreviewTabsSqlEditorFlag)
+                // )
+                return true
+              }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
                 return (
@@ -113,7 +137,9 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                {isNotReleased ? (
+                {true ? (
+                  // isReleased(selectedFeature?.key)
+
                   <Button disabled type="default">
                     Coming soon
                   </Button>
