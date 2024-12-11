@@ -40,7 +40,7 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
             )}
           >
             {hideTabs && <CollapseButton hideTabs={hideTabs} />}
-            {!hideTabs && <ExplorerTabs storeKey="explorer" />}
+            {!hideTabs && <ExplorerTabs />}
           </div>
         ) : null}
         <div className="h-full">{children}</div>

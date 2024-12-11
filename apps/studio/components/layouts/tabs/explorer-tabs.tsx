@@ -3,9 +3,8 @@ import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dn
 import { CSS } from '@dnd-kit/utilities'
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
-import { TabIcon } from 'components/tabs/TabIcon'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Plus, X } from 'lucide-react'
+import { CirclePlus, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import {
@@ -97,7 +96,6 @@ const SortableTab = ({
         )}
         {...listeners}
       >
-        {/* <TabIcon type={tab.type} /> */}
         <EntityTypeIcon type={tab.type} />
         <div className="flex items-center gap-0">
           <AnimatePresence mode="popLayout" initial>
@@ -224,7 +222,7 @@ export function ExplorerTabs({ onClose }: TabsProps) {
                 'hover:bg-surface-300 dark:hover:bg-surface-100'
               )}
             >
-              <TabIcon type={'new'} />
+              <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
               <div className="flex items-center gap-0">
                 <span>New</span>
               </div>

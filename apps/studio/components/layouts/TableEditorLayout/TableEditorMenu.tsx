@@ -40,7 +40,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { TableMenuEmptyState } from '../explorer/TableMenuEmptyState'
+import { TableMenuEmptyState } from './TableMenuEmptyState'
 import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 
 const TableEditorMenu = () => {

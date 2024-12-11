@@ -40,15 +40,6 @@ export function NewTab() {
       isBeta: false,
       onClick: handleNewQuery,
     },
-
-    {
-      icon: <Upload className="h-4 w-4 text-foreground" strokeWidth={1.5} />,
-      title: 'Upload CSV',
-      description: 'Import data from CSV files',
-      bgColor: 'bg-green-500',
-      isBeta: false,
-      onClick: handleNewQuery,
-    },
   ]
 
   const sqlEditorActions = [
@@ -60,28 +51,6 @@ export function NewTab() {
       isBeta: false,
       onClick: handleNewQuery,
     },
-    {
-      icon: (
-        <div className="relative">
-          <SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />
-          <div className="absolute -right-3 -top-4 bg-surface-300 border w-5 h-5 flex items-center justify-center rounded-full">
-            <BarChart2 className="h-3 w-3 text-foreground-light" strokeWidth={3} />
-          </div>
-        </div>
-      ),
-      title: 'New SQL Snippet Chart',
-      description: 'Create data visualizations',
-      bgColor: 'bg-green-500',
-      onClick: handleNewQuery,
-      // isBeta: true,
-    },
-    // {
-    //   icon: <BarChart2 className="h-4 w-4 text-foreground" strokeWidth={2} />,
-    //   title: 'New Report',
-    //   description: 'Create data visualizations',
-    //   bgColor: 'bg-orange-500',
-    //   isBeta: true,
-    // },
   ]
 
   const actions = editor === 'sql' ? sqlEditorActions : tableEditorActions
@@ -89,7 +58,7 @@ export function NewTab() {
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
       <div className="mx-auto max-w-2xl flex flex-col gap-10">
-        <div className="flex flex-wrap gap-5">
+        <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />
           ))}
