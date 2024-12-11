@@ -17,7 +17,7 @@ const MobileNavigationBar = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
-  const { openSheet, setMenu } = useSheet()
+  const { openSheet, setSheetContent } = useSheet()
 
   const onCloseNavigationIconLink = (event: any) => {
     snap.setNavigationPanelOpen(
@@ -27,7 +27,7 @@ const MobileNavigationBar = () => {
   }
 
   const handleMobileMenu = () => {
-    setMenu(
+    setSheetContent(
       <div data-state={'expanded'} className="w-full h-full flex flex-col py-2">
         <NavContent />
       </div>

@@ -11,7 +11,7 @@ import useDragToClose from 'common/hooks/useDragToClose'
 const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
-  const [menu, setMenu] = useState<React.ReactNode>(null)
+  const [sheetContent, setSheetContent] = useState<React.ReactNode>(null)
   const { width } = useWindowSize()
   const {
     ref: contentRef,
@@ -34,7 +34,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, [width])
 
   return (
-    <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, setMenu }}>
+    <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, setSheetContent }}>
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
@@ -42,6 +42,9 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           id="command-menu-dialog-content"
           hideClose
           forceMount
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
           onOpenAutoFocus={(e) => e.preventDefault()}
           onInteractOutside={() => setIsOpen(false)}
           size="large"
@@ -62,15 +65,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           }}
         >
           <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>
-            <DialogHeader
-              className="pointer-events-auto cursor-grab pb-2 group/sheet-header"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              <span className="w-full h-1 mx-auto max-w-[200px] rounded-full bg-foreground-muted/30 group-hover/sheet-header:bg-foreground-muted/50" />
-            </DialogHeader>
-            {menu}
+            {sheetContent}
           </ErrorBoundary>
         </DialogContent>
       </Dialog>

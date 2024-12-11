@@ -95,7 +95,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const selectedProject = useSelectedProject()
     const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
-    const { openSheet, setMenu } = useSheet()
+    const { openSheet, setSheetContent } = useSheet()
 
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
@@ -131,7 +131,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     }, [open])
 
     const handleMobileMenu = () => {
-      setMenu(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
+      setSheetContent(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
       openSheet()
     }
 

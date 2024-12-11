@@ -31,10 +31,10 @@ const WithSidebar = ({
   customSidebarContent,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const { openSheet, setMenu } = useSheet()
+  const { openSheet, setSheetContent } = useSheet()
 
   const handleMobileMenu = () => {
-    setMenu(
+    setSheetContent(
       <div className="w-full h-full flex flex-col py-2">
         <SidebarContent
           title={title}

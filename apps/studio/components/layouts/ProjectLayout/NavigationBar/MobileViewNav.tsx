@@ -11,10 +11,10 @@ interface Props {
 }
 
 const MobileViewNav = ({ title, productMenu }: PropsWithChildren<Props>) => {
-  const { openSheet, setMenu } = useSheet()
+  const { openSheet, setSheetContent } = useSheet()
 
   const handleMobileMenu = () => {
-    setMenu(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
+    setSheetContent(<div className="w-full h-full flex flex-col py-2">{productMenu}</div>)
     openSheet()
   }
 
