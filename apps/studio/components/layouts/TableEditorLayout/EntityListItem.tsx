@@ -1,31 +1,17 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import saveAs from 'file-saver'
-import {
-  Copy,
-  Download,
-  Edit,
-  Eye,
-  Lock,
-  MoreHorizontal,
-  Table2,
-  Trash,
-  Unlock,
-} from 'lucide-react'
-import Link from 'next/link'
-import Papa from 'papaparse'
-import { toast } from 'sonner'
-
 import { IS_PLATFORM } from 'common'
 import {
   MAX_EXPORT_ROW_COUNT,
   MAX_EXPORT_ROW_COUNT_MESSAGE,
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-types-infinite-query'
@@ -34,8 +20,15 @@ import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
 import { getTableEditor } from 'data/table-editor/table-editor-query'
 import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import saveAs from 'file-saver'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import Link from 'next/link'
+import Papa from 'papaparse'
+import { toast } from 'sonner'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { createTabId, getTabsStore, makeTabPermanent } from 'state/tabs'
 import {
   cn,
   DropdownMenu,
@@ -48,12 +41,8 @@ import {
   DropdownMenuTrigger,
   TreeViewItemVariant,
 } from 'ui'
-import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { getTabsStore, createTabId, makeTabPermanent } from 'state/tabs'
 import { useSnapshot } from 'valtio'
-import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 
 export interface EntityListItemProps {
   id: number | string

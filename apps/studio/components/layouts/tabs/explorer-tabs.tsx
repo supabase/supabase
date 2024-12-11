@@ -1,9 +1,10 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { TabIcon } from 'components/explorer/tabs/TabIcon'
+import { useParams } from 'common'
+import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
+import { TabIcon } from 'components/tabs/TabIcon'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useFlag } from 'hooks/ui/useFlag'
 import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -20,11 +21,8 @@ import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { CollapseButton } from './collapse-button'
 import { sidebarState } from './sidebar-state'
-import { useParams } from 'common'
-import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
 
 interface TabsProps {
-  storeKey: string
   onClose?: (id: string) => void
 }
 
@@ -41,13 +39,11 @@ const SortableTab = ({
   index,
   openTabs,
   onClose,
-  storeKey,
 }: {
   tab: Tab
   index: number
   openTabs: Tab[]
   onClose: (id: string) => void
-  storeKey: string
 }) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -141,7 +137,7 @@ const SortableTab = ({
   )
 }
 
-export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
+export function ExplorerTabs({ onClose }: TabsProps) {
   const { ref } = useParams()
   const editor = useEditorType()
   const router = useRouter()
@@ -210,7 +206,6 @@ export function ExplorerTabs({ storeKey, onClose }: TabsProps) {
                 index={index}
                 openTabs={openTabs}
                 onClose={() => handleClose(tab.id)}
-                storeKey={storeKey}
               />
             ))}
           </SortableContext>

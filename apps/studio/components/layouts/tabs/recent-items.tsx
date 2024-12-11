@@ -1,4 +1,4 @@
-import { EntityTypeIcon } from 'components/explorer/entity-type-icon'
+import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'

@@ -1,15 +1,14 @@
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useAppStateSnapshot } from 'state/app-state'
+import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
-import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { getTabsStore, removePreviewTab, removeTabsByEditor } from 'state/tabs'
-import { useParams } from 'common'
 
 const FeaturePreviewModal = () => {
   const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
@@ -49,8 +48,6 @@ const FeaturePreviewModal = () => {
       label: selectedFeatureKey,
     })
 
-    // handle Tabs preview
-    removePreviewTab(ref as string | undefined)
     if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
       removeTabsByEditor(ref as string | undefined, 'table')
     }
@@ -64,16 +61,16 @@ const FeaturePreviewModal = () => {
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
 
-  function isReleased(feature) {
-    switch (feature.key) {
-      case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
-        return enableFunctionsAssistant
-      case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
-        return isFeaturePreviewTabsTableEditorFlag
-      case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
-        return isFeaturePreviewTabsSqlEditorFlag
-    }
-  }
+  // function isReleased(feature) {
+  //   switch (feature.key) {
+  //     case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
+  //       return enableFunctionsAssistant
+  //     case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+  //       return isFeaturePreviewTabsTableEditorFlag
+  //     case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+  //       return isFeaturePreviewTabsSqlEditorFlag
+  //   }
+  // }
 
   return (
     <Modal
@@ -137,9 +134,7 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                {true ? (
-                  // isReleased(selectedFeature?.key)
-
+                {isNotReleased ? (
                   <Button disabled type="default">
                     Coming soon
                   </Button>

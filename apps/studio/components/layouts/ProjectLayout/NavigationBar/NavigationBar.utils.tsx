@@ -1,5 +1,3 @@
-import { Blocks, FileText, Lightbulb, List, PackageSearch, Settings, Table2 } from 'lucide-react'
-
 import type { Route } from 'components/ui/ui.types'
 import { EditorIndexPageLink } from 'data/prefetchers/project.$ref.editor'
 import type { Project } from 'data/projects/project-detail-query'
@@ -14,43 +12,29 @@ import {
   TableEditor,
 } from 'icons'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { useFlag } from 'hooks/ui/useFlag'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
-  const projectExplorer = useFlag('projectExplorer')
-
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}`
 
   return [
-    ...(projectExplorer
-      ? [
-          {
-            key: 'explorer',
-            label: 'Explorer',
-            icon: <PackageSearch size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
-            linkElement: <EditorIndexPageLink projectRef={ref} />,
-          },
-        ]
-      : [
-          {
-            key: 'editor',
-            label: 'Table Editor',
-            icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
-            linkElement: <EditorIndexPageLink projectRef={ref} />,
-          },
-          {
-            key: 'sql',
-            label: 'SQL Editor',
-            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: !IS_PLATFORM
-              ? `/project/${ref}/sql/1`
-              : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
-          },
-        ]),
+    {
+      key: 'editor',
+      label: 'Table Editor',
+      icon: <TableEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/editor`),
+      linkElement: <EditorIndexPageLink projectRef={ref} />,
+    },
+    {
+      key: 'sql',
+      label: 'SQL Editor',
+      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: !IS_PLATFORM
+        ? `/project/${ref}/sql/1`
+        : ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+    },
   ]
 }
 export const generateProductRoutes = (

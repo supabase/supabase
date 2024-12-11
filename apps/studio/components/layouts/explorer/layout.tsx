@@ -77,7 +77,7 @@ export const ExplorerLayout = ({ children }: ExplorerLayoutProps) => {
           )}
         >
           {hideTabs && <CollapseButton hideTabs={hideTabs} />}
-          {!hideTabs && <ExplorerTabs storeKey="explorer" />}
+          {!hideTabs && <ExplorerTabs />}
         </div>
         <div className="h-full">{children}</div>
       </div>
