@@ -84,9 +84,10 @@ test.describe('Table Editor page', () => {
       .filter({ hasText: /^Table Editor$/ })
       .first()
       .evaluate((el) => {
-        el.style.position = 'relative'
+        el.style.position = 'relative !important'
         el.style.left = '0'
         el.style.top = '0'
+        el.style.opacity = '1'
       })
     // click away to close the sorting dialog
     await page
