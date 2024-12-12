@@ -50,7 +50,10 @@ const WithSidebar = ({
   }
 
   return (
-    <div className="flex flex-col md:flex-row h-full">
+    /**
+     * id used in playwright-tests/tests/snapshot/spec/table-editor.spec.ts
+     * */
+    <div id="spec-bg-target" className="flex flex-col md:flex-row h-full">
       {!hideSidebar && !noContent && (
         <SidebarContent
           title={title}
@@ -95,11 +98,7 @@ export const SidebarContent = ({
         )}
       >
         {title && (
-          /**
-           * hide element offscreen from user on mobile but keep for test
-           * playwright-tests/tests/snapshot/spec/table-editor.spec.ts
-           * */
-          <div className="absolute -left-[9999px] -top-[9999px] md:left-auto md:top-auto md:relative block mb-2">
+          <div className="block mb-2">
             <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
               <h4 className="mb-0 text-lg truncate" title={title}>
                 {title}
