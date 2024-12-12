@@ -6,7 +6,6 @@ import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
-import { ResponseError } from 'types'
 
 const isObjectEmpty = (objectName: Object) => {
   return Object.keys(objectName).length === 0
@@ -47,6 +46,9 @@ export function usePHFlag<T = string | boolean>(name: string) {
 
   if (trackedValue !== flagValue) {
     try {
+      // [Joshen] Only fire the track endpoint once across sessions unless the flag value changes
+      // Note: This cannot guarantee excess calls in the event for e.g user clears local storage or uses incognito
+      // trackFeatureFlag checks for telemetry consent before actually firing the request too
       trackFeatureFlag({ feature_flag_name: name, feature_flag_value: flagValue })
       setTrackedValue(flagValue as string)
     } catch (error: any) {
