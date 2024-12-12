@@ -1,10 +1,12 @@
 import { useContext } from 'react'
+import * as Sentry from '@sentry/nextjs'
 
 import FlagContext from 'components/ui/Flag/FlagContext'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { trackFeatureFlag } from 'data/telemetry/track-feature-flag-mutation'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { trackFeatureFlag } from 'lib/posthog'
+import { ResponseError } from 'types'
 
 const isObjectEmpty = (objectName: Object) => {
   return Object.keys(objectName).length === 0
@@ -44,8 +46,16 @@ export function usePHFlag<T = string | boolean>(name: string) {
   }
 
   if (trackedValue !== flagValue) {
-    trackFeatureFlag({ feature_flag_name: name, feature_flag_value: flagValue })
-    setTrackedValue(flagValue as string)
+    try {
+      trackFeatureFlag({ feature_flag_name: name, feature_flag_value: flagValue })
+      setTrackedValue(flagValue as string)
+    } catch (error: any) {
+      Sentry.withScope((scope) => {
+        scope.setTag('type', 'phTrackFailure')
+        Sentry.captureException(error)
+      })
+      console.error(error.message)
+    }
   }
 
   return flagValue as T
