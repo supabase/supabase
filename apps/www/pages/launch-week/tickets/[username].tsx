@@ -135,16 +135,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )
 
-  const SITE_URL = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : 'http://localhost:3000'
-
   // fetch the normal ticket
   // stores the og images in supabase storage
-  fetch(
-    // @ts-ignore
-    `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`
-  )
+  fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}`)
 
   // fetch a specific user
   if (username) {
@@ -161,12 +154,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch the platinum ticket
   // stores the og images in supabase storage
   if (user?.secret) {
-    fetch(`${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
+    fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&secret=true`)
   } else if (user?.platinum) {
     // fetch /api-v2/ticket-og
-    fetch(
-      `${SITE_URL}/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`
-    )
+    fetch(`/api-v2/ticket-og?username=${encodeURIComponent(username ?? '')}&platinum=true`)
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'

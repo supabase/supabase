@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { BASE_PATH } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 import { passwordSchema } from 'lib/schemas'
 import {
   AlertDescription_Shadcn_,
@@ -51,11 +51,7 @@ const SignUpForm = () => {
       email,
       password,
       hcaptchaToken: token ?? null,
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/sign-in`,
+      redirectTo: `${getURL()}/sign-in`,
     })
   }
 

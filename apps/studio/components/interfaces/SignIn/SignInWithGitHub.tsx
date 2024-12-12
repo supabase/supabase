@@ -3,10 +3,10 @@ import { Github } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { BASE_PATH } from 'lib/constants'
-import { auth, buildPathWithParams } from 'lib/gotrue'
-import { Button } from 'ui'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { getURL } from 'lib/helpers'
+import { Button } from 'ui'
 import { LastSignInWrapper } from './LastSignInWrapper'
 
 const SignInWithGitHub = () => {
@@ -17,13 +17,7 @@ const SignInWithGitHub = () => {
 
     try {
       // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
-      const redirectTo = buildPathWithParams(
-        `${
-          process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-            ? location.origin
-            : process.env.NEXT_PUBLIC_SITE_URL
-        }${BASE_PATH}/sign-in-mfa`
-      )
+      const redirectTo = buildPathWithParams(`${getURL()}/sign-in-mfa`)
 
       const { error } = await auth.signInWithOAuth({
         provider: 'github',

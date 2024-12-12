@@ -1,11 +1,11 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { getURL } from 'lib/helpers'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
-import { BASE_PATH } from 'lib/constants'
 import { Button, Form, Input } from 'ui'
 
 const forgotPasswordSchema = object({
@@ -41,11 +41,7 @@ const ForgotPasswordForm = () => {
     resetPassword({
       email,
       hcaptchaToken: token,
-      redirectTo: `${
-        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
-          ? location.origin
-          : process.env.NEXT_PUBLIC_SITE_URL
-      }${BASE_PATH}/reset-password`,
+      redirectTo: `${getURL()}/reset-password`,
     })
   }
 
