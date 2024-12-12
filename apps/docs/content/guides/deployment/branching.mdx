@@ -29,13 +29,56 @@ You can run multiple Preview Branches for every Supabase project. Branches conta
   }}
 />
 
+Branching uses the `config.toml` file in your `supabase` directory to prepare and deploy the different services to each branch. These are:
+
+1. Database - Using the `migrations` directory for schema changes and `[db.seed]` block to declare the `sql_paths` for seeding data.
+2. Auth - The `auth` section of the `config.toml` file is used to sync your project config with the Branch
+3. Storage - Buckets defined in the `storage` section of the `config.toml` are created upon deployment of a new Branch and are seeded with files within the directory defined in the `objects_path` property
+4. Edge Functions - Functions are declared in `[functions.my-slug]` block with `entrypoint_path` specifying the location of `index.ts` or `index.js` file to your Edge Function.
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="auth" queryGroup="platform">
+  <TabPanel id="api" label="API Config Example">
+    ```toml
+    [api]
+    enabled = true
+    schemas = ["public","graphql_public","storage"]
+    ```
+  </TabPanel>
+  <TabPanel id="auth" label="Auth Config Example">
+    ```toml
+    [auth.external.github]
+    enabled = true
+    client_id = "env(GITHUB_CLIENT_ID)"
+    secret = "env(GITHUB_SECRET)"
+    redirect_uri = "" # Overrides the default auth redirectUrl.
+    ```
+  </TabPanel>
+  <TabPanel id="storage" label="Storage Config Example">
+    ```toml
+    [storage]
+    file_size_limit = "50MiB"
+
+    [storage.buckets.avatars]
+    public = false
+    allowed_mime_types = ["image/png", "image/jpeg"]
+    ```
+
+  </TabPanel>
+  <TabPanel id="function" label="Edge Function Config Example">
+    ```toml
+    [functions.hello-world]
+    entrypoint_path="functions/hello-world/index.js"
+    ```
+  </TabPanel>
+</Tabs>
+
 ### Branching workflow
 
 Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
 
 ## Git providers
 
-To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](<(https://github.com/orgs/supabase/discussions/18936)>) for GitLab, BitBucket, and non-Git based Branching.
+To manage code changes, your Supabase project must be connected to a Git repository. At this stage we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
 
 ### Branching with GitHub
 
@@ -95,7 +138,7 @@ When you merge your Git branch into the production branch, all new migrations wi
 
 ### Git providers
 
-We currently support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](<(https://github.com/orgs/supabase/discussions/18936)>) for GitLab, BitBucket, and non-Git based Branching.
+We currently support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
 
 ## How to use Supabase branching
 
@@ -105,83 +148,63 @@ Supabase Branching requires a hosted [Git provider](#git-providers). Follow thes
 
 You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a local `./supabase` directory:
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="existing"
-  queryGroup="platform"
->
-<TabPanel id="existing" label="Existing project">
-
-<StepHikeCompact>
-    <StepHikeCompact.Step step={1}>
+<Tabs scrollable size="small" type="underlined" defaultActiveId="existing" queryGroup="platform">
+  <TabPanel id="existing" label="Existing project">
+    <StepHikeCompact>
+      <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
+          If you don't have a `./supabase` directory, you can create one:
 
-            If you don't have a `./supabase` directory, you can create one:
-
-            <CH.Code lineNumbers={false}>
-
+          <CH.Code lineNumbers={false}>
             ```markdown
             supabase init
             ```
-
-            </CH.Code>
+          </CH.Code>
         </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+      </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={2}>
+      <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Pull your database migration" fullWidth>
+          Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. Make sure **Use connection pooling** is checked so you can use the IPv4-enabled connection pooler. (Without connection pooling, your database is only accessible over IPv6, which isn't yet supported by all network providers.)
 
-            Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. Make sure **Use connection pooling** is checked so you can use the IPv4-enabled connection pooler. (Without connection pooling, your database is only accessible over IPv6, which isn't yet supported by all network providers.)
-
-            <CH.Code lineNumbers={false}>
-
+          <CH.Code lineNumbers={false}>
             ```markdown
             supabase db pull --db-url <db_url>
 
             # Your Database URL looks something like:
             # postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:6543/postgres
             ```
-
-            </CH.Code>
-
+          </CH.Code>
         </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+      </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={3}>
+      <StepHikeCompact.Step step={3}>
         <StepHikeCompact.Details title="Commit the `supabase` directory to Git" fullWidth>
+          Commit the `supabase` directory to Git, and push your changes to your remote repository.
 
-            Commit the `supabase` directory to Git, and push your changes to your remote repository.
-
-            <CH.Code lineNumbers={false}>
-
+          <CH.Code lineNumbers={false}>
             ```bash
             git add supabase
             git commit -m "Initial migration"
             git push
             ```
-
-            </CH.Code>
-
-
+          </CH.Code>
         </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+      </StepHikeCompact.Step>
+    </StepHikeCompact>
 
-</StepHikeCompact>
+  </TabPanel>
 
-</TabPanel>
-<TabPanel id="new" label="New Project">
+  <TabPanel id="new" label="New Project">
+    Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started. Run the following command in your terminal to clone the example:
 
-Use the Next.js example template to try out branching. This template includes sample migration and seed files to get you started. Run the following command in your terminal to clone the example:
+    ```bash
+    npx create-next-app -e with-supabase
+    ```
 
-```bash
-npx create-next-app -e with-supabase
-```
+    Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
 
-Push your new project to a GitHub repo. For more information, see the GitHub guides on [creating](https://docs.github.com/en/get-started/quickstart/create-a-repo) and [pushing code](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository) to a new repository.
-
-</TabPanel>
+  </TabPanel>
 </Tabs>
 
 ### Enable Supabase branching
@@ -189,79 +212,70 @@ Push your new project to a GitHub repo. For more information, see the GitHub gui
 Once your repository is [correctly prepared](#preparing-your-git-repository), you can enable branching from the Supabase dashboard.
 
 <Admonition type="caution" label="Prepare your GitHub repository before enabling Branching">
-
-If your repository doesn't have all the migration files, your production branch could run an incomplete set of migrations. Make sure your [GitHub repository is prepared](#preparing-your-git-repository).
-
+  If your repository doesn't have all the migration files, your production branch could run an
+  incomplete set of migrations. Make sure your [GitHub repository is
+  prepared](#preparing-your-git-repository).
 </Admonition>
 
 <StepHikeCompact>
-    <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Inside your Supabase project, click `Enable branching`" fullWidth>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Inside your Supabase project, click `Enable branching`" fullWidth>
+      If you're prompted to join the waitlist, click `Join waitlist`. We're rolling out Branching to users in batches.
 
-            If you're prompted to join the waitlist, click `Join waitlist`. We're rolling out Branching to users in batches.
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
+      </figure>
+    </StepHikeCompact.Details>
 
-            <figure className="max-w-[520px]">
-            <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
-            </figure>
+  </StepHikeCompact.Step>
 
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Install the GitHub integration" fullWidth>
+      If you have been granted early access, once when clicking `Enable branching` you will see the following dialog:
 
-    <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Install the GitHub integration" fullWidth>
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
+      </figure>
 
-            If you have been granted early access, once when clicking `Enable branching` you will see the following dialog:
+      If you don't have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
 
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
-            </figure>
+      You're taken to the GitHub integration page. Click `Install`.
 
-            If you don't have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-permissions.jpg?v=1" />
+      </figure>
 
-            You're taken to the GitHub integration page. Click `Install`.
+      Follow the instructions to link your Supabase project to its GitHub repository.
 
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-permissions.jpg?v=1" />
-            </figure>
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-integration-link.jpg?v=1" />
+      </figure>
 
-            Follow the instructions to link your Supabase project to its GitHub repository.
+      Return to your project and re-click `Enable branching`.
+    </StepHikeCompact.Details>
 
-            <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-integration-link.jpg?v=1" />
-            </figure>
+  </StepHikeCompact.Step>
 
-            Return to your project and re-click `Enable branching`.
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
+      You should now see a popover with the GitHub Connection details shown.
 
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+      Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
 
-    <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
+      <Admonition type="caution" label="Your production branch can't be changed while branching is enabled.">
+        To change your production branch, you need to disable branching and re-enable it with a different branch.
+      </Admonition>
 
-            You should now see a popover with the GitHub Connection details shown.
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-production-branch.jpg?v=1" />
+      </figure>
+    </StepHikeCompact.Details>
 
-            Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
+  </StepHikeCompact.Step>
 
-            <Admonition type="caution" label="Your production branch can't be changed while branching is enabled.">
-
-            To change your production branch, you need to disable branching and re-enable it with a different branch.
-
-            </Admonition>
-
-            <figure className="max-w-[520px]">
-            <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-production-branch.jpg?v=1" />
-            </figure>
-
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Click `I understand, enable branching`. Branching is now enabled for your project." fullWidth>
-
-
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Click `I understand, enable branching`. Branching is now enabled for your project." fullWidth />
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 ### Create your first preview branch
@@ -269,56 +283,49 @@ If your repository doesn't have all the migration files, your production branch 
 Preview branches are automatically created for each pull request, but you can also manually create one.
 
 <StepHikeCompact>
-    <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create a new Git branch in your GitHub repository" fullWidth>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a new Git branch in your GitHub repository" fullWidth>
+      You need at least one other branch aside from your Supabase production branch.
 
-        You need at least one other branch aside from your Supabase production branch.
+      <figure className="max-w-[520px]">
+        <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-github.jpg?v=1" />
+        <figcaption>You can use the GitHub dashboard or command line to create a new branch. In this example, the new branch is called `feat/add-members`.</figcaption>
+      </figure>
+    </StepHikeCompact.Details>
 
-        <figure className="max-w-[520px]">
-            <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-github.jpg?v=1" />
-            <figcaption>You can use the GitHub dashboard or command line to create a new branch. In this example, the new branch is called `feat/add-members`.</figcaption>
-          </figure>
+  </StepHikeCompact.Step>
 
-        You can use the GitHub dashboard or command line to create a new branch. In this example, the new branch is called `feat/add-members`.
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Navigate to the Branches page in your Supabase dashboard." fullWidth>
+      In the Supabase dashboard, look for the branch dropdown on the right-hand side of the top bar. It should be set to your production branch by default. Open the dropdown and click `Manage branches`.
 
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-    <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Navigate to the Branches page in your Supabase dashboard." fullWidth>
-
-        In the Supabase dashboard, look for the branch dropdown on the right-hand side of the top bar. It should be set to your production branch by default. Open the dropdown and click `Manage branches`.
-
-        <figure className="max-w-[520px]">
+      <figure className="max-w-[520px]">
         <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-branch-dropdown.jpg?v=1" />
-        </figure>
+      </figure>
+    </StepHikeCompact.Details>
 
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
+  </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Create a Supabase preview branch" fullWidth>
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Create a Supabase preview branch" fullWidth>
+      Click `Create preview branch`.
 
-        Click `Create preview branch`.
-
-        <figure className="max-w-[520px]">
+      <figure className="max-w-[520px]">
         <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-branch-action.jpg?v=1" />
-        </figure>
+      </figure>
 
-        Type in the branch name you want to add. Click `Create branch` to confirm.
+      Type in the branch name you want to add. Click `Create branch` to confirm.
 
-        <Admonition type="note" label="Only branches from the repository can be used to create a Preview Branch">
+      <Admonition type="note" label="Only branches from the repository can be used to create a Preview Branch">
+        Git branches from external contributors currently can't support a Preview Branch
+      </Admonition>
 
-            Git branches from external contributors currently can't support a Preview Branch
-
-        </Admonition>
-
-        <figure className="max-w-[520px]">
+      <figure className="max-w-[520px]">
         <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-choose-branch.jpg?v=1" />
-        </figure>
+      </figure>
+    </StepHikeCompact.Details>
 
-        </StepHikeCompact.Details>
-    </StepHikeCompact.Step>
-
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 ### Make changes to your branch
