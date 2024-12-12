@@ -116,6 +116,7 @@ export const SQLEditor = () => {
   const [showPotentialIssuesModal, setShowPotentialIssuesModal] = useState(false)
   const [queryHasDestructiveOperations, setQueryHasDestructiveOperations] = useState(false)
   const [queryHasUpdateWithoutWhere, setQueryHasUpdateWithoutWhere] = useState(false)
+  const [showWidget, setShowWidget] = useState(false)
 
   // generate an id to be used for new snippets. The dependency on urlId is to avoid a bug which
   // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
@@ -626,6 +627,18 @@ export const SQLEditor = () => {
     isCompletionLoading,
   ])
 
+  // We want to check if the diff editor is mounted and if it is, we want to show the widget
+  // We also want to cleanup the widget when the diff editor is closed
+  useEffect(() => {
+    if (!isDiffOpen) {
+      setIsDiffEditorMounted(false)
+      setShowWidget(false)
+    } else if (diffEditorRef.current && isDiffEditorMounted) {
+      setShowWidget(true)
+      return () => setShowWidget(false)
+    }
+  }, [isDiffOpen, isDiffEditorMounted])
+
   return (
     <>
       <RunQueryWarningModal
@@ -685,7 +698,7 @@ export const SQLEditor = () => {
                             lineNumbersMinChars: 3,
                           }}
                         />
-                        {diffEditorRef.current && isDiffEditorMounted && (
+                        {showWidget && (
                           <InlineWidget
                             editor={diffEditorRef.current}
                             id="ask-ai-diff"
