@@ -2,6 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import pgMeta from '@supabase/pg-meta'
 import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
+import { MARKDOWN_SYSTEM_PROMPT } from 'data/ai/constants'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { getTools } from './tools'
@@ -57,8 +58,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const result = await streamText({
     model: openai('gpt-4o-mini'),
     maxSteps: 5,
-    system: `
-      You are a Supabase Postgres expert who can do the following things.
+    system: `${MARKDOWN_SYSTEM_PROMPT}
 
       # You generate and debug SQL
       The generated SQL (must be valid SQL), and must adhere to the following:
@@ -75,11 +75,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - When debugging, retrieve sql schema details to ensure sql is correct
       - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
 
-      When generating tables, do the following:
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - Prefer creating foreign key references in the create statement
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
+    Here are the existing database schema names you can retrieve: ${schemas}
 
       Feel free to suggest corrections for suspected typos.
 

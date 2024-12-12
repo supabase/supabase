@@ -15,7 +15,6 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -57,7 +56,6 @@ export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const NavigationBar = () => {
-  const os = detectOS()
   const router = useRouter()
   const { profile } = useProfile()
   const { project } = useProjectContext()
