@@ -50,10 +50,7 @@ const WithSidebar = ({
   }
 
   return (
-    /**
-     * id used in playwright-tests/tests/snapshot/spec/table-editor.spec.ts
-     * */
-    <div id="spec-bg-target" className="flex flex-col md:flex-row h-full">
+    <div className="flex flex-col md:flex-row h-full">
       {!hideSidebar && !noContent && (
         <SidebarContent
           title={title}

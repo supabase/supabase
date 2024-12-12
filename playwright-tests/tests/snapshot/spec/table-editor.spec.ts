@@ -79,7 +79,7 @@ test.describe('Table Editor page', () => {
     await page.getByRole('button', { name: 'Apply sorting' }).click()
 
     // click away to close the sorting dialog
-    await page.locator('#spec-bg-target').click()
+    await page.locator('#spec-click-target').click()
 
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
@@ -97,7 +97,7 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('Enter a value').fill('2')
     await page.getByRole('button', { name: 'Apply filter' }).click()
     // click away to close the filter dialog
-    await page.locator('#spec-bg-target').click()
+    await page.locator('#spec-click-target').click()
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).not.toContainText('100')
   })
