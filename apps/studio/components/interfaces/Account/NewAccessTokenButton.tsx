@@ -4,7 +4,6 @@ import { useState } from 'react'
 
 import { useAccessTokenCreateMutation } from 'data/access-tokens/access-tokens-create-mutation'
 import {
-  Alert,
   Button,
   DialogFooter,
   DropdownMenu,
@@ -15,6 +14,7 @@ import {
   Input,
   Modal,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
@@ -105,27 +105,30 @@ const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
             <>
               {tokenScope === 'V0' && (
                 <Modal.Content>
-                  <Alert
-                    withIcon
-                    variant="warning"
-                    title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                  >
-                    <p>
-                      These include deleting organizations and projects which cannot be undone. As
-                      such, be very careful when using this API.
-                    </p>
-                    <div className="mt-4">
-                      <Button asChild type="default" icon={<ExternalLink />}>
-                        <Link
-                          href="https://api.supabase.com/api/v0"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Experimental API documentation
-                        </Link>
-                      </Button>
-                    </div>
-                  </Alert>
+                  <Admonition
+                    type="warning"
+                    title="The experimental API provides additional endpoints which allows you to manage
+                      your organizations and projects."
+                    description={
+                      <>
+                        <p>
+                          These include deleting organizations and projects which cannot be undone.
+                          As such, be very careful when using this API.
+                        </p>
+                        <div className="mt-4">
+                          <Button asChild type="default" icon={<ExternalLink />}>
+                            <Link
+                              href="https://api.supabase.com/api/v0"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Experimental API documentation
+                            </Link>
+                          </Button>
+                        </div>
+                      </>
+                    }
+                  />
                 </Modal.Content>
               )}
               <Modal.Content>
