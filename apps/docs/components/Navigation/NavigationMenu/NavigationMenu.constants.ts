@@ -1005,6 +1005,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_stat_monitor',
         },
         {
+          name: 'postgres_fdw: query data from an external Postgres server',
+          url: '/guides/database/extensions/postgres_fdw',
+        },
+        {
           name: 'pgvector: Embeddings and vector similarity',
           url: '/guides/database/extensions/pgvector',
         },
