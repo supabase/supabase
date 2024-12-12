@@ -3,6 +3,12 @@ title: 'Rate limits'
 subtitle: 'Rate limits protect your services from abuse'
 ---
 
-Supabase Auth enforces rate limits on endpoints to prevent abuse. Some rate limits are [customizable](/dashboard/project/_/auth/rate-limits).
+Supabase Auth enforces rate limits on endpoints to prevent abuse. Some rate limits are [customizable](/dashboard/project/_/auth/rate-limits). Note that rate limits continue to apply when:
+- Email confirmations or Phone Confirmations are disabled
+- Send Email or Send SMS Hook is in use.
+
+
+
 
 <AuthRateLimits />
+
