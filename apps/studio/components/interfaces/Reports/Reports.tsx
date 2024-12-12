@@ -34,7 +34,10 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
   const [hasEdits, setHasEdits] = useState<any>(false)
 
-  const { data: userContents, isLoading } = useContentQuery(ref)
+  const { data: userContents, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
   const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
       setHasEdits(false)

@@ -7,7 +7,10 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<components['schemas']['CreateContentBody'], 'content'> & {
+export type InsertContentPayload = Omit<
+  components['schemas']['CreateContentBodyDto'],
+  'content'
+> & {
   content: Content['content']
 }
 
@@ -32,6 +35,7 @@ export async function insertContent(
       type: payload.type,
       visibility: payload.visibility,
       content: payload.content as any,
+      folder_id: payload.folder_id,
     },
     signal,
   })
@@ -58,7 +62,7 @@ export const useContentInsertMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await queryClient.invalidateQueries(contentKeys.list(projectRef))
+        await queryClient.invalidateQueries(contentKeys.allContentLists(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

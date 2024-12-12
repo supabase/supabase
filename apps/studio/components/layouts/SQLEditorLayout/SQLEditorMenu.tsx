@@ -27,6 +27,7 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 
 interface SQLEditorMenuProps {
   onViewOngoingQueries: () => void
@@ -40,6 +41,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [searchText, setSearchText] = useState('')
+  const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -91,8 +93,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
               onChange={(e) => setSearchText(e.target.value)}
             >
               <InnerSideBarFilterSortDropdown
-                value={snapV2.order}
-                onValueChange={(value: any) => snapV2.setOrder(value)}
+                value={sort}
+                onValueChange={(value: any) => setSort(value)}
               >
                 <InnerSideBarFilterSortDropdownItem key="name" value="name">
                   Alphabetical
@@ -141,7 +143,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           </InnerSideMenuItem>
         </div>
 
-        <SQLEditorNavV2 searchText={searchText} />
+        <SQLEditorNavV2 searchText={searchText} sort={sort} />
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

@@ -31,7 +31,10 @@ const ReportsMenu = () => {
     subject: { id: profile?.id },
   })
 
-  const { data: content, isLoading } = useContentQuery(ref)
+  const { data: content, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
   const { mutate: deleteReport, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: () => {
       setDeleteModalOpen(false)
@@ -154,7 +157,7 @@ const ReportsMenu = () => {
               {reportMenuItems.map((item) => (
                 <ReportMenuItem
                   key={item.id}
-                  item={item}
+                  item={item as any}
                   pageKey={pageKey}
                   onSelectEdit={() => {
                     setSelectedReportToUpdate(item.report)

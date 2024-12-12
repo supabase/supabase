@@ -3,15 +3,16 @@ import { toast } from 'sonner'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
+import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { getContentById } from 'data/content/content-id-query'
 import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
 import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
-import { Snippet, SnippetFolder, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import { getContentById } from 'data/content/content-id-query'
-import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
+import { SqlSnippets } from 'types'
+import { useMemo } from 'react'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -20,14 +21,14 @@ export type StateSnippetFolder = {
 }
 
 // [Joshen] API codegen is somehow missing the content property
-export interface SnippetContent extends Snippet {
-  content?: any
+export interface SnippetWithContent extends Snippet {
+  content?: SqlSnippets.Content
 }
 
 export type StateSnippet = {
   projectRef: string
   splitSizes: number[]
-  snippet: SnippetContent
+  snippet: SnippetWithContent
 }
 
 const NEW_FOLDER_ID = 'new-folder'
@@ -43,14 +44,13 @@ export const sqlEditorState = proxy({
   snippets: {} as {
     [snippetId: string]: StateSnippet
   },
-  // We're storing favorites separately as they need to be a flat list and hence
-  // cannot be derived from snippets as folder contents are loaded on demand
-  favoriteSnippets: {} as {
-    [snippetId: string]: {
-      projectRef: string
-      snippet: SqlSnippet
+
+  snippetOrdering: {} as {
+    [projectRef: string]: {
+      [key: string]: string[]
     }
   },
+
   // Query results, if any, for a snippet
   results: {} as {
     [snippetId: string]: {
@@ -59,12 +59,16 @@ export const sqlEditorState = proxy({
       autoLimit?: number
     }[]
   },
-  // Project ref as the key, marks which project already has snippets loaded
-  loaded: {} as {
-    [projectRef: string]: boolean
+  // Cursors for pagination
+  cursors: {} as {
+    [projectRefAndParentId: string]: string | undefined
   },
-  privateSnippetCount: {} as {
-    [projectRef: string]: number
+  snippetCounts: {} as {
+    [projectRef: string]: {
+      private: number
+      shared: number
+      favorited: number
+    }
   },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
@@ -88,41 +92,45 @@ export const sqlEditorState = proxy({
   // ## Methods to interact the store with
   // ========================================================================
 
-  // Initial loading of data into UI, only called once when first loading data
-  // Note that snippets here do not have the content property, and will need to be
-  // further loaded on demand instead. Entry point from SQLEditorNav.tsx
-  initializeRemoteSnippets: ({
+  getCursor: ({
     projectRef,
-    data,
-    sort,
+    parentId,
+    filter,
   }: {
     projectRef: string
-    data: SnippetFolderResponse
-    sort: 'name' | 'inserted_at'
+    parentId?: string
+    filter?: string
   }) => {
-    const { folders, contents } = data
-    folders?.forEach((folder) => {
-      sqlEditorState.folders[folder.id] = { projectRef, folder }
-    })
-    contents?.forEach((snippet) => {
-      sqlEditorState.addSnippet({ projectRef, snippet })
-    })
-    sqlEditorState.loaded[projectRef] = true
-    sqlEditorState.order = sort
+    return sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`]
   },
 
-  initializeFavoriteSnippets: ({
+  setCursor: ({
     projectRef,
-    snippets,
+    parentId,
+    cursor,
+    filter,
   }: {
     projectRef: string
-    snippets: SqlSnippet[]
+    parentId?: string
+    cursor?: string
+    filter?: string
   }) => {
-    snippets.forEach((snippet) => {
-      if (snippet.id && sqlEditorState.favoriteSnippets[snippet.id]?.snippet === undefined) {
-        sqlEditorState.favoriteSnippets[snippet.id] = { projectRef, snippet }
-      }
-    })
+    sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`] = cursor
+  },
+
+  hasNextPage: ({
+    projectRef,
+    parentId,
+    filter,
+  }: {
+    projectRef: string
+    parentId?: string
+    filter?: string
+  }) => {
+    return (
+      sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`] !==
+      undefined
+    )
   },
 
   setDiffContent: (sql: string, diffType: DiffType) =>
@@ -130,16 +138,53 @@ export const sqlEditorState = proxy({
 
   setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
 
-  setPrivateSnippetCount: ({ projectRef, value }: { projectRef: string; value: number }) => {
-    sqlEditorState.privateSnippetCount[projectRef] = value
+  setSnippetCount: ({
+    projectRef,
+    key,
+    value,
+  }: {
+    projectRef: string
+    key: 'private' | 'shared' | 'favorited'
+    value: number
+  }) => {
+    if (!sqlEditorState.snippetCounts[projectRef]) {
+      sqlEditorState.snippetCounts[projectRef] = { private: 0, shared: 0, favorited: 0 }
+    }
+
+    sqlEditorState.snippetCounts[projectRef][key] = value
   },
 
-  addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: Snippet }) => {
-    if (snippet.id && sqlEditorState.snippets[snippet.id]?.snippet?.content === undefined) {
-      sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
-      sqlEditorState.results[snippet.id] = []
-      sqlEditorState.savingStates[snippet.id] = 'IDLE'
+  addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: SnippetWithContent }) => {
+    if (sqlEditorState.snippets[snippet.id]) return
+
+    sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
+    sqlEditorState.results[snippet.id] = []
+    sqlEditorState.savingStates[snippet.id] = 'IDLE'
+  },
+
+  addSnippets: ({
+    projectRef,
+    snippets,
+    key,
+  }: {
+    projectRef: string
+    snippets: SnippetWithContent[]
+    key: string
+  }) => {
+    snippets.forEach((snippet) => {
+      sqlEditorState.addSnippet({ projectRef, snippet })
+    })
+
+    if (!sqlEditorState.snippetOrdering[projectRef]) {
+      sqlEditorState.snippetOrdering[projectRef] = {}
     }
+
+    const previousSnippetIds = sqlEditorState.snippetOrdering[projectRef][key] ?? []
+
+    // ensure if a snippet has been renamed it won't appear twice
+    sqlEditorState.snippetOrdering[projectRef][key] = Array.from(
+      new Set([...previousSnippetIds, ...snippets.map((x) => x.id)])
+    )
   },
 
   updateSnippet: ({
@@ -160,9 +205,22 @@ export const sqlEditorState = proxy({
     }
   },
 
+  setSnippet: (projectRef: string, snippet: SnippetWithContent) => {
+    let storedSnippet = sqlEditorState.snippets[snippet.id]
+    if (storedSnippet) {
+      if (!storedSnippet.snippet.content) {
+        storedSnippet.snippet.content = snippet.content
+        sqlEditorState.needsSaving.add(storedSnippet.snippet.id)
+      }
+    } else {
+      sqlEditorState.addSnippet({ projectRef: projectRef, snippet })
+    }
+  },
+
   setSql: (id: string, sql: string) => {
-    if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id].snippet.content.sql = sql
+    let snippet = sqlEditorState.snippets[id]?.snippet
+    if (snippet?.content) {
+      snippet.content.sql = sql
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -176,11 +234,11 @@ export const sqlEditorState = proxy({
     name: string
     description?: string
   }) => {
-    if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id] = {
-        ...sqlEditorState.snippets[id],
-        snippet: { ...sqlEditorState.snippets[id].snippet, name, description },
-      }
+    let snippet = sqlEditorState.snippets[id]?.snippet
+    if (snippet) {
+      snippet.name = name
+      snippet.description = description
+
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -193,6 +251,12 @@ export const sqlEditorState = proxy({
     sqlEditorState.results = otherResults
 
     sqlEditorState.needsSaving.delete(id)
+  },
+
+  addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {
+    if (sqlEditorState.folders[folder.id]) return
+
+    sqlEditorState.folders[folder.id] = { projectRef, folder }
   },
 
   addNewFolder: ({ projectRef }: { projectRef: string }) => {
@@ -212,31 +276,27 @@ export const sqlEditorState = proxy({
   },
 
   editFolder: (id: string) => {
-    sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'editing' }
+    sqlEditorState.folders[id].status = 'editing'
   },
 
   saveFolder: ({ id, name }: { id: string; name: string }) => {
-    const hasChanges = sqlEditorState.folders[id].folder.name !== name
+    let storeFolder = sqlEditorState.folders[id]
+    const hasChanges = storeFolder.folder.name !== name
 
     if (id === 'new-folder' && sqlEditorState.allFolderNames.includes(name)) {
       sqlEditorState.removeFolder(id)
       return toast.error('This folder name already exists')
     } else if (hasChanges && sqlEditorState.allFolderNames.includes(name)) {
-      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+      storeFolder.status = 'idle'
       return toast.error('This folder name already exists')
     }
 
-    const originalFolderName = sqlEditorState.folders[id].folder.name.slice()
+    const originalFolderName = storeFolder.folder.name.slice()
 
-    sqlEditorState.folders[id] = {
-      projectRef: sqlEditorState.folders[id].projectRef,
-      status: hasChanges ? 'saving' : 'idle',
-      folder: {
-        ...sqlEditorState.folders[id].folder,
-        id,
-        name,
-      },
-    }
+    storeFolder.status = hasChanges ? 'saving' : 'idle'
+    storeFolder.folder.id = id
+    storeFolder.folder.name = name
+
     if (hasChanges) {
       sqlEditorState.lastUpdatedFolderName = originalFolderName
       sqlEditorState.needsSaving.add(id)
@@ -253,39 +313,58 @@ export const sqlEditorState = proxy({
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.add(id),
 
   addFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id] = {
-        ...sqlEditorState.snippets[id],
-        snippet: {
-          ...sqlEditorState.snippets[id].snippet,
-          favorite: true,
-        },
-      }
+    const storeSnippet = sqlEditorState.snippets[id]
+    if (storeSnippet) {
+      storeSnippet.snippet.favorite = true
 
-      sqlEditorState.favoriteSnippets[id] = {
-        projectRef: sqlEditorState.snippets[id].projectRef,
-        snippet: {
-          ...sqlEditorState.snippets[id].snippet,
-          folder_id: undefined,
-        } as unknown as SqlSnippet,
-      }
+      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
+      counts.shared++
+
+      // Copy the snippet into the favorite section
+      const snippetOrdering = sqlEditorState.snippetOrdering[storeSnippet.projectRef]
+      Object.keys(snippetOrdering).forEach((key) => {
+        const firstSegment = key.split(':')[0]
+
+        if (firstSegment === 'private' || firstSegment === 'shared') {
+          const index = snippetOrdering[key]?.indexOf(id)
+          if (index > -1) {
+            const favoriteKey = ['favorite', ...key.split(':').slice(1)].join(':')
+
+            if (snippetOrdering[favoriteKey]) {
+              sqlEditorState.addSnippets({
+                key: favoriteKey,
+                projectRef: storeSnippet.projectRef,
+                snippets: [storeSnippet.snippet],
+              })
+            }
+          }
+        }
+      })
 
       sqlEditorState.needsSaving.add(id)
     }
   },
 
   removeFavorite: (id: string) => {
-    if (sqlEditorState.snippets[id]) {
-      sqlEditorState.snippets[id] = {
-        ...sqlEditorState.snippets[id],
-        snippet: {
-          ...sqlEditorState.snippets[id].snippet,
-          favorite: false,
-        },
-      }
+    const storeSnippet = sqlEditorState.snippets[id]
+    if (storeSnippet.snippet) {
+      storeSnippet.snippet.favorite = false
 
-      const { [id]: snippet, ...otherSnippets } = sqlEditorState.favoriteSnippets
-      sqlEditorState.favoriteSnippets = otherSnippets
+      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
+      counts.shared--
+
+      // Remove the snippet from the favorite section
+      const snippetOrdering = sqlEditorState.snippetOrdering[storeSnippet.projectRef]
+      Object.keys(snippetOrdering).forEach((key) => {
+        const firstSegment = key.split(':')[0]
+
+        if (firstSegment === 'favorite') {
+          const index = snippetOrdering[key]?.indexOf(id)
+          if (index > -1) {
+            snippetOrdering[key].splice(index, 1)
+          }
+        }
+      })
 
       sqlEditorState.needsSaving.add(id)
     }
@@ -298,7 +377,7 @@ export const sqlEditorState = proxy({
       let snippetContent = storeSnippet.snippet.content
       if (snippetContent === undefined) {
         const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
-        snippetContent = content
+        snippetContent = content as unknown as SqlSnippets.Content
       }
 
       if (snippetContent === undefined) {
@@ -306,23 +385,18 @@ export const sqlEditorState = proxy({
         return toast.error('Unable to share snippet: Content is missing')
       }
 
-      sqlEditorState.snippets[id] = {
-        ...storeSnippet,
-        snippet: {
-          ...storeSnippet.snippet,
-          content: snippetContent,
-          visibility,
-          folder_id: null as any,
-        },
-      }
+      storeSnippet.snippet.content = snippetContent
+      storeSnippet.snippet.visibility = visibility
+      storeSnippet.snippet.folder_id = undefined
 
-      if (sqlEditorState.favoriteSnippets[id] !== undefined) {
-        sqlEditorState.favoriteSnippets[id] = {
-          projectRef: sqlEditorState.favoriteSnippets[id].projectRef,
-          snippet: {
-            ...sqlEditorState.favoriteSnippets[id].snippet,
-            visibility,
-          } as unknown as SqlSnippet,
+      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
+      if (counts) {
+        if (visibility === 'user') {
+          counts.private += 1
+          counts.shared -= 1
+        } else if (visibility === 'project') {
+          counts.private -= 1
+          counts.shared += 1
         }
       }
 
@@ -361,33 +435,28 @@ export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnaps
 export const useSnippetFolders = (projectRef: string) => {
   const snapshot = useSqlEditorV2StateSnapshot()
 
-  return Object.values(snapshot.folders)
-    .filter((x) => x.projectRef === projectRef)
-    .map((x) => x.folder)
+  return useMemo(
+    () =>
+      Object.values(snapshot.folders)
+        .filter((x) => x.projectRef === projectRef)
+        .map((x) => x.folder),
+    [projectRef, snapshot.folders]
+  )
 }
 
-export const useSnippets = (projectRef: string) => {
+export const useSnippets = (projectRef: string, key: string) => {
   const snapshot = useSqlEditorV2StateSnapshot()
 
-  return Object.values(snapshot.snippets)
-    .filter((x) => x.projectRef === projectRef)
-    .map((x) => x.snippet)
-    .sort((a, b) => {
-      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
-      else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-    })
-}
-
-export const useFavoriteSnippets = (projectRef: string) => {
-  const snapshot = useSqlEditorV2StateSnapshot()
-
-  return Object.values(snapshot.favoriteSnippets)
-    .filter((x) => x.projectRef === projectRef)
-    .map((x) => x.snippet)
-    .sort((a, b) => {
-      if (snapshot.order === 'name') return a.name.localeCompare(b.name)
-      else return new Date(b.inserted_at ?? '').valueOf() - new Date(a.inserted_at ?? '').valueOf()
-    })
+  return useMemo(
+    () =>
+      snapshot.snippetOrdering?.[projectRef]?.[key]
+        ?.map((id) => snapshot.snippets[id].snippet)
+        .sort((a, b) => {
+          if (snapshot.order === 'name') return a.name.localeCompare(b.name)
+          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+        }) ?? [],
+    [projectRef, key, snapshot.snippets, snapshot.snippetOrdering]
+  )
 }
 
 // ========================================================================
@@ -423,7 +492,7 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
     } else {
       await updateSQLSnippetFolder({ projectRef, id, name })
       toast.success('Successfully updated folder')
-      sqlEditorState.folders[id] = { ...sqlEditorState.folders[id], status: 'idle' }
+      sqlEditorState.folders[id].status = 'idle'
     }
   } catch (error: any) {
     toast.error(`Failed to save folder: ${error.message}`)
@@ -433,14 +502,10 @@ async function upsertFolder(id: string, projectRef: string, name: string) {
       error.message.includes('update') &&
       sqlEditorState.lastUpdatedFolderName.length > 0
     ) {
-      sqlEditorState.folders[id] = {
-        ...sqlEditorState.folders[id],
-        status: 'idle',
-        folder: {
-          ...sqlEditorState.folders[id].folder,
-          name: sqlEditorState.lastUpdatedFolderName,
-        },
-      }
+      let storeFolder = sqlEditorState.folders[id]
+
+      storeFolder.status = 'idle'
+      storeFolder.folder.name = sqlEditorState.lastUpdatedFolderName
     }
   } finally {
     sqlEditorState.lastUpdatedFolderName = ''
@@ -484,11 +549,11 @@ if (typeof window !== 'undefined') {
             visibility: visibility ?? 'user',
             project_id: project_id ?? 0,
             owner_id: owner_id,
-            folder_id: folder_id,
+            folder_id: folder_id ?? undefined,
             content: {
-              ...content,
+              ...content!,
               content_id: id,
-              favorite: favorite,
+              favorite: favorite ?? false,
             },
           })
           sqlEditorState.needsSaving.delete(id)

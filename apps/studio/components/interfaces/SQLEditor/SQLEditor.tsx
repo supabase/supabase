@@ -228,7 +228,7 @@ export const SQLEditor = () => {
       const selection = editor.getSelection()
       const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
       const sql = snippet
-        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+        ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
         : selectedValue || editorRef.current?.getValue()
       formatQuery(
         {
@@ -268,7 +268,7 @@ export const SQLEditor = () => {
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
         const sql = snippet
-          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
+          ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
           : selectedValue || editorRef.current?.getValue()
 
         let queryHasIssues = false
@@ -398,7 +398,9 @@ export const SQLEditor = () => {
       const result = snapV2.results[id]?.[0]
       appSnap.setAiAssistantPanel({
         open: true,
-        sqlSnippets: [snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim()],
+        sqlSnippets: [
+          (snippet.snippet.content?.sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
+        ],
         initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
     } catch (error: unknown) {

@@ -9,8 +9,12 @@ import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Snippet } from 'data/content/sql-folders-query'
+import {
+  SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -125,10 +129,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
       await Promise.all(
         snippets.map(async (snippet) => {
-          let snippetContent = (snippet as SnippetDetail)?.content
+          let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            snippetContent = content
+            if ('sql' in content) {
+              snippetContent = content
+            }
           }
 
           if (snippetContent === undefined) {
