@@ -61,33 +61,38 @@ export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaF
   )
 
   return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      nodeTypes={nodeTypes}
-      onNodesChange={onNodesChange}
-      defaultEdgeOptions={{
-        type: 'smoothstep',
-        animated: true,
-        style: {
-          stroke: 'hsl(var(--border-stronger))',
-          strokeWidth: 0.5,
-        },
-      }}
-      fitView
-      minZoom={0.8}
-      maxZoom={1.8}
-      proOptions={{ hideAttribution: true }}
-      panOnScroll
-      panOnScrollSpeed={1}
+    <div
+      style={{ maskImage: 'linear-gradient(to right, transparent 2%, black 13%)' }}
+      className="absolute inset-0"
     >
-      <Background
-        gap={16}
-        className="[&>*]:stroke-foreground-muted opacity-[25%]"
-        variant={BackgroundVariant.Dots}
-        color={'inherit'}
-      />
-    </ReactFlow>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeTypes}
+        onNodesChange={onNodesChange}
+        defaultEdgeOptions={{
+          type: 'smoothstep',
+          animated: true,
+          style: {
+            stroke: 'hsl(var(--border-stronger))',
+            strokeWidth: 0.5,
+          },
+        }}
+        fitView
+        minZoom={0.8}
+        maxZoom={1.8}
+        proOptions={{ hideAttribution: true }}
+        panOnScroll
+        panOnScrollSpeed={1}
+      >
+        <Background
+          gap={16}
+          className="[&>*]:stroke-foreground-muted opacity-[25%]"
+          variant={BackgroundVariant.Dots}
+          color={'inherit'}
+        />
+      </ReactFlow>
+    </div>
   )
 }
 

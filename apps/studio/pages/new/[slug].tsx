@@ -22,6 +22,7 @@ import {
   FileX2,
   KeyRound,
   ListOrdered,
+  Settings,
   Square,
   User,
   User2,
@@ -129,6 +130,9 @@ import {
   TooltipContent_Shadcn_,
   TooltipProvider_Shadcn_,
   TooltipTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  CollapsibleContent_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -139,6 +143,8 @@ import { SchemaFlow } from 'components/interfaces/ProjectCreation/design/SchemaF
 import Globe from 'components/ui/Globe'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import DotGrid from 'components/ui/DotGrid'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import { Markdown } from 'components/interfaces/Markdown'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -318,6 +324,7 @@ const Wizard: NextPageWithLayout = () => {
 
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
+  const [showAdvanced, setShowAdvanced] = useState<Boolean[]>(false)
   const db = useRef<PGlite | null>()
   const [services, setServices] = useState<SupabaseService[]>([])
   const [title, setTitle] = useState<string>('')
@@ -358,7 +365,14 @@ const Wizard: NextPageWithLayout = () => {
       `)
   }, [])
 
-  const { messages, input, handleInputChange, append, setInput } = useChat({
+  const {
+    messages,
+    input,
+    handleInputChange,
+    append,
+    setInput,
+    isLoading: isMessagesLoading,
+  } = useChat({
     api: `${BASE_PATH}/api/ai/onboarding/design`,
     id: 'schema-generator',
     maxSteps: 7,
@@ -443,12 +457,8 @@ const Wizard: NextPageWithLayout = () => {
   const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
     useFreeProjectLimitCheckQuery({ slug })
 
-  console.log('messages', messages)
-
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
-
-  const [currentView, setCurrentView] = useState<'configure' | 'design'>('configure')
 
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
@@ -672,110 +682,841 @@ const Wizard: NextPageWithLayout = () => {
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
+  const selectedRegionObject = useMemo(() => {
+    const dbRegion = form.getValues('dbRegion')
+    const awsRegion = Object.entries(AWS_REGIONS).find(
+      ([_, region]) => region.displayName === dbRegion
+    )
+    const flyRegion = Object.entries(FLY_REGIONS).find(
+      ([_, region]) => region.displayName === dbRegion
+    )
+
+    if (awsRegion) {
+      const [name, details] = awsRegion
+      return {
+        name,
+        location: details.location,
+        code: details.code,
+        displayName: details.displayName,
+      }
+    }
+
+    if (flyRegion) {
+      const [name, details] = flyRegion
+      return {
+        name,
+        location: details.location,
+        code: details.code,
+        displayName: details.displayName,
+      }
+    }
+
+    return null
+  }, [form.getValues('dbRegion')])
+
   return (
     <div className="flex w-full h-screen overflow-hidden flex-col">
-      <div className="overflow-auto flex-1 flex items-stretch">
-        <Link
-          href="/projects"
-          className="fixed z-10 top-4 left-4 text-xs font-mono text-foreground-light flex gap-4 items-center"
-        >
-          <img
-            className="rounded border p-3 hover:border-white border-default"
-            src={`${BASE_PATH}/img/supabase-logo.svg`}
-            alt="Supabase"
-            style={{ height: 16 }}
-          />
-          Back to dashboard
-        </Link>
-        <section className="w-full flex-1 overflow-hidden">
+      <Link
+        href="/projects"
+        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default"
+      >
+        <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
+      </Link>
+      {/* <div className="border-b bg-muted py-3 px-12">
+        <div className="flex justify-between items-stretch">
+          <Link
+            href="/projects"
+            className="text-xs font-mono text-foreground-light flex gap-4 items-center"
+          >
+            <img
+              className="rounded border p-3 hover:border-white border-default"
+              src={`${BASE_PATH}/img/supabase-logo.svg`}
+              alt="Supabase"
+              style={{ height: 16 }}
+            />
+            Back to dashboard
+          </Link>
+          <div className="flex justify-between items-stretch">
+            <Button
+              htmlType="submit"
+              className="text-sm h-auto"
+              loading={isCreatingNewProject || isSuccessNewProject}
+              disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
+            >
+              Create new project
+            </Button>
+          </div>
+        </div>
+      </div> */}
+      <div className="overflow-auto flex-1 flex items-start">
+        <Form_Shadcn_ {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="max-w-[600px] p-24 pr-0 min-h-screen flex items-center"
+          >
+            <section className="relative">
+              <div>
+                {!isOrganizationsSuccess || (isLoadingFreeProjectLimitCheck && <p>Loading...</p>)}
+                <div className="mb-4">
+                  <h3 className="mb-1">Create a new project</h3>
+                  <p className="text-sm text-foreground-lighter">
+                    Your project will have its own dedicated instance and full Postgres database,
+                    including an automated API.
+                  </p>
+                </div>
+                <>
+                  {projectCreationDisabled ? (
+                    <div className="pb-8">
+                      <DisabledWarningDueToIncident title="Project creation is currently disabled" />
+                    </div>
+                  ) : (
+                    <div className="">
+                      <div className="pb-4 border-b grid grid-cols-2 gap-2">
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="organization"
+                          render={({ field }) => (
+                            <FormItemLayout label="Organization">
+                              {(organizations?.length ?? 0) > 0 && (
+                                <Select_Shadcn_
+                                  onValueChange={(slug) => {
+                                    field.onChange(slug)
+                                    router.push(`/new/${slug}`)
+                                  }}
+                                  defaultValue={field.value}
+                                >
+                                  <FormControl_Shadcn_>
+                                    <SelectTrigger_Shadcn_>
+                                      <SelectValue_Shadcn_ placeholder="Select an organization" />
+                                    </SelectTrigger_Shadcn_>
+                                  </FormControl_Shadcn_>
+                                  <SelectContent_Shadcn_>
+                                    <SelectGroup_Shadcn_>
+                                      {organizations?.map((x: any) => (
+                                        <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                                          {x.name}
+                                        </SelectItem_Shadcn_>
+                                      ))}
+                                    </SelectGroup_Shadcn_>
+                                  </SelectContent_Shadcn_>
+                                </Select_Shadcn_>
+                              )}
+                            </FormItemLayout>
+                          )}
+                        />
+                        {!isAdmin && <NotOrganizationOwnerWarning />}
+                        {canCreateProject && (
+                          <div>
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="projectName"
+                              render={({ field }) => (
+                                <FormItemLayout label="Project name">
+                                  <FormControl_Shadcn_>
+                                    <Input_Shadcn_
+                                      placeholder="Project name"
+                                      {...field}
+                                      onChange={(event) => {
+                                        field.onChange(event.target.value.replace(/\./g, ''))
+                                      }}
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItemLayout>
+                              )}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {canCreateProject && (
+                        <>
+                          <div className="py-4 border-b">
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="dbRegion"
+                              render={({ field }) => (
+                                <RegionSelector
+                                  field={field}
+                                  form={form}
+                                  cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                                />
+                              )}
+                            />
+                          </div>
+                          <div className="py-4 border-b">
+                            <FormField_Shadcn_
+                              control={form.control}
+                              name="dbPass"
+                              render={({ field }) => (
+                                <FormItemLayout
+                                  label="Database Password"
+                                  description={
+                                    <PasswordStrengthBar
+                                      passwordStrengthScore={form.getValues('dbPassStrength')}
+                                      password={field.value}
+                                      passwordStrengthMessage={passwordStrengthMessage}
+                                      generateStrongPassword={generatePassword}
+                                    />
+                                  }
+                                >
+                                  <FormControl_Shadcn_>
+                                    <Input
+                                      copy={field.value.length > 0}
+                                      type="password"
+                                      placeholder="Type in a strong password"
+                                      {...field}
+                                      autoComplete="off"
+                                      onChange={async (event) => {
+                                        field.onChange(event)
+                                        form.trigger('dbPassStrength')
+                                        const value = event.target.value
+                                        if (event.target.value === '') {
+                                          await form.setValue('dbPassStrength', 0)
+                                          await form.trigger('dbPass')
+                                        } else {
+                                          await delayedCheckPasswordStrength(value)
+                                        }
+                                      }}
+                                    />
+                                  </FormControl_Shadcn_>
+                                </FormItemLayout>
+                              )}
+                            />
+                          </div>
+                          <div className="py-4 border-b">
+                            <FormItemLayout label="Generate a starting schema">
+                              <div className="rounded-md border bg-surface-100">
+                                {messages.length > 0 && (
+                                  <div className="px-4 py-3 border-b space-y-1">
+                                    <p className="text-foreground-light">
+                                      {messages.filter((m) => m.role === 'user').slice(-1)[0]
+                                        ?.content || ''}
+                                    </p>
+                                    <p>
+                                      {messages[messages.length - 1].role === 'user' ||
+                                      messages[messages.length - 1].content === '' ? (
+                                        <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                                          <span>Thinking</span>
+                                          <div className="flex gap-1">
+                                            <motion.span
+                                              animate={{ opacity: [0, 1, 0] }}
+                                              transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                delay: 0,
+                                              }}
+                                            >
+                                              .
+                                            </motion.span>
+                                            <motion.span
+                                              animate={{ opacity: [0, 1, 0] }}
+                                              transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                delay: 0.3,
+                                              }}
+                                            >
+                                              .
+                                            </motion.span>
+                                            <motion.span
+                                              animate={{ opacity: [0, 1, 0] }}
+                                              transition={{
+                                                duration: 1.5,
+                                                repeat: Infinity,
+                                                delay: 0.6,
+                                              }}
+                                            >
+                                              .
+                                            </motion.span>
+                                          </div>
+                                        </motion.div>
+                                      ) : (
+                                        <Markdown
+                                          className="text-foreground"
+                                          content={
+                                            messages
+                                              .filter((m) => m.role === 'assistant')
+                                              .slice(-1)[0]?.content || ''
+                                          }
+                                        />
+                                      )}
+                                    </p>
+                                  </div>
+                                )}
+                                <textarea
+                                  id="input"
+                                  name="prompt"
+                                  autoComplete="off"
+                                  className="w-full px-4 text-sm py-2 border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter"
+                                  value={input}
+                                  disabled={isMessagesLoading}
+                                  onChange={handleInputChange}
+                                  placeholder={
+                                    messages.length > 0
+                                      ? 'Make an edit...'
+                                      : 'Describe your application...'
+                                  }
+                                  autoFocus
+                                  rows={
+                                    messages.length > 0
+                                      ? Math.max(1, Math.min(input.split('\n').length, 10))
+                                      : Math.max(3, Math.min(input.split('\n').length, 10))
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (!(e.target instanceof HTMLTextAreaElement)) {
+                                      return
+                                    }
+                                    if (
+                                      e.key === 'Enter' &&
+                                      !e.shiftKey &&
+                                      !e.nativeEvent.isComposing
+                                    ) {
+                                      e.preventDefault()
+                                      append({ role: 'user', content: input })
+                                      setInput('')
+                                    }
+                                  }}
+                                />
+                              </div>
+                            </FormItemLayout>
+                          </div>
+                          <div>
+                            {!showAdvanced && (
+                              <Button
+                                onClick={() => setShowAdvanced(true)}
+                                icon={<Settings size={16} />}
+                                type="outline"
+                                className="w-full mb-2 mt-4"
+                              >
+                                Advanced Configuration
+                              </Button>
+                            )}
+                            <div className={cn(showAdvanced ? 'block' : 'hidden')}>
+                              {cloudProviderEnabled && showNonProdFields && (
+                                <div className="py-4 border-b">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="cloudProvider"
+                                    render={({ field }) => (
+                                      <FormItemLayout label="Cloud provider">
+                                        <Select_Shadcn_
+                                          onValueChange={(value) => {
+                                            field.onChange(value)
+                                            form.setValue(
+                                              'dbRegion',
+                                              value === 'FLY'
+                                                ? FLY_REGIONS_DEFAULT.displayName
+                                                : AWS_REGIONS_DEFAULT.displayName
+                                            )
+                                          }}
+                                          defaultValue={field.value}
+                                        >
+                                          <FormControl_Shadcn_>
+                                            <SelectTrigger_Shadcn_>
+                                              <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
+                                            </SelectTrigger_Shadcn_>
+                                          </FormControl_Shadcn_>
+                                          <SelectContent_Shadcn_>
+                                            <SelectGroup_Shadcn_>
+                                              {Object.values(PROVIDERS).map((providerObj) => {
+                                                const label = providerObj['name']
+                                                const value = providerObj['id']
+                                                return (
+                                                  <SelectItem_Shadcn_ key={value} value={value}>
+                                                    {label}
+                                                  </SelectItem_Shadcn_>
+                                                )
+                                              })}
+                                            </SelectGroup_Shadcn_>
+                                          </SelectContent_Shadcn_>
+                                        </Select_Shadcn_>
+                                      </FormItemLayout>
+                                    )}
+                                  />
+                                </div>
+                              )}
+
+                              {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
+                                <div className="py-4 border-b">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="instanceSize"
+                                    render={({ field }) => (
+                                      <FormItemLayout
+                                        label={
+                                          <div className="flex flex-col gap-y-4">
+                                            <span>Compute Size</span>
+                                          </div>
+                                        }
+                                        description={
+                                          <>
+                                            <p>
+                                              The size for your dedicated database. You can change
+                                              this later.
+                                            </p>
+                                          </>
+                                        }
+                                      >
+                                        <Select_Shadcn_
+                                          value={field.value}
+                                          onValueChange={(value) => field.onChange(value)}
+                                        >
+                                          <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
+                                            <SelectValue_Shadcn_ placeholder="Select a compute size" />
+                                          </SelectTrigger_Shadcn_>
+                                          <SelectContent_Shadcn_>
+                                            <SelectGroup_Shadcn_>
+                                              {sizes
+                                                .filter((option) =>
+                                                  instanceSizeSpecs[
+                                                    option
+                                                  ].cloud_providers.includes(
+                                                    form.getValues('cloudProvider') as CloudProvider
+                                                  )
+                                                )
+                                                .map((option) => {
+                                                  return (
+                                                    <SelectItem_Shadcn_ key={option} value={option}>
+                                                      <div className="flex flex-row i gap-2">
+                                                        <div className="text-center w-[80px]">
+                                                          <Badge
+                                                            variant={
+                                                              option === 'micro'
+                                                                ? 'default'
+                                                                : 'brand'
+                                                            }
+                                                            className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                                          >
+                                                            {instanceSizeSpecs[option].label}
+                                                          </Badge>
+                                                        </div>
+                                                        <div className="text-sm">
+                                                          <span className="text-foreground">
+                                                            {instanceSizeSpecs[option].ram} RAM /{' '}
+                                                            {instanceSizeSpecs[option].cpu}{' '}
+                                                            {getCloudProviderArchitecture(
+                                                              form.getValues(
+                                                                'cloudProvider'
+                                                              ) as CloudProvider
+                                                            )}{' '}
+                                                            CPU
+                                                          </span>
+                                                          <p className="text-xs text-muted instance-details">
+                                                            ${instanceSizeSpecs[option].priceHourly}
+                                                            /hour (~$
+                                                            {instanceSizeSpecs[option].priceMonthly}
+                                                            /month)
+                                                          </p>
+                                                        </div>
+                                                      </div>
+                                                    </SelectItem_Shadcn_>
+                                                  )
+                                                })}
+                                            </SelectGroup_Shadcn_>
+                                          </SelectContent_Shadcn_>
+                                        </Select_Shadcn_>
+                                      </FormItemLayout>
+                                    )}
+                                  />
+
+                                  <FormItemLayout>
+                                    <div className="flex justify-between mr-2 mt-4">
+                                      <span>Additional Monthly Compute Costs</span>
+                                      <div className="text-brand flex gap-1 items-center">
+                                        {organizationProjects.length > 0 ? (
+                                          <>
+                                            <span>${additionalMonthlySpend}</span>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <span className="text-foreground-lighter line-through">
+                                              $
+                                              {
+                                                instanceSizeSpecs[instanceSize as DbInstanceSize]!
+                                                  .priceMonthly
+                                              }
+                                            </span>
+                                            <span>${additionalMonthlySpend}</span>
+                                          </>
+                                        )}
+                                        <InfoTooltip side="top" className="max-w-[450px] p-0">
+                                          <Table className="mt-2">
+                                            <TableHeader className="[&_th]:h-7">
+                                              <TableRow className="py-2">
+                                                <TableHead className="w-[170px]">Project</TableHead>
+                                                <TableHead>Compute Size</TableHead>
+                                                <TableHead className="text-right">
+                                                  Monthly Costs
+                                                </TableHead>
+                                              </TableRow>
+                                            </TableHeader>
+                                            <TableBody className="[&_td]:py-2">
+                                              {organizationProjects.map((project) => (
+                                                <TableRow
+                                                  key={project.ref}
+                                                  className="text-foreground-light"
+                                                >
+                                                  <TableCell className="w-[170px] truncate">
+                                                    {project.name}
+                                                  </TableCell>
+                                                  <TableCell className="text-center">
+                                                    {instanceLabel(project.infra_compute_size)}
+                                                  </TableCell>
+                                                  <TableCell className="text-right">
+                                                    $
+                                                    {monthlyInstancePrice(
+                                                      project.infra_compute_size
+                                                    )}
+                                                  </TableCell>
+                                                </TableRow>
+                                              ))}
+
+                                              <TableRow>
+                                                <TableCell className="w-[170px] flex gap-2">
+                                                  <span className="truncate">
+                                                    {form.getValues('projectName')
+                                                      ? form.getValues('projectName')
+                                                      : 'New project'}
+                                                  </span>
+                                                  <Badge size={'small'} variant={'default'}>
+                                                    NEW
+                                                  </Badge>
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                  {instanceLabel(instanceSize)}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                  ${monthlyInstancePrice(instanceSize)}
+                                                </TableCell>
+                                              </TableRow>
+                                            </TableBody>
+                                          </Table>
+                                          <PopoverSeparator />
+                                          <Table>
+                                            <TableHeader className="[&_th]:h-7">
+                                              <TableRow>
+                                                <TableHead colSpan={2}>Compute Credits</TableHead>
+                                                <TableHead colSpan={1} className="text-right">
+                                                  -$10
+                                                </TableHead>
+                                              </TableRow>
+                                            </TableHeader>
+                                            <TableBody className="[&_td]:py-2">
+                                              <TableRow className="text-foreground">
+                                                <TableCell colSpan={2}>
+                                                  Total Monthly Compute Costs
+                                                  {/**
+                                                   * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                                   *
+                                                   * Will be adjusted in the future [kevin]
+                                                   */}
+                                                  {organizationProjects.length > 0 && (
+                                                    <p className="text-xs text-foreground-lighter">
+                                                      Excluding Read replicas
+                                                    </p>
+                                                  )}
+                                                </TableCell>
+                                                <TableCell colSpan={1} className="text-right">
+                                                  ${monthlyComputeCosts}
+                                                </TableCell>
+                                              </TableRow>
+                                            </TableBody>
+                                          </Table>
+
+                                          <div className="p-4 text-xs text-foreground-light space-y-1">
+                                            <p>
+                                              Compute is charged usage-based whenever your billing
+                                              cycle resets. Given compute charges are hourly, your
+                                              invoice will contain "Compute Hours" for each hour a
+                                              project ran on a specific compute size.
+                                            </p>
+                                            {monthlyComputeCosts > 0 && (
+                                              <p>
+                                                Compute costs are applied on top of your
+                                                subscription plan costs.
+                                              </p>
+                                            )}
+                                          </div>
+                                        </InfoTooltip>
+                                      </div>
+                                    </div>
+
+                                    <div className="mt-2 text-foreground-lighter space-y-1">
+                                      {additionalMonthlySpend > 0 &&
+                                      availableComputeCredits === 0 ? (
+                                        <p>
+                                          Your monthly spend will increase, and can be more than
+                                          above if you exceed your plan's usage quota. Your
+                                          organization includes $10/month of compute credits, which
+                                          you already exceed with your existing projects.
+                                        </p>
+                                      ) : additionalMonthlySpend > 0 &&
+                                        availableComputeCredits > 0 ? (
+                                        <p>
+                                          Your monthly spend will increase, and can be more than
+                                          above if you exceed your plan's usage quota. Your
+                                          organization includes $10/month of compute credits, which
+                                          you exceed with the selected compute size.
+                                        </p>
+                                      ) : (
+                                        <p>
+                                          Your monthly spend won't increase, unless you exceed your
+                                          plan's usage quota. Your organization includes $10/month
+                                          of compute credits, which cover this project.
+                                        </p>
+                                      )}
+                                    </div>
+                                  </FormItemLayout>
+                                  <div className="flex flex-col gap-y-2 my-4">
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Billing</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
+                                  </div>
+                                </div>
+                              )}
+
+                              {!projectVersionSelectionDisabled && (
+                                <div className="py-4 border-b">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="postgresVersionSelection"
+                                    render={({ field }) => (
+                                      <PostgresVersionSelector
+                                        field={field}
+                                        form={form}
+                                        cloudProvider={
+                                          form.getValues('cloudProvider') as CloudProvider
+                                        }
+                                        organizationSlug={slug}
+                                        dbRegion={form.getValues('dbRegion')}
+                                      />
+                                    )}
+                                  />
+                                </div>
+                              )}
+
+                              {showNonProdFields && (
+                                <div className="py-4 border-b">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="postgresVersion"
+                                    render={({ field }) => (
+                                      <FormItemLayout
+                                        label="Custom Postgres version"
+                                        description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                                      >
+                                        <FormControl_Shadcn_>
+                                          <Input_Shadcn_
+                                            placeholder="Postgres version"
+                                            {...field}
+                                            autoComplete="off"
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItemLayout>
+                                    )}
+                                  />
+                                </div>
+                              )}
+
+                              <SecurityOptions form={form} />
+                              {allowOrioleDB && !!availableOrioleVersion && (
+                                <AdvancedConfiguration form={form} />
+                              )}
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      {freePlanWithExceedingLimits ? (
+                        isAdmin &&
+                        slug && (
+                          <div className="py-4 border-b">
+                            <FreeProjectLimitWarning
+                              membersExceededLimit={membersExceededLimit || []}
+                              orgSlug={slug}
+                            />
+                          </div>
+                        )
+                      ) : isManagedByVercel ? (
+                        <div className="py-4 border-b">
+                          <PartnerManagedResource
+                            partner="vercel-marketplace"
+                            resource="Projects"
+                            cta={{
+                              installationId: currentOrg?.partner_id,
+                              message: 'Visit Vercel to create a project',
+                            }}
+                          />
+                        </div>
+                      ) : hasOutstandingInvoices ? (
+                        <div className="py-4 border-b">
+                          <Admonition
+                            type="default"
+                            title="Your organization has overdue invoices"
+                            description={
+                              <div className="space-y-3">
+                                <p className="text-sm leading-normal">
+                                  Please resolve all outstanding invoices first before creating a
+                                  new project
+                                </p>
+
+                                <div>
+                                  <Button asChild type="default">
+                                    <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                                  </Button>
+                                </div>
+                              </div>
+                            }
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                  )}
+                </>
+              </div>
+              <Button className="w-full sticky top-0">Create project</Button>
+            </section>
+          </form>
+        </Form_Shadcn_>
+        <section className="flex-1 h-screen overflow-hidden sticky top-0">
           <div className="flex h-full flex-1">
-            <div className="flex-1 h-full bg-surface-100/50 backdrop-blur-sm relative">
+            <div className="flex-1 h-full relative">
               <motion.div
                 key="info"
                 transition={{
-                  duration: 1,
-                  ease: 'easeInOut',
+                  duration: 1.25,
+                  ease: 'easeIn',
                 }}
-                className={`absolute z-20 p-4 bg-muted min-w-80 rounded-lg border shadow-lg`}
+                className={`absolute z-20 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
+                initial={false}
                 animate={
                   nodes.length > 0
                     ? {
-                        bottom: '2%',
-                        left: '2%',
+                        top: '3%',
+                        right: '3%',
                         x: '0%',
                         y: '0%',
                       }
                     : {
-                        bottom: '50%',
-                        left: '50%',
-                        x: '-50%',
-                        y: '50%',
+                        top: '50%',
+                        right: '50%',
+                        x: '50%',
+                        y: '-50%',
                       }
                 }
               >
-                <div className="mb-2 font-medium">{title || 'Untitled Project'}</div>
+                <div className="flex items-start justify-between w-80">
+                  <div className="flex gap-x-3">
+                    {/* <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
+                      <Database size={16} />
+                    </div> */}
+                    <div className="flex flex-col gap-y-0.5">
+                      <p className="text-sm">Primary Database</p>
+                      <p className="flex items-center gap-x-1">
+                        <span className="text-sm text-foreground-light">
+                          {form.getValues('dbRegion')}
+                        </span>
+                      </p>
+                      <p className="flex items-center gap-x-1">
+                        <span className="text-sm text-foreground-light">
+                          {form.getValues('cloudProvider')}
+                        </span>
+                        <span className="text-sm text-foreground-light">•</span>
+                        <span className="text-sm text-foreground-light">
+                          {instanceLabel(form.getValues('computeSize'))}
+                        </span>
+                        <span className="text-sm text-foreground-light">•</span>
+                        <span className="text-sm text-foreground-light">
+                          {form.getValues('postgresVersionSelection')}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                  {selectedRegionObject && (
+                    <img
+                      alt="region icon"
+                      className="w-8 rounded-sm mt-0.5"
+                      src={`${BASE_PATH}/img/regions/${selectedRegionObject.name}.svg`}
+                    />
+                  )}
+                </div>
 
-                <div className="">
-                  <h3 className="text-sm font-medium mb-2">Services</h3>
-                  <TooltipProvider_Shadcn_>
-                    <div className="flex gap-2">
-                      {[
-                        { name: 'Auth', icon: User2 },
-                        { name: 'Storage', icon: File },
-                        { name: 'Database', icon: Database },
-                        { name: 'Edge Function', icon: Zap },
-                        { name: 'Cron', icon: Clock },
-                        { name: 'Queues', icon: ListOrdered },
-                        { name: 'Vector', icon: Box },
-                      ].map((service) => {
-                        const enabledService = services.find((s) => s.name === service.name)
-                        const isEnabled = !!enabledService
-                        return (
-                          <Tooltip_Shadcn_ key={service.name} delayDuration={100}>
-                            <TooltipTrigger_Shadcn_ asChild>
-                              <div
-                                className={`
+                <TooltipProvider_Shadcn_>
+                  <div className="flex gap-2 mt-4">
+                    {[
+                      { name: 'Auth', icon: User2 },
+                      { name: 'Storage', icon: File },
+                      { name: 'Database', icon: Database },
+                      { name: 'Edge Function', icon: Zap },
+                      { name: 'Cron', icon: Clock },
+                      { name: 'Queues', icon: ListOrdered },
+                      { name: 'Vector', icon: Box },
+                    ].map((service) => {
+                      const enabledService = services.find((s) => s.name === service.name)
+                      const isEnabled = !!enabledService
+                      return (
+                        <Tooltip_Shadcn_ key={service.name} delayDuration={100}>
+                          <TooltipTrigger_Shadcn_ asChild>
+                            <div
+                              className={`
                             flex items-center justify-center w-10 h-10 border rounded cursor-help
                             ${isEnabled ? 'border-brand-600 text-brand-600' : 'text-foreground-lighter'}
                           `}
-                              >
-                                <service.icon size={16} strokeWidth={2} />
-                              </div>
-                            </TooltipTrigger_Shadcn_>
-                            <TooltipContent_Shadcn_>
-                              {isEnabled
-                                ? `${service.name}: ${enabledService.reason}`
-                                : service.name}
-                            </TooltipContent_Shadcn_>
-                          </Tooltip_Shadcn_>
-                        )
-                      })}
-                    </div>
-                  </TooltipProvider_Shadcn_>
-                </div>
-
-                {userInfo && <InfoSection title="Project Details" data={userInfo} />}
-                {dbConfig && <InfoSection title="Database Configuration" data={dbConfig} />}
+                            >
+                              <service.icon size={16} strokeWidth={2} />
+                            </div>
+                          </TooltipTrigger_Shadcn_>
+                          <TooltipContent_Shadcn_>
+                            {isEnabled ? `${service.name}: ${enabledService.reason}` : service.name}
+                          </TooltipContent_Shadcn_>
+                        </Tooltip_Shadcn_>
+                      )
+                    })}
+                  </div>
+                </TooltipProvider_Shadcn_>
               </motion.div>
               <motion.div
                 layout
                 layoutId="globe"
                 className="absolute z-10 pointer-events-none inset-0"
                 initial={{
-                  y: nodes.length > 0 ? '75%' : '50%',
-                  x: nodes.length > 0 ? '-50%' : 0,
+                  x: nodes.length > 0 ? '100%' : '25%',
+                  opacity: nodes.length > 0 ? 0 : 1,
                 }}
                 animate={{
-                  y: nodes.length > 0 ? '75%' : '50%',
-                  x: nodes.length > 0 ? '-50%' : 0,
+                  x: nodes.length > 0 ? '100%' : '25%',
+                  opacity: nodes.length > 0 ? 0 : 1,
                 }}
-                style={{ maskImage: 'linear-gradient(to bottom, black, transparent 50%)' }}
+                style={{ maskImage: 'linear-gradient(to right, black, transparent 50%)' }}
                 transition={{
-                  duration: 1,
-                  ease: 'easeInOut',
+                  duration: 1.25,
+                  ease: 'easeIn',
                 }}
               >
-                <Globe />
+                <Globe
+                  currentLocation={selectedRegionObject?.location}
+                  markers={[
+                    ...Object.values(AWS_REGIONS).map((region) => region.location),
+                    ...Object.values(FLY_REGIONS).map((region) => region.location),
+                  ]}
+                />
               </motion.div>
               <AnimatePresence>
                 {nodes.length > 0 && (
@@ -791,703 +1532,6 @@ const Wizard: NextPageWithLayout = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
-
-            <div className="w-[500px] border-l h-full flex flex-col">
-              <Form_Shadcn_ {...form} className="flex-1 flex flex-col overflow-hidden">
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex-1 flex flex-col overflow-hidden"
-                >
-                  <div className="flex justify-between items-stretch border-b p-2 pr-6 pl-3">
-                    <ToggleGroup
-                      value={currentView}
-                      onValueChange={(value) => setCurrentView(value as 'configure' | 'design')}
-                      type="single"
-                      defaultValue="configure"
-                    >
-                      <ToggleGroupItem size="sm" value="configure" aria-label="Show configuration">
-                        Configure
-                      </ToggleGroupItem>
-                      <ToggleGroupItem size="sm" value="design" aria-label="Show design">
-                        Design
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                    <Button
-                      htmlType="submit"
-                      className="text-sm h-auto"
-                      loading={isCreatingNewProject || isSuccessNewProject}
-                      disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
-                    >
-                      Create new project
-                    </Button>
-                  </div>
-
-                  {currentView === 'configure' ? (
-                    <section className="relative overflow-auto flex-1">
-                      <div>
-                        {!isOrganizationsSuccess ||
-                          (isLoadingFreeProjectLimitCheck && <p>Loading...</p>)}
-                        <div className="p-6 pb-2">
-                          <h3>Create a new project</h3>
-                          <p className="text-sm text-foreground-lighter">
-                            Your project will have its own dedicated instance and full Postgres
-                            database, including an automated API.
-                          </p>
-                        </div>
-                        <>
-                          {projectCreationDisabled ? (
-                            <Panel.Content className="pb-8">
-                              <DisabledWarningDueToIncident title="Project creation is currently disabled" />
-                            </Panel.Content>
-                          ) : (
-                            <div className="divide-y divide-border-muted">
-                              <Panel.Content className={['space-y-4'].join(' ')}>
-                                <FormField_Shadcn_
-                                  control={form.control}
-                                  name="organization"
-                                  render={({ field }) => (
-                                    <FormItemLayout label="Organization">
-                                      {(organizations?.length ?? 0) > 0 && (
-                                        <Select_Shadcn_
-                                          onValueChange={(slug) => {
-                                            field.onChange(slug)
-                                            router.push(`/new/${slug}`)
-                                          }}
-                                          defaultValue={field.value}
-                                        >
-                                          <FormControl_Shadcn_>
-                                            <SelectTrigger_Shadcn_>
-                                              <SelectValue_Shadcn_ placeholder="Select an organization" />
-                                            </SelectTrigger_Shadcn_>
-                                          </FormControl_Shadcn_>
-                                          <SelectContent_Shadcn_>
-                                            <SelectGroup_Shadcn_>
-                                              {organizations?.map((x: any) => (
-                                                <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                                                  {x.name}
-                                                </SelectItem_Shadcn_>
-                                              ))}
-                                            </SelectGroup_Shadcn_>
-                                          </SelectContent_Shadcn_>
-                                        </Select_Shadcn_>
-                                      )}
-                                    </FormItemLayout>
-                                  )}
-                                />
-
-                                {!isAdmin && <NotOrganizationOwnerWarning />}
-                              </Panel.Content>
-
-                              {canCreateProject && (
-                                <>
-                                  <Panel.Content>
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="projectName"
-                                      render={({ field }) => (
-                                        <FormItemLayout label="Project name">
-                                          <FormControl_Shadcn_>
-                                            <Input_Shadcn_
-                                              placeholder="Project name"
-                                              {...field}
-                                              onChange={(event) => {
-                                                field.onChange(
-                                                  event.target.value.replace(/\./g, '')
-                                                )
-                                              }}
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItemLayout>
-                                      )}
-                                    />
-                                  </Panel.Content>
-
-                                  {cloudProviderEnabled && showNonProdFields && (
-                                    <Panel.Content>
-                                      <FormField_Shadcn_
-                                        control={form.control}
-                                        name="cloudProvider"
-                                        render={({ field }) => (
-                                          <FormItemLayout label="Cloud provider">
-                                            <Select_Shadcn_
-                                              onValueChange={(value) => {
-                                                field.onChange(value)
-                                                form.setValue(
-                                                  'dbRegion',
-                                                  value === 'FLY'
-                                                    ? FLY_REGIONS_DEFAULT.displayName
-                                                    : AWS_REGIONS_DEFAULT.displayName
-                                                )
-                                              }}
-                                              defaultValue={field.value}
-                                            >
-                                              <FormControl_Shadcn_>
-                                                <SelectTrigger_Shadcn_>
-                                                  <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                                                </SelectTrigger_Shadcn_>
-                                              </FormControl_Shadcn_>
-                                              <SelectContent_Shadcn_>
-                                                <SelectGroup_Shadcn_>
-                                                  {Object.values(PROVIDERS).map((providerObj) => {
-                                                    const label = providerObj['name']
-                                                    const value = providerObj['id']
-                                                    return (
-                                                      <SelectItem_Shadcn_ key={value} value={value}>
-                                                        {label}
-                                                      </SelectItem_Shadcn_>
-                                                    )
-                                                  })}
-                                                </SelectGroup_Shadcn_>
-                                              </SelectContent_Shadcn_>
-                                            </Select_Shadcn_>
-                                          </FormItemLayout>
-                                        )}
-                                      />
-                                    </Panel.Content>
-                                  )}
-
-                                  {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
-                                    <Panel.Content>
-                                      <FormField_Shadcn_
-                                        control={form.control}
-                                        name="instanceSize"
-                                        render={({ field }) => (
-                                          <FormItemLayout
-                                            label={
-                                              <div className="flex flex-col gap-y-4">
-                                                <span>Compute Size</span>
-                                              </div>
-                                            }
-                                            description={
-                                              <>
-                                                <p>
-                                                  The size for your dedicated database. You can
-                                                  change this later.
-                                                </p>
-                                              </>
-                                            }
-                                          >
-                                            <Select_Shadcn_
-                                              value={field.value}
-                                              onValueChange={(value) => field.onChange(value)}
-                                            >
-                                              <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                                <SelectValue_Shadcn_ placeholder="Select a compute size" />
-                                              </SelectTrigger_Shadcn_>
-                                              <SelectContent_Shadcn_>
-                                                <SelectGroup_Shadcn_>
-                                                  {sizes
-                                                    .filter((option) =>
-                                                      instanceSizeSpecs[
-                                                        option
-                                                      ].cloud_providers.includes(
-                                                        form.getValues(
-                                                          'cloudProvider'
-                                                        ) as CloudProvider
-                                                      )
-                                                    )
-                                                    .map((option) => {
-                                                      return (
-                                                        <SelectItem_Shadcn_
-                                                          key={option}
-                                                          value={option}
-                                                        >
-                                                          <div className="flex flex-row i gap-2">
-                                                            <div className="text-center w-[80px]">
-                                                              <Badge
-                                                                variant={
-                                                                  option === 'micro'
-                                                                    ? 'default'
-                                                                    : 'brand'
-                                                                }
-                                                                className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                                                              >
-                                                                {instanceSizeSpecs[option].label}
-                                                              </Badge>
-                                                            </div>
-                                                            <div className="text-sm">
-                                                              <span className="text-foreground">
-                                                                {instanceSizeSpecs[option].ram} RAM
-                                                                / {instanceSizeSpecs[option].cpu}{' '}
-                                                                {getCloudProviderArchitecture(
-                                                                  form.getValues(
-                                                                    'cloudProvider'
-                                                                  ) as CloudProvider
-                                                                )}{' '}
-                                                                CPU
-                                                              </span>
-                                                              <p className="text-xs text-muted instance-details">
-                                                                $
-                                                                {
-                                                                  instanceSizeSpecs[option]
-                                                                    .priceHourly
-                                                                }
-                                                                /hour (~$
-                                                                {
-                                                                  instanceSizeSpecs[option]
-                                                                    .priceMonthly
-                                                                }
-                                                                /month)
-                                                              </p>
-                                                            </div>
-                                                          </div>
-                                                        </SelectItem_Shadcn_>
-                                                      )
-                                                    })}
-                                                </SelectGroup_Shadcn_>
-                                              </SelectContent_Shadcn_>
-                                            </Select_Shadcn_>
-                                          </FormItemLayout>
-                                        )}
-                                      />
-                                      <div className="flex flex-col gap-y-2 my-4">
-                                        <Link
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                                        >
-                                          <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                            <p className="text-sm m-0">Compute Add-Ons</p>
-                                            <ExternalLink size={16} strokeWidth={1.5} />
-                                          </div>
-                                        </Link>
-                                        <Link
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
-                                        >
-                                          <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                            <p className="text-sm m-0">Compute Billing</p>
-                                            <ExternalLink size={16} strokeWidth={1.5} />
-                                          </div>
-                                        </Link>
-                                      </div>
-                                      <FormItemLayout>
-                                        <div className="flex justify-between mr-2">
-                                          <span>Additional Monthly Compute Costs</span>
-                                          <div className="text-brand flex gap-1 items-center">
-                                            {organizationProjects.length > 0 ? (
-                                              <>
-                                                <span>${additionalMonthlySpend}</span>
-                                              </>
-                                            ) : (
-                                              <>
-                                                <span className="text-foreground-lighter line-through">
-                                                  $
-                                                  {
-                                                    instanceSizeSpecs[
-                                                      instanceSize as DbInstanceSize
-                                                    ]!.priceMonthly
-                                                  }
-                                                </span>
-                                                <span>${additionalMonthlySpend}</span>
-                                              </>
-                                            )}
-                                            <InfoTooltip side="top" className="max-w-[450px] p-0">
-                                              <Table className="mt-2">
-                                                <TableHeader className="[&_th]:h-7">
-                                                  <TableRow className="py-2">
-                                                    <TableHead className="w-[170px]">
-                                                      Project
-                                                    </TableHead>
-                                                    <TableHead>Compute Size</TableHead>
-                                                    <TableHead className="text-right">
-                                                      Monthly Costs
-                                                    </TableHead>
-                                                  </TableRow>
-                                                </TableHeader>
-                                                <TableBody className="[&_td]:py-2">
-                                                  {organizationProjects.map((project) => (
-                                                    <TableRow
-                                                      key={project.ref}
-                                                      className="text-foreground-light"
-                                                    >
-                                                      <TableCell className="w-[170px] truncate">
-                                                        {project.name}
-                                                      </TableCell>
-                                                      <TableCell className="text-center">
-                                                        {instanceLabel(project.infra_compute_size)}
-                                                      </TableCell>
-                                                      <TableCell className="text-right">
-                                                        $
-                                                        {monthlyInstancePrice(
-                                                          project.infra_compute_size
-                                                        )}
-                                                      </TableCell>
-                                                    </TableRow>
-                                                  ))}
-
-                                                  <TableRow>
-                                                    <TableCell className="w-[170px] flex gap-2">
-                                                      <span className="truncate">
-                                                        {form.getValues('projectName')
-                                                          ? form.getValues('projectName')
-                                                          : 'New project'}
-                                                      </span>
-                                                      <Badge size={'small'} variant={'default'}>
-                                                        NEW
-                                                      </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
-                                                      {instanceLabel(instanceSize)}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                      ${monthlyInstancePrice(instanceSize)}
-                                                    </TableCell>
-                                                  </TableRow>
-                                                </TableBody>
-                                              </Table>
-                                              <PopoverSeparator />
-                                              <Table>
-                                                <TableHeader className="[&_th]:h-7">
-                                                  <TableRow>
-                                                    <TableHead colSpan={2}>
-                                                      Compute Credits
-                                                    </TableHead>
-                                                    <TableHead colSpan={1} className="text-right">
-                                                      -$10
-                                                    </TableHead>
-                                                  </TableRow>
-                                                </TableHeader>
-                                                <TableBody className="[&_td]:py-2">
-                                                  <TableRow className="text-foreground">
-                                                    <TableCell colSpan={2}>
-                                                      Total Monthly Compute Costs
-                                                      {/**
-                                                       * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                                       *
-                                                       * Will be adjusted in the future [kevin]
-                                                       */}
-                                                      {organizationProjects.length > 0 && (
-                                                        <p className="text-xs text-foreground-lighter">
-                                                          Excluding Read replicas
-                                                        </p>
-                                                      )}
-                                                    </TableCell>
-                                                    <TableCell colSpan={1} className="text-right">
-                                                      ${monthlyComputeCosts}
-                                                    </TableCell>
-                                                  </TableRow>
-                                                </TableBody>
-                                              </Table>
-
-                                              <div className="p-4 text-xs text-foreground-light space-y-1">
-                                                <p>
-                                                  Compute is charged usage-based whenever your
-                                                  billing cycle resets. Given compute charges are
-                                                  hourly, your invoice will contain "Compute Hours"
-                                                  for each hour a project ran on a specific compute
-                                                  size.
-                                                </p>
-                                                {monthlyComputeCosts > 0 && (
-                                                  <p>
-                                                    Compute costs are applied on top of your
-                                                    subscription plan costs.
-                                                  </p>
-                                                )}
-                                              </div>
-                                            </InfoTooltip>
-                                          </div>
-                                        </div>
-
-                                        <div className="mt-2 text-foreground-lighter space-y-1">
-                                          {additionalMonthlySpend > 0 &&
-                                          availableComputeCredits === 0 ? (
-                                            <p>
-                                              Your monthly spend will increase, and can be more than
-                                              above if you exceed your plan's usage quota. Your
-                                              organization includes $10/month of compute credits,
-                                              which you already exceed with your existing projects.
-                                            </p>
-                                          ) : additionalMonthlySpend > 0 &&
-                                            availableComputeCredits > 0 ? (
-                                            <p>
-                                              Your monthly spend will increase, and can be more than
-                                              above if you exceed your plan's usage quota. Your
-                                              organization includes $10/month of compute credits,
-                                              which you exceed with the selected compute size.
-                                            </p>
-                                          ) : (
-                                            <p>
-                                              Your monthly spend won't increase, unless you exceed
-                                              your plan's usage quota. Your organization includes
-                                              $10/month of compute credits, which cover this
-                                              project.
-                                            </p>
-                                          )}
-                                        </div>
-                                      </FormItemLayout>
-                                    </Panel.Content>
-                                  )}
-
-                                  <Panel.Content>
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="dbPass"
-                                      render={({ field }) => (
-                                        <FormItemLayout
-                                          label="Database Password"
-                                          description={
-                                            <PasswordStrengthBar
-                                              passwordStrengthScore={form.getValues(
-                                                'dbPassStrength'
-                                              )}
-                                              password={field.value}
-                                              passwordStrengthMessage={passwordStrengthMessage}
-                                              generateStrongPassword={generatePassword}
-                                            />
-                                          }
-                                        >
-                                          <FormControl_Shadcn_>
-                                            <Input
-                                              copy={field.value.length > 0}
-                                              type="password"
-                                              placeholder="Type in a strong password"
-                                              {...field}
-                                              autoComplete="off"
-                                              onChange={async (event) => {
-                                                field.onChange(event)
-                                                form.trigger('dbPassStrength')
-                                                const value = event.target.value
-                                                if (event.target.value === '') {
-                                                  await form.setValue('dbPassStrength', 0)
-                                                  await form.trigger('dbPass')
-                                                } else {
-                                                  await delayedCheckPasswordStrength(value)
-                                                }
-                                              }}
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItemLayout>
-                                      )}
-                                    />
-                                  </Panel.Content>
-
-                                  <Panel.Content>
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="dbRegion"
-                                      render={({ field }) => (
-                                        <RegionSelector
-                                          field={field}
-                                          form={form}
-                                          cloudProvider={
-                                            form.getValues('cloudProvider') as CloudProvider
-                                          }
-                                        />
-                                      )}
-                                    />
-                                  </Panel.Content>
-
-                                  {!projectVersionSelectionDisabled && (
-                                    <Panel.Content>
-                                      <FormField_Shadcn_
-                                        control={form.control}
-                                        name="postgresVersionSelection"
-                                        render={({ field }) => (
-                                          <PostgresVersionSelector
-                                            field={field}
-                                            form={form}
-                                            cloudProvider={
-                                              form.getValues('cloudProvider') as CloudProvider
-                                            }
-                                            organizationSlug={slug}
-                                            dbRegion={form.getValues('dbRegion')}
-                                          />
-                                        )}
-                                      />
-                                    </Panel.Content>
-                                  )}
-
-                                  {showNonProdFields && (
-                                    <Panel.Content>
-                                      <FormField_Shadcn_
-                                        control={form.control}
-                                        name="postgresVersion"
-                                        render={({ field }) => (
-                                          <FormItemLayout
-                                            label="Custom Postgres version"
-                                            description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
-                                          >
-                                            <FormControl_Shadcn_>
-                                              <Input_Shadcn_
-                                                placeholder="Postgres version"
-                                                {...field}
-                                                autoComplete="off"
-                                              />
-                                            </FormControl_Shadcn_>
-                                          </FormItemLayout>
-                                        )}
-                                      />
-                                    </Panel.Content>
-                                  )}
-
-                                  <SecurityOptions form={form} />
-                                  {allowOrioleDB && !!availableOrioleVersion && (
-                                    <AdvancedConfiguration form={form} />
-                                  )}
-                                </>
-                              )}
-
-                              {freePlanWithExceedingLimits ? (
-                                isAdmin &&
-                                slug && (
-                                  <Panel.Content>
-                                    <FreeProjectLimitWarning
-                                      membersExceededLimit={membersExceededLimit || []}
-                                      orgSlug={slug}
-                                    />
-                                  </Panel.Content>
-                                )
-                              ) : isManagedByVercel ? (
-                                <Panel.Content>
-                                  <PartnerManagedResource
-                                    partner="vercel-marketplace"
-                                    resource="Projects"
-                                    cta={{
-                                      installationId: currentOrg?.partner_id,
-                                      message: 'Visit Vercel to create a project',
-                                    }}
-                                  />
-                                </Panel.Content>
-                              ) : hasOutstandingInvoices ? (
-                                <Panel.Content>
-                                  <Admonition
-                                    type="default"
-                                    title="Your organization has overdue invoices"
-                                    description={
-                                      <div className="space-y-3">
-                                        <p className="text-sm leading-normal">
-                                          Please resolve all outstanding invoices first before
-                                          creating a new project
-                                        </p>
-
-                                        <div>
-                                          <Button asChild type="default">
-                                            <Link href={`/org/${slug}/invoices`}>
-                                              View invoices
-                                            </Link>
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    }
-                                  />
-                                </Panel.Content>
-                              ) : null}
-                            </div>
-                          )}
-                        </>
-                      </div>
-                    </section>
-                  ) : (
-                    <>
-                      {messages.length > 0 && (
-                        <div className="flex-1 h-full flex flex-col p-6 overflow-auto">
-                          <div className="space-y-4 mb-4">
-                            {messages
-                              .filter((m) => m.content?.length > 0)
-                              .map((m: Message) => (
-                                <div key={m.id}>
-                                  <Message
-                                    role={m.role as 'user' | 'assistant' | 'system'}
-                                    content={m.content}
-                                    isLoading={m === messages[messages.length - 1] && !m.content}
-                                  />
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )}
-                      {messages.length === 0 && (
-                        <div className="h-full w-full max-w-4xl flex flex-col justify-between p-6">
-                          <>
-                            <div className="h-48 flex-0">
-                              <DotGrid rows={10} columns={10} count={33} />
-                            </div>
-                            <div>
-                              <motion.h3
-                                className="mb-4"
-                                variants={{
-                                  hidden: { opacity: 0, y: 10 },
-                                  show: { opacity: 1, y: 0 },
-                                }}
-                                initial="hidden"
-                                animate="show"
-                              >
-                                What would you like to create?
-                              </motion.h3>
-                              <p className="text-foreground-light text-sm">
-                                Describe what you want to build and add any specific database
-                                requirements.
-                              </p>
-                              <div className="flex gap-2 flex-wrap mt-4 justify-start">
-                                <Button
-                                  type="outline"
-                                  className="rounded-full"
-                                  onClick={() =>
-                                    setInput(
-                                      'Create a Slack clone with channels, direct messages, and user profiles. Include tables for users, channels, messages, and channel memberships.'
-                                    )
-                                  }
-                                >
-                                  A Slack clone
-                                </Button>
-                                <Button
-                                  type="outline"
-                                  className="rounded-full"
-                                  onClick={() =>
-                                    setInput(
-                                      'Create a document database schema with support for hierarchical document storage, versioning, and metadata. Include tables for documents, versions, and tags.'
-                                    )
-                                  }
-                                >
-                                  Document database
-                                </Button>
-                                <Button
-                                  type="outline"
-                                  className="rounded-full"
-                                  onClick={() =>
-                                    setInput(
-                                      'Create a todo list application with support for multiple lists, due dates, priorities, and task categories. Include tables for users, lists, tasks, and categories.'
-                                    )
-                                  }
-                                >
-                                  Todo list
-                                </Button>
-                              </div>
-                            </div>
-                          </>
-                        </div>
-                      )}
-
-                      <div className="p-6 pt-0">
-                        <textarea
-                          id="input"
-                          name="prompt"
-                          autoComplete="off"
-                          className="w-full rounded-lg border px-4 text-sm py-2 bg-muted mb-0"
-                          value={input}
-                          onChange={handleInputChange}
-                          placeholder="Describe your application..."
-                          autoFocus
-                          rows={Math.max(3, Math.min(input.split('\n').length, 10))}
-                          onKeyDown={(e) => {
-                            if (!(e.target instanceof HTMLTextAreaElement)) {
-                              return
-                            }
-                            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-                              e.preventDefault()
-                              append({ role: 'user', content: input })
-                              setInput('')
-                            }
-                          }}
-                        />
-                      </div>
-                    </>
-                  )}
-                </form>
-              </Form_Shadcn_>
             </div>
           </div>
         </section>

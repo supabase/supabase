@@ -88,6 +88,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body
 
+  console.log('messages', messages)
+
   const result = await streamText({
     model: openai('gpt-4o-mini'),
     maxSteps: 7,
@@ -104,26 +106,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Create a profiles table in the public schema that links to auth.users instead of creating a users table
       - Always include appropriate indexes and foreign key constraints.
 
-
       Follow these rules:
-      - The first thing you should do is provide a brief explanation of what you're about to do. You can do this in parallel to calling tools.
-      • Do not ask for more information.
-      • Always call the executeSql tool when generating the database schema.
-      • Always set services after generating or modifying the schema
-      • Do not display SQL to the user or ask for confirmation.
-      • Provide a brief explanation of changes. Do not explain every detail of the schema. e.g. no need to explain column names
-      • All tools can be called in parallel.
-      • Always assess services required after each message. If a feature is added, decide whether that feature requires a new service. If so, call setServices with the new service as well as the existing services
-      • When setting services, include the complete list of required services (e.g. if adding storage to existing auth and database, include all three in the list vs just adding storage).
-      • Storage is used for file uploads.
-      • Auth is used for authentication.
-      • Database is used for storing data.
-      • Realtime is used for real-time updates.
-      • Edge Functions are used for serverless functions.
-      • Cron is used for scheduled tasks.
-      • Set a unique project title unless user provided one.
-      • Always set userInfo and dbConfig yourself after a description is provided by just inferring from the messages. Always add all existing and new user info and db config details to the tool call.
-      • Keep responses concise and to the point.
+      1. Generate a database schema that meets the user's requirements by calling the executeSql tool. Make your best guess without needing to ask for more.
+      2. Set the services required for the user's use case by calling the setServices tool.
+      3. Set the project title by calling the setTitle tool.
+      4. Always respond with a short single paragraph of less than 80 words of what you changed and the current state of the schema.
     `,
     messages,
     tools: getTools(),
