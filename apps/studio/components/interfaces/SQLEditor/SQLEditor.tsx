@@ -700,7 +700,7 @@ export const SQLEditor = () => {
                         />
                         {showWidget && (
                           <InlineWidget
-                            editor={diffEditorRef.current}
+                            editor={diffEditorRef.current!}
                             id="ask-ai-diff"
                             heightInLines={3}
                             afterLineNumber={0}
