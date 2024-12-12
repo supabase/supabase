@@ -24,36 +24,39 @@ export const BackupsList = ({ onSelectRestore }: BackupsListProps) => {
   )
 
   return (
-    <Panel>
-      {cloneBackups?.backups.length === 0 ? (
-        <>
-          <BackupsEmpty />
-        </>
-      ) : (
-        <div className="divide-y">
-          {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
-          {cloneBackups?.backups.map((backup) => {
-            if (!backup.isPhysicalBackup) return null
-            return (
-              <div className="flex p-4 gap-4" key={backup.id}>
-                <div>
-                  <TimestampInfo value={backup.inserted_at} />
+    <div className="flex flex-col gap-2">
+      <h3 className="text-sm font-medium">Available Backups</h3>
+      <Panel>
+        {cloneBackups?.backups.length === 0 ? (
+          <>
+            <BackupsEmpty />
+          </>
+        ) : (
+          <div className="divide-y">
+            {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
+            {cloneBackups?.backups.map((backup) => {
+              if (!backup.isPhysicalBackup) return null
+              return (
+                <div className="flex p-4 gap-4" key={backup.id}>
+                  <div>
+                    <TimestampInfo value={backup.inserted_at} />
+                  </div>
+                  <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                  {(backup.status as any) === 'COMPLETED' && (
+                    <Button
+                      className="ml-auto"
+                      type="outline"
+                      onClick={() => onSelectRestore(backup.id)}
+                    >
+                      Restore
+                    </Button>
+                  )}
                 </div>
-                <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                {(backup.status as any) === 'COMPLETED' && (
-                  <Button
-                    className="ml-auto"
-                    type="outline"
-                    onClick={() => onSelectRestore(backup.id)}
-                  >
-                    Restore
-                  </Button>
-                )}
-              </div>
-            )
-          })}
-        </div>
-      )}
-    </Panel>
+              )
+            })}
+          </div>
+        )}
+      </Panel>
+    </div>
   )
 }
