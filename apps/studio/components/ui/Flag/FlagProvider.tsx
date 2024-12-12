@@ -5,6 +5,7 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import { useUser } from 'lib/auth'
 import { getFlags } from 'lib/configcat'
 import { IS_PLATFORM } from 'lib/constants'
+import { CallFeatureFlagsResponse, getPHFeatureFlags } from 'lib/posthog'
 import FlagContext from './FlagContext'
 
 var getCookies = function () {
@@ -19,14 +20,27 @@ var getCookies = function () {
   return cookies
 }
 
+export type FlagProviderStore = {
+  configcat: { [key: string]: boolean | string }
+  posthog: CallFeatureFlagsResponse
+}
+
 const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
   const user = useUser()
 
   const { Provider } = FlagContext
-  const [store, setStore] = useState({})
+  const [store, setStore] = useState<FlagProviderStore>({ configcat: {}, posthog: {} })
 
   const processFlags = async (user?: User) => {
-    const flagStore: any = {}
+    const flagStore: FlagProviderStore = { configcat: {}, posthog: {} }
+
+    // Load PH flags
+    if (user) {
+      const flags = await getPHFeatureFlags()
+      if (flags) flagStore.posthog = flags
+    }
+
+    // Load ConfigCat flags
     const flagValues = await getFlags(user)
     let overridesCookieValue: Record<string, boolean> = {}
     try {
@@ -35,7 +49,8 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
     } catch {}
 
     flagValues.forEach((item) => {
-      flagStore[item.settingKey] = overridesCookieValue[item.settingKey] ?? item.settingValue
+      flagStore['configcat'][item.settingKey] =
+        overridesCookieValue[item.settingKey] ?? item.settingValue
     })
     setStore(flagStore)
   }
@@ -50,7 +65,11 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <Provider value={store}>
-      <FlagValues values={store} />
+      {/* 
+        [Joshen] Just support configcat flags in Vercel flags for now for simplicity
+        although I think it should be fairly simply to support PH too 
+      */}
+      <FlagValues values={store.configcat} />
       {children}
     </Provider>
   )
