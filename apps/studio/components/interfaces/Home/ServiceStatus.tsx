@@ -6,7 +6,11 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'common'
 import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
-import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
+import {
+  ProjectServiceStatus,
+  ProjectServiceStatusData,
+  useProjectServiceStatusQuery,
+} from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
@@ -21,6 +25,7 @@ import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
 
 const StatusMessage = ({
+  status,
   isLoading,
   isSuccess,
   isProjectNew,
@@ -28,10 +33,14 @@ const StatusMessage = ({
   isLoading: boolean
   isSuccess: boolean
   isProjectNew: boolean
+  status?: ProjectServiceStatus
 }) => {
   if (isLoading) return 'Checking status'
   if (isProjectNew) return 'Coming up...'
   if (isSuccess) return 'No issues'
+  if (status === 'UNHEALTHY') return 'Unhealthy'
+  if (status === 'COMING_UP') return 'Coming up...'
+  if (status === 'ACTIVE_HEALTHY') return 'Healthy'
   return 'Unable to connect'
 }
 
@@ -98,6 +107,7 @@ const ServiceStatus = () => {
     isLoading: boolean
     isSuccess?: boolean
     logsUrl: string
+    status?: ProjectServiceStatus
   }[] = [
     {
       name: 'Database',
@@ -113,6 +123,7 @@ const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading,
       isSuccess: restStatus?.healthy,
+      status: restStatus?.status,
       logsUrl: '/logs/postgrest-logs',
     },
     ...(authEnabled
@@ -123,6 +134,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: authStatus?.healthy,
+            status: authStatus?.status,
             logsUrl: '/logs/auth-logs',
           },
         ]
@@ -135,6 +147,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: realtimeStatus?.healthy,
+            status: realtimeStatus?.status,
             logsUrl: '/logs/realtime-logs',
           },
         ]
@@ -147,6 +160,7 @@ const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             isSuccess: storageStatus?.healthy,
+            status: storageStatus?.status,
             logsUrl: '/logs/storage-logs',
           },
         ]
@@ -235,6 +249,7 @@ const ServiceStatus = () => {
                     isLoading={service.isLoading}
                     isSuccess={!!service.isSuccess}
                     isProjectNew={isProjectNew}
+                    status={service.status}
                   />
                 </p>
               </div>
