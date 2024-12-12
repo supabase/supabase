@@ -72,11 +72,15 @@ breadcrumb: 'Migrations'
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Restore your backup" fullWidth>
-      Go to your [project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string:
+      Go to your [project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look something like this:
 
-      You will want to use the Direct connection string if you are able to (you have a IPv6 compatible network or have purchased the IPv4 addon). Otherwise, you will need to use the Session pooler connection string.
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
+        ```
 
-      Run this command after replacing the connection string below with your connection string from your project:
+      You will want to use the direct connection string if you are able to (you need to have an IPv6 compatible network or have purchased the IPv4 addon). Otherwise, you will need to use the Session pooler connection string.
+
+      Run this command after replacing the connection string as well as the password below with your connection string from your project:
 
       <StepHikeCompact.Code>
 
