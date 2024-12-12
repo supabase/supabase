@@ -1,0 +1,46 @@
+---
+title = "Connection errors when connecting to a Supabase database"
+github_url = "https://github.com/orgs/supabase/discussions/20951"
+date_created = "2024-02-02T13:11:59+00:00"
+topics = ["database", "platform", "supavisor"]
+keywords = ["ipv6", "network", "connections"]
+
+[[errors]]
+message = "(dial tcp [2001:db8:3333:4444:5555:6666:7777:8888]:5432: connect: no route to host)"
+
+[[errors]]
+message = "connect to db.example.supabase.co port 5432 (tcp) failed: Network is unreachable"
+
+[[errors]]
+message = 'could not translate host name "db.example.supabase.co" to address: nodename nor servname provided, or not known'
+
+[[errors]]
+code = "ENETUNREACH"
+
+[[errors]]
+code = "P1001"
+message = "Can't reach database server at db.example.supabase.co:5432"
+
+[[errors]]
+message = "port 5432 failed: could not create socket: Address family not supported by protocol"
+---
+
+If you receive any of the following error messages, it might be because the network you are connecting from does not support IPv6.
+
+- `(dial tcp [2001:db8:3333:4444:5555:6666:7777:8888]:5432: connect: no route to host)`
+- `connect to db.example.supabase.co (2001:db8:3333:4444:5555:6666:7777:8888) port 5432 (tcp) failed: Network is unreachable`
+- `could not translate host name "db.example.supabase.co" to address: nodename nor servname provided, or not known`
+- `ENETUNREACH 2001:db8:3333:4444:5555:6666:7777:8888`
+- `Error: P1001: Can't reach database server at db.example.supabase.co:5432`
+- `(2001:db8:3333:4444:5555:6666:7777:8888), port 5432 failed: could not create socket: Address family not supported by protocol`
+
+Note that these errors may manifest in cases other than your client network not supporting IPv6, but if you run into these errors after your project was migrated, it is likely that it is due to your network not supporting IPv6.
+
+To remediate this issue, either
+
+- configure your network for IPv6.
+- connect via Supavisor which resolves to a IPv4 address. You can get to your Supavisor connecting from the database settings page [here](https://supabase.com/dashboard/project/_/settings/database).
+- Purchase [the IPv4 addon](https://supabase.com/docs/guides/platform/ipv4-address).
+- Switch to using our client libraries or PostgREST.
+
+Visit [this discussion](https://github.com/orgs/supabase/discussions/17817) for more information about the IPv6 transition.

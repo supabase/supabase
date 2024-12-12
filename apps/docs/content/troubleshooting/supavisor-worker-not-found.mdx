@@ -1,0 +1,11 @@
+---
+title = "Supavisor worker not found"
+topics = ["database", "supavisor"]
+keywords = ["connections", "pooler"]
+
+[[errors]]
+code = ":worker_not_found"
+message = "Subscribe error: {:error, :worker_not_found}"
+---
+
+This log event is emitted when the client tries to connect to the database, but Supavisor does not have the necessary information to route the connection. Try reconnecting to the database as it can take some time for the project information to propagate to Supavisor.

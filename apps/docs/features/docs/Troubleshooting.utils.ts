@@ -74,7 +74,6 @@ export async function getAllTroubleshootingErrors() {
     if (seen.has(key)) {
       allErrors.delete(error)
     }
-    seen.add(key)
   }
 
   function sortErrors(
