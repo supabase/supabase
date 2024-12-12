@@ -16,7 +16,6 @@ const useDragToClose = ({
 
   const handleTouchStart = useCallback(
     (e: React.TouchEvent<HTMLDivElement>) => {
-      console.log('Touch started')
       setStartY(e.touches[0].clientY)
     },
     [setStartY]
