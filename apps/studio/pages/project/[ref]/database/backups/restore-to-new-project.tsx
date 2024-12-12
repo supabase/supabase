@@ -201,9 +201,7 @@ const RestoreToNewProject = () => {
           If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
-          <Link
-            href={`/dashboard/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}
-          >
+          <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
             Go to original project
           </Link>
         </Button>
