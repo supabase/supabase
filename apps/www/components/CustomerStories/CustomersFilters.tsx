@@ -172,7 +172,13 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
                       : ''
                   )}
                 >
-                  {industry === 'all' ? 'All Industries' : startCase(industry.replaceAll('-', ' '))}{' '}
+                  {industry === 'all'
+                    ? 'All Industries'
+                    : industry === 'ai'
+                      ? 'AI'
+                      : industry === 'saas'
+                        ? 'SaaS'
+                        : startCase(industry.replaceAll('-', ' '))}{' '}
                   <span className="text-foreground-lighter text-xs w-3">{count}</span>
                 </DropdownMenuItem>
               ))}
