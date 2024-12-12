@@ -39,12 +39,14 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -169,7 +171,7 @@ const TableEditorMenu = () => {
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
-              autoFocus
+              autoFocus={!isMobile}
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {

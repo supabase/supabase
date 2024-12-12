@@ -7,6 +7,10 @@ interface ProductMenuBarProps {
 const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarProps>) => {
   return (
     <div
+      /**
+       * id used in playwright-tests/tests/snapshot/spec/table-editor.spec.ts
+       * */
+      id="spec-click-target"
       className={[
         'hide-scrollbar flex flex-col w-full h-full', // Layout
         'bg-dash-sidebar',
