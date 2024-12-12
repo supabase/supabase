@@ -150,9 +150,7 @@ The following code samples are for App Router. For help with Pages Router, see t
 >
 <TabPanel id="client" label="Client-side">
 
-```ts utils/supabase/client.tsx
-'use client'
-
+```ts utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -167,7 +165,7 @@ export function createClient() {
 
 <TabPanel id="server" label="Server-side">
 
-```ts utils/supabase/server.tsx
+```ts utils/supabase/server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
