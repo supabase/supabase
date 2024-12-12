@@ -35,6 +35,7 @@ The extension enables Postgres to query tables and views on a remote Postgres se
         Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
 
     </TabPanel>
+
 </Tabs>
 
 ## Create a connection to another database
@@ -51,8 +52,8 @@ The extension enables Postgres to query tables and views on a remote Postgres se
                 create server "<foreign_server_name>"
                 foreign data wrapper postgres_fdw
                 options (
-                    host '<host>', 
-                    port '<port>', 
+                    host '<host>',
+                    port '<port>',
                     dbname '<dbname>'
                 );
             ```
@@ -68,7 +69,7 @@ The extension enables Postgres to query tables and views on a remote Postgres se
             create user mapping for "<dbname>"
             server "<foreign_server_name>"
             options (
-                user '<db_user>', 
+                user '<db_user>',
                 password '<password>'
             );
             ```
@@ -102,12 +103,13 @@ The extension enables Postgres to query tables and views on a remote Postgres se
     <StepHikeCompact.Step step={4}>
         <StepHikeCompact.Details title="Query foreign table"/>
         <StepHikeCompact.Code>
-            
+
             ```sql
             select * from '<foreign_table>'
             ```
         </StepHikeCompact.Code>
     </StepHikeCompact.Step>
+
 </StepHikeCompact>
 
 ### Configuring execution options
