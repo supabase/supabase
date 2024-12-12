@@ -97,10 +97,7 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('Enter a value').fill('2')
     await page.getByRole('button', { name: 'Apply filter' }).click()
     // click away to close the filter dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .click()
+    await page.locator('#table-editor-spec-target').click()
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).not.toContainText('100')
   })
