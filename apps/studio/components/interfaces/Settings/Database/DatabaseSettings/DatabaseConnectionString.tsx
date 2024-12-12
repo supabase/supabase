@@ -40,6 +40,7 @@ import {
   getConnectionStrings,
   getPoolerTld,
 } from './DatabaseSettings.utils'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 const CONNECTION_TYPES = [
   { id: 'uri', label: 'URI' },
@@ -104,12 +105,8 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
       : 'co'
 
   const handleCopy = (id: string) => {
-    const labelValue = CONNECTION_TYPES.find((type) => type.id === id)?.label
-    sendEvent({
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ? labelValue : '',
-    })
+    const connectionType = CONNECTION_TYPES.find((type) => type.id === id)?.label
+    sendEvent({ action: TelemetryActions.CONNECTION_STRING_COPIED, properties: { connectionType } })
   }
 
   const connectionStrings =
