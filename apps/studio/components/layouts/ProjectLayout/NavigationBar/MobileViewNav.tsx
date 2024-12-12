@@ -1,23 +1,15 @@
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
-import { useSheet } from 'ui-patterns/Sheet'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 interface Props {
   title?: string
-  productMenu?: ReactNode
+  handleMobileMenu: Function
 }
 
-const MobileViewNav = ({ title, productMenu }: PropsWithChildren<Props>) => {
-  const { openSheet, setSheetContent } = useSheet()
-
-  const handleMobileMenu = () => {
-    setSheetContent(<div className="w-full h-full flex flex-col pt-2 pb-6">{productMenu}</div>)
-    openSheet()
-  }
-
+const MobileViewNav = ({ title, handleMobileMenu }: PropsWithChildren<Props>) => {
   return (
     <nav
       className={cn(

@@ -1,6 +1,14 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
+import {
+  forwardRef,
+  Fragment,
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -130,10 +138,19 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
 
-    const handleMobileMenu = () => {
-      setSheetContent(<div className="w-full h-full flex flex-col pt-2 pb-6">{productMenu}</div>)
-      openSheet()
-    }
+    const handleMobileMenu = useCallback(() => {
+      if (!isLoading) {
+        setSheetContent(
+          <div
+            className="w-full h-full flex flex-col pt-2 pb-6"
+            key={`sheet-content-${Date.now()}`}
+          >
+            {productMenu}
+          </div>
+        )
+        openSheet()
+      }
+    }, [isLoading, productMenu, setSheetContent])
 
     return (
       <AppLayout>
@@ -158,7 +175,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             {/* Top Nav to access products from mobile */}
             {!hideIconBar && <MobileNavigationBar />}
             {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
-              <MobileViewNav title={product} productMenu={productMenu} />
+              <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
             )}
 
             {/* Product menu bar */}

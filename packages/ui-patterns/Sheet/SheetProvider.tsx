@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/compat/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
 import { cn, CommandEmpty_Shadcn_, Dialog, DialogContent } from 'ui'
@@ -12,8 +12,16 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [isOpen, setIsOpen] = useState(false)
   const [sheetContent, setSheetContent] = useState<React.ReactNode>(null)
   const { width } = useWindowSize()
-  const openSheet = () => setIsOpen(true)
-  const closeSheet = () => setIsOpen(false)
+
+  const openSheet = useCallback(() => setIsOpen(true), [])
+  const closeSheet = useCallback(() => setIsOpen(false), [])
+
+  const updateSheetContent = useCallback(
+    (content: React.ReactNode) => {
+      setSheetContent(content)
+    },
+    [setSheetContent]
+  )
 
   useEffect(() => {
     setIsOpen(false)
@@ -24,7 +32,14 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   }, [width])
 
   return (
-    <SheetContext.Provider value={{ openSheet, closeSheet, isOpen, setSheetContent }}>
+    <SheetContext.Provider
+      value={{
+        openSheet,
+        closeSheet,
+        isOpen,
+        setSheetContent: updateSheetContent,
+      }}
+    >
       {children}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent
@@ -39,9 +54,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             'h-[85dvh] mt-[15vh] md:max-h-[500px] md:mt-0 left-0 bottom-0 md:bottom-auto',
             '!animate-in !slide-in-from-bottom-[85%] !duration-300',
             'data-[state=closed]:!animate-out data-[state=closed]:!slide-out-to-bottom',
-            // Remove defaults set from primitive component
             '!slide-in-from-left-[0%] :!slide-in-from-top-[0%]',
-            // Remove defaults set from primitive component
             '!slide-out-to-left-[0%] !slide-out-to-top-[0%]',
             'md:data-[state=open]:!slide-in-from-bottom-[0%] md:data-[state=closed]:!slide-out-to-bottom-[0%]',
             'md:data-[state=open]:!zoom-in-95 md:data-[state=closed]:!zoom-out-95'
