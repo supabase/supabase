@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText, Info, X, ArrowDown } from 'lucide-react'
-import { memo, useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { ArrowDown, FileText, Info, X } from 'lucide-react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
@@ -24,7 +24,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -118,11 +118,10 @@ export const AIAssistant = ({
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (value: string) => {
+  const sendTelemetryEvent = (action: TelemetryActions) => {
     sendEvent({
-      value,
-      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
+      action,
+      properties: { contextAdded: (sqlSnippets ?? []).length > 0 },
     })
   }
 
@@ -195,9 +194,9 @@ export const AIAssistant = ({
     setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
-      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
+      sendTelemetryEvent(TelemetryActions.ASSISTANT_DEBUG_SUBMITTED)
     } else {
-      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+      sendTelemetryEvent(TelemetryActions.ASSISTANT_PROMPT_SUBMITTED)
     }
   }
 

@@ -26,6 +26,7 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
@@ -450,11 +451,7 @@ export const SQLEditor = () => {
         }
       }
 
-      sendEvent({
-        category: 'sql_editor',
-        action: 'ai_suggestion_accepted',
-        label: 'edit_snippet',
-      })
+      sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED })
 
       setSelectedDiffType(DiffType.Modification)
       setSourceSqlDiff(undefined)
@@ -474,12 +471,7 @@ export const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({
-      category: 'sql_editor',
-      action: 'ai_suggestion_rejected',
-      label: 'edit_snippet',
-    })
-
+    sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED })
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
   }, [router])

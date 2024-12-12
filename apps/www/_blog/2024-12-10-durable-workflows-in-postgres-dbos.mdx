@@ -50,7 +50,7 @@ The process is simple, but writing a _robust_ program for this is surprisingly d
 - You get to step 2, “Check Inventory”, and you're out of stock. You need to wait 24 hours for the new inventory before you can ship it. You need that “step” to sleep for a day.
 - Your program crashes during step 3, “Ship Order”, and it doesn't record that you've shipped the inventory. You end up sending the same order twice.
 
-A Durable Workflow Engine helps with these problems (and more). There are a few on the market that provide different architectures like [Trigger.dev](https://trigger.dev/), [Inngest](https://www.inngest.com/), [Windmill](https://www.windmill.dev), [Temporal](https://temporal.io/), and [AWS Step Functions](https://aws.amazon.com/step-functions/).
+A Durable Workflow Engine helps with these problems (and more). There are a few on the market that provide different architectures like [Oban](https://oban.pro/), [Trigger.dev](https://trigger.dev/), [Inngest](https://www.inngest.com/), [Windmill](https://www.windmill.dev), [Temporal](https://temporal.io/), and [AWS Step Functions](https://aws.amazon.com/step-functions/).
 
 DBOS offers a relatively unique approach to Workflows, storing the state in your own Postgres database. Let's explore how DBOS does it.
 
