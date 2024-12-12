@@ -44,7 +44,7 @@ Make sure the all users in your application have the `role: 'authenticated'` [cu
 
 <TabPanel id="dart" label="Flutter">
 
-Creating a client for the Web is as easy as passing the `accessToken` async function. This function should [return the Firebase Auth JWT of the current user](https://firebase.google.com/docs/auth/admin/verify-id-tokens#web) (or null if no such user) is found.
+Creating a client for the Web is as easy as passing the `accessToken` async function. This function should [return the Firebase Auth JWT of the current user](https://firebase.google.com/docs/auth/admin/verify-id-tokens) (or null if no such user) is found.
 
 ```dart
 await Supabase.initialize(
@@ -53,9 +53,6 @@ await Supabase.initialize(
   debug: false,
   accessToken: () async {
     final token = await FirebaseAuth.instance.currentUser?.getIdToken();
-    if (token == null) {
-      throw Exception('User is not signed in');
-    }
     return token;
   },
 );
