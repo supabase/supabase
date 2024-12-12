@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
@@ -50,11 +51,7 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendEvent({
-            category: 'realtime_inspector',
-            action: 'send_broadcast_message',
-            label: 'realtime_inspector_results',
-          })
+          sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT })
           sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />

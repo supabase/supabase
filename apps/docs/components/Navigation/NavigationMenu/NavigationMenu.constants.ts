@@ -2021,6 +2021,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
+        { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions',

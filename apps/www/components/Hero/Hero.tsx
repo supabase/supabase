@@ -25,9 +25,9 @@ const Hero = () => {
                 <div className="flex flex-col items-center">
                   <div className="z-40 w-full flex justify-center -mt-4 lg:-mt-12 mb-8">
                     <AnnouncementBadge
-                      url="/launch-week#day-5"
-                      badge="LW13: Day 5"
-                      announcement="database.build v2"
+                      url="/launch-week"
+                      badge="Launch Week 13"
+                      announcement="Learn more"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">
