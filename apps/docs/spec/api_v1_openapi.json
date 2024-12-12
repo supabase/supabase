@@ -88,6 +88,35 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/branches/{branch_id}/push": {
+      "post": {
+        "operationId": "v1-push-a-branch",
+        "summary": "Pushes a database branch",
+        "description": "Pushes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
+              }
+            }
+          },
+          "500": { "description": "Failed to push database branch" }
+        },
+        "tags": ["Environments"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/branches/{branch_id}/reset": {
       "post": {
         "operationId": "v1-reset-a-branch",
@@ -107,7 +136,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/BranchResetResponse" }
+                "schema": { "$ref": "#/components/schemas/BranchUpdateResponse" }
               }
             }
           },
@@ -280,6 +309,24 @@
             }
           }
         },
+        "tags": ["OAuth"],
+        "security": [{ "oauth2": ["write"] }]
+      }
+    },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "v1-revoke-token",
+        "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OAuthRevokeTokenBodyDto" }
+            }
+          }
+        },
+        "responses": { "204": { "description": "" } },
         "tags": ["OAuth"],
         "security": [{ "oauth2": ["write"] }]
       }
@@ -1977,6 +2024,24 @@
         "security": [{ "bearer": [] }]
       }
     },
+    "/v1/projects/{ref}/pause": {
+      "post": {
+        "operationId": "v1-pause-a-project",
+        "summary": "Pauses the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": { "minLength": 20, "maxLength": 20, "type": "string" }
+          }
+        ],
+        "responses": { "200": { "description": "" }, "403": { "description": "" } },
+        "tags": ["Projects"],
+        "security": [{ "bearer": [] }]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -2670,9 +2735,13 @@
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
+          "reset_on_push": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+          },
           "branch_name": { "type": "string" },
           "git_branch": { "type": "string" },
-          "reset_on_push": { "type": "boolean" },
           "persistent": { "type": "boolean" },
           "status": {
             "enum": [
@@ -2691,14 +2760,17 @@
         "type": "object",
         "properties": {
           "pr_number": { "type": "integer", "format": "int32" },
-          "latest_check_run_id": { "type": "integer", "format": "int64" },
+          "latest_check_run_id": {
+            "type": "number",
+            "deprecated": true,
+            "description": "This field is deprecated and will not be populated."
+          },
           "id": { "type": "string" },
           "name": { "type": "string" },
           "project_ref": { "type": "string" },
           "parent_project_ref": { "type": "string" },
           "is_default": { "type": "boolean" },
           "git_branch": { "type": "string" },
-          "reset_on_push": { "type": "boolean" },
           "persistent": { "type": "boolean" },
           "status": {
             "enum": [
@@ -2720,7 +2792,6 @@
           "project_ref",
           "parent_project_ref",
           "is_default",
-          "reset_on_push",
           "persistent",
           "status",
           "created_at",
@@ -2732,7 +2803,7 @@
         "properties": { "message": { "type": "string" } },
         "required": ["message"]
       },
-      "BranchResetResponse": {
+      "BranchUpdateResponse": {
         "type": "object",
         "properties": { "workflow_run_id": { "type": "string" }, "message": { "type": "string" } },
         "required": ["workflow_run_id", "message"]
@@ -2791,10 +2862,7 @@
         "type": "object",
         "properties": {
           "db_pass": { "type": "string", "description": "Database password" },
-          "name": {
-            "type": "string",
-            "description": "Name of your project, should not contain dots"
-          },
+          "name": { "type": "string", "description": "Name of your project" },
           "organization_id": { "type": "string", "description": "Slug of your organization" },
           "plan": {
             "type": "string",
@@ -2938,6 +3006,16 @@
           "refresh_token": { "type": "string" }
         },
         "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+      },
+      "OAuthRevokeTokenBodyDto": {
+        "type": "object",
+        "properties": {
+          "client_id": { "type": "string", "format": "uuid" },
+          "client_secret": { "type": "string" },
+          "refresh_token": { "type": "string" }
+        },
+        "required": ["client_id", "client_secret", "refresh_token"],
+        "additionalProperties": false
       },
       "SnippetProject": {
         "type": "object",
