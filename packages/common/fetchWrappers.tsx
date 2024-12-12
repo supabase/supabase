@@ -3,14 +3,17 @@ interface DataProps {
 }
 
 export const post = (url: string, data: DataProps, options = {} as { [key: string]: any }) => {
-  const { optionHeaders, ...otherOptions } = options
+  const { headers: optionHeaders, ...otherOptions } = options
+
+  let headers = new Headers({
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+    ...optionHeaders,
+  })
+
   return fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      ...optionHeaders,
-    },
+    headers,
     credentials: 'include',
     referrerPolicy: 'no-referrer-when-downgrade',
     body: JSON.stringify(data),
