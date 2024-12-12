@@ -1,4 +1,4 @@
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { MDXRemote } from 'next-mdx-remote/rsc'
