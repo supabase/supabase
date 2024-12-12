@@ -280,7 +280,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">
                     <p>This depends on the expected size of the result set from the query.</p>
                     <p>
-                      For queries that return a small number or rows, the startup cost is more
+                      For queries that return a small number of rows, the startup cost is more
                       critical and minimizing startup cost can lead to faster response times,
                       especially in interactive applications.
                     </p>
