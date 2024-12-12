@@ -8,10 +8,14 @@ import SignInLayout from 'components/layouts/SignInLayout/SignInLayout'
 import { Loading } from 'components/ui/Loading'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import type { NextPageWithLayout } from 'types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const { mutate: sendEvent } = useSendEventMutation()
+
   const [loading, setLoading] = useState(true)
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
@@ -39,6 +43,7 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
+            sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
             await queryClient.resetQueries()
             router.push(getReturnToPath())
             return

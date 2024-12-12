@@ -1,6 +1,9 @@
 // Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
 
 export enum TelemetryActions {
+  SIGN_UP = 'sign_up',
+  SIGN_IN = 'sign_in',
+
   ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
   ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
   ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',

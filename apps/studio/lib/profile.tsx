@@ -8,6 +8,8 @@ import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
 import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from './constants/telemetry'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -28,12 +30,13 @@ export const ProfileContext = createContext<ProfileContextType>({
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   const isLoggedIn = useIsLoggedIn()
 
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: sendIdentify } = useSendIdentifyMutation()
-
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
-    onError() {
-      toast.error('Failed to create your profile. Please refresh to try again.')
+    onSuccess: () => {
+      sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
     },
+    onError: () => toast.error('Failed to create your profile. Please refresh to try again.'),
   })
 
   // Track telemetry for the current user
