@@ -47,6 +47,7 @@ CMD ["npm", "run", "dev:studio"]
 # Compile Next.js
 FROM dev as builder
 
+ENV DOCKER_CONTAINER=true
 RUN npx turbo@2.0.4 run build --filter studio -- --no-lint
 
 # Copy only compiled code and dependencies
