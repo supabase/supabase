@@ -27,6 +27,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS, uuidv4 } from 'lib/helpers'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { format } from 'sql-formatter'
@@ -419,11 +420,7 @@ export const SQLEditor = () => {
         }
       }
 
-      sendEvent({
-        category: 'sql_editor',
-        action: 'ai_suggestion_accepted',
-        label: 'edit_snippet',
-      })
+      sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -444,16 +441,10 @@ export const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({
-      category: 'sql_editor',
-      action: 'ai_suggestion_rejected',
-      label: 'edit_snippet',
-    })
-
+    sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED })
     resetPrompt()
     closeDiff()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router])
+  }, [closeDiff, resetPrompt, sendEvent])
 
   const {
     complete,
@@ -515,6 +506,7 @@ export const SQLEditor = () => {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [closeDiff, id])
 
   useEffect(() => {
@@ -537,7 +529,7 @@ export const SQLEditor = () => {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [isDiffOpen, promptState.isOpen, acceptAiHandler, discardAiHandler, resetPrompt])
+  }, [os, isDiffOpen, promptState.isOpen, acceptAiHandler, discardAiHandler, resetPrompt])
 
   useEffect(() => {
     if (isDiffOpen) {

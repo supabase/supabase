@@ -13,6 +13,7 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -76,9 +77,8 @@ const SQLTemplates = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'scripts',
-                  action: 'script_clicked',
-                  label: x.title,
+                  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                  properties: { title },
                 })
               }}
             />
