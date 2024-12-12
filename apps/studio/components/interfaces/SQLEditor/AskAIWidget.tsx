@@ -47,7 +47,11 @@ export const AskAIWidget = ({
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.metaKey && !e.ctrlKey) {
+            handleSubmit()
+          }
+        }}
         disabled={isLoading}
       />
       {isDiffVisible && (
