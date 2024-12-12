@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "eslint": "^8.57.0",
-    "prettier": "^4.0.0-alpha.8",
+    "prettier": "~3.2.0",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
