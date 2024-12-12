@@ -376,13 +376,3 @@ export const constructConnStringSyntax = (
 
   return []
 }
-
-export const getPoolerTld = (connString: string) => {
-  try {
-    const segment = connString.split('pooler.supabase.')[1]
-    const tld = segment.split(':6543')[0]
-    return tld
-  } catch {
-    return 'com'
-  }
-}
