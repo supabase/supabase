@@ -25,7 +25,7 @@ jobs:
           exclude: |
             *.css
             **/package.json
-            **/package-lock.json
+            **/pnpm-lock.yaml
             ./.git/*
             *.ipynb
             ./i18n/README.*.md

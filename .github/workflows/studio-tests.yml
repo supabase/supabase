@@ -8,12 +8,12 @@ on:
     branches: [master, studio]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
   pull_request:
     branches: [master, studio]
     paths:
       - 'apps/studio/**'
-      - 'package-lock.json'
+      - 'pnpm-lock.yaml'
 
 # Cancel old builds on new commit for same workflow + branch/PR
 concurrency:
@@ -31,17 +31,22 @@ jobs:
           sparse-checkout: |
             apps/studio
             packages
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
+          cache: 'pnpm'
       - name: Install deps
-        run: npm ci
+        run: pnpm i
         working-directory: ./
       - name: Run Tests
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: npm run test:studio
+        run: pnpm run test:studio
         working-directory: ./
