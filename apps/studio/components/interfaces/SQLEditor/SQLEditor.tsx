@@ -523,7 +523,7 @@ export const SQLEditor = () => {
 
       switch (e.key) {
         case 'Enter':
-          if (e.shiftKey && isDiffOpen) {
+          if ((os === 'macos' ? e.metaKey : e.ctrlKey) && isDiffOpen) {
             acceptAiHandler()
             resetPrompt()
           }

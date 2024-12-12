@@ -38,60 +38,35 @@ export const AskAIWidget = ({
   }
 
   return (
-    <div className="rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl">
+    <div className="overflow-hidden rounded-md p-0 bg-popover border border-foreground/20 focus-within:border-foreground/30 shadow-xl text-sm max-w-xl">
       <Input
         inputRef={inputRef}
         size="xlarge"
         inputClassName="bg-transparent border-none shadow-none gap-4 text-xs focus-visible:outline-none focus-visible:ring-0 py-2 pl-3"
-        placeholder="Ask the Assistant to do something"
+        placeholder={isDiffVisible ? 'Make an edit...' : 'Ask the Assistant to do something'}
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
         disabled={isLoading}
-        actions={
-          <div className="flex items-center space-x-1 mr-3">
-            {isLoading ? (
-              <Loader2 size={16} className="animate-spin" />
-            ) : (
-              <>
-                {os === 'macos' ? (
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M3 5H7.76472L16.2353 19H21M16.2353 5H21"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      strokeLinecap="square"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                ) : (
-                  <p className="text-xs text-scale-1100">ALT</p>
-                )}
-                <ArrowDownLeft size={16} strokeWidth={1.5} />
-              </>
-            )}
-          </div>
-        }
       />
       {isDiffVisible && (
-        <div className="flex justify-start gap-2 pb-1 px-3 -mt-1">
-          <Button onClick={onAccept} className="text-xs h-auto py-0 px-3" disabled={isLoading}>
-            Accept
+        <div className="flex justify-start p-0 border-t">
+          <Button
+            type="text"
+            onClick={onAccept}
+            className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
+            disabled={isLoading}
+          >
+            Accept <span className="text-xs text-foreground-light">⌘ + Enter</span>
           </Button>
           <Button
             onClick={onReject}
-            type="outline"
-            className="text-xs h-auto py-0 px-3"
+            type="text"
+            className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >
-            Reject
+            Reject <span className="text-xs text-foreground-light">Esc</span>
           </Button>
         </div>
       )}
