@@ -1,12 +1,10 @@
 ---
 title: 'Restore Dashboard backup'
-subtitle: 'Guide on getting your dashboard backup restored to a new project'
+subtitle: 'Learn how to restore your dashboard backup to a new project'
 breadcrumb: 'Migrations'
 ---
 
-## Overview
-
-Here are the steps necessary to restore your dashboard backup into a new project. Expand the steps to see detailed instructions on how to do each step.
+## Before you begin
 
 <Accordion
   type="default"
@@ -53,84 +51,51 @@ Here are the steps necessary to restore your dashboard backup into a new project
     </AccordionItem>
 
   </div>
-
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header="Restore your backup using psql"
-      id="item-3"
-    >
-      <StepHikeCompact>
-
-      <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Get your Project ref" fullWidth>
-          You will need your Project ref (the project ref is the value between "https://" and ".supabase.co" in the URL) from your project URL below:
-
-          <ProjectConfigVariables variable="url" />
-
-        </StepHikeCompact.Details>
-      </StepHikeCompact.Step>
-
-      <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Get your database password" fullWidth>
-          If you do not have your database password, you can reset your database password in your
-          [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-        </StepHikeCompact.Details>
-      </StepHikeCompact.Step>
-
-      <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Get your project Host Address" fullWidth>
-          You can find your Host Address under the Connection parameters section in your [Database
-          Settings](https://supabase.com/dashboard/project/_/settings/database)
-        </StepHikeCompact.Details>
-      </StepHikeCompact.Step>
-
-      <StepHikeCompact.Step step={4}>
-        <StepHikeCompact.Details title="Check your backup file format" fullWidth>
-          By default, your backup file might be gzipped and have a .gz file extension. You will need to decompress it and the file you use should look like this: **backup_name.backup**
-
-        </StepHikeCompact.Details>
-      </StepHikeCompact.Step>
-
-      <StepHikeCompact.Step step={5}>
-        <StepHikeCompact.Details title="Restore your backup" fullWidth>
-          Take the command below and replace the following values with the values you have gotten in the previous steps:
-
-          - [PROJECT-REF]
-          - [YOUR-PASSWORD]
-          - [HOST-ADDRESS]
-          - /path/to/your/file with relative path of your downloaded backup.
-
-          <StepHikeCompact.Code>
-
-            ```sql
-            psql -d "postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST-ADDRESS]:5432/postgres" -f /path/to/your/file
-            ```
-          </StepHikeCompact.Code>
-
-          <Admonition type="tip">
-            For example, if you are running the command from your Desktop (Open terminal > run "cd Desktop") and your downloaded backup is in your Desktop folder, your /path/to/your/file could be "./db_cluster-29-05-2024@19-24-14.backup"
-          </Admonition>
-
-
-        </StepHikeCompact.Details>
-
-      </StepHikeCompact.Step>
-
-      </StepHikeCompact>
-
-    </AccordionItem>
-
-  </div>
-
-    <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header="Migrate Storage Objects to S3 storage"
-      id="item-4"
-    >
-      After restoring the project above, the metadata for the storage objects in the database will be present. The buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present.
-
-      To migrate downloaded storage objects to the new s3 buckets, you can use the following Google colab script and follow the instructions in the comments:
-    </AccordionItem>
-
-  </div>
 </Accordion>
+
+## Restore backup
+
+<StepHikeCompact>
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Get your database password" fullWidth>
+      If you do not have your database password, you can reset your database password in your
+      [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Check your backup file format" fullWidth>
+    By default, your backup file might be gzipped and have a .gz file extension. You will need to
+    decompress it and the file you use should look like this: **backup_name.backup**
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Restore your backup" fullWidth>
+      Go to your [project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string:
+
+      You will want to use the Direct connection string if you are able to (you have a IPv6 compatible network or have purchased the IPv4 addon). Otherwise, you will need to use the Session pooler connection string.
+
+      Run this command after replacing the connection string below with your connection string from your project:
+
+      <StepHikeCompact.Code>
+
+        ```sql
+        psql -d "postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres" -f /path/to/your/file
+        ```
+      </StepHikeCompact.Code>
+
+      <Admonition type="tip">
+        For example, if you are running the command from your Desktop (Open terminal > run "cd Desktop") and your downloaded backup is in your Desktop folder, your /path/to/your/file could be "./db_cluster-29-05-2024@19-24-14.backup"
+      </Admonition>
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Migrate Storage Objects to S3 storage (optional)
+
+After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
+
+You can use this [Google colab script](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing) to migrate your downloaded storage objects to the new s3 buckets. Follow the instructions in the comments to fill out the required fields then run the scripts.

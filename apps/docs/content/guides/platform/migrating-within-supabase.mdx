@@ -3,35 +3,21 @@ title: Migrating within Supabase
 subtitle: Migrate from one Supabase project to another
 ---
 
-<Admonition type="tip">
-  If you are on a Paid Plan and have physical backups enabled, you should use the [Restore to
-  another project feature](https://supabase.com/blog/restore-to-a-new-project) in the dashboard.
+<Admonition type="caution">
+  If you are on a Paid Plan and have physical backups enabled, you should instead use the [Restore
+  to another project feature](https://supabase.com/blog/restore-to-a-new-project) in the dashboard.
 </Admonition>
 
-You can migrate your database to a different Supabase project. **One possible reason you may need to do this is if your project has been paused for longer than 90 days.**
+You can migrate your project database to a different Supabase project. One possible reason you may need to do this is if your project has been paused for longer than 90 days and is no longer restorable.
 
-## Transfer to a different organization
+### I want to restore a backup downloaded from the dashboard to a new project
 
-Note that project migration is primarily for changing regions or upgrading to new major versions of the platform in some scenarios. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
+Follow our [Restore dashboard backup guide](/docs/guides/platform/migrating-within-supabase/dashboard_restore)
 
-## Migrate to a new Supabase project
+### I want to backup a old project or restore a CLI backup to a new project
 
-<StepHikeCompact>
-  <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Get your project backup file" fullWidth>
-    <Admonition type="caution">
-      **Skip this step if you already have your backup file for your project from the dashboard!**
-    </Admonition>
-      Follow with our [Backup guide using the Supabase CLI](/docs/guides/platform/migrating-within-supabase/backup)
-    </StepHikeCompact.Details>
-  </StepHikeCompact.Step>
+Follow our [Backup and Restore using the CLI guide](/docs/guides/platform/migrating-within-supabase/backup)
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Restore your backup file to a new project" fullWidth>
-      To restore a dashboard backup, follow our [Dashboard backup restore guide here](/docs/guides/platform/migrating-within-supabase/dashboard_restore)
+### I want to transfer my project to a different organization
 
-      Otherwise, you can follow our [CLI backup restore guide here](/docs/guides/platform/migrating-within-supabase/cli_restore)
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+Project migration is primarily for changing regions or upgrading to new major versions of the platform in some scenarios. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).
