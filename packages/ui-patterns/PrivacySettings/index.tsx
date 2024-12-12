@@ -31,6 +31,8 @@ export const PrivacySettings = ({
   }
 
   const handleOptOutTelemetry = async () => {
+    // remove telemetry data from session storage
+    sessionStorage.removeItem(LOCAL_STORAGE_KEYS.TELEMETRY_DATA)
     handleResetTelemetry(process.env.NEXT_PUBLIC_API_URL!)
   }
 

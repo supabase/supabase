@@ -6,7 +6,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import {
   AuthProvider,
   IS_PROD,
-  isBrowser,
+  LOCAL_STORAGE_KEYS,
   ThemeProvider,
   useTelemetryProps,
   useThemeSandbox,
@@ -38,6 +38,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const IS_DEV = !IS_PROD && !IS_PREVIEW
   const blockEvents = IS_DEV || !hasAcceptedConsent
 
+  const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
@@ -81,13 +82,12 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     // Store current page telemetry data in session storage if consent not given
-    const TELEMETRY_KEY = 'telemetry_data'
 
     if (!router.isReady) return
 
     // store telemetry data locally if consent not given
     if (blockEvents) {
-      const storedTelemetryData = sessionStorage.getItem(TELEMETRY_KEY)
+      const storedTelemetryData = sessionStorage.getItem(TELEMETRY_DATA)
       if (storedTelemetryData) return
 
       const telemetryData = {
@@ -103,10 +103,13 @@ export default function App({ Component, pageProps }: AppProps) {
           user_agent: navigator.userAgent,
         },
       }
-      sessionStorage.setItem(TELEMETRY_KEY, JSON.stringify(telemetryData))
+      // set a session storage item if consentValue = null
+      if (consentValue === null)
+        sessionStorage.setItem(TELEMETRY_DATA, JSON.stringify(telemetryData))
+
       return
     }
-  }, [consentValue, router.isReady])
+  }, [consentValue, router.isReady, blockEvents])
 
   useEffect(() => {
     if (!router.isReady) return

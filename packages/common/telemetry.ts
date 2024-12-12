@@ -1,7 +1,12 @@
 import { post } from './fetchWrappers'
 
 export function handlePageTelemetry(API_URL: string, route: string, telemetryProps: any) {
-  const { page_url, search, language, viewport_height, viewport_width } = telemetryProps
+  const { page_url } = telemetryProps
+
+  // check if ph exists, if not use an empty object
+  const ph = telemetryProps?.ph || {}
+  const { search = '', language = '', viewport_height = 0, viewport_width = 0 } = ph
+
   return post(
     `${API_URL}/telemetry/page`,
     {
@@ -10,16 +15,14 @@ export function handlePageTelemetry(API_URL: string, route: string, telemetryPro
       pathname: route,
       ph: {
         referrer: document.referrer,
-        user_agent: navigator.userAgent,
-        search,
         language,
+        search,
         viewport_height,
         viewport_width,
+        user_agent: navigator.userAgent,
       },
     },
-    {
-      headers: { Version: '2' },
-    }
+    { headers: { Version: '2' }, credentials: 'include' }
   )
 }
 

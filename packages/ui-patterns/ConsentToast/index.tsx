@@ -7,6 +7,7 @@ import {
   useBreakpoint,
   useTelemetryProps,
 } from 'common'
+
 import { noop } from 'lodash'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -77,7 +78,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
 }
 
 export const useConsent = () => {
-  const { TELEMETRY_CONSENT } = LOCAL_STORAGE_KEYS
+  const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
   const telemetryProps = useTelemetryProps()
 
@@ -87,10 +88,8 @@ export const useConsent = () => {
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
 
-    const TELEMETRY_KEY = 'telemetry_data'
-
     if (value === 'true') {
-      const storedTelemetry = sessionStorage.getItem(TELEMETRY_KEY)
+      const storedTelemetry = sessionStorage.getItem(TELEMETRY_DATA)
       if (storedTelemetry) {
         try {
           const telemetryData = JSON.parse(storedTelemetry)
@@ -99,18 +98,19 @@ export const useConsent = () => {
             window.location.pathname,
             telemetryData
           )
-          sessionStorage.removeItem(TELEMETRY_KEY)
+          sessionStorage.removeItem(TELEMETRY_DATA)
         } catch (error) {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        console.log('telemetryProps else? ')
         handlePageTelemetry(
           process.env.NEXT_PUBLIC_API_URL!,
           window.location.pathname,
           telemetryProps
         )
       }
+    } else {
+      sessionStorage.removeItem(TELEMETRY_DATA)
     }
 
     setConsentValue(value)
