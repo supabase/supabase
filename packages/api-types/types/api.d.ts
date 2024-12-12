@@ -3966,6 +3966,8 @@ export interface components {
       MFA_PHONE_OTP_LENGTH: number
       MFA_PHONE_TEMPLATE: string
       MFA_PHONE_VERIFY_ENABLED: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED: boolean
       MFA_TOTP_ENROLL_ENABLED: boolean
       MFA_TOTP_VERIFY_ENABLED: boolean
       MFA_WEB_AUTHN_ENROLL_ENABLED: boolean
@@ -6376,6 +6378,8 @@ export interface components {
       MFA_PHONE_OTP_LENGTH?: number
       MFA_PHONE_TEMPLATE?: string
       MFA_PHONE_VERIFY_ENABLED?: boolean
+      MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean
+      MFA_WEB_AUTHN_VERIFY_ENABLED?: boolean
       MFA_TOTP_ENROLL_ENABLED?: boolean
       MFA_TOTP_VERIFY_ENABLED?: boolean
       MFA_WEB_AUTHN_ENROLL_ENABLED?: boolean
