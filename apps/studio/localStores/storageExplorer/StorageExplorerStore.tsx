@@ -1328,7 +1328,7 @@ class StorageExplorerStore {
     }
   }
 
-  /* Folders CRUD */
+    /* Folders CRUD */
 
   fetchFolderContents = async (
     folderId: string | null,
@@ -1337,14 +1337,15 @@ class StorageExplorerStore {
     searchString: string = ''
   ) => {
     if (this.selectedBucket.id === undefined) return
-
+  
     this.abortApiCalls()
+  
     this.updateRowStatus(folderName, STORAGE_ROW_STATUS.LOADING, index)
     this.pushColumnAtIndex(
       { id: folderId, name: folderName, status: STORAGE_ROW_STATUS.LOADING, items: [] },
       index
     )
-
+  
     const prefix = this.openedFolders
       .slice(0, index + 1)
       .map((folder) => folder.name)
@@ -1355,7 +1356,7 @@ class StorageExplorerStore {
       search: searchString,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
-
+  
     try {
       const data = await listBucketObjects(
         {
@@ -1366,9 +1367,9 @@ class StorageExplorerStore {
         },
         this.abortController?.signal
       )
-
+  
       this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
-
+  
       const formattedItems = this.formatFolderItems(data)
       this.pushColumnAtIndex(
         {
@@ -1382,11 +1383,15 @@ class StorageExplorerStore {
         index
       )
     } catch (error: any) {
-      if (!error.message.includes('aborted')) {
+      if (error.name === 'AbortError') {
+        this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+      } else {
         toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
       }
     }
   }
+  
+  
 
   fetchMoreFolderContents = async (
     index: number,
@@ -1838,7 +1843,6 @@ class StorageExplorerStore {
   setSelectedItemToRename = (file: { name: string; columnIndex: number }) => {
     this.updateRowStatus(file.name, STORAGE_ROW_STATUS.EDITING, file.columnIndex)
   }
-
   private updateRowStatus = (
     name: string,
     status: STORAGE_ROW_STATUS,
