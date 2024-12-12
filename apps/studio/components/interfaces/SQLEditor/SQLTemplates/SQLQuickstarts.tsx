@@ -8,6 +8,7 @@ import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -76,9 +77,8 @@ const SQLQuickstarts = () => {
               onClick={(sql, title) => {
                 handleNewQuery(sql, title)
                 sendEvent({
-                  category: 'quickstart',
-                  action: 'quickstart_clicked',
-                  label: x.title,
+                  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
+                  properties: { title },
                 })
               }}
             />
