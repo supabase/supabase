@@ -78,23 +78,8 @@ test.describe('Table Editor page', () => {
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
 
-    // Need to first make it visible to test (it's hidden on mobile)
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .first()
-      .evaluate((el) => {
-        el.style.position = 'relative !important'
-        el.style.left = '0'
-        el.style.top = '0'
-        el.style.opacity = '1'
-      })
     // click away to close the sorting dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .first()
-      .click()
+    await page.locator('#table-editor-spec-target').click()
 
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
