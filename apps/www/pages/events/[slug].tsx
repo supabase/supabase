@@ -191,12 +191,6 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
-  const origin = isBrowser
-    ? location.origin
-    : process.env.VERCEL_URL
-      ? process.env.VERCEL_URL
-      : 'https://supabase.com'
-
   return (
     <>
       <NextSeo
