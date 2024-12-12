@@ -53,6 +53,7 @@ function CustomerStoriesPage(props: any) {
     return {
       logo: blog.logo,
       logoInverse: blog.logo_inverse,
+      name: blog.name,
       title: blog.title,
       link: blog.url,
       industry: blog.industry,

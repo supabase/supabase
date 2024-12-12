@@ -100,6 +100,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
 
     const matches = allCustomers.filter((customer: any) => {
       const found =
+        customer.name?.toLowerCase().includes(text.toLowerCase()) ||
         customer.title?.toLowerCase().includes(text.toLowerCase()) ||
         customer.about?.toLowerCase().includes(text.toLowerCase())
       return found
