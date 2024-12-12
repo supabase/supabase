@@ -8,7 +8,7 @@
     },
     "design-system#build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*"],
+      "env": ["NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_APP_URL"],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "docs#build": {
