@@ -363,7 +363,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start" className="w-44">
             <DropdownMenuItem
-              key="edit-table"
+              key="copy-name"
               className="space-x-2"
               onClick={(e) => {
                 e.stopPropagation()
