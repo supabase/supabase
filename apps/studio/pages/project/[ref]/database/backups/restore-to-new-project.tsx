@@ -225,37 +225,6 @@ const RestoreToNewProject = () => {
     )
   }
 
-  // if (lastClone?.status === 'FAILED') {
-  //   return (
-  //     <Admonition type="destructive" title="Failed to restore to new project">
-  //       <Markdown content="Sorry! The new project failed to be created, please reach out to support for assistance." />
-  //       <Button asChild type="default">
-  //         <Link
-  //           target="_blank"
-  //           rel="noreferrer noopener"
-  //           href={`/support/new?category=dashboard_bug&subject=Failed%20to%20restore%20to%20new%20project&message=Target%20project%20reference:%20${clonedProject?.ref ?? 'unknown'}`}
-  //         >
-  //           Contact support
-  //         </Link>
-  //       </Button>
-  //     </Admonition>
-  //   )
-  // }
-
-  // if (lastClone?.status === 'COMPLETED') {
-  //   return (
-  //     <Admonition type="default" title="Restoration completed">
-  //       <Markdown
-  //         className="max-w-full"
-  //         content={`The new project${!!clonedProject ? ` ${clonedProject.name}` : ''} has been created. A project can only be restored to another project once.`}
-  //       />
-  //       <Button asChild type="default">
-  //         <Link href={`/project/${lastClone?.target_project.ref}`}>Go to new project</Link>
-  //       </Button>
-  //     </Admonition>
-  //   )
-  // }
-
   if (lastClone?.status === 'IN_PROGRESS') {
     return (
       <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light">
@@ -331,7 +300,13 @@ const RestoreToNewProject = () => {
                 href={`/project/${c.target_project.ref}`}
                 className="flex flex-row items-center justify-between gap-2 text-sm p-4 group"
               >
-                <TimestampInfo value={c.inserted_at ?? ''} />
+                <div className="flex flex-row items-center gap-4">
+                  <div className="min-w-24 truncate">{c.target_project.name}</div>
+                  <TimestampInfo
+                    className="font-mono text-xs text-foreground-lighter"
+                    value={c.inserted_at ?? ''}
+                  />
+                </div>
                 <ChevronRightIcon className="size-4 text-foreground-light group-hover:text-foreground" />
               </Link>
             ))}
