@@ -61,7 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       : { result: [] }
 
     const result = await streamText({
-      model: openai('gpt-4o-mini'),
+      model: openai('gpt-4o-mini-2024-07-18'),
       maxSteps: 5,
       tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),
       system: `${SQL_SYSTEM_PROMPT}

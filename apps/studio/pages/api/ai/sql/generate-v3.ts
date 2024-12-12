@@ -56,7 +56,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     : { result: [] }
 
   const result = await streamText({
-    model: openai('gpt-4o-mini'),
+    model: openai('gpt-4o-mini-2024-07-18'),
     maxSteps: 5,
     system: `${MARKDOWN_SYSTEM_PROMPT}
 
