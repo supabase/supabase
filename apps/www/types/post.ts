@@ -19,6 +19,9 @@ type PostTypes = {
   path: string
   tags?: string[]
   categories?: string[]
+  industry?: string[]
+  company_size?: string
+  region?: string
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean

@@ -13,24 +13,52 @@ import { motion } from 'framer-motion'
 import styles from '~/styles/customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
+import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import { useState } from 'react'
+import { cn } from 'ui'
 
 export async function getStaticProps() {
-  const allPostsData = getSortedPosts({ directory: '_customers' })
+  const allPostsData: any[] = getSortedPosts({ directory: '_customers' })
   const rss = generateRss(allPostsData)
 
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/customers-rss.xml', rss)
+  const industries = allPostsData.reduce<{ [key: string]: number }>(
+    (acc, customer) => {
+      // Increment the 'all' counter
+      acc.all = (acc.all || 0) + 1
+
+      // Increment the counter for each category
+      customer.industry?.forEach((industry: string) => {
+        acc[industry] = (acc[industry] || 0) + 1
+      })
+
+      return acc
+    },
+    { all: 0 }
+  )
 
   return {
     props: {
       blogs: allPostsData,
+      industries,
     },
   }
 }
 
 function CustomerStoriesPage(props: any) {
   const { basePath } = useRouter()
+  const _allCustomers = props.blogs?.map((blog: PostTypes, idx: number) => {
+    return {
+      logo: blog.logo,
+      logoInverse: blog.logo_inverse,
+      title: blog.title,
+      link: blog.url,
+      industry: blog.industry,
+    }
+  })
+  const [customers, setCustomers] = useState(_allCustomers)
 
   const meta = {
     title: 'Customer Stories | Supabase',
@@ -38,15 +66,6 @@ function CustomerStoriesPage(props: any) {
     description:
       'See how Supabase empowers companies of all sizes to accelerate their growth and streamline their work.',
   }
-
-  const caseStudyThumbs = props.blogs?.map((blog: PostTypes, idx: number) => {
-    return {
-      logo: blog.logo,
-      logoInverse: blog.logo_inverse,
-      title: blog.title,
-      link: blog.url,
-    }
-  })
 
   return (
     <>
@@ -81,7 +100,7 @@ function CustomerStoriesPage(props: any) {
           <div className="container mx-auto mt-28 sm:mt-44 px-4 xl:px-20">
             <div className="mx-auto relative z-10">
               <motion.div
-                className="mx-auto sm:max-w-2xl text-center flex flex-col items-center"
+                className="mx-auto sm:max-w-2xl text-center flex flex-col items-center mb-12"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0, transition: { duration: 0.5, easing: 'easeOut' } }}
               >
@@ -91,8 +110,14 @@ function CustomerStoriesPage(props: any) {
                   create outstanding products and set new industry standards.
                 </h2>
               </motion.div>
-              <div className="mx-auto my-12 md:my-20 grid grid-cols-12 gap-6 not-prose">
-                {caseStudyThumbs.map((caseStudy: any, i: number) => (
+              <CustomersFilters
+                allCustomers={_allCustomers}
+                customers={customers}
+                setCustomers={setCustomers}
+                industries={props.industries}
+              />
+              <div className="mx-auto mt-6 mb-12 md:mb-20 grid grid-cols-12 gap-6 not-prose">
+                {customers?.map((caseStudy: any, i: number) => (
                   <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
                     <motion.a
                       className="col-span-12 md:col-span-4"
@@ -122,10 +147,10 @@ function CustomerStoriesPage(props: any) {
               </div>
             </div>
             <div
-              className={[
+              className={cn(
                 'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:!bg-background',
-                styles['bg-visual'],
-              ].join(' ')}
+                styles['bg-visual']
+              )}
             />
           </div>
         </div>
