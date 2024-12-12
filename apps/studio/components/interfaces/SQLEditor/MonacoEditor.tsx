@@ -108,16 +108,16 @@ const MonacoEditor = ({
         run: () => {
           const selection = editor.getSelection()
           const model = editor.getModel()
-          if (!model) return
+          if (!model || !selection) return
 
-          const selectedText = selection ? model.getValueInRange(selection) : ''
-          const fullText = model.getValue()
-          const beforeSelection = selection
-            ? fullText.substring(0, model.getOffsetAt(selection.getStartPosition()))
-            : ''
-          const afterSelection = selection
-            ? fullText.substring(model.getOffsetAt(selection.getEndPosition()))
-            : ''
+          const allLines = model.getLinesContent()
+
+          const startLineIndex = selection.startLineNumber - 1
+          const endLineIndex = selection.endLineNumber
+
+          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
+          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
+          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
 
           onPrompt({
             selection: selectedText,

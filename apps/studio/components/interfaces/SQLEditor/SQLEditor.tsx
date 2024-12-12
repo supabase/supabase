@@ -29,6 +29,7 @@ import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { format } from 'sql-formatter'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -587,16 +588,43 @@ export const SQLEditor = () => {
   }, [snapV2.diffContent])
 
   useEffect(() => {
-    if (completion && isCompletionLoading) {
+    if (!completion) {
+      return
+    }
+
+    const original =
+      promptState.beforeSelection + promptState.selection + promptState.afterSelection
+    const modified = promptState.beforeSelection + completion + promptState.afterSelection
+
+    if (isCompletionLoading) {
+      let formattedModified = modified
+
+      // Attempt to format the modified SQL in case the LLM left out indentation, etc
+      try {
+        formattedModified = format(
+          promptState.beforeSelection + completion + promptState.afterSelection,
+          {
+            language: 'postgresql',
+            keywordCase: 'lower',
+          }
+        )
+      } catch (error) {}
+
       setSourceSqlDiff({
-        original: promptState.beforeSelection + promptState.selection + promptState.afterSelection,
-        modified: promptState.beforeSelection + completion + promptState.afterSelection,
+        original,
+        modified: formattedModified,
       })
       setSelectedDiffType(DiffType.Modification)
       setPromptState((prev) => ({ ...prev, isLoading: false }))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [completion, promptState.beforeSelection, promptState.selection, promptState.afterSelection])
+  }, [
+    completion,
+    promptState.beforeSelection,
+    promptState.selection,
+    promptState.afterSelection,
+    isCompletionLoading,
+  ])
 
   return (
     <>
