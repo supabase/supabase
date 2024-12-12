@@ -95,7 +95,7 @@ const UserImpersonationSelector = () => {
               )
             }
             placeholder="Search for a user.."
-            onChange={(e) => setSearchText(e.target.value.trim())}
+            onChange={(e) => setSearchText(e.target.value.trim().toLocaleLowerCase())}
             value={searchText}
             size="small"
             actions={

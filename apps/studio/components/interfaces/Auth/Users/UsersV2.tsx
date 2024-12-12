@@ -205,7 +205,7 @@ export const UsersV2 = () => {
             onKeyDown={(e) => {
               if (e.code === 'Enter') {
                 setSearch(search.trim())
-                setFilterKeywords(search.trim())
+                setFilterKeywords(search.trim().toLocaleLowerCase())
               }
             }}
             actions={[
