@@ -1,12 +1,25 @@
-import { noop } from 'lodash'
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
-
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EMPTY_OBJ } from 'lib/void'
+import { noop } from 'lodash'
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from 'react'
 import { APISidePanelPreview } from './APISidePanelPreview'
 import { CLSPreview } from './CLSPreview'
 
 export const FEATURE_PREVIEWS = [
+  {
+    key: LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS,
+    name: 'Table Editor tabs',
+    content: <CLSPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
+    isNew: true,
+  },
+  {
+    key: LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS,
+    name: 'SQL Editor tabs',
+    content: <CLSPreview />,
+    discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
+    isNew: true,
+  },
   {
     key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
     name: 'Project API documentation',

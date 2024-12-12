@@ -7,11 +7,11 @@ import { SQLEditorMenu } from './SQLEditorMenu'
 import { useParams } from 'common'
 
 export interface SQLEditorLayoutProps {
-  title: string
+  // title: string
   children: ReactNode
 }
 
-const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
+const SQLEditorLayout = ({ children }: SQLEditorLayoutProps) => {
   const { viewOngoingQueries } = useParams()
   const [showOngoingQueries, setShowOngoingQueries] = useState(false)
 
@@ -30,19 +30,26 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
   }, [viewOngoingQueries])
 
   return (
-    <ProjectLayout
-      title={title || 'SQL'}
-      product="SQL Editor"
-      productMenu={productMenu}
-      isBlocking={false}
-      resizableSidebar
-    >
+    // <EditorBaseLayout
+    //   title={title || 'SQL'}
+    //   product="SQL Editor"
+    //   productMenu={
+    //     <SQLEditorMenu
+    //       key="sql-editor-menu"
+    //       onViewOngoingQueries={() => setShowOngoingQueries(true)}
+    //     />
+    //   }
+    //   isBlocking={false}
+    //   resizableSidebar
+    // >
+    <>
       {children}
       <OngoingQueriesPanel
         visible={showOngoingQueries}
         onClose={() => setShowOngoingQueries(false)}
       />
-    </ProjectLayout>
+    </>
+    // </EditorBaseLayout>
   )
 }
 

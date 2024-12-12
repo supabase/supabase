@@ -1,11 +1,14 @@
 import { useMonaco } from '@monaco-editor/react'
-import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
-
 import { useParams } from 'common/hooks/useParams'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
+import {
+  ProjectContextFromParamsProvider,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
+import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
 import { useContentIdQuery } from 'data/content/content-id-query'
@@ -16,8 +19,11 @@ import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { addTab, createTabId } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 
 const SqlEditor: NextPageWithLayout = () => {
@@ -164,13 +170,37 @@ const SqlEditor: NextPageWithLayout = () => {
     }
   }, [isPgInfoReady])
 
-  return (
-    <div className="flex-1 overflow-auto">
-      <SQLEditor />
-    </div>
-  )
+  const { flags } = useFeaturePreviewContext()
+  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+  // Watch for route changes
+  useEffect(() => {
+    if (isSqlEditorTabsEnabled) {
+      if (!router.isReady || !id || id === 'new') return
+
+      const tabId = createTabId('sql', { id })
+      const snippet = snippets.find((s) => s.id === id)
+
+      addTab(ref, {
+        id: tabId,
+        type: 'sql',
+        label: snippet?.name || 'Untitled Query',
+        metadata: {
+          sqlId: id,
+          name: snippet?.name,
+        },
+      })
+    }
+  }, [router.isReady, id, snippets, isSqlEditorTabsEnabled])
+
+  return <SQLEditor />
 }
 
-SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
+SqlEditor.getLayout = (page) => (
+  <ProjectContextFromParamsProvider>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
+      <SQLEditorLayout>{page}</SQLEditorLayout>
+    </EditorBaseLayout>
+  </ProjectContextFromParamsProvider>
+)
 
 export default SqlEditor

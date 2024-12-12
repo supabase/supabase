@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PropsWithChildren, useMemo } from 'react'
-
+import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { PropsWithChildren, useMemo, useState } from 'react'
+import { EditorBaseLayout } from '../editors/editor-base-layout'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+  const [showOngoingQueries, setShowOngoingQueries] = useState(false)
   const isPermissionsLoaded = usePermissionsLoaded()
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
-
-  const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -21,14 +21,20 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   }
 
   return (
-    <ProjectLayoutWithAuth
-      product="Table Editor"
-      productMenu={tableEditorMenu}
-      isBlocking={false}
-      resizableSidebar
-    >
+    // <EditorBaseLayout
+    //   product="Table Editor"
+    //   productMenu={<TableEditorMenu />}
+    //   isBlocking={false}
+    //   resizableSidebar
+    // >
+    <>
       {children}
-    </ProjectLayoutWithAuth>
+      <OngoingQueriesPanel
+        visible={showOngoingQueries}
+        onClose={() => setShowOngoingQueries(false)}
+      />
+    </>
+    // </EditorBaseLayout>
   )
 }
 

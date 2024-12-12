@@ -109,16 +109,16 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     }
   }, [ref, projectsInitialized])
 
-  useEffect(() => {
-    if (ref !== undefined && id !== undefined) {
-      if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
-        snap.setDashboardHistory(ref, 'sql', id)
-      }
-      if (router.pathname.endsWith('/editor/[id]')) {
-        snap.setDashboardHistory(ref, 'editor', id)
-      }
-    }
-  }, [ref, id])
+  // useEffect(() => {
+  //   if (ref !== undefined && id !== undefined) {
+  //     if (router.pathname.endsWith('/sql/[id]') && id !== 'new') {
+  //       snap.setDashboardHistory(ref, 'sql', id)
+  //     }
+  //     if (router.pathname.endsWith('/editor/[id]')) {
+  //       snap.setDashboardHistory(ref, 'editor', id)
+  //     }
+  //   }
+  // }, [ref, id])
 
   return <>{children}</>
 }

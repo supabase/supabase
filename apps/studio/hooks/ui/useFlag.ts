@@ -11,6 +11,8 @@ export function useFlag<T = boolean>(name: string) {
     return false
   }
 
+  if (name === 'projectExplorer') return false
+
   const isObjectEmpty = (objectName: Object) => {
     return Object.keys(objectName).length === 0
   }

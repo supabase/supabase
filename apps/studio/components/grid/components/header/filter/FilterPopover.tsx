@@ -1,21 +1,21 @@
-import update from 'immutability-helper'
-import { isEqual } from 'lodash'
-import { FilterIcon, Plus } from 'lucide-react'
-import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
-
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { Plus, PlusCircle } from 'lucide-react'
+import { Fragment, KeyboardEvent, useCallback, useMemo, useState } from 'react'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export interface FilterPopoverProps {
   table: SupaTable
@@ -27,10 +27,35 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
   const snap = useTableEditorStateSnapshot()
 
-  const btnText =
-    (filters || []).length > 0
-      ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
-      : 'Filter'
+  const btnText = useMemo(() => {
+    if (!filters?.length) return 'Filter'
+
+    const filterElements = (
+      <span className="text-foreground-light">
+        Filtering by
+        {filters.slice(0, 2).map((filter, i) => {
+          const [column, operator, value] = filter.split(':')
+          return (
+            <Fragment key={`filter-${filter}-${i}`}>
+              <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
+                <span className="opacity-75">{column}</span>
+                <span className="opacity-50 mx-0.5">:{operator}:</span>
+                <span className="font-mono">{value}</span>
+              </span>
+              {i === 0 && filters.length > 1 && <span className="ml-1">and</span>}
+            </Fragment>
+          )
+        })}
+        {filters.length > 2 && (
+          <span className="ml-1 text-xs">
+            and {filters.length - 2} more {filters.length - 2 === 1 ? 'rule' : 'rules'}
+          </span>
+        )}
+      </span>
+    )
+
+    return filterElements
+  }, [filters])
 
   const onApplyFilters = (appliedFilters: Filter[]) => {
     snap.setEnforceExactCount(false)
@@ -48,10 +73,16 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
     })
   }
 
+  const hasFilters = (filters || []).length > 0
+
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={(filters || []).length > 0 ? 'link' : 'text'} icon={<FilterIcon />}>
+        <Button
+          type={hasFilters ? 'default' : 'dashed'}
+          icon={!hasFilters && <PlusCircle strokeWidth={1.5} />}
+          className={cn('rounded-full', hasFilters && filters.length <= 2 && 'pr-0.5')}
+        >
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>

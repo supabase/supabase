@@ -1,18 +1,18 @@
-import update from 'immutability-helper'
-import { isEqual } from 'lodash'
-import { ChevronDown, List } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
-
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
 import { DropdownControl } from 'components/grid/components/common/DropdownControl'
 import type { Sort, SupaTable } from 'components/grid/types'
 import { useUrlState } from 'hooks/ui/useUrlState'
+import update from 'immutability-helper'
+import { isEqual } from 'lodash'
+import { ChevronDown, PlusCircle } from 'lucide-react'
+import { Fragment, useCallback, useMemo, useState } from 'react'
 import {
   Button,
   PopoverContent_Shadcn_,
   PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  cn,
 } from 'ui'
 import SortRow from './SortRow'
 
@@ -25,10 +25,34 @@ export interface SortPopoverProps {
 const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   const [open, setOpen] = useState(false)
 
-  const btnText =
-    (sorts || []).length > 0
-      ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
-      : 'Sort'
+  const hasSorts = (sorts || []).length > 0
+  const btnText = useMemo(() => {
+    if (!hasSorts) return 'Sort'
+
+    return (
+      <span className="text-foreground-light">
+        Sorting by
+        {sorts.slice(0, 2).map((sort, i) => {
+          const [column, direction] = sort.split(':')
+          return (
+            <Fragment key={`sort-${sort}-${i}`}>
+              <span className="ml-1 bg-selection border border-foreground-muted px-2 h-5 text-foreground text-xs rounded-full inline-flex items-center">
+                <span className="opacity-75">{column}</span>
+                <span className="opacity-50 mx-0.5">:</span>
+                <span className="font-mono">{direction}</span>
+              </span>
+              {i === 0 && sorts.length > 1 && <span className="ml-1">and</span>}
+            </Fragment>
+          )
+        })}
+        {sorts.length > 2 && (
+          <span className="ml-1 text-xs">
+            and {sorts.length - 2} more {sorts.length - 2 === 1 ? 'rule' : 'rules'}
+          </span>
+        )}
+      </span>
+    )
+  }, [sorts])
 
   const onApplySorts = (appliedSorts: Sort[]) => {
     setParams((prevParams) => {
@@ -42,7 +66,11 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
   return (
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type={(sorts || []).length > 0 ? 'link' : 'text'} icon={<List />}>
+        <Button
+          type={hasSorts ? 'default' : 'dashed'}
+          icon={!hasSorts && <PlusCircle strokeWidth={1.5} />}
+          className={cn('rounded-full', hasSorts && sorts.length <= 2 && 'pr-0.5')}
+        >
           {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>

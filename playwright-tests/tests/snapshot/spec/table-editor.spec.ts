@@ -22,7 +22,13 @@ test.describe('Table Editor page', () => {
     const tableName = `${kebabCase(testInfo.title).slice(0, 24)}-${testInfo.retry}-${Math.floor(Math.random() * 100)}`
 
     // The page has been loaded with the table data, we can now interact with the page
-    await page.getByRole('button', { name: 'New table', exact: true }).click()
+    await page
+      .getByRole('button')
+      .filter({
+        hasText: 'New table',
+      })
+      .or(page.getByRole('button', { name: 'New table' }))
+      .click()
     await page.getByTestId('table-name-input').waitFor({ state: 'visible' })
     await page.getByTestId('table-name-input').click()
     await page.getByTestId('table-name-input').fill(tableName)

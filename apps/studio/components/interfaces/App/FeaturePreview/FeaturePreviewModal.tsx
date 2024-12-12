@@ -1,24 +1,32 @@
+import { useParams } from 'common'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useFlag } from 'hooks/ui/useFlag'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useFlag } from 'hooks/ui/useFlag'
 import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
+
 import { useAppStateSnapshot } from 'state/app-state'
+import { removeTabsByEditor } from 'state/tabs'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
+  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
+
   const snap = useAppStateSnapshot()
+  const { ref } = useParams()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
-  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+
   const isNotReleased =
     selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
@@ -41,12 +49,30 @@ const FeaturePreviewModal = () => {
       label: selectedFeatureKey,
       value: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
     })
+
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'table')
+    }
+    if (selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS) {
+      removeTabsByEditor(ref as string | undefined, 'sql')
+    }
   }
 
   function handleCloseFeaturePreviewModal() {
     snap.setShowFeaturePreviewModal(false)
     snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
   }
+
+  // function isReleased(feature) {
+  //   switch (feature.key) {
+  //     case LOCAL_STORAGE_KEYS.UI_PREVIEW_FUNCTIONS_ASSISTANT:
+  //       return enableFunctionsAssistant
+  //     case LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS:
+  //       return isFeaturePreviewTabsTableEditorFlag
+  //     case LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS:
+  //       return isFeaturePreviewTabsSqlEditorFlag
+  //   }
+  // }
 
   return (
     <Modal
@@ -62,7 +88,16 @@ const FeaturePreviewModal = () => {
         <div className="flex">
           <div>
             <ScrollArea className="h-[550px] w-[280px] border-r">
-              {FEATURE_PREVIEWS.map((feature) => {
+              {FEATURE_PREVIEWS.filter((feature) => {
+                // const isTableEditor = feature.key === LOCAL_STORAGE_KEYS.UI_TABLE_EDITOR_TABS
+                // const isSqlEditor = feature.key === LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS
+
+                // return (
+                //   (isTableEditor && isFeaturePreviewTabsTableEditorFlag) ||
+                //   (isSqlEditor && isFeaturePreviewTabsSqlEditorFlag)
+                // )
+                return true
+              }).map((feature) => {
                 const isEnabled = flags[feature.key] ?? false
 
                 return (

@@ -28,6 +28,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
+  Skeleton,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -39,6 +40,8 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
+import { TableMenuEmptyState } from './TableMenuEmptyState'
+import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -111,10 +114,7 @@ const TableEditorMenu = () => {
 
   return (
     <>
-      <div
-        className="pt-5 flex flex-col flex-grow gap-5 h-full"
-        style={{ maxHeight: 'calc(100vh - 48px)' }}
-      >
+      <div className="h-[400px] flex flex-col flex-grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
@@ -166,8 +166,8 @@ const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
-          <InnerSideBarFilters>
+        <div className="flex flex-auto flex-col gap-2 pb-4">
+          <InnerSideBarFilters className="mx-2">
             <InnerSideBarFilterSearchInput
               autoFocus
               name="search-tables"
@@ -244,7 +244,7 @@ const TableEditorMenu = () => {
             </Popover_Shadcn_>
           </InnerSideBarFilters>
 
-          {isLoading && <InnerSideBarShimmeringLoaders />}
+          {isLoading && <SkeletonMenuList />}
 
           {isError && (
             <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
@@ -253,11 +253,7 @@ const TableEditorMenu = () => {
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <InnerSideBarEmptyPanel
-                  className="mx-2"
-                  title="No entities available"
-                  description="This schema has no entities available yet"
-                />
+                <TableMenuEmptyState />
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
                 <InnerSideBarEmptyPanel
@@ -267,9 +263,10 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-1 flex-grow" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
+                    // @ts-expect-error
                     ItemComponent={EntityListItem}
                     itemProps={{
                       projectRef: project?.ref!,
