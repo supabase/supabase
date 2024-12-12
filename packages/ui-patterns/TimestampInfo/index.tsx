@@ -22,17 +22,17 @@ const isUnixMicro = (unix: string | number): boolean => {
 
 const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).format('DD MMM  HH:mm:ss')
+  return dayjs.utc(timestamp).format('DD MMM  HH:mm:ss')
 }
 
 const timestampUtcFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).utc().format('DD MMM  HH:mm:ss')
+  return dayjs(timestamp).format('DD MMM  HH:mm:ss')
 }
 
 const timestampRelativeFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).fromNow()
+  return dayjs.utc(timestamp).fromNow()
 }
 
 export const TimestampInfo = ({
@@ -116,7 +116,7 @@ export const TimestampInfo = ({
         <TooltipRow label="UTC" value={utc} />
         <TooltipRow label={`${localTimezone}`} value={local} />
         <TooltipRow label="Relative" value={relative} />
-        <TooltipRow label="Timestamp" value={String(value)} />
+        <TooltipRow label="Timestamp UTC" value={String(value)} />
       </TooltipContent>
     </Tooltip>
   )
