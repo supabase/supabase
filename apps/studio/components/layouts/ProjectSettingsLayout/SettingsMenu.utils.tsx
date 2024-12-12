@@ -14,8 +14,6 @@ export const generateSettingsMenu = (
     edgeFunctions?: boolean
     storage?: boolean
     invoices?: boolean
-    warehouse?: boolean
-    logDrains?: boolean
     diskAndCompute?: boolean
   }
 ): ProductMenuGroup[] => {
@@ -25,8 +23,6 @@ export const generateSettingsMenu = (
   const authEnabled = features?.auth ?? true
   const edgeFunctionsEnabled = features?.edgeFunctions ?? true
   const storageEnabled = features?.storage ?? true
-  const warehouseEnabled = features?.warehouse ?? false
-  const logDrainsEnabled = features?.logDrains ?? false
   const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
   return [
@@ -77,7 +73,7 @@ export const generateSettingsMenu = (
           url: isProjectBuilding ? buildingUrl : `/project/${ref}/integrations/vault/overview`,
           items: [],
           rightIcon: <ArrowUpRight strokeWidth={1} className="h-4 w-4" />,
-          label: 'BETA',
+          label: 'Alpha',
         },
       ],
     },
@@ -126,17 +122,7 @@ export const generateSettingsMenu = (
               },
             ]
           : []),
-        ...(IS_PLATFORM && warehouseEnabled
-          ? [
-              {
-                name: 'Warehouse',
-                key: 'warehouse',
-                url: `/project/${ref}/settings/warehouse`,
-                items: [],
-              },
-            ]
-          : []),
-        ...(IS_PLATFORM && logDrainsEnabled
+        ...(IS_PLATFORM
           ? [
               {
                 name: `Log Drains`,

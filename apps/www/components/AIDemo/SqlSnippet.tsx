@@ -90,7 +90,7 @@ export const SqlSnippet = ({
   const ResultsDisplay = () => {
     if (resultType === 'chart') {
       return (
-        <div className="p-5 border-t border-t-muted">
+        <div className="px-0 py-5 border-t border-t-muted">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
               data={results}
@@ -121,14 +121,10 @@ export const SqlSnippet = ({
 
     return (
       <>
-        <div
-          className={cn(
-            showResults ? 'h-auto max-h-64 overflow-auto border-t border-t-muted' : 'h-0'
-          )}
-        >
+        <div className={cn(showResults ? 'h-auto max-h-64 overflow-auto border-t' : 'h-0')}>
           <table className="w-full m-0 p-0">
             <thead>
-              <tr className="bg-surface-100">
+              <tr className="bg-surface-100 border-b">
                 {results?.length > 0 &&
                   Object.keys(results[0]).map((key) => (
                     <th key={key} className="p-2 px-5 text-left text-xs font-mono">

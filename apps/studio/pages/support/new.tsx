@@ -26,7 +26,7 @@ const SupportPage = () => {
   return (
     <div className="relative flex overflow-y-auto overflow-x-hidden">
       <div className="mx-auto my-8 max-w-2xl w-full px-4 lg:px-6">
-        <div className="space-y-12 py-8">
+        <div className="flex flex-col gap-y-8 py-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-y-2">
             <div className="flex items-center space-x-3">
               <SVG src={`${BASE_PATH}/img/supabase-logo.svg`} className="h-4 w-4" />
@@ -97,7 +97,7 @@ const SupportPage = () => {
           <InformationBox
             title="Having trouble submitting the form?"
             description={
-              <div className="space-y-4">
+              <div className="flex flex-col gap-y-4">
                 <p className="flex items-center gap-x-1">
                   Email us directly at{' '}
                   <Link

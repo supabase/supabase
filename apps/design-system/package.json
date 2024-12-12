@@ -34,7 +34,7 @@
     "react-wrap-balancer": "^1.1.0",
     "recharts": "^2.12.7",
     "rehype-autolink-headings": "^7.1.0",
-    "rehype-pretty-code": "^0.6.0",
+    "rehype-pretty-code": "^0.9.0",
     "rehype-slug": "^6.0.0",
     "remark": "^14.0.3",
     "remark-code-import": "^1.2.0",

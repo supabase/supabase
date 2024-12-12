@@ -1,9 +1,10 @@
 import { openai } from '@ai-sdk/openai'
-import { streamText } from 'ai'
-import { getTools } from './tools'
 import pgMeta from '@supabase/pg-meta'
-import { executeSql } from 'data/sql/execute-sql-query'
+import { streamText } from 'ai'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import { executeSql } from 'data/sql/execute-sql-query'
+import { getTools } from './tools'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
@@ -11,15 +12,9 @@ const pgMetaSchemasList = pgMeta.schemas.list()
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    return res.status(400).json({
+      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
+    })
   }
 
   const { method } = req
@@ -28,13 +23,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'POST':
       return handlePost(req, res)
     default:
-      return new Response(
-        JSON.stringify({ data: null, error: { message: `Method ${method} Not Allowed` } }),
-        {
-          status: 405,
-          headers: { 'Content-Type': 'application/json', Allow: 'POST' },
-        }
-      )
+      res.setHeader('Allow', ['POST'])
+      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
   }
 }
 
@@ -76,9 +66,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Always use semicolons
       - Output as markdown
       - Always include code snippets if available
-      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
+      - If a code snippet is SQL, the first line of the snippet should always be -- props: {"title": "Query title", "runQuery": "false", "isChart": "true", "xAxis": "columnOrAlias", "yAxis": "columnOrAlias"}
       - Only include one line of comment props per markdown snippet, even if the snippet has multiple queries
       - Only set chart to true if the query makes sense as a chart. xAxis and yAxis need to be columns or aliases returned by the query.
+      - Only set runQuery to true if the query has no risk of writing data and is not a debugging request. Set it to false if there are any values that need to be replaced with real data.
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
@@ -113,13 +104,14 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       # For all your abilities, follow these instructions:
       - First look at the list of provided schemas and if needed, get more information about a schema. You will almost always need to retrieve information about the public schema before answering a question.
-      - If the question is about users or involves creating a users table, also retrieve the auth schema. 
+      - If the question is about users or involves creating a users table, also retrieve the auth schema.
+      - If it a query is a destructive query e.g. table drop, ask for confirmation before writing the query. The user will still have to run the query once you create it
   
 
       Here are the existing database schema names you can retrieve: ${schemas}
 
-      ${schema !== undefined ? `The user is currently looking at the ${schema} schema.` : ''}
-      ${table !== undefined ? `The user is currently looking at the ${table} table.` : ''}
+      ${schema !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${schema} schema.` : ''}
+      ${table !== undefined && includeSchemaMetadata ? `The user is currently looking at the ${table} table.` : ''}
       `,
     messages,
     tools: getTools({ projectRef, connectionString, authorization, includeSchemaMetadata }),

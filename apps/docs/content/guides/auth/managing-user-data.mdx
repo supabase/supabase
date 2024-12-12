@@ -69,7 +69,7 @@ You can assign metadata to users on sign up:
 
 ```js
 const { data, error } = await supabase.auth.signUp({
-  email: 'example@email.com',
+  email: 'valid.email@supabase.io',
   password: 'example-password',
   options: {
     data: {
@@ -85,7 +85,7 @@ const { data, error } = await supabase.auth.signUp({
 
 ```dart
 final res = await supabase.auth.signUp(
-  email: 'example@email.com',
+  email: 'valid.email@supabase.io',
   password: 'example-password',
   data: {
     'first_name': 'John',
@@ -99,7 +99,7 @@ final res = await supabase.auth.signUp(
 
 ```swift
 try await supabase.auth.signUp(
-  email: "example@email.com",
+  email: "valid.email@supabase.io",
   password: "example-password",
   data: [
     "first_name": .string("John"),
@@ -113,7 +113,7 @@ try await supabase.auth.signUp(
 
 ```kotlin
 val data = supabase.auth.signUpWith(Email) {
-    email = "example@email.com"
+    email = "valid.email@supabase.io"
     password = "example-password"
     data = buildJsonObject {
         put("first_name", "John")

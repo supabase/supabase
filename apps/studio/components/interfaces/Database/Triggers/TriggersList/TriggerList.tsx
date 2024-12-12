@@ -1,6 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
+import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
   Button,
@@ -12,15 +19,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Check, X, MoreVertical, Edit3, Trash, Edit, Edit2 } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { cn } from 'ui'
 import { generateTriggerCreateSQL } from './TriggerList.utils'
 
 interface TriggerListProps {
@@ -40,7 +38,6 @@ const TriggerList = ({
 }: TriggerListProps) => {
   const { project } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -141,40 +138,34 @@ const TriggerList = ({
                     <DropdownMenuTrigger asChild>
                       <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      side="bottom"
-                      align="end"
-                      className={cn(isAssistantV2Enabled ? 'w-52' : 'w-36')}
-                    >
+                    <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
                         <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>
-                      {isAssistantV2Enabled && (
-                        <DropdownMenuItem
-                          className="space-x-2"
-                          onClick={() => {
-                            const sql = generateTriggerCreateSQL(x)
-                            setAiAssistantPanel({
-                              open: true,
-                              initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
-                              suggestions: {
-                                title:
-                                  'I can help you make a change to this trigger, here are a few example prompts to get you started:',
-                                prompts: [
-                                  'Rename this trigger to ...',
-                                  'Change the events this trigger responds to ...',
-                                  'Modify this trigger to run after instead of before ...',
-                                ],
-                              },
-                              sqlSnippets: [sql],
-                            })
-                          }}
-                        >
-                          <Edit size={14} />
-                          <p>Edit with Assistant</p>
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          setAiAssistantPanel({
+                            open: true,
+                            initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
+                            suggestions: {
+                              title:
+                                'I can help you make a change to this trigger, here are a few example prompts to get you started:',
+                              prompts: [
+                                'Rename this trigger to ...',
+                                'Change the events this trigger responds to ...',
+                                'Modify this trigger to run after instead of before ...',
+                              ],
+                            },
+                            sqlSnippets: [sql],
+                          })
+                        }}
+                      >
+                        <Edit size={14} />
+                        <p>Edit with Assistant</p>
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
                         <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>
@@ -182,26 +173,18 @@ const TriggerList = ({
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<MoreVertical />} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="left">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to update triggers
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    disabled
+                    type="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to update triggers',
+                      },
+                    }}
+                  />
                 )}
               </div>
             )}

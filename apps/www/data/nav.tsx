@@ -2,7 +2,7 @@ import DevelopersDropdown from '~/components/Nav/DevelopersDropdown'
 import ProductDropdown from '~/components/Nav/ProductDropdown'
 
 import { data as DevelopersData } from 'data/Developers'
-import SolutionsData from 'data/Solutions'
+import MainProductsData from '~/data/MainProducts'
 
 export const getMenu = () => ({
   primaryNav: [
@@ -11,7 +11,7 @@ export const getMenu = () => ({
       hasDropdown: true,
       dropdown: <ProductDropdown />,
       dropdownContainerClassName: 'rounded-xl',
-      subMenu: SolutionsData,
+      subMenu: MainProductsData,
     },
     {
       title: 'Developers',

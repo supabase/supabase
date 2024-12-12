@@ -42,7 +42,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
               <Admonition
                 type="default"
                 title="Database backups are not available for OrioleDB"
-                description="OrioleDB is currently in preview and projects created are strictly ephemeral with no database backups"
+                description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
               >
                 <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
               </Admonition>

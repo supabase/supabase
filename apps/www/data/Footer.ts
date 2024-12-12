@@ -26,15 +26,19 @@ const footerData = [
       },
       {
         text: 'Vector',
-        url: '/vector',
+        url: '/modules/vector',
+      },
+      {
+        text: 'Cron',
+        url: '/modules/cron',
       },
       {
         text: 'Pricing',
         url: '/pricing',
       },
       {
-        text: 'GA Week',
-        url: '/ga-week',
+        text: 'Launch Week',
+        url: '/launch-week',
       },
     ],
   },

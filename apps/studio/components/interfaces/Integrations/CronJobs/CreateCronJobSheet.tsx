@@ -1,18 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { toString as CronToString } from 'cronstrue'
+import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { urlRegex } from 'components/interfaces/Auth/Auth.constants'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { useDatabaseCronJobCreateMutation } from 'data/database-cron-jobs/database-cron-jobs-create-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useState } from 'react'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,
@@ -28,11 +31,9 @@ import {
   SheetTitle,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-
-import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
 import { CRONJOB_DEFINITIONS } from './CronJobs.constants'
 import {
   buildCronQuery,
@@ -63,7 +64,19 @@ const edgeFunctionSchema = z.object({
   edgeFunctionName: z.string().trim().min(1, 'Please select one of the listed Edge Functions'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpBody: z.string().trim(),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const httpRequestSchema = z.object({
@@ -77,7 +90,19 @@ const httpRequestSchema = z.object({
     .refine((value) => value.startsWith('http'), 'Please include HTTP/HTTPs to your URL'),
   timeoutMs: z.coerce.number().int().gte(1000).lte(5000).default(1000),
   httpHeaders: z.array(z.object({ name: z.string(), value: z.string() })),
-  httpBody: z.string().trim(),
+  httpBody: z
+    .string()
+    .trim()
+    .optional()
+    .refine((value) => {
+      if (!value) return true
+      try {
+        JSON.parse(value)
+        return true
+      } catch {
+        return false
+      }
+    }, 'Input must be valid JSON'),
 })
 
 const sqlFunctionSchema = z.object({
@@ -146,6 +171,13 @@ export const CreateCronJobSheet = ({
   const isEditing = !!selectedCronJob?.jobname
 
   const [showEnableExtensionModal, setShowEnableExtensionModal] = useState(false)
+
+  const { data: cronJobs } = useCronJobsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: upsertCronJob, isLoading } = useDatabaseCronJobCreateMutation()
 
   const canToggleExtensions = useCheckPermissions(
@@ -181,6 +213,18 @@ export const CreateCronJobSheet = ({
   }
 
   const onSubmit: SubmitHandler<CreateCronJobForm> = async ({ name, schedule, values }) => {
+    // job names should be unique
+    const nameExists = cronJobs?.some(
+      (job) => job.jobname === name && job.jobname !== selectedCronJob?.jobname
+    )
+    if (nameExists) {
+      form.setError('name', {
+        type: 'manual',
+        message: 'A cron job with this name already exists',
+      })
+      return
+    }
+
     let command = ''
     if (values.type === 'edge_function') {
       command = buildHttpRequestCommand(
@@ -219,6 +263,17 @@ export const CreateCronJobSheet = ({
           } else {
             toast.success(`Successfully created cron job ${name}`)
           }
+
+          sendEvent({
+            action: isEditing
+              ? TelemetryActions.CRON_JOB_UPDATED
+              : TelemetryActions.CRON_JOB_CREATED,
+            properties: {
+              type: values.type,
+              schedule: schedule,
+            },
+          })
+
           onClose()
         },
       }

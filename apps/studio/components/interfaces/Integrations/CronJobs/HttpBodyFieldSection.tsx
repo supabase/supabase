@@ -32,9 +32,6 @@ export const HttpBodyFieldSection = ({ form }: HttpBodyFieldSectionProps) => {
                 onChange={field.onChange}
               />
             </FormControl_Shadcn_>
-            <FormDescription_Shadcn_ className="text-foreground-lighter">
-              The content should match the content-type header.
-            </FormDescription_Shadcn_>
             <FormMessage_Shadcn_ />
           </FormItem_Shadcn_>
         )}

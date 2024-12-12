@@ -46,7 +46,7 @@ When you created your project you were also asked to enter a password. This is a
 
 Changing the password does not result in any downtime. All connected services, such as postgrest, pgbouncer, and other Supabase managed services, are automatically updated to use the latest password to ensure availability. However, if you have any external services connecting to the Supabase database using hardcoded username/password credentials, a manual update will be required.
 
-## Granting Permissions
+## Granting permissions
 
 Roles can be granted various permissions on database objects using the `GRANT` command. Permissions include `SELECT`, `INSERT`, `UPDATE`, and `DELETE`. You can configure access to almost any object inside your database - including tables, views, functions, and triggers.
 
