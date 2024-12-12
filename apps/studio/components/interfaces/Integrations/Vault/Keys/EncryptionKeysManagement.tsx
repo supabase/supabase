@@ -14,7 +14,8 @@ import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Key, Loader, Search, Trash, X } from 'lucide-react'
-import { Alert, Button, Form, Input, Listbox, Modal, Separator } from 'ui'
+import { Button, Form, Input, Listbox, Modal, Separator } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 const DEFAULT_KEY_NAME = 'No description provided'
 
@@ -256,13 +257,12 @@ export const EncryptionKeysManagement = () => {
         header="Confirm to delete key"
       >
         <Modal.Content className="space-y-4">
-          <Alert
-            withIcon
-            variant="warning"
-            title="Deleting a key that's in use will cause any secret or column which depends on it to be unusable."
-          >
-            Do ensure that the key is not currently in use to prevent any issues.
-          </Alert>
+          <Admonition
+            type="warning"
+            title="Deleting a key that's in use will cause any secret or column which depends on it to be
+              unusable."
+            description="Do ensure that the key is not currently in use to prevent any issues."
+          />
           <p className="text-sm">
             The following key will be permanently removed and cannot be recovered.
           </p>
