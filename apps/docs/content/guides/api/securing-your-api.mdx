@@ -287,7 +287,7 @@ Create the `public.check_request` function:
 create function public.check_request()
   returns void
   language plpgsql
-  security definer
+  security invoker
   as $$
 declare
   req_app_api_key text := current_setting('request.headers', true)::json->>'x-app-api-key';
