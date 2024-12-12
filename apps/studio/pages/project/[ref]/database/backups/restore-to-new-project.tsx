@@ -299,7 +299,7 @@ const RestoreToNewProject = () => {
                 className="flex flex-row items-center justify-between gap-2 text-sm p-4 group"
               >
                 <div className="flex flex-row items-center gap-4">
-                  <div className="min-w-24 truncate">{c.target_project.name}</div>
+                  <div className="min-w-24 truncate">{(c.target_project as any).name}</div>
                   <TimestampInfo
                     className="font-mono text-xs text-foreground-lighter"
                     value={c.inserted_at ?? ''}
