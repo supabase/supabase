@@ -1,12 +1,12 @@
 import { isUndefined } from 'lodash'
 import { ArrowUpRight, LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren, ReactNode, useState } from 'react'
 
-import { Badge, cn, Menu } from 'ui'
+import { Badge, cn, Menu, Sheet, SheetContent } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
-import { useSheet } from 'ui-patterns/Sheet'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 interface WithSidebarProps {
   title: string
@@ -31,22 +31,10 @@ const WithSidebar = ({
   customSidebarContent,
 }: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const { openSheet, setSheetContent } = useSheet()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
 
   const handleMobileMenu = () => {
-    setSheetContent(
-      <div className="w-full h-full flex flex-col pt-2 pb-6">
-        <SidebarContent
-          title={title}
-          header={header}
-          sections={sections}
-          subitems={subitems}
-          subitemsParentKey={subitemsParentKey}
-          customSidebarContent={customSidebarContent}
-        />
-      </div>
-    )
-    openSheet()
+    setIsSheetOpen(true)
   }
 
   return (
@@ -70,6 +58,17 @@ const WithSidebar = ({
         />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          subitems={subitems}
+          subitemsParentKey={subitemsParentKey}
+          customSidebarContent={customSidebarContent}
+          className="hidden md:block"
+        />
+      </MobileSheetNav>
     </div>
   )
 }

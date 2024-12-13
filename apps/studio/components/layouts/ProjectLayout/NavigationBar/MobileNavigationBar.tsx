@@ -5,35 +5,27 @@ import { Search, Menu } from 'lucide-react'
 import { useParams } from 'common'
 import { IS_PLATFORM } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSheet } from 'ui-patterns/Sheet'
 
-import { buttonVariants, cn } from 'ui'
+import { buttonVariants, cn, Sheet, SheetContent } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns'
 import { NavContent } from './NavigationBar'
+import { useState } from 'react'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
 
 const MobileNavigationBar = () => {
   const router = useRouter()
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const snap = useAppStateSnapshot()
-  const { openSheet, setSheetContent } = useSheet()
 
   const onCloseNavigationIconLink = (event: any) => {
     snap.setNavigationPanelOpen(
       false,
       event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
     )
-  }
-
-  const handleMobileMenu = () => {
-    setSheetContent(
-      <div data-state={'expanded'} className="w-full h-full flex flex-col pt-2 pb-6">
-        <NavContent />
-      </div>
-    )
-    openSheet()
   }
 
   return (
@@ -82,12 +74,15 @@ const MobileNavigationBar = () => {
               buttonVariants({ type: 'default' }),
               'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
             )}
-            onClick={() => handleMobileMenu()}
+            onClick={() => setIsSheetOpen(true)}
           >
             <Menu size={18} strokeWidth={1} />
           </button>
         </div>
       </nav>
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <NavContent />
+      </MobileSheetNav>
     </div>
   )
 }
