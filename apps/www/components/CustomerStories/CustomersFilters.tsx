@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
-import { useKey } from 'react-use'
+import { useEffect, useState } from 'react'
 import type PostTypes from '~/types/post'
 import {
   Button,
@@ -9,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Input,
   cn,
 } from 'ui'
 import { ChevronDown, X as CloseIcon } from 'lucide-react'
@@ -32,8 +30,6 @@ export const useFilters = (initialIndustry: string, initialProduct: string) => {
     const params = new URLSearchParams()
     if (industry !== 'all') params.set('industry', industry)
     if (product !== 'all') params.set('product', product)
-    // if (industry) params.set('industry', industry)
-    // if (product) params.set('product', product)
     router.replace({ pathname: '/customers', query: params.toString() }, undefined, {
       shallow: true,
     })
