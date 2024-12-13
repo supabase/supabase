@@ -73,7 +73,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Explain what the snippet does in a sentence or two before showing it
       - Use vector(384) data type for any embedding/vector related query
       - When debugging, retrieve sql schema details to ensure sql is correct
-      - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table. Never expose the users table in the auth schema through a view in the public schema.
+      - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table.
+      - Never suggest creating a view to retrieve information from the users table of the auth schema. This is against our best practices.
 
       When generating tables, do the following:
       - Ensure that all tables always have a primary key
@@ -81,6 +82,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Prefer creating foreign key references in the create statement
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
+      - If a foreign key is created, include a statement to create database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
 
       Feel free to suggest corrections for suspected typos.
 
