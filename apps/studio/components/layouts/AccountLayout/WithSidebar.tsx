@@ -66,7 +66,6 @@ const WithSidebar = ({
           subitems={subitems}
           subitemsParentKey={subitemsParentKey}
           customSidebarContent={customSidebarContent}
-          className="hidden md:block"
         />
       </MobileSheetNav>
     </div>
