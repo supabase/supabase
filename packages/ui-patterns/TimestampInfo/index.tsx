@@ -20,14 +20,19 @@ const isUnixMicro = (unix: string | number): boolean => {
   return isNum && digitLength
 }
 
+const timestampLabelFormatter = (value: string | number, format: string) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  return dayjs(timestamp).format(format)
+}
+
 const timestampLocalFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).format('DD MMM  HH:mm:ss')
+  return dayjs(timestamp).format('DD MMM YYYY HH:mm:ss')
 }
 
 const timestampUtcFormatter = (value: string | number) => {
   const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).utc().format('DD MMM  HH:mm:ss')
+  return dayjs(timestamp).utc().format('DD MMM YYYY HH:mm:ss')
 }
 
 const timestampRelativeFormatter = (value: string | number) => {
@@ -35,19 +40,28 @@ const timestampRelativeFormatter = (value: string | number) => {
   return dayjs(timestamp).fromNow()
 }
 
+const timestampFormatter = (value: string) => {
+  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
+  return String(Number(dayjs(timestamp)))
+}
+
 export const TimestampInfo = ({
   value,
   className,
+  labelFormatter = 'DD MMM HH:mm:ss',
 }: {
-  className?: string
   value: string | number
+  className?: string
+  labelFormatter?: string
 }) => {
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const [align, setAlign] = useState<'start' | 'end'>('start')
+
   const local = timestampLocalFormatter(value)
   const utc = timestampUtcFormatter(value)
   const relative = timestampRelativeFormatter(value)
-  const [align, setAlign] = useState<'start' | 'end'>('start')
-  const triggerRef = useRef<HTMLButtonElement>(null)
   const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const timestamp = typeof value === 'number' ? String(value) : timestampFormatter(value)
 
   // Calculate alignment based on trigger position
   // Needed so that the tooltip isn't hidden behind the header on top rows
@@ -110,13 +124,13 @@ export const TimestampInfo = ({
         ref={triggerRef}
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
-        <span>{timestampLocalFormatter(value)}</span>
+        <span>{timestampLabelFormatter(value, labelFormatter)}</span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
         <TooltipRow label="UTC" value={utc} />
         <TooltipRow label={`${localTimezone}`} value={local} />
         <TooltipRow label="Relative" value={relative} />
-        <TooltipRow label="Timestamp" value={String(value)} />
+        <TooltipRow label="Timestamp" value={timestamp} />
       </TooltipContent>
     </Tooltip>
   )
