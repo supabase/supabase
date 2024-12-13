@@ -25,7 +25,7 @@ export enum PRODUCT_SHORTNAMES {
   VECTOR = 'vector',
 }
 
-// Launch Weeek
+// Launch Week
 export const SAMPLE_TICKET_NUMBER = 1234
 export const SITE_URL =
   process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
