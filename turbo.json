@@ -8,7 +8,18 @@
     },
     "design-system#build": {
       "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_APP_URL"],
+      "env": [
+        "NEXT_PUBLIC_BASE_PATH",
+        "NEXT_PUBLIC_APP_URL",
+        // These envs are used in the packages
+        "NEXT_PUBLIC_STORAGE_KEY",
+        "NEXT_PUBLIC_AUTH_DEBUG_KEY",
+        "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
+        "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
+        "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
+        "NEXT_PUBLIC_GOTRUE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
+      ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "docs#build": {
@@ -26,16 +37,15 @@
         "NEXT_PUBLIC_DEV_AUTH_PAGE",
         "NEXT_PUBLIC_IS_PLATFORM",
         "NEXT_PUBLIC_VERCEL_ENV",
-
+        // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_SUPABASE_ANON_KEY"
-      ],
-      "passThroughEnv": [
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "DOCS_GITHUB_APP_ID",
         "DOCS_GITHUB_APP_INSTALLATION_ID",
         "DOCS_GITHUB_APP_PRIVATE_KEY",
@@ -67,15 +77,14 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "SUPABASE_URL",
-
+        // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
         "NEXT_PUBLIC_AUTH_NAVIGATOR_LOCK_KEY",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_VERCEL_ENV",
-      ],
-      "passThroughEnv": [
+        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "READ_ONLY_URL",
@@ -110,7 +119,7 @@
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_API_URL",
         "NODE_ENV",
-
+        // These envs are used in the packages
         "NEXT_PUBLIC_STORAGE_KEY",
         "NEXT_PUBLIC_AUTH_DEBUG_KEY",
         "NEXT_PUBLIC_AUTH_PERSISTED_KEY",
@@ -118,9 +127,8 @@
         "NEXT_PUBLIC_IS_PLATFORM",
         "NEXT_PUBLIC_AUTH_DETECT_SESSION_IN_URL",
         "NEXT_PUBLIC_GOTRUE_URL",
-        "NEXT_PUBLIC_BASE_PATH"
-      ],
-      "passThroughEnv": [
+        "NEXT_PUBLIC_BASE_PATH",
+        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
         "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
         "GITHUB_CHANGELOG_APP_ID",
         "GITHUB_CHANGELOG_APP_INSTALLATION_ID",
