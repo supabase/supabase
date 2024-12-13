@@ -35,6 +35,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
     : inputValue
 
   const saveChanges = (value: string | null) => {
+    if ((typeof value === 'string' && value.length === 0) || timeValue === 'Invalid Date') return
     onRowChange({ ...row, [column.key]: value }, true)
   }
 
