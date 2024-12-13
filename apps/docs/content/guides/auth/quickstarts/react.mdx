@@ -66,7 +66,6 @@ hideToc: true
 
     In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
-    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
@@ -103,49 +102,48 @@ hideToc: true
                 <form onSubmit={signInWithEmail}>
                     <div>
                         <label htmlFor="email">
-                            Email:
-                            <input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="email@address.com"
-                                />
-                            </label>
-                        </div>
-                        <div>
-                            <label htmlFor="password">
-                                Password:
-                                <input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Password"
-                                />
-                            </label>
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading}
+                        Email:
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        placeholder="email@address.com"
+                        />
+                        </label>
+                    </div>
+                    <div>
+                        <label htmlFor="password">
+                        Password:
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Password"
+                        />
+                        </label>
+                    </div>
+                    <button
+                        type="submit"
+                        disabled={loading}
                         >
-                            Sign in
-                        </button>
-                        <button
-                            type="button"
-                            onClick={signUpWithEmail}
-                            disabled={loading}
+                    Sign in
+                    </button>
+                    <button
+                        type="button"
+                        onClick={signUpWithEmail}
+                        disabled={loading}
                         >
-                            Sign up
-                        </button>
-                    </form>
-                </div>
+                    Sign up
+                    </button>
+                </form>
+            </div>
             );
-        }
+      }
       export default App;
-
       ```
 
     </StepHikeCompact.Code>
