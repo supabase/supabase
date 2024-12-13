@@ -78,11 +78,12 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
       When generating tables, do the following:
       - Ensure that all tables always have a primary key
+      - Ensure that all tables have RLS enabled. Inform the user that they will need to create RLS policies before being able to read or write to the table over Supabase APIs.
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
       - Prefer creating foreign key references in the create statement
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
-      - If a foreign key is created, include a statement to create database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
+      - If a foreign key is created, include a statement to create a database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
 
       Feel free to suggest corrections for suspected typos.
 
