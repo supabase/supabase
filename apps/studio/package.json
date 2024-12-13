@@ -177,7 +177,7 @@
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
-    "prettier": "^4.0.0-alpha.8",
+    "prettier": "3.2.4",
     "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
     "typescript": "~5.5.0"
