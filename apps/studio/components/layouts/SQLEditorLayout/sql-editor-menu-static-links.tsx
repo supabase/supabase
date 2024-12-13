@@ -22,11 +22,12 @@ export function SqlEditorMenuStaticLinks() {
   return (
     <div>
       {OPTIONS.map((pageId) => {
+        const pageActive = isPageActive(pageId)
         const isPreview = isSqlEditorTabsEnabled ? tabs.previewTabId === `sql-${pageId}` : false
-        const isOpen = tabs.openTabs.includes(`sql-${pageId}`)
-        const isActive = !isSqlEditorTabsEnabled
+        const isOpen = !isSqlEditorTabsEnabled
           ? isPageActive(pageId)
           : Object.values(tabs.tabsMap).some((tab) => tab?.id === `sql-${pageId}`)
+        const isActive = tabs.openTabs.includes(`sql-${pageId}`) && pageActive
         return (
           <InnerSideMenuDataItem
             title="Templates"
