@@ -90,6 +90,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Then retrieve existing RLS policies and guidelines on how to write policies using the getRlsKnowledge tool .
       - Then write new policies or update existing policies based on the prompt
       - When asked to suggest policies, either alter existing policies or add new ones to the public schema.
+      - When writing policies that use a function from the auth schema, ensure that the calls are wrapped with parentheses e.g select auth.uid() should be written as (select auth.uid()) instead
 
       # You write database functions
       Your purpose is to generate a database function with the constraints given by the user. The output may also include a database trigger
