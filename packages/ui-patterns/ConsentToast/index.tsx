@@ -89,16 +89,19 @@ export const useConsent = () => {
     if (!isBrowser) return
 
     if (value === 'true') {
-      const storedTelemetry = sessionStorage.getItem(TELEMETRY_DATA)
-      if (storedTelemetry) {
+      const cookies = document.cookie.split(';')
+      const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(TELEMETRY_DATA))
+      if (telemetryCookie) {
         try {
-          const telemetryData = JSON.parse(storedTelemetry)
+          const encodedData = telemetryCookie.split('=')[1]
+          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
           handlePageTelemetry(
             process.env.NEXT_PUBLIC_API_URL!,
             window.location.pathname,
             telemetryData
           )
-          sessionStorage.removeItem(TELEMETRY_DATA)
+          // remove the telemetry cookie
+          document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
         } catch (error) {
           console.error('Invalid telemetry data:', error)
         }
@@ -110,7 +113,8 @@ export const useConsent = () => {
         )
       }
     } else {
-      sessionStorage.removeItem(TELEMETRY_DATA)
+      // remove the telemetry cookie
+      document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
     }
 
     setConsentValue(value)

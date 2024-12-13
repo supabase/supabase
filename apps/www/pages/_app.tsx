@@ -9,6 +9,7 @@ import {
   LOCAL_STORAGE_KEYS,
   ThemeProvider,
   useTelemetryProps,
+  useTelemetryCookie,
   useThemeSandbox,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
@@ -36,15 +37,29 @@ export default function App({ Component, pageProps }: AppProps) {
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
   const IS_DEV = !IS_PROD && !IS_PREVIEW
-  const blockEvents = IS_DEV || !hasAcceptedConsent
+  //const blockEvents = IS_DEV || !hasAcceptedConsent
+  const blockEvents = !hasAcceptedConsent
 
-  const { TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
   const { search, language, viewport_height, viewport_width } = telemetryProps
 
   useThemeSandbox()
+
+  useTelemetryCookie({
+    blockEvents,
+    consentValue: consentValue,
+    telemetryStorageKey: LOCAL_STORAGE_KEYS.TELEMETRY_DATA,
+    title,
+    telemetryProps: {
+      referrer: typeof document !== 'undefined' ? document?.referrer : '',
+      language: telemetryProps.language,
+      search: telemetryProps.search,
+      viewport_height: telemetryProps.viewport_height,
+      viewport_width: telemetryProps.viewport_width,
+    },
+  })
 
   function handlePageTelemetry(url: string) {
     return post(
@@ -79,37 +94,6 @@ export default function App({ Component, pageProps }: AppProps) {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
   }, [router.events, consentValue])
-
-  useEffect(() => {
-    // Store current page telemetry data in session storage if consent not given
-
-    if (!router.isReady) return
-
-    // store telemetry data locally if consent not given
-    if (blockEvents) {
-      const storedTelemetryData = sessionStorage.getItem(TELEMETRY_DATA)
-      if (storedTelemetryData) return
-
-      const telemetryData = {
-        page_url: window.location.href,
-        page_title: title,
-        pathname: router.pathname,
-        ph: {
-          referrer,
-          language,
-          search,
-          viewport_height,
-          viewport_width,
-          user_agent: navigator.userAgent,
-        },
-      }
-      // set a session storage item if consentValue = null
-      if (consentValue === null)
-        sessionStorage.setItem(TELEMETRY_DATA, JSON.stringify(telemetryData))
-
-      return
-    }
-  }, [consentValue, router.isReady, blockEvents])
 
   useEffect(() => {
     if (!router.isReady) return
