@@ -14,6 +14,7 @@ const isObjectEmpty = (obj: Object) => {
 export function useFlag<T = boolean>(name: string) {
   const project = useSelectedProject()
   const flagStore = useContext(FlagContext) as FlagProviderStore
+
   const store = flagStore.configcat
 
   // Temporary override as Fly projects are cant seem to upgrade their compute with the new disk UI
@@ -37,7 +38,7 @@ export function usePHFlag<T = string | boolean>(name: string) {
   const flagValue = store[name]
 
   // Flag store has not been initialized
-  if (!store || isObjectEmpty(store)) return undefined
+  if (isObjectEmpty(store)) return undefined
 
   if (!isObjectEmpty(store) && flagValue === undefined) {
     console.error(`Flag key "${name}" does not exist in PostHog flag store`)
