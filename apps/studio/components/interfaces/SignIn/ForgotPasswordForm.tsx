@@ -1,13 +1,12 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { getURL } from 'lib/helpers'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
-import { Button, Form, Input } from 'ui'
 import { BASE_PATH } from 'lib/constants'
+import { Button, Form, Input } from 'ui'
 
 const forgotPasswordSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),

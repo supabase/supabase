@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import * as yup from 'yup'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { getURL } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
 import {
   AlertDescription_Shadcn_,
@@ -16,7 +16,6 @@ import {
   Input,
 } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
-import { BASE_PATH } from 'lib/constants'
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),

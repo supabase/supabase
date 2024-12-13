@@ -3,12 +3,12 @@ import { Github } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-import { useLastSignIn } from 'hooks/misc/useLastSignIn'
-import { auth, buildPathWithParams } from 'lib/gotrue'
-import { getURL } from 'lib/helpers'
-import { Button } from 'ui'
-import { LastSignInWrapper } from './LastSignInWrapper'
 import { BASE_PATH } from 'lib/constants'
+
+import { auth, buildPathWithParams } from 'lib/gotrue'
+import { Button } from 'ui'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { LastSignInWrapper } from './LastSignInWrapper'
 
 const SignInWithGitHub = () => {
   const [loading, setLoading] = useState(false)
