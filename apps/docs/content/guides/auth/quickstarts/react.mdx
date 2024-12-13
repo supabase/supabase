@@ -72,14 +72,26 @@ hideToc: true
 
 
       ```js src/App.js
-      import React, { useState } from 'react';
+      import React, { useState, useEffect } from 'react';
       import { createClient } from '@supabase/supabase-js'
+
+      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
       function App() {
         const [email, setEmail] = useState('');
         const [password, setPassword] = useState('');
         const [loading, setLoading] = useState(false);
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+        useEffect(() => {
+            supabase.auth.getSession().then(({ data: { session } }) => {
+              setSession(session)
+            })
+            const {
+              data: { subscription },
+            } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session)
+            })
+          return () => subscription.unsubscribe()
+        }, [])
 
         async function signInWithEmail(e) {
             e.preventDefault();
@@ -99,6 +111,9 @@ hideToc: true
 
         return (
             <div>
+                {session ? (
+                    <div> Logged in </div>
+                ) : (
                 <form onSubmit={signInWithEmail}>
                     <div>
                         <label htmlFor="email">
@@ -108,8 +123,9 @@ hideToc: true
                             name="email"
                             type="email"
                             value={email}
+                            autocomplete="email"
                             onChange={(e) => setEmail(e.target.value)}
-                        placeholder="email@address.com"
+                            placeholder="email@address.com"
                         />
                         </label>
                     </div>
@@ -122,7 +138,7 @@ hideToc: true
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                        placeholder="Password"
+                            placeholder="Password"
                         />
                         </label>
                     </div>
@@ -140,8 +156,9 @@ hideToc: true
                     Sign up
                     </button>
                 </form>
+                )}
             </div>
-            );
+        );
       }
       export default App;
       ```
