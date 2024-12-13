@@ -196,7 +196,7 @@ const NavigationBar = () => {
   )
 
   return (
-    <div className="w-14 h-full flex flex-col">
+    <div className="w-14 flex flex-col">
       <nav
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(

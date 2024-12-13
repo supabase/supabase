@@ -173,9 +173,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </title>
             <meta name="description" content="Supabase Studio" />
           </Head>
-          <div className="flex flex-col h-screen">
+          <div className="flex flex-col h-screen w-screen">
             {!hideHeader && IS_PLATFORM && <LayoutHeader />}
-            <div className="flex flex-row grow">
+            <div className="flex h-full flex-row grow overflow-y-auto">
               {!hideIconBar && <NavigationBar />}
               <ResizablePanelGroup
                 className="flex h-full"
