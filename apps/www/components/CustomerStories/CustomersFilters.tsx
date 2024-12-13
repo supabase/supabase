@@ -152,7 +152,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
                   </>
                 ) : (
                   <>
-                    {startCase(activeIndustry?.replaceAll('-', ' '))}
+                    {getIndustryLabel(activeIndustry)}
                     <span className="text-foreground-lighter text-xs">
                       {industries[activeIndustry]}
                     </span>
@@ -172,13 +172,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
                       : ''
                   )}
                 >
-                  {industry === 'all'
-                    ? 'All Industries'
-                    : industry === 'ai'
-                      ? 'AI'
-                      : industry === 'saas'
-                        ? 'SaaS'
-                        : startCase(industry.replaceAll('-', ' '))}{' '}
+                  {getIndustryLabel(industry)}{' '}
                   <span className="text-foreground-lighter text-xs w-3">{count}</span>
                 </DropdownMenuItem>
               ))}
@@ -220,6 +214,19 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
       </motion.div>
     </div>
   )
+}
+
+const getIndustryLabel = (industry: string) => {
+  switch (industry) {
+    case 'all':
+      return 'All Industries'
+    case 'ai':
+      return 'AI'
+    case 'saas':
+      return 'SaaS'
+    default:
+      return startCase(industry.replaceAll('-', ' '))
+  }
 }
 
 export default CustomerFilters
