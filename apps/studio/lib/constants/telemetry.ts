@@ -52,6 +52,14 @@ export interface ConnectionStringCopiedEvent {
      * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
      */
     connectionType: string
+    /**
+     * Language of the code block if selected, e.g. bash, go
+     */
+    lang: string
+    /**
+     * Connection Method, e.g. direct, transaction_pooler, session_pooler
+     */
+    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
   }
 }
 

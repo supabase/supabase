@@ -85,7 +85,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 onClick={() => {
                   sendEvent({
                     action: TelemetryActions.CRON_JOB_HISTORY_CLICKED,
-                  } as CronJobHistoryClickedEvent)
+                  })
                 }}
               >
                 <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
@@ -99,7 +99,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_UPDATE_CLICKED,
-                      } as CronJobUpdateClickedEvent)
+                      })
                       onEditCronJob(job)
                     }}
                   >
@@ -110,7 +110,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                     onClick={() => {
                       sendEvent({
                         action: TelemetryActions.CRON_JOB_DELETE_CLICKED,
-                      } as CronJobDeleteClickedEvent)
+                      })
                       onDeleteCronJob(job)
                     }}
                   >

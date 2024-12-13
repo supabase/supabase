@@ -19,7 +19,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED } as CronJobDeletedEvent)
+      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED })
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)
       onClose()
     },

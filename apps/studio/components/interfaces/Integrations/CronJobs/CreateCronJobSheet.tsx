@@ -272,7 +272,7 @@ export const CreateCronJobSheet = ({
               type: values.type,
               schedule: schedule,
             },
-          } as CronJobCreatedEvent | CronJobUpdatedEvent)
+          })
 
           onClose()
         },

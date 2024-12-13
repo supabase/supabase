@@ -10,7 +10,7 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { ConnectionStringCopiedEvent, TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
