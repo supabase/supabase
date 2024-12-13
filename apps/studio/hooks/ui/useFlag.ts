@@ -7,8 +7,8 @@ import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { trackFeatureFlag } from 'lib/posthog'
 
-const isObjectEmpty = (objectName: Object) => {
-  return Object.keys(objectName).length === 0
+const isObjectEmpty = (obj: Object) => {
+  return Object.keys(obj).length === 0
 }
 
 export function useFlag<T = boolean>(name: string) {
@@ -37,7 +37,7 @@ export function usePHFlag<T = string | boolean>(name: string) {
   const flagValue = store[name]
 
   // Flag store has not been initialized
-  if (isObjectEmpty(store)) return undefined
+  if (!store || isObjectEmpty(store)) return undefined
 
   if (!isObjectEmpty(store) && flagValue === undefined) {
     console.error(`Flag key "${name}" does not exist in PostHog flag store`)
