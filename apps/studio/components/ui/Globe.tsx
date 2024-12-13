@@ -41,7 +41,6 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
-      height: width * 2,
       phi: 0,
       theta: 0.3,
       dark: resolvedTheme?.includes('dark') ? 1 : 0,
@@ -78,15 +77,13 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       },
     })
 
-    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
-
     return () => {
       window.removeEventListener('resize', debouncedResize)
       cobe.destroy()
     }
   }, [resolvedTheme])
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-contain" />
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 }
 
 export default Globe

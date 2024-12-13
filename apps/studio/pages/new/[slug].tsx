@@ -133,6 +133,8 @@ import {
   Collapsible_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   CollapsibleContent_Shadcn_,
+  Loading,
+  LoadingLine,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -145,6 +147,8 @@ import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import DotGrid from 'components/ui/DotGrid'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { Markdown } from 'components/interfaces/Markdown'
+import LoadingState from 'components/layouts/ProjectLayout/LoadingState'
+import LogoLoader from '@ui/components/LogoLoader'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -714,6 +718,8 @@ const Wizard: NextPageWithLayout = () => {
     return null
   }, [form.getValues('dbRegion')])
 
+  if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
+
   return (
     <div className="flex w-full h-screen overflow-hidden flex-col">
       <Link
@@ -756,7 +762,6 @@ const Wizard: NextPageWithLayout = () => {
           >
             <section className="relative">
               <div>
-                {!isOrganizationsSuccess || (isLoadingFreeProjectLimitCheck && <p>Loading...</p>)}
                 <div className="mb-4">
                   <h3 className="mb-1">Create a new project</h3>
                   <p className="text-sm text-foreground-lighter">
@@ -804,7 +809,6 @@ const Wizard: NextPageWithLayout = () => {
                             </FormItemLayout>
                           )}
                         />
-                        {!isAdmin && <NotOrganizationOwnerWarning />}
                         {canCreateProject && (
                           <div>
                             <FormField_Shadcn_
@@ -827,6 +831,7 @@ const Wizard: NextPageWithLayout = () => {
                           </div>
                         )}
                       </div>
+                      {!isAdmin && <NotOrganizationOwnerWarning />}
 
                       {canCreateProject && (
                         <>
@@ -1402,9 +1407,9 @@ const Wizard: NextPageWithLayout = () => {
                 key="info"
                 transition={{
                   duration: 1.25,
-                  ease: 'easeIn',
+                  ease: 'easeInOut',
                 }}
-                className={`absolute z-20 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
+                className={`absolute z-30 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
                 initial={false}
                 animate={
                   nodes.length > 0
@@ -1495,19 +1500,25 @@ const Wizard: NextPageWithLayout = () => {
               <motion.div
                 layout
                 layoutId="globe"
-                className="absolute z-10 pointer-events-none inset-0"
+                className="absolute z-10 pointer-events-none aspect-square right-0"
                 initial={{
-                  x: nodes.length > 0 ? '100%' : '25%',
-                  opacity: nodes.length > 0 ? 0 : 1,
+                  x: nodes.length > 0 ? '75%' : '25%',
+                  opacity: 1,
+                  width: nodes.length > 0 ? '60%' : '100%',
+                  top: nodes.length > 0 ? '0' : '50%',
+                  y: nodes.length > 0 ? '-25%' : '-50%',
                 }}
                 animate={{
-                  x: nodes.length > 0 ? '100%' : '25%',
-                  opacity: nodes.length > 0 ? 0 : 1,
+                  x: nodes.length > 0 ? '25%' : '25%',
+                  opacity: 1,
+                  width: nodes.length > 0 ? '60%' : '100%',
+                  top: nodes.length > 0 ? '0' : '50%',
+                  y: nodes.length > 0 ? '-25%' : '-50%',
                 }}
-                style={{ maskImage: 'linear-gradient(to right, black, transparent 50%)' }}
+                style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
                 transition={{
                   duration: 1.25,
-                  ease: 'easeIn',
+                  ease: 'easeInOut',
                 }}
               >
                 <Globe
@@ -1524,7 +1535,7 @@ const Wizard: NextPageWithLayout = () => {
                     initial={{ opacity: 0, scale: 1.05 }}
                     animate={{ opacity: 1, scale: 1, transition: { delay: 1 } }}
                     exit={{ opacity: 0 }}
-                    className="h-full"
+                    className="h-full z-20"
                   >
                     <ReactFlowProvider>
                       <SchemaFlow nodes={nodes} edges={edges} />
