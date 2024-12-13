@@ -9,7 +9,11 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import {
+  CronJobDeleteClickedEvent,
+  CronJobUpdateClickedEvent,
+  TelemetryActions,
+} from 'lib/constants/telemetry'
 import {
   Button,
   DropdownMenu,
@@ -90,7 +94,9 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 <DropdownMenuContent align="end" className="w-36">
                   <DropdownMenuItem
                     onClick={() => {
-                      sendEvent({ action: TelemetryActions.CRON_JOB_UPDATE_CLICKED })
+                      sendEvent({
+                        action: TelemetryActions.CRON_JOB_UPDATE_CLICKED,
+                      } as CronJobUpdateClickedEvent)
                       onEditCronJob(job)
                     }}
                   >
@@ -99,7 +105,9 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
-                      sendEvent({ action: TelemetryActions.CRON_JOB_DELETE_CLICKED })
+                      sendEvent({
+                        action: TelemetryActions.CRON_JOB_DELETE_CLICKED,
+                      } as CronJobDeleteClickedEvent)
                       onDeleteCronJob(job)
                     }}
                   >

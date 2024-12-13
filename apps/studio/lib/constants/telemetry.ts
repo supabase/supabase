@@ -54,6 +54,92 @@ export interface ConnectionStringCopiedEvent {
   }
 }
 
+/**
+ * Cron job created.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCreatedEvent {
+  action: TelemetryActions.CRON_JOB_CREATED
+  properties: {
+    /**
+     * What the cron job executes, e.g. sql_function or sql_snippet
+     */
+    type: 'sql_function' | 'sql_snippet'
+    /**
+     * Schedule of the cron job in the format of * * * * *
+     */
+    schedule: string
+  }
+}
+
+/**
+ * Cron job updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobUpdatedEvent {
+  action: TelemetryActions.CRON_JOB_UPDATED
+  properties: {
+    /**
+     * What the cron job executes, e.g. sql_function or sql_snippet
+     */
+    type: 'sql_function' | 'sql_snippet'
+    /**
+     * Schedule of the cron job in the format of * * * * *
+     */
+    schedule: string
+  }
+}
+
+/**
+ * Cron job deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobDeletedEvent {
+  action: TelemetryActions.CRON_JOB_DELETED
+}
+
+/**
+ * Create job button clicked that opens the dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCreateClickedEvent {
+  action: TelemetryActions.CRON_JOB_CREATE_CLICKED
+}
+
+/**
+ * Edit cron job button (hidden in the dropdown) clicked that opens the dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobUpdateClickedEvent {
+  action: TelemetryActions.CRON_JOB_UPDATE_CLICKED
+}
+
+/**
+ * Delete cron job button (hidden in the dropdown) clicked that opens the deletion confirmation modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobDeleteClickedEvent {
+  action: TelemetryActions.CRON_JOB_DELETE_CLICKED
+}
+
 // [Joshen] Just adding these to start consolidating our telemetry configs
 // may change depending on how we choose to standardize across all apps
 // Events define the name of the event and it'll be used as the primary identification

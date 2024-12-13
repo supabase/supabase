@@ -4,7 +4,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { CronJobDeletedEvent, TelemetryActions } from 'lib/constants/telemetry'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteCronJobProps {
@@ -19,7 +19,7 @@ export const DeleteCronJob = ({ cronJob, visible, onClose }: DeleteCronJobProps)
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: deleteDatabaseCronJob, isLoading } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
-      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED })
+      sendEvent({ action: TelemetryActions.CRON_JOB_DELETED } as CronJobDeletedEvent)
       toast.success(`Successfully removed cron job ${cronJob.jobname}`)
       onClose()
     },
