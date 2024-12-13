@@ -28,12 +28,9 @@ export const BackupsList = ({ onSelectRestore }: BackupsListProps) => {
       <h3 className="text-sm font-medium">Available Backups</h3>
       <Panel>
         {cloneBackups?.backups.length === 0 ? (
-          <>
-            <BackupsEmpty />
-          </>
+          <BackupsEmpty />
         ) : (
           <div className="divide-y">
-            {/* <pre>{JSON.stringify({ cloneStatus }, null, 2)}</pre> */}
             {cloneBackups?.backups.map((backup) => {
               if (!backup.isPhysicalBackup) return null
               return (
