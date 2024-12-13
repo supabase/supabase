@@ -48,7 +48,6 @@ interface SQLEditorTreeViewItemProps {
   hasNextPage?: boolean
   fetchNextPage?: () => void
   isFetchingNextPage?: boolean
-  paginationFilter?: string
   sort?: 'inserted_at' | 'name'
   name?: string
   onFolderContentsChange?: (info: { isLoading: boolean; snippets?: Snippet[] }) => void
