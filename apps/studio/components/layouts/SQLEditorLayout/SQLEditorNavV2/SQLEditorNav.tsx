@@ -83,6 +83,9 @@ export const SQLEditorNav = ({
     isLoading,
     isPreviousData,
     isFetching,
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
   } = useSQLSnippetFoldersQuery(
     { projectRef, name: debouncedSearchText, sort },
     { keepPreviousData: true }
@@ -664,6 +667,9 @@ export const SQLEditorNav = ({
                       snapV2.saveFolder({ id: element.id as string, name })
                     }
                   }}
+                  hasNextPage={hasNextPage}
+                  fetchNextPage={fetchNextPage}
+                  isFetchingNextPage={isFetchingNextPage}
                   sort={sort}
                   name={debouncedSearchText}
                   onFolderContentsChange={({ isLoading, snippets }) => {

@@ -364,8 +364,8 @@ export const SQLEditorTreeViewItem = ({
             type="outline"
             size="tiny"
             block
-            loading={isFetchingNextPageInFolder || _isFetchingNextPage}
-            disabled={isFetchingNextPageInFolder || _isFetchingNextPage}
+            loading={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}
+            disabled={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}
             onClick={fetchNextPage}
           >
             Load More

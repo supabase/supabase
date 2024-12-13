@@ -53,10 +53,6 @@ export const sqlEditorState = proxy({
       autoLimit?: number
     }[]
   },
-  // Cursors for pagination
-  cursors: {} as {
-    [projectRefAndParentId: string]: string | undefined
-  },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
@@ -77,47 +73,6 @@ export const sqlEditorState = proxy({
   // ========================================================================
   // ## Methods to interact the store with
   // ========================================================================
-
-  getCursor: ({
-    projectRef,
-    parentId,
-    filter,
-  }: {
-    projectRef: string
-    parentId?: string
-    filter?: string
-  }) => {
-    return sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`]
-  },
-
-  setCursor: ({
-    projectRef,
-    parentId,
-    cursor,
-    filter,
-  }: {
-    projectRef: string
-    parentId?: string
-    cursor?: string
-    filter?: string
-  }) => {
-    sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`] = cursor
-  },
-
-  hasNextPage: ({
-    projectRef,
-    parentId,
-    filter,
-  }: {
-    projectRef: string
-    parentId?: string
-    filter?: string
-  }) => {
-    return (
-      sqlEditorState.cursors[`${projectRef}:${parentId ?? 'root'}:${filter ?? 'none'}`] !==
-      undefined
-    )
-  },
 
   setDiffContent: (sql: string, diffType: DiffType) =>
     (sqlEditorState.diffContent = { sql, diffType }),
