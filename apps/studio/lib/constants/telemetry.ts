@@ -38,6 +38,22 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
 }
 
+/**
+ * User copied the database connection string.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ConnectionStringCopiedEvent {
+  action: TelemetryActions.CONNECTION_STRING_COPIED
+  properties: {
+    /**
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
+     */
+    connectionType: string
+  }
+}
+
 // [Joshen] Just adding these to start consolidating our telemetry configs
 // may change depending on how we choose to standardize across all apps
 // Events define the name of the event and it'll be used as the primary identification

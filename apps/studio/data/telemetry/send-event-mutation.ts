@@ -4,14 +4,16 @@ import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { ConnectionStringCopiedEvent, TelemetryActions } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-export type SendEventVariables = {
-  action: TelemetryActions
-  properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
-}
+export type SendEventVariables =
+  | {
+      action: TelemetryActions
+      properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
+    }
+  | ConnectionStringCopiedEvent
 
 type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
 
