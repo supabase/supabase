@@ -29,7 +29,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const appSnap = useAppStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
-  const snippets = useSnippets(ref!)
+  const allSnippets = useSnippets(ref!)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
@@ -120,10 +120,10 @@ const SqlEditor: NextPageWithLayout = () => {
 
   useEffect(() => {
     if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
-      const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
+      const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets, content])
+  }, [id, allSnippets, content])
 
   // Enable pgsql format
   useEffect(() => {

@@ -693,10 +693,6 @@ export interface paths {
     /** Search profiles by username, email with the given keywords */
     post: operations['SearchProfileController_searchProfile']
   }
-  '/platform/profile/subscriptions': {
-    /** Gets the user's subscription statistics */
-    get: operations['SubscriptionsController_getSubscriptionsStatistics']
-  }
   '/platform/projects': {
     /**
      * Gets all projects that belong to the authenticated user
@@ -2103,6 +2099,10 @@ export interface paths {
     /** [Beta] Authorize user through oauth */
     get: operations['v1-authorize-user']
   }
+  '/v1/oauth/revoke': {
+    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    post: operations['v1-revoke-token']
+  }
   '/v1/oauth/token': {
     /** [Beta] Exchange auth code for user's access and refresh token */
     post: operations['v1-exchange-oauth-token']
@@ -2313,6 +2313,10 @@ export interface paths {
   '/v1/projects/{ref}/network-restrictions/apply': {
     /** [Beta] Updates project's network restrictions */
     post: operations['v1-update-network-restrictions']
+  }
+  '/v1/projects/{ref}/pause': {
+    /** Pauses the given project */
+    post: operations['v1-pause-a-project']
   }
   '/v1/projects/{ref}/pgsodium': {
     /** [Beta] Gets project's pgsodium config */
@@ -4358,6 +4362,12 @@ export interface components {
       )[]
       website: string
     }
+    OAuthRevokeTokenBodyDto: {
+      /** Format: uuid */
+      client_id: string
+      client_secret: string
+      refresh_token: string
+    }
     OAuthTokenBody: {
       client_id: string
       client_secret: string
@@ -5756,16 +5766,6 @@ export interface components {
     SubdomainAvailabilityResponse: {
       available: boolean
     }
-    SubscriptionStatisticsResponse: {
-      total_active_free_projects: number
-      total_enterprise_projects: number
-      total_free_projects: number
-      total_paid_projects: number
-      total_paused_free_projects: number
-      total_payg_projects: number
-      total_pro_projects: number
-      total_team_projects: number
-    }
     SupavisorConfigResponse: {
       connectionString: string
       /** @enum {string} */
@@ -5893,12 +5893,7 @@ export interface components {
       tax_id: components['schemas']['TaxId'] | null
     }
     TelemetryCallFeatureFlagsResponseDto: {
-      featureFlagPayloads: {
-        [key: string]: string
-      }
-      featureFlags: {
-        [key: string]: string
-      }
+      [key: string]: unknown
     }
     TelemetryEventBodyV2: {
       action: string
@@ -5918,7 +5913,7 @@ export interface components {
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
-      feature_flag_value: string
+      feature_flag_value?: unknown
     }
     TelemetryGroupsIdentityBody: {
       organization_slug?: string
@@ -8606,13 +8601,13 @@ export interface operations {
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
-      query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
-        org_slug?: string[]
-        project_ref?: string[]
-        offset: number
-        limit: number
+      query?: {
+        limit?: string
+        offset?: string
+        priority?: 'Critical' | 'Warning' | 'Info'
+        status?: 'new' | 'seen' | 'archived'
+        org_slug?: string
+        project_ref?: string
       }
     }
     responses: {
@@ -11762,20 +11757,6 @@ export interface operations {
         }
       }
       /** @description Failed to search profiles with the given keywords */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the user's subscription statistics */
-  SubscriptionsController_getSubscriptionsStatistics: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SubscriptionStatisticsResponse']
-        }
-      }
-      /** @description Failed to retrieve user's subscription statistics */
       500: {
         content: never
       }
@@ -16036,6 +16017,19 @@ export interface operations {
       }
     }
   }
+  /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+  'v1-revoke-token': {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OAuthRevokeTokenBodyDto']
+      }
+    }
+    responses: {
+      204: {
+        content: never
+      }
+    }
+  }
   /** [Beta] Exchange auth code for user's access and refresh token */
   'v1-exchange-oauth-token': {
     requestBody: {
@@ -17081,6 +17075,23 @@ export interface operations {
       }
       /** @description Failed to update project network restrictions */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Pauses the given project */
+  'v1-pause-a-project': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
         content: never
       }
     }

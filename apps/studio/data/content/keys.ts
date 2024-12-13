@@ -19,8 +19,15 @@ export const contentKeys = {
       favorite?: boolean
     }
   ) => ['projects', projectRef, 'content', 'sql', { sort, visibility, favorite, name }] as const,
-  folders: (projectRef: string | undefined, id?: string) =>
-    ['projects', projectRef, 'content', 'folders', id].filter(Boolean),
+  folders: (
+    projectRef: string | undefined,
+    options?: { sort?: 'inserted_at' | 'name'; name?: string }
+  ) => ['projects', projectRef, 'content', 'folders', options] as const,
+  folderContents: (
+    projectRef: string | undefined,
+    id?: string,
+    options?: { sort?: 'inserted_at' | 'name'; name?: string }
+  ) => ['projects', projectRef, 'content', 'folders', id, options],
   resource: (projectRef: string | undefined, id?: string) =>
     ['projects', projectRef, 'content', id] as const,
   count: (

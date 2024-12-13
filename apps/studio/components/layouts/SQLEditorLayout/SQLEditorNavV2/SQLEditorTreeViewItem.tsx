@@ -2,10 +2,11 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Copy, Download, Edit, ExternalLink, Lock, Move, Plus, Share, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useEffect } from 'react'
 
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
+import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
@@ -18,7 +19,6 @@ import {
   ContextMenu_Shadcn_,
   TreeViewItem,
 } from 'ui'
-import { useFetchSQLSnippetFolders } from './SQLEditorNav.utils'
 
 interface SQLEditorTreeViewItemProps {
   element: any
@@ -74,17 +74,14 @@ export const SQLEditorTreeViewItem = ({
   hasNextPage: _hasNextPage,
   fetchNextPage: _fetchNextPage,
   isFetchingNextPage: _isFetchingNextPage,
-  paginationFilter,
   sort,
   name,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
-  const { id, ref } = useParams()
+  const { id, ref: projectRef } = useParams()
   const { profile } = useProfile()
   const { className, onClick } = getNodeProps()
   const snapV2 = useSqlEditorV2StateSnapshot()
-
-  const [isFetchingFolder, setIsFetchingFolder] = useState(false)
 
   const isOwner = profile?.id === element?.metadata.owner_id
   const isSharedSnippet = element.metadata.visibility === 'project'
@@ -97,54 +94,51 @@ export const SQLEditorTreeViewItem = ({
     subject: { id: profile?.id },
   })
 
-  const fetchSQLSnippetFolders = useFetchSQLSnippetFolders()
-
   const parentId = element.parent === 0 ? undefined : element.parent
 
-  const hasNextPage =
-    _hasNextPage !== undefined
-      ? _hasNextPage
-      : ref &&
-        snapV2.hasNextPage({
-          projectRef: ref,
-          parentId,
-          filter: [paginationFilter, sort, name].filter(Boolean).join(':'),
-        })
+  const isEnabled = isBranch && isExpanded
 
-  const [isFetchingNextPage, setIsFetchingNextPage] = useState(false)
-
-  function fetchNextPage() {
-    if (typeof _fetchNextPage === 'function') {
-      _fetchNextPage()
-      return
-    }
-
-    if (ref === undefined) return
-
-    setIsFetchingNextPage(true)
-
-    fetchSQLSnippetFolders({
-      projectRef: ref,
-      folderId: parentId,
-      cursor: snapV2.getCursor({
-        projectRef: ref,
-        parentId,
-        filter: [paginationFilter, sort, name].filter(Boolean).join(':'),
-      }),
+  const {
+    data,
+    isSuccess,
+    isLoading,
+    isFetchingNextPage: isFetchingNextPageInFolder,
+    hasNextPage: hasNextPageInFolder,
+    fetchNextPage: fetchNestPageInFolder,
+  } = useSQLSnippetFolderContentsQuery(
+    {
+      projectRef,
+      folderId: parentId ?? element.id,
       name,
       sort,
-    }).finally(() => {
-      setIsFetchingNextPage(false)
-    })
-  }
+    },
+    {
+      enabled: isEnabled,
+    }
+  )
+  useEffect(() => {
+    if (projectRef && isSuccess) {
+      data.pages.forEach((page) => {
+        page.contents?.forEach((snippet) => {
+          snapV2.addSnippet({
+            projectRef,
+            snippet,
+          })
+        })
+      })
+    }
+  }, [projectRef, data?.pages])
 
-  const onOpenFolder = async (id: string) => {
-    if (!ref) return console.error('Project ref is required')
+  const isInFolder = parentId !== undefined
 
-    setIsFetchingFolder(true)
-    fetchSQLSnippetFolders({ projectRef: ref, folderId: id, name, sort }).finally(() => {
-      setIsFetchingFolder(false)
-    })
+  const hasNextPage = isInFolder ? hasNextPageInFolder : _hasNextPage
+
+  function fetchNextPage() {
+    if (isInFolder) {
+      fetchNestPageInFolder()
+    } else if (typeof _fetchNextPage === 'function') {
+      _fetchNextPage()
+    }
   }
 
   return (
@@ -160,18 +154,18 @@ export const SQLEditorTreeViewItem = ({
             isBranch={isBranch}
             isSelected={isSelected || id === element.id}
             isEditing={isEditing}
-            isLoading={isFetchingFolder || isSaving}
+            isLoading={(isEnabled && isLoading) || isSaving}
             onEditSubmit={(value) => {
               if (onEditSave !== undefined) onEditSave(value)
             }}
             onClick={(e) => {
               if (!isBranch) {
                 if (!e.shiftKey) {
-                  router.push(`/project/${ref}/sql/${element.id}`)
+                  router.push(`/project/${projectRef}/sql/${element.id}`)
                 } else if (id !== 'new') {
                   onMultiSelect?.(element.id)
                 } else {
-                  router.push(`/project/${ref}/sql/${element.id}`)
+                  router.push(`/project/${projectRef}/sql/${element.id}`)
                 }
               } else {
                 // Prevent expanding folder while editing text
@@ -181,7 +175,6 @@ export const SQLEditorTreeViewItem = ({
                 }
 
                 onClick(e)
-                if (!isExpanded) onOpenFolder(element.id)
               }
             }}
           />
@@ -255,7 +248,11 @@ export const SQLEditorTreeViewItem = ({
                 onSelect={() => {}}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Link href={`/project/${ref}/sql/${element.id}`} target="_blank" rel="noreferrer">
+                <Link
+                  href={`/project/${projectRef}/sql/${element.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <ExternalLink size={14} />
                   Open in new tab
                 </Link>
@@ -350,8 +347,8 @@ export const SQLEditorTreeViewItem = ({
             type="outline"
             size="tiny"
             block
-            loading={isFetchingNextPage || _isFetchingNextPage}
-            disabled={isFetchingNextPage || _isFetchingNextPage}
+            loading={isFetchingNextPageInFolder || _isFetchingNextPage}
+            disabled={isFetchingNextPageInFolder || _isFetchingNextPage}
             onClick={fetchNextPage}
           >
             Load More

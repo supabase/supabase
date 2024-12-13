@@ -1,7 +1,11 @@
-import { getSQLSnippetFolders, SnippetFolderResponse } from 'data/content/sql-folders-query'
-import { useCallback } from 'react'
-import { toast } from 'sonner'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { InfiniteData, InfiniteQueryObserver, useQueryClient } from '@tanstack/react-query'
+import { SQLSnippetFolderContentsData } from 'data/content/sql-folder-contents-query'
+import {
+  Snippet,
+  SnippetFolderResponse,
+  SQLSnippetFoldersData,
+} from 'data/content/sql-folders-query'
+import { useEffect, useMemo, useState } from 'react'
 
 export interface TreeViewItemProps {
   id: string | number
@@ -81,38 +85,64 @@ export function getLastItemIds(items: TreeViewItemProps[]) {
   return lastItemIds
 }
 
-export function useFetchSQLSnippetFolders() {
-  const snapV2 = useSqlEditorV2StateSnapshot()
+/**
+ * Returns a list of filtered snippets WITH filtered sub-snippets
+ */
+export function useFilteredSnippets(
+  projectRef: string | undefined,
+  snippetsPages?: InfiniteData<SQLSnippetFoldersData>,
+  name?: string,
+  sort?: 'name' | 'inserted_at'
+) {
+  const [results, setResults] = useState<
+    {
+      snippets: Snippet[]
+      isLoading: boolean
+    }[]
+  >([])
 
-  const fetchSQLSnippetFolders = useCallback(
-    ({ projectRef, folderId, cursor, sort, name }: Parameters<typeof getSQLSnippetFolders>[0]) => {
-      if (projectRef === undefined) return Promise.resolve()
+  const queryClient = useQueryClient()
+  useEffect(() => {
+    const folderIds =
+      snippetsPages?.pages.flatMap((page) => page.folders?.map((x) => x.id) ?? []) ?? []
 
-      return getSQLSnippetFolders({ projectRef, folderId, cursor, sort, name })
-        .then((data) => {
-          const key = ['private', sort, name].filter(Boolean).join(':')
-
-          if (data.contents !== undefined) {
-            snapV2.addSnippets({
-              projectRef,
-              snippets: data.contents,
-              key,
-            })
+    const unsubscribeFns = folderIds.map((folderId, i) =>
+      new InfiniteQueryObserver<SQLSnippetFolderContentsData>(queryClient, {
+        queryKey: ['projects', projectRef, 'content', 'folders', folderId, { name, sort }],
+        keepPreviousData: true,
+        enabled: false,
+      }).subscribe(({ data, isLoading }) => {
+        setResults((prev) => {
+          const newResults = [...prev]
+          newResults[i] = {
+            snippets: data?.pages.flatMap((page) => page.contents ?? []) ?? [],
+            isLoading,
           }
-
-          data.folders?.forEach((folder) => {
-            snapV2.addFolder({ projectRef, folder })
-          })
-
-          snapV2.setCursor({ projectRef, parentId: folderId, cursor: data.cursor, filter: key })
+          return newResults
         })
-        .catch((error) => {
-          toast.error('Failed to fetch snippets: ' + error.message)
-        })
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+      })
+    )
+
+    return () => {
+      unsubscribeFns.forEach((unsub) => unsub())
+    }
+  }, [projectRef, queryClient, name, sort, snippetsPages?.pages])
+
+  // rollup all result objects into one object
+  return useMemo(
+    () =>
+      results.reduce(
+        (acc, curr) => {
+          return {
+            snippets: [...acc.snippets, ...curr.snippets],
+            isLoading: acc.isLoading || curr.isLoading,
+          }
+        },
+        {
+          snippets: snippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? [],
+          isLoading: false,
+        }
+      ),
+    [results, snippetsPages?.pages]
   )
-
-  return fetchSQLSnippetFolders
 }

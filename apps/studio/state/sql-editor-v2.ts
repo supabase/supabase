@@ -45,12 +45,6 @@ export const sqlEditorState = proxy({
     [snippetId: string]: StateSnippet
   },
 
-  snippetOrdering: {} as {
-    [projectRef: string]: {
-      [key: string]: string[]
-    }
-  },
-
   // Query results, if any, for a snippet
   results: {} as {
     [snippetId: string]: {
@@ -63,13 +57,6 @@ export const sqlEditorState = proxy({
   cursors: {} as {
     [projectRefAndParentId: string]: string | undefined
   },
-  snippetCounts: {} as {
-    [projectRef: string]: {
-      private: number
-      shared: number
-      favorited: number
-    }
-  },
   // Synchronous saving of folders and snippets (debounce behavior)
   needsSaving: proxySet<string>([]),
   // Stores the state of each snippet
@@ -77,7 +64,6 @@ export const sqlEditorState = proxy({
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
   },
   limit: 100,
-  order: 'inserted_at' as 'name' | 'inserted_at',
   // For handling renaming folder failed
   lastUpdatedFolderName: '',
 
@@ -136,55 +122,12 @@ export const sqlEditorState = proxy({
   setDiffContent: (sql: string, diffType: DiffType) =>
     (sqlEditorState.diffContent = { sql, diffType }),
 
-  setOrder: (value: 'name' | 'inserted_at') => (sqlEditorState.order = value),
-
-  setSnippetCount: ({
-    projectRef,
-    key,
-    value,
-  }: {
-    projectRef: string
-    key: 'private' | 'shared' | 'favorited'
-    value: number
-  }) => {
-    if (!sqlEditorState.snippetCounts[projectRef]) {
-      sqlEditorState.snippetCounts[projectRef] = { private: 0, shared: 0, favorited: 0 }
-    }
-
-    sqlEditorState.snippetCounts[projectRef][key] = value
-  },
-
   addSnippet: ({ projectRef, snippet }: { projectRef: string; snippet: SnippetWithContent }) => {
     if (sqlEditorState.snippets[snippet.id]) return
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
     sqlEditorState.savingStates[snippet.id] = 'IDLE'
-  },
-
-  addSnippets: ({
-    projectRef,
-    snippets,
-    key,
-  }: {
-    projectRef: string
-    snippets: SnippetWithContent[]
-    key: string
-  }) => {
-    snippets.forEach((snippet) => {
-      sqlEditorState.addSnippet({ projectRef, snippet })
-    })
-
-    if (!sqlEditorState.snippetOrdering[projectRef]) {
-      sqlEditorState.snippetOrdering[projectRef] = {}
-    }
-
-    const previousSnippetIds = sqlEditorState.snippetOrdering[projectRef][key] ?? []
-
-    // ensure if a snippet has been renamed it won't appear twice
-    sqlEditorState.snippetOrdering[projectRef][key] = Array.from(
-      new Set([...previousSnippetIds, ...snippets.map((x) => x.id)])
-    )
   },
 
   updateSnippet: ({
@@ -317,30 +260,6 @@ export const sqlEditorState = proxy({
     if (storeSnippet) {
       storeSnippet.snippet.favorite = true
 
-      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
-      counts.shared++
-
-      // Copy the snippet into the favorite section
-      const snippetOrdering = sqlEditorState.snippetOrdering[storeSnippet.projectRef]
-      Object.keys(snippetOrdering).forEach((key) => {
-        const firstSegment = key.split(':')[0]
-
-        if (firstSegment === 'private' || firstSegment === 'shared') {
-          const index = snippetOrdering[key]?.indexOf(id)
-          if (index > -1) {
-            const favoriteKey = ['favorite', ...key.split(':').slice(1)].join(':')
-
-            if (snippetOrdering[favoriteKey]) {
-              sqlEditorState.addSnippets({
-                key: favoriteKey,
-                projectRef: storeSnippet.projectRef,
-                snippets: [storeSnippet.snippet],
-              })
-            }
-          }
-        }
-      })
-
       sqlEditorState.needsSaving.add(id)
     }
   },
@@ -349,22 +268,6 @@ export const sqlEditorState = proxy({
     const storeSnippet = sqlEditorState.snippets[id]
     if (storeSnippet.snippet) {
       storeSnippet.snippet.favorite = false
-
-      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
-      counts.shared--
-
-      // Remove the snippet from the favorite section
-      const snippetOrdering = sqlEditorState.snippetOrdering[storeSnippet.projectRef]
-      Object.keys(snippetOrdering).forEach((key) => {
-        const firstSegment = key.split(':')[0]
-
-        if (firstSegment === 'favorite') {
-          const index = snippetOrdering[key]?.indexOf(id)
-          if (index > -1) {
-            snippetOrdering[key].splice(index, 1)
-          }
-        }
-      })
 
       sqlEditorState.needsSaving.add(id)
     }
@@ -388,17 +291,6 @@ export const sqlEditorState = proxy({
       storeSnippet.snippet.content = snippetContent
       storeSnippet.snippet.visibility = visibility
       storeSnippet.snippet.folder_id = undefined
-
-      let counts = sqlEditorState.snippetCounts[storeSnippet.projectRef]
-      if (counts) {
-        if (visibility === 'user') {
-          counts.private += 1
-          counts.shared -= 1
-        } else if (visibility === 'project') {
-          counts.private -= 1
-          counts.shared += 1
-        }
-      }
 
       sqlEditorState.needsSaving.add(id)
     }
@@ -444,18 +336,15 @@ export const useSnippetFolders = (projectRef: string) => {
   )
 }
 
-export const useSnippets = (projectRef: string, key: string) => {
+export const useSnippets = (projectRef: string) => {
   const snapshot = useSqlEditorV2StateSnapshot()
 
   return useMemo(
     () =>
-      snapshot.snippetOrdering?.[projectRef]?.[key]
-        ?.map((id) => snapshot.snippets[id].snippet)
-        .sort((a, b) => {
-          if (snapshot.order === 'name') return a.name.localeCompare(b.name)
-          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-        }) ?? [],
-    [projectRef, key, snapshot.snippets, snapshot.snippetOrdering]
+      Object.values(snapshot.snippets)
+        .filter((storeSnippet) => storeSnippet.projectRef === projectRef)
+        .map((storeSnippet) => storeSnippet.snippet),
+    [projectRef, snapshot.snippets]
   )
 }
 
