@@ -21,6 +21,7 @@ type PostTypes = {
   tags?: string[]
   categories?: string[]
   industry?: string[]
+  supabase_products?: string[]
   company_size?: string
   region?: string
   logo?: string

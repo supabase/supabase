@@ -15,7 +15,7 @@ import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import CustomersFilters from '../components/CustomerStories/CustomersFilters'
 import { useState } from 'react'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 
 export async function getStaticProps() {
   const allPostsData: any[] = getSortedPosts({ directory: '_customers' })
@@ -24,6 +24,7 @@ export async function getStaticProps() {
   // create a rss feed in public directory
   // rss feed is added via <Head> component in render return
   fs.writeFileSync('./public/customers-rss.xml', rss)
+
   const industries = allPostsData.reduce<{ [key: string]: number }>(
     (acc, customer) => {
       // Increment the 'all' counter
@@ -39,10 +40,26 @@ export async function getStaticProps() {
     { all: 0 }
   )
 
+  const products = allPostsData.reduce<{ [key: string]: number }>(
+    (acc, customer) => {
+      // Increment the 'all' counter
+      acc.all = (acc.all || 0) + 1
+
+      // Increment the counter for each category
+      customer.supabase_products?.forEach((product: string) => {
+        acc[product] = (acc[product] || 0) + 1
+      })
+
+      return acc
+    },
+    { all: 0 }
+  )
+
   return {
     props: {
       blogs: allPostsData,
       industries,
+      products,
     },
   }
 }
@@ -57,6 +74,7 @@ function CustomerStoriesPage(props: any) {
       title: blog.title,
       link: blog.url,
       industry: blog.industry,
+      products: blog.supabase_products,
     }
   })
   const [customers, setCustomers] = useState(_allCustomers)
@@ -113,38 +131,44 @@ function CustomerStoriesPage(props: any) {
               </motion.div>
               <CustomersFilters
                 allCustomers={_allCustomers}
-                customers={customers}
                 setCustomers={setCustomers}
                 industries={props.industries}
+                products={props.products}
               />
-              <div className="mx-auto mt-6 mb-12 md:mb-20 grid grid-cols-12 gap-6 not-prose">
-                {customers?.map((caseStudy: any, i: number) => (
-                  <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
-                    <motion.a
-                      className="col-span-12 md:col-span-4"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: {
-                          duration: 0.4,
-                          ease: [0.24, 0.25, 0.05, 1],
-                          delay: 0.2 + i / 15,
-                        },
-                      }}
-                    >
-                      <GlassPanel
-                        {...caseStudy}
-                        background={true}
-                        showIconBg={true}
-                        showLink={true}
-                        hasLightIcon
+              <div className="mx-auto mt-4 sm:mt-6 mb-12 md:mb-20 grid grid-cols-12 gap-6 not-prose">
+                {customers?.length ? (
+                  customers?.map((caseStudy: any, i: number) => (
+                    <Link href={`${caseStudy.link}`} key={caseStudy.title} passHref legacyBehavior>
+                      <motion.a
+                        className="col-span-12 md:col-span-4"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{
+                          opacity: 1,
+                          y: 0,
+                          transition: {
+                            duration: 0.4,
+                            ease: [0.24, 0.25, 0.05, 1],
+                            delay: 0.2 + i / 15,
+                          },
+                        }}
                       >
-                        {caseStudy.description}
-                      </GlassPanel>
-                    </motion.a>
-                  </Link>
-                ))}
+                        <GlassPanel
+                          {...caseStudy}
+                          background={true}
+                          showIconBg={true}
+                          showLink={true}
+                          hasLightIcon
+                        >
+                          {caseStudy.description}
+                        </GlassPanel>
+                      </motion.a>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="col-span-12 flex flex-col gap-2 py-4 text-sm text-muted">
+                    <p>No customers found</p>
+                  </div>
+                )}
               </div>
             </div>
             <div

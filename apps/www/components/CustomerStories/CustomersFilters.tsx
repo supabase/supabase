@@ -1,12 +1,8 @@
-import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
-import { startCase } from 'lodash'
-import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/router'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { useKey } from 'react-use'
 import type PostTypes from '~/types/post'
-
 import {
   Button,
   DropdownMenu,
@@ -16,117 +12,103 @@ import {
   Input,
   cn,
 } from 'ui'
-import { ChevronDown, Search, X as CloseIcon } from 'lucide-react'
+import { ChevronDown, X as CloseIcon } from 'lucide-react'
+import startCase from 'lodash/startCase'
+import { useBreakpoint } from 'common'
 
 interface Props {
   allCustomers: PostTypes[]
-  customers?: PostTypes[]
   setCustomers: (posts: any) => void
   industries: { [key: string]: number }
+  products: { [key: string]: number }
 }
 
-/**
- * search via industry if no q param
- * search via industry and reset q param if present
- */
-
-function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [industry, setIndustry] = useState<string>('all')
-  const [searchTerm, setSearchTerm] = useState<string>('')
-  const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
-
+export const useFilters = (initialIndustry: string, initialProduct: string) => {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const q = searchParams?.get('q')
-  const activeIndustry = searchParams?.get('industry')
-  const isMobile = useBreakpoint(1023)
+  const [industry, setIndustry] = useState<string>(initialIndustry)
+  const [product, setProduct] = useState<string>(initialProduct)
 
-  const handleSearchChange = (customer: any) => {
-    activeIndustry && setIndustry('all')
-    handleSearchByText(customer.target.value)
+  const updateUrlParams = () => {
+    const params = new URLSearchParams()
+    if (industry !== 'all') params.set('industry', industry)
+    if (product !== 'all') params.set('product', product)
+    // if (industry) params.set('industry', industry)
+    // if (product) params.set('product', product)
+    router.replace({ pathname: '/customers', query: params.toString() }, undefined, {
+      shallow: true,
+    })
   }
 
   useEffect(() => {
-    if (!q) {
-      handlePosts()
-    }
-  }, [industry])
+    updateUrlParams()
+  }, [industry, product])
 
-  useEffect(() => {
-    if (q) {
-      handleSearchByText(q)
-    }
-  }, [q])
+  return { industry, setIndustry, product, setProduct }
+}
 
-  const handleReplaceRouter = () => {
-    if (!searchTerm && industry !== 'all') {
-      router.query.industry = industry
-      router.replace(router, undefined, { shallow: true, scroll: false })
-    }
-  }
+function CustomerFilters({ allCustomers, setCustomers, industries, products }: Props) {
+  const isMobile = useBreakpoint('sm')
+  const router = useRouter()
+  const {
+    industry: activeIndustry,
+    setIndustry,
+    product: activeProduct,
+    setProduct,
+  } = useFilters('all', 'all')
 
   const handlePosts = () => {
-    handleReplaceRouter()
-
     setCustomers(
-      industry === 'all'
-        ? allCustomers
-        : allCustomers.filter((customer: any) => {
-            const found = customer.industry?.includes(industry)
-            console.log('customer', customer, industry, found)
-            return found
-          })
+      allCustomers.filter((customer: any) => {
+        const matchesIndustry =
+          activeIndustry === 'all' || customer.industry?.includes(activeIndustry)
+        const matchesProduct = activeProduct === 'all' || customer.products?.includes(activeProduct)
+        return matchesIndustry && matchesProduct
+      })
     )
   }
 
-  useKey('Escape', () => handleSearchByText(''))
-
-  useEffect(() => {
-    if (router.isReady && q) {
-      setSearchTerm(q)
-    }
-    if (router.isReady && activeIndustry && activeIndustry !== 'all') {
-      setIndustry(activeIndustry)
-    }
-  }, [activeIndustry, router.isReady, q])
-
-  const handleSearchByText = (text: string) => {
-    setSearchTerm(text)
-    searchParams?.has('q') &&
-      router.replace('/customers', undefined, { shallow: true, scroll: false })
-    router.replace(`/customers?q=${text}`, undefined, { shallow: true, scroll: false })
-    if (text.length < 1) router.replace('/customers', undefined, { shallow: true, scroll: false })
-
-    const matches = allCustomers.filter((customer: any) => {
-      const found =
-        customer.name?.toLowerCase().includes(text.toLowerCase()) ||
-        customer.title?.toLowerCase().includes(text.toLowerCase()) ||
-        customer.about?.toLowerCase().includes(text.toLowerCase())
-      return found
-    })
-
-    setCustomers(matches)
-  }
-
-  const handleSetIndustry = (industry: string) => {
-    searchTerm && handlePosts()
-    searchTerm && setSearchTerm('')
-    setIndustry(industry)
-    industry === 'all'
-      ? router.replace('/customers', undefined, { shallow: true, scroll: false })
-      : router.replace(`/customers?industry=${industry}`, undefined, {
-          shallow: true,
-          scroll: false,
-        })
+  const resetFilters = () => {
+    handleIndustryFilter('all')
+    handleProductFilter('all')
   }
 
   useEffect(() => {
-    if (!inputRef.current) return
-    if (showSearchInput && isMobile) {
-      inputRef.current?.focus()
+    handlePosts()
+  }, [activeIndustry, activeProduct])
+
+  const handleIndustryFilter = (selectedIndustry: string) => {
+    if (selectedIndustry === 'all') {
+      setIndustry('all')
+      const { industry, ...rest } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: rest,
+      })
+    } else {
+      setIndustry(selectedIndustry)
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, industry: selectedIndustry },
+      })
     }
-  }, [showSearchInput, isMobile])
+  }
+
+  const handleProductFilter = (selectedProduct: string) => {
+    if (selectedProduct === 'all') {
+      setProduct('all')
+      const { product, ...rest } = router.query
+      router.push({
+        pathname: router.pathname,
+        query: rest,
+      })
+    } else {
+      setProduct(selectedProduct)
+      router.push({
+        pathname: router.pathname,
+        query: { ...router.query, product: selectedProduct },
+      })
+    }
+  }
 
   return (
     <div className="flex flex-row items-center justify-between gap-2">
@@ -135,7 +117,7 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.05 } }}
-          className="flex"
+          className="flex flex-row flex-wrap sm:flex-nowrap justify-start items-center gap-2"
         >
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -143,28 +125,16 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
                 type="outline"
                 size="medium"
                 iconRight={<ChevronDown />}
-                className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
+                className="w-full min-w-[150px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
               >
-                {!activeIndustry ? (
-                  <>
-                    All Industries{' '}
-                    <span className="text-foreground-lighter text-xs">{industries['all']}</span>
-                  </>
-                ) : (
-                  <>
-                    {getIndustryLabel(activeIndustry)}
-                    <span className="text-foreground-lighter text-xs">
-                      {industries[activeIndustry]}
-                    </span>
-                  </>
-                )}
+                {getIndustryLabel(activeIndustry) || 'All Industries'}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="start">
+            <DropdownMenuContent>
               {Object.entries(industries).map(([industry, count]) => (
                 <DropdownMenuItem
                   key={`item-${industry}`}
-                  onClick={() => handleSetIndustry(industry)}
+                  onClick={() => handleIndustryFilter(industry)}
                   className={cn(
                     'flex gap-0.5 items-center justify-between',
                     (industry === 'all' && !activeIndustry) || industry === activeIndustry
@@ -178,40 +148,51 @@ function CustomerFilters({ allCustomers, setCustomers, industries }: Props) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="outline"
+                size="medium"
+                iconRight={<ChevronDown />}
+                className="w-full min-w-[200px] flex [&_span]:flex [&_span]:items-center [&_span]:gap-2 justify-between items-center py-2"
+              >
+                {getProductLabel(activeProduct) || 'All Products'}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {Object.entries(products).map(([product, count]) => (
+                <DropdownMenuItem
+                  key={`item-${product}`}
+                  onClick={() => handleProductFilter(product)}
+                  className={cn(
+                    'flex gap-0.5 items-center justify-between',
+                    (product === 'all' && !activeProduct) || product === activeProduct
+                      ? 'text-brand-600'
+                      : ''
+                  )}
+                >
+                  {getProductLabel(product)}{' '}
+                  <span className="text-foreground-lighter text-xs w-3">{count}</span>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button
+            onClick={resetFilters}
+            className={cn(
+              'transition-opacity',
+              activeIndustry !== 'all' || activeProduct !== 'all'
+                ? 'opacity-100 visible'
+                : 'opacity-0 invisible'
+            )}
+            type={isMobile ? 'default' : 'text'}
+            block={isMobile}
+            iconRight={<CloseIcon />}
+          >
+            Reset filters
+          </Button>
         </motion.div>
       </AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0, transition: { duration: 0.05 } }}
-        className="w-full h-[38px] flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]"
-      >
-        <Input
-          inputRef={inputRef}
-          icon={<Search size="14" />}
-          size="small"
-          layout="vertical"
-          autoComplete="off"
-          type="search"
-          placeholder="Search customer"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          className="w-full [&_input]:!h-[38px]"
-          actions={
-            searchTerm && (
-              <Button
-                type="link"
-                onClick={() => {
-                  handleSearchByText('')
-                }}
-                className="text-foreground-light hover:text-foreground bg-control/100 hover:bg-selection"
-              >
-                <CloseIcon size="14" />
-              </Button>
-            )
-          }
-        />
-      </motion.div>
     </div>
   )
 }
@@ -226,6 +207,17 @@ const getIndustryLabel = (industry: string) => {
       return 'SaaS'
     default:
       return startCase(industry.replaceAll('-', ' '))
+  }
+}
+
+const getProductLabel = (product: string) => {
+  switch (product) {
+    case 'all':
+      return 'All Products'
+    case 'functions':
+      return 'Edge Functions'
+    default:
+      return startCase(product.replaceAll('-', ' '))
   }
 }
 
