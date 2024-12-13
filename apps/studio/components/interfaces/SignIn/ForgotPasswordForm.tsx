@@ -7,6 +7,7 @@ import { object, string } from 'yup'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
 import { Button, Form, Input } from 'ui'
+import { BASE_PATH } from 'lib/constants'
 
 const forgotPasswordSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -41,7 +42,11 @@ const ForgotPasswordForm = () => {
     resetPassword({
       email,
       hcaptchaToken: token,
-      redirectTo: `${getURL()}/reset-password`,
+      redirectTo: `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }${BASE_PATH}/reset-password`,
     })
   }
 

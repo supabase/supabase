@@ -16,6 +16,7 @@ import {
   Input,
 } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
+import { BASE_PATH } from 'lib/constants'
 
 const signUpSchema = passwordSchema.shape({
   email: yup.string().email().required().label('Email'),
@@ -51,7 +52,11 @@ const SignUpForm = () => {
       email,
       password,
       hcaptchaToken: token ?? null,
-      redirectTo: `${getURL()}/sign-in`,
+      redirectTo: `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }${BASE_PATH}/sign-in`,
     })
   }
 

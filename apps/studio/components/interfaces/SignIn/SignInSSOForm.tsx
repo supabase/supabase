@@ -9,6 +9,7 @@ import { useLastSignIn } from 'hooks/misc/useLastSignIn'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 import { getURL } from 'lib/helpers'
+import { BASE_PATH } from 'lib/constants'
 
 const WHITELIST_ERRORS = ['No SSO provider assigned for this domain']
 
@@ -30,7 +31,13 @@ const SignInSSOForm = () => {
     }
 
     // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
-    const redirectTo = buildPathWithParams(`${getURL()}/sign-in-mfa`)
+    const redirectTo = buildPathWithParams(
+      `${
+        process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+          ? location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL
+      }${BASE_PATH}/sign-in-mfa`
+    )
 
     const { data, error } = await auth.signInWithSSO({
       domain: email.split('@')[1],
