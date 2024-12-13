@@ -2,8 +2,11 @@ import { CalculatedColumn } from 'react-data-grid'
 
 import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { BooleanEditor } from '../components/editor/BooleanEditor'
-import { DateEditor } from '../components/editor/DateEditor'
-import { DateTimeEditor, DateTimeWithTimezoneEditor } from '../components/editor/DateTimeEditor'
+import {
+  DateEditor,
+  DateTimeEditor,
+  DateTimeWithTimezoneEditor,
+} from '../components/editor/DateTimeEditor'
 import { JsonEditor } from '../components/editor/JsonEditor'
 import { NumberEditor } from '../components/editor/NumberEditor'
 import { SelectEditor } from '../components/editor/SelectEditor'
