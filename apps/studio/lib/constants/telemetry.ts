@@ -13,13 +13,14 @@ export enum TelemetryActions {
   ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
+
   CRON_JOB_CREATED = 'cron_job_created',
   CRON_JOB_UPDATED = 'cron_job_updated',
   CRON_JOB_DELETED = 'cron_job_deleted',
   CRON_JOB_DELETE_CLICKED = 'cron_job_delete_clicked',
   CRON_JOB_UPDATE_CLICKED = 'cron_job_update_clicked',
   CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
-  CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED = 'cron_job_view_previous_runs_clicked',
+  CRON_JOB_HISTORY_CLICKED = 'cron_job_history_clicked',
 
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
@@ -59,7 +60,7 @@ export interface ConnectionStringCopiedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
  */
 export interface CronJobCreatedEvent {
   action: TelemetryActions.CRON_JOB_CREATED
@@ -80,7 +81,7 @@ export interface CronJobCreatedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/integrations/cron/jobs
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
  */
 export interface CronJobUpdatedEvent {
   action: TelemetryActions.CRON_JOB_UPDATED
@@ -138,6 +139,17 @@ export interface CronJobUpdateClickedEvent {
  */
 export interface CronJobDeleteClickedEvent {
   action: TelemetryActions.CRON_JOB_DELETE_CLICKED
+}
+
+/**
+ * History button clicked to see previous runs of the cron job
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobHistoryClickedEvent {
+  action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
 }
 
 // [Joshen] Just adding these to start consolidating our telemetry configs

@@ -11,6 +11,7 @@ import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/databa
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import {
   CronJobDeleteClickedEvent,
+  CronJobHistoryClickedEvent,
   CronJobUpdateClickedEvent,
   TelemetryActions,
 } from 'lib/constants/telemetry'
@@ -82,7 +83,9 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 type="default"
                 icon={<History />}
                 onClick={() => {
-                  sendEvent({ action: TelemetryActions.CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED })
+                  sendEvent({
+                    action: TelemetryActions.CRON_JOB_HISTORY_CLICKED,
+                  } as CronJobHistoryClickedEvent)
                 }}
               >
                 <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
