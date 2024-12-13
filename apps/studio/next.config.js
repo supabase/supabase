@@ -61,7 +61,7 @@ const STYLE_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 const FONT_SRC_URLS = `${CLOUDFLARE_CDN_URL}`
 
 const csp = [
-  ...(process.env.VERCEL_ENV === 'preview' ||
+  ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
     ? [
