@@ -80,7 +80,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
             'group-aria-current/item:text-foreground',
-            'absolute left-12 md:left-7 md:group-data-[state=expanded]:left-12',
+            'absolute left-10 md:left-7 md:group-data-[state=expanded]:left-12',
             'opacity-100 md:opacity-0 md:group-data-[state=expanded]:opacity-100',
             `${isActive && 'text-foreground hover:text-foreground'}`,
             'transition-all'
