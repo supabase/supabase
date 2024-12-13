@@ -76,6 +76,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - In Supabase, the auth schema already has a users table which is used to store users. It is common practice to create a profiles table in the public schema that links to auth.users to store user information instead. You don't need to create a new users table. Never expose the users table in the auth schema through a view in the public schema.
 
       When generating tables, do the following:
+      - Ensure that all tables always have a primary key
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
       - Prefer creating foreign key references in the create statement
       - Prefer 'text' over 'varchar'
