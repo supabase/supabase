@@ -178,7 +178,7 @@ const TableEditorMenu = () => {
                 setSearchText(e.target.value)
               }}
               value={searchText}
-              placeholder="Search tables yo..."
+              placeholder="Search tables..."
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
