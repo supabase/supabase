@@ -59,10 +59,18 @@ export async function getContent(
     throw new Error('Content not found')
   }
 
+  // these are tabs that are static content
+  // these canot be removed from localstorage based on this query request
+  const IGNORED_TAB_IDS = ['sql-templates', 'sql-quickstarts']
+
   // get current content ids
-  const currentContentIds = response.data
-    .filter((content: Content) => content.type === 'sql')
-    .map((content: Content) => createTabId('sql', { id: content.id }))
+  const currentContentIds = [
+    ...response.data
+      .filter((content: Content) => content.type === 'sql')
+      .map((content: Content) => createTabId('sql', { id: content.id })),
+    // append ignored tab IDs
+    ...IGNORED_TAB_IDS,
+  ]
 
   // handle local tabs
   // checks IDs against localstorage state

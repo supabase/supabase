@@ -13,8 +13,8 @@ import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
-  const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
+  // const isFeaturePreviewTabsTableEditorFlag = useFlag('featurePreviewTabsTableEditor')
+  // const isFeaturePreviewTabsSqlEditorFlag = useFlag('featurePreviewTabsSqlEditor')
   const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const snap = useAppStateSnapshot()

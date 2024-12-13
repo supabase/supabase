@@ -1,9 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FilePlus, FolderPlus, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useState } from 'react'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -11,6 +6,10 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { FilePlus, FolderPlus, Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   Button,
@@ -24,15 +23,22 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
-  InnerSideMenuItem,
+  InnerSideMenuDataItem,
 } from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { addTab, createTabId, makeActiveTabPermanent } from 'state/tabs'
+import { SqlEditorMenuStaticLinks } from './sql-editor-menu-static-links'
 
 interface SQLEditorMenuProps {
   onViewOngoingQueries?: () => void
 }
 
 export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
+  const { flags } = useFeaturePreviewContext()
+  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
+
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -77,6 +83,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
       toast.error(`Failed to create new query: ${error.message}`)
     }
   }
+
+  console.log('asPath', router.asPath)
 
   return (
     <div className="h-full flex flex-col justify-between">
@@ -124,22 +132,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           </DropdownMenu>
         </div>
 
-        {/* <div className="px-2">
-          <InnerSideMenuItem
-            title="Templates"
-            isActive={router.asPath === `/project/${ref}/sql/templates`}
-            href={`/project/${ref}/sql/templates`}
-          >
-            Templates
-          </InnerSideMenuItem>
-          <InnerSideMenuItem
-            title="Quickstarts"
-            isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-            href={`/project/${ref}/sql/quickstarts`}
-          >
-            Quickstarts
-          </InnerSideMenuItem>
-        </div> */}
+        <SqlEditorMenuStaticLinks />
 
         <SQLEditorNavV2 searchText={searchText} />
       </div>

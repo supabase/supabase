@@ -74,8 +74,8 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   // end of tabs preview logic
 
   const isActive = _isActive ?? Number(id) === entity.id
-  const tabsStore = getTabsStore(projectRef)
-  const tabs = useSnapshot(tabsStore)
+
+  const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
 
   const { data: lints = [] } = useProjectLintsQuery({

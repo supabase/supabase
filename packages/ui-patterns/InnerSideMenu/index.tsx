@@ -15,6 +15,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  TreeViewItemVariant,
   cn,
 } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
@@ -112,6 +113,37 @@ const InnerSideMenuItem = forwardRef<
         className
       )}
     />
+  )
+})
+
+const InnerSideMenuDataItem = forwardRef<
+  ElementRef<typeof Link>,
+  React.ComponentPropsWithoutRef<typeof Link> & {
+    isActive?: boolean
+    forceHoverState?: boolean | null
+    isPreview?: boolean
+    isOpened?: boolean
+  }
+>(({ isActive = true, forceHoverState, isPreview, isOpened = true, ...props }, ref) => {
+  return (
+    <Link
+      ref={ref}
+      {...props}
+      aria-current={isActive}
+      className={cn(
+        TreeViewItemVariant({
+          isSelected: isActive && !isPreview,
+          isOpened: isOpened && !isPreview,
+          isPreview,
+        }),
+        'px-4',
+        // forceHoverState && 'bg-surface-200',
+        props.className
+      )}
+    >
+      {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+      {props.children}
+    </Link>
   )
 })
 
@@ -262,6 +294,7 @@ export {
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
+  InnerSideMenuDataItem,
   InnerSideMenuItemLoading,
   InnerSideMenuSeparator,
 }

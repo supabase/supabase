@@ -68,7 +68,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   return (
     <div
       className={cn(
-        'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar',
+        'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar flex-shrink-0',
         headerBorder ? 'border-b border-default' : ''
       )}
     >

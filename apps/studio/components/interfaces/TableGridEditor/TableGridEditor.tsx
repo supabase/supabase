@@ -246,11 +246,12 @@ const TableGridEditor = ({
         showCustomChildren={(isViewSelected || isTableSelected) && selectedView === 'definition'}
         customHeader={
           (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-            <div className="flex items-center space-x-2">
-              <p>
-                SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
+            <div className="flex items-center space-x-2 px-3">
+              <p className="text-sm text-foreground-light">
+                SQL Definition of{' '}
+                <span className="text-sm text-foreground">{selectedTable.name}</span>{' '}
               </p>
-              <p className="text-foreground-light text-sm">(Read only)</p>
+              <p className="text-foreground-lighter text-sm">(Read only)</p>
             </div>
           ) : null
         }

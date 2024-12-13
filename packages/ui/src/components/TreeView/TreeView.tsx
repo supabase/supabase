@@ -221,7 +221,7 @@ const TreeViewItem = forwardRef<
   }
 )
 
-export const SQL_ICON = forwardRef<SVGSVGElement, LucideSVGProps>((props, ref) => (
+const SQL_ICON = forwardRef<SVGSVGElement, LucideSVGProps>((props, ref) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
     <g clipPath="url(#clip0_1018_49117)">
       <path d="M20.8457 14.4531V15.6348H17.8916V14.4531H20.8457ZM18.3311 8.52539V15.6348H16.9004V8.52539H18.3311Z" />

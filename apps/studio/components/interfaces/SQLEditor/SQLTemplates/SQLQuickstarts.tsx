@@ -56,11 +56,10 @@ const SQLQuickstarts = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6">
+    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10">
       <div className="mb-8">
-        <div className="mb-4">
-          <h1 className="text-foreground mb-3 text-xl">Quickstarts</h1>
-
+        <div className="mb-6">
+          <h1 className="text-foreground mb-1 text-xl">Quickstarts</h1>
           <p className="text-foreground-light text-sm">
             Click on any script to fill the query box, modify the script, then click
             <span className="text-code">Run</span>.
