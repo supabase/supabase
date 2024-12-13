@@ -12,11 +12,9 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
   onClose,
 }: RenderEditCellProps<TRow, TSummaryRow>) {
   const value = row[column.key as keyof TRow] as unknown as string
-  console.log('NumberEditor', value)
 
   function onChange(event: React.ChangeEvent<HTMLInputElement>) {
     const _value = event.target.value
-    console.log('onChange', _value)
     if (_value === '') onRowChange({ ...row, [column.key]: null })
     else onRowChange({ ...row, [column.key]: _value })
   }
