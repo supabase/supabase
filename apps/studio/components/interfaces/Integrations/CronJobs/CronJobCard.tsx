@@ -9,7 +9,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   DropdownMenu,
@@ -78,11 +78,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 type="default"
                 icon={<History />}
                 onClick={() => {
-                  sendEvent({
-                    action: TELEMETRY_EVENTS.CRON_JOBS,
-                    value: TELEMETRY_VALUES.CRON_JOBS_VIEW_PREVIOUS_RUNS,
-                    label: 'User clicked view previous runs button',
-                  })
+                  sendEvent({ action: TelemetryActions.CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED })
                 }}
               >
                 <Link href={`/project/${ref}/integrations/cron/jobs/${job.jobname}`}>History</Link>
@@ -94,11 +90,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                 <DropdownMenuContent align="end" className="w-36">
                   <DropdownMenuItem
                     onClick={() => {
-                      sendEvent({
-                        action: TELEMETRY_EVENTS.CRON_JOBS,
-                        value: TELEMETRY_VALUES.CRON_JOB_UPDATE_CLICKED,
-                        label: 'User clicked edit cron job button',
-                      })
+                      sendEvent({ action: TelemetryActions.CRON_JOB_UPDATE_CLICKED })
                       onEditCronJob(job)
                     }}
                   >
@@ -107,11 +99,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     onClick={() => {
-                      sendEvent({
-                        action: TELEMETRY_EVENTS.CRON_JOBS,
-                        value: TELEMETRY_VALUES.CRON_JOB_DELETE_CLICKED,
-                        label: 'User clicked delete cron job button',
-                      })
+                      sendEvent({ action: TelemetryActions.CRON_JOB_DELETE_CLICKED })
                       onDeleteCronJob(job)
                     }}
                   >

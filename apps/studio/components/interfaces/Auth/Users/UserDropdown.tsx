@@ -98,7 +98,8 @@ const UserDropdown = ({
   async function handleDelete() {
     await timeout(200)
     if (!ref) return console.error('Project ref is required')
-    deleteUser({ projectRef: ref, user })
+    if (!user.id) return console.error('User id is required')
+    deleteUser({ projectRef: ref, userId: user.id })
   }
 
   async function handleDeleteFactors() {
