@@ -84,10 +84,18 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - If a foreign key is created, include a statement to create a database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
+      - If the table is a foreign table, create it in a new schema called private. If the private schema doesnt exist, create it. 
+        - Explain to the user that we create it outside of the public schema as it can present a security risk as foreign tables views cannot be configured to respect RLS policies. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0017_foreign_table_in_api
 
       When generating views, do the following:
       - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views.
       - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
+      - If the view is a materialized view, create it in a new schema called private. If the private schema doesnt exist, create it. 
+        - Explain to the user that we create it outside of the public schema as it can present a security risk as materialized views cannot be configured to respect RLS policies of the underlying tables they are built upon, nor can they be secured with RLS directly. Provide this link for users to view more details about the security risk: https://supabase.com/docs/guides/database/database-advisors?queryGroups=lint&lint=0016_materialized_view_in_api
+
+      When installing database extensions, do the following:
+      - Never install extensions in the public schema
+      - Extensions should be installed in the extensions schema, or a dedicated schema
 
       Feel free to suggest corrections for suspected typos.
 
