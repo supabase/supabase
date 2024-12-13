@@ -41,6 +41,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [searchText, setSearchText] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
   const [sort, setSort] = useLocalStorage<'name' | 'inserted_at'>('sql-editor-sort', 'inserted_at')
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -91,6 +92,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
               aria-labelledby="Search queries"
               value={searchText}
               onChange={(e) => setSearchText(e.target.value)}
+              isLoading={isSearching}
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
@@ -143,7 +145,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
           </InnerSideMenuItem>
         </div>
 
-        <SQLEditorNavV2 searchText={searchText} sort={sort} />
+        <SQLEditorNavV2 searchText={searchText} sort={sort} setIsSearching={setIsSearching} />
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">

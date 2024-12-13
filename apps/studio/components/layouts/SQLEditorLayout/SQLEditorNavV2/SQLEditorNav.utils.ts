@@ -1,11 +1,4 @@
-import { InfiniteData, InfiniteQueryObserver, useQueryClient } from '@tanstack/react-query'
-import { SQLSnippetFolderContentsData } from 'data/content/sql-folder-contents-query'
-import {
-  Snippet,
-  SnippetFolderResponse,
-  SQLSnippetFoldersData,
-} from 'data/content/sql-folders-query'
-import { useEffect, useMemo, useState } from 'react'
+import { SnippetFolderResponse } from 'data/content/sql-folders-query'
 
 export interface TreeViewItemProps {
   id: string | number
@@ -83,66 +76,4 @@ export function getLastItemIds(items: TreeViewItemProps[]) {
   }
 
   return lastItemIds
-}
-
-/**
- * Returns a list of filtered snippets WITH filtered sub-snippets
- */
-export function useFilteredSnippets(
-  projectRef: string | undefined,
-  snippetsPages?: InfiniteData<SQLSnippetFoldersData>,
-  name?: string,
-  sort?: 'name' | 'inserted_at'
-) {
-  const [results, setResults] = useState<
-    {
-      snippets: Snippet[]
-      isLoading: boolean
-    }[]
-  >([])
-
-  const queryClient = useQueryClient()
-  useEffect(() => {
-    const folderIds =
-      snippetsPages?.pages.flatMap((page) => page.folders?.map((x) => x.id) ?? []) ?? []
-
-    const unsubscribeFns = folderIds.map((folderId, i) =>
-      new InfiniteQueryObserver<SQLSnippetFolderContentsData>(queryClient, {
-        queryKey: ['projects', projectRef, 'content', 'folders', folderId, { name, sort }],
-        keepPreviousData: true,
-        enabled: false,
-      }).subscribe(({ data, isLoading }) => {
-        setResults((prev) => {
-          const newResults = [...prev]
-          newResults[i] = {
-            snippets: data?.pages.flatMap((page) => page.contents ?? []) ?? [],
-            isLoading,
-          }
-          return newResults
-        })
-      })
-    )
-
-    return () => {
-      unsubscribeFns.forEach((unsub) => unsub())
-    }
-  }, [projectRef, queryClient, name, sort, snippetsPages?.pages])
-
-  // rollup all result objects into one object
-  return useMemo(
-    () =>
-      results.reduce(
-        (acc, curr) => {
-          return {
-            snippets: [...acc.snippets, ...curr.snippets],
-            isLoading: acc.isLoading || curr.isLoading,
-          }
-        },
-        {
-          snippets: snippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? [],
-          isLoading: false,
-        }
-      ),
-    [results, snippetsPages?.pages]
-  )
 }

@@ -1,10 +1,9 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { Eye, EyeOffIcon, Heart, Unlock } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
-import { InfiniteQueryObserver, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import { MoveQueryModal } from 'components/interfaces/SQLEditor/MoveQueryModal'
@@ -14,7 +13,6 @@ import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLE
 import { useContentCountQuery } from 'data/content/content-count-query'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { getContentById } from 'data/content/content-id-query'
-import { SQLSnippetFolderContentsData } from 'data/content/sql-folder-contents-query'
 import { useSQLSnippetFoldersDeleteMutation } from 'data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from 'data/content/sql-folders-query'
 import { useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
@@ -36,22 +34,19 @@ import {
 } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
-import {
-  ROOT_NODE,
-  formatFolderResponseForTreeView,
-  getLastItemIds,
-  useFilteredSnippets,
-} from './SQLEditorNav.utils'
+import { ROOT_NODE, formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
 
 interface SQLEditorNavProps {
   searchText: string
   sort?: 'inserted_at' | 'name'
+  setIsSearching?: Dispatch<SetStateAction<boolean>>
 }
 
 export const SQLEditorNav = ({
   searchText: _searchText,
   sort = 'inserted_at',
+  setIsSearching,
 }: SQLEditorNavProps) => {
   const searchText = _searchText.trim()
   const debouncedSearchText = useDebounce(searchText, 250)
@@ -83,7 +78,12 @@ export const SQLEditorNav = ({
   // =================
   // Private snippets & folders
   // =================
-  const { data: privateSnippetsPages, isLoading } = useSQLSnippetFoldersQuery(
+  const {
+    data: privateSnippetsPages,
+    isLoading,
+    isPreviousData,
+    isFetching,
+  } = useSQLSnippetFoldersQuery(
     { projectRef, name: debouncedSearchText, sort },
     { keepPreviousData: true }
   )
@@ -105,17 +105,34 @@ export const SQLEditorNav = ({
     }
   }, [projectRef, privateSnippetsPages?.pages])
 
-  const filteredSnippets = useFilteredSnippets(
-    projectRef,
-    privateSnippetsPages,
-    debouncedSearchText,
-    sort
+  const [subResults, setSubResults] = useState<{
+    [id: string]: { snippets?: Snippet[]; isLoading: boolean }
+  }>({})
+
+  const filteredSnippets = useMemo(
+    () =>
+      Object.values(subResults).reduce(
+        (acc, curr) => {
+          return {
+            snippets: [...(acc.snippets ?? []), ...(curr.snippets ?? [])],
+            isLoading: acc.isLoading || curr.isLoading,
+          }
+        },
+        {
+          snippets: privateSnippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? [],
+          isLoading: isLoading || (isPreviousData && isFetching),
+        }
+      ),
+    [subResults, privateSnippetsPages?.pages, isLoading, isPreviousData, isFetching]
   )
+  useEffect(() => {
+    setIsSearching?.(filteredSnippets.isLoading)
+  }, [filteredSnippets.isLoading, setIsSearching])
 
   const privateSnippets = useMemo(
     () =>
       filteredSnippets.snippets
-        .filter((snippet) => snippet.visibility === 'user')
+        ?.filter((snippet) => snippet.visibility === 'user')
         .sort((a, b) => {
           if (sort === 'name') return a.name.localeCompare(b.name)
           else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
@@ -276,9 +293,9 @@ export const SQLEditorNav = ({
     [projectSnippetsTreeState]
   )
 
-  // ===================
+  // ==================
   // Delete mutations
-  // ===================
+  // ==================
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
@@ -429,26 +446,17 @@ export const SQLEditorNav = ({
     setSelectedSnippets(_selectedSnippets)
   }
 
-  // ======================================
-  // [Joshen] useEffects kept at the bottom
-  // ======================================
+  useEffect(() => {
+    if (snippet !== undefined && !mountedId) {
+      if (snippet.visibility === 'project') setShowSharedSnippets(true)
+      if (snippet.folder_id) {
+        setDefaultExpandedFolderIds([snippet.folder_id])
+      }
 
-  // useEffect(() => {
-  //   const loadFolderContents = async (folderId: string) => {
-  //     await fetchSQLSnippetFolders({ projectRef, folderId, sort, name: debouncedSearchText })
-  //   }
-
-  //   if (snippet !== undefined && !mountedId) {
-  //     if (snippet.visibility === 'project') setShowSharedSnippets(true)
-  //     if (snippet.folder_id) {
-  //       setDefaultExpandedFolderIds([snippet.folder_id])
-  //       loadFolderContents(snippet.folder_id)
-  //     }
-
-  //     // Only want to run this once when loading sql/[id] route
-  //     setMountedId(true)
-  //   }
-  // }, [snippet, mountedId, sort, debouncedSearchText])
+      // Only want to run this once when loading sql/[id] route
+      setMountedId(true)
+    }
+  }, [snippet, mountedId, sort, debouncedSearchText])
 
   useEffect(() => {
     // Unselect all snippets whenever opening another snippet
@@ -658,6 +666,12 @@ export const SQLEditorNav = ({
                   }}
                   sort={sort}
                   name={debouncedSearchText}
+                  onFolderContentsChange={({ isLoading, snippets }) => {
+                    setSubResults((prev) => ({
+                      ...prev,
+                      [element.id as string]: { snippets, isLoading },
+                    }))
+                  }}
                 />
               )}
             />

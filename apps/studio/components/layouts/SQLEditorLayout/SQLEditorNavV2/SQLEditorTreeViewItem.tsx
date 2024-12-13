@@ -7,7 +7,9 @@ import { useEffect } from 'react'
 import { IS_PLATFORM } from 'common'
 import { useParams } from 'common/hooks/useParams'
 import { useSQLSnippetFolderContentsQuery } from 'data/content/sql-folder-contents-query'
+import { Snippet } from 'data/content/sql-folders-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import useLatest from 'hooks/misc/useLatest'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -41,7 +43,7 @@ interface SQLEditorTreeViewItemProps {
   onEditSave?: (name: string) => void
   onMultiSelect?: (id: string) => void
 
-  // Pagination options
+  // Pagination/filtering options
   isLastItem: boolean
   hasNextPage?: boolean
   fetchNextPage?: () => void
@@ -49,6 +51,7 @@ interface SQLEditorTreeViewItemProps {
   paginationFilter?: string
   sort?: 'inserted_at' | 'name'
   name?: string
+  onFolderContentsChange?: (info: { isLoading: boolean; snippets?: Snippet[] }) => void
 }
 
 export const SQLEditorTreeViewItem = ({
@@ -76,6 +79,7 @@ export const SQLEditorTreeViewItem = ({
   isFetchingNextPage: _isFetchingNextPage,
   sort,
   name,
+  onFolderContentsChange,
 }: SQLEditorTreeViewItemProps) => {
   const router = useRouter()
   const { id, ref: projectRef } = useParams()
@@ -105,6 +109,8 @@ export const SQLEditorTreeViewItem = ({
     isFetchingNextPage: isFetchingNextPageInFolder,
     hasNextPage: hasNextPageInFolder,
     fetchNextPage: fetchNestPageInFolder,
+    isPreviousData,
+    isFetching,
   } = useSQLSnippetFolderContentsQuery(
     {
       projectRef,
@@ -114,6 +120,7 @@ export const SQLEditorTreeViewItem = ({
     },
     {
       enabled: isEnabled,
+      keepPreviousData: true,
     }
   )
   useEffect(() => {
@@ -128,6 +135,16 @@ export const SQLEditorTreeViewItem = ({
       })
     }
   }, [projectRef, data?.pages])
+
+  const onFolderContentsChangeRef = useLatest(onFolderContentsChange)
+  useEffect(() => {
+    if (isEnabled) {
+      onFolderContentsChangeRef.current?.({
+        isLoading: isLoading || (isPreviousData && isFetching),
+        snippets: data?.pages.flatMap((page) => page.contents ?? []),
+      })
+    }
+  }, [data?.pages, isFetching, isLoading, isPreviousData, isEnabled])
 
   const isInFolder = parentId !== undefined
 
