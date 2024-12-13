@@ -25,7 +25,7 @@ const SheetProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     setIsOpen(false)
-  }, [router?.pathname])
+  }, [router?.asPath])
 
   useEffect(() => {
     setIsOpen(false)
