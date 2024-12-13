@@ -6,24 +6,30 @@ import type { ResponseError } from 'types'
 import { contentKeys } from './keys'
 import { ContentType } from './content-query'
 
-type UpdateContentVariables = { projectRef: string; id: string; type: ContentType; content: any }
+type UpdateContentVariables = {
+  projectRef: string
+  id: string
+  type: ContentType
+  content: any
+  name?: string
+  description?: string
+}
 
 export async function updateContent(
-  { projectRef, id, type, content }: UpdateContentVariables,
+  { projectRef, id, type, content, name, description }: UpdateContentVariables,
   signal?: AbortSignal
 ) {
   const { data, error } = await patch('/platform/projects/{ref}/content', {
     params: {
-      // @ts-ignore API codegen issue
       path: { ref: projectRef },
       query: { id },
     },
-    body: { id, type, content },
+    body: { id, type, content, name, description },
     signal,
   })
 
   if (error) handleError(error)
-  return data
+  return data[0]
 }
 
 type UpdateContentData = Awaited<ReturnType<typeof updateContent>>

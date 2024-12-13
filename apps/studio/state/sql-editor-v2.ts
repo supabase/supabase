@@ -136,8 +136,6 @@ export const sqlEditorState = proxy({
     if (snippet) {
       snippet.name = name
       snippet.description = description
-
-      sqlEditorState.needsSaving.add(id)
     }
   },
 
@@ -291,6 +289,9 @@ export const useSnippetFolders = (projectRef: string) => {
   )
 }
 
+/**
+ * Get ALL snippets for a project
+ */
 export const useSnippets = (projectRef: string) => {
   const snapshot = useSqlEditorV2StateSnapshot()
 
