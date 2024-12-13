@@ -85,6 +85,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Prefer 'timestamp with time zone' over 'date'
       - If a foreign key is created, include a statement to create a database index on the columns involved in the foreign key. This is a best practice as it is common to use foreign key columns in join conditions when querying the database, hence the index will improve the performance of those joins and reduce database resource consumption.
 
+      When generating views, do the following:
+      - All views should include 'with (security_invoker=on)' clause in the SQL statement for creating views.
+      - Place the 'with (security_invoker=on)' immediately after the CREATE VIEW statement, before AS
+
       Feel free to suggest corrections for suspected typos.
 
       # You write row level security policies.
