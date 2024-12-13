@@ -451,7 +451,7 @@ export const SQLEditor = () => {
     completion,
     isLoading: isCompletionLoading,
   } = useCompletion({
-    api: `${BASE_PATH}/api/ai/monaco/complete`,
+    api: `${BASE_PATH}/api/ai/sql/complete`,
     body: {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
