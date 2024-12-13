@@ -37,13 +37,17 @@ const SqlEditor: NextPageWithLayout = () => {
     true
   )
 
+  // Don't fetch the snippet if it already exists in the state. This avoids a race condition where
+  // the snippet is inserted and fetched at the same time.
+  const existsSnippet = id ? !!snapV2.snippets[id] : undefined
+
   useContentIdQuery(
     { projectRef: ref, id },
     {
       // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
       // the snapV2 valtio store for some reason hence why the added typeof check here
       retry: false,
-      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function'),
+      enabled: Boolean(id !== 'new' && typeof snapV2.addSnippet === 'function') && !existsSnippet,
       onSuccess: (data) => {
         snapV2.addSnippet({ projectRef: ref as string, snippet: data })
       },
