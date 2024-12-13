@@ -178,7 +178,7 @@ const TableEditorMenu = () => {
                 setSearchText(e.target.value)
               }}
               value={searchText}
-              placeholder="Search tables..."
+              placeholder="Search tables yo..."
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
@@ -203,7 +203,7 @@ const TableEditorMenu = () => {
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[28px] px-1.5"
+                  className="h-[32px] md:h-[28px] px-1.5"
                   icon={<Filter />}
                 />
               </PopoverTrigger_Shadcn_>
