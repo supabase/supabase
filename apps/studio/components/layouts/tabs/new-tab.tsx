@@ -4,6 +4,7 @@ import { partition } from 'lodash'
 import { BarChart2, Table2, Upload } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
+  Button,
   cn,
   SQL_ICON,
   Tabs_Shadcn_,
@@ -16,6 +17,7 @@ import { ActionCard } from './actions-card'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { RecentItems } from './recent-items'
+import Link from 'next/link'
 
 export function NewTab() {
   const router = useRouter()
@@ -74,7 +76,7 @@ export function NewTab() {
             </TabsList_Shadcn_>
             <TabsContent_Shadcn_ value="templates" className="max-w-5xl mx-auto py-5">
               <div className="grid grid-cols-3 gap-4 px-8">
-                {templates.map((item, i) => (
+                {templates.slice(0, 9).map((item, i) => (
                   <ActionCard
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
@@ -92,6 +94,11 @@ export function NewTab() {
                     }
                   />
                 ))}
+              </div>
+              <div className="flex justify-center mt-5">
+                <Button asChild type="default">
+                  <Link href={`/project/${ref}/sql/templates`}>View more templates</Link>
+                </Button>
               </div>
             </TabsContent_Shadcn_>
             <TabsContent_Shadcn_ value="quickstarts" className="max-w-5xl mx-auto py-5">
@@ -114,6 +121,11 @@ export function NewTab() {
                     }
                   />
                 ))}
+              </div>
+              <div className="flex justify-center mt-5">
+                <Button asChild type="default">
+                  <Link href={`/project/${ref}/sql/quickstarts`}>View more templates</Link>
+                </Button>
               </div>
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
