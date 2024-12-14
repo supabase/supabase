@@ -68,7 +68,8 @@ export const useSendEventMutation = ({
 
   return useMutation<SendEventData, ResponseError, SendEventVariables>(
     (vars) => {
-      const { action, properties } = vars
+      const { action } = vars
+      const properties = 'properties' in vars ? vars.properties : {}
 
       const body: SendEventPayload = {
         action,
@@ -83,7 +84,7 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: (properties || {}) as any,
+        custom_properties: properties as any,
       }
 
       return sendEvent({ body })
