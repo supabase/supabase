@@ -6,7 +6,6 @@ import {
 } from 'components/grid/components/header/Header'
 import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { Markdown } from 'components/interfaces/Markdown'
 import {
   formatTableRowsToSQL,
   getEntityLintDetails,
@@ -23,7 +22,8 @@ import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import saveAs from 'file-saver'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
+import { copyToClipboard } from 'lib/helpers'
+import { Clipboard, Copy, Download, Edit, Lock, MoreHorizontal, Trash, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
 import { toast } from 'sonner'
@@ -73,9 +73,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const isPreview = isTableEditorTabsEnabled ? tabStore.previewTabId === tabId : false
   // end of tabs preview logic
 
-  const isActive = _isActive ?? Number(id) === entity.id
   const tabs = useSnapshot(tabStore)
   const isOpened = Object.values(tabs.tabsMap).some((tab) => tab.metadata?.tableId === entity.id)
+  const isActive = Number(id) === entity.id
+  const canEdit = isActive && !isLocked
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -224,23 +225,21 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
         if (tableHasLints) {
-          tooltipContent = 'RLS Disabled'
+          tooltipContent = 'RLS disabled'
         }
         break
       case ENTITY_TYPE.VIEW:
         if (viewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
         if (materializedViewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
-
         break
       case ENTITY_TYPE.FOREIGN_TABLE:
         tooltipContent = 'RLS is not enforced on foreign tables'
-
         break
       default:
         break
@@ -340,85 +339,103 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           <EntityTooltipTrigger entity={entity} />
         </div>
 
-        {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
+        {canEdit && (
           <DropdownMenu>
-            <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
+            <DropdownMenuTrigger className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-[state=open]:text-foreground">
               <MoreHorizontal size={14} strokeWidth={2} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start" className="w-44">
               <DropdownMenuItem
-                key="edit-table"
+                key="copy-name"
                 className="space-x-2"
                 onClick={(e) => {
                   e.stopPropagation()
-                  snap.onEditTable()
+                  copyToClipboard(entity.name)
                 }}
               >
-                <Edit size={12} />
-                <span>Edit Table</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                key="duplicate-table"
-                className="space-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  snap.onDuplicateTable()
-                }}
-              >
-                <Copy size={12} />
-                <span>Duplicate Table</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
-                <Link
-                  key="view-policies"
-                  href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
-                >
-                  <Lock size={12} />
-                  <span>View Policies</span>
-                </Link>
+                <Clipboard size={12} />
+                <span>Copy name</span>
               </DropdownMenuItem>
 
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="gap-x-2">
-                  <Download size={12} />
-                  Export Data
-                </DropdownMenuSubTrigger>
-                <DropdownMenuSubContent>
+              {entity.type === ENTITY_TYPE.TABLE && (
+                <>
+                  <DropdownMenuSeparator />
+
                   <DropdownMenuItem
-                    key="download-table-csv"
+                    key="edit-table"
                     className="space-x-2"
                     onClick={(e) => {
                       e.stopPropagation()
-                      exportTableAsCSV()
+                      snap.onEditTable()
                     }}
                   >
-                    <span>Export table as CSV</span>
+                    <Edit size={12} />
+                    <span>Edit table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    key="download-table-sql"
+                    key="duplicate-table"
+                    className="space-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDuplicateTable()
+                    }}
+                  >
+                    <Copy size={12} />
+                    <span>Duplicate table</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
+                    <Link
+                      key="view-policies"
+                      href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                    >
+                      <Lock size={12} />
+                      <span>View policies</span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-table-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportTableAsCSV()
+                        }}
+                      >
+                        <span>Export table as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-table-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportTableAsSQL()
+                        }}
+                      >
+                        <span>Export table as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-table"
                     className="gap-x-2"
                     onClick={(e) => {
                       e.stopPropagation()
-                      exportTableAsSQL()
+                      snap.onDeleteTable()
                     }}
                   >
-                    <span>Export table as SQL</span>
+                    <Trash size={12} />
+                    <span>Delete table</span>
                   </DropdownMenuItem>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                key="delete-table"
-                className="gap-x-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  snap.onDeleteTable()
-                }}
-              >
-                <Trash size={12} />
-                <span>Delete Table</span>
-              </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         )}

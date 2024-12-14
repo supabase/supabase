@@ -4,25 +4,16 @@ import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-type SendEvent = components['schemas']['TelemetryEventBodyV2']
-
 export type SendEventVariables = {
-  /** Defines the name of the event, refer to TELEMETRY_EVENTS in lib/constants */
-  action: string
-  /** These are all under the event's properties (customizable on the FE) */
-  /** value: refer to TELEMETRY_VALUES in lib/constants */
-  value?: string
-  /** label: secondary tag to the event for further identification */
-  label?: string
-  /** To deprecate - seems unnecessary */
-  category?: string
-  properties?: Record<string, any>
+  action: TelemetryActions
+  properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
 }
 
-type SendEventPayload = any
+type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
 
 export async function sendEvent({ body }: { body: SendEventPayload }) {
   const consent =
@@ -34,6 +25,7 @@ export async function sendEvent({ body }: { body: SendEventPayload }) {
 
   const headers = { Version: '2' }
   const { data, error } = await post(`/platform/telemetry/event`, { body, headers })
+
   if (error) handleError(error)
   return data
 }
@@ -55,9 +47,9 @@ export const useSendEventMutation = ({
 
   return useMutation<SendEventData, ResponseError, SendEventVariables>(
     (vars) => {
-      const { action, ...otherVars } = vars
+      const { action, properties } = vars
 
-      const body: SendEvent = {
+      const body: SendEventPayload = {
         action,
         page_url: window.location.href,
         page_title: title,
@@ -70,8 +62,7 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        // @ts-expect-error - API is returning a wrong type
-        custom_properties: otherVars,
+        custom_properties: (properties || {}) as any,
       }
 
       return sendEvent({ body })

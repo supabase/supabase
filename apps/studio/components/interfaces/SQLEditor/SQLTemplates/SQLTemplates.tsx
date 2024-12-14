@@ -12,10 +12,10 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
-import SQLCard from './SQLCard'
 import { getTabsStore } from 'state/tabs'
 import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { cn, SQL_ICON } from 'ui'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -92,9 +92,8 @@ const SQLTemplates = () => {
               onClick={() => {
                 handleNewQuery(x.sql, x.title)
                 sendEvent({
-                  category: 'scripts',
-                  action: 'script_clicked',
-                  label: x.title,
+                  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                  properties: { title: x.title },
                 })
               }}
             />
