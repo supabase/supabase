@@ -84,7 +84,7 @@ export function NewTab() {
                         label: item.title,
                       })
                     }}
-                    bgColor="bg-alternative"
+                    bgColor="bg-alternative border"
                     key={`action-card-${i}`}
                     {...item}
                     icon={
@@ -106,7 +106,7 @@ export function NewTab() {
                         label: item.title,
                       })
                     }}
-                    bgColor="bg-alternative"
+                    bgColor="bg-alternative border"
                     key={`action-card-${i}`}
                     {...item}
                     icon={

@@ -13,6 +13,8 @@ import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
+import { ActionCard } from 'components/layouts/tabs/actions-card'
+import { cn, SQL_ICON } from 'ui'
 
 const SQLQuickstarts = () => {
   const router = useRouter()
@@ -56,7 +58,7 @@ const SQLQuickstarts = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10">
+    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div className="mb-8">
         <div className="mb-6">
           <h1 className="text-foreground mb-1 text-xl">Quickstarts</h1>
@@ -66,14 +68,16 @@ const SQLQuickstarts = () => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {quickStart.map((x) => (
-            <SQLCard
-              key={x.title}
+          {quickStart.map((x, i) => (
+            <ActionCard
               title={x.title}
               description={x.description}
-              sql={x.sql}
-              onClick={(sql, title) => {
-                handleNewQuery(sql, title)
+              bgColor="bg-alternative border"
+              key={`action-card-${i}`}
+              icon={<SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />}
+              // sql={x.sql}
+              onClick={() => {
+                handleNewQuery(x.sql, x.title)
                 sendEvent({
                   category: 'quickstart',
                   action: 'quickstart_clicked',

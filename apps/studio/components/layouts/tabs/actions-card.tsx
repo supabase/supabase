@@ -13,7 +13,7 @@ export const ActionCard = (card: {
       className="grow bg-surface-100 p-3 transition-colors hover:bg-surface-200 border border-light hover:border-default cursor-pointer"
       onClick={card.onClick}
     >
-      <div className={`relative flex items-center gap-3`}>
+      <div className={`relative flex items-start gap-3`}>
         {card.isBeta && (
           <Badge className="absolute -right-5 -top-5 bg-surface-300 bg-opacity-100 text-xs text-foreground">
             Coming soon

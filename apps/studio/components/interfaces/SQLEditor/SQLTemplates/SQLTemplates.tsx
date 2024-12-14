@@ -14,6 +14,8 @@ import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 import { getTabsStore } from 'state/tabs'
+import { ActionCard } from 'components/layouts/tabs/actions-card'
+import { cn, SQL_ICON } from 'ui'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -69,7 +71,7 @@ const SQLTemplates = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10">
+    <div className="block h-full space-y-8 overflow-y-auto p-6 px-10 bg-dash-sidebar dark:bg-surface-100">
       <div>
         <div className="mb-6">
           <h1 className="text-foreground mb-1 text-xl">Scripts</h1>
@@ -80,14 +82,15 @@ const SQLTemplates = () => {
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 ">
-          {sql.map((x) => (
-            <SQLCard
-              key={x.title}
+          {sql.map((x, i) => (
+            <ActionCard
+              key={`action-card-${i}`}
               title={x.title}
               description={x.description}
-              sql={x.sql}
-              onClick={(sql, title) => {
-                handleNewQuery(sql, title)
+              bgColor="bg-alternative border"
+              icon={<SQL_ICON className={cn('fill-foreground', 'w-4 h-4')} strokeWidth={1.5} />}
+              onClick={() => {
+                handleNewQuery(x.sql, x.title)
                 sendEvent({
                   category: 'scripts',
                   action: 'script_clicked',
