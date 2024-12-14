@@ -37,14 +37,11 @@ If we explore our `.env.local` with our `config.toml`, we can see that we drive 
 dependent with the `env()` syntax:
 
 ```toml
-...
 site_url = "env(SUPABASE_AUTH_SITE_URL)"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
     # Will be localhost:3000 in development or the URL of your deployed app in production.
     "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)",
 ]
-...
 
 [auth.external.github]
 enabled = true
