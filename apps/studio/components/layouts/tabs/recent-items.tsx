@@ -30,7 +30,7 @@ export function RecentItems() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-sm text-foreground">Recent files</h2>
+      <h2 className="text-sm text-foreground">Recent items</h2>
       <div className="flex flex-col gap-0">
         {filteredItems.length === 0 ? (
           <motion.div
