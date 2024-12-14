@@ -33,11 +33,11 @@ enabled = true
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.
-# site_url = "env(SUPABASE_AUTH_SITE_URL)"
+site_url = "env(SUPABASE_AUTH_SITE_URL)"
 # A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
     # Will be localhost:3000 in development or the URL of your deployed app in production.
-    # "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)",
+    "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)",
 ]
 # How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 (1 week).
 jwt_expiry = 3600
@@ -64,7 +64,7 @@ max_frequency = "1m0s"
 # Number of characters used in the email OTP.
 otp_length = 6
 # Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+otp_expiry = 86400
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.
@@ -88,7 +88,6 @@ uri = "pg-functions://postgres/public/custom_access_token_hook"
 enabled = true
 client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
-redirect_uri = "env(SUPABASE_AUTH_REDIRECT_URI)"
 
 
 [analytics]
