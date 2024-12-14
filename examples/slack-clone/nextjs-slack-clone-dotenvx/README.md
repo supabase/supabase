@@ -1,50 +1,55 @@
-# Dotenvx integration with supabase project
+# Integrating Dotenvx with a Supabase Project
 
-This is a full-stack Slack clone example using:
+This project is a full-stack Slack clone built using:
 
-- Frontend:
-  - [Next.js](https://github.com/vercel/next.js) - a React framework for production.
-  - [Supabase.js](https://supabase.com/docs/library/getting-started) for user management and realtime data syncing.
-- Backend:
-  - [supabase.com/dashboard](https://supabase.com/dashboard/): hosted Postgres database with restful API for usage with Supabase.js.
-  - A connection to github for authentification.
+### Frontend:
+
+- **[Next.js](https://github.com/vercel/next.js):** A React framework optimized for production.
+- **[Supabase.js](https://supabase.com/docs/library/getting-started):** For user management and real-time data syncing.
+
+### Backend:
+
+- **[Supabase](https://supabase.com/dashboard):** A hosted Postgres database with a RESTful API, used alongside Supabase.js.
+- **GitHub Authentication:** For user login.
+
+---
 
 ## Introduction
 
-This project demonstrate how you can leverage [dotenvx](https://dotenvx.com/) and `config.toml` to easily deploy differents
-environments. We'll see how you can have a similiar setup for your dev and remote production project.
+This example demonstrates how to use [dotenvx](https://dotenvx.com/) and `config.toml` to manage multiple environments seamlessly. You'll learn how to set up local and production environments with shared, secure configurations.
 
-## Core concept
+---
 
-Most of the configurations within `config.toml` can received env variables via the `env()` syntax. Our goal here is to leverage
-this with `dotenvx` to handle sensistives values such as Github app credentials for the auth 3rd parties.
+## Core Concept
 
-The key thing to know about `dotenvx` is that it allows you to easily encrypt secrets and share them across your team.
-The key to decrypt thoses secrets will be stored under `.env.keys`, those must be secured and left out of your version control.
-You'll need to share thoses private keys with your team to allow them to decrypt the env values [more details about how dotenvx secrets works](https://dotenvx.com/encryption).
+`config.toml` supports environment variables through the `env()` syntax. Using `dotenvx`, you can securely manage sensitive values like GitHub credentials for third-party authentication.
 
-In this example, we'll reproduce how you would deploy and manage an app environment using dotenvx.
+### Key Features of Dotenvx:
 
-### How to structure your environment files:
+- Secrets are encrypted and stored securely, while private decryption keys are saved in `.env.keys` (excluded from version control).
+- Teams can share private keys to decrypt environment values securely.
+- Learn more: [Dotenvx secrets and encryption](https://dotenvx.com/encryption).
 
-We recommend to follow a similar convention to the one we use in this project.
-We're clearly spltting the environments into 3 files"
+This example guides you through deploying and managing app environments with dotenvx.
 
-- `supabase/.env.local` -- In charge of setting up the "local development" so you can test and develop your application when you use `npx supabase start`
-- `supabase/.env.production` -- Will contain the environment for the main production project on supabase.
+---
 
-If we explore our `.env.local` with our `config.toml` we can see that we drive the values that are environment
-dependents with the `env()` synax:
+## Structuring Environment Files
+
+Follow the conventions used in this project, where environments are split into three files:
+
+1. `supabase/.env.local` - For local development using `npx supabase start`.
+2. `supabase/.env.production` - For your main production environment on Supabase.
+
+### Example: Environment-Driven Configuration
+
+Using `env()` in `config.toml` simplifies environment-specific values:
 
 ```toml
-...
 site_url = "env(SUPABASE_AUTH_SITE_URL)"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = [
-    # Will be localhost:3000 in development or the URL of your deployed app in production.
-    "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)",
+    "env(SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS)"
 ]
-...
 
 [auth.external.github]
 enabled = true
@@ -52,49 +57,73 @@ client_id = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID)"
 secret = "env(SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET)"
 ```
 
-# Local development
+---
 
-To run the stack locally, we need to set those values. Some of them aren't senstitives and are stored in plain text
-but you can see that we have encrypted values for our github connections:
+## Local Development
 
-```supabase/.env.local
-SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=encrypted:BGN3vY/hup3ZENuwbkSxhL9TI7QvGH24HyPS9nd/oaZSQMmuDPS+Y1IJKPCsi38BSxxcHEUh09I9jp75nUuslXjHWs+y9p4OLIUPcUBAYlPTKvPrxkn3MLzJ0WxdvukWlzMosSZfUdMtYpze3GnU9UEDG0+O
-SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:BMefTMshFBXOxqYuxGt7HEOhVM1C0tySmX/Wl23nRe0Bm1aiMuzfFIBqUDd21jM2hqnEUJgaOQ6HJSFEJt/iXBWUvqz2aedTUbELTyuCZKNCQWF2cAAOYqipaoFKIODCqGwULhYFD31G0y0WlJWXOB0IAwyhACJu7y4nvsZmuZ8yNvASHP5Blho=
+Set local environment values in `supabase/.env.local`. Sensitive values like GitHub credentials should be encrypted.
+
+Example `.env.local` file:
+
+```dotenv
+# GitHub Credentials (encrypted)
+SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID=encrypted:<client-id>
+SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET=encrypted:<client-secret>
 ```
 
-You want to replace thoses with the ones macthing your own development [Github Oauth App](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
-
-To do so, we can simply remove the ones we currently have in our `.env.local` and set your own using `dotenvx` cli:
+Replace placeholders with your own [GitHub OAuth App credentials](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app):
 
 ```bash
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID "<your-github-client-id>" -f supabase/.env.local
-npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-github-app-secret>" -f supabase/.env.local
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID "<your-client-id>" -f supabase/.env.local
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.local
 ```
 
-Dotenvx will automatically encrypt those values and create a `.env.keys` for you locally.
+Run the local stack:
 
-Now that we have everything setup, we can run our stack with `dotenvx` so all the env values get set and decrypted properly:
-
-```
-# First we start our supabase local server
+```bash
 npx dotenvx run -f supabase/.env.local -- npx supabase start
-# Then we can start our frontend dev server similarly
 npx dotenvx run -f supabase/.env.local -- npm run dev
 ```
 
-If you now heads up to `locahost:3000` you should be able to connect using github oauth integration and use the app.
+Visit `localhost:3000` to test the app with GitHub OAuth integration.
 
-# Remote deployment
+---
 
-Now that we ensured our local development is working, it's time to get this deployed to our remote supabase project.
+## Remote Deployment
 
-## Deploy with vercel
+### Prerequisites
 
-The easiest way to get started is to deploy with vercel. This will:
+- **Vercel Account**
+- **Supabase Account**
 
-1. Allow you to create a new supabase project
-2. Link and deploy the frontend for this project on Vecel
+1. **Create a Supabase Project:**
+   Sign up at [Supabase Dashboard](https://supabase.com/dashboard) and create a new project. After the database initializes, configure `.env.production`:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone&project-name=supabase-nextjs-slack-clone&repository-name=supabase-nextjs-slack-clone&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase%2Fsupabase%2Ftree%2Fmaster%2Fexamples%2Fslack-clone%2Fnextjs-slack-clone)
+```dotenv
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-api-key>
+```
 
-> Here we assume you already have a vercel
+2. **Configure Production Variables:**
+
+Set the site URL for authentication services:
+
+```dotenv
+SUPABASE_AUTH_SITE_URL=https://<your-app-url>.vercel.app/
+SUPABASE_AUTH_ADDITIONAL_REDIRECT_URLS=https://<your-app-url>.vercel.app/**
+```
+
+Add GitHub credentials:
+
+```bash
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_CLIENT_ID "<your-client-id>" -f supabase/.env.production
+npx dotenvx set SUPABASE_AUTH_EXTERNAL_GITHUB_SECRET "<your-secret>" -f supabase/.env.production
+```
+
+3. **Deploy to Supabase Remote:**
+
+```bash
+npx dotenvx run -f supabase/.env.production -- npx supabase link --project-ref <project-ref>
+npx dotenvx run -f supabase/.env.production -- npx supabase db push
+npx dotenvx run -f supabase/.env.production -- npx supabase config push
+```
