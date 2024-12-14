@@ -13,7 +13,6 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
-import SQLCard from './SQLCard'
 import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { cn, SQL_ICON } from 'ui'
 

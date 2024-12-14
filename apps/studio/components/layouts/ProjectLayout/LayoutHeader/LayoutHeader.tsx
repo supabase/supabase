@@ -20,6 +20,8 @@ import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
 import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
+import { useRouter } from 'next/router'
+import Image from 'next/image'
 
 const LayoutHeaderDivider = () => (
   <span className="text-border-stronger">
@@ -41,6 +43,7 @@ const LayoutHeaderDivider = () => (
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
+  const router = useRouter()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
@@ -65,6 +68,10 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
+  console.log('router basepath', router.basePath)
+
+  const isProjects = router.asPath.includes('/project/')
+
   return (
     <div
       className={cn(
@@ -72,11 +79,31 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      <div className="flex items-center justify-between py-2 px-3 flex-1">
+      <div
+        className={cn(
+          'flex items-center justify-between py-2 px-3 flex-1',
+          !isProjects ? 'pl-3' : 'pl-5'
+        )}
+      >
         <div className="flex items-center text-sm">
+          {isProjects && (
+            <Link
+              href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+              className="flex items-center justify-center"
+              // onClick={onCloseNavigationIconLink}
+            >
+              <Image
+                alt="Supabase"
+                src={`${router.basePath}/img/supabase-logo.svg`}
+                width={18}
+                height={18}
+                // className="absolute w-6 cursor-pointer rounded"
+              />
+            </Link>
+          )}
           {projectRef && (
             <>
-              <div className="flex items-center">
+              <div className="flex items-center pl-2">
                 <OrganizationDropdown />
                 <LayoutHeaderDivider />
                 <ProjectDropdown />
