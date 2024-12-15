@@ -69,6 +69,7 @@ const getInitialState = () => {
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
       showConnectDialog: false,
+      ongoingQueriesPanelOpen: false,
     }
   }
 
@@ -113,6 +114,7 @@ const getInitialState = () => {
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
     showConnectDialog: false,
+    ongoingQueriesPanelOpen: false,
   }
 }
 
@@ -216,6 +218,11 @@ export const appState = proxy({
   showConnectDialog: false,
   setShowConnectDialog: (value: boolean) => {
     appState.showConnectDialog = value
+  },
+
+  showOngoingQueriesPanelOpen: false,
+  setOnGoingQueriesPanelOpen: (value: boolean) => {
+    appState.ongoingQueriesPanelOpen = value
   },
 })
 

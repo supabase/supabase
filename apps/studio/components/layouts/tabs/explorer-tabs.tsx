@@ -92,7 +92,7 @@ const SortableTab = ({
           'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
           'border-b border-default',
           // bottom border active rule
-          'data-[state=active]:border-b-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+          'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
           'relative group h-full',
           'hover:bg-surface-300 dark:hover:bg-surface-100',
           tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
@@ -129,7 +129,7 @@ const SortableTab = ({
         >
           <X size={12} className="text-foreground-light" />
         </span>
-        {/* <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" /> */}
+        <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
       </TabsTrigger_Shadcn_>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />

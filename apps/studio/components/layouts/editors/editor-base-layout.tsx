@@ -1,13 +1,12 @@
 import { useParams } from 'common'
-import { OngoingQueriesPanel } from 'components/interfaces/SQLEditor/OngoingQueriesPanel'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { usePathname } from 'next/navigation'
-import { ComponentProps, ReactNode, useState } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../tabs/collapse-button'
 import { ExplorerTabs } from '../tabs/explorer-tabs'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useEditorType } from './editors-layout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -18,7 +17,6 @@ export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayout
 export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
-  const [showOngoingQueries, setShowOngoingQueries] = useState(false)
 
   // tabs preview flag logic
   const editor = useEditorType()
@@ -45,10 +43,6 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
         ) : null}
         <div className="h-full">{children}</div>
       </div>
-      <OngoingQueriesPanel
-        visible={showOngoingQueries}
-        onClose={() => setShowOngoingQueries(false)}
-      />
     </ProjectLayoutWithAuth>
   )
 }

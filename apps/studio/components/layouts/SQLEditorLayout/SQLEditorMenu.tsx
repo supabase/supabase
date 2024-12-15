@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
@@ -23,22 +24,12 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
-  InnerSideMenuDataItem,
 } from 'ui-patterns/InnerSideMenu'
-import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
-import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { addTab, createTabId, makeActiveTabPermanent } from 'state/tabs'
 import { SqlEditorMenuStaticLinks } from './sql-editor-menu-static-links'
+import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
+import { getAppStateSnapshot } from 'state/app-state'
 
-interface SQLEditorMenuProps {
-  onViewOngoingQueries?: () => void
-}
-
-export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
-  const { flags } = useFeaturePreviewContext()
-  const isSqlEditorTabsEnabled = flags[LOCAL_STORAGE_KEYS.UI_SQL_EDITOR_TABS]
-
+export const SQLEditorMenu = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
@@ -46,6 +37,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const [searchText, setSearchText] = useState('')
+
+  const appState = getAppStateSnapshot()
 
   const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'sql', owner_id: profile?.id },
@@ -138,7 +131,7 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
       </div>
 
       <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block type="default" onClick={onViewOngoingQueries}>
+        <Button block type="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
           View running queries
         </Button>
       </div>
