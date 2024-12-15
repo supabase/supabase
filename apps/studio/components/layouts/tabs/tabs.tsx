@@ -155,10 +155,12 @@ const TabPreview = ({ tab }: { tab: string }) => {
     <motion.div
       layoutId={tab}
       transition={{ duration: 0.045 }}
-      className="flex items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
+      animate={{ opacity: 0.7 }}
+      className="flex relative items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
     >
       <EntityTypeIcon type={tabData.type} />
       <span>{tabData.type === 'schema' ? 'schema' : tabData.label || 'Untitled'}</span>
+      <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground-muted" />
     </motion.div>
   )
 }
