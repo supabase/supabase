@@ -1,12 +1,12 @@
+import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import type { RecentItem } from 'state/recent-items'
-import { recentItemsStore } from 'state/recent-items'
+import { getRecentItemsStore } from 'state/recent-items'
 import { editorEntityTypes } from 'state/tabs'
 import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
@@ -14,10 +14,10 @@ import { useEditorType } from '../editors/editors-layout.hooks'
 dayjs.extend(relativeTime)
 
 export function RecentItems() {
-  const recentItemsSnap = useSnapshot(recentItemsStore)
-  const router = useRouter()
+  const { ref } = useParams()
+  const store = getRecentItemsStore(ref)
+  const recentItemsSnap = useSnapshot(store)
   const editor = useEditorType()
-  const { ref } = router.query
 
   if (!recentItemsSnap?.items || !ref) return null
 
@@ -25,8 +25,6 @@ export function RecentItems() {
   const filteredItems = recentItemsSnap.items
     .filter((item) => editorEntityTypes[editor].includes(item.type))
     .sort((a, b) => b.timestamp - a.timestamp)
-
-  console.log('filteredItems', filteredItems)
 
   return (
     <div className="space-y-4">

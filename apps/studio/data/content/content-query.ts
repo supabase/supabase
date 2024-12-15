@@ -59,6 +59,8 @@ export async function getContent(
     throw new Error('Content not found')
   }
 
+  // handle recent items
+
   // these are tabs that are static content
   // these canot be removed from localstorage based on this query request
   const IGNORED_TAB_IDS = ['sql-templates', 'sql-quickstarts']
@@ -80,11 +82,14 @@ export async function getContent(
   removeTabs(projectRef, tabIds)
 
   // handle recent items
-  const recentItems = getRecentItemsByType('sql')
+  const recentItems = getRecentItemsByType(projectRef, 'sql')
   // remove recent items that are no longer in the response
   removeRecentItems(
+    projectRef,
     // tabIds that are no longer in the response
-    recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
+    recentItems
+      ? recentItems.filter((item) => !currentContentIds.includes(item.id)).map((item) => item.id)
+      : []
   )
 
   return {

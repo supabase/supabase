@@ -22,6 +22,8 @@ export async function getTableEditor(
     throw new Error('id is required')
   }
 
+  console.log('HELLOW WORLD')
+
   const sql = getTableEditorSql(id)
   const { result } = await executeSql(
     {

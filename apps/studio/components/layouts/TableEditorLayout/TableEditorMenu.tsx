@@ -1,9 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { Filter, Plus } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-
 import { useParams } from 'common'
+import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -17,6 +14,9 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { partition } from 'lodash'
+import { Filter, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
@@ -28,7 +28,6 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-  Skeleton,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -36,12 +35,10 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
-import { SkeletonMenuList } from 'components/editor-menu-list-skeleton'
 
 const TableEditorMenu = () => {
   const { id: _id } = useParams()
@@ -114,7 +111,7 @@ const TableEditorMenu = () => {
 
   return (
     <>
-      <div className="h-[400px] flex flex-col flex-grow gap-5 pt-5 h-full">
+      <div className="flex flex-col flex-grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"

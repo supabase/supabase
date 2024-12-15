@@ -20,6 +20,8 @@ export async function getViews(
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
+  console.log('VIEWS RAN')
+
   const { data, error } = await get('/platform/pg-meta/{ref}/views', {
     params: {
       header: { 'x-connection-encrypted': connectionString! },

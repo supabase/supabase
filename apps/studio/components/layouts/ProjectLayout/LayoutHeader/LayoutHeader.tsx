@@ -68,8 +68,6 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
-  console.log('router basepath', router.basePath)
-
   const isProjects = router.asPath.includes('/project/')
 
   return (
@@ -90,14 +88,13 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
               className="flex items-center justify-center"
-              // onClick={onCloseNavigationIconLink}
             >
               <Image
                 alt="Supabase"
                 src={`${router.basePath}/img/supabase-logo.svg`}
                 width={18}
                 height={18}
-                // className="absolute w-6 cursor-pointer rounded"
+                className="w-[18px] h-[18px]"
               />
             </Link>
           )}

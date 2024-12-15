@@ -1,14 +1,11 @@
 import { useParams } from 'common'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Pointer } from 'lucide-react'
 import { useRef } from 'react'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
-import EntityListItem from './EntityListItem'
+import { cn, TreeViewItemVariant } from 'ui'
+import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
 
 export const TableMenuEmptyState = () => {
-  const { ref = '' } = useParams()
-  const dummyListRef = useRef(null) // statisfy type requirements
-
   return (
     <InnerSideBarEmptyPanel
       title="No tables or views"
@@ -25,24 +22,23 @@ export const TableMenuEmptyState = () => {
             <Pointer size={16} className="text-foreground-light" strokeWidth={1.5} />
           </div>
           {[...Array(4)].map((_, i) => (
-            <div className="border-l pointer-events-none">
-              <EntityListItem
-                id={-(i + 1)}
-                listRef={dummyListRef}
-                index={i} // Add this
-                projectRef={ref}
-                isLocked={false}
-                isActive={i === 2 ? true : false}
-                key={-(i + 1)}
-                item={{
-                  rls_enabled: false,
-                  id: -(i + 1),
-                  name: `example_table_${i + 1}`,
-                  type: i % 2 === 0 ? ENTITY_TYPE.TABLE : ENTITY_TYPE.VIEW,
-                  comment: null,
-                  schema: 'public',
-                }}
-              />
+            <div className="border-l pointer-events-none" key={`some-${i}`}>
+              <div
+                className={cn(
+                  'group',
+                  TreeViewItemVariant({
+                    isSelected: i === 2 ? true : false,
+                    isOpened: i === 2 ? true : false,
+                    isPreview: false,
+                  }),
+                  'px-4 min-w-40'
+                )}
+                aria-selected={i === 2}
+              >
+                {i === 2 && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+                <EntityTypeIcon type={'r'} />
+                {`postgres_table_${i}`}
+              </div>
             </div>
           ))}
         </div>

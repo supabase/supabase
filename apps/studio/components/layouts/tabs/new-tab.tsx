@@ -1,7 +1,10 @@
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { partition } from 'lodash'
-import { BarChart2, Table2, Upload } from 'lucide-react'
+import { Table2 } from 'lucide-react'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -14,10 +17,7 @@ import {
 } from 'ui'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { ActionCard } from './actions-card'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { RecentItems } from './recent-items'
-import Link from 'next/link'
 
 export function NewTab() {
   const router = useRouter()
@@ -81,9 +81,8 @@ export function NewTab() {
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
-                        category: 'scripts',
-                        action: 'script_clicked',
-                        label: item.title,
+                        action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED,
+                        properties: { title: item.title },
                       })
                     }}
                     bgColor="bg-alternative border"
@@ -108,9 +107,8 @@ export function NewTab() {
                     onClick={() => {
                       handleNewQuery(item.sql, item.title)
                       sendEvent({
-                        category: 'scripts',
-                        action: 'script_clicked',
-                        label: item.title,
+                        action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED,
+                        properties: { title: item.title },
                       })
                     }}
                     bgColor="bg-alternative border"

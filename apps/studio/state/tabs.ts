@@ -87,7 +87,7 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
   if (store.tabsMap[tab.id]) {
     store.activeTab = tab.id
     if (!tab.isPreview && tab.type !== 'new') {
-      addRecentItem(tab)
+      addRecentItem(ref, tab)
     }
     return
   }
@@ -99,7 +99,7 @@ export const addTab = (ref: string | undefined, tab: Tab) => {
     store.activeTab = tab.id
     // Add to recent items when creating permanent tab
     if (tab.type !== 'new') {
-      addRecentItem(tab)
+      addRecentItem(ref, tab)
     }
     return
   }
@@ -165,7 +165,7 @@ export const makeTabPermanent = (ref: string | undefined, tabId: string) => {
     store.previewTabId = undefined
     // Add to recent items when preview tab becomes permanent
     if (tab.type !== 'new') {
-      addRecentItem(tab)
+      addRecentItem(ref, tab)
     }
   }
 }
@@ -193,7 +193,7 @@ export const handleTabNavigation = (ref: string | undefined, id: string, router:
 
   // Add to recent items when navigating to a non-preview, non-new tab
   if (!tab.isPreview && tab.type !== 'new') {
-    addRecentItem(tab)
+    addRecentItem(ref, tab)
   }
 
   switch (tab.type) {

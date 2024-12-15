@@ -110,6 +110,8 @@ export async function getEntityTypes(
     signal
   )
 
+  console.log('query entity ran')
+
   return result[0] as EntityTypesResponse
 }
 

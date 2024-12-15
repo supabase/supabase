@@ -302,7 +302,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <>
         {!isPreview && isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-          <Tooltip.Trigger className="min-w-4" asChild>
+          <Tooltip.Trigger className="min-w-4">
             <EntityTypeIcon type={entity.type} />
           </Tooltip.Trigger>
           <Tooltip.Portal>

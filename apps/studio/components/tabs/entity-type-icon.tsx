@@ -3,7 +3,7 @@ import { Eye, GitBranch, Table2 } from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 interface EntityTypeIconProps {
-  type: ENTITY_TYPE | 'sql' | 'schema' | 'new'
+  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'
   size?: number
   strokeWidth?: number
   isActive?: boolean
@@ -37,7 +37,7 @@ export const EntityTypeIcon = ({
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
-          'text-foreground-muted group-hover:text-foreground-lighter',
+          'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-lighter',
           'transition-colors'
         )}
