@@ -10,6 +10,7 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { editorEntityTypes, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
+import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -39,7 +40,8 @@ const TableEditorPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <NewTab />
+      {isTableEditorTabsEnabled ? <NewTab /> : <EmptyState />}
+
       <SidePanelEditor onTableCreated={onTableCreated} />
     </>
   )
