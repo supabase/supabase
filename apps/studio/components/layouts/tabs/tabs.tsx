@@ -1,4 +1,11 @@
-import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
 import { horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useParams } from 'common'
@@ -68,15 +75,15 @@ const SortableTab = ({
     return false
   }, [openTabs, currentSchema, tab.type])
 
-  // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
-
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="flex items-center h-10 first-of-type:border-l"
+      layoutId={tab.id}
+      transition={{ duration: 0.065 }}
+      animate={{ opacity: isDragging ? 0 : 1 }}
+      className={cn('flex items-center h-10 first-of-type:border-l')}
     >
       <TabsTrigger_Shadcn_
         value={tab.id}
@@ -129,7 +136,27 @@ const SortableTab = ({
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}
-    </div>
+    </motion.div>
+  )
+}
+
+const TabPreview = ({ tab }: { tab: string }) => {
+  const { ref } = useParams()
+  const store = getTabsStore(ref)
+  const tabs = useSnapshot(store)
+  const tabData = tabs.tabsMap[tab]
+
+  if (!tabData) return null
+
+  return (
+    <motion.div
+      layoutId={tab}
+      transition={{ duration: 0.065 }}
+      className="flex items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
+    >
+      <EntityTypeIcon type={tabData.type} />
+      <span>{tabData.type === 'schema' ? 'schema' : tabData.label || 'Untitled'}</span>
+    </motion.div>
   )
 }
 
@@ -180,15 +207,15 @@ export function Tabs() {
   const isOnNewPage = router.pathname.endsWith('/explorer/new')
 
   return (
-    <Tabs_Shadcn_
-      value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
-      onValueChange={handleTabChange}
-      className="w-full flex"
-    >
-      <CollapseButton hideTabs={false} />
-      <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-x-auto">
-        {/* Draggable regular tabs */}
-        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <Tabs_Shadcn_
+        value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
+        onValueChange={handleTabChange}
+        className="w-full flex"
+      >
+        <CollapseButton hideTabs={false} />
+        <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-clip overflow-x-auto ">
+          {/* Draggable regular tabs */}
           <SortableContext
             items={regularTabs.map((tab) => tab.id)}
             strategy={horizontalListSortingStrategy}
@@ -203,66 +230,69 @@ export function Tabs() {
               />
             ))}
           </SortableContext>
-        </DndContext>
 
-        {/* Non-draggable new tab */}
-        {hasNewTab && (
-          <>
-            <TabsTrigger_Shadcn_
-              value={'new'}
-              className={cn(
-                'flex items-center gap-2 px-3 text-xs',
-                'bg-dash-sidebar/50 dark:bg-surface-100/50',
-                'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-                'relative group h-full border-t-2 !border-b-0',
-                'hover:bg-surface-300 dark:hover:bg-surface-100'
-              )}
-            >
-              <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
-              <div className="flex items-center gap-0">
-                <span>New</span>
-              </div>
-              <span
-                role="button"
-                onClick={(e) => {
-                  e.preventDefault()
-                  e.stopPropagation()
-                  handleClose('new')
-                }}
-                className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
-                onMouseDown={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
+          {/* Non-draggable new tab */}
+          {hasNewTab && (
+            <>
+              <TabsTrigger_Shadcn_
+                value={'new'}
+                className={cn(
+                  'flex items-center gap-2 px-3 text-xs',
+                  'bg-dash-sidebar/50 dark:bg-surface-100/50',
+                  'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+                  'relative group h-full border-t-2 !border-b-0',
+                  'hover:bg-surface-300 dark:hover:bg-surface-100'
+                )}
               >
-                <X size={12} className="text-foreground-light" />
-              </span>{' '}
-              <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-            </TabsTrigger_Shadcn_>
-          </>
-        )}
-
-        <AnimatePresence initial={false}>
-          {!isOnNewPage && !hasNewTab && (
-            <motion.button
-              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
-              onClick={() =>
-                router.push(
-                  `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
-                )
-              }
-              initial={{ opacity: 0, scale: 0.8, x: -10 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Plus
-                size={16}
-                strokeWidth={1.5}
-                className="text-foreground-lighter hover:text-foreground-light"
-              />
-            </motion.button>
+                <Plus size={16} strokeWidth={1.5} className={'text-foreground-lighter'} />
+                <div className="flex items-center gap-0">
+                  <span>New</span>
+                </div>
+                <span
+                  role="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleClose('new')
+                  }}
+                  className="ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onPointerDown={(e) => e.stopPropagation()}
+                >
+                  <X size={12} className="text-foreground-light" />
+                </span>{' '}
+                <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+              </TabsTrigger_Shadcn_>
+            </>
           )}
-        </AnimatePresence>
-        <div className="grow h-full border-b pr-6" />
-      </TabsList_Shadcn_>
-    </Tabs_Shadcn_>
+
+          <AnimatePresence initial={false}>
+            {!isOnNewPage && !hasNewTab && (
+              <motion.button
+                className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
+                onClick={() =>
+                  router.push(
+                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
+                  )
+                }
+                initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                animate={{ opacity: 1, scale: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Plus
+                  size={16}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter hover:text-foreground-light"
+                />
+              </motion.button>
+            )}
+          </AnimatePresence>
+          <div className="grow h-full border-b pr-6" />
+        </TabsList_Shadcn_>
+      </Tabs_Shadcn_>
+      <DragOverlay dropAnimation={null}>
+        {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
+      </DragOverlay>
+    </DndContext>
   )
 }
