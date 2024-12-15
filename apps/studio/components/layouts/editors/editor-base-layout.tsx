@@ -12,9 +12,11 @@ import { useEditorType } from './editors-layout.hooks'
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
   children: ReactNode
   hideTabs?: boolean
+  title?: string
+  product?: string
 }
 
-export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) => {
+export const EditorBaseLayout = ({ children, title, product, ...props }: ExplorerLayoutProps) => {
   const { ref } = useParams()
   const pathname = usePathname()
 
@@ -28,7 +30,7 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
   // end of tabs preview flag logic
 
   return (
-    <ProjectLayoutWithAuth resizableSidebar={true} {...props}>
+    <ProjectLayoutWithAuth resizableSidebar={true} title={title} product={product} {...props}>
       <div className="flex flex-col h-full">
         {tableEditorTabsEnabled || sqlEditorTabsEnabled ? (
           <div

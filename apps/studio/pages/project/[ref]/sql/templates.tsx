@@ -42,7 +42,7 @@ const SqlTemplates: NextPageWithLayout = () => {
 
 SqlTemplates.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />}>
+    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
       <SQLEditorLayout>{page}</SQLEditorLayout>
     </EditorBaseLayout>
   </ProjectContextFromParamsProvider>

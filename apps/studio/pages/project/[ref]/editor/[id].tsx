@@ -92,7 +92,7 @@ const TableEditorPage: NextPageWithLayout = () => {
 
 TableEditorPage.getLayout = (page) => (
   <ProjectContextFromParamsProvider>
-    <EditorBaseLayout productMenu={<TableEditorMenu />}>
+    <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
       <TableEditorLayout>{page}</TableEditorLayout>
     </EditorBaseLayout>
   </ProjectContextFromParamsProvider>
