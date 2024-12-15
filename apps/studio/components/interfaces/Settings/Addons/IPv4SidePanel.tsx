@@ -14,11 +14,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
 import { Button, Radio, SidePanel, cn } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
-  const { ref: projectRef } = useParams() 
+  const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
 
   const [selectedOption, setSelectedOption] = useState<string>('ipv4_none')
