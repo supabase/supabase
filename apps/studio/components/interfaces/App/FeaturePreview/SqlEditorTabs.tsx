@@ -5,10 +5,9 @@ import Image from 'next/image'
 export const SqlEditorTabsPreview = () => {
   return (
     <div className="space-y-2">
-      <Markdown
-        className="text-foreground-light"
-        content={`The SQL Editor now features tabs for improved navigation and organization.`}
-      />
+      <p className="text-foreground-light text-sm mb-4">
+        The SQL Editor now features tabs for improved navigation and organization.
+      </p>
       <Image
         src={`${BASE_PATH}/img/previews/tabs-sql.png`}
         width={1860}

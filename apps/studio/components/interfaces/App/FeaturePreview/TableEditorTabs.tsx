@@ -5,9 +5,7 @@ export const TableEditorTabsPreview = () => {
   return (
     <div className="space-y-2">
       <p className="text-foreground-light text-sm mb-4">
-        Your project's API documentation will be available on any page across the dashboard. <br />
-        Get contextualized code snippets based on what you're viewing in the dashboard. Less
-        thinking, more building.
+        The Table Editor now features tabs for improved navigation and organization.
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/tabs-editor.png`}
