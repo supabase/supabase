@@ -15,6 +15,7 @@ import { Admonition } from 'ui-patterns'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { makeActiveTabPermanent } from 'state/tabs'
 
 export type MonacoEditorProps = {
   id: string
@@ -120,6 +121,9 @@ const MonacoEditor = ({
   }, 1000)
 
   function handleEditorChange(value: string | undefined) {
+    // make active tab permanent
+    makeActiveTabPermanent(ref)
+
     const snippetCheck = snapV2.snippets[id]
 
     if (id && value) {

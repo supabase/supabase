@@ -59,7 +59,7 @@ export function NewTab() {
 
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">
-      <div className="mx-auto max-w-2xl flex flex-col gap-10">
+      <div className="mx-auto max-w-2xl flex flex-col gap-10 px-10">
         <div className="grid grid-cols-2 gap-4">
           {actions.map((item, i) => (
             <ActionCard key={`action-card-${i}`} {...item} />
