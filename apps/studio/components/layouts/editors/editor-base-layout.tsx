@@ -6,7 +6,7 @@ import { ComponentProps, ReactNode } from 'react'
 import { cn } from 'ui'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import { CollapseButton } from '../tabs/collapse-button'
-import { ExplorerTabs } from '../tabs/explorer-tabs'
+import { Tabs } from '../tabs/tabs'
 import { useEditorType } from './editors-layout.hooks'
 
 export interface ExplorerLayoutProps extends ComponentProps<typeof ProjectLayoutWithAuth> {
@@ -38,7 +38,7 @@ export const EditorBaseLayout = ({ children, ...props }: ExplorerLayoutProps) =>
             )}
           >
             {hideTabs && <CollapseButton hideTabs={hideTabs} />}
-            {!hideTabs && <ExplorerTabs />}
+            {!hideTabs && <Tabs />}
           </div>
         ) : null}
         <div className="h-full">{children}</div>

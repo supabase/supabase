@@ -4,7 +4,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useParams } from 'common'
 import { EntityTypeIcon } from 'components/tabs/entity-type-icon'
 import { AnimatePresence, motion } from 'framer-motion'
-import { CirclePlus, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import {
@@ -19,11 +19,6 @@ import { cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
 import { useSnapshot } from 'valtio'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { CollapseButton } from './collapse-button'
-import { sidebarState } from './sidebar-state'
-
-interface TabsProps {
-  onClose?: (id: string) => void
-}
 
 /**
  * Individual draggable tab component that handles:
@@ -138,7 +133,7 @@ const SortableTab = ({
   )
 }
 
-export function ExplorerTabs({ onClose }: TabsProps) {
+export function Tabs() {
   const { ref } = useParams()
   const editor = useEditorType()
   const router = useRouter()
@@ -174,7 +169,7 @@ export function ExplorerTabs({ onClose }: TabsProps) {
   }
 
   const handleClose = (id: string) => {
-    handleTabClose(ref, id, router, editor, onClose)
+    handleTabClose(ref, id, router, editor)
   }
 
   const handleTabChange = (id: string) => {
