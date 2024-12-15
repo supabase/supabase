@@ -98,7 +98,7 @@ export const DatabaseConnectionString = () => {
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
       properties: { connectionType },
-    } as ConnectionStringCopiedEvent)
+    })
   }
 
   const connectionStrings =
