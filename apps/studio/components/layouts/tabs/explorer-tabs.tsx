@@ -144,7 +144,6 @@ export function ExplorerTabs({ onClose }: TabsProps) {
   const router = useRouter()
   const store = getTabsStore(ref)
   const tabs = useSnapshot(store)
-  const sidebar = useSnapshot(sidebarState)
   const sensors = useSensors(useSensor(PointerSensor))
 
   const openTabs = tabs.openTabs

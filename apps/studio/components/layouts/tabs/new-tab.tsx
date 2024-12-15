@@ -1,11 +1,20 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
+import { createSqlSnippetSkeletonV2 } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { partition } from 'lodash'
 import { Table2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { toast } from 'sonner'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { getTabsStore } from 'state/tabs'
 import {
   Button,
   cn,
@@ -16,6 +25,7 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 import { useEditorType } from '../editors/editors-layout.hooks'
+import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { ActionCard } from './actions-card'
 import { RecentItems } from './recent-items'
 
@@ -23,15 +33,18 @@ export function NewTab() {
   const router = useRouter()
   const { ref } = useParams()
   const editor = useEditorType()
-
-  const handleNewQuery = async (sql?: string, name?: string) => {
-    router.push(`/project/${ref}/sql/new`)
-  }
-
+  const snap = useTableEditorStateSnapshot()
+  const { profile } = useProfile()
   const [templates] = partition(SQL_TEMPLATES, { type: 'template' })
   const [quickstarts] = partition(SQL_TEMPLATES, { type: 'quickstart' })
-
   const { mutate: sendEvent } = useSendEventMutation()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const { project } = useProjectContext()
+
+  const canCreateSQLSnippet = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
+    resource: { type: 'sql', owner_id: profile?.id },
+    subject: { id: profile?.id },
+  })
 
   const tableEditorActions = [
     {
@@ -40,7 +53,7 @@ export function NewTab() {
       description: 'Design and create a new database table',
       bgColor: 'bg-blue-500',
       isBeta: false,
-      onClick: handleNewQuery,
+      onClick: snap.onAddTable,
     },
   ]
 
@@ -51,11 +64,48 @@ export function NewTab() {
       description: 'Execute SQL queries',
       bgColor: 'bg-green-500',
       isBeta: false,
-      onClick: handleNewQuery,
+      onClick: () => router.push(`/project/${ref}/sql/new`),
     },
   ]
 
   const actions = editor === 'sql' ? sqlEditorActions : tableEditorActions
+
+  const handleNewQuery = async (sql: string, name: string) => {
+    if (!ref) return console.error('Project ref is required')
+    if (!project) return console.error('Project is required')
+    if (!profile) return console.error('Profile is required')
+
+    if (!canCreateSQLSnippet) {
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
+    }
+
+    try {
+      const snippet = createSqlSnippetSkeletonV2({
+        id: uuidv4(),
+        name,
+        sql,
+        owner_id: profile?.id,
+        project_id: project?.id,
+      })
+      snapV2.addSnippet({ projectRef: ref, snippet })
+      snapV2.addNeedsSaving(snippet.id)
+
+      const store = getTabsStore(ref)
+      const tabId = `sql-${snippet.id}`
+      store.openTabs = [...store.openTabs, tabId]
+      store.tabsMap[tabId] = {
+        id: tabId,
+        type: 'sql',
+        label: name,
+        metadata: { sqlId: snippet.id },
+      }
+      store.activeTab = tabId
+
+      router.push(`/project/${ref}/sql/${snippet.id}`)
+    } catch (error: any) {
+      toast.error(`Failed to create new query: ${error.message}`)
+    }
+  }
 
   return (
     <div className="bg-surface-100 h-full overflow-y-auto py-12">

@@ -1,21 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { useRouter } from 'next/router'
-import { toast } from 'sonner'
-
 import { useParams } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { partition } from 'lodash'
+import { useRouter } from 'next/router'
+import { toast } from 'sonner'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 import { getTabsStore } from 'state/tabs'
-import { ActionCard } from 'components/layouts/tabs/actions-card'
 import { cn, SQL_ICON } from 'ui'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import { createSqlSnippetSkeletonV2 } from '../SQLEditor.utils'
 
 const SQLTemplates = () => {
   const router = useRouter()
@@ -59,8 +58,8 @@ const SQLTemplates = () => {
       store.tabsMap[tabId] = {
         id: tabId,
         type: 'sql',
-        // Remove the label since we'll derive it dynamically
-        metadata: { sqlId: snippet.id },
+        label: name,
+        metadata: { sqlId: snippet.id, name },
       }
       store.activeTab = tabId
 
