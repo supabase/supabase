@@ -128,7 +128,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
@@ -157,120 +157,118 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     const sideBarIsOpen = forceShowProductMenu ? true : sidebar.isOpen
 
     return (
-      <AppLayout>
-        <ProjectContextProvider projectRef={projectRef}>
-          <Head>
-            <title>
-              {title
-                ? `${title} | Supabase`
-                : selectedTable
-                  ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-                  : projectName
-                    ? `${projectName} | ${organizationName} | Supabase`
-                    : organizationName
-                      ? `${organizationName} | Supabase`
-                      : 'Supabase'}
-            </title>
-            <meta name="description" content="Supabase Studio" />
-          </Head>
-          <div className="flex flex-col h-screen w-screen">
-            {!hideHeader && IS_PLATFORM && <LayoutHeader />}
-            <div className="flex h-full flex-row grow overflow-y-auto">
-              {!hideIconBar && <NavigationBar />}
-              <ResizablePanelGroup
-                className="flex h-full"
-                direction="horizontal"
-                autoSaveId="project-layout"
-              >
-                {showProductMenu && productMenu && (
-                  <ResizablePanel
-                    order={1}
-                    id="panel-left"
-                    className={cn(
-                      'transition-all duration-[120ms]',
-                      sideBarIsOpen
-                        ? resizableSidebar
-                          ? 'min-w-64 max-w-[32rem]'
-                          : 'min-w-64 max-w-64'
-                        : 'w-0 flex-shrink-0 max-w-0'
-                    )}
-                  >
-                    {sideBarIsOpen && (
-                      <AnimatePresence>
-                        <motion.div
-                          initial={{ width: 0, opacity: 0, height: '100%' }}
-                          animate={{ width: 'auto', opacity: 1, height: '100%' }}
-                          exit={{ width: 0, opacity: 0, height: '100%' }}
-                          className="h-full"
-                          transition={{ duration: 0.12 }}
-                        >
-                          <MenuBarWrapper
-                            isLoading={isLoading}
-                            isBlocking={isBlocking}
-                            productMenu={productMenu}
-                          >
-                            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-                          </MenuBarWrapper>
-                        </motion.div>
-                      </AnimatePresence>
-                    )}
-                  </ResizablePanel>
-                )}
-                {showProductMenu && productMenu && sideBarIsOpen && (
-                  <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
-                )}
-                <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
-                  <ResizablePanelGroup
-                    className="h-full w-full overflow-x-hidden flex-1"
-                    direction="horizontal"
-                    autoSaveId="project-layout-content"
-                  >
-                    <ResizablePanel id="panel-content" className="w-full min-w-[600px]">
-                      <main
-                        className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
-                        ref={ref}
+      <ProjectContextProvider projectRef={projectRef}>
+        <Head>
+          <title>
+            {title
+              ? `${title} | Supabase`
+              : selectedTable
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
+          </title>
+          <meta name="description" content="Supabase Studio" />
+        </Head>
+        <div className="flex flex-col h-screen w-screen">
+          {!hideHeader && IS_PLATFORM && <LayoutHeader />}
+          <div className="flex h-full flex-row grow overflow-y-auto">
+            {!hideIconBar && <NavigationBar />}
+            <ResizablePanelGroup
+              className="flex h-full"
+              direction="horizontal"
+              autoSaveId="project-layout"
+            >
+              {showProductMenu && productMenu && (
+                <ResizablePanel
+                  order={1}
+                  id="panel-left"
+                  className={cn(
+                    'transition-all duration-[120ms]',
+                    sideBarIsOpen
+                      ? resizableSidebar
+                        ? 'min-w-64 max-w-[32rem]'
+                        : 'min-w-64 max-w-64'
+                      : 'w-0 flex-shrink-0 max-w-0'
+                  )}
+                >
+                  {sideBarIsOpen && (
+                    <AnimatePresence>
+                      <motion.div
+                        initial={{ width: 0, opacity: 0, height: '100%' }}
+                        animate={{ width: 'auto', opacity: 1, height: '100%' }}
+                        exit={{ width: 0, opacity: 0, height: '100%' }}
+                        className="h-full"
+                        transition={{ duration: 0.12 }}
                       >
-                        {showPausedState ? (
-                          <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                            <div className="w-full">
-                              <ProjectPausedState product={product} />
-                            </div>
-                          </div>
-                        ) : (
-                          <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                            <Fragment key={selectedProject?.ref}>
-                              <ResourceExhaustionWarningBanner />
-                              {children}
-                            </Fragment>
-                          </ContentWrapper>
-                        )}
-                      </main>
-                    </ResizablePanel>
-                    {isClient && aiAssistantPanel.open && (
-                      <>
-                        <ResizableHandle />
-                        <ResizablePanel
-                          id="panel-assistant"
-                          className={cn(
-                            'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
-                            'min-w-[400px] max-w-[500px]',
-                            '2xl:min-w-[500px] 2xl:max-w-[600px]'
-                          )}
+                        <MenuBarWrapper
+                          isLoading={isLoading}
+                          isBlocking={isBlocking}
+                          productMenu={productMenu}
                         >
-                          <AIAssistantPanel />
-                        </ResizablePanel>
-                      </>
-                    )}
-                  </ResizablePanelGroup>
+                          <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                        </MenuBarWrapper>
+                      </motion.div>
+                    </AnimatePresence>
+                  )}
                 </ResizablePanel>
-              </ResizablePanelGroup>
-            </div>
+              )}
+              {showProductMenu && productMenu && sideBarIsOpen && (
+                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+              )}
+              <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
+                <ResizablePanelGroup
+                  className="h-full w-full overflow-x-hidden flex-1"
+                  direction="horizontal"
+                  autoSaveId="project-layout-content"
+                >
+                  <ResizablePanel id="panel-content" className="w-full min-w-[600px]">
+                    <main
+                      className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
+                      ref={ref}
+                    >
+                      {showPausedState ? (
+                        <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                          <div className="w-full">
+                            <ProjectPausedState product={product} />
+                          </div>
+                        </div>
+                      ) : (
+                        <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                          <Fragment key={selectedProject?.ref}>
+                            <ResourceExhaustionWarningBanner />
+                            {children}
+                          </Fragment>
+                        </ContentWrapper>
+                      )}
+                    </main>
+                  </ResizablePanel>
+                  {isClient && aiAssistantPanel.open && (
+                    <>
+                      <ResizableHandle />
+                      <ResizablePanel
+                        id="panel-assistant"
+                        className={cn(
+                          'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
+                          'min-w-[400px] max-w-[500px]',
+                          '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                        )}
+                      >
+                        <AIAssistantPanel />
+                      </ResizablePanel>
+                    </>
+                  )}
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </div>
-          <EnableBranchingModal />
-          <AISettingsModal />
-          <ProjectAPIDocs />
-        </ProjectContextProvider>
-      </AppLayout>
+        </div>
+        <EnableBranchingModal />
+        <AISettingsModal />
+        <ProjectAPIDocs />
+      </ProjectContextProvider>
     )
   }
 )

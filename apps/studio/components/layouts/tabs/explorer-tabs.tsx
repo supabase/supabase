@@ -90,7 +90,10 @@ const SortableTab = ({
           'flex items-center gap-2 px-3 text-xs',
           'bg-dash-sidebar/50 dark:bg-surface-100/50',
           'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-          'relative group h-full border-t-2 !border-b-0',
+          'border-b border-default',
+          // bottom border active rule
+          'data-[state=active]:border-b-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+          'relative group h-full',
           'hover:bg-surface-300 dark:hover:bg-surface-100',
           tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
         )}
@@ -126,7 +129,7 @@ const SortableTab = ({
         >
           <X size={12} className="text-foreground-light" />
         </span>
-        <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
+        {/* <div className="absolute w-full -bottom-[1px] left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" /> */}
       </TabsTrigger_Shadcn_>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
@@ -186,11 +189,10 @@ export function ExplorerTabs({ onClose }: TabsProps) {
     <Tabs_Shadcn_
       value={hasNewTab ? 'new' : tabs.activeTab ?? undefined}
       onValueChange={handleTabChange}
-      className="w-full"
+      className="w-full flex"
     >
-      <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center">
-        <CollapseButton hideTabs={sidebar.isOpen} />
-
+      <CollapseButton hideTabs={false} />
+      <TabsList_Shadcn_ className="bg-surface-200 dark:bg-alternative rounded-b-none gap-0 h-10 flex items-center w-full z-[1] border-none overflow-x-auto">
         {/* Draggable regular tabs */}
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           <SortableContext
@@ -247,7 +249,7 @@ export function ExplorerTabs({ onClose }: TabsProps) {
         <AnimatePresence initial={false}>
           {!isOnNewPage && !hasNewTab && (
             <motion.button
-              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0"
+              className="flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0 border-b"
               onClick={() =>
                 router.push(
                   `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new`
@@ -265,6 +267,7 @@ export function ExplorerTabs({ onClose }: TabsProps) {
             </motion.button>
           )}
         </AnimatePresence>
+        <div className="grow h-full border-b pr-6" />
       </TabsList_Shadcn_>
     </Tabs_Shadcn_>
   )

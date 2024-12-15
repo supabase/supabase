@@ -71,7 +71,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const isProjects = router.asPath.includes('/project/')
 
   return (
-    <div
+    <header
       className={cn(
         'flex h-12 max-h-12 min-h-12 items-center bg-dash-sidebar flex-shrink-0',
         headerBorder ? 'border-b border-default' : ''
@@ -147,7 +147,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
           <AssistantButton />
         </div>
       )}
-    </div>
+    </header>
   )
 }
 export default LayoutHeader

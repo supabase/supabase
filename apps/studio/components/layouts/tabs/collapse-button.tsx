@@ -25,7 +25,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
     <button
       className={cn(
         'flex items-center justify-center w-10 h-10 hover:bg-surface-100 shrink-0',
-        !hideTabs && 'border-r'
+        !hideTabs && 'border-b border-b-default'
       )}
       onClick={() => (sidebarState.isOpen = !sidebar.isOpen)}
     >

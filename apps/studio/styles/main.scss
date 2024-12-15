@@ -44,9 +44,7 @@ body,
 .main {
   @apply bg-studio relative;
   @apply text-foreground;
-  height: 100%;
-  padding: 0;
-  margin: 0;
+  @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
