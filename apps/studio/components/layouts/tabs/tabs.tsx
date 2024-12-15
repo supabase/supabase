@@ -75,13 +75,16 @@ const SortableTab = ({
     return false
   }, [openTabs, currentSchema, tab.type])
 
+  // Create a motion version of TabsTrigger while preserving all functionality
+  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
       {...attributes}
       layoutId={tab.id}
-      transition={{ duration: 0.065 }}
+      transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
       className={cn('flex items-center h-10 first-of-type:border-l')}
     >
@@ -151,7 +154,7 @@ const TabPreview = ({ tab }: { tab: string }) => {
   return (
     <motion.div
       layoutId={tab}
-      transition={{ duration: 0.065 }}
+      transition={{ duration: 0.045 }}
       className="flex items-center gap-2 px-3 text-xs bg-dash-sidebar dark:bg-surface-100 shadow-lg rounded-sm h-10"
     >
       <EntityTypeIcon type={tabData.type} />
@@ -166,7 +169,13 @@ export function Tabs() {
   const router = useRouter()
   const store = getTabsStore(ref)
   const tabs = useSnapshot(store)
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 1, // Start with a very small distance
+      },
+    })
+  )
 
   const openTabs = tabs.openTabs
     .map((id) => tabs.tabsMap[id])
