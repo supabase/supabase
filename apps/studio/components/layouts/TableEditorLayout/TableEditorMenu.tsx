@@ -244,7 +244,9 @@ const TableEditorMenu = () => {
           {isLoading && <SkeletonMenuList />}
 
           {isError && (
-            <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            <div className="mx-4">
+              <AlertError error={(error ?? null) as any} subject="Failed to retrieve tables" />
+            </div>
           )}
 
           {isSuccess && (

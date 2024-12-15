@@ -10,13 +10,13 @@ export const SkeletonMenuList = () => {
   ]
 
   return (
-    <>
+    <div className="px-4 flex flex-col gap-0">
       {items.map((item, index) => (
-        <div key={index} className={`flex flex-row h-6 px-3 items-center gap-3 ${item.opacity}`}>
+        <div key={index} className={`flex flex-row h-6 items-center gap-3 ${item.opacity}`}>
           <Skeleton className="h-4 w-5" />
           <Skeleton className={`h-4 ${item.width}`} />
         </div>
       ))}
-    </>
+    </div>
   )
 }
