@@ -38,31 +38,27 @@ const defaultState: RecentItems = {
   items: [],
 }
 
-// Load initial state from localStorage
-// const loadInitialState = (ref: string | undefined): RecentItemsState => {
-//   // Check if running in a browser environment
-//   if (typeof window === 'undefined') return defaultState
-
-//   // Retrieve stored recent items from localStorage
-//   const stored = localStorage.getItem(getStorageKey(ref))
-//   if (!stored) return defaultState // Return default state if nothing is stored
-
-//   try {
-//     // Parse and return the stored items
-//     return JSON.parse(stored)
-//   } catch (error) {
-//     // Log error if parsing fails
-//     console.error('Failed to parse recent items from localStorage:', error)
-//     return defaultState // Return default state on error
-//   }
-// }
 export const recentItemsStore = proxy<RecentItemsStore>({})
 
 export const getRecentItemsStore = (ref: string | undefined): RecentItems => {
   if (!ref) return proxy(defaultState)
   if (!recentItemsStore[ref]) {
     const stored = localStorage.getItem(getStorageKey(ref))
-    recentItemsStore[ref] = proxy(stored ? JSON.parse(stored) : { ...defaultState })
+    console.debug('[Recent Items] Loading stored items:', stored)
+
+    try {
+      const parsed = stored ? JSON.parse(stored) : defaultState
+      // Validate the shape of the data
+      if (!parsed.items || !Array.isArray(parsed.items)) {
+        console.warn('[Recent Items] Invalid stored data, using default')
+        recentItemsStore[ref] = proxy({ ...defaultState })
+      } else {
+        recentItemsStore[ref] = proxy(parsed)
+      }
+    } catch (error) {
+      console.error('[Recent Items] Failed to parse stored items:', error)
+      recentItemsStore[ref] = proxy({ ...defaultState })
+    }
   }
 
   return recentItemsStore[ref]
@@ -80,34 +76,6 @@ if (typeof window !== 'undefined') {
     })
   })
 }
-
-// Create a proxy store for recent items state
-
-// Subscribe to changes in the store and save to localStorage
-// if (typeof window !== 'undefined') {
-//   // Function to save current state to localStorage
-//   const saveToStorage = () => {
-//     try {
-//       // Save the recent items as a JSON string
-//       localStorage.setItem(RECENT_ITEMS_KEY, JSON.stringify(recentItemsStore))
-//     } catch (error) {
-//       // Log error if saving fails
-//       console.error('Failed to save recent items to localStorage:', error)
-//     }
-//   }
-
-//   // Use a debounced version to avoid too many writes to localStorage
-//   let timeout: NodeJS.Timeout
-//   const debouncedSave = () => {
-//     clearTimeout(timeout) // Clear previous timeout
-//     timeout = setTimeout(saveToStorage, 1000) // Set new timeout
-//   }
-
-//   // Subscribe to changes in the recent items store
-//   subscribe(recentItemsStore, () => {
-//     debouncedSave() // Call the debounced save function on changes
-//   })
-// }
 
 // Function to add a recent item
 export const addRecentItem = (ref: string | undefined, tab: Tab) => {

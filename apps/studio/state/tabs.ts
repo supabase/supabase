@@ -54,7 +54,24 @@ export const getTabsStore = (ref: string | undefined): TabsState => {
   if (!ref) return proxy(defaultState)
   if (!tabsStore[ref]) {
     const stored = localStorage.getItem(getStorageKey(ref))
-    tabsStore[ref] = proxy(stored ? JSON.parse(stored) : { ...defaultState })
+    console.debug('[Tabs] Loading stored tabs:', stored)
+    try {
+      const parsed = stored ? JSON.parse(stored) : defaultState
+      if (
+        !parsed.openTabs ||
+        !Array.isArray(parsed.openTabs) ||
+        !parsed.tabsMap ||
+        typeof parsed.tabsMap !== 'object'
+      ) {
+        console.warn('[Tabs] Invalid stored data, using default')
+        tabsStore[ref] = proxy({ ...defaultState })
+      } else {
+        tabsStore[ref] = proxy(parsed)
+      }
+    } catch (error) {
+      console.error('[Tabs] Failed to parse stored tabs:', error)
+      tabsStore[ref] = proxy({ ...defaultState })
+    }
   }
 
   return tabsStore[ref]
