@@ -20,6 +20,7 @@ import {
   ExternalLink,
   File,
   FileX2,
+  Import,
   KeyRound,
   ListOrdered,
   Settings,
@@ -135,6 +136,7 @@ import {
   CollapsibleContent_Shadcn_,
   Loading,
   LoadingLine,
+  Textarea,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -322,13 +324,22 @@ function InfoSection({ title, data }: { title: string; data: Record<string, any>
   )
 }
 
-const Wizard: NextPageWithLayout = () => {
+const WizardForm = ({
+  aiDescription = '',
+  title: formTitle = '',
+  description: formDescription = '',
+}: {
+  aiDescription: string
+  title: string
+  description: string
+}) => {
   const router = useRouter()
   const { slug, projectName } = useParams()
 
   const [nodes, setNodes] = useState<Node[]>([])
   const [edges, setEdges] = useState<Edge[]>([])
-  const [showAdvanced, setShowAdvanced] = useState<Boolean[]>(false)
+  const [initialGenerate, setInitialGenerate] = useState<boolean>(!!aiDescription)
+  const [showAdvanced, setShowAdvanced] = useState<Boolean>(false)
   const db = useRef<PGlite | null>()
   const [services, setServices] = useState<SupabaseService[]>([])
   const [title, setTitle] = useState<string>('')
@@ -380,6 +391,9 @@ const Wizard: NextPageWithLayout = () => {
     api: `${BASE_PATH}/api/ai/onboarding/design`,
     id: 'schema-generator',
     maxSteps: 7,
+    onFinish: () => {
+      setInitialGenerate(false)
+    },
     // Handle client-side tools
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'executeSql') {
@@ -453,6 +467,12 @@ const Wizard: NextPageWithLayout = () => {
       }
     },
   })
+
+  useEffect(() => {
+    if (aiDescription?.length > 0) {
+      append({ role: 'user', content: aiDescription })
+    }
+  }, [aiDescription])
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -718,42 +738,16 @@ const Wizard: NextPageWithLayout = () => {
     return null
   }, [form.getValues('dbRegion')])
 
-  if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
+  if (initialGenerate) {
+    return (
+      <div className="flex w-full h-screen overflow-hidden flex-col items-center justify-center">
+        <LogoLoader />
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full h-screen overflow-hidden flex-col">
-      <Link
-        href="/projects"
-        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default"
-      >
-        <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
-      </Link>
-      {/* <div className="border-b bg-muted py-3 px-12">
-        <div className="flex justify-between items-stretch">
-          <Link
-            href="/projects"
-            className="text-xs font-mono text-foreground-light flex gap-4 items-center"
-          >
-            <img
-              className="rounded border p-3 hover:border-white border-default"
-              src={`${BASE_PATH}/img/supabase-logo.svg`}
-              alt="Supabase"
-              style={{ height: 16 }}
-            />
-            Back to dashboard
-          </Link>
-          <div className="flex justify-between items-stretch">
-            <Button
-              htmlType="submit"
-              className="text-sm h-auto"
-              loading={isCreatingNewProject || isSuccessNewProject}
-              disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
-            >
-              Create new project
-            </Button>
-          </div>
-        </div>
-      </div> */}
       <div className="overflow-auto flex-1 flex items-start">
         <Form_Shadcn_ {...form}>
           <form
@@ -763,11 +757,8 @@ const Wizard: NextPageWithLayout = () => {
             <section className="relative">
               <div>
                 <div className="mb-4">
-                  <h3 className="mb-1">Create a new project</h3>
-                  <p className="text-sm text-foreground-lighter">
-                    Your project will have its own dedicated instance and full Postgres database,
-                    including an automated API.
-                  </p>
+                  <h3 className="mb-1">{formTitle}</h3>
+                  <p className="text-sm text-foreground-lighter">{formDescription}</p>
                 </div>
                 <>
                   {projectCreationDisabled ? (
@@ -1501,33 +1492,32 @@ const Wizard: NextPageWithLayout = () => {
                 layout
                 layoutId="globe"
                 className="absolute z-10 pointer-events-none aspect-square right-0"
-                initial={{
-                  x: nodes.length > 0 ? '75%' : '25%',
-                  opacity: 1,
-                  width: nodes.length > 0 ? '60%' : '100%',
-                  top: nodes.length > 0 ? '0' : '50%',
-                  y: nodes.length > 0 ? '-25%' : '-50%',
-                }}
+                initial={false}
                 animate={{
                   x: nodes.length > 0 ? '25%' : '25%',
                   opacity: 1,
                   width: nodes.length > 0 ? '60%' : '100%',
                   top: nodes.length > 0 ? '0' : '50%',
-                  y: nodes.length > 0 ? '-25%' : '-50%',
+                  y: nodes.length > 0 ? '-35%' : '-50%',
                 }}
-                style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
                 transition={{
                   duration: 1.25,
                   ease: 'easeInOut',
                 }}
               >
-                <Globe
-                  currentLocation={selectedRegionObject?.location}
-                  markers={[
-                    ...Object.values(AWS_REGIONS).map((region) => region.location),
-                    ...Object.values(FLY_REGIONS).map((region) => region.location),
-                  ]}
-                />
+                <div className="absolute inset-[10%] bg-background-200 rounded-full" />
+                <div
+                  className="absolute inset-0 "
+                  style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
+                >
+                  <Globe
+                    currentLocation={selectedRegionObject?.location}
+                    markers={[
+                      ...Object.values(AWS_REGIONS).map((region) => region.location),
+                      ...Object.values(FLY_REGIONS).map((region) => region.location),
+                    ]}
+                  />
+                </div>
               </motion.div>
               <AnimatePresence>
                 {nodes.length > 0 && (
@@ -1748,6 +1738,142 @@ const layoutElements = (nodes: Node[], edges: Edge[]) => {
   })
 
   return { nodes, edges }
+}
+
+const Step1 = ({
+  onSubmit,
+  onStartBlank,
+  onMigrate,
+}: {
+  onSubmit: (value: string) => void
+  onStartBlank: () => void
+  onMigrate: () => void
+}) => {
+  const [value, setValue] = useState('')
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    onSubmit(value)
+  }
+
+  return (
+    <div className="flex w-full h-screen overflow-auto bg-background-200">
+      <div className="max-w-[600px] mx-auto p-16 min-h-screen flex items-center">
+        <div className="w-full">
+          <h3>What are you building?</h3>
+          <p className="text-sm text-foreground-lighter mb-4">
+            We can generate a starting schema for you including sample data.
+          </p>
+          <Textarea
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className="mb-4 bg-surface-100 w-full"
+            placeholder="e.g. a messaging app with users, messages and groups built on NextJS"
+          />
+          <Button onClick={handleSubmit} type="primary" className="w-full">
+            Continue
+          </Button>
+          <div className="text-center text-sm text-foreground-lighter my-4">or</div>
+          <div className="grid grid-cols-2 gap-4">
+            <div
+              className="p-6 h-auto block text-center border rounded-md cursor text-sm border-strong hover:border-foreground-muted cursor-pointer"
+              role="button"
+              onClick={onStartBlank}
+            >
+              <Database
+                strokeWidth={1.5}
+                size={20}
+                className="text-foreground-lighter mx-auto mb-4"
+              />
+              <span className="mb-1 block">Start blank</span>
+              <span className="text-foreground-lighter text-center">
+                Configure a database and dive right in
+              </span>
+            </div>
+            <div
+              className="p-6 h-auto block text-center border rounded-md cursor text-sm border-strong hover:border-foreground-muted cursor-pointer"
+              role="button"
+              onClick={onMigrate}
+            >
+              <Import
+                strokeWidth={1.5}
+                size={20}
+                className="text-foreground-lighter mx-auto mb-4"
+              />
+              <span className="mb-1 block">Migrate</span>
+              <span className="text-foreground-lighter text-center">
+                Import your database from another provider
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const Wizard: NextPageWithLayout = () => {
+  const { slug, projectName } = useParams()
+
+  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
+  const currentOrg = organizations?.find((o: any) => o.slug === slug)
+
+  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
+    useFreeProjectLimitCheckQuery({ slug })
+
+  const [step, setStep] = useState(1)
+  const [aiDescription, setAiDescription] = useState('')
+  const [title, setTitle] = useState('Create a new project')
+  const [description, setDescription] = useState(
+    'Get started by choosing how you want to create your project'
+  )
+
+  if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
+
+  return (
+    <>
+      <Link
+        href="/projects"
+        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default"
+      >
+        <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
+      </Link>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={step}
+          initial={{ opacity: 0, scale: 1.02 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.98 }}
+          transition={{ duration: 0.3 }}
+        >
+          {step === 1 ? (
+            <Step1
+              onSubmit={(value) => {
+                setAiDescription(value)
+                setTitle('Create a project')
+                setDescription(
+                  'We have generated a starting schema for you based on your description'
+                )
+                setStep(2)
+              }}
+              onStartBlank={() => {
+                setTitle('Start from Scratch')
+                setDescription('Configure your new blank project')
+                setStep(2)
+              }}
+              onMigrate={() => {
+                setTitle('Migrate Existing Database')
+                setDescription('First we need to create a new project to migrate your database to')
+                setStep(2)
+              }}
+            />
+          ) : (
+            <WizardForm aiDescription={aiDescription} title={title} description={description} />
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </>
+  )
 }
 
 export default withAuth(Wizard)
