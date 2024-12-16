@@ -5,12 +5,15 @@ import { ResponseError } from 'types'
 import { contentKeys } from './keys'
 import { SqlSnippet } from './sql-snippets-query'
 
-interface getContentCountVariables {
-  projectRef?: string
+type GetContentFilters = {
   type: 'sql' | 'report' | 'log_sql'
   visibility?: SqlSnippet['visibility']
   favorite?: boolean
   name?: string
+}
+
+interface getContentCountVariables extends GetContentFilters {
+  projectRef?: string
 }
 
 export async function getContentCount(
@@ -18,6 +21,11 @@ export async function getContentCount(
   signal?: AbortSignal
 ) {
   if (typeof projectRef === 'undefined') throw new Error('projectRef is required')
+
+  const query: GetContentFilters = { type }
+  if (visibility) query.visibility = visibility
+  if (favorite) query.favorite = favorite
+  if (name) query.name = name
 
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
     params: { path: { ref: projectRef }, query: { type, visibility, favorite, name } },

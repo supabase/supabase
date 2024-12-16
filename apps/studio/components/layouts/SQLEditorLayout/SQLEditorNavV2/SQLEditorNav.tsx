@@ -24,7 +24,7 @@ import {
   useSnippetFolders,
   useSqlEditorV2StateSnapshot,
 } from 'state/sql-editor-v2'
-import { Separator, TreeView } from 'ui'
+import { cn, Separator, TreeView } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
@@ -52,6 +52,7 @@ export const SQLEditorNav = ({
 }: SQLEditorNavProps) => {
   const searchText = _searchText.trim()
   const debouncedSearchText = useDebounce(searchText, 250)
+  const isSearching = searchText.length > 0
 
   const router = useRouter()
   const { profile } = useProfile()
@@ -521,9 +522,13 @@ export const SQLEditorNav = ({
             <SQLEditorLoadingSnippets />
           ) : numProjectSnippets === 0 ? (
             <InnerSideBarEmptyPanel
-              className="mx-2"
-              title="No shared queries"
-              description="Share queries with your team by right-clicking on the query."
+              className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
+              title={isSearching ? 'No results found based on your search' : 'No shared queries'}
+              description={
+                isSearching
+                  ? undefined
+                  : 'Share queries with your team by right-clicking on the query'
+              }
             />
           ) : (
             <TreeView
@@ -575,14 +580,16 @@ export const SQLEditorNav = ({
             <SQLEditorLoadingSnippets />
           ) : numFavoriteSnippets === 0 ? (
             <InnerSideBarEmptyPanel
-              title="No favorite queries"
-              className="mx-2"
+              title={isSearching ? 'No results found based on your search' : 'No favorite queries'}
+              className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
               description={
-                <>
-                  Save a query to favorites for easy accessibility by clicking the{' '}
-                  <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
-                  icon.
-                </>
+                isSearching ? null : (
+                  <>
+                    Save a query to favorites for easy accessibility by clicking the{' '}
+                    <Heart size={12} className="inline-block relative align-center -top-[1px]" />{' '}
+                    icon.
+                  </>
+                )
               }
             />
           ) : (
