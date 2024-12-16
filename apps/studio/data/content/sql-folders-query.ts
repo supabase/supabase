@@ -16,6 +16,9 @@ export type SQLSnippetFolderVariables = {
   sort?: 'name' | 'inserted_at'
 }
 
+// [Joshen TODO] Change this to 50 at the end before merging
+export const SNIPPET_PAGE_LIMIT = 3
+
 export async function getSQLSnippetFolders(
   { projectRef, cursor, sort, name }: SQLSnippetFolderVariables,
   signal?: AbortSignal
@@ -30,12 +33,11 @@ export async function getSQLSnippetFolders(
       query: {
         type: 'sql',
         cursor,
-        limit: '3',
+        limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,
         sort_order: sortOrder,
         name,
-        // hard coding visibility to 'user' as folders
-        // are only supported for user content
+        // [Alaister] Hard coding visibility to 'user' as folders are only supported for user content
         visibility: 'user',
       },
     },

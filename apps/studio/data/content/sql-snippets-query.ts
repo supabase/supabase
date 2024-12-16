@@ -3,6 +3,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 import { get } from 'data/fetchers'
 import { Content } from './content-query'
 import { contentKeys } from './keys'
+import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'
 
 export type SqlSnippet = Extract<Content, { type: 'sql' }>
 
@@ -34,7 +35,7 @@ export async function getSqlSnippets(
         visibility,
         favorite,
         name,
-        limit: '3',
+        limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,
         sort_order: sortOrder,
       },

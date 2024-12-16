@@ -77,9 +77,9 @@ export const SQLEditorNav = ({
 
   const snippet = snapV2.snippets[id as string]?.snippet
 
-  // =================
+  // ==========================
   // Private snippets & folders
-  // =================
+  // ==========================
   const {
     data: privateSnippetsPages,
     isLoading,

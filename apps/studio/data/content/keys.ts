@@ -17,12 +17,12 @@ export const contentKeys = {
   folders: (
     projectRef: string | undefined,
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
-  ) => ['projects', projectRef, 'content', 'folders', options] as const,
+  ) => ['projects', projectRef, 'content', 'folders', options].filter(Boolean),
   folderContents: (
     projectRef: string | undefined,
     id?: string,
     options?: { sort?: 'inserted_at' | 'name'; name?: string }
-  ) => ['projects', projectRef, 'content', 'folders', id, options],
+  ) => ['projects', projectRef, 'content', 'folders', id, options].filter(Boolean),
   resource: (projectRef: string | undefined, id?: string) =>
     ['projects', projectRef, 'content', id] as const,
   count: (
