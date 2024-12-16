@@ -34,7 +34,7 @@ import {
   DatabaseConnectionType,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { getConnectionStrings, getPoolerTld } from './DatabaseSettings.utils'
+import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
@@ -130,11 +130,6 @@ export const DatabaseConnectionString = () => {
             sqlalchemy: '',
           },
         }
-
-  const poolerTld =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? getPoolerTld(poolingConfiguration?.connectionString)
-      : 'com'
 
   // @mildtomato - Possible reintroduce later
   //
@@ -311,8 +306,8 @@ export const DatabaseConnectionString = () => {
                     ...CONNECTION_PARAMETERS.port,
                     value: poolingConfiguration?.db_port.toString() ?? '6543',
                   },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab)}
@@ -345,8 +340,8 @@ export const DatabaseConnectionString = () => {
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
                   { ...CONNECTION_PARAMETERS.port, value: '5432' },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab)}
