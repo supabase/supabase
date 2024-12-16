@@ -46,7 +46,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
   return (
     <>
       <Panel
-        className="mb-8"
+        className="mb-4 md:mb-8"
         title={<h5>Profile Information</h5>}
         footer={
           <FormActions
