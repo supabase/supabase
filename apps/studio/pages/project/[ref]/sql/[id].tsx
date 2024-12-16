@@ -39,7 +39,9 @@ const SqlEditor: NextPageWithLayout = () => {
 
   // Don't fetch the snippet if it already exists in the state. This avoids a race condition where
   // the snippet is inserted and fetched at the same time.
-  const existsSnippet = id ? !!snapV2.snippets[id] : undefined
+  const existsSnippet = id
+    ? id in snapV2.snippets && snapV2.snippets[id].snippet?.content !== undefined
+    : undefined
 
   useContentIdQuery(
     { projectRef: ref, id },
