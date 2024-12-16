@@ -10,6 +10,7 @@ import { usePoolingConfigurationQuery } from 'data/database/pooling-configuratio
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { pluckObjectFields } from 'lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
@@ -33,7 +34,7 @@ import {
   DatabaseConnectionType,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { getConnectionStrings, getPoolerTld } from './DatabaseSettings.utils'
+import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
@@ -93,11 +94,10 @@ export const DatabaseConnectionString = () => {
   const connectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
 
   const handleCopy = (id: string) => {
-    const labelValue = DATABASE_CONNECTION_TYPES.find((type) => type.id === id)?.label
+    const connectionType = DATABASE_CONNECTION_TYPES.find((type) => type.id === id)?.label
     sendEvent({
-      category: 'settings',
-      action: 'copy_connection_string',
-      label: labelValue ?? '',
+      action: TelemetryActions.CONNECTION_STRING_COPIED,
+      properties: { connectionType },
     })
   }
 
@@ -130,11 +130,6 @@ export const DatabaseConnectionString = () => {
             sqlalchemy: '',
           },
         }
-
-  const poolerTld =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? getPoolerTld(poolingConfiguration?.connectionString)
-      : 'com'
 
   // @mildtomato - Possible reintroduce later
   //
@@ -306,22 +301,14 @@ export const DatabaseConnectionString = () => {
                 }}
                 notice={['Does not support PREPARE statements']}
                 parameters={[
-                  {
-                    ...CONNECTION_PARAMETERS.host,
-                    value: `${projectRef}.pooler.supabase.${poolerTld}`,
-                  },
+                  { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
                   {
                     ...CONNECTION_PARAMETERS.port,
                     value: poolingConfiguration?.db_port.toString() ?? '6543',
-                    description: 'Port number for transaction pooler',
                   },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-                  {
-                    ...CONNECTION_PARAMETERS.pool_mode,
-                    value: 'transaction',
-                    description: 'Each transaction uses a different connection',
-                  },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
+                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab)}
               />
@@ -351,22 +338,11 @@ export const DatabaseConnectionString = () => {
                   description: 'Session pooler connections are IPv4 proxied for free.',
                 }}
                 parameters={[
-                  {
-                    ...CONNECTION_PARAMETERS.host,
-                    value: `${projectRef}.pooler.supabase.${poolerTld}`,
-                  },
-                  {
-                    ...CONNECTION_PARAMETERS.port,
-                    value: '5432',
-                    description: 'Port number for session pooler',
-                  },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
-                  {
-                    ...CONNECTION_PARAMETERS.pool_mode,
-                    value: 'session',
-                    description: 'Connection is reserved for the entire session',
-                  },
+                  { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
+                  { ...CONNECTION_PARAMETERS.port, value: '5432' },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
+                  { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
                 ]}
                 onCopyCallback={() => handleCopy(selectedTab)}
               />
