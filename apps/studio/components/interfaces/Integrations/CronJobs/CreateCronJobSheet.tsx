@@ -15,7 +15,7 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { CronJobCreatedEvent, CronJobUpdatedEvent, TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,

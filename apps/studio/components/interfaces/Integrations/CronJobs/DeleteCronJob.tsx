@@ -4,7 +4,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { CronJobDeletedEvent, TelemetryActions } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 interface DeleteCronJobProps {

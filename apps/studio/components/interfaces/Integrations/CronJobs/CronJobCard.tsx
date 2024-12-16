@@ -9,12 +9,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import {
-  CronJobDeleteClickedEvent,
-  CronJobHistoryClickedEvent,
-  CronJobUpdateClickedEvent,
-  TelemetryActions,
-} from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   DropdownMenu,

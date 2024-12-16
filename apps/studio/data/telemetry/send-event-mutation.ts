@@ -6,14 +6,14 @@ import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import {
   ConnectionStringCopiedEvent,
-  CronJobCreatedEvent,
-  CronJobUpdatedEvent,
-  CronJobDeletedEvent,
-  TelemetryActions,
   CronJobCreateClickedEvent,
+  CronJobCreatedEvent,
   CronJobDeleteClickedEvent,
-  CronJobUpdateClickedEvent,
+  CronJobDeletedEvent,
   CronJobHistoryClickedEvent,
+  CronJobUpdateClickedEvent,
+  CronJobUpdatedEvent,
+  TelemetryActions,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
