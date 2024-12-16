@@ -13,6 +13,7 @@ import { components } from 'api-types'
 import { useParams } from 'common'
 import { debounce, uniqBy } from 'lodash'
 import {
+  ArrowUp,
   Box,
   ChevronRight,
   Clock,
@@ -137,6 +138,7 @@ import {
   Loading,
   LoadingLine,
   Textarea,
+  Label_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -151,6 +153,7 @@ import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { Markdown } from 'components/interfaces/Markdown'
 import LoadingState from 'components/layouts/ProjectLayout/LoadingState'
 import LogoLoader from '@ui/components/LogoLoader'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -880,7 +883,27 @@ const WizardForm = ({
                             />
                           </div>
                           <div className="py-4 border-b">
-                            <FormItemLayout label="Generate a starting schema">
+                            <FormItemLayout>
+                              <div className="flex justify-between w-full block items-center mb-4">
+                                <Label_Shadcn_ className="flex-1">
+                                  Generate a starting schema
+                                </Label_Shadcn_>
+                                {messages?.length > 0 && (
+                                  <Button
+                                    type="outline"
+                                    size="small"
+                                    onClick={() => {
+                                      append({
+                                        role: 'user',
+                                        content:
+                                          'Undo everything you have done and create a blank database',
+                                      })
+                                    }}
+                                  >
+                                    Reset
+                                  </Button>
+                                )}
+                              </div>
                               <div className="rounded-md border bg-surface-100">
                                 {messages.length > 0 && (
                                   <div className="px-4 py-3 border-b space-y-1">
@@ -939,40 +962,54 @@ const WizardForm = ({
                                     </p>
                                   </div>
                                 )}
-                                <textarea
-                                  id="input"
-                                  name="prompt"
-                                  autoComplete="off"
-                                  className="w-full px-4 text-sm py-2 border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter"
-                                  value={input}
-                                  disabled={isMessagesLoading}
-                                  onChange={handleInputChange}
-                                  placeholder={
-                                    messages.length > 0
-                                      ? 'Make an edit...'
-                                      : 'Describe your application...'
-                                  }
-                                  autoFocus
-                                  rows={
-                                    messages.length > 0
-                                      ? Math.max(1, Math.min(input.split('\n').length, 10))
-                                      : Math.max(3, Math.min(input.split('\n').length, 10))
-                                  }
-                                  onKeyDown={(e) => {
-                                    if (!(e.target instanceof HTMLTextAreaElement)) {
-                                      return
+                                <div className="w-full px-4 text-sm pt-2 pb-4 border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter">
+                                  <textarea
+                                    id="input"
+                                    name="prompt"
+                                    autoComplete="off"
+                                    className="text-sm w-full bg-transparent border-none p-0 resize-none focus:outline-none focus:ring-0 resize-none"
+                                    value={input}
+                                    disabled={isMessagesLoading}
+                                    onChange={handleInputChange}
+                                    placeholder={
+                                      messages.length > 0
+                                        ? 'Make an edit...'
+                                        : 'Describe your application...'
                                     }
-                                    if (
-                                      e.key === 'Enter' &&
-                                      !e.shiftKey &&
-                                      !e.nativeEvent.isComposing
-                                    ) {
-                                      e.preventDefault()
-                                      append({ role: 'user', content: input })
-                                      setInput('')
+                                    autoFocus
+                                    rows={
+                                      messages.length > 0
+                                        ? Math.max(1, Math.min(input.split('\n').length, 10))
+                                        : Math.max(3, Math.min(input.split('\n').length, 10))
                                     }
-                                  }}
-                                />
+                                    onKeyDown={(e) => {
+                                      if (!(e.target instanceof HTMLTextAreaElement)) {
+                                        return
+                                      }
+                                      if (
+                                        e.key === 'Enter' &&
+                                        !e.shiftKey &&
+                                        !e.nativeEvent.isComposing
+                                      ) {
+                                        e.preventDefault()
+                                        append({ role: 'user', content: input })
+                                        setInput('')
+                                      }
+                                    }}
+                                  />
+                                  <div className="flex w-full justify-end">
+                                    <Button
+                                      onClick={(e) => {
+                                        e.preventDefault()
+                                        append({ role: 'user', content: input })
+                                        setInput('')
+                                      }}
+                                      className="rounded-full w-7 h-7 justify-center items-center p-0"
+                                    >
+                                      <ArrowUp size={16} />
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
                             </FormItemLayout>
                           </div>
