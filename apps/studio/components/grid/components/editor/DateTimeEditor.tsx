@@ -14,8 +14,8 @@ interface BaseEditorProps<TRow, TSummaryRow = unknown>
 
 const FORMAT_MAP = {
   date: 'YYYY-MM-DD',
-  datetime: 'YYYY-MM-DDTHH:mm:ss',
-  datetimetz: 'YYYY-MM-DDTHH:mm:ssZ',
+  datetime: 'YYYY-MM-DD HH:mm:ss',
+  datetimetz: 'YYYY-MM-DD HH:mm:ss+ZZ',
 }
 
 function BaseEditor<TRow, TSummaryRow = unknown>({
@@ -60,6 +60,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <Input
             autoFocus
             value={inputValue}
+            placeholder={FORMAT_MAP[type]}
             onChange={(e) => setInputValue(e.target.value)}
             className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
           />
