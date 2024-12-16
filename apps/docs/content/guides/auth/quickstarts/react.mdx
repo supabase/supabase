@@ -105,7 +105,7 @@ hideToc: true
             setLoading(true);
             const { data: { session }, error } = await supabase.auth.signUp({ email, password });
             if (error) alert(error.message);
-            if (!session) alert('Please check your inbox for email verification!');
+            if (!error) alert('Please check your inbox for email verification!');
             setLoading(false);
         }
 
@@ -114,7 +114,7 @@ hideToc: true
                 {session ? (
                     <div> Logged in </div>
                 ) : (
-                <form onSubmit={signInWithEmail}>
+                <form>
                     <div>
                         <label htmlFor="email">
                         Email:
@@ -143,7 +143,8 @@ hideToc: true
                         </label>
                     </div>
                     <button
-                        type="submit"
+                        type="button"
+                        onClick={signInWithEmail}
                         disabled={loading}
                         >
                     Sign in
