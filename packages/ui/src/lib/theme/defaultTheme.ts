@@ -36,9 +36,10 @@ const defaults = {
   size: {
     // buttons, inputs, input labels use these sizes
     text: {
-      tiny: 'text-xs',
-      small: 'text-sm leading-4',
-      medium: 'text-sm',
+      // text-base (16px) ensures inputs don't zoom in on mobile
+      tiny: 'text-base md:text-xs',
+      small: 'text-base md:text-sm leading-4',
+      medium: 'text-base md:text-sm',
       large: 'text-base',
       xlarge: 'text-base',
     },

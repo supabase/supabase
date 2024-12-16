@@ -60,7 +60,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
         <Form_Shadcn_ {...form}>
           <form
             id={formId}
-            className="space-y-6 w-full px-8 py-8"
+            className="space-y-6 w-full p-4 md:p-8"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField_Shadcn_

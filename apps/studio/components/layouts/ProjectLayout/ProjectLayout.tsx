@@ -236,8 +236,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                       <ResizablePanel
                         id="panel-assistant"
                         className={cn(
-                          'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
-                          'min-w-[400px] max-w-[500px]',
+                          'bg absolute right-0 top-0 md:top-[48px] bottom-0 xl:relative xl:top-0',
+                          'w-screen md:w-auto md:min-w-[400px] max-w-[500px]',
                           '2xl:min-w-[500px] 2xl:max-w-[600px]'
                         )}
                       >
