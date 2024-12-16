@@ -246,7 +246,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           const noChanges = JSON.stringify(initialValues) === JSON.stringify(values)
           return (
             <Collapsible.Content>
-              <div className="group border-t border-strong bg-surface-100 py-6 px-6 text-foreground">
+              <div className="group border-t border-strong bg-surface-100 py-6 px-4 md:px-6 text-foreground">
                 <div className="mx-auto my-6 max-w-lg space-y-6">
                   {showAlert(provider.title)}
                   {Object.keys(provider.properties).map((x: string) => (

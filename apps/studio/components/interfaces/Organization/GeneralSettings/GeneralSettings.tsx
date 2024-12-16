@@ -82,7 +82,7 @@ const GeneralSettings = () => {
           return (
             <FormPanel
               footer={
-                <div className="flex py-4 px-8">
+                <div className="flex p-4 md:px-8">
                   <FormActions
                     form={formId}
                     isSubmitting={isUpdating}

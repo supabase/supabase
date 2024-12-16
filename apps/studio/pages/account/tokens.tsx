@@ -19,7 +19,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 pt-6 pb-14 lg:px-16 xl:px-24 2xl:px-32">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between">
         <div>
           <FormHeader
             title="Access Tokens"

@@ -113,7 +113,7 @@ const Usage = () => {
   return (
     <>
       <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
-        <div className="py-4 flex items-center space-x-4">
+        <div className="py-4 flex flex-col md:flex-row md:items-center gap-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
           {isErrorSubscription && (
