@@ -57,7 +57,7 @@ const SQLQuickstarts = () => {
   }
 
   return (
-    <div className="block h-full space-y-8 overflow-y-auto p-6">
+    <div className="block h-full space-y-8 overflow-y-auto p-4 md:p-6">
       <div className="mb-8">
         <div className="mb-4">
           <h1 className="text-foreground mb-3 text-xl">Quickstarts</h1>
