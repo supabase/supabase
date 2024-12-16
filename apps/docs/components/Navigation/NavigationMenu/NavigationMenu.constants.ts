@@ -1021,6 +1021,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/postgis',
         },
         {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
+        },
+        {
           name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
@@ -1164,7 +1168,10 @@ export const queues: NavMenuConstant = {
     {
       name: 'References',
       url: undefined,
-      items: [{ name: 'API', url: '/guides/queues/api' }],
+      items: [
+        { name: 'API', url: '/guides/queues/api' },
+        { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
+      ],
     },
   ],
 }
