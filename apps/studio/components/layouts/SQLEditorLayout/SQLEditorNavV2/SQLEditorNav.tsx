@@ -36,6 +36,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import SQLEditorLoadingSnippets from './SQLEditorLoadingSnippets'
 import { ROOT_NODE, formatFolderResponseForTreeView, getLastItemIds } from './SQLEditorNav.utils'
 import { SQLEditorTreeViewItem } from './SQLEditorTreeViewItem'
+import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
+import { SqlSnippets } from 'types'
 
 interface SQLEditorNavProps {
   searchText: string
@@ -296,9 +298,15 @@ export const SQLEditorNav = ({
     [projectSnippetsTreeState]
   )
 
-  // ==================
-  // Delete mutations
-  // ==================
+  // ==========================
+  // Snippet mutations from  RQ
+  // ==========================
+
+  const { mutate: upsertContent, isLoading: isUpserting } = useContentUpsertV2Mutation({
+    onError: (error) => {
+      toast.error(`Failed to update query: ${error.message}`)
+    },
+  })
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onError: (error, data) => {
@@ -352,18 +360,49 @@ export const SQLEditorNav = ({
     )
   }
 
-  const onConfirmShare = () => {
-    if (!selectedSnippetToShare) return console.error('Snippet ID is required')
-    snapV2.shareSnippet(selectedSnippetToShare.id, 'project')
-    setSelectedSnippetToShare(undefined)
-    setShowSharedSnippets(true)
-  }
+  const onUpdateVisibility = async (action: 'share' | 'unshare') => {
+    const snippet = action === 'share' ? selectedSnippetToShare : selectedSnippetToUnshare
+    if (!projectRef) return console.error('Project ref is required')
+    if (!snippet) return console.error('Snippet ID is required')
 
-  const onConfirmUnshare = () => {
-    if (!selectedSnippetToUnshare) return console.error('Snippet ID is required')
-    snapV2.shareSnippet(selectedSnippetToUnshare.id, 'user')
-    setSelectedSnippetToUnshare(undefined)
-    setShowPrivateSnippets(true)
+    const storeSnippet = snapV2.snippets[snippet.id]
+
+    if (storeSnippet) {
+      let snippetContent = storeSnippet.snippet.content
+      if (snippetContent === undefined) {
+        const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
+        snippetContent = content as unknown as SqlSnippets.Content
+      }
+
+      if (snippetContent === undefined) {
+        // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
+        return toast.error('Unable to update snippet visibility: Content is missing')
+      }
+
+      upsertContent(
+        {
+          projectRef,
+          payload: {
+            ...snippet,
+            visibility: action === 'share' ? 'project' : 'user',
+            folder_id: undefined,
+            content: snippetContent,
+          },
+        },
+        {
+          onSuccess: () => {
+            setSelectedSnippetToShare(undefined)
+            setSelectedSnippetToUnshare(undefined)
+            setShowSharedSnippets(true)
+            toast.success(
+              action === 'share'
+                ? 'Snippet is now shared to the project'
+                : 'Snippet is now unshared from the project'
+            )
+          },
+        }
+      )
+    }
   }
 
   const onSelectCopyPersonal = async (snippet: SnippetWithContent) => {
@@ -711,12 +750,13 @@ export const SQLEditorNav = ({
 
       <ConfirmationModal
         size="medium"
+        loading={isUpserting}
         title={`Confirm to share query: ${selectedSnippetToShare?.name}`}
         confirmLabel="Share query"
         confirmLabelLoading="Sharing query"
         visible={selectedSnippetToShare !== undefined}
         onCancel={() => setSelectedSnippetToShare(undefined)}
-        onConfirm={onConfirmShare}
+        onConfirm={() => onUpdateVisibility('share')}
         alert={{
           title: 'This SQL query will become public to all team members',
           description: 'Anyone with access to the project can view it',
@@ -741,7 +781,7 @@ export const SQLEditorNav = ({
         confirmLabelLoading="Unsharing query"
         visible={selectedSnippetToUnshare !== undefined}
         onCancel={() => setSelectedSnippetToUnshare(undefined)}
-        onConfirm={onConfirmUnshare}
+        onConfirm={() => onUpdateVisibility('unshare')}
         alert={{
           title: 'This SQL query will no longer be public to all team members',
           description: 'Only you will have access to this query',

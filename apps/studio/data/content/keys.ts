@@ -7,18 +7,13 @@ export const contentKeys = {
     ['projects', projectRef, 'content', type] as const,
   sqlSnippets: (
     projectRef: string | undefined,
-    {
-      sort,
-      name,
-      visibility,
-      favorite,
-    }: {
+    options?: {
       sort?: 'inserted_at' | 'name'
       name?: string
       visibility?: SqlSnippet['visibility']
       favorite?: boolean
     }
-  ) => ['projects', projectRef, 'content', 'sql', { sort, visibility, favorite, name }] as const,
+  ) => ['projects', projectRef, 'content', 'sql', options].filter(Boolean),
   folders: (
     projectRef: string | undefined,
     options?: { sort?: 'inserted_at' | 'name'; name?: string }

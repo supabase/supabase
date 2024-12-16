@@ -226,29 +226,6 @@ export const sqlEditorState = proxy({
     }
   },
 
-  shareSnippet: async (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
-    const storeSnippet = sqlEditorState.snippets[id]
-
-    if (storeSnippet) {
-      let snippetContent = storeSnippet.snippet.content
-      if (snippetContent === undefined) {
-        const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
-        snippetContent = content as unknown as SqlSnippets.Content
-      }
-
-      if (snippetContent === undefined) {
-        // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
-        return toast.error('Unable to share snippet: Content is missing')
-      }
-
-      storeSnippet.snippet.content = snippetContent
-      storeSnippet.snippet.visibility = visibility
-      storeSnippet.snippet.folder_id = undefined
-
-      sqlEditorState.needsSaving.add(id)
-    }
-  },
-
   addResult: (id: string, results: any[], autoLimit?: number) => {
     if (sqlEditorState.results[id]) {
       sqlEditorState.results[id].unshift({ rows: results, autoLimit })
@@ -314,7 +291,11 @@ async function upsertSnippet(id: string, projectRef: string, payload: UpsertCont
     await upsertContent({ projectRef, payload })
 
     const queryClient = getQueryClient()
-    await queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql'))
+    await Promise.all([
+      queryClient.invalidateQueries(contentKeys.count(projectRef, 'sql')),
+      queryClient.invalidateQueries(contentKeys.sqlSnippets(projectRef)),
+      queryClient.invalidateQueries(contentKeys.folders(projectRef)),
+    ])
 
     sqlEditorState.savingStates[id] = 'IDLE'
   } catch (error) {
