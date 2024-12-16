@@ -359,6 +359,7 @@ const RestoreToNewProject = () => {
       {hasPITREnabled ? (
         <>
           <PITRForm
+            disabled={isRestoring}
             onSubmit={(v) => {
               setShowConfirmationDialog(true)
               setRecoveryTimeTarget(v.recoveryTimeTargetUnix)
