@@ -68,7 +68,7 @@ And then deploy it with:
 supabase functions deploy hello-world --project-ref [PROJECT REF]
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 This will create an infinite loop, as we are generating an additional log event that will eventually trigger a new request to this edge function. However, due to the batching nature of how Log Drain events are dispatched, the rate of edge function triggers will not increase greatly and will have an upper bound.
 
