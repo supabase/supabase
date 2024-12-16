@@ -151,7 +151,7 @@ const RestoreToNewProject = () => {
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
               value={clone.inserted_at ?? ''}
-              isUTC={true}
+              // isUTC={true}
             />
           </div>
         </div>
@@ -170,7 +170,7 @@ const RestoreToNewProject = () => {
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
               value={clone.inserted_at ?? ''}
-              isUTC={true}
+              // isUTC={true}
             />
           </div>
           <div className="flex items-center justify-end text-foreground-lighter group-hover:text-foreground">
