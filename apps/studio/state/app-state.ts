@@ -68,6 +68,7 @@ const getInitialState = () => {
       showGenerateSqlModal: false,
       navigationPanelOpen: false,
       navigationPanelJustClosed: false,
+      showConnectDialog: false,
     }
   }
 
@@ -111,6 +112,7 @@ const getInitialState = () => {
     showGenerateSqlModal: false,
     navigationPanelOpen: false,
     navigationPanelJustClosed: false,
+    showConnectDialog: false,
   }
 }
 
@@ -210,15 +212,22 @@ export const appState = proxy({
       ...value,
     }
   },
+
+  showConnectDialog: false,
+  setShowConnectDialog: (value: boolean) => {
+    appState.showConnectDialog = value
+  },
 })
 
 // Set up localStorage subscription
 if (typeof window !== 'undefined') {
   subscribe(appState, () => {
-    localStorage.setItem(
-      LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE,
-      JSON.stringify(appState.aiAssistantPanel)
-    )
+    const state = {
+      ...appState.aiAssistantPanel,
+      // limit to 20 messages so as to not overflow the context window
+      messages: appState.aiAssistantPanel.messages?.slice(-20),
+    }
+    localStorage.setItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE, JSON.stringify(state))
   })
 }
 

@@ -7,7 +7,7 @@ import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -115,7 +115,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()

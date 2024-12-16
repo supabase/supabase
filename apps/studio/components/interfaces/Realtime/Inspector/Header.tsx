@@ -3,6 +3,7 @@ import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { Button } from 'ui'
 import { ChooseChannelPopover } from './ChooseChannelPopover'
 import { RealtimeFilterPopover } from './RealtimeFilterPopover'
@@ -34,11 +35,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
                 onChangeConfig({ ...config, enabled: !config.enabled })
                 if (!config.enabled) {
                   // the user has clicked to start listening
-                  sendEvent({
-                    category: 'realtime_inspector',
-                    action: 'started_listening',
-                    label: 'realtime_inspector_config',
-                  })
+                  sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED })
                 }
               }}
             >
