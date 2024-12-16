@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - master
+      - ci/lint-master # testing only
   workflow_dispatch:
 
 env:
