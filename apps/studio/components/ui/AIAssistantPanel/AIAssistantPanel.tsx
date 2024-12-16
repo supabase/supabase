@@ -25,7 +25,7 @@ export const AIAssistantPanel = () => {
     <AIAssistant
       initialMessages={initialMessages}
       id={chatId}
-      className={cn('w-full h-full')}
+      className={cn('w-full h-full max-h-[100dvh]')}
       onResetConversation={handleReset}
     />
   )
