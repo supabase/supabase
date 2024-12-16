@@ -190,10 +190,9 @@ Events are batched with a maximum of 250 events per request.
 
 The log source and product name will be used as stream labels.
 
-The `event_message` and `timestamp` fields will be dropped from the events to avoid sending duplicate data.
+The `event_message` and `timestamp` fields will be dropped from the events to avoid duplicate data.
 
-Loki must be configured to accept **stuctured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accomodate large log event payloads of different products.
-
+Loki must be configured to accept **structured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accommodate large log event payloads of different products.
 
 ## Pricing
 
