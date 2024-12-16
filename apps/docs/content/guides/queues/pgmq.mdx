@@ -20,9 +20,9 @@ create extension pgmq;
 
 ## Usage [#get-usage]
 
-### Queue Management
+### Queue management
 
-#### create
+#### Create
 
 Create a new queue.
 
@@ -47,7 +47,7 @@ select from pgmq.create('my_queue');
 --------
 ```
 
-#### create_unlogged
+#### Create_unlogged
 
 Creates an unlogged table. This is useful when write throughput is more important that durability.
 See Postgres documentation for [unlogged tables](https://www.postgresql.org/docs/current/sql-createtable.html#SQL-CREATETABLE-UNLOGGED) for more information.
@@ -75,7 +75,7 @@ select pgmq.create_unlogged('my_unlogged');
 
 ---
 
-#### detach_archive
+#### Detach_archive
 
 Drop the queue's archive table as a member of the PGMQ extension. Useful for preventing the queue's archive table from being drop when `drop extension pgmq` is executed.
 This does not prevent the further archives() from appending to the archive table.
@@ -102,7 +102,7 @@ select * from pgmq.detach_archive('my_queue');
 
 ---
 
-#### drop_queue
+#### Drop_queue
 
 Deletes a queue and its archive table.
 
@@ -128,9 +128,9 @@ select * from pgmq.drop_queue('my_unlogged');
  t
 ```
 
-### Sending Messages
+### Sending messages
 
-#### send
+#### Send
 
 Send a single message to a queue.
 
@@ -164,7 +164,7 @@ select * from pgmq.send('my_queue', '{"hello": "world"}');
 
 ---
 
-#### send_batch
+#### Send_batch
 
 Send 1 or more messages to a queue.
 
@@ -203,9 +203,9 @@ select * from pgmq.send_batch(
 
 ---
 
-### Reading Messages
+### Reading messages
 
-#### read
+#### Read
 
 Read 1 or more messages from a queue. The VT specifies the delay in seconds between reading and the message becoming invisible to other consumers.
 
@@ -242,7 +242,7 @@ select * from pgmq.read('my_queue', 10, 2);
 
 ---
 
-#### read_with_poll
+#### Read_with_poll
 
 Same as read(). Also provides convenient long-poll functionality.
 When there are no messages in the queue, the function call will wait for `max_poll_seconds` in duration before returning.
@@ -282,7 +282,7 @@ select * from pgmq.read_with_poll('my_queue', 1, 1, 5, 100);
 
 ---
 
-#### pop
+#### Pop
 
 Reads a single message from a queue and deletes it upon read.
 
@@ -312,9 +312,9 @@ pgmq=# select * from pgmq.pop('my_queue');
 
 ---
 
-### Deleting/Archiving Messages
+### Deleting/Archiving messages
 
-#### delete (single)
+#### Delete (single)
 
 Deletes a single message from a queue.
 
@@ -343,7 +343,7 @@ select pgmq.delete('my_queue', 5);
 
 ---
 
-#### delete (batch)
+#### Delete (batch)
 
 Delete one or many messages from a queue.
 
@@ -384,7 +384,7 @@ select * from pgmq.delete('my_queue', array[6, 999]);
 
 ---
 
-#### purge_queue
+#### Purge_queue
 
 Permanently deletes all messages in a queue. Returns the number of messages that were deleted.
 
@@ -413,7 +413,7 @@ select * from pgmq.purge_queue('my_queue');
 
 ---
 
-#### archive (single)
+#### Archive (single)
 
 Removes a single requested message from the specified queue and inserts it into the queue's archive.
 
@@ -445,7 +445,7 @@ select * from pgmq.archive('my_queue', 1);
 
 ---
 
-#### archive (batch)
+#### Archive (batch)
 
 Deletes a batch of requested messages from the specified queue and inserts them into the queue's archive.
 Returns an array of message ids that were successfully archived.
@@ -489,7 +489,7 @@ select * from pgmq.archive('my_queue', array[4, 999]);
 
 ### Utilities
 
-#### set_vt
+#### Set_vt
 
 Sets the visibility timeout of a message to a specified time duration in the future. Returns the record of the message that was updated.
 
@@ -524,7 +524,7 @@ select * from pgmq.set_vt('my_queue', 11, 30);
 
 ---
 
-#### list_queues
+#### List_queues
 
 List all the queues that currently exist.
 
@@ -553,7 +553,7 @@ select * from pgmq.list_queues();
 
 ---
 
-#### metrics
+#### Metrics
 
 Get metrics for a specific queue.
 
@@ -599,7 +599,7 @@ select * from pgmq.metrics('my_queue');
 
 ---
 
-#### metrics_all
+#### Metrics_all
 
 Get metrics for all existing queues.
 
@@ -638,7 +638,7 @@ select * from pgmq.metrics_all();
 
 ### Types
 
-#### message_record
+#### Message_record
 
 The complete representation of a message in a queue.
 

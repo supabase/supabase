@@ -26,7 +26,7 @@ The benchmarking results include the following workloads:
 
 ## Results
 
-### Realtime Broadcast Performance
+### Realtime Broadcast performance
 
 This workload evaluates the system's capacity to handle multiple concurrent WebSocket connections and message broadcasting. Each virtual user (VU) in the test:
 
@@ -51,7 +51,7 @@ This workload evaluates the system's capacity to handle multiple concurrent WebS
 | New Connection Rate | 320 conn/sec              |
 | Channel Join Rate   | 640 joins/sec             |
 
-### Payload Size Impact
+### Payload size impact
 
 This workload tests the system's performance with different message payload sizes to understand how data volume affects throughput and latency. Each virtual user (VU) follows the same connection pattern as the broadcast test, but with varying message sizes:
 
@@ -62,15 +62,15 @@ This workload tests the system's performance with different message payload size
 - Sends messages with payloads of 1KB, 10KB, and 50KB
 - Generates traffic by sending 2 messages per second to each joined channel for 5 minutes
 
-#### 1KB Payload
+#### 1KB payload
 
 ![1KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-1kb.png)
 
-#### 10KB Payload
+#### 10KB payload
 
 ![10KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-10kb.png)
 
-#### 50KB Payload
+#### 50KB payload
 
 ![50KB Payload Broadcast Performance](/docs/img/guides/realtime/payload-size-50kb-small.png)
 
@@ -86,7 +86,7 @@ This workload tests the system's performance with different message payload size
 
 > Note: The final column shows results with reduced load (2,000 users) for the 50KB payload test, demonstrating how the system performs with larger payloads under different concurrency levels.
 
-### Large-Scale Broadcasting
+### Large-Scale broadcasting
 
 This workload demonstrates Realtime's capability to handle high-scale scenarios with a large number of concurrent users and broadcast channels. The test simulates a scenario where each user participates in group communications with periodic message broadcasts:
 
