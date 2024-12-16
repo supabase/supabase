@@ -1,3 +1,43 @@
+// Standardization as per document: https://www.notion.so/supabase/Event-tracking-standardization-1195004b775f80f98ee3fa9e70cf4d05
+
+export enum TelemetryActions {
+  SIGN_UP = 'sign_up',
+  SIGN_IN = 'sign_in',
+
+  ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
+  ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
+  ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',
+  ASSISTANT_SUGGESTION_ACCEPTED = 'assistant_suggestion_accepted',
+  ASSISTANT_SUGGESTION_REJECTED = 'assistant_suggestion_rejected',
+  ASSISTANT_SUGGESTION_COPIED = 'assistant_suggestion_copied',
+  ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
+
+  CONNECTION_STRING_COPIED = 'connection_string_copied',
+  CRON_JOB_CREATED = 'cron_job_created',
+  CRON_JOB_UPDATED = 'cron_job_updated',
+  CRON_JOB_DELETED = 'cron_job_deleted',
+  CRON_JOB_DELETE_CLICKED = 'cron_job_delete_clicked',
+  CRON_JOB_UPDATE_CLICKED = 'cron_job_update_clicked',
+  CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
+  CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED = 'cron_job_view_previous_runs_clicked',
+
+  FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
+  FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
+
+  REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
+  REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
+  REALTIME_INSPECTOR_MESSAGE_CLICKED = 'realtime_inspector_message_clicked',
+  REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED = 'realtime_inspector_copy_message_clicked',
+  REALTIME_INSPECTOR_FILTERS_APPLIED = 'realtime_inspector_filters_applied',
+  REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED = 'realtime_inspector_database_role_updated',
+
+  SQL_EDITOR_QUICKSTART_CLICKED = 'sql_editor_quickstart_clicked',
+  SQL_EDITOR_TEMPLATE_CLICKED = 'sql_editor_template_clicked',
+  SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
+  SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+  SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+}
+
 // [Joshen] Just adding these to start consolidating our telemetry configs
 // may change depending on how we choose to standardize across all apps
 // Events define the name of the event and it'll be used as the primary identification
