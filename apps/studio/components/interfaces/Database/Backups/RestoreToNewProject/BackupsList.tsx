@@ -9,9 +9,10 @@ import { TimestampInfo } from 'ui-patterns'
 
 interface BackupsListProps {
   onSelectRestore: (id: number) => void
+  disabled?: boolean
 }
 
-export const BackupsList = ({ onSelectRestore }: BackupsListProps) => {
+export const BackupsList = ({ onSelectRestore, disabled }: BackupsListProps) => {
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -34,20 +35,25 @@ export const BackupsList = ({ onSelectRestore }: BackupsListProps) => {
             {cloneBackups?.backups.map((backup) => {
               if (!backup.isPhysicalBackup) return null
               return (
-                <div className="flex p-4 gap-4" key={backup.id}>
+                <div className="grid grid-cols-4 gap-4 items-center p-4" key={backup.id}>
                   <div>
                     <TimestampInfo value={backup.inserted_at} />
                   </div>
-                  <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
-                  {(backup.status as any) === 'COMPLETED' && (
-                    <Button
-                      className="ml-auto"
-                      type="outline"
-                      onClick={() => onSelectRestore(backup.id)}
-                    >
-                      Restore
-                    </Button>
-                  )}
+                  <div>
+                    <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
+                  </div>
+                  <div className="col-span-2 flex justify-end">
+                    {(backup.status as any) === 'COMPLETED' && (
+                      <Button
+                        className="ml-auto"
+                        type="outline"
+                        onClick={() => onSelectRestore(backup.id)}
+                        disabled={disabled}
+                      >
+                        Restore
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )
             })}
