@@ -13,8 +13,9 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { formatCurrency } from 'lib/helpers'
 import { useAddonsPagePanel } from 'state/addons-page'
-import { Alert, AlertDescription_Shadcn_, Alert_Shadcn_, Button, Radio, SidePanel, cn } from 'ui'
-import { ExternalLink, AlertTriangle } from 'lucide-react'
+import { Button, Radio, SidePanel, cn } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const IPv4SidePanel = () => {
   const { ref: projectRef } = useParams()
@@ -187,10 +188,12 @@ const IPv4SidePanel = () => {
 
           {hasChanges && (
             <>
-              <Alert withIcon variant="info" title="Potential downtime">
-                There might be some downtime when enabling the add-on since some DNS clients might
-                have cached the old DNS entry. Generally, this should be less than a minute.
-              </Alert>
+              <Admonition
+                type="note"
+                title="Potential downtime"
+                description="There might be some downtime when enabling the add-on since some DNS clients might
+                have cached the old DNS entry. Generally, this should be less than a minute."
+              />
               {selectedOption !== 'ipv4_none' && (
                 <p className="text-sm text-foreground-light">
                   By default, this is only applied to the Primary database for your project. If{' '}
@@ -216,20 +219,14 @@ const IPv4SidePanel = () => {
           )}
 
           {isFreePlan && (
-            <Alert
-              withIcon
-              variant="info"
-              title="IPv4 add-on is unavailable on the Free Plan"
-              actions={
-                <Button asChild type="default">
-                  <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
-                    View available plans
-                  </Link>
-                </Button>
-              }
-            >
-              Upgrade your plan to enable a IPv4 address for your project
-            </Alert>
+            <Admonition type="note" title="IPv4 add-on is unavailable on the Free Plan">
+              <p>Upgrade your plan to enable a IPv4 address for your project</p>
+              <Button asChild type="default">
+                <Link href={`/org/${organization?.slug}/billing?panel=subscriptionPlan`}>
+                  View available plans
+                </Link>
+              </Button>
+            </Admonition>
           )}
         </div>
       </SidePanel.Content>
