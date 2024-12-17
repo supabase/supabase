@@ -13,6 +13,7 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/title',
   '/ai/sql/debug',
   '/ai/sql/cron',
+  '/ai/docs',
   '/get-ip-address',
 ]
 
