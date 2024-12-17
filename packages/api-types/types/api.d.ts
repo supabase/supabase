@@ -619,14 +619,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/platform/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/platform/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -1677,14 +1669,6 @@ export interface paths {
   '/v0/pg-meta/{ref}/search/tables': {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
-  }
-  '/v0/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
   }
   '/v0/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -2952,7 +2936,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: string
+      folder_id?: null
       id?: string
       name: string
       owner_id?: number
@@ -3777,7 +3761,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3801,7 +3785,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite?: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -4042,21 +4026,6 @@ export interface components {
       is_grantable?: boolean
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    GrantTablePrivilegesBody: {
-      grantee: string
-      is_grantable?: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -4800,12 +4769,6 @@ export interface components {
       schema: string
       size: string
     }
-    PostgresTablePrivileges: {
-      kind: string
-      name: string
-      privileges: components['schemas']['TablePrivilege'][]
-      schema: string
-    }
     PostgrestConfigResponse: {
       db_anon_role: string
       db_extra_search_path: string
@@ -5164,11 +5127,7 @@ export interface components {
       region: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
       ssl_enforced: boolean
-      is_sensitive?: boolean
       status: string
-    }
-    ProjectSensitivitySettingResponse: {
-      is_sensitive: boolean
     }
     /** @enum {string} */
     ProjectStatus:
@@ -5444,20 +5403,6 @@ export interface components {
       grantee: string
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    RevokeTablePrivilegesBody: {
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     RunQueryBody: {
       query: string
@@ -5861,22 +5806,8 @@ export interface components {
       name: string
       schema: string
     }
-    TablePrivilege: {
-      grantee: string
-      grantor: string
-      is_grantable: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
     TargetClonedProject: {
+      name: string
       ref: string
     }
     TargetCloneStatus: {
@@ -6225,7 +6156,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: string
+      folder_id?: null
       id?: string
       name?: string
       owner_id?: number
@@ -6580,9 +6511,6 @@ export interface components {
     UpdateProjectBody: {
       name: string
     }
-    UpdateProjectSensitivityBody: {
-      is_sensitive: boolean
-    }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
       domains?: string[]
@@ -6770,7 +6698,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: string
+      folder_id?: null
       id: string
       name: string
       owner_id: number
@@ -6836,7 +6764,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite?: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -6852,7 +6780,7 @@ export interface components {
     UserContentObjectMeta: {
       description?: string
       favorite?: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -8066,7 +7994,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': Record<string, never>
         }
       }
       /** @description Failed to list available valid backups */
@@ -11147,94 +11075,6 @@ export interface operations {
       }
     }
   }
-  /** Retrieve table privileges */
-  TablePrivilegesController_getTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Grant table privileges */
-  TablePrivilegesController_grantTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GrantTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to grant table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Revoke table privileges */
-  TablePrivilegesController_revokeTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RevokeTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to revoke table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets project pg.tables or pg.table with the given ID */
   TablesController_getTables: {
     parameters: {
@@ -12862,7 +12702,7 @@ export interface operations {
         limit?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        visibility?: 'user' | 'project' | 'org' | 'public'
+        visibility?: ('user' | 'project' | 'org' | 'public')[]
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
         favorite?: boolean
@@ -12985,7 +12825,7 @@ export interface operations {
   ContentController_getContentCount: {
     parameters: {
       query?: {
-        visibility?: 'user' | 'project' | 'org' | 'public'
+        visibility?: ('user' | 'project' | 'org' | 'public')[]
         type?: 'sql' | 'report' | 'log_sql'
         favorite?: boolean
         name?: string
@@ -13014,7 +12854,7 @@ export interface operations {
         limit?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        visibility?: 'user' | 'project' | 'org' | 'public'
+        visibility?: ('user' | 'project' | 'org' | 'public')[]
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
       }
@@ -13710,30 +13550,29 @@ export interface operations {
       }
     }
   }
-  /** Update project's sensitivity settings */
-  SettingsController_patchProjectSensitivity: {
+  /** Updates the given project sensitivity */
+  SensitivityController_updateProjectSensitivity: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string
-      } 
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateProjectSensitivityBody']
+        'application/json': components['schemas']['MarkSensitiveBody']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectSensitivitySettingResponse']
+          'application/json': components['schemas']['ProjectSensitivityResponse']
         }
       }
-      /** @description Failed to update project's sensitivity setting */
-      404: {
+      403: {
         content: never
       }
-      /** @description Failed to update project's sensitivity setting */
+      /** @description Failed to update project */
       500: {
         content: never
       }

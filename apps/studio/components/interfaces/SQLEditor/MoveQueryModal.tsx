@@ -150,7 +150,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 visibility: snippet.visibility,
                 project_id: snippet.project_id,
                 owner_id: snippet.owner_id,
-                folder_id: selectedId === 'root' ? (null as any) : folderId,
+                folder_id: selectedId === 'root' ? null : folderId,
                 content: snippetContent as any,
               },
             })

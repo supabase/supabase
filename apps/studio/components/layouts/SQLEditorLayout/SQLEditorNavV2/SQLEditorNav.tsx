@@ -386,7 +386,7 @@ export const SQLEditorNav = ({
           payload: {
             ...snippet,
             visibility: action === 'share' ? 'project' : 'user',
-            folder_id: undefined,
+            folder_id: null,
             content: snippetContent,
           },
         },

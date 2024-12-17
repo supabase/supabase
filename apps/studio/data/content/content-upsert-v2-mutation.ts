@@ -9,8 +9,12 @@ import { contentKeys } from './keys'
 
 export type UpsertContentPayloadV2 = Omit<
   components['schemas']['UpsertContentBodyDto'],
-  'content'
+  'content' | 'folder_id'
 > & {
+  // [Joshen] Am not sure why but API codegen is typing folder_id as undefined | null
+  // although API docs on http://localhost:8080/api#tag/projects-content/PUT/platform/projects/{ref}/content
+  // shows that it's correctly typed as UUID | null, so manually fixing it here for now
+  folder_id?: string | null
   content: Content['content']
 }
 
@@ -61,7 +65,7 @@ export const useContentUpsertV2Mutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to insert content: ${data.message}`)
+          toast.error(`Failed to upsert content: ${data.message}`)
         } else {
           onError(data, variables, context)
         }
