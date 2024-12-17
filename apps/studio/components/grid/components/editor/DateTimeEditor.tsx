@@ -2,10 +2,21 @@ import dayjs from 'dayjs'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 
-import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import {
+  Button,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Popover_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+} from 'ui'
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { BlockKeys } from '../common/BlockKeys'
+import { ChevronDown } from 'lucide-react'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
@@ -100,9 +111,31 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
               <p className="text-xs text-foreground-light">Cancel changes</p>
             </div>
           </div>
-          <Button type="default" onClick={() => saveChanges(null)}>
-            Set NULL
-          </Button>
+          <div className="flex">
+            <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
+              Set NULL
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  icon={<ChevronDown />}
+                  className="px-1 rounded-l-none border-l-0"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-20" align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
+                    const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
+                    saveChanges(now)
+                  }}
+                >
+                  Set to NOW
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
