@@ -2936,7 +2936,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: null
+      folder_id?: null | string
       id?: string
       name: string
       owner_id?: number
@@ -6156,7 +6156,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: null
+      folder_id?: null | string
       id?: string
       name?: string
       owner_id?: number
@@ -6698,7 +6698,7 @@ export interface components {
       }
       description?: string
       /** Format: uuid */
-      folder_id?: null
+      folder_id?: null | string
       id: string
       name: string
       owner_id: number

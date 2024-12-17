@@ -9,12 +9,8 @@ import { contentKeys } from './keys'
 
 export type UpsertContentPayloadV2 = Omit<
   components['schemas']['UpsertContentBodyDto'],
-  'content' | 'folder_id'
+  'content'
 > & {
-  // [Joshen] Am not sure why but API codegen is typing folder_id as undefined | null
-  // although API docs on http://localhost:8080/api#tag/projects-content/PUT/platform/projects/{ref}/content
-  // shows that it's correctly typed as UUID | null, so manually fixing it here for now
-  folder_id?: string | null
   content: Content['content']
 }
 
