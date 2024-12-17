@@ -99,10 +99,11 @@ const RestoreToNewProject = () => {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error) => {
         // If the user doesn't have permission to read physical backups (or they are disabled), don't retry
         // This way we don't have to wait for 3 requests to finish.
-        if (error?.response?.status === 403) return false
+        if (typeof error === 'object' && error !== null && 'code' in error && error?.code === 403)
+          return false
         return failureCount < 3
       },
       onSuccess: (data) => {
