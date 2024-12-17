@@ -122,6 +122,7 @@ export const TimestampInfo = ({
     <Tooltip>
       <TooltipTrigger
         ref={triggerRef}
+        asChild
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
         <span>{timestampLabelFormatter(value, labelFormatter)}</span>
