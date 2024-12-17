@@ -37,7 +37,7 @@ export const BackupsList = ({ onSelectRestore }: BackupsListProps) => {
             return (
               <div className="flex p-4 gap-4" key={backup.id}>
                 <div>
-                  <TimestampInfo value={backup.inserted_at} />
+                  <TimestampInfo utcTimestamp={backup.inserted_at} />
                 </div>
                 <Badge>{JSON.stringify(backup.status).replaceAll('"', '')}</Badge>
                 {(backup.status as any) === 'COMPLETED' && (
