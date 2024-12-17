@@ -9,42 +9,45 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { ProjectPageNavigation } from '../AuthLayout/ProjectPageNavigation'
+import { useParams } from 'common'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
-const DatabaseProductMenu = () => {
-  const project = useSelectedProject()
+// const DatabaseProductMenu = () => {
+//   const project = useSelectedProject()
 
-  const router = useRouter()
-  const page = router.pathname.split('/')[4]
+//   const router = useRouter()
+//   const page = router.pathname.split('/')[4]
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
+//   const { data } = useDatabaseExtensionsQuery({
+//     projectRef: project?.ref,
+//     connectionString: project?.connectionString,
+//   })
+//   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
-  const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
-  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
+//   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
+//   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
+//   const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
-  return (
-    <>
-      <ProductMenu
-        page={page}
-        menu={generateDatabaseMenu(project, {
-          pgNetExtensionExists,
-          pitrEnabled,
-          columnLevelPrivileges,
-        })}
-      />
-    </>
-  )
-}
+//   return (
+//     <>
+//       <ProductMenu
+//         page={page}
+//         menu={generateDatabaseMenu(project.ref as string, {
+//           pgNetExtensionExists,
+//           pitrEnabled,
+//           columnLevelPrivileges,
+//         })}
+//       />
+//     </>
+//   )
+// }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  const { ref } = useParams()
   return (
     <ProjectLayout
       product="Database"

@@ -9,6 +9,7 @@ import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import ProjectLayout from '../ProjectLayout/ProjectLayout'
 import StorageMenu from './StorageMenu'
+import { ProjectPageNavigation } from '../AuthLayout/ProjectPageNavigation'
 
 export interface StorageLayoutProps {
   title: string
@@ -48,7 +49,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
   return (
     <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
-      {children}
+      <ProjectPageNavigation navKey="storage">{children}</ProjectPageNavigation>
     </ProjectLayout>
   )
 }

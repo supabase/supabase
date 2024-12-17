@@ -54,19 +54,24 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
 
+  const databaseMenu = generateDatabaseMenu(ref as string)
+  const authMenu = generateAuthMenu(ref as string)
+
   return [
     {
       key: 'database',
       label: 'Database',
       icon: <Database size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link:
-        ref &&
-        (isProjectBuilding
-          ? buildingUrl
-          : isProjectActive
-            ? `/project/${ref}/database/schemas`
-            : `/project/${ref}/database/backups/scheduled`),
-      items: generateDatabaseMenu(ref as string),
+        // ref
+        //  &&
+        // (isProjectBuilding
+        //   ? buildingUrl
+        //   : isProjectActive
+        // ?
+        `/project/${ref}/database/schemas`,
+      // : `/project/${ref}/database/backups/scheduled`),
+      items: databaseMenu,
     },
     ...(authEnabled
       ? [
@@ -75,7 +80,7 @@ export const generateProductRoutes = (
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
-            items: generateAuthMenu(ref as string),
+            // items: authMenu,
           },
         ]
       : []),

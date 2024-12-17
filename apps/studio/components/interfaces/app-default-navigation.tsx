@@ -200,30 +200,32 @@ export function AppDefaultNavigation() {
 
 function NavLink({ route, active }: { route: any; active?: boolean }) {
   const router = useRouter()
-  const hasItems = route.items && route.items.some((section) => section.items.length > 0)
+  // const hasItems = route.items && route.items.some((section) => section.items.length > 0)
   const [open, setOpen] = useState(false)
 
-  // if (!hasItems) {
-  return (
-    <SidebarMenuItem key={route.key}>
-      <SidebarMenuButton
-        asChild
-        isActive={active}
-        className="text-sm [&_svg]:opacity-50"
-        size={'sm'}
-      >
-        <Link href={route.link ?? ''}>
-          {route.icon}
-          {route.label}
-        </Link>
-      </SidebarMenuButton>
-    </SidebarMenuItem>
-  )
-  // }
+  // console.log('route', route)
+
+  if (!route.items) {
+    return (
+      <SidebarMenuItem key={route.key}>
+        <SidebarMenuButton
+          asChild
+          isActive={active}
+          className="text-sm [&_svg]:opacity-50"
+          size={'sm'}
+        >
+          <Link href={route.link ?? ''}>
+            {route.icon}
+            {route.label}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
 
   return (
     <Collapsible_Shadcn_ className="group/collapsible" open={open} onOpenChange={setOpen}>
-      <SidebarMenuItem key={route.key}>
+      <SidebarMenuItem>
         <CollapsibleTrigger_Shadcn_ asChild>
           <SidebarMenuButton
             className="text-sm flex items-center [&_svg]:opacity-50 data-[active=true]>[&>svg]:opacity-100"
@@ -247,25 +249,16 @@ function NavLink({ route, active }: { route: any; active?: boolean }) {
             style={{ overflow: 'hidden' }}
           >
             <SidebarMenuSub className="gap-0.5">
-              {route.items.map((item) =>
-                item.items
-                  .filter((x) => {
-                    if (!x.rightIcon) {
-                      return x
-                    }
-                  })
-                  .map((subItem) => (
-                    <SidebarMenuSubItem key={subItem.key}>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={router.asPath === subItem.url}
-                        size="sm"
-                      >
-                        <Link href={subItem.url ?? ''}>{subItem.name}</Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  ))
-              )}
+              {route.items.map((item, i) => {
+                // console.log('item', item)
+                return (
+                  <SidebarMenuSubItem key={`${item.key}-${i}`}>
+                    <SidebarMenuSubButton asChild isActive={router.asPath === item.link} size="md">
+                      <Link href={item.link ?? '/wrong-url'}>{item.title}</Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                )
+              })}
             </SidebarMenuSub>
           </motion.div>
         </CollapsibleContent_Shadcn_>
@@ -303,11 +296,12 @@ function ProjectLinks() {
   const otherRoutes = generateOtherRoutes(ref, project)
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
-  console.log(productRoutes)
+  // console.log(productRoutes)
 
   return (
     <SidebarMenu className="gap-[2px]">
       <NavLink
+        key="home"
         active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
         route={{
           key: 'HOME',
@@ -317,25 +311,25 @@ function ProjectLinks() {
           linkElement: <ProjectIndexPageLink projectRef={ref} />,
         }}
       />
-      {toolRoutes.map((route) => (
-        <NavLink key={route.key} route={route} active={activeRoute === route.key} />
+      {toolRoutes.map((route, i) => (
+        <NavLink key={`tools-routes-${i}`} route={route} active={activeRoute === route.key} />
       ))}
       <Separator className="my-1 bg-border-muted" />
       <span className="text-foreground-muted text-xs uppercase font-mono text-[12px] px-1.5 mt-2 tracking-wider">
         products
       </span>
-      {productRoutes.map((route) => (
-        <NavLink key={route.key} route={route} active={activeRoute === route.key} />
+      {productRoutes.map((route, i) => (
+        <NavLink key={`product-routes-${i}`} route={route} active={activeRoute === route.key} />
       ))}
       <Separator className="my-1 bg-border-muted" />
       <span className="text-foreground-muted text-xs uppercase font-mono text-[12px] px-1.5 mt-2 tracking-wider">
         develop
       </span>
-      {otherRoutes.map((route) => (
-        <NavLink key={route.key} route={route} active={activeRoute === route.key} />
+      {otherRoutes.map((route, i) => (
+        <NavLink key={`other-routes-${i}`} route={route} active={activeRoute === route.key} />
       ))}
-      {settingsRoutes.map((route) => (
-        <NavLink key={route.key} route={route} active={activeRoute === route.key} />
+      {settingsRoutes.map((route, i) => (
+        <NavLink key={`settings-routes-${i}`} route={route} active={activeRoute === route.key} />
       ))}
     </SidebarMenu>
   )

@@ -184,7 +184,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
       className="
         bg-studio
         border-overlay flex
-        h-full w-full flex-col rounded-md border"
+        h-full w-full flex-col"
     >
       {selectedItems.length === 0 ? (
         <FileExplorerHeader

@@ -11,6 +11,8 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
+import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
+import { ProjectPageNavigation } from 'components/layouts/AuthLayout/ProjectPageNavigation'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const snap = useTableEditorStateSnapshot()
@@ -50,7 +52,9 @@ const DatabaseTables: NextPageWithLayout = () => {
 DatabaseTables.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout>
-      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+      <DatabaseLayout title="Database">
+        <ProjectPageNavigation navKey="postgres-items">{page}</ProjectPageNavigation>
+      </DatabaseLayout>
     </DefaultLayout>
   </AppLayout>
 )
