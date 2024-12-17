@@ -1,12 +1,10 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { Search } from 'lucide-react'
-import { useState } from 'react'
-
-import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
 import Policies from 'components/interfaces/Auth/Policies/Policies'
+import { PolicyEditorPanel } from 'components/interfaces/Auth/Policies/PolicyEditorPanel'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
 import { DocsButton } from 'components/ui/DocsButton'
@@ -19,6 +17,9 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
 import { useUrlState } from 'hooks/ui/useUrlState'
 import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
+import { partition } from 'lodash'
+import { Search } from 'lucide-react'
+import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { Input } from 'ui'
 
@@ -174,9 +175,13 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 }
 
 AuthPoliciesPage.getLayout = (page) => (
-  <AuthLayout title="Auth">
-    <div className="h-full p-4">{page}</div>
-  </AuthLayout>
+  <AppLayout>
+    <DefaultLayout>
+      <AuthLayout title="Auth">
+        <div className="h-full p-4">{page}</div>
+      </AuthLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default AuthPoliciesPage

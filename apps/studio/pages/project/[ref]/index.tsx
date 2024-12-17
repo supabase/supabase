@@ -28,6 +28,8 @@ import {
   TooltipTrigger_Shadcn_,
 } from 'ui'
 import { InlineLink } from 'components/ui/InlineLink'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const Home: NextPageWithLayout = () => {
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -148,6 +150,12 @@ const Home: NextPageWithLayout = () => {
   )
 }
 
-Home.getLayout = (page) => <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+Home.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <ProjectLayoutWithAuth>{page}</ProjectLayoutWithAuth>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default Home

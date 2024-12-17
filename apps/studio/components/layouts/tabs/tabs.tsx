@@ -104,6 +104,7 @@ const SortableTab = ({
         )}
         {...listeners}
       >
+        {/* <div className="w-1 h-0.5 bg-brand opacity-0 group-data-[state=active]:opacity-100" /> */}
         <EntityTypeIcon type={tab.type} />
         <div className="flex items-center gap-0">
           <AnimatePresence mode="popLayout" initial>

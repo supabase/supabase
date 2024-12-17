@@ -11,6 +11,9 @@ import { useRouter } from 'next/router'
 import { editorEntityTypes, getTabsStore } from 'state/tabs'
 import type { NextPageWithLayout } from 'types'
 import EmptyState from 'components/interfaces/TableGridEditor/EmptyState'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -48,11 +51,17 @@ const TableEditorPage: NextPageWithLayout = () => {
 }
 
 TableEditorPage.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
-    <EditorBaseLayout productMenu={<TableEditorMenu />} product="Table Editor">
-      <TableEditorLayout>{page}</TableEditorLayout>
-    </EditorBaseLayout>
-  </ProjectContextFromParamsProvider>
+  <AppLayout>
+    <DefaultLayout>
+      <ProjectLayoutWithAuth productMenu={<TableEditorMenu />} product="Table Editor">
+        <EditorBaseLayout>
+          <TableEditorLayout>
+            <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
+          </TableEditorLayout>
+        </EditorBaseLayout>
+      </ProjectLayoutWithAuth>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default TableEditorPage

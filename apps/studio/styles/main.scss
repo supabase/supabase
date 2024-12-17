@@ -42,7 +42,7 @@ html,
 body,
 #__next,
 .main {
-  @apply bg-studio relative;
+  @apply bg relative;
   @apply text-foreground;
   @apply overflow-x-clip;
   -moz-osx-font-smoothing: grayscale;

@@ -1,4 +1,6 @@
 import { AuditLogs } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -14,5 +16,11 @@ const OrgAuditLogs: NextPageWithLayout = () => {
   )
 }
 
-OrgAuditLogs.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgAuditLogs.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <OrganizationLayout>{page}</OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 export default OrgAuditLogs

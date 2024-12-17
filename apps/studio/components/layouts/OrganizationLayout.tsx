@@ -1,5 +1,3 @@
-import type { PropsWithChildren } from 'react'
-
 import { useParams } from 'common'
 import PartnerIcon from 'components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from 'components/ui/PartnerManagedResource'
@@ -9,9 +7,12 @@ import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
+import type { PropsWithChildren } from 'react'
 import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
 import AccountLayout from './AccountLayout/AccountLayout'
+import DefaultLayout from './DefaultLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
+import { AnimatePresence, motion } from 'framer-motion'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
@@ -26,6 +27,10 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   })
 
   const navMenuItems = [
+    {
+      label: 'Projects',
+      href: `/org/${slug}`,
+    },
     {
       label: 'General',
       href: `/org/${slug}/general`,
@@ -68,15 +73,18 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
 
   return (
-    <AccountLayout
-      title={selectedOrganization?.name ?? 'Supabase'}
-      breadcrumbs={[{ key: `org-settings`, label: 'Settings' }]}
-    >
-      <ScaffoldHeader className="pb-0">
-        <ScaffoldContainer id="billing-page-top">
-          <ScaffoldTitle className="pb-3">
-            {selectedOrganization?.name ?? 'Organization'} settings
-          </ScaffoldTitle>
+    <div className="w-full">
+      <AnimatePresence>
+        <motion.div
+          className="px-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{
+            duration: 0.2,
+            ease: 'easeOut',
+          }}
+        >
           <NavMenu className="border-none" aria-label="Organization menu navigation">
             {filteredNavMenuItems.map((item) => (
               <NavMenuItem key={item.label} active={currentPath === item.href}>
@@ -84,10 +92,19 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
               </NavMenuItem>
             ))}
           </NavMenu>
-        </ScaffoldContainer>
-      </ScaffoldHeader>
+        </motion.div>
+      </AnimatePresence>
 
-      <ScaffoldDivider />
+      {/* <ScaffoldDivider /> */}
+      <motion.div
+        layoutId="layout-header-bottom-border"
+        className="bg-border h-px w-full"
+        initial={false}
+        transition={{
+          duration: 0.15, // Faster duration
+          ease: 'easeOut',
+        }}
+      />
 
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
         <ScaffoldContainer className="mt-8">
@@ -106,7 +123,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
       )}
 
       {children}
-    </AccountLayout>
+    </div>
   )
 }
 

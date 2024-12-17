@@ -2,11 +2,14 @@ import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common/hooks/useParams'
 import { useFeaturePreviewContext } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { SQLEditor } from 'components/interfaces/SQLEditor/SQLEditor'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { EditorBaseLayout } from 'components/layouts/editors/editor-base-layout'
 import {
   ProjectContextFromParamsProvider,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import SQLEditorLayout from 'components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from 'components/layouts/SQLEditorLayout/SQLEditorMenu'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
@@ -196,11 +199,17 @@ const SqlEditor: NextPageWithLayout = () => {
 }
 
 SqlEditor.getLayout = (page) => (
-  <ProjectContextFromParamsProvider>
-    <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
-      <SQLEditorLayout>{page}</SQLEditorLayout>
-    </EditorBaseLayout>
-  </ProjectContextFromParamsProvider>
+  <AppLayout>
+    <DefaultLayout>
+      <ProjectLayoutWithAuth productMenu={<SQLEditorMenu />} product="SQL Editor">
+        <EditorBaseLayout productMenu={<SQLEditorMenu />} product="SQL Editor">
+          <SQLEditorLayout>
+            <ProjectContextFromParamsProvider>{page}</ProjectContextFromParamsProvider>
+          </SQLEditorLayout>
+        </EditorBaseLayout>
+      </ProjectLayoutWithAuth>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 export default SqlEditor

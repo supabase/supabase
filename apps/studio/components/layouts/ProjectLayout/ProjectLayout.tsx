@@ -8,15 +8,16 @@ import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustio
 import { AnimatePresence, motion } from 'framer-motion'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { withAuth } from 'hooks/misc/withAuth'
 import { useActionKey } from 'hooks/useActionKey'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, PROJECT_STATUS } from 'lib/constants'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 import { useSnapshot } from 'valtio'
-import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import { useEditorType } from '../editors/editors-layout.hooks'
 import { sidebarState } from '../tabs/sidebar-state'
@@ -25,6 +26,7 @@ import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
+import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
 import ProductMenuBar from './ProductMenuBar'
@@ -34,9 +36,7 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import { ProjectPausedState } from './PausedState/ProjectPausedState'
-import { withAuth } from 'hooks/misc/withAuth'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { ProjectNavigationBarHorizontal } from './NavigationBar/navigation-bar-horizontal'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -172,10 +172,11 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex flex-col h-screen w-screen">
-          {!hideHeader && IS_PLATFORM && <LayoutHeader />}
-          <div className="flex h-full flex-row grow overflow-y-auto">
-            {!hideIconBar && <NavigationBar />}
+        <div className="flex flex-row h-full w-screen">
+          {/* <ProjectNavigationBarHorizontal /> */}
+          {/* <div className="flex h-full flex-row flex-grow gap-1"> */}
+          {!hideIconBar && <NavigationBar />}
+          <div className={cn('border-l w-full rounded-tl-[7px] flex-row grow overflow-y-auto')}>
             <ResizablePanelGroup
               className="flex h-full"
               direction="horizontal"
@@ -186,7 +187,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   order={1}
                   id="panel-left"
                   className={cn(
-                    'transition-all duration-[120ms]',
+                    'transition-all duration-[120ms] border-t',
                     sideBarIsOpen
                       ? resizableSidebar
                         ? 'min-w-64 max-w-[32rem]'
@@ -220,11 +221,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               )}
               <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
                 <ResizablePanelGroup
-                  className="h-full w-full overflow-x-hidden flex-1"
+                  className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-1"
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className="w-full min-w-[600px]">
+                  <ResizablePanel
+                    id="panel-content"
+                    className={cn(
+                      'w-full min-w-[600px] border-t bg-dash-sidebar',
+                      aiAssistantPanel.open && 'border-r rounded-tr-[7px]'
+                    )}
+                  >
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}
@@ -247,13 +254,17 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   </ResizablePanel>
                   {isClient && aiAssistantPanel.open && (
                     <>
-                      <ResizableHandle />
+                      <ResizableHandle
+                        withHandle
+                        className="opacity-0 focus-within:opacity-100 hover:opacity-100"
+                      />
                       <ResizablePanel
                         id="panel-assistant"
                         className={cn(
                           'bg absolute right-0 top-[48px] bottom-0 xl:relative xl:top-0',
                           'min-w-[400px] max-w-[500px]',
-                          '2xl:min-w-[500px] 2xl:max-w-[600px]'
+                          '2xl:min-w-[500px] 2xl:max-w-[600px]',
+                          'border-l border-t rounded-tl-[7px]'
                         )}
                       >
                         <AIAssistantPanel />
@@ -264,6 +275,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               </ResizablePanel>
             </ResizablePanelGroup>
           </div>
+          {/* </div> */}
         </div>
         <EnableBranchingModal />
         <AISettingsModal />

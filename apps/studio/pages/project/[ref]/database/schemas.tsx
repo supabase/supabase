@@ -1,7 +1,8 @@
-import { ReactFlowProvider } from 'reactflow'
-
 import { SchemaGraph } from 'components/interfaces/Database/Schemas/SchemaGraph'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import { ReactFlowProvider } from 'reactflow'
 import type { NextPageWithLayout } from 'types'
 
 const SchemasPage: NextPageWithLayout = () => {
@@ -14,6 +15,12 @@ const SchemasPage: NextPageWithLayout = () => {
   )
 }
 
-SchemasPage.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+SchemasPage.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default SchemasPage

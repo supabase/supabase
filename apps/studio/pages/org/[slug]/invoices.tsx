@@ -1,4 +1,6 @@
 import { InvoicesSettings } from 'components/interfaces/Organization'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
@@ -20,5 +22,11 @@ const OrgInvoices: NextPageWithLayout = () => {
   )
 }
 
-OrgInvoices.getLayout = (page) => <OrganizationLayout>{page}</OrganizationLayout>
+OrgInvoices.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <OrganizationLayout>{page}</OrganizationLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 export default OrgInvoices

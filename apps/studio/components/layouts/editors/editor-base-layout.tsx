@@ -30,21 +30,21 @@ export const EditorBaseLayout = ({ children, title, product, ...props }: Explore
   // end of tabs preview flag logic
 
   return (
-    <ProjectLayoutWithAuth resizableSidebar={true} title={title} product={product} {...props}>
-      <div className="flex flex-col h-full">
-        {tableEditorTabsEnabled || sqlEditorTabsEnabled ? (
-          <div
-            className={cn(
-              'h-10 flex items-center',
-              !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
-            )}
-          >
-            {hideTabs && <CollapseButton hideTabs={hideTabs} />}
-            {!hideTabs && <Tabs />}
-          </div>
-        ) : null}
-        <div className="h-full">{children}</div>
-      </div>
-    </ProjectLayoutWithAuth>
+    // <ProjectLayoutWithAuth resizableSidebar={true} title={title} product={product} {...props}>
+    <div className="flex flex-col h-full">
+      {tableEditorTabsEnabled || sqlEditorTabsEnabled ? (
+        <div
+          className={cn(
+            'h-10 flex items-center',
+            !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
+          )}
+        >
+          {hideTabs && <CollapseButton hideTabs={hideTabs} />}
+          {!hideTabs && <Tabs />}
+        </div>
+      ) : null}
+      <div className="h-full">{children}</div>
+    </div>
+    // </ProjectLayoutWithAuth>
   )
 }

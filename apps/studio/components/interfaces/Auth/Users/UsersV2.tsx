@@ -191,8 +191,7 @@ export const UsersV2 = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-      <div className="bg-surface-200 py-3 px-6 flex items-center justify-between border-t">
+      <div className="py-3 px-5 flex items-center justify-between">
         <div className="flex items-center gap-x-2">
           <Input
             size="tiny"

@@ -25,11 +25,7 @@ import {
 } from 'ui'
 import PartnerIcon from 'components/ui/PartnerIcon'
 
-interface OrganizationDropdownProps {
-  isNewNav?: boolean
-}
-
-const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) => {
+const OrganizationDropdown = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
@@ -52,7 +48,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
         <PopoverTrigger_Shadcn_ asChild>
           <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
             <div className="flex items-center space-x-2">
-              <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
+              <p className={'text-sm'}>{orgName}</p>
               {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
             </div>
           </Button>
@@ -65,11 +61,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
               <CommandGroup_Shadcn_>
                 <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
                   {organizations?.map((org) => {
-                    const href = router.pathname.includes('[slug]')
-                      ? router.pathname.replace('[slug]', org.slug)
-                      : isNewNav
-                        ? `/org/${org.slug}`
-                        : `/org/${org.slug}/general`
+                    const href = `/org/${org.slug}`
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}
