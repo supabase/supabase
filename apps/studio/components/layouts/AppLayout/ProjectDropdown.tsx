@@ -119,10 +119,13 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   return IS_PLATFORM ? (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-          <div className="flex items-center space-x-2">
-            <p className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</p>
-          </div>
+        <Button
+          type="default"
+          className="pr-2 justify-start [&_span]:w-full [&_span]:text-left"
+          iconRight={<ChevronsUpDown />}
+          block
+        >
+          {selectedProject?.name}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">

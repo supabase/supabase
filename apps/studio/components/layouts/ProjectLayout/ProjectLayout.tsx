@@ -172,11 +172,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
-        <div className="flex flex-row h-full w-screen">
+        <div className="flex flex-row h-full w-full">
           {/* <ProjectNavigationBarHorizontal /> */}
           {/* <div className="flex h-full flex-row flex-grow gap-1"> */}
-          {!hideIconBar && <NavigationBar />}
-          <div className={cn('border-l w-full rounded-tl-[7px] flex-row grow overflow-y-auto')}>
+          {/* {!hideIconBar && <NavigationBar />} */}
+          <div
+            className={cn(
+              'border-l w-full rounded-tl-[7px] rounded-bl-[7px] border-t border-b overflow-hidden flex-row grow overflow-y-auto'
+            )}
+          >
             <ResizablePanelGroup
               className="flex h-full"
               direction="horizontal"
@@ -187,7 +191,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   order={1}
                   id="panel-left"
                   className={cn(
-                    'transition-all duration-[120ms] border-t',
+                    'transition-all duration-[120ms]',
                     sideBarIsOpen
                       ? resizableSidebar
                         ? 'min-w-64 max-w-[32rem]'
@@ -228,7 +232,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   <ResizablePanel
                     id="panel-content"
                     className={cn(
-                      'w-full min-w-[600px] border-t bg-dash-sidebar',
+                      'w-full min-w-[600px] bg-dash-sidebar',
                       aiAssistantPanel.open && 'border-r rounded-tr-[7px]'
                     )}
                   >

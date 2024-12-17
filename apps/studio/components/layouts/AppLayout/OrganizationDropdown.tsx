@@ -46,14 +46,19 @@ const OrganizationDropdown = () => {
     <div className="flex items-center">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="text" className="pr-2" iconRight={<ChevronsUpDown />}>
-            <div className="flex items-center space-x-2">
-              <p className={'text-sm'}>{orgName}</p>
-              {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
-            </div>
+          <Button type="default" className="pr-2" iconRight={<ChevronsUpDown />}>
+            {orgName}
+            {/* <div className="flex items-center space-x-2"> */}
+            {/* <p className={''}>{orgName}</p> */}
+            {/* {isSuccess && (
+                <Badge variant="default" size={'small'}>
+                  {subscription?.plan.name}
+                </Badge>
+              )} */}
+            {/* </div> */}
           </Button>
         </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        <PopoverContent_Shadcn_ className="p-0" side="right" align="start">
           <Command_Shadcn_>
             <CommandInput_Shadcn_ placeholder="Find organization..." />
             <CommandList_Shadcn_>

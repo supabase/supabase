@@ -30,9 +30,9 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full border px-0 w-8 h-8" asChild>
+      <DropdownMenuTrigger className="rounded-full border px-0 w-7 h-7 flex-shrink-0" asChild>
         <Button type="default">
-          <User size={18} strokeWidth={1.5} />
+          <User size={16} strokeWidth={1.5} />
         </Button>
       </DropdownMenuTrigger>
 

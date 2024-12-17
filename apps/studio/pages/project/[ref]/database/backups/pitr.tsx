@@ -22,6 +22,8 @@ import { PROJECT_STATUS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
 import { Admonition } from 'ui-patterns'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -42,7 +44,11 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
 }
 
 DatabasePhysicalBackups.getLayout = (page) => (
-  <DatabaseLayout title="Database">{page}</DatabaseLayout>
+  <AppLayout>
+    <DefaultLayout>
+      <DatabaseLayout title="Database">{page}</DatabaseLayout>
+    </DefaultLayout>
+  </AppLayout>
 )
 
 const PITR = () => {

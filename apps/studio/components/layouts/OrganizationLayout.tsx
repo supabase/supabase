@@ -74,7 +74,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <div className="w-full">
-      <AnimatePresence>
+      {/* <AnimatePresence>
         <motion.div
           className="px-10"
           initial={{ opacity: 0, y: -20 }}
@@ -93,10 +93,10 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             ))}
           </NavMenu>
         </motion.div>
-      </AnimatePresence>
+      </AnimatePresence> */}
 
       {/* <ScaffoldDivider /> */}
-      <motion.div
+      {/* <motion.div
         layoutId="layout-header-bottom-border"
         className="bg-border h-px w-full"
         initial={false}
@@ -104,7 +104,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
           duration: 0.15, // Faster duration
           ease: 'easeOut',
         }}
-      />
+      /> */}
 
       {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
         <ScaffoldContainer className="mt-8">
