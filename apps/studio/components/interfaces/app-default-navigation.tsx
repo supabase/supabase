@@ -24,6 +24,7 @@ import {
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
+  Separator,
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -123,6 +124,7 @@ export function AppDefaultNavigation() {
         </SidebarHeader>
         <SidebarContent className="px-3">
           {isProjects ? <ProjectLinks /> : <OrganizationLinks />}
+          <Separator />
           <AnimatePresence>
             {ref && (
               <motion.div
@@ -140,7 +142,7 @@ export function AppDefaultNavigation() {
             )}
             {connectDialogUpdate && ref && (
               <motion.div
-                className="flex flex-col"
+                className="px-3"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -149,7 +151,9 @@ export function AppDefaultNavigation() {
                   ease: 'easeOut',
                 }}
               >
-                <Connect />
+                <div>
+                  <Connect />
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
