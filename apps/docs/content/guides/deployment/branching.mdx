@@ -41,7 +41,7 @@ To manage code changes, your Supabase project must be connected to a Git reposit
 
 Supabase Branching uses the Supabase GitHub integration to read files from your GitHub repository. With this integration, Supabase watches all commits, branches, and pull requests of your GitHub repository.
 
-You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created and configured based on the [`config.toml`](/docs/guides/local-development/cli/config) configuration on this branch, the migrations in the Git branch of that Preview Branch are run on the Preview Branch.
+You can create a corresponding Preview Branch for any Git branch in your repository. Each time a new Preview Branch is created and configured based on the [`config.toml`](/docs/guides/local-development/cli/config) configuration on this branch, the migrations from the corresponding Git branch are run on the Preview Branch.
 
 The Preview Branch is also [seeded](/docs/guides/local-development/seeding-your-database) with sample data based on `./supabase/seed.sql` by default, if that file exists.
 
