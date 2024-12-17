@@ -12702,7 +12702,7 @@ export interface operations {
         limit?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        visibility?: ('user' | 'project' | 'org' | 'public')[]
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
         favorite?: boolean
@@ -12825,7 +12825,7 @@ export interface operations {
   ContentController_getContentCount: {
     parameters: {
       query?: {
-        visibility?: ('user' | 'project' | 'org' | 'public')[]
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
         favorite?: boolean
         name?: string
@@ -12854,7 +12854,7 @@ export interface operations {
         limit?: string
         sort_by?: 'name' | 'inserted_at'
         sort_order?: 'asc' | 'desc'
-        visibility?: ('user' | 'project' | 'org' | 'public')[]
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
         name?: string
       }
