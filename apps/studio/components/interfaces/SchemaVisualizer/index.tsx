@@ -3,7 +3,7 @@ import { PostgresMetaBase, PostgresTable, wrapError, wrapResult } from '@gregnr/
 import dagre from '@dagrejs/dagre'
 import { Edge, Node, Position, ReactFlowProvider } from 'reactflow'
 import { useEffect, useRef, useState } from 'react'
-import { SchemaFlow } from 'components/interfaces/ProjectCreation/design/SchemaFlow'
+import { SchemaFlow } from 'components/interfaces/ProjectCreation/SchemaFlow'
 
 export const TABLE_NODE_WIDTH = 640
 export const TABLE_NODE_ROW_HEIGHT = 80
@@ -133,10 +133,6 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
 }
 
 // Helper functions
-
-function arraysEqual(a: string[], b: string[]): boolean {
-  return a.length === b.length && a.every((val, index) => val === b[index])
-}
 
 async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
   nodes: Node<TableNodeData>[]

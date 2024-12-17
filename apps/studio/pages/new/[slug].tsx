@@ -4,7 +4,7 @@ import { useChat } from 'ai/react'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import { debounce } from 'lodash'
-import { ArrowUp, ExternalLink, Settings } from 'lucide-react'
+import { ArrowUp, ChevronLeft, ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -164,6 +164,7 @@ const WizardForm = ({
   const [showAdvanced, setShowAdvanced] = useState<Boolean>(false)
   const [services, setServices] = useState<SupabaseService[]>([])
   const [sqlStatements, setSqlStatements] = useState<string[]>([])
+  const [showVisual, setShowVisual] = useState(false)
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -432,19 +433,25 @@ const WizardForm = ({
     return null
   }, [form.getValues('dbRegion')])
 
-  if (aiDescription && sqlStatements.length === 0)
-    return (
-      <div className="h-full w-full flex items-center justify-center">
-        <LogoLoader />
-      </div>
-    )
-
   return (
     <div className="flex lg:flex-row flex-col w-full overflow-auto h-screen items-start">
+      <AnimatePresence>
+        {aiDescription && sqlStatements.length === 0 && (
+          <motion.div
+            initial={false}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 bg-background z-20 flex items-center justify-center"
+          >
+            <LogoLoader />
+          </motion.div>
+        )}
+      </AnimatePresence>
       <Form_Shadcn_ {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full lg:max-w-[600px] p-16 lg:p-24 lg:pr-0 min-h-screen flex items-center"
+          className="w-full lg:max-w-[600px] p-16 lg:p-24 lg:pr-0 min-h-screen lg:flex lg:items-center"
         >
           <section className="relative">
             <div>
@@ -585,6 +592,15 @@ const WizardForm = ({
                               }
                             }}
                           />
+                          {sqlStatements.length > 0 && (
+                            <Button
+                              type="default"
+                              className="w-full mt-2 lg:hidden"
+                              onClick={() => setShowVisual(!showVisual)}
+                            >
+                              View the schema
+                            </Button>
+                          )}
                         </div>
                         <div>
                           {!showAdvanced && (
@@ -994,7 +1010,14 @@ const WizardForm = ({
           </section>
         </form>
       </Form_Shadcn_>
-      <section className="fixed inset-0 bg-background-200 lg:bg-transparent z-10 lg:flex-1 flex-0 shrink-0 w-full lg:h-screen overflow-hidden lg:sticky lg:top-0 order-first lg:order-none">
+      <section
+        className={cn(
+          'bg-background-200 lg:bg-transparent lg:z-10 lg:flex-1 flex-0 shrink-0 w-full lg:h-screen overflow-hidden',
+          // Mobile styles
+          'lg:sticky lg:top-0', // Always relative on desktop
+          showVisual ? 'fixed inset-0 z-40' : 'hidden lg:block' // Toggle visibility on mobile
+        )}
+      >
         <ProjectVisual
           sqlStatements={sqlStatements}
           services={services}
@@ -1007,6 +1030,18 @@ const WizardForm = ({
           }}
           instanceLabel={instanceLabel}
         />
+
+        {/* Add close button when showing visual on mobile */}
+        {showVisual && (
+          <Button
+            type="default"
+            iconLeft={ChevronLeft}
+            className="absolute top-4 left-4 lg:hidden"
+            onClick={() => setShowVisual(false)}
+          >
+            Back
+          </Button>
+        )}
       </section>
     </div>
   )
@@ -1048,7 +1083,7 @@ const Wizard: NextPageWithLayout = () => {
     <>
       <Link
         href="/projects"
-        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default"
+        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default z-30"
       >
         <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
       </Link>

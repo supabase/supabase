@@ -49,7 +49,7 @@ export const ProjectVisual = ({
             duration: 1.25,
             ease: 'easeInOut',
           }}
-          className={`absolute z-30 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
+          className={`hidden lg:block absolute z-30 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
           initial={false}
           animate={
             sqlStatements.length > 0
@@ -136,7 +136,7 @@ export const ProjectVisual = ({
         <motion.div
           layout
           layoutId="globe"
-          className="absolute z-10 pointer-events-none aspect-square right-0"
+          className="hidden lg:block absolute z-10 pointer-events-none aspect-square right-0"
           initial={false}
           animate={{
             x: sqlStatements.length > 0 ? '25%' : '25%',
