@@ -27,6 +27,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { Admonition } from 'ui-patterns'
 
 interface CreateCredentialModalProps {
   visible: boolean
@@ -156,6 +157,13 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <DialogSectionSeparator />
             <Form_Shadcn_ {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
+                {/* [Joshen TODO] This needs to be dynamic */}
+                <Admonition
+                  type="default"
+                  title="Connections to Storage via S3 protocol is currently disabled"
+                  description="Enable connections via S3 protocol before using your new access key"
+                  className="border-t-0 border-x-0 rounded-none"
+                />
                 <DialogSection>
                   <FormField
                     name="description"

@@ -8,6 +8,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import AlertError from 'components/ui/AlertError'
+import { InlineLink } from 'components/ui/InlineLink'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -35,7 +36,6 @@ import {
 } from 'ui'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
-import { Markdown } from 'components/interfaces/Markdown'
 
 interface StorageSettingsState {
   fileSizeLimit: number
@@ -153,7 +153,7 @@ const StorageSettings = () => {
       {isSuccess && (
         <form id={formId} className="" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="bg-surface-100  overflow-hidden border-muted rounded-md border shadow">
-            <div className="flex flex-col gap-0 divide-y divide-border-muted">
+            <div className="flex flex-col gap-0 divide-y divide-border">
               <div className="grid grid-cols-12 gap-6 px-8 py-8 lg:gap-12">
                 <div className="relative flex flex-col col-span-12 gap-6 lg:col-span-4">
                   <p className="text-sm">Upload file size limit</p>
@@ -251,7 +251,13 @@ const StorageSettings = () => {
                       )}
                     />
                   </div>
-                  <Markdown content="Optimize and resize images on the fly. [Learn more](https://supabase.com/docs/guides/storage/serving/image-transformations)." />
+                  <p className="text-sm text-foreground-light">
+                    Optimize and resize images on the fly.{' '}
+                    <InlineLink href="https://supabase.com/docs/guides/storage/serving/image-transformations">
+                      Learn more
+                    </InlineLink>
+                    .
+                  </p>
                 </div>
               </div>
             </div>
