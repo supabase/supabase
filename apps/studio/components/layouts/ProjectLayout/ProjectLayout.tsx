@@ -182,7 +182,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             )}
           >
             <ResizablePanelGroup
-              className="flex h-full"
+              className="flex h-full w-full"
               direction="horizontal"
               autoSaveId="project-layout"
             >
@@ -223,7 +223,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
               {showProductMenu && productMenu && sideBarIsOpen && (
                 <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
               )}
-              <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col">
+              <ResizablePanel order={2} id="panel-right" className="h-full flex flex-col w-full">
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1 flex flex-row gap-1"
                   direction="horizontal"

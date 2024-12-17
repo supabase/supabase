@@ -82,15 +82,25 @@ export function AppDefaultNavigation() {
                     duration: 0.15,
                     ease: 'easeOut',
                   }}
+                  className="flex gap-1.5 items-center mb-1"
                 >
+                  <div className="-ml-5">
+                    <Button
+                      onClick={() => setOpen(false)}
+                      className="px-1 justify-start"
+                      type="text"
+                    >
+                      <SidebarClose size={12} strokeWidth={1} />
+                    </Button>
+                  </div>
                   <button
                     onClick={() => router.push(`/org/${selectedOrg?.slug}`)}
-                    className="group/org-back-button text-foreground-light flex items-center gap-2 hover:text-foreground text-xs mb-2"
+                    className="group/org-back-button text-foreground-lighter flex items-center gap-1 hover:text-foreground text-xs cursor-pointer"
                   >
                     <CornerLeftUp
                       size={14}
                       strokeWidth={1}
-                      className="text-forefground-lighter group-hover/org-back-button:text-foreground"
+                      className="text-forefground-lighter group-hover/org-back-button:text-foreground group-hover/org-back-button:translate-y-[-2px] transition-transform"
                     />
                     Organization
                   </button>
@@ -159,11 +169,6 @@ export function AppDefaultNavigation() {
           </AnimatePresence>
         </SidebarContent>
         <SidebarFooter>
-          <div>
-            <Button onClick={() => setOpen(false)} className="px-1 justify-start" type="text">
-              <SidebarClose size={12} strokeWidth={1} />
-            </Button>
-          </div>
           <UserDropdown />
         </SidebarFooter>
       </Sidebar>

@@ -18,7 +18,7 @@ const DefaultLayout = ({ children }: PropsWithChildren<DefaultLayoutProps>) => {
           <SidebarOpenTopBanner />
           <div className="flex h-full w-full flex-row grow overflow-y-auto">
             <AppDefaultNavigation />
-            <div className="py-1.5 px-1.5 flex-grow">{children}</div>
+            <div className="py-1.5 px-1.5 flex-grow w-full h-full">{children}</div>
           </div>
         </div>
       </SidebarProvider>
