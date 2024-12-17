@@ -59,7 +59,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
       // productMenu={<AuthProductMenu />}
       isBlocking={false}
     >
-      <ProjectPageNavigation items={generateAuthMenu(ref as string)} />
+      {/* <ProjectPageNavigation items={generateAuthMenu(ref as string)} /> */}
       {children}
     </ProjectLayout>
   )

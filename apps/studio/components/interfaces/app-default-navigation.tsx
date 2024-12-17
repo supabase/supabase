@@ -19,14 +19,31 @@ import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { Badge, Button, cn, Separator } from 'ui'
+import {
+  Button,
+  Collapsible_Shadcn_,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  useSidebar,
+} from 'ui'
 import { AppDefaultNavigationUsageBanner } from './app-default-navigation-usage-banner'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { Blocks, Boxes, CornerLeftUp } from 'lucide-react'
+import { Blocks, Boxes, ChevronDown, ChevronRight, CornerLeftUp, SidebarClose } from 'lucide-react'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Connect from './Connect/Connect'
 import { useFlag } from 'hooks/ui/useFlag'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
+import { UserDropdown } from './user-dropdown'
 
 export const ICON_SIZE = 18
 export const ICON_STROKE_WIDTH = 1.5
@@ -46,110 +63,173 @@ export function AppDefaultNavigation() {
 
   const connectDialogUpdate = useFlag('connectDialogUpdate')
 
+  const { state, open, setOpen, openMobile, setOpenMobile, isMobile, toggleSidebar } = useSidebar()
+
   return (
     <>
-      <nav className="min-w-[180px] px-3 py-2 flex flex-col gap-5">
-        <div className="flex flex-col gap-1">
-          {!isProjects && <OrganizationDropdown />}
-          <AnimatePresence>
-            {isProjects && (
-              <motion.div
-                initial={{ opacity: 0, x: -20, height: 0 }}
-                animate={{ opacity: 1, x: 0, height: 'auto' }}
-                exit={{ opacity: 0, x: -20, height: 0 }}
-                transition={{
-                  duration: 0.15,
-                  ease: 'easeOut',
-                }}
-              >
-                <button
-                  onClick={() => router.push(`/org/${selectedOrg?.slug}`)}
-                  className="group/org-back-button text-foreground-light flex items-center gap-2 hover:text-foreground text-xs mb-2"
+      <Sidebar className="!border-r-0" collapsible="offcanvas">
+        <SidebarHeader className="px-3">
+          <div className="flex flex-col gap-1">
+            {!isProjects && <OrganizationDropdown />}
+            <AnimatePresence>
+              {isProjects && (
+                <motion.div
+                  initial={{ opacity: 0, x: -20, height: 0 }}
+                  animate={{ opacity: 1, x: 0, height: 'auto' }}
+                  exit={{ opacity: 0, x: -20, height: 0 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
                 >
-                  <CornerLeftUp
-                    size={14}
-                    strokeWidth={1}
-                    className="text-forefground-lighter group-hover/org-back-button:text-foreground"
-                  />
-                  Organization
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {/* <UserDropdown /> */}
+                  <button
+                    onClick={() => router.push(`/org/${selectedOrg?.slug}`)}
+                    className="group/org-back-button text-foreground-light flex items-center gap-2 hover:text-foreground text-xs mb-2"
+                  >
+                    <CornerLeftUp
+                      size={14}
+                      strokeWidth={1}
+                      className="text-forefground-lighter group-hover/org-back-button:text-foreground"
+                    />
+                    Organization
+                  </button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            {/* <UserDropdown /> */}
+            <AnimatePresence>
+              {ref && (
+                <motion.div
+                  className="flex items-center"
+                  initial={{ opacity: 0, x: -20, height: 0 }}
+                  animate={{ opacity: 1, x: 0, height: 'auto' }}
+                  exit={{ opacity: 0, x: -20, height: 0 }}
+                  transition={{
+                    duration: 0.15,
+                    ease: 'easeOut',
+                  }}
+                >
+                  <ProjectDropdown />
+                  <AppDefaultNavigationUsageBanner />
+                  {selectedProject && isBranchingEnabled && (
+                    <>
+                      <BranchDropdown />
+                    </>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </SidebarHeader>
+        <SidebarContent className="px-3">
+          {isProjects ? <ProjectLinks /> : <OrganizationLinks />}
           <AnimatePresence>
             {ref && (
               <motion.div
-                className="flex items-center"
-                initial={{ opacity: 0, x: -20, height: 0 }}
-                animate={{ opacity: 1, x: 0, height: 'auto' }}
-                exit={{ opacity: 0, x: -20, height: 0 }}
+                className="flex flex-col"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
                 transition={{
                   duration: 0.15,
                   ease: 'easeOut',
                 }}
               >
-                <ProjectDropdown />
-                <AppDefaultNavigationUsageBanner />
-                {selectedProject && isBranchingEnabled && (
-                  <>
-                    <BranchDropdown />
-                  </>
-                )}
+                {!isBranchingEnabled && <EnableBranchingButton />}
+              </motion.div>
+            )}
+            {connectDialogUpdate && ref && (
+              <motion.div
+                className="flex flex-col"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{
+                  duration: 0.15,
+                  ease: 'easeOut',
+                }}
+              >
+                <Connect />
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-        {isProjects ? <ProjectLinks /> : <OrganizationLinks />}
-        <AnimatePresence>
-          {ref && (
-            <motion.div
-              className="flex flex-col"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{
-                duration: 0.15,
-                ease: 'easeOut',
-              }}
-            >
-              {!isBranchingEnabled && <EnableBranchingButton />}
-            </motion.div>
-          )}
-          {connectDialogUpdate && ref && (
-            <motion.div
-              className="flex flex-col"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{
-                duration: 0.15,
-                ease: 'easeOut',
-              }}
-            >
-              <Connect />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+        </SidebarContent>
+        <SidebarFooter>
+          <div>
+            <Button onClick={() => setOpen(false)} className="px-1 justify-start" type="text">
+              <SidebarClose size={12} strokeWidth={1} />
+            </Button>
+          </div>
+          <UserDropdown />
+        </SidebarFooter>
+      </Sidebar>
     </>
   )
 }
 
 function NavLink({ route, active }: { route: any; active?: boolean }) {
+  const router = useRouter()
+  const hasItems = route.items && route.items.some((section) => section.items.length > 0)
+
+  if (!hasItems) {
+    return (
+      <SidebarMenuItem key={route.key}>
+        <SidebarMenuButton
+          asChild
+          isActive={active}
+          className="text-sm [&_svg]:opacity-50"
+          size={'sm'}
+        >
+          <Link href={route.link ?? ''}>
+            {route.icon}
+            {route.label}
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
+
   return (
-    <Button
-      asChild
-      type={'text'}
-      icon={route.icon}
-      className={cn(
-        'px-1 justify-start text-foreground-light [&_svg]:text-foreground-lighter',
-        active && 'bg-selection text-foreground [&_svg]:text-foreground'
-      )}
-      block
-    >
-      <Link href={route.link ?? ''}>{route.label}</Link>
-    </Button>
+    <Collapsible_Shadcn_ className="group/collapsible">
+      <SidebarMenuItem key={route.key}>
+        <CollapsibleTrigger_Shadcn_ asChild>
+          <SidebarMenuButton
+            className="text-sm flex items-center [&_svg]:opacity-50 data-[active=true]>[&>svg]:opacity-100"
+            size={'sm'}
+          >
+            <>
+              {route.icon}
+              <span className="flex-grow">{route.label}</span>
+              <ChevronDown className="text-foreground-muted self-end transition-transform group-data-[state=closed]/collapsible:rotate-90" />
+            </>
+          </SidebarMenuButton>
+        </CollapsibleTrigger_Shadcn_>
+        <CollapsibleContent_Shadcn_>
+          <SidebarMenuSub className="gap-0.5">
+            {route.items.map((item) =>
+              item.items
+                .filter((x) => {
+                  // filter out external links
+                  if (!x.rightIcon) {
+                    return x
+                  }
+                })
+                .map((subItem) => (
+                  <SidebarMenuSubItem key={subItem.key}>
+                    <SidebarMenuSubButton
+                      asChild
+                      isActive={router.asPath === subItem.url}
+                      size="sm"
+                    >
+                      <Link href={subItem.url ?? ''}>{subItem.name}</Link>
+                    </SidebarMenuSubButton>
+                  </SidebarMenuSubItem>
+                ))
+            )}
+          </SidebarMenuSub>
+        </CollapsibleContent_Shadcn_>
+      </SidebarMenuItem>
+    </Collapsible_Shadcn_>
   )
 }
 
@@ -182,8 +262,10 @@ function ProjectLinks() {
   const otherRoutes = generateOtherRoutes(ref, project)
   const settingsRoutes = generateSettingsRoutes(ref, project)
 
+  console.log(productRoutes)
+
   return (
-    <ul className="flex flex-col gap-1 items-start">
+    <SidebarMenu className="gap-[2px]">
       <NavLink
         active={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
         route={{
@@ -216,8 +298,7 @@ function ProjectLinks() {
       {settingsRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
-      {/* <Separator className="my-1 bg-border-muted" /> */}
-    </ul>
+    </SidebarMenu>
   )
 }
 
@@ -225,9 +306,6 @@ const OrganizationLinks = () => {
   const router = useRouter()
   const activeRoute = router.pathname.split('/')[3]
   const { slug } = useParams()
-
-  const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
-  const invoicesEnabled = invoicesEnabledOnProfileLevel
 
   const navMenuItems = [
     {

@@ -2,9 +2,7 @@ import { useParams } from 'common'
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
-export const generateAuthMenu = (): ProductMenuGroup[] => {
-  const ref = useParams()
-  console.log('generateAuthMenu params', ref)
+export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
   return [
     {
       title: 'Manage',
@@ -28,12 +26,6 @@ export const generateAuthMenu = (): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Session',
-                key: 'session',
-                url: `/project/${ref}/auth/session`,
-                items: [],
-              },
-              {
                 name: 'MFA',
                 key: 'mfa',
                 url: `/project/${ref}/auth/mfa`,
@@ -46,27 +38,9 @@ export const generateAuthMenu = (): ProductMenuGroup[] => {
                 items: [],
               },
               {
-                name: 'Social login',
-                key: 'providers',
-                url: `/project/${ref}/auth/social-login`,
-                items: [],
-              },
-              {
-                name: 'Rate Limits',
-                key: 'rate-limits',
-                url: `/project/${ref}/auth/rate-limits`,
-                items: [],
-              },
-              {
                 name: 'Email Templates',
                 key: 'templates',
                 url: `/project/${ref}/auth/templates`,
-                items: [],
-              },
-              {
-                name: 'URL Configuration',
-                key: 'url-configuration',
-                url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
               {
@@ -90,9 +64,7 @@ export const generateAuthMenu = (): ProductMenuGroup[] => {
   ]
 }
 
-export const generateAuthConfigurationMenu = (): ProductMenuGroup[] => {
-  const ref = useParams()
-  console.log('generateAuthConfigurationMenu params', ref)
+export const generateAuthConfigurationMenu = ({ ref }: { ref: string }): ProductMenuGroup[] => {
   return [
     {
       title: 'Configuration',

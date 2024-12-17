@@ -46,7 +46,11 @@ const DatabaseProductMenu = () => {
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
   return (
-    <ProjectLayout product="Database" productMenu={<DatabaseProductMenu />} isBlocking={false}>
+    <ProjectLayout
+      product="Database"
+      // productMenu={<DatabaseProductMenu />}
+      isBlocking={false}
+    >
       {children}
     </ProjectLayout>
   )

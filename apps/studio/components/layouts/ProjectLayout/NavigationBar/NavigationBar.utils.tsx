@@ -14,6 +14,8 @@ import {
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Blocks, FileText, Lightbulb, List, Settings } from 'lucide-react'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
+import { generateAuthMenu } from 'components/layouts/AuthLayout/AuthLayout.utils'
+import { generateDatabaseMenu } from 'components/layouts/DatabaseLayout/DatabaseMenu.utils'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -63,6 +65,7 @@ export const generateProductRoutes = (
           : isProjectActive
             ? `/project/${ref}/database/schemas`
             : `/project/${ref}/database/backups/scheduled`),
+      items: generateDatabaseMenu(ref as string),
     },
     ...(authEnabled
       ? [
@@ -71,6 +74,7 @@ export const generateProductRoutes = (
             label: 'Authentication',
             icon: <Auth size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/auth/users`),
+            items: generateAuthMenu(ref as string),
           },
         ]
       : []),

@@ -3,8 +3,8 @@
   "style": "default",
   "rsc": false,
   "tailwind": {
-    "config": "./../config/tailwind-shadcn.config.js",
-    "css": ".storybook/shadcn.css",
+    "config": "./../config/tailwind.config.js",
+    "css": "./shadcn.css",
     "baseColor": "gray",
     "cssVariables": true
   },

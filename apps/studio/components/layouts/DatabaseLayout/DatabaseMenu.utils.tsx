@@ -4,14 +4,13 @@ import { IS_PLATFORM } from 'lib/constants'
 import { ArrowUpRight } from 'lucide-react'
 
 export const generateDatabaseMenu = (
-  project?: Project,
+  ref?: string,
   flags?: {
     pgNetExtensionExists: boolean
     pitrEnabled: boolean
     columnLevelPrivileges: boolean
   }
 ): ProductMenuGroup[] => {
-  const ref = project?.ref ?? 'default'
   const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
 
   return [

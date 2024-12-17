@@ -30,13 +30,24 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="rounded-full border px-0 w-7 h-7 flex-shrink-0" asChild>
-        <Button type="default">
-          <User size={16} strokeWidth={1.5} />
+      <DropdownMenuTrigger className="border px-0 flex-shrink-0" asChild>
+        <Button type="default" className="[&>span]:flex px-2 py-2" size="medium">
+          <div className="flex flex-row gap-2 items-center">
+            {/* <User size={16} strokeWidth={1.5} /> */}
+            <div className="w-6 h-6 rounded bg-foreground"></div>
+            <div className="flex-grow flex flex-col gap-0 justify-start text-left">
+              <span className="text-foreground-light truncate text-xs leading-none">
+                {profile?.username}
+              </span>
+              <span className="text-foreground-lighter truncate text-xs">
+                {profile?.primary_email}
+              </span>
+            </div>
+          </div>
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent side="bottom" align="end">
+      <DropdownMenuContent side="top" align="start">
         {IS_PLATFORM && (
           <>
             <div className="px-2 py-1 flex flex-col gap-0 text-sm">

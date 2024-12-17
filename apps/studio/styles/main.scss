@@ -13,14 +13,33 @@
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
+  --sidebar-background: var(--background-default);
+  --sidebar-foreground: var(--foreground-light);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
+[data-theme='deep-dark'],
+.deep-dark,
+[data-theme='dark'],
 .dark {
   --chart-1: 220 70% 50%;
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
+  --sidebar-background: var(--background-default);
+  --sidebar-foreground: var(--foreground-light);
+  --sidebar-primary: var(--foreground-default);
+  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-accent: var(--background-selection);
+  --sidebar-accent-foreground: var(--foreground-default);
+  --sidebar-border: var(--border-default);
+  --sidebar-ring: 217.2 91.2% 59.8%;
 }
 
 @layer utilities {
