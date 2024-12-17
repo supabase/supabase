@@ -113,8 +113,8 @@ const BottomRect = ({ isActive }: { isActive: boolean }) => (
       width={RECT_WIDTH}
       height={32}
       className={cn(
-        'stroke-brand-500 fill-brand-300 stroke-[1] transition-all',
-        isActive && 'fill-brand-400 stroke-brand',
+        'stroke-border fill-background-surface-100 stroke-[1] transition-all',
+        isActive && 'fill-background-surface-100 stroke-border-stronger',
         'flex items-center justify-center'
       )}
       x={RECT_X}
@@ -129,7 +129,10 @@ const BottomRect = ({ isActive }: { isActive: boolean }) => (
     />
     <Database
       size={21}
-      className={cn('w-4 h-4 text-brand-500 transition-all', isActive && 'text-brand')}
+      className={cn(
+        'w-4 h-4 text-foreground-lighter transition-all',
+        isActive && 'text-foreground'
+      )}
       x={RECT_X + RECT_WIDTH / 6} // Center horizontally (8 is half of icon width)
       y={BOTTOM_RECT_Y + 5.5} // Center vertically (16 is half of rect height, 8 is half of icon height)
       strokeWidth={1}

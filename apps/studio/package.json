@@ -16,8 +16,6 @@
     "test:update:watch": "vitest --watch --update",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "typecheck": "tsc --noEmit",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write ."
   },
@@ -136,10 +134,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
-    "@storybook/addon-essentials": "^7.5.3",
-    "@storybook/addon-interactions": "^7.5.3",
-    "@storybook/addon-links": "^7.5.3",
-    "@storybook/react": "^7.5.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/react": "^14.0.0",
@@ -179,7 +173,6 @@
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
-    "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
     "typescript": "~5.5.0"
   }

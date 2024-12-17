@@ -2,6 +2,7 @@ type PostTypes = {
   slug?: string
   type: 'casestudy' | 'blog' | 'event'
   title: string
+  name?: string
   date: string
   formattedDate?: string
   coverImage?: string
@@ -19,6 +20,10 @@ type PostTypes = {
   path: string
   tags?: string[]
   categories?: string[]
+  industry?: string[]
+  supabase_products?: string[]
+  company_size?: string
+  region?: string
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean
