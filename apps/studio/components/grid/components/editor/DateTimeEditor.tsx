@@ -81,9 +81,11 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
         <div className="px-3 py-1 flex flex-col gap-y-0.5">
           <p className="text-xs text-foreground-lighter">Formatted value:</p>
           {(inputValue ?? '').length === 0 ? (
-            <p className="text-sm font-mono text-foreground-light">Enter a valid date format</p>
+            <p className="text-sm font-mono text-foreground-light h-[21px]">
+              Enter a valid date format
+            </p>
           ) : timeValue === 'Invalid Date' ? (
-            <p className="text-sm font-mono text-foreground-light">Invalid date format</p>
+            <p className="text-sm font-mono text-foreground-light h-[21px]">Invalid date format</p>
           ) : (
             <TimestampInfo
               value={timeValue}
@@ -94,7 +96,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                     ? 'DD MMM YYYY HH:mm:ss'
                     : 'DD MMM YYYY HH:mm:ss (ZZ)'
               }
-              className="text-left !text-sm font-mono tracking-tight"
+              className="text-left text-sm font-mono tracking-tight"
             />
           )}
         </div>
