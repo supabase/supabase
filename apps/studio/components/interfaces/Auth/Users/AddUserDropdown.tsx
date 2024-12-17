@@ -1,10 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ChevronDown, Mail, UserPlus } from 'lucide-react'
 import { useState } from 'react'
-import semver from 'semver'
 
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -34,27 +32,25 @@ const AddUserDropdown = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-40">
-          {
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <DropdownMenuItem
-                  className="space-x-2 !pointer-events-auto"
-                  disabled={!canInviteUsers}
-                  onClick={() => {
-                    if (canInviteUsers) setInviteVisible(true)
-                  }}
-                >
-                  <Mail size={14} />
-                  <p>Send invitation</p>
-                </DropdownMenuItem>
-              </TooltipTrigger_Shadcn_>
-              {!canInviteUsers && (
-                <TooltipContent_Shadcn_ side="left">
-                  You need additional permissions to invite users
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
-          }
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <DropdownMenuItem
+                className="space-x-2 !pointer-events-auto"
+                disabled={!canInviteUsers}
+                onClick={() => {
+                  if (canInviteUsers) setInviteVisible(true)
+                }}
+              >
+                <Mail size={14} />
+                <p>Send invitation</p>
+              </DropdownMenuItem>
+            </TooltipTrigger_Shadcn_>
+            {!canInviteUsers && (
+              <TooltipContent_Shadcn_ side="left">
+                You need additional permissions to invite users
+              </TooltipContent_Shadcn_>
+            )}
+          </Tooltip_Shadcn_>
 
           <Tooltip_Shadcn_>
             <TooltipTrigger_Shadcn_ asChild>
@@ -78,7 +74,7 @@ const AddUserDropdown = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {<InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
+      <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />
       <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />
     </>
   )
