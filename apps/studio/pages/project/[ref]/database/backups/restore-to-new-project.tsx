@@ -99,6 +99,12 @@ const RestoreToNewProject = () => {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
+      retry: (failureCount, error: any) => {
+        // If the user doesn't have permission to read physical backups (or they are disabled), don't retry
+        // This way we don't have to wait for 3 requests to finish.
+        if (error?.response?.status === 403) return false
+        return failureCount < 3
+      },
       onSuccess: (data) => {
         const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
         if (!hasTransientState) setRefetchInterval(false)
