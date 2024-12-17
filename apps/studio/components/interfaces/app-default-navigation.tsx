@@ -203,23 +203,23 @@ function NavLink({ route, active }: { route: any; active?: boolean }) {
   const hasItems = route.items && route.items.some((section) => section.items.length > 0)
   const [open, setOpen] = useState(false)
 
-  if (!hasItems) {
-    return (
-      <SidebarMenuItem key={route.key}>
-        <SidebarMenuButton
-          asChild
-          isActive={active}
-          className="text-sm [&_svg]:opacity-50"
-          size={'sm'}
-        >
-          <Link href={route.link ?? ''}>
-            {route.icon}
-            {route.label}
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    )
-  }
+  // if (!hasItems) {
+  return (
+    <SidebarMenuItem key={route.key}>
+      <SidebarMenuButton
+        asChild
+        isActive={active}
+        className="text-sm [&_svg]:opacity-50"
+        size={'sm'}
+      >
+        <Link href={route.link ?? ''}>
+          {route.icon}
+          {route.label}
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  )
+  // }
 
   return (
     <Collapsible_Shadcn_ className="group/collapsible" open={open} onOpenChange={setOpen}>
@@ -317,7 +317,6 @@ function ProjectLinks() {
           linkElement: <ProjectIndexPageLink projectRef={ref} />,
         }}
       />
-      <Separator className="my-1 bg-border-muted" />
       {toolRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
@@ -335,7 +334,6 @@ function ProjectLinks() {
       {otherRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
-      <Separator className="my-1 bg-border-muted" />
       {settingsRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
