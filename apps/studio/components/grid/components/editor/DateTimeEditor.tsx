@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 
@@ -13,14 +14,14 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { BlockKeys } from '../common/BlockKeys'
-import { ChevronDown } from 'lucide-react'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
   type: 'date' | 'datetime' | 'datetimetz'
+  isNullable: boolean
 }
 
 const FORMAT_MAP = {
@@ -33,6 +34,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   row,
   column,
   type,
+  isNullable,
   onRowChange,
   onClose,
 }: BaseEditorProps<TRow, TSummaryRow>) {
@@ -70,7 +72,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
         >
           <Input
             autoFocus
-            value={inputValue}
+            value={inputValue ?? ''}
             placeholder={FORMAT_MAP[type]}
             onChange={(e) => setInputValue(e.target.value)}
             className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
@@ -112,29 +114,44 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             </div>
           </div>
           <div className="flex">
-            <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
-              Set NULL
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="default"
-                  icon={<ChevronDown />}
-                  className="px-1 rounded-l-none border-l-0"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-20" align="end">
-                <DropdownMenuItem
-                  onClick={() => {
-                    // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
-                    const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
-                    saveChanges(now)
-                  }}
-                >
-                  Set to NOW
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isNullable ? (
+              <>
+                <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
+                  Set NULL
+                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="default"
+                      icon={<ChevronDown />}
+                      className="px-1 rounded-l-none border-l-0"
+                    />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-20" align="end">
+                    <DropdownMenuItem
+                      onClick={() => {
+                        // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
+                        const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
+                        saveChanges(now)
+                      }}
+                    >
+                      Set to NOW
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <Button
+                type="default"
+                onClick={() => {
+                  // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
+                  const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
+                  saveChanges(now)
+                }}
+              >
+                Set to NOW
+              </Button>
+            )}
           </div>
         </div>
       </PopoverContent_Shadcn_>
@@ -142,20 +159,9 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   )
 }
 
-export function DateTimeEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="datetime" />
-}
-
-export function DateTimeWithTimezoneEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="datetimetz" />
-}
-
-export function DateEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="date" />
+export function DateTimeEditor(type: 'datetime' | 'datetimetz' | 'date', isNullable: boolean) {
+  // eslint-disable-next-line react/display-name
+  return <TRow, TSummaryRow = unknown>(props: RenderEditCellProps<TRow, TSummaryRow>) => {
+    return <BaseEditor {...props} type={type} isNullable={isNullable} />
+  }
 }
