@@ -18,7 +18,7 @@ import { Home } from 'icons'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   Collapsible_Shadcn_,
@@ -133,17 +133,41 @@ export function AppDefaultNavigation() {
           </div>
         </SidebarHeader>
         <SidebarContent className="px-3">
-          {isProjects ? <ProjectLinks /> : <OrganizationLinks />}
+          <AnimatePresence mode="wait">
+            {isProjects ? (
+              <motion.div
+                key="project-links"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.12, ease: 'easeOut' }}
+              >
+                <ProjectLinks />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="org-links"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.12, ease: 'easeOut' }}
+              >
+                <OrganizationLinks />
+              </motion.div>
+            )}
+          </AnimatePresence>
           <Separator />
+        </SidebarContent>
+        <SidebarFooter>
           <AnimatePresence>
             {ref && (
               <motion.div
                 className="flex flex-col"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
                 transition={{
-                  duration: 0.15,
+                  duration: 0.12,
                   ease: 'easeOut',
                 }}
               >
@@ -153,11 +177,11 @@ export function AppDefaultNavigation() {
             {connectDialogUpdate && ref && (
               <motion.div
                 className="px-3"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
                 transition={{
-                  duration: 0.15,
+                  duration: 0.12,
                   ease: 'easeOut',
                 }}
               >
@@ -167,8 +191,6 @@ export function AppDefaultNavigation() {
               </motion.div>
             )}
           </AnimatePresence>
-        </SidebarContent>
-        <SidebarFooter>
           <UserDropdown />
         </SidebarFooter>
       </Sidebar>
@@ -179,6 +201,7 @@ export function AppDefaultNavigation() {
 function NavLink({ route, active }: { route: any; active?: boolean }) {
   const router = useRouter()
   const hasItems = route.items && route.items.some((section) => section.items.length > 0)
+  const [open, setOpen] = useState(false)
 
   if (!hasItems) {
     return (
@@ -199,7 +222,7 @@ function NavLink({ route, active }: { route: any; active?: boolean }) {
   }
 
   return (
-    <Collapsible_Shadcn_ className="group/collapsible">
+    <Collapsible_Shadcn_ className="group/collapsible" open={open} onOpenChange={setOpen}>
       <SidebarMenuItem key={route.key}>
         <CollapsibleTrigger_Shadcn_ asChild>
           <SidebarMenuButton
@@ -213,29 +236,38 @@ function NavLink({ route, active }: { route: any; active?: boolean }) {
             </>
           </SidebarMenuButton>
         </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_>
-          <SidebarMenuSub className="gap-0.5">
-            {route.items.map((item) =>
-              item.items
-                .filter((x) => {
-                  // filter out external links
-                  if (!x.rightIcon) {
-                    return x
-                  }
-                })
-                .map((subItem) => (
-                  <SidebarMenuSubItem key={subItem.key}>
-                    <SidebarMenuSubButton
-                      asChild
-                      isActive={router.asPath === subItem.url}
-                      size="sm"
-                    >
-                      <Link href={subItem.url ?? ''}>{subItem.name}</Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                ))
-            )}
-          </SidebarMenuSub>
+        <CollapsibleContent_Shadcn_ forceMount>
+          <motion.div
+            initial={false}
+            animate={{
+              height: open ? 'auto' : 0,
+              opacity: open ? 1 : 0,
+            }}
+            transition={{ duration: 0.12 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <SidebarMenuSub className="gap-0.5">
+              {route.items.map((item) =>
+                item.items
+                  .filter((x) => {
+                    if (!x.rightIcon) {
+                      return x
+                    }
+                  })
+                  .map((subItem) => (
+                    <SidebarMenuSubItem key={subItem.key}>
+                      <SidebarMenuSubButton
+                        asChild
+                        isActive={router.asPath === subItem.url}
+                        size="sm"
+                      >
+                        <Link href={subItem.url ?? ''}>{subItem.name}</Link>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  ))
+              )}
+            </SidebarMenuSub>
+          </motion.div>
         </CollapsibleContent_Shadcn_>
       </SidebarMenuItem>
     </Collapsible_Shadcn_>
@@ -285,25 +317,25 @@ function ProjectLinks() {
           linkElement: <ProjectIndexPageLink projectRef={ref} />,
         }}
       />
-      {/* <Separator className="my-1 bg-border-muted" /> */}
-      <span className="text-foreground-muted text-xs uppercase font-mono text-[12px] px-1.5 mt-2 tracking-wider">
-        tools
-      </span>
+      <Separator className="my-1 bg-border-muted" />
       {toolRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
+      <Separator className="my-1 bg-border-muted" />
       <span className="text-foreground-muted text-xs uppercase font-mono text-[12px] px-1.5 mt-2 tracking-wider">
         products
       </span>
       {productRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
+      <Separator className="my-1 bg-border-muted" />
       <span className="text-foreground-muted text-xs uppercase font-mono text-[12px] px-1.5 mt-2 tracking-wider">
         develop
       </span>
       {otherRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}
+      <Separator className="my-1 bg-border-muted" />
       {settingsRoutes.map((route) => (
         <NavLink key={route.key} route={route} active={activeRoute === route.key} />
       ))}

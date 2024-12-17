@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Boxes, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -46,7 +46,7 @@ const OrganizationDropdown = () => {
     <div className="flex items-center">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
-          <Button type="default" className="pr-2" iconRight={<ChevronsUpDown />}>
+          <Button type="default" className="pr-2" iconRight={<ChevronsUpDown />} icon={<Boxes />}>
             {orgName}
             {/* <div className="flex items-center space-x-2"> */}
             {/* <p className={''}>{orgName}</p> */}

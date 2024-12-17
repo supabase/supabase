@@ -32,7 +32,7 @@ export function UserDropdown() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="border px-0 flex-shrink-0" asChild>
+      <DropdownMenuTrigger className="border px-0 flex-shrink-0 px-3" asChild>
         <Button type="default" className="[&>span]:flex px-1 py-2 pl-0.5" size="medium">
           <div className="flex flex-row gap-2 items-center">
             {/* <User size={16} strokeWidth={1.5} /> */}

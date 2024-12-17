@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown, Plus } from 'lucide-react'
+import { Box, Check, ChevronsUpDown, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ParsedUrlQuery } from 'querystring'
@@ -124,6 +124,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
           className="pr-2 justify-start [&_span]:w-full [&_span]:text-left"
           iconRight={<ChevronsUpDown />}
           block
+          icon={<Box />}
         >
           {selectedProject?.name}
         </Button>

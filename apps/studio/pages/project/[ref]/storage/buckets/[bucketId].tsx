@@ -7,6 +7,8 @@ import StorageLayout from 'components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import type { NextPageWithLayout } from 'types'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()
@@ -37,6 +39,12 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
+PageLayout.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <StorageLayout title="Buckets">{page}</StorageLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default PageLayout

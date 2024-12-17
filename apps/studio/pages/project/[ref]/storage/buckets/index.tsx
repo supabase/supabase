@@ -1,4 +1,6 @@
 import { useParams } from 'common'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
@@ -37,6 +39,12 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
+PageLayout.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <StorageLayout title="Buckets">{page}</StorageLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default PageLayout
