@@ -1,56 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { PGlite } from '@electric-sql/pglite'
-import {
-  PostgresMetaBase,
-  PostgresMetaErr,
-  PostgresTable,
-  wrapError,
-  wrapResult,
-} from '@gregnr/postgres-meta/base'
 import { useChat } from 'ai/react'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import { debounce, uniqBy } from 'lodash'
-import {
-  ArrowUp,
-  Box,
-  ChevronRight,
-  Clock,
-  Database,
-  ExternalLink,
-  File,
-  FileX2,
-  Import,
-  KeyRound,
-  ListOrdered,
-  Settings,
-  Square,
-  User,
-  User2,
-  Zap,
-} from 'lucide-react'
+import { ArrowUp, ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import ReactMarkdown from 'react-markdown'
-import ReactFlow, {
-  Background,
-  BackgroundVariant,
-  Controls,
-  Edge,
-  MiniMap,
-  Node,
-  Position,
-  ReactFlowProvider,
-  useEdgesState,
-  useNodesState,
-  useReactFlow,
-  useStore,
-} from 'reactflow'
+import { Edge, Node, Position, ReactFlowProvider } from 'reactflow'
 import 'reactflow/dist/style.css'
-import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
 import { AnimatePresence, motion } from 'framer-motion'
 import { z } from 'zod'
@@ -62,16 +22,13 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
-import Design from 'components/interfaces/ProjectCreation/Design'
 import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
-import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
-import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
@@ -105,11 +62,9 @@ import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
-  AiIconAnimation,
   Badge,
   Button,
   cn,
-  CodeBlock,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -126,17 +81,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  ToggleGroup,
-  ToggleGroupItem,
   Tooltip_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipProvider_Shadcn_,
   TooltipTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  Loading,
-  LoadingLine,
   Textarea,
   Label_Shadcn_,
 } from 'ui'
@@ -144,16 +92,14 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { TableNode } from 'components/interfaces/ProjectCreation/design/TableNode'
 import { SchemaFlow } from 'components/interfaces/ProjectCreation/design/SchemaFlow'
 import Globe from 'components/ui/Globe'
-import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
-import DotGrid from 'components/ui/DotGrid'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { Markdown } from 'components/interfaces/Markdown'
-import LoadingState from 'components/layouts/ProjectLayout/LoadingState'
 import LogoLoader from '@ui/components/LogoLoader'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
+import InitialStep from 'components/interfaces/ProjectCreation/InitialStep'
+import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -199,132 +145,17 @@ const FormSchema = z.object({
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
   useOrioleDb: z.boolean(),
+  sql: z.string().optional(),
 })
 
 export type CreateProjectForm = z.infer<typeof FormSchema>
 
-const NODE_SEP = 25
-const RANK_SEP = 50
-
 export const TABLE_NODE_WIDTH = 640
 export const TABLE_NODE_ROW_HEIGHT = 80
-
-interface MessageProps {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  isLoading?: boolean
-}
-
-function Message({ role, content, isLoading }: MessageProps) {
-  const isUser = role === 'user'
-
-  return (
-    <motion.div
-      layout="position"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className={cn('mb-4 text-sm', isUser ? 'text-foreground' : 'text-foreground-light')}
-    >
-      <div className="flex gap-4 w-auto overflow-hidden">
-        {isUser ? (
-          <figure className="w-5 h-5 shrink-0 bg-foreground rounded-full flex items-center justify-center">
-            <User size={16} strokeWidth={1.5} className="text-background" />
-          </figure>
-        ) : (
-          <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
-        )}
-
-        <ReactMarkdown
-          className="space-y-5 flex-1 [&>*>code]:text-xs [&>*>*>code]:text-xs min-w-0 [&_li]:space-y-4"
-          remarkPlugins={[remarkGfm]}
-          components={{
-            pre: ({ children }: any) => {
-              const code = children[0]
-              const language = code.props.className?.replace('language-', '') || 'sql'
-              return (
-                <div className="w-auto -ml-[36px] overflow-x-hidden">
-                  <CodeBlock
-                    language={language}
-                    value={code.props.children[0]}
-                    className={cn(
-                      'max-h-96 max-w-none block border rounded !bg-transparent !py-3 !px-3.5 prose dark:prose-dark text-foreground',
-                      '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
-                    )}
-                  />
-                </div>
-              )
-            },
-            code: ({ children, className }: any) => {
-              if (className) return null // handled by pre
-              return (
-                <code className="text-xs bg-background-surface-200 px-1 py-0.5 rounded">
-                  {children}
-                </code>
-              )
-            },
-            p: ({ children }: any) => <p className="mb-4">{children}</p>,
-            ul: ({ children }: any) => <ul className="flex flex-col gap-y-4">{children}</ul>,
-            ol: ({ children }: any) => <ol className="flex flex-col gap-y-4">{children}</ol>,
-            li: ({ children }: any) => <li className="[&>pre]:mt-2">{children}</li>,
-          }}
-        >
-          {content}
-        </ReactMarkdown>
-      </div>
-      {isLoading && (
-        <div className="flex gap-2 items-center text-foreground-lighter mt-2">
-          <div className="animate-pulse">Thinking...</div>
-        </div>
-      )}
-    </motion.div>
-  )
-}
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
   reason: string
-}
-
-interface UserInfo {
-  platform?: string
-  userCount?: number
-  industry?: string
-  region?: string
-  scale?: string
-}
-
-interface DatabaseConfig {
-  region: string
-  postgresVersion: string
-  computeSize?: string
-  storageSize?: number
-  highAvailability?: boolean
-}
-
-function formatKey(key: string): string {
-  return key
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
-    .split(/(?=[A-Z])/)
-    .join(' ')
-    .toLowerCase()
-    .replace(/^\w/, (c) => c.toUpperCase()) // Capitalize first letter
-}
-
-function InfoSection({ title, data }: { title: string; data: Record<string, any> }) {
-  return (
-    <div className="space-y-1 mt-4">
-      <h3 className="font-medium text-sm mb-2">{title}</h3>
-      {Object.entries(data).map(([key, value]) => {
-        if (value === undefined || value === '') return null
-        return (
-          <div key={key} className="text-xs text-foreground-light font-mono">
-            <span className="text-foreground-lighter">{formatKey(key)}: </span>
-            {typeof value === 'boolean' ? (value ? 'Yes' : 'No') : value.toString()}
-          </div>
-        )
-      })}
-    </div>
-  )
 }
 
 const WizardForm = ({
@@ -339,143 +170,10 @@ const WizardForm = ({
   const router = useRouter()
   const { slug, projectName } = useParams()
 
-  const [nodes, setNodes] = useState<Node[]>([])
-  const [edges, setEdges] = useState<Edge[]>([])
   const [initialGenerate, setInitialGenerate] = useState<boolean>(!!aiDescription)
   const [showAdvanced, setShowAdvanced] = useState<Boolean>(false)
-  const db = useRef<PGlite | null>()
   const [services, setServices] = useState<SupabaseService[]>([])
-  const [title, setTitle] = useState<string>('')
-  const [userInfo, setUserInfo] = useState<UserInfo>()
-  const [dbConfig, setDbConfig] = useState<DatabaseConfig>()
-
-  useEffect(() => {
-    db.current = new PGlite()
-    db.current.exec(`
-        CREATE SCHEMA auth;
-        CREATE TABLE auth.users (
-            instance_id uuid,
-            id uuid NOT NULL,
-            aud character varying(255),
-            role character varying(255),
-            email character varying(255),
-            encrypted_password character varying(255),
-            confirmed_at timestamp with time zone,
-            invited_at timestamp with time zone,
-            confirmation_token character varying(255),
-            confirmation_sent_at timestamp with time zone,
-            recovery_token character varying(255),
-            recovery_sent_at timestamp with time zone,
-            email_change_token character varying(255),
-            email_change character varying(255),
-            email_change_sent_at timestamp with time zone,
-            last_sign_in_at timestamp with time zone,
-            raw_app_meta_data jsonb,
-            raw_user_meta_data jsonb,
-            is_super_admin boolean,
-            created_at timestamp with time zone,
-            updated_at timestamp with time zone
-        );
-        ALTER TABLE ONLY auth.users
-        ADD CONSTRAINT users_email_key UNIQUE (email);
-        ALTER TABLE ONLY auth.users
-        ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-      `)
-  }, [])
-
-  const {
-    messages,
-    input,
-    handleInputChange,
-    append,
-    setInput,
-    isLoading: isMessagesLoading,
-  } = useChat({
-    api: `${BASE_PATH}/api/ai/onboarding/design`,
-    id: 'schema-generator',
-    maxSteps: 7,
-    onFinish: () => {
-      setInitialGenerate(false)
-    },
-    // Handle client-side tools
-    async onToolCall({ toolCall }) {
-      if (toolCall.toolName === 'executeSql') {
-        if (!db.current) return { success: false, error: 'Database not initialized' }
-        try {
-          console.log('Executing SQL:', toolCall.args.sql)
-          await db.current.exec((toolCall.args as { sql: string }).sql)
-
-          const pgMeta = new PostgresMetaBase({
-            query: async (sql: string) => {
-              try {
-                const res = await db.current?.query(sql)
-                return wrapResult<any[]>(res.rows)
-              } catch (error) {
-                console.error('Query failed:', error)
-                return wrapError(error, sql)
-              }
-            },
-            end: async () => {},
-          })
-
-          const { data: tables, error } = await pgMeta.tables.list({
-            includedSchemas: ['public'],
-            includeColumns: true,
-          })
-
-          if (error) {
-            console.error('Failed to get tables:', error)
-            return { success: false, error: `Failed to get tables: ${error}` }
-          }
-
-          if (tables) {
-            const graphData = await getGraphDataFromTables(tables)
-            setNodes(graphData.nodes)
-            setEdges(graphData.edges)
-          }
-
-          return {
-            success: true,
-            message: 'Database successfully updated. Respond with next steps.',
-          }
-        } catch (error) {
-          console.error('Failed to execute SQL:', error)
-          return {
-            success: false,
-            error: `SQL execution failed: ${error instanceof Error ? error.message : String(error)}`,
-          }
-        }
-      }
-
-      if (toolCall.toolName === 'setServices') {
-        const newServices = (toolCall.args as { services: SupabaseService[] }).services
-        setServices(newServices)
-        return 'Services updated successfully'
-      }
-
-      if (toolCall.toolName === 'setTitle') {
-        const newTitle = (toolCall.args as { title: string }).title
-        setTitle(newTitle)
-        return 'Title updated successfully'
-      }
-
-      if (toolCall.toolName === 'saveUserInfo') {
-        setUserInfo(toolCall.args as UserInfo)
-        return 'User info saved successfully'
-      }
-
-      if (toolCall.toolName === 'setDatabaseConfig') {
-        setDbConfig(toolCall.args as DatabaseConfig)
-        return 'Database config saved successfully'
-      }
-    },
-  })
-
-  useEffect(() => {
-    if (aiDescription?.length > 0) {
-      append({ role: 'user', content: aiDescription })
-    }
-  }, [aiDescription])
+  const [sqlStatements, setSqlStatements] = useState<string[]>([])
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -585,6 +283,7 @@ const WizardForm = ({
       useApiSchema: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
+      sql: '',
     },
   })
 
@@ -629,6 +328,7 @@ const WizardForm = ({
       useApiSchema,
       postgresVersionSelection,
       useOrioleDb,
+      sql,
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
@@ -653,6 +353,7 @@ const WizardForm = ({
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
+      initialSql: sql,
     }
 
     if (postgresVersion) {
@@ -740,6 +441,63 @@ const WizardForm = ({
 
     return null
   }, [form.getValues('dbRegion')])
+
+  // Generate schema field
+  const {
+    messages,
+    input,
+    handleInputChange,
+    append,
+    setInput,
+    isLoading: isMessagesLoading,
+  } = useChat({
+    api: `${BASE_PATH}/api/ai/onboarding/design`,
+    id: 'schema-generator',
+    maxSteps: 7,
+    onFinish: () => {
+      setInitialGenerate(false)
+    },
+    async onToolCall({ toolCall }) {
+      if (toolCall.toolName === 'executeSql') {
+        try {
+          const sql = (toolCall.args as { sql: string }).sql
+          console.log('Executing SQL:', sql)
+          form.setValue('sql', sql)
+          setSqlStatements((prev) => [...prev, sql])
+          return {
+            success: true,
+            message: 'Database successfully updated. Respond with next steps.',
+          }
+        } catch (error) {
+          console.error('Failed to execute SQL:', error)
+          return {
+            success: false,
+            error: `SQL execution failed: ${error instanceof Error ? error.message : String(error)}`,
+          }
+        }
+      }
+
+      if (toolCall.toolName === 'setServices') {
+        const newServices = (toolCall.args as { services: SupabaseService[] }).services
+        setServices(newServices)
+        return 'Services updated successfully'
+      }
+
+      if (toolCall.toolName === 'setTitle') {
+        const newTitle = (toolCall.args as { title: string }).title
+        if (!form.getValues('projectName')) {
+          form.setValue('projectName', newTitle)
+        }
+        return 'Title updated successfully'
+      }
+    },
+  })
+
+  useEffect(() => {
+    if (aiDescription?.length > 0) {
+      append({ role: 'user', content: aiDescription })
+    }
+  }, [aiDescription])
 
   if (initialGenerate) {
     return (
@@ -962,12 +720,12 @@ const WizardForm = ({
                                     </p>
                                   </div>
                                 )}
-                                <div className="w-full px-4 text-sm pt-2 pb-4 border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter">
+                                <div className="w-full relative text-sm border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter">
                                   <textarea
                                     id="input"
                                     name="prompt"
                                     autoComplete="off"
-                                    className="text-sm w-full bg-transparent border-none p-0 resize-none focus:outline-none focus:ring-0 resize-none"
+                                    className="text-sm w-full bg-transparent border-none px-4 pt-2 py-8 resize-none focus:outline-none focus:ring-0 resize-none"
                                     value={input}
                                     disabled={isMessagesLoading}
                                     onChange={handleInputChange}
@@ -997,18 +755,16 @@ const WizardForm = ({
                                       }
                                     }}
                                   />
-                                  <div className="flex w-full justify-end">
-                                    <Button
-                                      onClick={(e) => {
-                                        e.preventDefault()
-                                        append({ role: 'user', content: input })
-                                        setInput('')
-                                      }}
-                                      className="rounded-full w-7 h-7 justify-center items-center p-0"
-                                    >
-                                      <ArrowUp size={16} />
-                                    </Button>
-                                  </div>
+                                  <Button
+                                    onClick={(e) => {
+                                      e.preventDefault()
+                                      append({ role: 'user', content: input })
+                                      setInput('')
+                                    }}
+                                    className="rounded-full w-7 h-7 absolute bottom-2 right-2 justify-center items-center p-0"
+                                  >
+                                    <ArrowUp size={16} />
+                                  </Button>
                                 </div>
                               </div>
                             </FormItemLayout>
@@ -1428,151 +1184,18 @@ const WizardForm = ({
             </section>
           </form>
         </Form_Shadcn_>
-        <section className="flex-1 h-screen overflow-hidden sticky top-0">
-          <div className="flex h-full flex-1">
-            <div className="flex-1 h-full relative">
-              <motion.div
-                key="info"
-                transition={{
-                  duration: 1.25,
-                  ease: 'easeInOut',
-                }}
-                className={`absolute z-30 p-4 bg-surface-100 min-w-80 rounded-lg border shadow-lg`}
-                initial={false}
-                animate={
-                  nodes.length > 0
-                    ? {
-                        top: '3%',
-                        right: '3%',
-                        x: '0%',
-                        y: '0%',
-                      }
-                    : {
-                        top: '50%',
-                        right: '50%',
-                        x: '50%',
-                        y: '-50%',
-                      }
-                }
-              >
-                <div className="flex items-start justify-between w-80">
-                  <div className="flex gap-x-3">
-                    {/* <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-                      <Database size={16} />
-                    </div> */}
-                    <div className="flex flex-col gap-y-0.5">
-                      <p className="text-sm">Primary Database</p>
-                      <p className="flex items-center gap-x-1">
-                        <span className="text-sm text-foreground-light">
-                          {form.getValues('dbRegion')}
-                        </span>
-                      </p>
-                      <p className="flex items-center gap-x-1">
-                        <span className="text-sm text-foreground-light">
-                          {form.getValues('cloudProvider')}
-                        </span>
-                        <span className="text-sm text-foreground-light">•</span>
-                        <span className="text-sm text-foreground-light">
-                          {instanceLabel(form.getValues('computeSize'))}
-                        </span>
-                        <span className="text-sm text-foreground-light">•</span>
-                        <span className="text-sm text-foreground-light">
-                          {form.getValues('postgresVersionSelection')}
-                        </span>
-                      </p>
-                    </div>
-                  </div>
-                  {selectedRegionObject && (
-                    <img
-                      alt="region icon"
-                      className="w-8 rounded-sm mt-0.5"
-                      src={`${BASE_PATH}/img/regions/${selectedRegionObject.name}.svg`}
-                    />
-                  )}
-                </div>
-
-                <TooltipProvider_Shadcn_>
-                  <div className="flex gap-2 mt-4">
-                    {[
-                      { name: 'Auth', icon: User2 },
-                      { name: 'Storage', icon: File },
-                      { name: 'Database', icon: Database },
-                      { name: 'Edge Function', icon: Zap },
-                      { name: 'Cron', icon: Clock },
-                      { name: 'Queues', icon: ListOrdered },
-                      { name: 'Vector', icon: Box },
-                    ].map((service) => {
-                      const enabledService = services.find((s) => s.name === service.name)
-                      const isEnabled = !!enabledService
-                      return (
-                        <Tooltip_Shadcn_ key={service.name} delayDuration={100}>
-                          <TooltipTrigger_Shadcn_ asChild>
-                            <div
-                              className={`
-                            flex items-center justify-center w-10 h-10 border rounded cursor-help
-                            ${isEnabled ? 'border-brand-600 text-brand-600' : 'text-foreground-lighter'}
-                          `}
-                            >
-                              <service.icon size={16} strokeWidth={2} />
-                            </div>
-                          </TooltipTrigger_Shadcn_>
-                          <TooltipContent_Shadcn_>
-                            {isEnabled ? `${service.name}: ${enabledService.reason}` : service.name}
-                          </TooltipContent_Shadcn_>
-                        </Tooltip_Shadcn_>
-                      )
-                    })}
-                  </div>
-                </TooltipProvider_Shadcn_>
-              </motion.div>
-              <motion.div
-                layout
-                layoutId="globe"
-                className="absolute z-10 pointer-events-none aspect-square right-0"
-                initial={false}
-                animate={{
-                  x: nodes.length > 0 ? '25%' : '25%',
-                  opacity: 1,
-                  width: nodes.length > 0 ? '60%' : '100%',
-                  top: nodes.length > 0 ? '0' : '50%',
-                  y: nodes.length > 0 ? '-35%' : '-50%',
-                }}
-                transition={{
-                  duration: 1.25,
-                  ease: 'easeInOut',
-                }}
-              >
-                <div className="absolute inset-[10%] bg-background-200 rounded-full" />
-                <div
-                  className="absolute inset-0 "
-                  style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
-                >
-                  <Globe
-                    currentLocation={selectedRegionObject?.location}
-                    markers={[
-                      ...Object.values(AWS_REGIONS).map((region) => region.location),
-                      ...Object.values(FLY_REGIONS).map((region) => region.location),
-                    ]}
-                  />
-                </div>
-              </motion.div>
-              <AnimatePresence>
-                {nodes.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 1.05 }}
-                    animate={{ opacity: 1, scale: 1, transition: { delay: 1 } }}
-                    exit={{ opacity: 0 }}
-                    className="h-full z-20"
-                  >
-                    <ReactFlowProvider>
-                      <SchemaFlow nodes={nodes} edges={edges} />
-                    </ReactFlowProvider>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </section>
+        <ProjectVisual
+          sqlStatements={sqlStatements}
+          services={services}
+          selectedRegion={selectedRegionObject}
+          projectDetails={{
+            dbRegion: form.getValues('dbRegion'),
+            cloudProvider: form.getValues('cloudProvider'),
+            computeSize: form.getValues('computeSize'),
+            postgresVersion: form.getValues('postgresVersionSelection'),
+          }}
+          instanceLabel={instanceLabel}
+        />
       </div>
     </div>
   )
@@ -1590,263 +1213,6 @@ const monthlyInstancePrice = (instance: string | undefined): number => {
 
 const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
-}
-
-type TableNodeData = {
-  name: string
-  isForeign: boolean
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isUpdateable: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
-
-async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
-  nodes: Node<TableNodeData>[]
-  edges: Edge[]
-}> {
-  if (!tables.length) {
-    return { nodes: [], edges: [] }
-  }
-
-  const nodes = tables.map((table) => {
-    const columns = (table.columns || [])
-      .sort((a, b) => a.ordinal_position - b.ordinal_position)
-      .map((column) => {
-        return {
-          id: column.id,
-          isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
-          name: column.name,
-          format: column.format,
-          isNullable: column.is_nullable,
-          isUnique: column.is_unique,
-          isUpdateable: column.is_updatable,
-          isIdentity: column.is_identity,
-        }
-      })
-
-    return {
-      id: `${table.id}`,
-      type: 'table',
-      data: {
-        name: table.name,
-        isForeign: false,
-        columns,
-      },
-      position: { x: 0, y: 0 },
-    }
-  })
-
-  const edges: Edge[] = []
-  const currentSchema = tables[0].schema
-  const uniqueRelationships = uniqBy(
-    tables.flatMap((t) => t.relationships),
-    'id'
-  )
-
-  for (const rel of uniqueRelationships) {
-    // TODO: Support [external->this] relationship?
-    if (rel.source_schema !== currentSchema) {
-      continue
-    }
-
-    // Create additional [this->foreign] node that we can point to on the graph.
-    if (rel.target_table_schema !== currentSchema) {
-      nodes.push({
-        id: rel.constraint_name,
-        type: 'table',
-        data: {
-          name: `${rel.target_table_schema}.${rel.target_table_name}.${rel.target_column_name}`,
-          isForeign: true,
-          columns: [],
-        },
-        position: { x: 0, y: 0 },
-      })
-
-      const [source, sourceHandle] = findTablesHandleIds(
-        tables,
-        rel.source_table_name,
-        rel.source_column_name
-      )
-
-      if (source) {
-        edges.push({
-          id: String(rel.id),
-          type: 'table',
-          source,
-          sourceHandle,
-          target: rel.constraint_name,
-          targetHandle: rel.constraint_name,
-        })
-      }
-
-      continue
-    }
-
-    const [source, sourceHandle] = findTablesHandleIds(
-      tables,
-      rel.source_table_name,
-      rel.source_column_name
-    )
-    const [target, targetHandle] = findTablesHandleIds(
-      tables,
-      rel.target_table_name,
-      rel.target_column_name
-    )
-
-    // We do not support [external->this] flow currently.
-    if (source && target) {
-      edges.push({
-        id: String(rel.id),
-        type: 'table',
-        source,
-        sourceHandle,
-        target,
-        targetHandle,
-      })
-    }
-  }
-
-  return layoutElements(nodes, edges)
-}
-
-function findTablesHandleIds(
-  tables: PostgresTable[],
-  table_name: string,
-  column_name: string
-): [string?, string?] {
-  for (const table of tables) {
-    if (table_name !== table.name) continue
-
-    for (const column of table.columns || []) {
-      if (column_name !== column.name) continue
-
-      return [String(table.id), column.id]
-    }
-  }
-
-  return []
-}
-
-/**
- * Positions nodes relative to each other on the graph using `dagre`.
- */
-const layoutElements = (nodes: Node[], edges: Edge[]) => {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({
-    rankdir: 'LR',
-    align: 'UR',
-    nodesep: 50,
-    ranksep: 50,
-  })
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, {
-      width: TABLE_NODE_WIDTH / 2,
-      height: (TABLE_NODE_ROW_HEIGHT / 2) * (node.data.columns.length + 1), // columns + header
-    })
-  })
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target)
-  })
-
-  dagre.layout(dagreGraph)
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id)
-    node.targetPosition = Position.Left
-    node.sourcePosition = Position.Right
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
-    node.position = {
-      x: nodeWithPosition.x - nodeWithPosition.width / 2,
-      y: nodeWithPosition.y - nodeWithPosition.height / 2,
-    }
-
-    return node
-  })
-
-  return { nodes, edges }
-}
-
-const Step1 = ({
-  onSubmit,
-  onStartBlank,
-  onMigrate,
-}: {
-  onSubmit: (value: string) => void
-  onStartBlank: () => void
-  onMigrate: () => void
-}) => {
-  const [value, setValue] = useState('')
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(value)
-  }
-
-  return (
-    <div className="flex w-full h-screen overflow-auto bg-background-200">
-      <div className="max-w-[600px] mx-auto p-16 min-h-screen flex items-center">
-        <div className="w-full">
-          <h3>What are you building?</h3>
-          <p className="text-sm text-foreground-lighter mb-4">
-            We can generate a starting schema for you including sample data.
-          </p>
-          <Textarea
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            className="mb-4 bg-surface-100 w-full"
-            placeholder="e.g. a messaging app with users, messages and groups built on NextJS"
-          />
-          <Button onClick={handleSubmit} type="primary" className="w-full">
-            Continue
-          </Button>
-          <div className="text-center text-sm text-foreground-lighter my-4">or</div>
-          <div className="grid grid-cols-2 gap-4">
-            <div
-              className="p-6 h-auto block text-center border rounded-md cursor text-sm border-strong hover:border-foreground-muted cursor-pointer"
-              role="button"
-              onClick={onStartBlank}
-            >
-              <Database
-                strokeWidth={1.5}
-                size={20}
-                className="text-foreground-lighter mx-auto mb-4"
-              />
-              <span className="mb-1 block">Start blank</span>
-              <span className="text-foreground-lighter text-center">
-                Configure a database and dive right in
-              </span>
-            </div>
-            <div
-              className="p-6 h-auto block text-center border rounded-md cursor text-sm border-strong hover:border-foreground-muted cursor-pointer"
-              role="button"
-              onClick={onMigrate}
-            >
-              <Import
-                strokeWidth={1.5}
-                size={20}
-                className="text-foreground-lighter mx-auto mb-4"
-              />
-              <span className="mb-1 block">Migrate</span>
-              <span className="text-foreground-lighter text-center">
-                Import your database from another provider
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 const Wizard: NextPageWithLayout = () => {
@@ -1884,7 +1250,7 @@ const Wizard: NextPageWithLayout = () => {
           transition={{ duration: 0.3 }}
         >
           {step === 1 ? (
-            <Step1
+            <InitialStep
               onSubmit={(value) => {
                 setAiDescription(value)
                 setTitle('Create a project')
