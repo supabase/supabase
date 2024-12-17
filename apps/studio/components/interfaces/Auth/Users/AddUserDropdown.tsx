@@ -19,8 +19,6 @@ import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
 
 const AddUserDropdown = () => {
-  const inviteEnabled = IS_PLATFORM
-
   const canInviteUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'invite_user')
   const canCreateUsers = useCheckPermissions(PermissionAction.AUTH_EXECUTE, 'create_user')
 
@@ -36,7 +34,7 @@ const AddUserDropdown = () => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-40">
-          {inviteEnabled && (
+          {
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <DropdownMenuItem
@@ -56,7 +54,7 @@ const AddUserDropdown = () => {
                 </TooltipContent_Shadcn_>
               )}
             </Tooltip_Shadcn_>
-          )}
+          }
 
           <Tooltip_Shadcn_>
             <TooltipTrigger_Shadcn_ asChild>
@@ -80,7 +78,7 @@ const AddUserDropdown = () => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {inviteEnabled && <InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
+      {<InviteUserModal visible={inviteVisible} setVisible={setInviteVisible} />}
       <CreateUserModal visible={createVisible} setVisible={setCreateVisible} />
     </>
   )
