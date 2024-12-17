@@ -4,7 +4,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { getTools } from '../sql/tools'
 import { executeSql } from 'data/sql/execute-sql-query'
 import pgMeta from '@supabase/pg-meta'
-import { SQL_SYSTEM_PROMPT } from 'data/ai/constants'
 
 export const maxDuration = 30
 const openAiKey = process.env.OPENAI_API_KEY
