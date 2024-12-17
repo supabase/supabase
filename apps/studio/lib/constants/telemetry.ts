@@ -13,13 +13,14 @@ export enum TelemetryActions {
   ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
+
   CRON_JOB_CREATED = 'cron_job_created',
   CRON_JOB_UPDATED = 'cron_job_updated',
   CRON_JOB_DELETED = 'cron_job_deleted',
   CRON_JOB_DELETE_CLICKED = 'cron_job_delete_clicked',
   CRON_JOB_UPDATE_CLICKED = 'cron_job_update_clicked',
   CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
-  CRON_JOBS_VIEW_PREVIOUS_RUNS_CLICKED = 'cron_job_view_previous_runs_clicked',
+  CRON_JOB_HISTORY_CLICKED = 'cron_job_history_clicked',
 
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
@@ -36,6 +37,127 @@ export enum TelemetryActions {
   SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED = 'sql_editor_result_download_csv_clicked',
   SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED = 'sql_editor_result_copy_markdown_clicked',
   SQL_EDITOR_RESULT_COPY_JSON_CLICKED = 'sql_editor_result_copy_markdown_clicked',
+}
+
+/**
+ * User copied the database connection string.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface ConnectionStringCopiedEvent {
+  action: TelemetryActions.CONNECTION_STRING_COPIED
+  properties: {
+    /**
+     * Method selected by user, e.g. URI, PSQL, SQLAlchemy, etc.
+     */
+    connectionType: string
+    /**
+     * Language of the code block if selected, e.g. bash, go
+     */
+    lang: string
+    /**
+     * Connection Method, e.g. direct, transaction_pooler, session_pooler
+     */
+    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+  }
+}
+
+/**
+ * Cron job created.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ */
+export interface CronJobCreatedEvent {
+  action: TelemetryActions.CRON_JOB_CREATED
+  properties: {
+    /**
+     * What the cron job executes, e.g. sql_function or sql_snippet
+     */
+    type: 'sql_function' | 'sql_snippet'
+    /**
+     * Schedule of the cron job in the format of * * * * *
+     */
+    schedule: string
+  }
+}
+
+/**
+ * Cron job updated.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs?dialog-shown=true
+ */
+export interface CronJobUpdatedEvent {
+  action: TelemetryActions.CRON_JOB_UPDATED
+  properties: {
+    /**
+     * What the cron job executes, e.g. sql_function or sql_snippet
+     */
+    type: 'sql_function' | 'sql_snippet'
+    /**
+     * Schedule of the cron job in the format of * * * * *
+     */
+    schedule: string
+  }
+}
+
+/**
+ * Cron job deleted.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobDeletedEvent {
+  action: TelemetryActions.CRON_JOB_DELETED
+}
+
+/**
+ * Create job button clicked that opens the dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobCreateClickedEvent {
+  action: TelemetryActions.CRON_JOB_CREATE_CLICKED
+}
+
+/**
+ * Edit cron job button (hidden in the dropdown) clicked that opens the dialog.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobUpdateClickedEvent {
+  action: TelemetryActions.CRON_JOB_UPDATE_CLICKED
+}
+
+/**
+ * Delete cron job button (hidden in the dropdown) clicked that opens the deletion confirmation modal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobDeleteClickedEvent {
+  action: TelemetryActions.CRON_JOB_DELETE_CLICKED
+}
+
+/**
+ * History button clicked to see previous runs of the cron job
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/integrations/cron/jobs
+ */
+export interface CronJobHistoryClickedEvent {
+  action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
 }
 
 // [Joshen] Just adding these to start consolidating our telemetry configs
