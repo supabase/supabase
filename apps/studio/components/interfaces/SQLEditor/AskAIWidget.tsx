@@ -43,7 +43,7 @@ export const AskAIWidget = ({
         inputRef={inputRef}
         size="xlarge"
         inputClassName="bg-transparent border-none shadow-none gap-4 text-xs focus-visible:outline-none focus-visible:ring-0 py-2 pl-3"
-        placeholder={isDiffVisible ? 'Make an edit...' : 'Ask the Assistant to do something'}
+        placeholder={isDiffVisible ? 'Make an edit...' : 'Edit SQL via the Assistant...'}
         autoFocus
         value={value}
         onChange={(e) => onChange(e.target.value)}
