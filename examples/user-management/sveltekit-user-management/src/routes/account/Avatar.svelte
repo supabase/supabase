@@ -13,7 +13,20 @@
 	const currentUrl = $svelteState(urlProp)
 	let fileInput: HTMLInputElement | null = null
 
-	const dispatch = createEventDispatcher()
+	const dispatch = createEventDispatcher<{
+		urlChange: string;
+		upload: void;
+	}>()
+
+	$svelteEffect(() => {
+		// Update currentUrl when urlProp changes
+		currentUrl.set(urlProp)
+	})
+
+	$svelteEffect(() => {
+		// Dispatch urlChange event when currentUrl changes
+		dispatch('urlChange', currentUrl)
+	})
 
 	const downloadImage = async (path: string) => {
 		try {
@@ -79,7 +92,7 @@
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
-		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
+		<div class="avatar no-image" style="height: {size}em; width: {size}em;" />
 	{/if}
 	<input type="hidden" name="avatarUrl" value={currentUrl} />
 

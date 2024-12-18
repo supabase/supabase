@@ -31,6 +31,10 @@
 			update()
 		}
 	}
+
+	const handleUrlChange = (event: CustomEvent<string>) => {
+		avatarUrl.set(event.detail)
+	}
 </script>
 
 <div class="form-widget">
@@ -41,14 +45,15 @@
 		use:enhance={handleSubmit}
 		bind:this={profileForm}
 	>
-        <Avatar
-            {supabase}
-            bind:url={avatarUrl}
-            size={10}
-            on:upload={() => {
-                profileForm.requestSubmit();
-            }}
-        />
+		<Avatar
+			{supabase}
+			urlProp={avatarUrl}
+			size={10}
+			on:urlChange={handleUrlChange}
+			on:upload={() => {
+				profileForm.requestSubmit();
+			}}
+		/>
 		<div>
 			<label for="email">Email</label>
 			<input id="email" type="text" value={session.user.email} disabled />
