@@ -8,5 +8,8 @@ export default defineConfig({
 				runes: true
 			}
 		})
-	]
+	],
+	build: {
+		ssr: false
+	}
 });
