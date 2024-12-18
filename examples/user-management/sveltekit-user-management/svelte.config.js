@@ -11,7 +11,8 @@ const config = {
 		}),
 		csrf: {
 			checkOrigin: false,
-		}
+		},
+		ssr: false
 	},
 
 	compilerOptions: {
