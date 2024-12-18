@@ -2,19 +2,19 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
+	import { state, effect, props } from 'svelte'
 
-	let $data;
-	let $supabase;
-	let $session;
+	let { data } = props()
+	let { supabase, session } = data
 
-	$effect(() => {
-		const { data } = $supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== $session?.expires_at) {
+	effect(() => {
+		const { data: authData } = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
 			}
 		})
 
-		return () => data.subscription.unsubscribe()
+		return () => authData.subscription.unsubscribe()
 	})
 </script>
 
@@ -23,5 +23,5 @@
 </svelte:head>
 
 <div class="container" style="padding: 50px 0 100px 0">
-	{@render $$slots.default()}
+	<slot />
 </div>

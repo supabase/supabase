@@ -1,16 +1,17 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import { state, props } from 'svelte'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	let $form: ActionData;
-	let $loading = $state(false);
+	let { form } = props<{ form: ActionData }>()
+	let loading = state(false)
 
 	const handleSubmit: SubmitFunction = () => {
-		$loading = true;
+		loading = true
 		return async ({ update }) => {
-			update();
-			$loading = false;
+			update()
+			loading = false
 		}
 	}
 </script>
@@ -23,9 +24,9 @@
 	<div class="col-6 form-widget">
 		<h1 class="header">Supabase + SvelteKit</h1>
 		<p class="description">Sign in via magic link with your email below</p>
-		{#if $form?.message !== undefined}
-		<div class="success {$form?.success ? '' : 'fail'}">
-			{$form?.message}
+		{#if form?.message !== undefined}
+		<div class="success {form?.success ? '' : 'fail'}">
+			{form?.message}
 		</div>
 		{/if}
 		<div>
@@ -36,17 +37,17 @@
 				class="inputField"
 				type="email"
 				placeholder="Your email"
-				value={$form?.email ?? ''}
+				value={form?.email ?? ''}
 			/>
 		</div>
-		{#if $form?.errors?.email}
+		{#if form?.errors?.email}
 		<span class="flex items-center text-sm error">
-			{$form?.errors?.email}
+			{form?.errors?.email}
 		</span>
 		{/if}
 		<div>
 			<button class="button primary block">
-				{ $loading ? 'Loading' : 'Send magic link' }
+				{ loading ? 'Loading' : 'Send magic link' }
 			</button>
 		</div>
 	</div>
