@@ -21,6 +21,7 @@ import { BlockKeys } from '../common/BlockKeys'
 interface BaseEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
   type: 'date' | 'datetime' | 'datetimetz'
+  isNullable: boolean
 }
 
 const FORMAT_MAP = {
@@ -152,20 +153,9 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   )
 }
 
-export function DateTimeEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="datetime" />
-}
-
-export function DateTimeWithTimezoneEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="datetimetz" />
-}
-
-export function DateEditor<TRow, TSummaryRow = unknown>(
-  props: RenderEditCellProps<TRow, TSummaryRow>
-) {
-  return <BaseEditor {...props} type="date" />
+export function DateTimeEditor(type: 'datetime' | 'datetimetz' | 'date', isNullable: boolean) {
+  // eslint-disable-next-line react/display-name
+  return <TRow, TSummaryRow = unknown>(props: RenderEditCellProps<TRow, TSummaryRow>) => {
+    return <BaseEditor {...props} type={type} isNullable={isNullable} />
+  }
 }
