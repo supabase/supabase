@@ -6,6 +6,7 @@ import { cn } from 'ui/src/lib/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
+import { Clipboard } from 'lucide-react'
 
 dayjs.extend(relativeTime)
 dayjs.extend(utc)
@@ -25,7 +26,7 @@ type TimestampFormatter = {
   format?: string
 }
 
-const timestampLocalFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
+export const timestampLocalFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
   const timestamp = isUnixMicro(utcTimestamp) ? unixMicroToIsoTimestamp(utcTimestamp) : utcTimestamp
   return dayjs.utc(timestamp).local().format(format)
 }
@@ -51,11 +52,15 @@ const timestampRelativeFormatter = ({ utcTimestamp }: TimestampFormatter) => {
 export const TimestampInfo = ({
   utcTimestamp,
   className,
+  displayAs = 'local',
   format = 'DD MMM  HH:mm:ss',
+  labelFormat = 'DD MMM HH:mm:ss',
 }: {
   className?: string
   utcTimestamp: string | number
+  displayAs?: 'local' | 'utc'
   format?: string
+  labelFormat?: string
 }) => {
   const local = timestampLocalFormatter({ utcTimestamp, format })
   const utc = timestampUtcFormatter({ utcTimestamp, format })
@@ -101,10 +106,8 @@ export const TimestampInfo = ({
           }, 1000)
         }}
         className={cn(
-          'relative cursor-default grid grid-cols-2 gap-2 hover:bg-surface-100 px-2 py-1',
-          {
-            'bg-surface-100': copied,
-          }
+          'relative cursor-default grid grid-cols-2 gap-2 hover:bg-surface-100 px-2 py-1 group',
+          { 'bg-surface-100': copied }
         )}
       >
         <span className="text-right truncate">{label}:</span>
@@ -114,7 +117,10 @@ export const TimestampInfo = ({
               Copied!
             </span>
           )}
-          <span>{value}</span>
+          <span className="flex items-center gap-x-2">
+            {value}
+            <Clipboard size={12} className="opacity-0 group-hover:opacity-100 transition" />
+          </span>
         </div>
       </span>
     )
@@ -123,10 +129,15 @@ export const TimestampInfo = ({
   return (
     <Tooltip>
       <TooltipTrigger
+        asChild
         ref={triggerRef}
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
-        <span>{timestampLocalFormatter({ utcTimestamp, format })}</span>
+        <span>
+          {displayAs === 'local'
+            ? timestampLocalFormatter({ utcTimestamp, format: labelFormat })
+            : timestampUtcFormatter({ utcTimestamp, format: labelFormat })}
+        </span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
         <TooltipRow label="UTC" value={utc} />
