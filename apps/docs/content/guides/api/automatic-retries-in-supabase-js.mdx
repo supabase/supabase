@@ -69,21 +69,31 @@ fetchData();
 
 ## 5. Fine-Tuning Retries for Specific Requests
 
-If you need different retry logic for certain requests, you can override the default fetch for specific API calls:
+If you need different retry logic for certain requests, you can use the `retryOn` with a custom function to inpsect the URL or response and decide whether to retry the request.
 
 ```javascript
-async function fetchWithCustomRetry() {
-  const fetchWithCustomOptions = fetchRetry(fetch, {
-    retries: 5,
-    retryDelay: (attempt) => 1000 * attempt, // Linear backoff
-  });
+const fetchWithRetry = fetchRetry(fetch, {
+  retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
+  retryOn: (attempt, error, response) => {
+    const shouldRetry
+      = (attempt: number, error: Error | null, response: Response | null) =>
+        attempt < 3
+          && response
+          && response.status >= 500
+          && response.url.includes('rpc/your_stored_procedure')
 
+    if (shouldRetry(attempt, error, response)) {
+      console.log(`Retrying request... Attempt #${attempt}`, response)
+      return true
+    }
+
+    return false
+  }
+})
+
+async function yourStoredProcedure() {
   const { data, error } = await supabase
-    .rpc('your_stored_procedure', {
-      param1: 'value1'
-    }, {
-      fetch: fetchWithCustomOptions
-    });
+    .rpc('your_stored_procedure', { param1: 'value1' });
 
   if (error) {
     console.log('Error executing RPC:', error);
@@ -92,22 +102,10 @@ async function fetchWithCustomRetry() {
   }
 }
 
-fetchWithCustomRetry();
+yourStoredProcedure();
 ```
 
-## 6. Debugging and Logs
-
-To debug retry behavior, you can use the `onRetry` callback to log retry attempts:
-
-```javascript
-const fetchWithRetry = fetchRetry(fetch, {
-  retries: 3,
-  retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000),
-  onRetry: (attempt, error, response) => {
-    console.log(`Retrying request... Attempt #${attempt}`, error || response);
-  },
-});
-```
+By using `retryOn` with a custom function, you can define specific conditions for retrying requests. In this example, the retry logic is applied only to requests targeting a specific stored procedure.
 
 ## Conclusion
 
