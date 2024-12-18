@@ -1,0 +1,74 @@
+---
+id: 'Analytics'
+title: 'Event Analytics'
+description: 'Scalable data analytics'
+subtitle: 'Scalable data analytics for observability, metrics, and more.'
+hideToc: true
+---
+
+Supabase Analytics is an event ingestion and querying engine, that allows for storing, dispatching, and querying of events from one or more databases.
+
+## Features
+
+### Scalable Storage and Querying Costs
+
+Columnar databases allows for fast analysis while providing compact storage mechanisms. The costs scale predictably according to the amount of data stored, allowing users to have a peace of mind when managing billing and infrastructure costs.
+
+Lucene-based event management systems worked well before the advent of scalable database options, but starts to get prohibitively expensive beyond a certain scale and volume, and the data would need to be shipped elsewhere to be further analyzed over the long term.
+
+Analytics connects to databases such as BigQuery to store massive volumes of data, while also providing tooling to abstract away the infrastructure intricacies of working with the underlying storage engine.
+
+### Bring Your Own Backends
+
+Analytics can integrate with your very own backends, with Analytics managing the ingestion pipeline and maximizing throughput of events. This ensures maximum flexibility for storing sensitive data.
+
+Bringing-your-own-backend gives Supabase customers complete control over storage and querying costs.
+
+### Schema Management
+
+When events are ingested, the backend's schema is automatically managed by Analytics, allowing you to insert JSON payloads without having to worry about data type changes.
+
+When new fields are sent to Analytics, the data type is detected automatically and merged into the current table schema.
+
+## Quickstart
+
+1. Create a collection
+
+   Head over to the [Logs & Analytics page](https://supabase.com/dashboard/project/_/logs/explorer).
+
+   Create a **New Collection** under the Analytics Events section.
+
+2. Retrieve ingestion access token
+
+   Retrieve your public ingestion access token by clicking [Analytics Settings](https://supabase.com/dashboard/project/_/settings/Analytics) and clicking on the copy button.
+
+3. Send an event
+
+   Execute this cURL command to send an event to Analytics.
+
+   Replace `YOUR-COLLECTION-NAME-HERE` and `YOUR-ACCESS-TOKEN-HERE` placeholders with the values from step 2.
+
+```bash
+# By collection name
+curl -X "POST" "https://api.warehouse.tech/api/events/json?collection_name=YOUR-COLLLECTION-NAME-HERE" \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'Authorization: Bearer YOUR-ACCESS-TOKEN-HERE' \
+    -d $'[{
+    "message": "This is the main event message",
+    "metadata": {"some": "log event"}
+}]'
+
+
+# By collection UUID
+curl -X "POST" "https://api.warehouse.tech/api/events/json?collection=YOUR-COLLECTION-UUID-HERE" \
+    -H 'Content-Type: application/json; charset=utf-8' \
+    -H 'Authorization: Bearer YOUR-ACCESS-TOKEN-HERE' \
+    -d $'[{
+    "message": "This is the main event message",
+    "metadata": {"some": "log event"}
+}]'
+```
+
+4. **Check the Collection**
+
+You should see your new event pop up in the collection overview. You can then search and filter the collection for specific events using the filters, or use SQL to query the Analytics collections.
