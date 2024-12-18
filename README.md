@@ -195,6 +195,15 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <td><a href="https://github.com/supabase-community/storage-gdscript" target="_blank" rel="noopener noreferrer">storage-gdscript</a></td>
     <td><a href="https://github.com/supabase-community/functions-gdscript" target="_blank" rel="noopener noreferrer">functions-gdscript</a></td>
   </tr>
+  <tr>
+    <td>Arduino (C++)</td>
+    <td><a href="https://github.com/zumatt/Supabase-ESP32" target="_blank" rel="noopener noreferrer">supabase-esp32</a></td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+    <td>-</td>
+  </tr>
   <!-- /notranslate -->
 </table>
 
