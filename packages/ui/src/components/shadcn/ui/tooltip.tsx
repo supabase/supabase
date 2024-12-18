@@ -11,7 +11,12 @@ const Tooltip = (props: React.ComponentPropsWithoutRef<typeof TooltipPrimitive.R
   <TooltipPrimitive.Root delayDuration={180} {...props} />
 )
 
-const TooltipTrigger = TooltipPrimitive.Trigger
+const TooltipTrigger = React.forwardRef<
+  React.ElementRef<typeof TooltipPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TooltipPrimitive.TooltipTrigger ref={ref} {...props} className={cn(className)} />
+))
 
 const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
