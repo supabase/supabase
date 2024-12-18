@@ -2,7 +2,7 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { defineProps, defineState, defineEffect } from 'svelte'
+	import { defineProps, defineState, defineEffect } from 'svelte/runes'
 
 	const size = $defineProps<number>(10)
 	const urlProp = $defineProps<string>('')
@@ -106,7 +106,7 @@
 			id="single"
 			accept="image/*"
 			bind:this={fileInput}
-			on:change={uploadAvatar}
+			onchange={uploadAvatar}
 			disabled={uploading.value}
 		/>
 	</div>
