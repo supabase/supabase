@@ -13,6 +13,8 @@ Using OAuth2.0 you can retrieve an access and refresh token that grant your appl
 2. In the upper-right section of the page, click **Add application**.
 3. Fill in the required details and click **Confirm**.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ## Show a "Connect Supabase" button
 
 In your user interface, add a "Connect Supabase" button to kick off the OAuth flow. Follow the design guidelines outlined in our [brand assets](/brand-assets).
@@ -157,7 +159,7 @@ When creating a new project, you can either ask the user to provide a database p
 
 You can configure the user's [custom SMTP settings](https://supabase.com/docs/guides/auth/auth-smtp) using the [`/config/auth` endpoint](https://api.supabase.com/api/v1#/projects%20config/updateV1AuthConfig).
 
-### Handling Dynamic Redirect URLs
+### Handling dynamic redirect URLs
 
 To handle multiple, dynamically generated redirect URLs within the same OAuth app, you can leverage the `state` query parameter. When starting the OAuth process, include the desired, encoded redirect URL in the `state` parameter.
 Once authorization is complete, we will sends the `state` value back to your app. You can then verify its integrity and extract the correct redirect URL, decoding it and redirecting the user to the correct URL.
