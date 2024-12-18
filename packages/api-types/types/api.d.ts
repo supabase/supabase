@@ -7994,7 +7994,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['BackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
