@@ -2,13 +2,12 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	import { runes } from 'svelte/runes'
-	const { props: svelteProps, effect: svelteEffect } = runes
+	import { props, effect } from 'svelte'
 
-	const data = $svelteProps<{ supabase: any; session: any }>()
+	const data = $props<{ supabase: any; session: any }>()
 	const { supabase, session } = data
 
-	$svelteEffect(() => {
+	$effect(() => {
 		const { data: authData } = supabase.auth.onAuthStateChange((event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
