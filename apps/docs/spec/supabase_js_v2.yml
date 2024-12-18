@@ -3882,6 +3882,35 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: update-a-record-with-count
+        name: Update a record and return count
+        code: |
+          ```ts
+          const result = await supabase
+            .from('countries')
+            .update({ name: 'Australia' }, {count: 'exact'})
+            .eq('id', 1)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            insert into
+                countries (id, name)
+            values
+                (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            error: null,
+            data: null,
+            count: 1,
+            status: 204,
+            statusText: 'No Content'
+          }
+          ```
       - id: update-a-record-and-return-it
         name: Update a record and return it
         code: |
