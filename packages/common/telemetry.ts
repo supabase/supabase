@@ -17,9 +17,7 @@ interface TelemetryData {
 export function handlePageTelemetry(API_URL: string, route: string, telemetryData: TelemetryData) {
   const { page_url } = telemetryData
 
-  // check if ph exists, if not use an empty object
-  const ph = telemetryData?.ph || {}
-  const { search = '', language = '', viewport_height = 0, viewport_width = 0 } = ph
+  const { search, language, viewport_height, viewport_width } = telemetryData.ph
 
   return post(
     `${API_URL}/telemetry/page`,
