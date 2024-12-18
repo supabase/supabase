@@ -67,6 +67,15 @@ const ColumnType = ({
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
+  // handle non data fill to give error
+  const handleSelect = (value: string) => {
+    if (!value) {
+      alert("Please select a column type.");
+      return;
+    }
+    onOptionSelect(value);
+  }
+
   // @ts-ignore
   const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.format))
   const isAvailableType = value ? availableTypes.includes(value) : true
@@ -221,7 +230,7 @@ const ColumnType = ({
                       value={option.name}
                       className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
                       onSelect={(value: string) => {
-                        onOptionSelect(value)
+                        handleSelect(value);
                         setOpen(false)
                       }}
                     >
