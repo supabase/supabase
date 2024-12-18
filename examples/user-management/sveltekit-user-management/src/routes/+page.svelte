@@ -3,15 +3,14 @@
 	import { enhance } from '$app/forms'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let form: ActionData;
-	
-	let loading = false
+	let { form } = $props<{ form: ActionData }>();
+	let loading = $state(false);
 
 	const handleSubmit: SubmitFunction = () => {
-		loading = true
+		loading = true;
 		return async ({ update }) => {
-			update()
-			loading = false
+			update();
+			loading = false;
 		}
 	}
 </script>
@@ -31,13 +30,13 @@
 		{/if}
 		<div>
 			<label for="email">Email address</label>
-			<input 
-				id="email" 
-				name="email" 
-				class="inputField" 
-				type="email" 
-				placeholder="Your email" 
-				value={form?.email ?? ''} 
+			<input
+				id="email"
+				name="email"
+				class="inputField"
+				type="email"
+				placeholder="Your email"
+				value={form?.email ?? ''}
 			/>
 		</div>
 		{#if form?.errors?.email}

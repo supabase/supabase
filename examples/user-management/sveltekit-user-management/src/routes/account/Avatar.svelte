@@ -3,15 +3,17 @@
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
 
-	export let size = 10
-	export let url: string
-	export let supabase: SupabaseClient
+	let { size = 10, url, supabase } = $props<{
+		size?: number;
+		url: string;
+		supabase: SupabaseClient;
+	}>();
 
-	let avatarUrl: string | null = null
-	let uploading = false
-	let files: FileList
+	let avatarUrl = $state<string | null>(null);
+	let uploading = $state(false);
+	let files = $state<FileList | null>(null);
 
-	const dispatch = createEventDispatcher()
+	const dispatch = createEventDispatcher();
 
 	const downloadImage = async (path: string) => {
 		try {
@@ -61,7 +63,9 @@
 		}
 	}
 
-	$: if (url) downloadImage(url)
+	$effect(() => {
+		if (url) downloadImage(url);
+	});
 </script>
 
 <div>
