@@ -6,9 +6,23 @@ topics = ["database", "platform"]
 keywords = ["timeout", "query", "database", "psql", "compute"]
 ---
 
-> NOTE: If you are receiving timeout errors for normal REST operations from your application, you should check out this [guide](https://github.com/orgs/supabase/discussions/14256) instead
+<Admonition type="tip">
 
-Some queries, such as indexing a table or changing a column's data type are unavoidably time consuming. When you must execute long-running queries, there are a few steps that should be taken. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has an internal time limit of ~1 minute for queries, so it is necessary to execute your code through an external interface, such as PSQL.
+This page covers long-running queries via the Dashboard or external interfaces. For Supabase Client API timeout errors, check this [guide](https://github.com/orgs/supabase/discussions/14256) instead.
+
+</Admonition>
+
+Certain queries, like indexing a table or changing a column's data type, are inherently time-consuming. The [Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/sql/) has a 1-minute timeout limit.
+ 
+To execute long-running queries, follow the below steps.
+
+### Install an external SQL client
+
+The guide focuses on [psql](https://supabase.com/docs/guides/database/psql) but you can use any Postgres client.
+
+Some other options include:
+- [pgadmin](https://supabase.com/docs/guides/database/pgadmin)
+- [DBeaver](https://supabase.com/docs/guides/database/dbeaver)
 
 You can install PSQL in [macOS](https://stackoverflow.com/a/49689589/2188186) and [Windows](https://www.postgresql.org/download/windows/) by following these links and instructions. For Linux (Debian) you can run the following:
 
@@ -17,16 +31,28 @@ sudo apt-get update
 sudo apt-get install postgresql-client
 ```
 
-Once installed, you can find your PSQL string from the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Please make sure if you are using the pooler connection that it is in session mode (port 5432).
+Once installed, you can find your PSQL string in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database). Please make sure if you are using the pooler connection that it is in session mode (port 5432).
 
-> If you are working in an [ IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, it is preferable to use the direct connection for these types of long running tasks
+<Admonition type="tip">
 
-Then you can increase the query timeout for your session:
+If you are working in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, it is preferable to use the direct connection.
 
+</Admonition>
+
+### Increase the query timeout
+
+Then you can increase the query timeout solely for your session:
+
+Long timeout
 ```sql
 set statement_timeout = '120min';
 ```
 
+Disable timeout
+```sql
+set statement_timeout = '0';
+```
+
 If your task is particularly long, you can may want to consider boosting your computing power temporarily. Compute size on Supabase is charged by the hour, so you can increase it for an hour or two, complete your task faster, then scale it back afterward.
 
-Here is a list of [compute add-ons](https://supabase.com/docs/guides/platform/compute-add-ons). If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
+If you want to temporarily upgrade, you can find the add-ons for your project in your [Dashboard's Add-Ons Settings.](https://supabase.green/dashboard/project/_/settings/addons)
