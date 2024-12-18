@@ -15,8 +15,10 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
     return [Math.PI - ((long * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180]
   }
   const focusRef = useRef([0, 0])
+  const currentLocationRef = useRef(currentLocation)
 
   useEffect(() => {
+    currentLocationRef.current = currentLocation
     if (currentLocation) {
       const [lat, long] = currentLocation
       focusRef.current = locationToAngles(lat, long)
@@ -59,18 +61,24 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
           }))
         : undefined,
       onRender: (state) => {
-        state.phi = currentPhi
-        state.theta = currentTheta
-        const [focusPhi, focusTheta] = focusRef.current
-        const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
-        const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
+        if (currentLocationRef.current) {
+          state.phi = currentPhi
+          state.theta = currentTheta
+          const [focusPhi, focusTheta] = focusRef.current
+          const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
+          const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
 
-        if (distPositive < distNegative) {
-          currentPhi += distPositive * 0.08
+          if (distPositive < distNegative) {
+            currentPhi += distPositive * 0.03
+          } else {
+            currentPhi -= distNegative * 0.03
+          }
+          currentTheta = currentTheta * 0.97 + focusTheta * 0.03
         } else {
-          currentPhi -= distNegative * 0.08
+          // Slow constant rotation when no location is focused
+          state.phi = currentPhi
+          currentPhi += 0.002
         }
-        currentTheta = currentTheta * 0.92 + focusTheta * 0.08
 
         state.width = width * 2
         state.height = width * 2

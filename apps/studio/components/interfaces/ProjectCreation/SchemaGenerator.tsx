@@ -1,5 +1,5 @@
 import { useChat } from 'ai/react'
-import { Button } from 'ui'
+import { Button, Textarea } from 'ui'
 import { ArrowUp } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -18,6 +18,7 @@ interface Props {
   onSqlGenerated: (sql: string) => void
   onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
+  isOneOff: boolean
 }
 
 export const SchemaGenerator = ({
@@ -25,8 +26,10 @@ export const SchemaGenerator = ({
   onSqlGenerated,
   onServicesUpdated,
   onTitleUpdated,
+  isOneOff = false,
 }: Props) => {
   const [input, setInput] = useState('')
+  const [hasSql, setHasSql] = useState(false)
 
   const {
     messages,
@@ -37,10 +40,14 @@ export const SchemaGenerator = ({
     api: `${BASE_PATH}/api/ai/onboarding/design`,
     id: 'schema-generator',
     maxSteps: 7,
+    onFinish: () => {
+      setInput('')
+    },
     async onToolCall({ toolCall }) {
       if (toolCall.toolName === 'executeSql') {
         try {
           const sql = (toolCall.args as { sql: string }).sql
+          setHasSql(true)
           onSqlGenerated(sql)
           return {
             success: true,
@@ -76,68 +83,50 @@ export const SchemaGenerator = ({
   }, [])
 
   return (
-    <FormItemLayout>
-      <div className="flex justify-between w-full block items-center mb-4">
-        <Label_Shadcn_ className="flex-1">Generate a starting schema</Label_Shadcn_>
-        {messages?.length > 0 && (
-          <Button
-            type="outline"
-            size="small"
-            onClick={() => {
-              append({
-                role: 'user',
-                content: 'Undo everything you have done and create a blank database',
-              })
-            }}
-          >
-            Reset
-          </Button>
-        )}
-      </div>
+    <div>
+      {!isOneOff && (
+        <div className="flex justify-between w-full block items-center mb-4">
+          <Label_Shadcn_ className="text-foreground-light flex-1">
+            Generate a starting schema
+          </Label_Shadcn_>
+          {messages?.length > 0 && (
+            <Button
+              type="outline"
+              size="tiny"
+              onClick={() => {
+                append({
+                  role: 'user',
+                  content: 'Undo everything you have done and create a blank database',
+                })
+              }}
+            >
+              Reset
+            </Button>
+          )}
+        </div>
+      )}
       <div className="rounded-md border bg-surface-100">
-        {messages.length > 0 && (
-          <div className="px-4 py-3 border-b space-y-1">
-            <p className="text-foreground-light">
-              {messages.filter((m) => m.role === 'user').slice(-1)[0]?.content || ''}
-            </p>
-            <p>
-              {messages[messages.length - 1].role === 'user' ||
-              messages[messages.length - 1].content === '' ? (
-                <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                  <span>Thinking</span>
-                  <div className="flex gap-1">
-                    {[0, 0.3, 0.6].map((delay) => (
-                      <motion.span
-                        key={delay}
-                        animate={{ opacity: [0, 1, 0] }}
-                        transition={{
-                          duration: 1.5,
-                          repeat: Infinity,
-                          delay,
-                        }}
-                      >
-                        .
-                      </motion.span>
-                    ))}
-                  </div>
-                </motion.div>
-              ) : (
+        {messages.length > 0 &&
+          messages[messages.length - 1].role === 'assistant' &&
+          messages[messages.length - 1].content.length > 0 &&
+          ((isOneOff && !hasSql) || !isOneOff) && (
+            <div className="px-4 py-3 border-b space-y-1">
+              <p>
                 <Markdown
-                  className="text-foreground"
+                  className="text-foreground-light"
                   content={
                     messages.filter((m) => m.role === 'assistant').slice(-1)[0]?.content || ''
                   }
                 />
-              )}
-            </p>
-          </div>
-        )}
+              </p>
+            </div>
+          )}
         <div className="w-full relative text-sm border-none block bg-muted mb-0 text-foreground-light placeholder:text-foreground-lighter">
-          <textarea
+          <Textarea
             id="input"
             name="prompt"
             autoComplete="off"
-            className="text-sm w-full bg-transparent border-none px-4 pt-2 py-8 resize-none focus:outline-none focus:ring-0 resize-none"
+            className="text-sm w-full bg-transparent border-none resize-none px-4 pt-3 pb-8"
             value={input}
             disabled={isMessagesLoading}
             onChange={(e) => {
@@ -145,35 +134,31 @@ export const SchemaGenerator = ({
               setInput(e.target.value)
             }}
             placeholder={messages.length > 0 ? 'Make an edit...' : 'Describe your application...'}
-            autoFocus
-            rows={
-              messages.length > 0
-                ? Math.max(1, Math.min(input.split('\n').length, 10))
-                : Math.max(3, Math.min(input.split('\n').length, 10))
-            }
+            rows={Math.max(3, Math.min(input.split('\n').length, 10))}
             onKeyDown={(e) => {
               if (!(e.target instanceof HTMLTextAreaElement)) {
                 return
               }
               if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault()
+                setHasSql(false)
                 append({ role: 'user', content: input })
-                setInput('')
               }
             }}
           />
           <Button
             onClick={(e) => {
               e.preventDefault()
+              setHasSql(false)
               append({ role: 'user', content: input })
-              setInput('')
             }}
-            className="rounded-full w-7 h-7 absolute bottom-2 right-2 justify-center items-center p-0"
-          >
-            <ArrowUp size={16} />
-          </Button>
+            disabled={isMessagesLoading}
+            loading={isMessagesLoading}
+            icon={<ArrowUp size={16} />}
+            className="rounded-full absolute bottom-2 right-2"
+          ></Button>
         </div>
       </div>
-    </FormItemLayout>
+    </div>
   )
 }

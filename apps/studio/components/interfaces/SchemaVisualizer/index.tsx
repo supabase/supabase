@@ -4,24 +4,11 @@ import dagre from '@dagrejs/dagre'
 import { Edge, Node, Position, ReactFlowProvider } from 'reactflow'
 import { useEffect, useRef, useState } from 'react'
 import { SchemaFlow } from 'components/interfaces/ProjectCreation/SchemaFlow'
+import { getGraphDataFromTables } from '../Database/Schemas/Schemas.utils'
+import { TableNodeData } from '../Database/Schemas/SchemaTableNode'
 
 export const TABLE_NODE_WIDTH = 640
 export const TABLE_NODE_ROW_HEIGHT = 80
-
-type TableNodeData = {
-  name: string
-  isForeign: boolean
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isUpdateable: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
 
 interface SchemaVisualizerProps {
   sqlStatements: string[]
@@ -76,6 +63,7 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
     const updateSchema = async () => {
       if (!db.current) return
 
+      console.log('updateSchema', sqlStatements)
       // Execute only new statements
       const newStatements = sqlStatements.filter((sql) => !executedStatements.current.has(sql))
 
@@ -91,6 +79,7 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
           query: async (sql: string) => {
             try {
               const res = await db.current?.query(sql)
+              console.log('response:', sql, res)
               return wrapResult<any[]>(res.rows)
             } catch (error) {
               console.error('Query failed:', error)
@@ -111,9 +100,13 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
         }
 
         if (tables) {
-          const graphData = await getGraphDataFromTables(tables)
-          setNodes(graphData.nodes)
-          setEdges(graphData.edges)
+          const { nodes, edges } = await getGraphDataFromTables(
+            'onboarding',
+            { id: 1, name: 'public', owner: 'admin' },
+            tables
+          )
+          setNodes(nodes)
+          setEdges(edges)
         }
       } catch (error) {
         console.error('Failed to execute SQL:', error)
@@ -123,6 +116,8 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
     updateSchema()
   }, [sqlStatements])
 
+  console.log('nodes', nodes)
+
   return (
     <div className={className}>
       <ReactFlowProvider>
@@ -130,153 +125,4 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
       </ReactFlowProvider>
     </div>
   )
-}
-
-// Helper functions
-
-async function getGraphDataFromTables(tables: PostgresTable[]): Promise<{
-  nodes: Node<TableNodeData>[]
-  edges: Edge[]
-}> {
-  if (!tables.length) {
-    return { nodes: [], edges: [] }
-  }
-
-  const nodes = tables.map((table) => {
-    const columns = (table.columns || [])
-      .sort((a, b) => a.ordinal_position - b.ordinal_position)
-      .map((column) => ({
-        id: column.id,
-        isPrimary: table.primary_keys.some((pk) => pk.name === column.name),
-        name: column.name,
-        format: column.format,
-        isNullable: column.is_nullable,
-        isUnique: column.is_unique,
-        isUpdateable: column.is_updatable,
-        isIdentity: column.is_identity,
-      }))
-
-    return {
-      id: `${table.id}`,
-      type: 'table',
-      data: {
-        name: table.name,
-        isForeign: false,
-        columns,
-      },
-      position: { x: 0, y: 0 },
-    }
-  })
-
-  const edges = generateEdges(tables)
-  return layoutElements(nodes, edges)
-}
-
-function generateEdges(tables: PostgresTable[]): Edge[] {
-  const edges: Edge[] = []
-  const currentSchema = tables[0].schema
-  const uniqueRelationships = uniqBy(
-    tables.flatMap((t) => t.relationships),
-    'id'
-  )
-
-  for (const rel of uniqueRelationships) {
-    if (rel.source_schema !== currentSchema) {
-      continue
-    }
-
-    if (rel.target_table_schema !== currentSchema) {
-      edges.push({
-        id: rel.constraint_name,
-        type: 'table',
-        source: findTablesHandleIds(tables, rel.source_table_name, rel.source_column_name)[0] || '',
-        sourceHandle: findTablesHandleIds(tables, rel.source_table_name, rel.source_column_name)[1],
-        target: rel.constraint_name,
-        targetHandle: rel.constraint_name,
-      })
-      continue
-    }
-
-    const [source, sourceHandle] = findTablesHandleIds(
-      tables,
-      rel.source_table_name,
-      rel.source_column_name
-    )
-    const [target, targetHandle] = findTablesHandleIds(
-      tables,
-      rel.target_table_name,
-      rel.target_column_name
-    )
-
-    if (source && target) {
-      edges.push({
-        id: String(rel.id),
-        type: 'table',
-        source,
-        sourceHandle,
-        target,
-        targetHandle,
-      })
-    }
-  }
-
-  return edges
-}
-
-function findTablesHandleIds(
-  tables: PostgresTable[],
-  table_name: string,
-  column_name: string
-): [string?, string?] {
-  for (const table of tables) {
-    if (table_name !== table.name) continue
-
-    for (const column of table.columns || []) {
-      if (column_name !== column.name) continue
-
-      return [String(table.id), column.id]
-    }
-  }
-
-  return []
-}
-
-function layoutElements(nodes: Node[], edges: Edge[]) {
-  const dagreGraph = new dagre.graphlib.Graph()
-  dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({
-    rankdir: 'LR',
-    align: 'UR',
-    nodesep: 50,
-    ranksep: 50,
-  })
-
-  nodes.forEach((node) => {
-    dagreGraph.setNode(node.id, {
-      width: TABLE_NODE_WIDTH / 2,
-      height: (TABLE_NODE_ROW_HEIGHT / 2) * (node.data.columns.length + 1),
-    })
-  })
-
-  edges.forEach((edge) => {
-    dagreGraph.setEdge(edge.source, edge.target)
-  })
-
-  dagre.layout(dagreGraph)
-
-  nodes.forEach((node) => {
-    const nodeWithPosition = dagreGraph.node(node.id)
-    node.targetPosition = Position.Left
-    node.sourcePosition = Position.Right
-    node.position = {
-      x: nodeWithPosition.x - nodeWithPosition.width / 2,
-      y: nodeWithPosition.y - nodeWithPosition.height / 2,
-    }
-  })
-
-  return { nodes, edges }
-}
-
-function uniqBy<T>(arr: T[], key: keyof T): T[] {
-  return Array.from(new Map(arr.map((item) => [item[key], item])).values())
 }

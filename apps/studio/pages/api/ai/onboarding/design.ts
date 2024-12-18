@@ -103,7 +103,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - In Supabase, the auth schema already has a users table which is used to store users
-      - Create a profiles table in the public schema that links to auth.users instead of creating a users table
+      - Create a profiles table in the public schema where the primary id is uuid and references the auth.users schema instead of creating a users table
       - Always include appropriate indexes and foreign key constraints.
 
       Follow these rules:

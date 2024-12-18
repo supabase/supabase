@@ -12,8 +12,8 @@ const NODE_SEP = 25
 const RANK_SEP = 50
 
 export async function getGraphDataFromTables(
-  ref: string,
-  schema: PostgresSchema,
+  ref?: string,
+  schema?: PostgresSchema,
   tables: PostgresTable[]
 ): Promise<{
   nodes: Node<TableNodeData>[]

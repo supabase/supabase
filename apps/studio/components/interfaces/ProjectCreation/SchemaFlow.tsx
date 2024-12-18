@@ -11,27 +11,14 @@ import {
   Edge,
   Node,
   applyNodeChanges,
+  MiniMap,
+  NodeProps,
 } from 'reactflow'
 import { useMemo, useState, useEffect, useCallback } from 'react'
-import { TableNode } from './TableNode'
+import { TableNode, TableNodeData } from '../Database/Schemas/SchemaTableNode'
 
 export const TABLE_NODE_WIDTH = 640
 export const TABLE_NODE_ROW_HEIGHT = 80
-
-type TableNodeData = {
-  name: string
-  isForeign: boolean
-  columns: {
-    id: string
-    isPrimary: boolean
-    isNullable: boolean
-    isUnique: boolean
-    isUpdateable: boolean
-    isIdentity: boolean
-    name: string
-    format: string
-  }[]
-}
 
 interface SchemaFlowProps {
   nodes: Node[]
@@ -41,7 +28,10 @@ interface SchemaFlowProps {
 export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaFlowProps) {
   const [nodes, setNodes] = useNodesState(initialNodes)
   const [edges, setEdges] = useEdgesState(initialEdges)
-  const nodeTypes = useMemo(() => ({ table: TableNode }), [])
+  const nodeTypes = useMemo(
+    () => ({ table: (props: NodeProps<TableNodeData>) => <TableNode {...props} placeholder /> }),
+    []
+  )
   const reactFlowInstance = useReactFlow<TableNodeData>()
 
   useEffect(() => {
@@ -73,6 +63,7 @@ export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaF
         defaultEdgeOptions={{
           type: 'smoothstep',
           animated: true,
+          deletable: false,
           style: {
             stroke: 'hsl(var(--border-stronger))',
             strokeWidth: 0.5,
