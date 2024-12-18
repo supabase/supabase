@@ -6,10 +6,9 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import {
   AuthProvider,
   IS_PROD,
-  LOCAL_STORAGE_KEYS,
   ThemeProvider,
-  useTelemetryProps,
   useTelemetryCookie,
+  useTelemetryProps,
   useThemeSandbox,
 } from 'common'
 import { DefaultSeo } from 'next-seo'
@@ -25,17 +24,17 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
+import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
-import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const { consentValue, hasAcceptedConsent } = useConsent()
+  const { hasAcceptedConsent } = useConsent()
   const IS_DEV = !IS_PROD && !IS_PREVIEW
   //const blockEvents = IS_DEV || !hasAcceptedConsent
   const blockEvents = !hasAcceptedConsent
@@ -47,19 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useThemeSandbox()
 
-  useTelemetryCookie({
-    blockEvents,
-    consentValue: consentValue,
-    telemetryStorageKey: LOCAL_STORAGE_KEYS.TELEMETRY_DATA,
-    title,
-    telemetryProps: {
-      referrer: typeof document !== 'undefined' ? document?.referrer : '',
-      language: telemetryProps.language,
-      search: telemetryProps.search,
-      viewport_height: telemetryProps.viewport_height,
-      viewport_width: telemetryProps.viewport_width,
-    },
-  })
+  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
 
   function handlePageTelemetry(url: string) {
     return post(
@@ -93,7 +80,7 @@ export default function App({ Component, pageProps }: AppProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router.events, consentValue])
+  }, [router.events, blockEvents])
 
   useEffect(() => {
     if (!router.isReady) return
