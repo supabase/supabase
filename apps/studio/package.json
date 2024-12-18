@@ -16,8 +16,6 @@
     "test:update:watch": "vitest --watch --update",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",
     "typecheck": "tsc --noEmit",
-    "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook",
     "prettier:check": "prettier --check .",
     "prettier:write": "prettier --write ."
   },
@@ -32,6 +30,7 @@
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "^14.2.3",
+    "@number-flow/react": "^0.3.2",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@sentry/nextjs": "^8.34.0",
@@ -79,7 +78,6 @@
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.5",
     "monaco-editor": "0.33.0",
-    "@number-flow/react": "^0.3.2",
     "next": "^14.2.10",
     "next-themes": "^0.3.0",
     "nuqs": "^1.17.8",
@@ -135,10 +133,6 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
-    "@storybook/addon-essentials": "^7.5.3",
-    "@storybook/addon-interactions": "^7.5.3",
-    "@storybook/addon-links": "^7.5.3",
-    "@storybook/react": "^7.5.3",
     "@supabase/postgres-meta": "^0.64.4",
     "@testing-library/dom": "^9.3.3",
     "@testing-library/react": "^14.0.0",
@@ -178,7 +172,6 @@
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
     "prettier": "^4.0.0-alpha.8",
-    "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
     "typescript": "~5.5.0"
   }
