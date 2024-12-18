@@ -1,0 +1,51 @@
+---
+id: 'storage-management'
+title: 'Object Metadata'
+description: 'Learn how to store and retrieve object metadata'
+subtitle: 'Learn how to get object metadata'
+sidebar_label: 'Object Metadata'
+---
+
+## Object Metadata
+Each object in a bucket can have metadata associated with it. Metadata is a set of key-value pairs that describe the object.
+You can use metadata to store information such as the object's content type, author, or any other custom data.
+
+Each upload method in the Storage API accepts a `metadata` option that allows you to add custom metadata to the object.
+See the following guides for more information on how to upload objects with metadata:
+
+- [Standard Uploads](/docs/guides/storage/uploads/standard-uploads#metadata)
+- [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads#metadata)
+
+
+<Admonition type="note">
+
+    The metadata is immutable, meaning that once an object is uploaded with metadata, you cannot update the metadata.
+    You will currently need to update objects by re-uploading them with the new metadata.
+
+</Admonition>
+
+
+## Retrieving Metadata
+
+To retrieve the metadata of an object, use the `info()` method.
+
+```javascript
+const { data, error } = await supabase.from('bucket_name').info('path/your/object.png')
+
+console.log(data)
+
+// {
+//     id: "string",
+//     name: "string",
+//     version: "string",
+//     size: "number",
+//     content_type: "string",
+//     cache_control: "string"
+//     etag: "string"
+//     metadata: {
+//         custom_key: "custom_value"
+//     },
+//     last_modified: "string"
+//     created_at: "string"
+// }
+```
