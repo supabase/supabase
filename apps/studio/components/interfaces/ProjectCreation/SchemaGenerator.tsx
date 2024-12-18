@@ -14,15 +14,13 @@ interface SupabaseService {
 }
 
 interface Props {
-  aiDescription?: string
   onSqlGenerated: (sql: string) => void
   onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
-  isOneOff: boolean
+  isOneOff?: boolean
 }
 
 export const SchemaGenerator = ({
-  aiDescription = '',
   onSqlGenerated,
   onServicesUpdated,
   onTitleUpdated,
@@ -75,12 +73,6 @@ export const SchemaGenerator = ({
       }
     },
   })
-
-  useEffect(() => {
-    if (aiDescription) {
-      append({ role: 'user', content: aiDescription })
-    }
-  }, [])
 
   return (
     <div>

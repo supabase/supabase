@@ -500,6 +500,50 @@ const WizardForm = () => {
                           <div className="pb-8">
                             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
                           </div>
+                        ) : !isAdmin ? (
+                          <NotOrganizationOwnerWarning />
+                        ) : freePlanWithExceedingLimits ? (
+                          isAdmin &&
+                          slug && (
+                            <div className="py-5">
+                              <FreeProjectLimitWarning
+                                membersExceededLimit={membersExceededLimit || []}
+                                orgSlug={slug}
+                              />
+                            </div>
+                          )
+                        ) : isManagedByVercel ? (
+                          <div className="py-5">
+                            <PartnerManagedResource
+                              partner="vercel-marketplace"
+                              resource="Projects"
+                              cta={{
+                                installationId: currentOrg?.partner_id,
+                                message: 'Visit Vercel to create a project',
+                              }}
+                            />
+                          </div>
+                        ) : hasOutstandingInvoices ? (
+                          <div className="py-5">
+                            <Admonition
+                              type="default"
+                              title="Your organization has overdue invoices"
+                              description={
+                                <div className="space-y-3">
+                                  <p className="text-sm leading-normal">
+                                    Please resolve all outstanding invoices first before creating a
+                                    new project
+                                  </p>
+
+                                  <div>
+                                    <Button asChild type="default">
+                                      <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                                    </Button>
+                                  </div>
+                                </div>
+                              }
+                            />
+                          </div>
                         ) : (
                           <div className="">
                             <div className="">
@@ -536,589 +580,523 @@ const WizardForm = () => {
                                     </FormItemLayout>
                                   )}
                                 />
-                                {canCreateProject && (
-                                  <div>
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="projectName"
-                                      render={({ field }) => (
-                                        <FormItemLayout label="Project name">
-                                          <FormControl_Shadcn_>
-                                            <Input_Shadcn_
-                                              autoFocus
-                                              placeholder="Project name"
-                                              {...field}
-                                              onChange={(event) => {
-                                                field.onChange(
-                                                  event.target.value.replace(/\./g, '')
-                                                )
-                                              }}
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItemLayout>
-                                      )}
-                                    />
-                                  </div>
-                                )}
+                                <div>
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="projectName"
+                                    render={({ field }) => (
+                                      <FormItemLayout label="Project name">
+                                        <FormControl_Shadcn_>
+                                          <Input_Shadcn_
+                                            autoFocus
+                                            placeholder="Project name"
+                                            {...field}
+                                            onChange={(event) => {
+                                              field.onChange(event.target.value.replace(/\./g, ''))
+                                            }}
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItemLayout>
+                                    )}
+                                  />
+                                </div>
                               </div>
-                              {!isAdmin && <NotOrganizationOwnerWarning />}
 
-                              {canCreateProject && (
-                                <>
-                                  <div className="py-5 border-b">
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="dbRegion"
-                                      render={({ field }) => (
-                                        <RegionSelector
-                                          field={field}
-                                          form={form}
-                                          cloudProvider={
-                                            form.getValues('cloudProvider') as CloudProvider
-                                          }
-                                        />
-                                      )}
-                                    />
-                                  </div>
-                                  <div className="py-5">
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="dbPass"
-                                      render={({ field }) => (
-                                        <FormItemLayout
-                                          label="Database Password"
-                                          description={
-                                            <PasswordStrengthBar
-                                              passwordStrengthScore={form.getValues(
-                                                'dbPassStrength'
-                                              )}
-                                              password={field.value}
-                                              passwordStrengthMessage={passwordStrengthMessage}
-                                              generateStrongPassword={generatePassword}
-                                            />
-                                          }
-                                        >
-                                          <FormControl_Shadcn_>
-                                            <Input
-                                              copy={field.value.length > 0}
-                                              type="password"
-                                              placeholder="Type in a strong password"
-                                              {...field}
-                                              autoComplete="off"
-                                              onChange={async (event) => {
-                                                field.onChange(event)
-                                                form.trigger('dbPassStrength')
-                                                const value = event.target.value
-                                                if (event.target.value === '') {
-                                                  await form.setValue('dbPassStrength', 0)
-                                                  await form.trigger('dbPass')
-                                                } else {
-                                                  await delayedCheckPasswordStrength(value)
-                                                }
-                                              }}
-                                            />
-                                          </FormControl_Shadcn_>
-                                        </FormItemLayout>
-                                      )}
-                                    />
-                                  </div>
-                                  <div className="py-5 border-t border-b">
-                                    <FormItemLayout>
-                                      <SchemaGenerator
-                                        aiDescription={aiDescription}
-                                        onSqlGenerated={(sql) => {
-                                          form.setValue('sql', sql)
-                                          setSqlStatements((prev) => [...prev, sql])
-                                        }}
-                                        onServicesUpdated={setServices}
-                                        onTitleUpdated={(title) => {
-                                          if (!form.getValues('projectName')) {
-                                            form.setValue('projectName', title)
-                                          }
-                                        }}
+                              <>
+                                <div className="py-5 border-b">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="dbRegion"
+                                    render={({ field }) => (
+                                      <RegionSelector
+                                        field={field}
+                                        form={form}
+                                        cloudProvider={
+                                          form.getValues('cloudProvider') as CloudProvider
+                                        }
                                       />
-                                    </FormItemLayout>
-                                    {sqlStatements.length > 0 && (
-                                      <Button
-                                        type="default"
-                                        className="w-full mt-2 lg:hidden"
-                                        onClick={() => setShowVisual(!showVisual)}
-                                      >
-                                        View the schema
-                                      </Button>
                                     )}
-                                  </div>
-                                  <div>
-                                    {!showAdvanced && (
-                                      <Button
-                                        onClick={() => setShowAdvanced(true)}
-                                        icon={<Settings size={16} />}
-                                        type="outline"
-                                        className="w-full mb-2 mt-4"
+                                  />
+                                </div>
+                                <div className="py-5">
+                                  <FormField_Shadcn_
+                                    control={form.control}
+                                    name="dbPass"
+                                    render={({ field }) => (
+                                      <FormItemLayout
+                                        label="Database Password"
+                                        description={
+                                          <PasswordStrengthBar
+                                            passwordStrengthScore={form.getValues('dbPassStrength')}
+                                            password={field.value}
+                                            passwordStrengthMessage={passwordStrengthMessage}
+                                            generateStrongPassword={generatePassword}
+                                          />
+                                        }
                                       >
-                                        Advanced Configuration
-                                      </Button>
+                                        <FormControl_Shadcn_>
+                                          <Input
+                                            copy={field.value.length > 0}
+                                            type="password"
+                                            placeholder="Type in a strong password"
+                                            {...field}
+                                            autoComplete="off"
+                                            onChange={async (event) => {
+                                              field.onChange(event)
+                                              form.trigger('dbPassStrength')
+                                              const value = event.target.value
+                                              if (event.target.value === '') {
+                                                await form.setValue('dbPassStrength', 0)
+                                                await form.trigger('dbPass')
+                                              } else {
+                                                await delayedCheckPasswordStrength(value)
+                                              }
+                                            }}
+                                          />
+                                        </FormControl_Shadcn_>
+                                      </FormItemLayout>
                                     )}
-                                    <div className={cn(showAdvanced ? 'block' : 'hidden')}>
-                                      {cloudProviderEnabled && showNonProdFields && (
+                                  />
+                                </div>
+                                <div className="py-5 border-t border-b">
+                                  <FormItemLayout>
+                                    <SchemaGenerator
+                                      onSqlGenerated={(sql) => {
+                                        form.setValue('sql', sql)
+                                        setSqlStatements((prev) => [...prev, sql])
+                                      }}
+                                      onServicesUpdated={setServices}
+                                      onTitleUpdated={(title) => {
+                                        if (!form.getValues('projectName')) {
+                                          form.setValue('projectName', title)
+                                        }
+                                      }}
+                                    />
+                                  </FormItemLayout>
+                                  {sqlStatements.length > 0 && (
+                                    <Button
+                                      type="default"
+                                      className="w-full mt-2 lg:hidden"
+                                      onClick={() => setShowVisual(!showVisual)}
+                                    >
+                                      View the schema
+                                    </Button>
+                                  )}
+                                </div>
+                                <div>
+                                  {!showAdvanced && (
+                                    <Button
+                                      onClick={() => setShowAdvanced(true)}
+                                      icon={<Settings size={16} />}
+                                      type="outline"
+                                      className="w-full mb-2 mt-4"
+                                    >
+                                      Advanced Configuration
+                                    </Button>
+                                  )}
+                                  <div className={cn(showAdvanced ? 'block' : 'hidden')}>
+                                    {cloudProviderEnabled && showNonProdFields && (
+                                      <div className="py-5 border-b">
+                                        <FormField_Shadcn_
+                                          control={form.control}
+                                          name="cloudProvider"
+                                          render={({ field }) => (
+                                            <FormItemLayout label="Cloud provider">
+                                              <Select_Shadcn_
+                                                onValueChange={(value) => {
+                                                  field.onChange(value)
+                                                  form.setValue(
+                                                    'dbRegion',
+                                                    value === 'FLY'
+                                                      ? FLY_REGIONS_DEFAULT.displayName
+                                                      : AWS_REGIONS_DEFAULT.displayName
+                                                  )
+                                                }}
+                                                defaultValue={field.value}
+                                              >
+                                                <FormControl_Shadcn_>
+                                                  <SelectTrigger_Shadcn_>
+                                                    <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
+                                                  </SelectTrigger_Shadcn_>
+                                                </FormControl_Shadcn_>
+                                                <SelectContent_Shadcn_>
+                                                  <SelectGroup_Shadcn_>
+                                                    {Object.values(PROVIDERS).map((providerObj) => {
+                                                      const label = providerObj['name']
+                                                      const value = providerObj['id']
+                                                      return (
+                                                        <SelectItem_Shadcn_
+                                                          key={value}
+                                                          value={value}
+                                                        >
+                                                          {label}
+                                                        </SelectItem_Shadcn_>
+                                                      )
+                                                    })}
+                                                  </SelectGroup_Shadcn_>
+                                                </SelectContent_Shadcn_>
+                                              </Select_Shadcn_>
+                                            </FormItemLayout>
+                                          )}
+                                        />
+                                      </div>
+                                    )}
+
+                                    {orgSubscription?.plan &&
+                                      orgSubscription?.plan.id !== 'free' && (
                                         <div className="py-5 border-b">
                                           <FormField_Shadcn_
                                             control={form.control}
-                                            name="cloudProvider"
+                                            name="instanceSize"
                                             render={({ field }) => (
-                                              <FormItemLayout label="Cloud provider">
+                                              <FormItemLayout
+                                                label={
+                                                  <div className="flex flex-col gap-y-4">
+                                                    <span>Compute Size</span>
+                                                  </div>
+                                                }
+                                                description={
+                                                  <>
+                                                    <p>
+                                                      The size for your dedicated database. You can
+                                                      change this later.
+                                                    </p>
+                                                  </>
+                                                }
+                                              >
                                                 <Select_Shadcn_
-                                                  onValueChange={(value) => {
-                                                    field.onChange(value)
-                                                    form.setValue(
-                                                      'dbRegion',
-                                                      value === 'FLY'
-                                                        ? FLY_REGIONS_DEFAULT.displayName
-                                                        : AWS_REGIONS_DEFAULT.displayName
-                                                    )
-                                                  }}
-                                                  defaultValue={field.value}
+                                                  value={field.value}
+                                                  onValueChange={(value) => field.onChange(value)}
                                                 >
-                                                  <FormControl_Shadcn_>
-                                                    <SelectTrigger_Shadcn_>
-                                                      <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                                                    </SelectTrigger_Shadcn_>
-                                                  </FormControl_Shadcn_>
+                                                  <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
+                                                    <SelectValue_Shadcn_ placeholder="Select a compute size" />
+                                                  </SelectTrigger_Shadcn_>
                                                   <SelectContent_Shadcn_>
                                                     <SelectGroup_Shadcn_>
-                                                      {Object.values(PROVIDERS).map(
-                                                        (providerObj) => {
-                                                          const label = providerObj['name']
-                                                          const value = providerObj['id']
+                                                      {sizes
+                                                        .filter((option) =>
+                                                          instanceSizeSpecs[
+                                                            option
+                                                          ].cloud_providers.includes(
+                                                            form.getValues(
+                                                              'cloudProvider'
+                                                            ) as CloudProvider
+                                                          )
+                                                        )
+                                                        .map((option) => {
                                                           return (
                                                             <SelectItem_Shadcn_
-                                                              key={value}
-                                                              value={value}
+                                                              key={option}
+                                                              value={option}
                                                             >
-                                                              {label}
+                                                              <div className="flex flex-row i gap-2">
+                                                                <div className="text-center w-[80px]">
+                                                                  <Badge
+                                                                    variant={
+                                                                      option === 'micro'
+                                                                        ? 'default'
+                                                                        : 'brand'
+                                                                    }
+                                                                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                                                  >
+                                                                    {
+                                                                      instanceSizeSpecs[option]
+                                                                        .label
+                                                                    }
+                                                                  </Badge>
+                                                                </div>
+                                                                <div className="text-sm">
+                                                                  <span className="text-foreground">
+                                                                    {instanceSizeSpecs[option].ram}{' '}
+                                                                    RAM /{' '}
+                                                                    {instanceSizeSpecs[option].cpu}{' '}
+                                                                    {getCloudProviderArchitecture(
+                                                                      form.getValues(
+                                                                        'cloudProvider'
+                                                                      ) as CloudProvider
+                                                                    )}{' '}
+                                                                    CPU
+                                                                  </span>
+                                                                  <p className="text-xs text-muted instance-details">
+                                                                    $
+                                                                    {
+                                                                      instanceSizeSpecs[option]
+                                                                        .priceHourly
+                                                                    }
+                                                                    /hour (~$
+                                                                    {
+                                                                      instanceSizeSpecs[option]
+                                                                        .priceMonthly
+                                                                    }
+                                                                    /month)
+                                                                  </p>
+                                                                </div>
+                                                              </div>
                                                             </SelectItem_Shadcn_>
                                                           )
-                                                        }
-                                                      )}
+                                                        })}
                                                     </SelectGroup_Shadcn_>
                                                   </SelectContent_Shadcn_>
                                                 </Select_Shadcn_>
                                               </FormItemLayout>
                                             )}
                                           />
-                                        </div>
-                                      )}
 
-                                      {orgSubscription?.plan &&
-                                        orgSubscription?.plan.id !== 'free' && (
-                                          <div className="py-5 border-b">
-                                            <FormField_Shadcn_
-                                              control={form.control}
-                                              name="instanceSize"
-                                              render={({ field }) => (
-                                                <FormItemLayout
-                                                  label={
-                                                    <div className="flex flex-col gap-y-4">
-                                                      <span>Compute Size</span>
-                                                    </div>
-                                                  }
-                                                  description={
-                                                    <>
-                                                      <p>
-                                                        The size for your dedicated database. You
-                                                        can change this later.
-                                                      </p>
-                                                    </>
-                                                  }
+                                          <FormItemLayout>
+                                            <div className="flex justify-between mr-2 mt-4">
+                                              <span>Additional Monthly Compute Costs</span>
+                                              <div className="text-brand flex gap-1 items-center">
+                                                {organizationProjects.length > 0 ? (
+                                                  <>
+                                                    <span>${additionalMonthlySpend}</span>
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <span className="text-foreground-lighter line-through">
+                                                      $
+                                                      {
+                                                        instanceSizeSpecs[
+                                                          instanceSize as DbInstanceSize
+                                                        ]!.priceMonthly
+                                                      }
+                                                    </span>
+                                                    <span>${additionalMonthlySpend}</span>
+                                                  </>
+                                                )}
+                                                <InfoTooltip
+                                                  side="top"
+                                                  className="max-w-[450px] p-0"
                                                 >
-                                                  <Select_Shadcn_
-                                                    value={field.value}
-                                                    onValueChange={(value) => field.onChange(value)}
-                                                  >
-                                                    <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                                      <SelectValue_Shadcn_ placeholder="Select a compute size" />
-                                                    </SelectTrigger_Shadcn_>
-                                                    <SelectContent_Shadcn_>
-                                                      <SelectGroup_Shadcn_>
-                                                        {sizes
-                                                          .filter((option) =>
-                                                            instanceSizeSpecs[
-                                                              option
-                                                            ].cloud_providers.includes(
-                                                              form.getValues(
-                                                                'cloudProvider'
-                                                              ) as CloudProvider
-                                                            )
-                                                          )
-                                                          .map((option) => {
-                                                            return (
-                                                              <SelectItem_Shadcn_
-                                                                key={option}
-                                                                value={option}
-                                                              >
-                                                                <div className="flex flex-row i gap-2">
-                                                                  <div className="text-center w-[80px]">
-                                                                    <Badge
-                                                                      variant={
-                                                                        option === 'micro'
-                                                                          ? 'default'
-                                                                          : 'brand'
-                                                                      }
-                                                                      className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                                                                    >
-                                                                      {
-                                                                        instanceSizeSpecs[option]
-                                                                          .label
-                                                                      }
-                                                                    </Badge>
-                                                                  </div>
-                                                                  <div className="text-sm">
-                                                                    <span className="text-foreground">
-                                                                      {
-                                                                        instanceSizeSpecs[option]
-                                                                          .ram
-                                                                      }{' '}
-                                                                      RAM /{' '}
-                                                                      {
-                                                                        instanceSizeSpecs[option]
-                                                                          .cpu
-                                                                      }{' '}
-                                                                      {getCloudProviderArchitecture(
-                                                                        form.getValues(
-                                                                          'cloudProvider'
-                                                                        ) as CloudProvider
-                                                                      )}{' '}
-                                                                      CPU
-                                                                    </span>
-                                                                    <p className="text-xs text-muted instance-details">
-                                                                      $
-                                                                      {
-                                                                        instanceSizeSpecs[option]
-                                                                          .priceHourly
-                                                                      }
-                                                                      /hour (~$
-                                                                      {
-                                                                        instanceSizeSpecs[option]
-                                                                          .priceMonthly
-                                                                      }
-                                                                      /month)
-                                                                    </p>
-                                                                  </div>
-                                                                </div>
-                                                              </SelectItem_Shadcn_>
-                                                            )
-                                                          })}
-                                                      </SelectGroup_Shadcn_>
-                                                    </SelectContent_Shadcn_>
-                                                  </Select_Shadcn_>
-                                                </FormItemLayout>
-                                              )}
-                                            />
-
-                                            <FormItemLayout>
-                                              <div className="flex justify-between mr-2 mt-4">
-                                                <span>Additional Monthly Compute Costs</span>
-                                                <div className="text-brand flex gap-1 items-center">
-                                                  {organizationProjects.length > 0 ? (
-                                                    <>
-                                                      <span>${additionalMonthlySpend}</span>
-                                                    </>
-                                                  ) : (
-                                                    <>
-                                                      <span className="text-foreground-lighter line-through">
-                                                        $
-                                                        {
-                                                          instanceSizeSpecs[
-                                                            instanceSize as DbInstanceSize
-                                                          ]!.priceMonthly
-                                                        }
-                                                      </span>
-                                                      <span>${additionalMonthlySpend}</span>
-                                                    </>
-                                                  )}
-                                                  <InfoTooltip
-                                                    side="top"
-                                                    className="max-w-[450px] p-0"
-                                                  >
-                                                    <Table className="mt-2">
-                                                      <TableHeader className="[&_th]:h-7">
-                                                        <TableRow className="py-2">
-                                                          <TableHead className="w-[170px]">
-                                                            Project
-                                                          </TableHead>
-                                                          <TableHead>Compute Size</TableHead>
-                                                          <TableHead className="text-right">
-                                                            Monthly Costs
-                                                          </TableHead>
-                                                        </TableRow>
-                                                      </TableHeader>
-                                                      <TableBody className="[&_td]:py-2">
-                                                        {organizationProjects.map((project) => (
-                                                          <TableRow
-                                                            key={project.ref}
-                                                            className="text-foreground-light"
-                                                          >
-                                                            <TableCell className="w-[170px] truncate">
-                                                              {project.name}
-                                                            </TableCell>
-                                                            <TableCell className="text-center">
-                                                              {instanceLabel(
-                                                                project.infra_compute_size
-                                                              )}
-                                                            </TableCell>
-                                                            <TableCell className="text-right">
-                                                              $
-                                                              {monthlyInstancePrice(
-                                                                project.infra_compute_size
-                                                              )}
-                                                            </TableCell>
-                                                          </TableRow>
-                                                        ))}
-
-                                                        <TableRow>
-                                                          <TableCell className="w-[170px] flex gap-2">
-                                                            <span className="truncate">
-                                                              {form.getValues('projectName')
-                                                                ? form.getValues('projectName')
-                                                                : 'New project'}
-                                                            </span>
-                                                            <Badge
-                                                              size={'small'}
-                                                              variant={'default'}
-                                                            >
-                                                              NEW
-                                                            </Badge>
+                                                  <Table className="mt-2">
+                                                    <TableHeader className="[&_th]:h-7">
+                                                      <TableRow className="py-2">
+                                                        <TableHead className="w-[170px]">
+                                                          Project
+                                                        </TableHead>
+                                                        <TableHead>Compute Size</TableHead>
+                                                        <TableHead className="text-right">
+                                                          Monthly Costs
+                                                        </TableHead>
+                                                      </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="[&_td]:py-2">
+                                                      {organizationProjects.map((project) => (
+                                                        <TableRow
+                                                          key={project.ref}
+                                                          className="text-foreground-light"
+                                                        >
+                                                          <TableCell className="w-[170px] truncate">
+                                                            {project.name}
                                                           </TableCell>
                                                           <TableCell className="text-center">
-                                                            {instanceLabel(instanceSize)}
-                                                          </TableCell>
-                                                          <TableCell className="text-right">
-                                                            ${monthlyInstancePrice(instanceSize)}
-                                                          </TableCell>
-                                                        </TableRow>
-                                                      </TableBody>
-                                                    </Table>
-                                                    <PopoverSeparator />
-                                                    <Table>
-                                                      <TableHeader className="[&_th]:h-7">
-                                                        <TableRow>
-                                                          <TableHead colSpan={2}>
-                                                            Compute Credits
-                                                          </TableHead>
-                                                          <TableHead
-                                                            colSpan={1}
-                                                            className="text-right"
-                                                          >
-                                                            -$10
-                                                          </TableHead>
-                                                        </TableRow>
-                                                      </TableHeader>
-                                                      <TableBody className="[&_td]:py-2">
-                                                        <TableRow className="text-foreground">
-                                                          <TableCell colSpan={2}>
-                                                            Total Monthly Compute Costs
-                                                            {/**
-                                                             * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                                             *
-                                                             * Will be adjusted in the future [kevin]
-                                                             */}
-                                                            {organizationProjects.length > 0 && (
-                                                              <p className="text-xs text-foreground-lighter">
-                                                                Excluding Read replicas
-                                                              </p>
+                                                            {instanceLabel(
+                                                              project.infra_compute_size
                                                             )}
                                                           </TableCell>
-                                                          <TableCell
-                                                            colSpan={1}
-                                                            className="text-right"
-                                                          >
-                                                            ${monthlyComputeCosts}
+                                                          <TableCell className="text-right">
+                                                            $
+                                                            {monthlyInstancePrice(
+                                                              project.infra_compute_size
+                                                            )}
                                                           </TableCell>
                                                         </TableRow>
-                                                      </TableBody>
-                                                    </Table>
+                                                      ))}
 
-                                                    <div className="p-4 text-xs text-foreground-light space-y-1">
+                                                      <TableRow>
+                                                        <TableCell className="w-[170px] flex gap-2">
+                                                          <span className="truncate">
+                                                            {form.getValues('projectName')
+                                                              ? form.getValues('projectName')
+                                                              : 'New project'}
+                                                          </span>
+                                                          <Badge size={'small'} variant={'default'}>
+                                                            NEW
+                                                          </Badge>
+                                                        </TableCell>
+                                                        <TableCell className="text-center">
+                                                          {instanceLabel(instanceSize)}
+                                                        </TableCell>
+                                                        <TableCell className="text-right">
+                                                          ${monthlyInstancePrice(instanceSize)}
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    </TableBody>
+                                                  </Table>
+                                                  <PopoverSeparator />
+                                                  <Table>
+                                                    <TableHeader className="[&_th]:h-7">
+                                                      <TableRow>
+                                                        <TableHead colSpan={2}>
+                                                          Compute Credits
+                                                        </TableHead>
+                                                        <TableHead
+                                                          colSpan={1}
+                                                          className="text-right"
+                                                        >
+                                                          -$10
+                                                        </TableHead>
+                                                      </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody className="[&_td]:py-2">
+                                                      <TableRow className="text-foreground">
+                                                        <TableCell colSpan={2}>
+                                                          Total Monthly Compute Costs
+                                                          {/**
+                                                           * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                                           *
+                                                           * Will be adjusted in the future [kevin]
+                                                           */}
+                                                          {organizationProjects.length > 0 && (
+                                                            <p className="text-xs text-foreground-lighter">
+                                                              Excluding Read replicas
+                                                            </p>
+                                                          )}
+                                                        </TableCell>
+                                                        <TableCell
+                                                          colSpan={1}
+                                                          className="text-right"
+                                                        >
+                                                          ${monthlyComputeCosts}
+                                                        </TableCell>
+                                                      </TableRow>
+                                                    </TableBody>
+                                                  </Table>
+
+                                                  <div className="p-4 text-xs text-foreground-light space-y-1">
+                                                    <p>
+                                                      Compute is charged usage-based whenever your
+                                                      billing cycle resets. Given compute charges
+                                                      are hourly, your invoice will contain "Compute
+                                                      Hours" for each hour a project ran on a
+                                                      specific compute size.
+                                                    </p>
+                                                    {monthlyComputeCosts > 0 && (
                                                       <p>
-                                                        Compute is charged usage-based whenever your
-                                                        billing cycle resets. Given compute charges
-                                                        are hourly, your invoice will contain
-                                                        "Compute Hours" for each hour a project ran
-                                                        on a specific compute size.
+                                                        Compute costs are applied on top of your
+                                                        subscription plan costs.
                                                       </p>
-                                                      {monthlyComputeCosts > 0 && (
-                                                        <p>
-                                                          Compute costs are applied on top of your
-                                                          subscription plan costs.
-                                                        </p>
-                                                      )}
-                                                    </div>
-                                                  </InfoTooltip>
-                                                </div>
+                                                    )}
+                                                  </div>
+                                                </InfoTooltip>
                                               </div>
-
-                                              <div className="mt-2 text-foreground-lighter space-y-1">
-                                                {additionalMonthlySpend > 0 &&
-                                                availableComputeCredits === 0 ? (
-                                                  <p>
-                                                    Your monthly spend will increase, and can be
-                                                    more than above if you exceed your plan's usage
-                                                    quota. Your organization includes $10/month of
-                                                    compute credits, which you already exceed with
-                                                    your existing projects.
-                                                  </p>
-                                                ) : additionalMonthlySpend > 0 &&
-                                                  availableComputeCredits > 0 ? (
-                                                  <p>
-                                                    Your monthly spend will increase, and can be
-                                                    more than above if you exceed your plan's usage
-                                                    quota. Your organization includes $10/month of
-                                                    compute credits, which you exceed with the
-                                                    selected compute size.
-                                                  </p>
-                                                ) : (
-                                                  <p>
-                                                    Your monthly spend won't increase, unless you
-                                                    exceed your plan's usage quota. Your
-                                                    organization includes $10/month of compute
-                                                    credits, which cover this project.
-                                                  </p>
-                                                )}
-                                              </div>
-                                            </FormItemLayout>
-                                            <div className="flex flex-col gap-y-2 my-4">
-                                              <Link
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                                              >
-                                                <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                                  <p className="text-sm m-0">Compute Add-Ons</p>
-                                                  <ExternalLink size={16} strokeWidth={1.5} />
-                                                </div>
-                                              </Link>
-                                              <Link
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
-                                              >
-                                                <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                                  <p className="text-sm m-0">Compute Billing</p>
-                                                  <ExternalLink size={16} strokeWidth={1.5} />
-                                                </div>
-                                              </Link>
                                             </div>
+
+                                            <div className="mt-2 text-foreground-lighter space-y-1">
+                                              {additionalMonthlySpend > 0 &&
+                                              availableComputeCredits === 0 ? (
+                                                <p>
+                                                  Your monthly spend will increase, and can be more
+                                                  than above if you exceed your plan's usage quota.
+                                                  Your organization includes $10/month of compute
+                                                  credits, which you already exceed with your
+                                                  existing projects.
+                                                </p>
+                                              ) : additionalMonthlySpend > 0 &&
+                                                availableComputeCredits > 0 ? (
+                                                <p>
+                                                  Your monthly spend will increase, and can be more
+                                                  than above if you exceed your plan's usage quota.
+                                                  Your organization includes $10/month of compute
+                                                  credits, which you exceed with the selected
+                                                  compute size.
+                                                </p>
+                                              ) : (
+                                                <p>
+                                                  Your monthly spend won't increase, unless you
+                                                  exceed your plan's usage quota. Your organization
+                                                  includes $10/month of compute credits, which cover
+                                                  this project.
+                                                </p>
+                                              )}
+                                            </div>
+                                          </FormItemLayout>
+                                          <div className="flex flex-col gap-y-2 my-4">
+                                            <Link
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                                            >
+                                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                                <p className="text-sm m-0">Compute Add-Ons</p>
+                                                <ExternalLink size={16} strokeWidth={1.5} />
+                                              </div>
+                                            </Link>
+                                            <Link
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                            >
+                                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                                <p className="text-sm m-0">Compute Billing</p>
+                                                <ExternalLink size={16} strokeWidth={1.5} />
+                                              </div>
+                                            </Link>
                                           </div>
-                                        )}
-
-                                      {!projectVersionSelectionDisabled && (
-                                        <div className="py-5 border-b">
-                                          <FormField_Shadcn_
-                                            control={form.control}
-                                            name="postgresVersionSelection"
-                                            render={({ field }) => (
-                                              <PostgresVersionSelector
-                                                field={field}
-                                                form={form}
-                                                cloudProvider={
-                                                  form.getValues('cloudProvider') as CloudProvider
-                                                }
-                                                organizationSlug={slug}
-                                                dbRegion={form.getValues('dbRegion')}
-                                              />
-                                            )}
-                                          />
                                         </div>
                                       )}
 
-                                      {showNonProdFields && (
-                                        <div className="py-5 border-b">
-                                          <FormField_Shadcn_
-                                            control={form.control}
-                                            name="postgresVersion"
-                                            render={({ field }) => (
-                                              <FormItemLayout
-                                                label="Custom Postgres version"
-                                                description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
-                                              >
-                                                <FormControl_Shadcn_>
-                                                  <Input_Shadcn_
-                                                    placeholder="Postgres version"
-                                                    {...field}
-                                                    autoComplete="off"
-                                                  />
-                                                </FormControl_Shadcn_>
-                                              </FormItemLayout>
-                                            )}
-                                          />
-                                        </div>
-                                      )}
-                                      <div className="py-4 border-b">
-                                        <SecurityOptions
+                                    {!projectVersionSelectionDisabled && (
+                                      <div className="py-5 border-b">
+                                        <FormField_Shadcn_
+                                          control={form.control}
+                                          name="postgresVersionSelection"
+                                          render={({ field }) => (
+                                            <PostgresVersionSelector
+                                              field={field}
+                                              form={form}
+                                              cloudProvider={
+                                                form.getValues('cloudProvider') as CloudProvider
+                                              }
+                                              organizationSlug={slug}
+                                              dbRegion={form.getValues('dbRegion')}
+                                            />
+                                          )}
+                                        />
+                                      </div>
+                                    )}
+
+                                    {showNonProdFields && (
+                                      <div className="py-5 border-b">
+                                        <FormField_Shadcn_
+                                          control={form.control}
+                                          name="postgresVersion"
+                                          render={({ field }) => (
+                                            <FormItemLayout
+                                              label="Custom Postgres version"
+                                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                                            >
+                                              <FormControl_Shadcn_>
+                                                <Input_Shadcn_
+                                                  placeholder="Postgres version"
+                                                  {...field}
+                                                  autoComplete="off"
+                                                />
+                                              </FormControl_Shadcn_>
+                                            </FormItemLayout>
+                                          )}
+                                        />
+                                      </div>
+                                    )}
+                                    <div className="py-4 border-b">
+                                      <SecurityOptions
+                                        layout="vertical"
+                                        collapsible={false}
+                                        form={form}
+                                      />
+                                    </div>
+                                    {allowOrioleDB && !!availableOrioleVersion && (
+                                      <div className="py-4">
+                                        <AdvancedConfiguration
                                           layout="vertical"
                                           collapsible={false}
                                           form={form}
                                         />
                                       </div>
-                                      {allowOrioleDB && !!availableOrioleVersion && (
-                                        <div className="py-4">
-                                          <AdvancedConfiguration
-                                            layout="vertical"
-                                            collapsible={false}
-                                            form={form}
-                                          />
-                                        </div>
-                                      )}
-                                    </div>
+                                    )}
                                   </div>
-                                </>
-                              )}
-
-                              {freePlanWithExceedingLimits ? (
-                                isAdmin &&
-                                slug && (
-                                  <div className="py-5 border-b">
-                                    <FreeProjectLimitWarning
-                                      membersExceededLimit={membersExceededLimit || []}
-                                      orgSlug={slug}
-                                    />
-                                  </div>
-                                )
-                              ) : isManagedByVercel ? (
-                                <div className="py-5 border-b">
-                                  <PartnerManagedResource
-                                    partner="vercel-marketplace"
-                                    resource="Projects"
-                                    cta={{
-                                      installationId: currentOrg?.partner_id,
-                                      message: 'Visit Vercel to create a project',
-                                    }}
-                                  />
                                 </div>
-                              ) : hasOutstandingInvoices ? (
-                                <div className="py-5 border-b">
-                                  <Admonition
-                                    type="default"
-                                    title="Your organization has overdue invoices"
-                                    description={
-                                      <div className="space-y-3">
-                                        <p className="text-sm leading-normal">
-                                          Please resolve all outstanding invoices first before
-                                          creating a new project
-                                        </p>
+                              </>
 
-                                        <div>
-                                          <Button asChild type="default">
-                                            <Link href={`/org/${slug}/invoices`}>
-                                              View invoices
-                                            </Link>
-                                          </Button>
-                                        </div>
-                                      </div>
-                                    }
-                                  />
-                                </div>
-                              ) : null}
                               <Button className="w-full sticky top-0">Create project</Button>
                             </div>
                           </div>
