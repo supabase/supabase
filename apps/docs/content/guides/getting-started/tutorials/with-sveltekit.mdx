@@ -211,14 +211,11 @@ Update your `src/routes/+layout.svelte`:
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	import { onMount } from 'svelte'
 
-	export let data
+	let { data } = $props();
+	let { supabase, session } = data;
 
-	let { supabase, session } = data
-	$: ({ supabase, session } = data)
-
-	onMount(() => {
+	$effect(() => {
 		const { data } = supabase.auth.onAuthStateChange((event, newSession) => {
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate('supabase:auth')
@@ -248,15 +245,14 @@ Create a magic link login/signup page for your application:
 	import { enhance } from '$app/forms'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let form: ActionData;
-
-	let loading = false
+	let { form } = $props<{ form: ActionData }>();
+	let loading = $state(false);
 
 	const handleSubmit: SubmitFunction = () => {
-		loading = true
+		loading = true;
 		return async ({ update }) => {
-			update()
-			loading = false
+			update();
+			loading = false;
 		}
 	}
 </script>
@@ -431,31 +427,28 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
-	export let data
-	export let form
+	let { data, form } = $props();
+	let { session, supabase, profile } = data;
 
-	let { session, supabase, profile } = data
-	$: ({ session, supabase, profile } = data)
-
-	let profileForm: HTMLFormElement
-	let loading = false
-	let fullName: string = profile?.full_name ?? ''
-	let username: string = profile?.username ?? ''
-	let website: string = profile?.website ?? ''
-	let avatarUrl: string = profile?.avatar_url ?? ''
+	let profileForm = $state<HTMLFormElement | null>(null);
+	let loading = $state(false);
+	let fullName = $state(profile?.full_name ?? '');
+	let username = $state(profile?.username ?? '');
+	let website = $state(profile?.website ?? '');
+	let avatarUrl = $state(profile?.avatar_url ?? '');
 
 	const handleSubmit: SubmitFunction = () => {
-		loading = true
+		loading = true;
 		return async () => {
-			loading = false
+			loading = false;
 		}
 	}
 
 	const handleSignOut: SubmitFunction = () => {
-		loading = true
+		loading = true;
 		return async ({ update }) => {
-			loading = false
-			update()
+			loading = false;
+			update();
 		}
 	}
 </script>
@@ -600,15 +593,17 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
 
-	export let size = 10
-	export let url: string
-	export let supabase: SupabaseClient
+	let { size = 10, url, supabase } = $props<{
+		size?: number;
+		url: string;
+		supabase: SupabaseClient;
+	}>();
 
-	let avatarUrl: string | null = null
-	let uploading = false
-	let files: FileList
+	let avatarUrl = $state<string | null>(null);
+	let uploading = $state(false);
+	let files = $state<FileList | null>(null);
 
-	const dispatch = createEventDispatcher()
+	const dispatch = createEventDispatcher();
 
 	const downloadImage = async (path: string) => {
 		try {
@@ -658,8 +653,9 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 		}
 	}
 
-	$: if (url) downloadImage(url)
-</script>
+	$effect(() => {
+		if (url) downloadImage(url);
+	});
 
 <div>
 	{#if avatarUrl}
