@@ -16,7 +16,9 @@ const config = {
 		// Ensure client-side routing works
 		paths: {
 			base: ''
-		}
+		},
+		// Disable SSR for SPA mode
+		ssr: false
 	},
 
 	compilerOptions: {
