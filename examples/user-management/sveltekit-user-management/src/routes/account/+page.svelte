@@ -3,31 +3,31 @@
 	import { enhance } from '$app/forms'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
-	import { props, state } from 'svelte'
+	import { props as svelteProps, state as svelteState } from 'svelte'
 
-	const data = $props<{ session: any; supabase: any; profile: any }>()
-	const form = $props<any>()
+	const data = $svelteProps<{ session: any; supabase: any; profile: any }>()
+	const form = $svelteProps<any>()
 
 	const { session, supabase, profile } = data
 	let profileForm: HTMLFormElement | null = null
-	const loading = $state(false)
-	const fullName = $state(profile?.full_name ?? '')
-	const username = $state(profile?.username ?? '')
-	const website = $state(profile?.website ?? '')
-	const avatarUrl = $state(profile?.avatar_url ?? '')
+	const loading = $svelteState(false)
+	const fullName = $svelteState(profile?.full_name ?? '')
+	const username = $svelteState(profile?.username ?? '')
+	const website = $svelteState(profile?.website ?? '')
+	const avatarUrl = $svelteState(profile?.avatar_url ?? '')
 
 	const handleSubmit = () => {
-		loading = true
+		loading.set(true)
 		return async ({ update }: { update: () => void }) => {
-			loading = false
+			loading.set(false)
 			update()
 		}
 	}
 
 	const handleSignOut = () => {
-		loading = true
+		loading.set(true)
 		return async ({ update }: { update: () => void }) => {
-			loading = false
+			loading.set(false)
 			update()
 		}
 	}

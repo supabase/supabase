@@ -2,14 +2,15 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { props, state } from 'svelte'
+	import { props as svelteProps, state as svelteState, effect as svelteEffect } from 'svelte'
 
-	const size = $props<number>(10)
-	const url = $props<string>('')
-	const supabase = $props<SupabaseClient>()
+	const size = $svelteProps<number>(10)
+	const urlProp = $svelteProps<string>('')
+	const supabase = $svelteProps<SupabaseClient>()
 
-	const avatarUrl = $state<string | null>(null)
-	const uploading = $state(false)
+	const avatarUrl = $svelteState<string | null>(null)
+	const uploading = $svelteState(false)
+	const currentUrl = $svelteState(urlProp)
 	let fileInput: HTMLInputElement | null = null
 
 	const dispatch = createEventDispatcher()
@@ -23,7 +24,7 @@
 			}
 
 			const imageUrl = URL.createObjectURL(imageData)
-			avatarUrl = imageUrl
+			avatarUrl.set(imageUrl)
 		} catch (error) {
 			if (error instanceof Error) {
 				console.log('Error downloading image: ', error.message)
@@ -33,7 +34,7 @@
 
 	const uploadAvatar = async (event: Event) => {
 		try {
-			uploading = true
+			uploading.set(true)
 			const input = event.target as HTMLInputElement
 			const files = input.files
 
@@ -51,7 +52,7 @@
 				throw error
 			}
 
-			url = filePath
+			currentUrl.set(filePath)
 			setTimeout(() => {
 				dispatch('upload')
 			}, 100)
@@ -60,11 +61,13 @@
 				alert(error.message)
 			}
 		} finally {
-			uploading = false
+			uploading.set(false)
 		}
 	}
 
-	$: if (url) downloadImage(url)
+	$svelteEffect(() => {
+		if (currentUrl) downloadImage(currentUrl)
+	})
 </script>
 
 <div>
@@ -78,7 +81,7 @@
 	{:else}
 		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
-	<input type="hidden" name="avatarUrl" value={url} />
+	<input type="hidden" name="avatarUrl" value={currentUrl} />
 
 	<div style="width: {size}em;">
 		<label class="button primary block" for="single">

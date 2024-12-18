@@ -2,16 +2,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
 	import type { ActionData } from './$types'
-	import { props, state } from 'svelte'
+	import { props as svelteProps, state as svelteState } from 'svelte'
 
-	const form = $props<{ message?: string; success?: boolean; email?: string; errors?: { email?: string } } | null>()
-	const loading = $state(false)
+	const form = $svelteProps<{ message?: string; success?: boolean; email?: string; errors?: { email?: string } } | null>()
+	const loading = $svelteState(false)
 
 	const handleSubmit = () => {
-		loading = true
+		loading.set(true)
 		return async ({ update }: { update: () => void }) => {
 			update()
-			loading = false
+			loading.set(false)
 		}
 	}
 </script>
