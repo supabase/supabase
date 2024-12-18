@@ -7,12 +7,15 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			fallback: 'index.html'
+			pages: 'build',
+			assets: 'build',
+			fallback: 'index.html',
+			precompress: false,
+			strict: true
 		}),
 		csrf: {
 			checkOrigin: false,
-		},
-		ssr: false
+		}
 	},
 
 	compilerOptions: {
