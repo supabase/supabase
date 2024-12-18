@@ -619,14 +619,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/platform/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/platform/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -692,10 +684,6 @@ export interface paths {
   '/platform/profile/search': {
     /** Search profiles by username, email with the given keywords */
     post: operations['SearchProfileController_searchProfile']
-  }
-  '/platform/profile/subscriptions': {
-    /** Gets the user's subscription statistics */
-    get: operations['SubscriptionsController_getSubscriptionsStatistics']
   }
   '/platform/projects': {
     /**
@@ -1684,14 +1672,6 @@ export interface paths {
   '/v0/pg-meta/{ref}/search/tables': {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
-  }
-  '/v0/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
   }
   '/v0/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
@@ -4056,21 +4036,6 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }
-    GrantTablePrivilegesBody: {
-      grantee: string
-      is_grantable?: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
-    }
     HCaptchaBody: {
       hcaptchaToken: string
     }
@@ -4813,12 +4778,6 @@ export interface components {
       schema: string
       size: string
     }
-    PostgresTablePrivileges: {
-      kind: string
-      name: string
-      privileges: components['schemas']['TablePrivilege'][]
-      schema: string
-    }
     PostgrestConfigResponse: {
       db_anon_role: string
       db_extra_search_path: string
@@ -5177,11 +5136,7 @@ export interface components {
       region: string
       service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
       ssl_enforced: boolean
-      is_sensitive?: boolean
       status: string
-    }
-    ProjectSensitivitySettingResponse: {
-      is_sensitive: boolean
     }
     /** @enum {string} */
     ProjectStatus:
@@ -5457,20 +5412,6 @@ export interface components {
       grantee: string
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    RevokeTablePrivilegesBody: {
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     RunQueryBody: {
       query: string
@@ -5748,6 +5689,10 @@ export interface components {
     }
     StorageFeatures: {
       imageTransformation: components['schemas']['StorageFeatureImageTransformation']
+      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
+    }
+    StorageFeatureS3Protocol: {
+      enabled: boolean
     }
     StorageObject: {
       bucket_id: string
@@ -5781,16 +5726,6 @@ export interface components {
     }
     SubdomainAvailabilityResponse: {
       available: boolean
-    }
-    SubscriptionStatisticsResponse: {
-      total_active_free_projects: number
-      total_enterprise_projects: number
-      total_free_projects: number
-      total_paid_projects: number
-      total_paused_free_projects: number
-      total_payg_projects: number
-      total_pro_projects: number
-      total_team_projects: number
     }
     SupavisorConfigResponse: {
       connectionString: string
@@ -5883,22 +5818,8 @@ export interface components {
       name: string
       schema: string
     }
-    TablePrivilege: {
-      grantee: string
-      grantor: string
-      is_grantable: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
     TargetClonedProject: {
+      name: string
       ref: string
     }
     TargetCloneStatus: {
@@ -6597,9 +6518,6 @@ export interface components {
     }
     UpdateProjectBody: {
       name: string
-    }
-    UpdateProjectSensitivityBody: {
-      is_sensitive: boolean
     }
     UpdateProviderBody: {
       attribute_mapping?: components['schemas']['AttributeMapping']
@@ -8650,13 +8568,13 @@ export interface operations {
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
-      query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
-        org_slug?: string[]
-        project_ref?: string[]
-        offset: number
-        limit: number
+      query?: {
+        limit?: string
+        offset?: string
+        priority?: 'Critical' | 'Warning' | 'Info'
+        status?: 'new' | 'seen' | 'archived'
+        org_slug?: string
+        project_ref?: string
       }
     }
     responses: {
@@ -11189,94 +11107,6 @@ export interface operations {
       }
     }
   }
-  /** Retrieve table privileges */
-  TablePrivilegesController_getTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Grant table privileges */
-  TablePrivilegesController_grantTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GrantTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to grant table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Revoke table privileges */
-  TablePrivilegesController_revokeTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RevokeTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to revoke table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets project pg.tables or pg.table with the given ID */
   TablesController_getTables: {
     parameters: {
@@ -11806,20 +11636,6 @@ export interface operations {
         }
       }
       /** @description Failed to search profiles with the given keywords */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the user's subscription statistics */
-  SubscriptionsController_getSubscriptionsStatistics: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SubscriptionStatisticsResponse']
-        }
-      }
-      /** @description Failed to retrieve user's subscription statistics */
       500: {
         content: never
       }
@@ -13749,30 +13565,29 @@ export interface operations {
       }
     }
   }
-  /** Update project's sensitivity settings */
-  SettingsController_patchProjectSensitivity: {
+  /** Updates the given project sensitivity */
+  SensitivityController_updateProjectSensitivity: {
     parameters: {
       path: {
         /** @description Project ref */
         ref: string
-      } 
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateProjectSensitivityBody']
+        'application/json': components['schemas']['MarkSensitiveBody']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['ProjectSensitivitySettingResponse']
+          'application/json': components['schemas']['ProjectSensitivityResponse']
         }
       }
-      /** @description Failed to update project's sensitivity setting */
-      404: {
+      403: {
         content: never
       }
-      /** @description Failed to update project's sensitivity setting */
+      /** @description Failed to update project */
       500: {
         content: never
       }

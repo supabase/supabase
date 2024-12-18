@@ -2,8 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { useParams } from 'common'
@@ -12,10 +13,13 @@ import {
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import NoPermission from 'components/ui/NoPermission'
 import Panel from 'components/ui/Panel'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
@@ -50,20 +54,30 @@ export const S3Connection = () => {
   const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery(
+  const {
+    data: config,
+    error: configError,
+    isSuccess: isSuccessStorageConfig,
+    isError: isErrorStorageConfig,
+  } = useProjectStorageConfigQuery({ projectRef })
+  const { data: storageCreds, isLoading: isLoadingStorageCreds } = useStorageCredentialsQuery(
     { projectRef },
     { enabled: canReadS3Credentials }
   )
 
-  const FormSchema = z.object({ s3ConnectionEnabled: z.boolean() })
+  const { mutate: updateStorageConfig, isLoading: isUpdating } =
+    useProjectStorageConfigUpdateUpdateMutation({
+      onSuccess: (_, vars) => {
+        if (vars.features) form.reset({ s3ConnectionEnabled: vars.features.s3Protocol.enabled })
+        toast.success('Successfully updated storage settings')
+      },
+    })
 
+  const FormSchema = z.object({ s3ConnectionEnabled: z.boolean() })
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    // [Joshen TODO] Hook up properly
-    defaultValues: { s3ConnectionEnabled: true },
+    defaultValues: { s3ConnectionEnabled: false },
   })
-  // [Joshen TODO] Hook up properly
-  const isUpdating = false
 
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.endpoint
@@ -72,8 +86,20 @@ export const S3Connection = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
-    // [Joshen TODO]
+    if (!config) return console.error('Storage config is required')
+    updateStorageConfig({
+      projectRef,
+      features: {
+        ...config?.features,
+        s3Protocol: { enabled: data.s3ConnectionEnabled },
+      },
+    })
   }
+
+  useEffect(() => {
+    form.reset({ s3ConnectionEnabled: config?.features.s3Protocol.enabled })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isSuccessStorageConfig])
 
   return (
     <>
@@ -103,12 +129,21 @@ export const S3Connection = () => {
                         size="large"
                         checked={field.value}
                         onCheckedChange={field.onChange}
-                        disabled={field.disabled}
+                        disabled={!isSuccessStorageConfig || field.disabled}
                       />
                     </FormControl_Shadcn_>
                   </FormItemLayout>
                 )}
               />
+
+              {isErrorStorageConfig && (
+                <div className="px-8 pb-8">
+                  <AlertError
+                    subject="Failed to retrieve storage configuration"
+                    error={configError}
+                  />
+                </div>
+              )}
 
               <Separator className="bg-border" />
 
@@ -208,7 +243,7 @@ export const S3Connection = () => {
           </Alert_Shadcn_>
         ) : (
           <>
-            {storageCredsQuery.isLoading ? (
+            {isLoadingStorageCreds ? (
               <div className="p-4">
                 <GenericSkeletonLoader />
               </div>

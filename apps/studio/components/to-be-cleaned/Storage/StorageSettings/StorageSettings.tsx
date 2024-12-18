@@ -54,7 +54,7 @@ const StorageSettings = () => {
     isLoading,
     isSuccess,
     isError,
-  } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  } = useProjectStorageConfigQuery({ projectRef })
 
   const organization = useSelectedOrganization()
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
@@ -116,7 +116,7 @@ const StorageSettings = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: initialValues,
   })
-  const { fileSizeLimit: limit, unit: storageUnit, imageTransformationEnabled } = form.watch()
+  const { fileSizeLimit: limit, unit: storageUnit } = form.watch()
 
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
@@ -127,13 +127,14 @@ const StorageSettings = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!projectRef) return console.error('Project ref is required')
+    if (!config) return console.error('Storage config is required')
+
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
       features: {
-        imageTransformation: {
-          enabled: data.imageTransformationEnabled,
-        },
+        imageTransformation: { enabled: data.imageTransformationEnabled },
+        s3Protocol: config.features.s3Protocol,
       },
     })
   }
