@@ -418,7 +418,11 @@ export const SQLEditorNav = ({
           setSelectedSnippetToShare(undefined)
           setSelectedSnippetToUnshare(undefined)
           setShowSharedSnippets(true)
-          snapV2.updateSnippet({ id: snippet.id, snippet: { visibility } })
+          snapV2.updateSnippet({
+            id: snippet.id,
+            snippet: { visibility, folder_id: null },
+            skipSave: true,
+          })
           toast.success(
             action === 'share'
               ? 'Snippet is now shared to the project'
