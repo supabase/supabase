@@ -43,7 +43,7 @@ export const NoticeBanner = () => {
   }
 
   return (
-    <div className="flex items-center justify-center gap-x-4 bg-surface-100 py-1 mx-5 border transition text-foreground border-default">
+    <div className="flex items-center justify-center gap-x-4 bg-surface-100 py-0.5 mx-2 border transition text-foreground border-default rounded-[7px]">
       <p className="text-sm">
         Action required: Set up a custom SMTP provider, further restrictions will be imposed for the
         default email provider

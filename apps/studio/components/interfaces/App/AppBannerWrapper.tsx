@@ -29,21 +29,17 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {
-          // ongoingIncident
-          true && (
-            //
-            <IncidentBanner />
-          )
-        }
-        {/* {
-          //showNoticeBanner
+        {ongoingIncident && (
+          // true
           //
-          true && (
-            //
-            <NoticeBanner />
-          )
-        } */}
+          <IncidentBanner />
+        )}
+        {showNoticeBanner && (
+          //
+          // true
+          //
+          <NoticeBanner />
+        )}
         {profile !== undefined && <RestrictionBanner />}
       </div>
       {children}

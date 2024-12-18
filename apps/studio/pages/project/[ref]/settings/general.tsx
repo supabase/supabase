@@ -6,6 +6,8 @@ import {
   General,
   TransferProjectPanel,
 } from 'components/interfaces/Settings/General'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldHeader, ScaffoldTitle } from 'components/layouts/Scaffold'
@@ -48,5 +50,11 @@ const ProjectSettings: NextPageWithLayout = () => {
   )
 }
 
-ProjectSettings.getLayout = (page) => <SettingsLayout title="General">{page}</SettingsLayout>
+ProjectSettings.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <SettingsLayout title="General">{page}</SettingsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 export default ProjectSettings

@@ -21,6 +21,8 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
 import type { NextPageWithLayout } from 'types'
 import { Alert_Shadcn_, Button } from 'ui'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
   const canManageLogDrains = useCheckPermissions(PermissionAction.ANALYTICS_ADMIN_WRITE, 'logflare')
@@ -155,5 +157,11 @@ const LogDrainsSettings: NextPageWithLayout = () => {
   )
 }
 
-LogDrainsSettings.getLayout = (page) => <SettingsLayout title="Log Drains">{page}</SettingsLayout>
+LogDrainsSettings.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <SettingsLayout title="Log Drains">{page}</SettingsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 export default LogDrainsSettings

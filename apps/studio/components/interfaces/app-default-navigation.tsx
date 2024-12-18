@@ -45,11 +45,13 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Blocks,
   Boxes,
+  ChartArea,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
   CornerLeftUp,
   SidebarClose,
+  Users,
 } from 'lucide-react'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import Connect from './Connect/Connect'
@@ -400,16 +402,10 @@ const OrganizationLinks = () => {
       icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
-      label: 'General',
-      href: `/org/${slug}/general`,
-      key: 'general',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
       label: 'Team',
       href: `/org/${slug}/team`,
       key: 'team',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
       label: 'Integrations',
@@ -418,42 +414,54 @@ const OrganizationLinks = () => {
       icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
     {
-      label: 'Billing',
-      href: `/org/${slug}/billing`,
-      key: 'billing',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
       label: 'Usage',
       href: `/org/${slug}/usage`,
       key: 'usage',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
+    // {
+    //   label: 'Billing',
+    //   href: `/org/${slug}/billing`,
+    //   key: 'billing',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    // },
     {
-      label: 'Invoices',
-      href: `/org/${slug}/invoices`,
-      key: 'invoices',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      //   hidden: !invoicesEnabled,
+      label: 'Organization settings',
+      href: `/org/${slug}/settings`,
+      key: 'settings',
+      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
-    {
-      label: 'OAuth Apps',
-      href: `/org/${slug}/apps`,
-      key: 'apps',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
-      label: 'Audit Logs',
-      href: `/org/${slug}/audit`,
-      key: 'audit',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
-    {
-      label: 'Legal Documents',
-      href: `/org/${slug}/documents`,
-      key: 'documents',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-    },
+    // {
+    //   label: 'OAuth Apps',
+    //   href: `/org/${slug}/apps`,
+    //   key: 'apps',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    // },
+    // {
+    //   label: 'General',
+    //   href: `/org/${slug}/general`,
+    //   key: 'general',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    // },
+    // {
+    //   label: 'Audit Logs',
+    //   href: `/org/${slug}/audit`,
+    //   key: 'audit',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    // },
+    // {
+    //   label: 'Legal Documents',
+    //   href: `/org/${slug}/documents`,
+    //   key: 'documents',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    // },
+    // {
+    //   label: 'Invoices',
+    //   href: `/org/${slug}/invoices`,
+    //   key: 'invoices',
+    //   icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+    //   //   hidden: !invoicesEnabled,
+    // },
   ]
 
   return (

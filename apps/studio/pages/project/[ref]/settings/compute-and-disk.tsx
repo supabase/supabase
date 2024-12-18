@@ -1,4 +1,6 @@
 import { DiskManagementForm } from 'components/interfaces/DiskManagement/DiskManagementForm'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,
@@ -24,5 +26,11 @@ const AuthSettings: NextPageWithLayout = () => {
   )
 }
 
-AuthSettings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
+AuthSettings.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <SettingsLayout>{page}</SettingsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 export default AuthSettings

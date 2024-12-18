@@ -13,6 +13,8 @@ import AccountLayout from './AccountLayout/AccountLayout'
 import DefaultLayout from './DefaultLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import { AnimatePresence, motion } from 'framer-motion'
+import { NoticeBanner } from './AppLayout/NoticeBanner'
+import { OrganizationResourceBanner } from 'components/interfaces/Organization/resource-banner'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
@@ -74,7 +76,9 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <div className="relative py-1.5 w-full h-full">
-      <div className="relative w-full h-full border-l border-t border-b rounded-tl-[7px] rounded-bl-[7px] bg-dash-sidebar overflow-y-auto">
+      <div className="relative w-full h-full border-l border-t border-b rounded-tl-[7px] rounded-bl-[7px] bg-dash-sidebar flex flex-col">
+        {/* <NoticeBanner /> */}
+        <OrganizationResourceBanner />
         {/* <AnimatePresence>
         <motion.div
           className="px-10"
@@ -122,7 +126,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             </Alert_Shadcn_>
           </ScaffoldContainer>
         )}
-        <main className="h-full w-full">{children}</main>
+        <main className="h-full w-full overflow-y-auto">{children}</main>
       </div>
     </div>
   )
