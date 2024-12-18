@@ -345,6 +345,7 @@ const WizardForm = () => {
       dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
+      dbSql: sql,
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
@@ -441,6 +442,11 @@ const WizardForm = () => {
     return null
   }, [form.getValues('dbRegion')])
 
+  // set sql fields anytime the sqlStatements array changes
+  useEffect(() => {
+    form.setValue('sql', sqlStatements.join('\n\n'))
+  }, [sqlStatements])
+
   return (
     <div className="flex lg:flex-row flex-col w-full overflow-auto h-screen items-start">
       <div className="w-full lg:max-w-[600px] relative p-16 lg:p-24 lg:pr-0 min-h-screen lg:flex lg:items-center">
@@ -455,7 +461,6 @@ const WizardForm = () => {
             {step === 1 ? (
               <InitialStep
                 onSqlGenerated={(sql) => {
-                  form.setValue('sql', sql)
                   setSqlStatements((prev) => [...prev, sql])
                 }}
                 onServicesUpdated={setServices}
@@ -488,7 +493,11 @@ const WizardForm = () => {
               />
             ) : (
               <Form_Shadcn_ {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+                <form
+                  id="project-create-form"
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="w-full"
+                >
                   <section className="relative">
                     <div>
                       <div className="mb-2">
@@ -662,7 +671,6 @@ const WizardForm = () => {
                                   <FormItemLayout>
                                     <SchemaGenerator
                                       onSqlGenerated={(sql) => {
-                                        form.setValue('sql', sql)
                                         setSqlStatements((prev) => [...prev, sql])
                                       }}
                                       onServicesUpdated={setServices}
@@ -1097,7 +1105,13 @@ const WizardForm = () => {
                                 </div>
                               </>
 
-                              <Button className="w-full sticky top-0">Create project</Button>
+                              <Button
+                                form="project-create-form"
+                                htmlType="submit"
+                                className="w-full sticky top-0"
+                              >
+                                Create project
+                              </Button>
                             </div>
                           </div>
                         )}
