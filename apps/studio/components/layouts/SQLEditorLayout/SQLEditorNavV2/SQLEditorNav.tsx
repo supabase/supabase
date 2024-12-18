@@ -223,17 +223,22 @@ export const SQLEditorNav = ({
     })
   }, [projectRef, privateSnippetsPages?.pages])
 
-  const favoriteSnippets = useMemo(
-    () =>
-      favoriteSqlSnippetsData?.pages
-        .flatMap((page) => page.contents ?? [])
+  const favoriteSnippets = useMemo(() => {
+    let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
+
+    if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
+      snippets.push(snippet as any)
+    }
+
+    return (
+      snippets
         .map((snippet) => ({ ...snippet, folder_id: undefined }))
         .sort((a, b) => {
           if (sort === 'name') return a.name.localeCompare(b.name)
           else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-        }) ?? [],
-    [favoriteSqlSnippetsData?.pages, sort]
-  )
+        }) ?? []
+    )
+  }, [favoriteSqlSnippetsData?.pages, snippet, sort])
 
   const { data: favoritedSnippetCountData } = useContentCountQuery({
     projectRef,
@@ -289,16 +294,20 @@ export const SQLEditorNav = ({
     })
   }, [projectRef, privateSnippetsPages?.pages])
 
-  const sharedSnippets = useMemo(
-    () =>
-      sharedSqlSnippetsData?.pages
-        .flatMap((page) => page.contents ?? [])
-        .sort((a, b) => {
-          if (sort === 'name') return a.name.localeCompare(b.name)
-          else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
-        }) ?? [],
-    [sharedSqlSnippetsData?.pages, sort]
-  )
+  const sharedSnippets = useMemo(() => {
+    let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
+
+    if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
+      snippets.push(snippet as any)
+    }
+
+    return (
+      snippets.sort((a, b) => {
+        if (sort === 'name') return a.name.localeCompare(b.name)
+        else return new Date(b.inserted_at).valueOf() - new Date(a.inserted_at).valueOf()
+      }) ?? []
+    )
+  }, [sharedSqlSnippetsData?.pages, snippet, sort])
 
   const { data: sharedSnippetCountData } = useContentCountQuery({
     projectRef,
