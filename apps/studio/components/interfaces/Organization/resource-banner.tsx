@@ -18,16 +18,16 @@ export function OrganizationResourceBanner() {
           type="danger"
           title="Outstanding Invoices"
           message="Please pay invoices to avoid service disruption."
-          link={`/org/${org?.slug}/invoices`}
+          link={`/org/${org?.slug}/settings/invoices`}
           org={org}
         />
       )}
-      {true && (
+      {org?.restriction_status === 'grace_period' && (
         <WarningBanner
           type="warning"
           title="Your organization has exceeded its quota"
           message={`You are given a grace period until ${dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY')}`}
-          link={`/org/${org?.slug}/billing`}
+          link={`/org/${org?.slug}/settings/billing`}
           org={org}
         />
       )}
@@ -36,7 +36,7 @@ export function OrganizationResourceBanner() {
           type="warning"
           title="Grace period is over"
           message="Your project will not be able to serve requests when you used up your quota."
-          link={`/org/${org?.slug}/billing`}
+          link={`/org/${org?.slug}/settings/billing`}
           org={org}
         />
       )}
@@ -45,7 +45,7 @@ export function OrganizationResourceBanner() {
           type="danger"
           title="Services Restricted"
           message="Your project is unable to serve any requests as your organization has used up its quota."
-          link={`/org/${org?.slug}/billing`}
+          link={`/org/${org?.slug}/settings/billing`}
           org={org}
         />
       )}
@@ -78,7 +78,8 @@ const WarningBanner = ({
     <div
       className={cn(
         `relative ${bannerStyles} border-b border-muted py-1 flex items-center gap-2 flex-shrink-0 px-10 justify-center`,
-        isProject && 'last:rounded-b-[7px] mx-2 border-default border-l border-r'
+        isProject && 'last:rounded-b-[7px] mx-2 border-default border-l border-r',
+        'flex-shrink-0'
       )}
     >
       <div className="mx-auto w-full xl:max-w-[700px] items-center flex flex-row gap-3">

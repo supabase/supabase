@@ -1,13 +1,14 @@
-import { InvoicesSettings } from 'components/interfaces/Organization'
+import { GeneralSettings as GeneralSettingsLegacy } from 'components/interfaces/Organization'
 import AppLayout from 'components/layouts/AppLayout/AppLayout'
 import DefaultLayout from 'components/layouts/DefaultLayout'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
+import OrganizationSettingsLayout from 'components/layouts/ProjectLayout/organization-settings-layout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
-const OrgInvoices: NextPageWithLayout = () => {
+const OrgGeneralSettings: NextPageWithLayout = () => {
   const { isLoading: isLoadingPermissions } = usePermissionsQuery()
   const selectedOrganization = useSelectedOrganization()
 
@@ -16,17 +17,19 @@ const OrgInvoices: NextPageWithLayout = () => {
       {selectedOrganization === undefined && isLoadingPermissions ? (
         <Loading />
       ) : (
-        <InvoicesSettings />
+        <GeneralSettingsLegacy />
       )}
     </>
   )
 }
 
-OrgInvoices.getLayout = (page) => (
+OrgGeneralSettings.getLayout = (page) => (
   <AppLayout>
     <DefaultLayout>
-      <OrganizationLayout>{page}</OrganizationLayout>
+      <OrganizationLayout>
+        <OrganizationSettingsLayout>{page}</OrganizationSettingsLayout>
+      </OrganizationLayout>
     </DefaultLayout>
   </AppLayout>
 )
-export default OrgInvoices
+export default OrgGeneralSettings

@@ -110,13 +110,6 @@ export function AppDefaultNavigation() {
 }
 
 function NavLink({ route, active }: { route: any; active?: boolean }) {
-  const router = useRouter()
-  // const hasItems = route.items && route.items.some((section) => section.items.length > 0)
-  const [open, setOpen] = useState(false)
-
-  // console.log('route', route)
-
-  // if (!route.items) {
   return (
     <SidebarMenuItem key={route.key}>
       <SidebarMenuButton
@@ -252,7 +245,7 @@ const OrganizationLinks = () => {
     // },
     {
       label: 'Organization settings',
-      href: `/org/${slug}/settings`,
+      href: `/org/${slug}/settings/general`,
       key: 'settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
     },
@@ -291,21 +284,17 @@ const OrganizationLinks = () => {
 
   return (
     <SidebarMenu className="flex flex-col gap-1 items-start">
-      <SidebarGroup
-      // className={cn(!open && 'pt-0')}
-      >
+      <SidebarGroup>
         {navMenuItems.map((item, i) => (
-          <SidebarMenuItem key={`${item.label}-${i}`}>
-            <NavLink
-              active={i === 0 ? activeRoute === undefined : activeRoute === item.key}
-              route={{
-                label: item.label,
-                link: item.href,
-                key: item.label,
-                icon: item.icon,
-              }}
-            />
-          </SidebarMenuItem>
+          <NavLink
+            active={i === 0 ? activeRoute === undefined : activeRoute === item.key}
+            route={{
+              label: item.label,
+              link: item.href,
+              key: item.label,
+              icon: item.icon,
+            }}
+          />
         ))}
       </SidebarGroup>
     </SidebarMenu>

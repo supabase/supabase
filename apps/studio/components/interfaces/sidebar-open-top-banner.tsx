@@ -116,7 +116,6 @@ export function SidebarOpenTopBanner() {
         </div>
         {!!project?.ref && (
           <motion.div
-            className="border-l flex-0 h-full"
             initial={{ opacity: 0, x: -20 }}
             animate={{
               opacity: !aiAssistantPanel.open ? 1 : 0,

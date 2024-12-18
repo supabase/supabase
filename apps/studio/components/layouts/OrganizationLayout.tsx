@@ -8,7 +8,7 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import type { PropsWithChildren } from 'react'
-import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, NavMenu, NavMenuItem } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn, NavMenu, NavMenuItem } from 'ui'
 import AccountLayout from './AccountLayout/AccountLayout'
 import DefaultLayout from './DefaultLayout'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
@@ -75,30 +75,34 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
 
   return (
-    <div className="relative py-1.5 w-full h-full">
-      <div className="relative w-full h-full border-l border-t border-b rounded-tl-[7px] rounded-bl-[7px] bg-dash-sidebar flex flex-col">
+    <div className="flex flex-row h-full w-full">
+      <div
+        className={cn(
+          'border-l w-full rounded-tl-[7px] rounded-bl-[7px] border-t border-b my-1.5 bg-dash-sidebar flex flex-col'
+        )}
+      >
         {/* <NoticeBanner /> */}
         <OrganizationResourceBanner />
         {/* <AnimatePresence>
-        <motion.div
-          className="px-10"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{
-            duration: 0.2,
-            ease: 'easeOut',
-          }}
-        >
-          <NavMenu className="border-none" aria-label="Organization menu navigation">
-            {filteredNavMenuItems.map((item) => (
-              <NavMenuItem key={item.label} active={currentPath === item.href}>
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </motion.div>
-      </AnimatePresence> */}
+          <motion.div
+            className="px-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{
+              duration: 0.2,
+              ease: 'easeOut',
+            }}
+          >
+            <NavMenu className="border-none" aria-label="Organization menu navigation">
+              {filteredNavMenuItems.map((item) => (
+                <NavMenuItem key={item.label} active={currentPath === item.href}>
+                  <Link href={item.href}>{item.label}</Link>
+                </NavMenuItem>
+              ))}
+            </NavMenu>
+          </motion.div>
+        </AnimatePresence> */}
 
         {/* <ScaffoldDivider /> */}
         {/* <motion.div
