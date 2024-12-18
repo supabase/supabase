@@ -10,7 +10,7 @@ Attempting to create a second Job with the same name (and case) will overwrite t
 
 </Admonition>
 
-## Schedule a Job
+## Schedule a job
 
 <Tabs
   scrollable
@@ -84,7 +84,7 @@ You can input seconds for your Job schedule interval as long as you're on Postgr
 
 </Admonition>
 
-## Edit a Job
+## Edit a job
 
 <Tabs
   scrollable
@@ -134,7 +134,7 @@ It is also possible to modify a job by using the `cron.schedule()` function by i
 </TabPanel>
 </Tabs>
 
-## Activate/Deactivate a Job
+## Activate/Deactivate a job
 
 <Tabs
   scrollable
@@ -175,7 +175,7 @@ select cron.alter_job(
 </TabPanel>
 </Tabs>
 
-## Unschedule a Job
+## Unschedule a job
 
 <Tabs
   scrollable
@@ -213,7 +213,7 @@ Unscheduling a Job will permanently delete the Job from `cron.job` table but its
 </TabPanel>
 </Tabs>
 
-## Inspecting Job Runs
+## Inspecting job runs
 
 <Tabs
   scrollable
@@ -328,7 +328,7 @@ This requires the [`pg_net` extension](/docs/guides/database/extensions/pg_net) 
 
 </Admonition>
 
-## Caution: Scheduling System Maintenance
+## Caution: Scheduling system maintenance
 
 Be extremely careful when setting up Jobs for system maintenance tasks as they can have unintended consequences.
 

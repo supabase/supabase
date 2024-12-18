@@ -6,13 +6,13 @@ subtitle: 'Bandwidth & Storage Egress'
 sidebar_label: 'Bandwidth & Storage Egress'
 ---
 
-## Bandwidth & Storage Egress
+## Bandwidth & Storage egress
 
 Free Plan Organizations in Supabase have a limit of 5 GB of bandwidth. This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
 
-### Checking Storage Egress Requests in Log Explorer:
+### Checking Storage egress requests in Logs Explorer:
 
-We have a template query that you can use to get the number of requests for each object in [Log Explorer](/dashboard/project/_/logs/explorer/templates).
+We have a template query that you can use to get the number of requests for each object in [Logs Explorer](/dashboard/project/_/logs/explorer/templates).
 
 ```sql
 select
@@ -45,7 +45,7 @@ Example of the output:
 ]
 ```
 
-### Calculating Egress:
+### Calculating egress:
 
 If you already know the size of those files, you can calculate the egress by multiplying the number of requests by the size of the file.
 You can also get the size of the file with the following cURL:
@@ -67,6 +67,6 @@ Total Egress = 395.76MB
 
 You can see that these values can get quite large, so it's important to keep track of the egress and optimize the files.
 
-### Optimizing Egress:
+### Optimizing egress:
 
 If you are on the Pro Plan, you can use the [Supabase Image Transformations](/docs/guides/storage/image-transformations) to optimize the images and reduce the egress.

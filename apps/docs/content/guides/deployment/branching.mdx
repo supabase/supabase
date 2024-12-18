@@ -198,8 +198,6 @@ If your repository doesn't have all the migration files, your production branch 
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Inside your Supabase project, click `Enable branching`" fullWidth>
 
-            If you're prompted to join the waitlist, click `Join waitlist`. We're rolling out Branching to users in batches.
-
             <figure className="max-w-[520px]">
             <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
             </figure>
@@ -210,13 +208,13 @@ If your repository doesn't have all the migration files, your production branch 
     <StepHikeCompact.Step step={2}>
         <StepHikeCompact.Details title="Install the GitHub integration" fullWidth>
 
-            If you have been granted early access, once when clicking `Enable branching` you will see the following dialog:
+            When clicking `Enable branching` you will see the following dialog:
 
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
             </figure>
 
-            If you don't have the GitHub integration installed, click `Install GitHub Integration`. The integration is required to run migration files and the optional database seed file.
+            If you don't have the GitHub integration installed, click `Add new project connection`. The integration is required to run migration files and the optional database seed file.
 
             You're taken to the GitHub integration page. Click `Install`.
 
@@ -236,9 +234,7 @@ If your repository doesn't have all the migration files, your production branch 
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="If you see the following dialog, you're in the Early Access group" fullWidth>
-
-            You should now see a popover with the GitHub Connection details shown.
+        <StepHikeCompact.Details title="You should now see a popover with the GitHub Connection details shown" fullWidth>
 
             Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
 
@@ -255,7 +251,7 @@ If your repository doesn't have all the migration files, your production branch 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Step step={4}>
         <StepHikeCompact.Details title="Click `I understand, enable branching`. Branching is now enabled for your project." fullWidth>
 
 
@@ -621,14 +617,14 @@ If you prefer not to use branching, you can manage your environments and tests i
 
 You can also combine both strategies to perform both local and staging tests.
 
-## Early access pricing
+## Pricing
 
-Branching is available on the Pro Plan and above for Early Access users. The price during Early Access is:
+Branching is available on the Pro Plan and above. The price is:
 
 - Each Preview branch costs $0.32 per day
 - Each Preview branch is billed until it is removed
 
-Prices listed are for Early Access and are subject to change.
+Prices listed are subject to change.
 
 ## Feedback
 

@@ -37,7 +37,7 @@ Supabase Edge Runtime does currently not support hosting/serving of static files
 
 ```ts
 // functions/main/index.ts
-import aiPlugins from './ai-plugins.json' assert { type: 'json' }
+import aiPlugins from './ai-plugins.json' with { type: 'json' }
 
 // [...]
 
@@ -89,7 +89,7 @@ Next, we create our `/functions/chatgpt-plugin/index.ts` [file](https://github.c
 ```ts
 // /functions/chatgpt-plugin/index.ts
 import { Application, Router } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
-import openapi from './openapi.json' assert { type: 'json' }
+import openapi from './openapi.json' with { type: 'json' }
 
 console.log('Hello from `chatgpt-plugin` Function!')
 

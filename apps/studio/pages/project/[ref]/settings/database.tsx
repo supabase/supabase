@@ -8,6 +8,7 @@ import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 import { ConnectionStringMoved } from 'components/interfaces/Settings/Database/ConnectionStringMoved'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { DatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
+import ResetDbPassword from 'components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
@@ -43,6 +44,7 @@ const ProjectSettings: NextPageWithLayout = () => {
                 <DatabaseSettings />
               </>
             )}
+            <ResetDbPassword />
             <ConnectionPooling />
           </div>
 

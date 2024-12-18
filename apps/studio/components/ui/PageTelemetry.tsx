@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
-import { useParams, useUser } from 'common'
+import { useParams, useTelemetryCookie, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
 import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
@@ -38,6 +38,10 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
   const { mutate: sendGroupsIdentify } = useSendGroupsIdentifyMutation()
   const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
+
+  const title = typeof document !== 'undefined' ? document?.title : ''
+  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
+  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
 
   useEffect(() => {
     if (consentValue !== null) {
