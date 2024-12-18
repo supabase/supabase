@@ -2,15 +2,15 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { props, state, effect } from 'svelte/runes'
+	import { defineProps, defineState, defineEffect } from 'svelte'
 
-	const size = $props<number>(10)
-	const urlProp = $props<string>('')
-	const supabase = $props<SupabaseClient>()
+	const size = $defineProps<number>(10)
+	const urlProp = $defineProps<string>('')
+	const supabase = $defineProps<SupabaseClient>()
 
-	const avatarUrl = $state<string | null>(null)
-	const uploading = $state(false)
-	const currentUrl = $state(urlProp)
+	const avatarUrl = $defineState<string | null>(null)
+	const uploading = $defineState(false)
+	const currentUrl = $defineState(urlProp)
 	let fileInput: HTMLInputElement | null = null
 
 	const dispatch = createEventDispatcher<{
@@ -18,14 +18,14 @@
 		upload: void;
 	}>()
 
-	$effect(() => {
+	$defineEffect(() => {
 		// Update currentUrl when urlProp changes
-		currentUrl.set(urlProp)
+		currentUrl.value = urlProp
 	})
 
-	$effect(() => {
+	$defineEffect(() => {
 		// Dispatch urlChange event when currentUrl changes
-		dispatch('urlChange', currentUrl)
+		dispatch('urlChange', currentUrl.value)
 	})
 
 	const downloadImage = async (path: string) => {
@@ -37,7 +37,7 @@
 			}
 
 			const imageUrl = URL.createObjectURL(imageData)
-			avatarUrl.set(imageUrl)
+			avatarUrl.value = imageUrl
 		} catch (error) {
 			if (error instanceof Error) {
 				console.log('Error downloading image: ', error.message)
@@ -47,7 +47,7 @@
 
 	const uploadAvatar = async (event: Event) => {
 		try {
-			uploading.set(true)
+			uploading.value = true
 			const input = event.target as HTMLInputElement
 			const files = input.files
 
@@ -65,7 +65,7 @@
 				throw error
 			}
 
-			currentUrl.set(filePath)
+			currentUrl.value = filePath
 			setTimeout(() => {
 				dispatch('upload')
 			}, 100)
@@ -74,31 +74,31 @@
 				alert(error.message)
 			}
 		} finally {
-			uploading.set(false)
+			uploading.value = false
 		}
 	}
 
-	$effect(() => {
-		if (currentUrl) downloadImage(currentUrl)
+	$defineEffect(() => {
+		if (currentUrl.value) downloadImage(currentUrl.value)
 	})
 </script>
 
 <div>
-	{#if avatarUrl}
+	{#if avatarUrl.value}
 		<img
-			src={avatarUrl}
-			alt={avatarUrl ? 'Avatar' : 'No image'}
+			src={avatarUrl.value}
+			alt={avatarUrl.value ? 'Avatar' : 'No image'}
 			class="avatar image"
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
 		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
-	<input type="hidden" name="avatarUrl" value={currentUrl} />
+	<input type="hidden" name="avatarUrl" value={currentUrl.value} />
 
 	<div style="width: {size}em;">
 		<label class="button primary block" for="single">
-			{uploading ? 'Uploading ...' : 'Upload'}
+			{uploading.value ? 'Uploading ...' : 'Upload'}
 		</label>
 		<input
 			style="visibility: hidden; position:absolute;"
@@ -106,8 +106,8 @@
 			id="single"
 			accept="image/*"
 			bind:this={fileInput}
-			onchange={uploadAvatar}
-			disabled={uploading}
+			on:change={uploadAvatar}
+			disabled={uploading.value}
 		/>
 	</div>
 </div>
