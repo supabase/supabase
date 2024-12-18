@@ -36,8 +36,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const telemetryProps = useTelemetryProps()
   const { hasAcceptedConsent } = useConsent()
   const IS_DEV = !IS_PROD && !IS_PREVIEW
-  //const blockEvents = IS_DEV || !hasAcceptedConsent
-  const blockEvents = !hasAcceptedConsent
+  const blockEvents = IS_DEV || !hasAcceptedConsent
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -86,7 +85,7 @@ export default function App({ Component, pageProps }: AppProps) {
     if (!router.isReady) return
     if (blockEvents) return
     handlePageTelemetry(window.location.href)
-  }, [router.isReady])
+  }, [router.isReady, blockEvents])
 
   useEffect(() => {
     const handleBeforeUnload = async () => {

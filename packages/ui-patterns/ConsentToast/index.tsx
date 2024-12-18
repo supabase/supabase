@@ -166,7 +166,6 @@ export const useConsent = () => {
 
   return {
     consentValue,
-    setConsentValue,
     hasAcceptedConsent: consentValue === 'true',
     triggerConsentToast,
   }
