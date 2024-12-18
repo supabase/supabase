@@ -48,6 +48,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import { AskAIWidget } from './AskAIWidget'
@@ -98,8 +99,6 @@ export const SQLEditor = () => {
     selectedDiffType,
     setSelectedDiffType,
     pendingTitle,
-    setPendingTitle,
-    isAcceptDiffLoading,
     setIsAcceptDiffLoading,
     isDiffOpen,
     defaultSqlDiff,
@@ -721,6 +720,7 @@ export const SQLEditor = () => {
                       <MonacoEditor
                         autoFocus
                         id={id}
+                        className={cn(isDiffOpen && 'hidden')}
                         editorRef={editorRef}
                         monacoRef={monacoRef}
                         executeQuery={executeQuery}

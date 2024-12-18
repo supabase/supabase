@@ -40,10 +40,11 @@ const InlineWidget = ({
   editor,
   id,
   beforeLineNumber,
-  afterLineNumber,
+  afterLineNumber = 0,
   heightInLines = 1,
 }: PropsWithChildren<InlineWidgetProps>) => {
   const lineNumber = beforeLineNumber ?? afterLineNumber
+  console.log({ lineNumber })
   const key = `${id}-${lineNumber.toString()}`
 
   const containerElement = useMemo(() => document.createElement('div'), [])
