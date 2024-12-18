@@ -10,16 +10,16 @@ const config = {
 	kit: {
 		// Use static adapter for SPA deployment
 		adapter: adapter({
+			pages: 'dist',
+			assets: 'dist',
 			fallback: 'index.html',
+			precompress: false,
 			strict: false
 		}),
 		// Ensure client-side routing works
 		paths: {
 			base: ''
-		},
-		// Configure for client-side rendering
-		csr: true,
-		ssr: false
+		}
 	},
 
 	compilerOptions: {
