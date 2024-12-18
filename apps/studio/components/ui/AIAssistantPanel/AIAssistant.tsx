@@ -511,7 +511,9 @@ export const AIAssistant = ({
               title="OpenAI API key not set"
               description={
                 <Markdown
-                  content={'Add your `OPENAI_API_KEY` to `./docker/.env` to use the AI Assistant.'}
+                  content={
+                    'Add your `OPENAI_API_KEY` to your environment variables to use the AI Assistant.'
+                  }
                 />
               }
             />
