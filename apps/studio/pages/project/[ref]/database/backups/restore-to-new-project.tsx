@@ -82,7 +82,7 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
-  const hasPITREnabled = cloneBackups?.pitr_enabled
+  const PITR_ENABLED = cloneBackups?.pitr_enabled
 
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
@@ -99,17 +99,11 @@ const RestoreToNewProject = () => {
     {
       refetchInterval,
       refetchOnWindowFocus: false,
-      retry: (failureCount, error) => {
-        // If the user doesn't have permission to read physical backups (or they are disabled), don't retry
-        // This way we don't have to wait for 3 requests to finish.
-        if (typeof error === 'object' && error !== null && 'code' in error && error?.code === 403)
-          return false
-        return failureCount < 3
-      },
       onSuccess: (data) => {
-        const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
+        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
         if (!hasTransientState) setRefetchInterval(false)
       },
+      enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
@@ -293,7 +287,7 @@ const RestoreToNewProject = () => {
 
   if (
     !isLoading &&
-    hasPITREnabled &&
+    PITR_ENABLED &&
     !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
   ) {
     return (
@@ -305,7 +299,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
+  if (!isLoading && !PITR_ENABLED && cloneBackups?.backups.length === 0) {
     return (
       <>
         <Admonition
@@ -361,7 +355,7 @@ const RestoreToNewProject = () => {
           </Panel>
         </div>
       ) : null}
-      {hasPITREnabled ? (
+      {PITR_ENABLED ? (
         <>
           <PITRForm
             disabled={isRestoring}
