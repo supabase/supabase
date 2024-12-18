@@ -36,7 +36,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     const classes = [
       'relative',
-      'h-10 w-10 group-data-[state=expanded]:w-full',
+      'h-10 w-full md:w-10 md:group-data-[state=expanded]:w-full',
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
@@ -80,8 +80,8 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
             'min-w-[128px] text-sm text-foreground-light',
             'group-hover/item:text-foreground',
             'group-aria-current/item:text-foreground',
-            'absolute left-7 group-data-[state=expanded]:left-12',
-            'opacity-0 group-data-[state=expanded]:opacity-100',
+            'absolute left-10 md:left-7 md:group-data-[state=expanded]:left-12',
+            'opacity-100 md:opacity-0 md:group-data-[state=expanded]:opacity-100',
             `${isActive && 'text-foreground hover:text-foreground'}`,
             'transition-all'
           )}
