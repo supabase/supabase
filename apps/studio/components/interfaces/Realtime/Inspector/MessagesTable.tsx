@@ -13,6 +13,7 @@ import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import { DocsButton } from 'components/ui/DocsButton'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 export const isErrorLog = (l: LogData) => {
   return l.message === 'SYSTEM' && l.metadata?.status === 'error'
@@ -177,11 +178,7 @@ const MessagesTable = ({
                       isRowSelected={false}
                       selectedCellIdx={undefined}
                       onClick={() => {
-                        sendEvent({
-                          category: 'realtime_inspector',
-                          action: 'focused-specific-message',
-                          label: 'realtime_inspector_results',
-                        })
+                        sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED })
                         setFocusedLog(row)
                       }}
                     />

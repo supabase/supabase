@@ -145,8 +145,8 @@ const InnerSideBarFilterSearchInput = forwardRef<
         ref={ref}
         type="text"
         className={cn(
-          'h-[28px] w-full',
-          'text-xs',
+          'h-[32px] md:h-[28px] w-full',
+          'text-base md:text-xs',
           'pl-7',
           'pr-7',
           'w-full',
@@ -179,7 +179,7 @@ const InnerSideBarFilterSortDropdown = forwardRef<
         <DropdownMenuTrigger
           asChild
           className={cn(
-            'absolute right-1 top-[.3rem]',
+            'absolute right-1 top-[.4rem] md:top-[.3rem]',
             'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
             triggerClassName
           )}
