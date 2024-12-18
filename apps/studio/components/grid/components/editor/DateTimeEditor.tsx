@@ -14,14 +14,13 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
 } from 'ui'
+import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { BlockKeys } from '../common/BlockKeys'
 
 interface BaseEditorProps<TRow, TSummaryRow = unknown>
   extends RenderEditCellProps<TRow, TSummaryRow> {
   type: 'date' | 'datetime' | 'datetimetz'
-  isNullable: boolean
 }
 
 const FORMAT_MAP = {
@@ -34,7 +33,6 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   row,
   column,
   type,
-  isNullable,
   onRowChange,
   onClose,
 }: BaseEditorProps<TRow, TSummaryRow>) {
@@ -43,9 +41,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 
   const value = row[column.key as keyof TRow] as unknown as string
   const [inputValue, setInputValue] = useState(value)
-  const timeValue = inputValue
-    ? dayjs(inputValue, format).format('DD MMM YYYY HH:mm:ss (ZZ)')
-    : inputValue
+  const timeValue = inputValue ? Number(dayjs(inputValue, format)) : inputValue
 
   const saveChanges = (value: string | null) => {
     if ((typeof value === 'string' && value.length === 0) || timeValue === 'Invalid Date') return
@@ -72,7 +68,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
         >
           <Input
             autoFocus
-            value={inputValue ?? ''}
+            value={inputValue}
             placeholder={FORMAT_MAP[type]}
             onChange={(e) => setInputValue(e.target.value)}
             className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
@@ -81,23 +77,28 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
         <div className="px-3 py-1 flex flex-col gap-y-0.5">
           <p className="text-xs text-foreground-lighter">Formatted value:</p>
           {(inputValue ?? '').length === 0 ? (
-            <p className="text-sm font-mono text-foreground-light h-[21px]">
-              Enter a valid date format
-            </p>
+            <p className="text-sm font-mono text-foreground-light">Enter a valid date format</p>
           ) : timeValue === 'Invalid Date' ? (
-            <p className="text-sm font-mono text-foreground-light h-[21px]">Invalid date format</p>
-          ) : (
+            <p className="text-sm font-mono text-foreground-light">Invalid date format</p>
+          ) : type === 'datetimetz' ? (
             <TimestampInfo
-              value={timeValue}
-              labelFormatter={
-                type === 'date'
-                  ? 'DD MMM YYYY'
-                  : type === 'datetime'
-                    ? 'DD MMM YYYY HH:mm:ss'
-                    : 'DD MMM YYYY HH:mm:ss (ZZ)'
-              }
-              className="text-left text-sm font-mono tracking-tight"
+              displayAs="utc"
+              utcTimestamp={timeValue}
+              labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+              className="text-left !text-sm font-mono tracking-tight"
             />
+          ) : (
+            <p className="text-sm font-mono tracking-tight">
+              {timestampLocalFormatter({
+                utcTimestamp: timeValue,
+                format:
+                  type === 'date'
+                    ? 'DD MMM YYYY'
+                    : type === 'datetime'
+                      ? 'DD MMM YYYY HH:mm:ss'
+                      : undefined,
+              })}
+            </p>
           )}
         </div>
         <div className="px-3 pt-1 pb-2 flex justify-between gap-x-1">
@@ -116,44 +117,29 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             </div>
           </div>
           <div className="flex">
-            {isNullable ? (
-              <>
-                <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
-                  Set NULL
-                </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      type="default"
-                      icon={<ChevronDown />}
-                      className="px-1 rounded-l-none border-l-0"
-                    />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-20" align="end">
-                    <DropdownMenuItem
-                      onClick={() => {
-                        // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
-                        const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
-                        saveChanges(now)
-                      }}
-                    >
-                      Set to NOW
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
-            ) : (
-              <Button
-                type="default"
-                onClick={() => {
-                  // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
-                  const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
-                  saveChanges(now)
-                }}
-              >
-                Set to NOW
-              </Button>
-            )}
+            <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
+              Set NULL
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  icon={<ChevronDown />}
+                  className="px-1 rounded-l-none border-l-0"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-20" align="end">
+                <DropdownMenuItem
+                  onClick={() => {
+                    // [Joshen] The replace here is needed for timestamptz cause dayjs formats "ZZ" with "+" already
+                    const now = dayjs().format(FORMAT_MAP[type]).replace('++', '+')
+                    saveChanges(now)
+                  }}
+                >
+                  Set to NOW
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </PopoverContent_Shadcn_>
@@ -161,9 +147,20 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   )
 }
 
-export function DateTimeEditor(type: 'datetime' | 'datetimetz' | 'date', isNullable: boolean) {
-  // eslint-disable-next-line react/display-name
-  return <TRow, TSummaryRow = unknown>(props: RenderEditCellProps<TRow, TSummaryRow>) => {
-    return <BaseEditor {...props} type={type} isNullable={isNullable} />
-  }
+export function DateTimeEditor<TRow, TSummaryRow = unknown>(
+  props: RenderEditCellProps<TRow, TSummaryRow>
+) {
+  return <BaseEditor {...props} type="datetime" />
+}
+
+export function DateTimeWithTimezoneEditor<TRow, TSummaryRow = unknown>(
+  props: RenderEditCellProps<TRow, TSummaryRow>
+) {
+  return <BaseEditor {...props} type="datetimetz" />
+}
+
+export function DateEditor<TRow, TSummaryRow = unknown>(
+  props: RenderEditCellProps<TRow, TSummaryRow>
+) {
+  return <BaseEditor {...props} type="date" />
 }
