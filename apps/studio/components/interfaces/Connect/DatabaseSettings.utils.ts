@@ -72,7 +72,7 @@ export const getConnectionStrings = (
   // Pooler connection strings
   const poolerPsqlString = isMd5
     ? `psql "postgresql://${poolerUser}:${password}@${poolerHost}:${poolerPort}/${poolerName}?options=reference%3D${projectRef}"`
-    : `psql -h ${poolerHost} -p ${poolerPort} -d ${poolerName} -U ${poolerUser}.${projectRef}`
+    : `psql -h ${poolerHost} -p ${poolerPort} -d ${poolerName} -U ${poolerUser}`
 
   const poolerUriString = poolingInfo.connectionString
 
@@ -375,14 +375,4 @@ export const constructConnStringSyntax = (
   }
 
   return []
-}
-
-export const getPoolerTld = (connString: string) => {
-  try {
-    const segment = connString.split('pooler.supabase.')[1]
-    const tld = segment.split(':6543')[0]
-    return tld
-  } catch {
-    return 'com'
-  }
 }
