@@ -20,12 +20,12 @@
 
 	effect(() => {
 		// Update currentUrl when urlProp changes
-		currentUrl = urlProp
+		$currentUrl = urlProp
 	})
 
 	effect(() => {
 		// Dispatch urlChange event when currentUrl changes
-		dispatch('urlChange', currentUrl)
+		dispatch('urlChange', $currentUrl)
 	})
 
 	const downloadImage = async (path: string) => {
@@ -37,7 +37,7 @@
 			}
 
 			const imageUrl = URL.createObjectURL(imageData)
-			avatarUrl = imageUrl
+			$avatarUrl = imageUrl
 		} catch (error) {
 			if (error instanceof Error) {
 				console.log('Error downloading image: ', error.message)
@@ -47,7 +47,7 @@
 
 	const uploadAvatar = async (event: Event) => {
 		try {
-			uploading = true
+			$uploading = true
 			const input = event.target as HTMLInputElement
 			const files = input.files
 
@@ -65,7 +65,7 @@
 				throw error
 			}
 
-			currentUrl = filePath
+			$currentUrl = filePath
 			setTimeout(() => {
 				dispatch('upload')
 			}, 100)
@@ -74,31 +74,31 @@
 				alert(error.message)
 			}
 		} finally {
-			uploading = false
+			$uploading = false
 		}
 	}
 
 	effect(() => {
-		if (currentUrl) downloadImage(currentUrl)
+		if ($currentUrl) downloadImage($currentUrl)
 	})
 </script>
 
 <div>
-	{#if avatarUrl}
+	{#if $avatarUrl}
 		<img
-			src={avatarUrl}
-			alt={avatarUrl ? 'Avatar' : 'No image'}
+			src={$avatarUrl}
+			alt={$avatarUrl ? 'Avatar' : 'No image'}
 			class="avatar image"
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
 		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
-	<input type="hidden" name="avatarUrl" value={currentUrl} />
+	<input type="hidden" name="avatarUrl" value={$currentUrl} />
 
 	<div style="width: {size}em;">
 		<label class="button primary block" for="single">
-			{uploading ? 'Uploading ...' : 'Upload'}
+			{$uploading ? 'Uploading ...' : 'Upload'}
 		</label>
 		<input
 			style="visibility: hidden; position:absolute;"
@@ -107,7 +107,7 @@
 			accept="image/*"
 			bind:this={fileInput}
 			onchange={uploadAvatar}
-			disabled={uploading}
+			disabled={$uploading}
 		/>
 	</div>
 </div>

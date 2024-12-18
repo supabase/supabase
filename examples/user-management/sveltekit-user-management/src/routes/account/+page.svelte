@@ -17,23 +17,23 @@
 	const avatarUrl = state(profile?.avatar_url ?? '')
 
 	const handleSubmit = () => {
-		loading = true
+		$loading = true
 		return async ({ update }: { update: () => void }) => {
-			loading = false
+			$loading = false
 			update()
 		}
 	}
 
 	const handleSignOut = () => {
-		loading = true
+		$loading = true
 		return async ({ update }: { update: () => void }) => {
-			loading = false
+			$loading = false
 			update()
 		}
 	}
 
 	const handleUrlChange = (event: CustomEvent<string>) => {
-		avatarUrl = event.detail
+		$avatarUrl = event.detail
 	}
 </script>
 
@@ -47,7 +47,7 @@
 	>
 		<Avatar
 			{supabase}
-			urlProp={avatarUrl}
+			urlProp={$avatarUrl}
 			size={10}
 			on:urlChange={handleUrlChange}
 			on:upload={() => {
@@ -61,32 +61,32 @@
 
 		<div>
 			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? $fullName} />
 		</div>
 
 		<div>
 			<label for="username">Username</label>
-			<input id="username" name="username" type="text" value={form?.username ?? username} />
+			<input id="username" name="username" type="text" value={form?.username ?? $username} />
 		</div>
 
 		<div>
 			<label for="website">Website</label>
-			<input id="website" name="website" type="url" value={form?.website ?? website} />
+			<input id="website" name="website" type="url" value={form?.website ?? $website} />
 		</div>
 
 		<div>
 			<input
 				type="submit"
 				class="button block primary"
-				value={loading ? 'Loading...' : 'Update'}
-				disabled={loading}
+				value={$loading ? 'Loading...' : 'Update'}
+				disabled={$loading}
 			/>
 		</div>
 	</form>
 
 	<form method="post" action="?/signout" use:enhance={handleSignOut}>
 		<div>
-			<button class="button block" disabled={loading}>Sign Out</button>
+			<button class="button block" disabled={$loading}>Sign Out</button>
 		</div>
 	</form>
 </div>
