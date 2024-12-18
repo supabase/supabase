@@ -73,8 +73,9 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const filteredNavMenuItems = navMenuItems.filter((item) => !item.hidden)
 
   return (
-    <div className="w-full">
-      {/* <AnimatePresence>
+    <div className="relative py-1.5 w-full h-full">
+      <div className="relative w-full h-full border-l border-t border-b rounded-tl-[7px] rounded-bl-[7px] bg-dash-sidebar overflow-y-auto">
+        {/* <AnimatePresence>
         <motion.div
           className="px-10"
           initial={{ opacity: 0, y: -20 }}
@@ -95,8 +96,8 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
         </motion.div>
       </AnimatePresence> */}
 
-      {/* <ScaffoldDivider /> */}
-      {/* <motion.div
+        {/* <ScaffoldDivider /> */}
+        {/* <motion.div
         layoutId="layout-header-bottom-border"
         className="bg-border h-px w-full"
         initial={false}
@@ -106,23 +107,23 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
         }}
       /> */}
 
-      {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
-        <ScaffoldContainer className="mt-8">
-          <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
-            <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
-            <AlertTitle_Shadcn_ className="flex-1">
-              This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
-            </AlertTitle_Shadcn_>
-            <Button type="default" iconRight={<ExternalLink />} asChild disabled={!isSuccess}>
-              <a href={data?.url} target="_blank" rel="noopener noreferrer">
-                Manage
-              </a>
-            </Button>
-          </Alert_Shadcn_>
-        </ScaffoldContainer>
-      )}
-
-      {children}
+        {selectedOrganization && selectedOrganization?.managed_by !== 'supabase' && (
+          <ScaffoldContainer className="mt-8">
+            <Alert_Shadcn_ variant="default" className="flex items-center gap-4">
+              <PartnerIcon organization={selectedOrganization} showTooltip={false} size="medium" />
+              <AlertTitle_Shadcn_ className="flex-1">
+                This organization is managed by {PARTNER_TO_NAME[selectedOrganization.managed_by]}.
+              </AlertTitle_Shadcn_>
+              <Button type="default" iconRight={<ExternalLink />} asChild disabled={!isSuccess}>
+                <a href={data?.url} target="_blank" rel="noopener noreferrer">
+                  Manage
+                </a>
+              </Button>
+            </Alert_Shadcn_>
+          </ScaffoldContainer>
+        )}
+        <main className="h-full w-full">{children}</main>
+      </div>
     </div>
   )
 }

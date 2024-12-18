@@ -23,6 +23,8 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import type { NextPageWithLayout } from 'types'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
+import DefaultLayout from 'components/layouts/DefaultLayout'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -96,6 +98,12 @@ const PageLayout: NextPageWithLayout = () => {
   )
 }
 
-PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
+PageLayout.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <FunctionsLayout>{page}</FunctionsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default PageLayout

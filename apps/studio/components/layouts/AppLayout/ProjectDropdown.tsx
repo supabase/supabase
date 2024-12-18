@@ -121,6 +121,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
       <PopoverTrigger_Shadcn_ asChild>
         <Button
           type="default"
+          size="tiny"
           className="pr-2 justify-start [&_span]:w-full [&_span]:text-left"
           iconRight={<ChevronsUpDown />}
           block

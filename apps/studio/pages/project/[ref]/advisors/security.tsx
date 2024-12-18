@@ -13,6 +13,8 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
+import DefaultLayout from 'components/layouts/DefaultLayout'
+import AppLayout from 'components/layouts/AppLayout/AppLayout'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -72,11 +74,11 @@ const ProjectLints: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
+      {/* <FormHeader
         className="py-4 px-6 !mb-0"
         title="Security Advisor"
         docsUrl="https://supabase.com/docs/guides/database/database-linter"
-      />
+      /> */}
       <LintPageTabs
         activeLints={activeLints}
         isLoading={isLoading}
@@ -109,6 +111,12 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 }
 
-ProjectLints.getLayout = (page) => <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
+ProjectLints.getLayout = (page) => (
+  <AppLayout>
+    <DefaultLayout>
+      <AdvisorsLayout title="Linter">{page}</AdvisorsLayout>
+    </DefaultLayout>
+  </AppLayout>
+)
 
 export default ProjectLints

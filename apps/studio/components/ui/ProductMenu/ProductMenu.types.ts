@@ -23,4 +23,5 @@ export interface ProductMenuGroupItem {
   childId?: string
 
   childIcon?: ReactNode
+  childItems?: ProductMenuGroupItem[]
 }

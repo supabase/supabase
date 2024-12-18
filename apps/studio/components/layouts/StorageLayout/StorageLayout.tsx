@@ -48,7 +48,11 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
   }
 
   return (
-    <ProjectLayout title={title || 'Storage'} product="Storage" productMenu={<StorageMenu />}>
+    <ProjectLayout
+      title={title || 'Storage'}
+      product="Storage"
+      // productMenu={<StorageMenu />}
+    >
       <ProjectPageNavigation navKey="storage">{children}</ProjectPageNavigation>
     </ProjectLayout>
   )

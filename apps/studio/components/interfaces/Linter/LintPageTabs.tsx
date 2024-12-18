@@ -71,6 +71,7 @@ const LintPageTabs = ({
   return (
     <Tabs_Shadcn_
       defaultValue={currentTab}
+      className=""
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
         setSelectedLint(null)
@@ -78,15 +79,14 @@ const LintPageTabs = ({
         router.push({ ...router, query: { ...rest, preset: value, id: null } })
       }}
     >
-      <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>
+      <TabsList_Shadcn_ className={cn('px-5 my-3 flex gap-2 border-0 items-end z-10 relative')}>
         {LINT_TABS.map((tab) => (
           <TabsTrigger_Shadcn_
             key={tab.id}
             value={tab.id}
             className={cn(
-              'group relative',
-              'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
-              'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+              'group relative rounded-full',
+              'px-2 py-1 flex flex-row items-center gap-3 !shadow-none border border-default',
               tab.id === currentTab ? '!bg-surface-200' : '!bg-surface-200/[33%]',
               'hover:!bg-surface-100',
               'data-[state=active]:!bg-surface-200',
@@ -94,9 +94,9 @@ const LintPageTabs = ({
               'transition'
             )}
           >
-            {tab.id === currentTab && (
+            {/* {tab.id === currentTab && (
               <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
-            )}
+            )} */}
             <div className="flex items-center gap-x-2">
               <span
                 className={
@@ -111,14 +111,14 @@ const LintPageTabs = ({
               </span>
 
               <span className="">{tab.label}</span>
-              <Tooltip_Shadcn_>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
             </div>
             <LintCountLabel tab={tab} />
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </TabsTrigger_Shadcn_>
         ))}
       </TabsList_Shadcn_>

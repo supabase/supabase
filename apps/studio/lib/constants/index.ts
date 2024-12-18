@@ -76,6 +76,7 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
+  STORAGE_BUCKETS_COLUMN_CONFIG: (ref: string) => `supabase-storage-buckets-columns-${ref}`,
 }
 
 export const OPT_IN_TAGS = {

@@ -14,6 +14,7 @@ import { useParams } from 'common'
 import { generateStoragePageItemsMenu } from '../StorageLayout/StorageLayout.utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import { generateAdvisorsPageItemsMenu } from '../AdvisorsLayout/AdvisorsLayout.utils'
 
 export function ProjectPageNavigation({ children, navKey }: PropsWithChildren<{ navKey: string }>) {
   const params = useParams()
@@ -26,6 +27,7 @@ export function ProjectPageNavigation({ children, navKey }: PropsWithChildren<{ 
   const postgresItemsMenu = generatePostgresItemsMenu(ref as string)
   const authMenu = generateAuthPageMenu(ref as string)
   const storagePageItemsMenu = generateStoragePageItemsMenu(ref as string)
+  const advisorsPageItemsMenu = generateAdvisorsPageItemsMenu(ref as string)
 
   switch (navKey) {
     case 'auth':
@@ -36,6 +38,9 @@ export function ProjectPageNavigation({ children, navKey }: PropsWithChildren<{ 
       break
     case 'storage':
       items = storagePageItemsMenu
+      break
+    case 'advisors':
+      items = advisorsPageItemsMenu
       break
     default:
       items = []

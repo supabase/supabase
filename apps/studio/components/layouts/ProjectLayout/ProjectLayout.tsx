@@ -178,14 +178,10 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           {/* {!hideIconBar && <NavigationBar />} */}
           <div
             className={cn(
-              'border-l w-full rounded-tl-[7px] rounded-bl-[7px] border-t border-b overflow-hidden flex-row grow overflow-y-auto'
+              'border-l w-full rounded-tl-[7px] rounded-bl-[7px] border-t border-b flex-row my-1.5'
             )}
           >
-            <ResizablePanelGroup
-              className="flex h-full w-full"
-              direction="horizontal"
-              autoSaveId="project-layout"
-            >
+            <ResizablePanelGroup className="" direction="horizontal" autoSaveId="project-layout">
               {showProductMenu && productMenu && (
                 <ResizablePanel
                   order={1}
