@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
-	import { $props, $state } from 'svelte'
+	import { props, state } from 'svelte'
 
 	const data = $props<{ session: any; supabase: any; profile: any }>()
 	const form = $props<any>()
@@ -17,23 +17,23 @@
 	const avatarUrl = $state(profile?.avatar_url ?? '')
 
 	const handleSubmit = () => {
-		loading.set(true)
+		loading.value = true
 		return async ({ update }: { update: () => void }) => {
-			loading.set(false)
+			loading.value = false
 			update()
 		}
 	}
 
 	const handleSignOut = () => {
-		loading.set(true)
+		loading.value = true
 		return async ({ update }: { update: () => void }) => {
-			loading.set(false)
+			loading.value = false
 			update()
 		}
 	}
 
 	const handleUrlChange = (event: CustomEvent<string>) => {
-		avatarUrl.set(event.detail)
+		avatarUrl.value = event.detail
 	}
 </script>
 
@@ -47,7 +47,7 @@
 	>
 		<Avatar
 			{supabase}
-			urlProp={avatarUrl}
+			urlProp={avatarUrl.value}
 			size={10}
 			on:urlChange={handleUrlChange}
 			on:upload={() => {
@@ -61,32 +61,32 @@
 
 		<div>
 			<label for="fullName">Full Name</label>
-			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName} />
+			<input id="fullName" name="fullName" type="text" value={form?.fullName ?? fullName.value} />
 		</div>
 
 		<div>
 			<label for="username">Username</label>
-			<input id="username" name="username" type="text" value={form?.username ?? username} />
+			<input id="username" name="username" type="text" value={form?.username ?? username.value} />
 		</div>
 
 		<div>
 			<label for="website">Website</label>
-			<input id="website" name="website" type="url" value={form?.website ?? website} />
+			<input id="website" name="website" type="url" value={form?.website ?? website.value} />
 		</div>
 
 		<div>
 			<input
 				type="submit"
 				class="button block primary"
-				value={loading ? 'Loading...' : 'Update'}
-				disabled={loading}
+				value={loading.value ? 'Loading...' : 'Update'}
+				disabled={loading.value}
 			/>
 		</div>
 	</form>
 
 	<form method="post" action="?/signout" use:enhance={handleSignOut}>
 		<div>
-			<button class="button block" disabled={loading}>Sign Out</button>
+			<button class="button block" disabled={loading.value}>Sign Out</button>
 		</div>
 	</form>
 </div>
