@@ -41,8 +41,8 @@ export async function getNotifications(options: NotificationVariables, signal?: 
     params: {
       // @ts-ignore
       query: {
-        offset: page * limit,
-        limit,
+        offset: (page * limit).toString(),
+        limit: limit.toString(),
         ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
         ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
         ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
