@@ -1,17 +1,16 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
-	import { state, props } from 'svelte'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	let { form } = props<{ form: ActionData }>()
-	let loading = state(false)
+	export let form: ActionData
+	let $loading = $state(false)
 
 	const handleSubmit: SubmitFunction = () => {
-		loading = true
+		$loading = true
 		return async ({ update }) => {
 			update()
-			loading = false
+			$loading = false
 		}
 	}
 </script>
@@ -47,7 +46,7 @@
 		{/if}
 		<div>
 			<button class="button primary block">
-				{ loading ? 'Loading' : 'Send magic link' }
+				{ $loading ? 'Loading' : 'Send magic link' }
 			</button>
 		</div>
 	</div>
