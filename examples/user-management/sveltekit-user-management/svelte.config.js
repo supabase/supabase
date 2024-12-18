@@ -8,7 +8,10 @@ const config = {
 	kit: {
 		adapter: adapter({
 			fallback: 'index.html'
-		})
+		}),
+		csrf: {
+			checkOrigin: false,
+		}
 	},
 
 	compilerOptions: {

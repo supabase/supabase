@@ -1,11 +1,10 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
-	import { state as svelteState, props as svelteProps } from 'svelte'
 	import type { ActionData } from './$types'
 
-	let { form } = $svelteProps<{ form?: ActionData | null }>()
-	let loading = $svelteState(false)
+	export let form: ActionData | null = null
+	let loading = false
 
 	const handleSubmit = () => {
 		loading = true

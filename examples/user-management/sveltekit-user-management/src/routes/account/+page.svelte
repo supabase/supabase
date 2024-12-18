@@ -1,19 +1,19 @@
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
-	import { state as svelteState, props as svelteProps } from 'svelte'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
 
-	let { data, form } = $svelteProps<{ data: any; form?: any }>()
-	let { session, supabase, profile } = data
+	export let data
+	export let form
 
-	let profileForm = $svelteState<HTMLFormElement | null>(null)
-	let loading = $svelteState(false)
-	let fullName = $svelteState(profile?.full_name ?? '')
-	let username = $svelteState(profile?.username ?? '')
-	let website = $svelteState(profile?.website ?? '')
-	let avatarUrl = $svelteState(profile?.avatar_url ?? '')
+	let { session, supabase, profile } = data
+	let profileForm: HTMLFormElement | null = null
+	let loading = false
+	let fullName = profile?.full_name ?? ''
+	let username = profile?.username ?? ''
+	let website = profile?.website ?? ''
+	let avatarUrl = profile?.avatar_url ?? ''
 
 	const handleSubmit = () => {
 		loading = true

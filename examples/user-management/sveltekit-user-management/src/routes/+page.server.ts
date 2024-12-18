@@ -2,6 +2,8 @@
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 
+export const prerender = false
+
 export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) => {
   const { session } = await safeGetSession()
 
@@ -23,7 +25,7 @@ export const actions: Actions = {
 		const formData = await request.formData()
 		const email = formData.get('email') as string
     const validEmail = /^[\w-\.+]+@([\w-]+\.)+[\w-]{2,8}$/.test(email)
-    
+
 		if (!validEmail) {
 			return fail(400, { errors: { email: "Please enter a valid email address" }, email })
 		}

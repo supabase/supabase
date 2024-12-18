@@ -5,5 +5,12 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	build: {
 		target: 'esnext'
+	},
+	server: {
+		fs: { allow: ['.'] }
+	},
+	preview: {
+		host: true,
+		strictPort: true
 	}
 });

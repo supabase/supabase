@@ -2,17 +2,14 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { state as svelteState, effect as svelteEffect, props as svelteProps } from 'svelte'
 
-	let { size = 10, url = '', supabase } = $svelteProps<{
-		size?: number
-		url: string
-		supabase: SupabaseClient
-	}>()
+	export let size = 10
+	export let url = ''
+	export let supabase: SupabaseClient
 
-	let avatarUrl = $svelteState<string | null>(null)
-	let uploading = $svelteState(false)
-	let fileInput = $svelteState<HTMLInputElement | null>(null)
+	let avatarUrl: string | null = null
+	let uploading = false
+	let fileInput: HTMLInputElement | null = null
 
 	const dispatch = createEventDispatcher()
 
@@ -66,9 +63,7 @@
 		}
 	}
 
-	$svelteEffect(() => {
-		if (url) downloadImage(url)
-	})
+	$: if (url) downloadImage(url)
 </script>
 
 <div>
@@ -80,7 +75,7 @@
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
-		<div class="avatar no-image" style="height: {size}em; width: {size}em;" />
+		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
 	<input type="hidden" name="avatarUrl" value={url} />
 
