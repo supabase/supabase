@@ -20,37 +20,52 @@ const isUnixMicro = (unix: string | number): boolean => {
   return isNum && digitLength
 }
 
-const timestampLocalFormatter = (value: string | number) => {
-  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).format('DD MMM  HH:mm:ss')
+type TimestampFormatter = {
+  utcTimestamp: string | number
+  format?: string
 }
 
-const timestampUtcFormatter = (value: string | number) => {
-  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).utc().format('DD MMM  HH:mm:ss')
+const timestampLocalFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
+  const timestamp = isUnixMicro(utcTimestamp) ? unixMicroToIsoTimestamp(utcTimestamp) : utcTimestamp
+  return dayjs.utc(timestamp).local().format(format)
 }
 
-const timestampRelativeFormatter = (value: string | number) => {
-  const timestamp = isUnixMicro(value) ? unixMicroToIsoTimestamp(value) : value
-  return dayjs(timestamp).fromNow()
+const timestampUtcFormatter = ({ utcTimestamp, format }: TimestampFormatter) => {
+  const timestamp = isUnixMicro(utcTimestamp) ? unixMicroToIsoTimestamp(utcTimestamp) : utcTimestamp
+  return dayjs.utc(timestamp).format(format)
 }
 
+const timestampRelativeFormatter = ({ utcTimestamp }: TimestampFormatter) => {
+  const timestamp = isUnixMicro(utcTimestamp) ? unixMicroToIsoTimestamp(utcTimestamp) : utcTimestamp
+  return dayjs.utc(timestamp).fromNow()
+}
+
+/**
+ * TimestampInfo component displays a timestamp with a tooltip showing various time formats.
+ * @param {string|number} props.utcTimestamp - UTC timestamp value. Can be either:
+ *   - ISO 8601 string (e.g., "2024-01-01T00:00:00Z")
+ *   - Unix microseconds (16-digit number)
+ * @param {string} [props.format="DD MMM  HH:mm:ss"] - Display format for the timestamp (using dayjs format)
+ * @returns {JSX.Element} Timestamp display with tooltip showing UTC, local, relative, and raw timestamp values
+ */
 export const TimestampInfo = ({
-  value,
+  utcTimestamp,
   className,
+  format = 'DD MMM  HH:mm:ss',
 }: {
   className?: string
-  value: string | number
+  utcTimestamp: string | number
+  format?: string
 }) => {
-  const local = timestampLocalFormatter(value)
-  const utc = timestampUtcFormatter(value)
-  const relative = timestampRelativeFormatter(value)
+  const local = timestampLocalFormatter({ utcTimestamp, format })
+  const utc = timestampUtcFormatter({ utcTimestamp, format })
+  const relative = timestampRelativeFormatter({ utcTimestamp })
   const [align, setAlign] = useState<'start' | 'end'>('start')
   const triggerRef = useRef<HTMLButtonElement>(null)
   const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
 
   // Calculate alignment based on trigger position
-  // Needed so that the tooltip isn't hidden behind the header on top rows
+  // Needed so that the tooltip isn't hidden behind the header on top rows (in logs)
   useEffect(() => {
     const updateAlignment = () => {
       if (triggerRef.current) {
@@ -77,6 +92,7 @@ export const TimestampInfo = ({
       <span
         onClick={(e) => {
           e.stopPropagation()
+          e.preventDefault()
           navigator.clipboard.writeText(value)
           setCopied(true)
 
@@ -110,13 +126,13 @@ export const TimestampInfo = ({
         ref={triggerRef}
         className={`text-xs ${className} border-b border-transparent hover:border-dashed hover:border-foreground-light`}
       >
-        <span>{timestampLocalFormatter(value)}</span>
+        <span>{timestampLocalFormatter({ utcTimestamp, format })}</span>
       </TooltipTrigger>
       <TooltipContent align={align} side="right" className="font-mono p-0 py-1">
         <TooltipRow label="UTC" value={utc} />
         <TooltipRow label={`${localTimezone}`} value={local} />
         <TooltipRow label="Relative" value={relative} />
-        <TooltipRow label="Timestamp" value={String(value)} />
+        <TooltipRow label="Timestamp" value={String(utcTimestamp)} />
       </TooltipContent>
     </Tooltip>
   )
