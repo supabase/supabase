@@ -174,6 +174,12 @@ export function LogsSidebarMenuV2() {
           items: [],
         }
       : null,
+    {
+      name: 'Cron',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
+      items: [],
+    },
   ]
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
@@ -245,14 +251,6 @@ export function LogsSidebarMenuV2() {
           href={`/project/${ref}/logs/explorer/templates`}
         >
           Templates
-        </InnerSideMenuItem>
-        <InnerSideMenuItem
-          title="Settings"
-          isActive={isActive(`/project/${ref}/settings/warehouse`)}
-          href={`/project/${ref}/settings/warehouse`}
-        >
-          Settings
-          <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
         </InnerSideMenuItem>
       </div>
       <Separator className="my-4" />

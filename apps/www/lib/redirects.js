@@ -6,6 +6,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/compute-add-ons',
+    destination: '/docs/guides/platform/compute-and-disk',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage-caching',
     destination: '/docs/guides/storage/cdn/fundamentals',
   },
@@ -2824,6 +2829,21 @@ module.exports = [
     source: '/docs/guides/resources/examples',
     destination: '/docs/guides/getting-started',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
+    destination: '/docs/guides/database/connecting-to-postgres',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts',
+    destination: '/partners',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts/:path*',
+    destination: '/partners',
+  },
 
   // marketing
 
@@ -2831,5 +2851,12 @@ module.exports = [
     permanent: true,
     source: '/changelogpod',
     destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
+
+  // features
+  {
+    permanent: true,
+    source: '/features/ai-query-assistance',
+    destination: '/features/ai-assistant',
   },
 ]

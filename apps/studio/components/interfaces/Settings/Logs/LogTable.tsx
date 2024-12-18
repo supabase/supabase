@@ -174,6 +174,9 @@ const LogTable = ({
       case 'auth':
         columns = AuthColumnRenderer
         break
+      case 'pg_cron':
+        columns = DatabasePostgresColumnRender
+        break
 
       case 'workflow_run':
         columns = WorkflowRunColumnRenderer

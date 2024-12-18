@@ -260,7 +260,7 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(r.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
 group by path, search
@@ -364,6 +364,7 @@ export enum LogsTableName {
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
   WORKFLOW_RUN = 'workflow_run_logs',
+  PG_CRON = 'pg_cron_logs',
 }
 
 export const LOGS_TABLES = {
@@ -378,6 +379,7 @@ export const LOGS_TABLES = {
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
   workflow_run: LogsTableName.WORKFLOW_RUN,
+  pg_cron: LogsTableName.POSTGRES,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -392,6 +394,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
   [LogsTableName.WORKFLOW_RUN]: 'Logs obtained from workflow runs',
+  [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {

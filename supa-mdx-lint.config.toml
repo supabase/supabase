@@ -1,0 +1,14 @@
+ignore_patterns = ["**/_*.mdx"]
+
+# Heading should be sentence case
+Rule001HeadingCase = "include('supa-mdx-lint/Rule001HeadingCase.toml')"
+
+Rule003Spelling = false
+# Check spelling
+# Error message: "Word not found in dictionary"
+# Rule003Spelling = "include('supa-mdx-lint/Rule003Spelling.toml')"
+
+Rule002AdmonitionTypes = false
+# [Rule002AdmonitionTypes]
+# Allowed admonition types are:
+# admonition_types = ["note", "tip", "caution", "deprecation", "danger"]

@@ -1,8 +1,9 @@
 type PostTypes = {
   slug?: string
-  type: 'casestudy' | 'blog'
+  type: 'casestudy' | 'blog' | 'event'
   title: string
-  date?: string
+  name?: string
+  date: string
   formattedDate?: string
   coverImage?: string
   author?: string
@@ -17,8 +18,12 @@ type PostTypes = {
   description: string
   url: string
   path: string
-  tags?: []
-  categories?: []
+  tags?: string[]
+  categories?: string[]
+  industry?: string[]
+  supabase_products?: string[]
+  company_size?: string
+  region?: string
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean

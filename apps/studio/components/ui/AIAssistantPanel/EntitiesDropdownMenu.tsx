@@ -1,23 +1,23 @@
-import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { debounce } from 'lodash'
 import { Check, Loader2, Search } from 'lucide-react'
 import { useCallback, useState } from 'react'
+
+import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
   Command_Shadcn_,
   CommandEmpty_Shadcn_,
   CommandGroup_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
-  ScrollArea,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { DropdownScrollArea } from './DropdownScrollArea'
-import { Admonition } from 'ui-patterns'
 
 interface EntitiesDropdownMenuProps {
   selectedSchemas: string[]
-  selectedEntities: { schema: string; name: string }[]
+  selectedEntities: readonly { schema: string; name: string }[]
   onToggleEntity: (value: { schema: string; name: string }) => void
 }
 

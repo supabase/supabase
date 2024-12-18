@@ -8,7 +8,7 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import type { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-infinite-query'
 import { timeout } from 'lib/helpers'
 import {
   Button,
@@ -98,7 +98,8 @@ const UserDropdown = ({
   async function handleDelete() {
     await timeout(200)
     if (!ref) return console.error('Project ref is required')
-    deleteUser({ projectRef: ref, user })
+    if (!user.id) return console.error('User id is required')
+    deleteUser({ projectRef: ref, userId: user.id })
   }
 
   async function handleDeleteFactors() {

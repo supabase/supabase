@@ -1,12 +1,12 @@
 import { isUndefined } from 'lodash'
-import Link from 'next/link'
-import { ReactNode } from 'react'
-
-import { useFlag } from 'hooks/ui/useFlag'
 import { ArrowUpRight, LogOut } from 'lucide-react'
-import { Badge, cn, Menu } from 'ui'
+import Link from 'next/link'
+import { PropsWithChildren, ReactNode, useState } from 'react'
+
+import { Badge, cn, Menu, Sheet, SheetContent } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 interface WithSidebarProps {
   title: string
@@ -17,7 +17,6 @@ interface WithSidebarProps {
   subitemsParentKey?: number
   hideSidebar?: boolean
   customSidebarContent?: ReactNode
-  children: ReactNode
 }
 
 const WithSidebar = ({
@@ -30,63 +29,106 @@ const WithSidebar = ({
   subitemsParentKey,
   hideSidebar = false,
   customSidebarContent,
-}: WithSidebarProps) => {
+}: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
+  const handleMobileMenu = () => {
+    setIsSheetOpen(true)
+  }
 
   return (
-    <div className="flex h-full">
+    <div className="flex flex-col md:flex-row h-full">
       {!hideSidebar && !noContent && (
-        <div
-          id="with-sidebar"
-          className={[
-            'h-full bg-dash-sidebar',
-            'hide-scrollbar w-64 overflow-auto border-r border-default',
-          ].join(' ')}
-        >
-          {title && (
-            <div className="mb-2">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
-                <h4 className="mb-0 text-lg truncate" title={title}>
-                  {title}
-                </h4>
-              </div>
-            </div>
-          )}
-          {header && header}
-          <div className="-mt-1">
-            <Menu>
-              {customSidebarContent}
-              {sections.map((section) => {
-                return Boolean(section.heading) ? (
-                  <SectionWithHeaders
-                    key={section.key}
-                    section={section}
-                    subitems={subitems}
-                    subitemsParentKey={subitemsParentKey}
-                  />
-                ) : (
-                  <div className="border-b py-5 px-6 border-default" key={section.key}>
-                    <SidebarItem
-                      links={section.links}
-                      subitems={subitems}
-                      subitemsParentKey={subitemsParentKey}
-                    />
-                  </div>
-                )
-              })}
-            </Menu>
-          </div>
-        </div>
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          subitems={subitems}
+          subitemsParentKey={subitemsParentKey}
+          customSidebarContent={customSidebarContent}
+          className="hidden md:block"
+        />
       )}
       <div className="flex flex-1 flex-col">
-        {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
+        <LayoutHeader
+          breadcrumbs={breadcrumbs}
+          showProductMenu={!hideSidebar && !noContent}
+          handleMobileMenu={handleMobileMenu}
+        />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          subitems={subitems}
+          subitemsParentKey={subitemsParentKey}
+          customSidebarContent={customSidebarContent}
+        />
+      </MobileSheetNav>
     </div>
   )
 }
 export default WithSidebar
+
+export const SidebarContent = ({
+  title,
+  header,
+  sections,
+  subitems,
+  subitemsParentKey,
+  customSidebarContent,
+  className,
+}: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
+  return (
+    <>
+      <div
+        id="with-sidebar"
+        className={cn(
+          'h-full bg-dash-sidebar',
+          'hide-scrollbar w-full md:w-64 overflow-auto md:border-r border-default',
+          className
+        )}
+      >
+        {title && (
+          <div className="block mb-2">
+            <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
+              <h4 className="mb-0 text-lg truncate" title={title}>
+                {title}
+              </h4>
+            </div>
+          </div>
+        )}
+        {header && header}
+        <div className="-mt-1">
+          <Menu>
+            {customSidebarContent}
+            {sections.map((section) => {
+              return Boolean(section.heading) ? (
+                <SectionWithHeaders
+                  key={section.key}
+                  section={section}
+                  subitems={subitems}
+                  subitemsParentKey={subitemsParentKey}
+                />
+              ) : (
+                <div className="border-b py-5 px-6 border-default" key={section.key}>
+                  <SidebarItem
+                    links={section.links}
+                    subitems={subitems}
+                    subitemsParentKey={subitemsParentKey}
+                  />
+                </div>
+              )
+            })}
+          </Menu>
+        </div>
+      </div>
+    </>
+  )
+}
 
 interface SectionWithHeadersProps {
   section: SidebarSection

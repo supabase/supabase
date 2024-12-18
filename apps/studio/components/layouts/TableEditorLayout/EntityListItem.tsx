@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import saveAs from 'file-saver'
 import {
+  Clipboard,
   Copy,
   Download,
   Edit,
@@ -27,10 +28,12 @@ import {
 } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
+import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
@@ -45,8 +48,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import { Markdown } from 'components/interfaces/Markdown'
-import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { copyToClipboard } from 'lib/helpers'
 
 export interface EntityListItemProps {
   id: number
@@ -65,6 +67,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const { selectedSchema } = useQuerySchemaState()
 
   const isActive = Number(id) === entity.id
+  const canEdit = isActive && !isLocked
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -109,29 +112,23 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
-      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }
 
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
-        )
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,
@@ -168,30 +165,24 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
 
-      if (table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
         return toast.error(
-          <Markdown content={MAX_EXPORT_ROW_COUNT_MESSAGE} className="text-foreground" />,
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
           { id: toastId }
         )
       }
 
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
-        )
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,
@@ -225,23 +216,21 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
         if (tableHasLints) {
-          tooltipContent = 'RLS Disabled'
+          tooltipContent = 'RLS disabled'
         }
         break
       case ENTITY_TYPE.VIEW:
         if (viewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
         if (materializedViewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
-
         break
       case ENTITY_TYPE.FOREIGN_TABLE:
         tooltipContent = 'RLS is not enforced on foreign tables'
-
         break
       default:
         break
@@ -367,85 +356,103 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         <EntityTooltipTrigger entity={entity} />
       </div>
 
-      {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
+      {canEdit && (
         <DropdownMenu>
           <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
             <MoreHorizontal size={14} strokeWidth={2} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start" className="w-44">
             <DropdownMenuItem
-              key="edit-table"
+              key="copy-name"
               className="space-x-2"
               onClick={(e) => {
                 e.stopPropagation()
-                snap.onEditTable()
+                copyToClipboard(entity.name)
               }}
             >
-              <Edit size={12} />
-              <span>Edit Table</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              key="duplicate-table"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                snap.onDuplicateTable()
-              }}
-            >
-              <Copy size={12} />
-              <span>Duplicate Table</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
-              <Link
-                key="view-policies"
-                href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
-              >
-                <Lock size={12} />
-                <span>View Policies</span>
-              </Link>
+              <Clipboard size={12} />
+              <span>Copy name</span>
             </DropdownMenuItem>
 
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="gap-x-2">
-                <Download size={12} />
-                Export Data
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
+            {entity.type === ENTITY_TYPE.TABLE && (
+              <>
+                <DropdownMenuSeparator />
+
                 <DropdownMenuItem
-                  key="download-table-csv"
+                  key="edit-table"
                   className="space-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    exportTableAsCSV()
+                    snap.onEditTable()
                   }}
                 >
-                  <span>Export table as CSV</span>
+                  <Edit size={12} />
+                  <span>Edit table</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  key="download-table-sql"
+                  key="duplicate-table"
+                  className="space-x-2"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    snap.onDuplicateTable()
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>Duplicate table</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
+                  <Link
+                    key="view-policies"
+                    href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                  >
+                    <Lock size={12} />
+                    <span>View policies</span>
+                  </Link>
+                </DropdownMenuItem>
+
+                <DropdownMenuSub>
+                  <DropdownMenuSubTrigger className="gap-x-2">
+                    <Download size={12} />
+                    Export data
+                  </DropdownMenuSubTrigger>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem
+                      key="download-table-csv"
+                      className="space-x-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        exportTableAsCSV()
+                      }}
+                    >
+                      <span>Export table as CSV</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      key="download-table-sql"
+                      className="gap-x-2"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        exportTableAsSQL()
+                      }}
+                    >
+                      <span>Export table as SQL</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuSub>
+
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  key="delete-table"
                   className="gap-x-2"
                   onClick={(e) => {
                     e.stopPropagation()
-                    exportTableAsSQL()
+                    snap.onDeleteTable()
                   }}
                 >
-                  <span>Export table as SQL</span>
+                  <Trash size={12} />
+                  <span>Delete table</span>
                 </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              key="delete-table"
-              className="gap-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                snap.onDeleteTable()
-              }}
-            >
-              <Trash size={12} />
-              <span>Delete Table</span>
-            </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       )}

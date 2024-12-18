@@ -115,11 +115,11 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
           <h1 className="text-sm text-brand md:text-base">
             <span className="sr-only">Supabase </span>Careers
           </h1>
-          <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.5px]">
+          <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
             We're on a mission to build the best developer platform
           </h2>
           <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            Explore remote possibilities and join our team to help us achieve it.
+            Explore remote opportunities and join our team to help us achieve it.
           </p>
           <Button asChild type="primary" className="mt-4">
             <Link href="#positions">Open positions</Link>
@@ -135,7 +135,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                   className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
                 >
                   <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
-                  <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">{company.number}</h2>
+                  <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1px]">{company.number}</h2>
                   <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
                     {company.text}
                   </ReactMarkdown>
@@ -160,17 +160,18 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 <Globe />
               </div>
               <div className="relative md:col-span-3">
-                <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] md:max-w-xs tracking-[-1.5px]">
-                  We work together, wherever we are
+                <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] md:max-w-xs tracking-[-1px] leading-7">
+                  We work together, <br className="md:hidden" />
+                  wherever we are
                 </h2>
-                <p className="text-foreground-light mt-4 text-xs sm:text-sm md:text-base md:w-full">
+                <p className="text-foreground-light mt-4 text-sm md:text-base md:w-full">
                   Working in a globally distributed team is rewarding but has its challenges. We are
                   across many different timezones, so we use tools like Notion, Slack, and Discord
                   to stay connected to our team, and our community.
                 </p>
                 <div className="max-w-[300px] sm:max-w-md md:max-w-md mt-20">
                   <div className="border-t-2 border-brand w-4/12"></div>
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl pt-2 tracking-[-1.5px]">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl pt-2 tracking-[-1px]">
                     We deeply believe in the efficacy of collaborative open source
                   </h2>
                 </div>
@@ -181,10 +182,10 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
               <div className="md:flex md:gap-6">
                 <div className="md:w-1/2">
                   <div>
-                    <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">
+                    <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">
                       What is Supabase
                     </h2>
-                    <p className="text-foreground-light text-xs sm:text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
+                    <p className="text-foreground-light text-sm lg:text-base pt-2 sm:max-w-md xl:max-w-lg">
                       Supabase is an open source Firebase alternative, built by developers for
                       developers. Supabase adds auth, realtime, storage, restful APIs, and edge
                       functions to Postgres without a single line of code. Supabase was born-remote.
@@ -287,8 +288,8 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
             </SectionContainer>
 
             <SectionContainer>
-              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">Human powered</h2>
-              <p className="text-foreground-lighter text-xs sm:text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
+              <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">Human powered</h2>
+              <p className="text-foreground-lighter text-sm lg:text-base pt-3 sm:w-3/5 lg:max-w-sm">
                 As a completely remote and asynchronous team, we focus on these five traits to keep
                 our team effective:
               </p>
@@ -298,7 +299,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                     return (
                       <div key={i} className="flex flex-col gap-3">
                         <div>
-                          <h2 className="text-base">{human.title}</h2>
+                          <h3 className="text-base">{human.title}</h3>
                           <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
                         </div>
                       </div>
@@ -310,7 +311,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
 
             <SectionContainer className="!pb-0">
               <div className="text-center">
-                <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1.5px]">
+                <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[300px] xl:max-w-none mx-auto tracking-[-1px]">
                   1,000 + Contributors building Supabase
                 </h2>
                 <p className="text-foreground-light text-xs sm:text-sm lg:text-base sm:max-w-lg lg:max-w-2xl mx-auto pt-3">
@@ -376,7 +377,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
         <SectionContainer>
           <div className="xl:flex lg:items-start xl:gap-10 justify-between">
             <div className="xl:min-w-[300px] xl:max-w-[400px]">
-              <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-1.5px]">
+              <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-none tracking-[-1px]">
                 Great people deserve great benefits
               </h2>
             </div>
@@ -386,7 +387,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                   return (
                     <div className="h-full flex items-start space-x-6 w-full" key={i}>
                       <div className="h-fit text-sm lg:text-base">
-                        <h2 className="text-sm">{benefits.title}</h2>
+                        <h3 className="text-sm">{benefits.title}</h3>
                         <ReactMarkdown className="prose pt-1 text-sm">
                           {benefits.text}
                         </ReactMarkdown>
@@ -400,9 +401,9 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
         </SectionContainer>
 
         <SectionContainer>
-          <div className="text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1.5px]">How we hire</h2>
-            <p className="text-xs sm:text-sm lg:text-base text-foreground-light pt-3">
+          <div className="md:text-center sm:max-w-md md:w-3/4 lg:max-w-lg xl:max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl xl:text-4xl tracking-[-1px]">How we hire</h2>
+            <p className="text-sm lg:text-base text-foreground-light pt-3">
               The entire process is fully remote and all communication happens over email or via
               video chat in Google Meet. The calls are all 1:1 and usually take between 20-45
               minutes. We know you are interviewing us too, so please ask questions. We are happy to
@@ -417,15 +418,15 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                   className="flex lg:block items-start space-x-6 lg:space-x-0 lg:w-full"
                 >
                   <div className="lg:flex items-center">
-                    <h3 className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
+                    <div className="bg-brand-400 border-[1px] border-brand-300 text-brand-600 text-md text-center w-[44px] px-2 py-1.5 rounded-md">
                       {i + 1}
-                    </h3>
+                    </div>
                     <div className="h-[100px] w-[1px] sm:h-[100px] mx-auto lg:h-[1px] lg:w-full bg-brand-500 lg:pr-6"></div>
                   </div>
                   <div className="lg:mt-6">
-                    <h2 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
+                    <h3 className="sm:text-lg max-w-[75%] xl:max-w-none xl:w-11/12 lg:max-w-none">
                       {hiring.title}
-                    </h2>
+                    </h3>
                     <p className="text-foreground-light text-xs sm:text-sm mt-1 md:w-3/4 lg:w-11/12">
                       {hiring.text}
                     </p>
@@ -443,9 +444,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
 
         <div id="positions" className="max-w-6xl mx-auto">
           <SectionContainer>
-            <h2 className="text-xl sm:text-3xl xl:text-3xl tracking-[-1.5px] mb-3">
-              Open positions
-            </h2>
+            <h2 className="text-xl sm:text-3xl xl:text-3xl tracking-[-1px] mb-3">Open positions</h2>
             <p className="max-w-xl text-foreground-lighter">
               Want to build the best developer platform?
               <br /> We’d love to talk to you.
@@ -453,7 +452,7 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
             <div className="mt-10 flex flex-col gap-4">
               {Object.entries(jobs).map(([team, teamJobs]) => (
                 <div key={team}>
-                  <h4 className="text-foreground-lighter text-sm">{team}</h4>
+                  <h3 className="text-foreground-lighter text-sm">{team}</h3>
                   <div className="mt-2 -space-y-px">
                     {(teamJobs as JobItemProps[])
                       .filter((job: any) => !filterGenericJob(job))
@@ -469,6 +468,22 @@ const CareerPage: NextPage<CareersPageProps> = ({ jobs, placeholderJob, contribu
                 <JobItem job={placeholderJob} />
               </div>
             )}
+            <div className="pt-8 mt-4 border-t border-muted flex flex-col lg:flex-row justify-between items-start lg:items-end gap-2">
+              <div>
+                <h3>Don't see a role that fits?</h3>
+                <p className="text-foreground-lighter text-sm">
+                  Join our talent community to stay updated on future opportunities.
+                </p>
+              </div>
+              <Button asChild type="primary">
+                <Link
+                  href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
+                  target="_blank"
+                >
+                  Join community
+                </Link>
+              </Button>
+            </div>
           </SectionContainer>
         </div>
       </DefaultLayout>
@@ -484,7 +499,7 @@ const JobItem: React.FC<{ job: JobItemProps }> = ({ job }) => {
       href={job.jobUrl}
       className="
         first-of-type:rounded-t-md last-of-type:rounded-b-md
-        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4 px-7
+        cursor-pointer md:cursor-default bg-surface-75 border border-muted drop-shadow-sm p-4
         flex flex-col md:flex-row
         md:items-center
         transition hover:bg-surface-100
@@ -492,8 +507,10 @@ const JobItem: React.FC<{ job: JobItemProps }> = ({ job }) => {
       "
       target="_blank"
     >
-      <h2 className="text-base min-w-[240px] lg:min-w-[316px] sm:truncate mr-6">{job.title}</h2>
-      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 w-full items-center">
+      <h4 className="text-base min-w-[240px] lg:min-w-[316px] flex-grow sm:truncate mr-6">
+        {job.title}
+      </h4>
+      <div className="flex justify-between justify-[normal] pt-2 md:pt-0 lg:w-1/3 items-center">
         <div className="flex items-center gap-4">
           <Badge>
             <GlobeAltIcon className="w-3 h-3" />

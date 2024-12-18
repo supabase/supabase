@@ -56,6 +56,7 @@ Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
+Laurence Isla
 Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia
@@ -75,6 +76,7 @@ Rory Wilding
 Sam Rose
 Sreyas Udayavarman
 Stanislav M
+Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
@@ -82,6 +84,7 @@ Terry Sutton
 Thomas E
 Thor Schaeff
 Tom Ashley
+Tom G
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert

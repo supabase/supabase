@@ -4,7 +4,8 @@ import type { RenderCellProps } from 'react-data-grid'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
-import { useTableQuery } from 'data/tables/table-query'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
@@ -23,11 +24,13 @@ export const ForeignKeyFormatter = (props: Props) => {
   const { projectRef, tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
 
-  const { data: selectedTable } = useTableQuery({
+  const { data } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
+  const selectedTable = isTableLike(data) ? data : undefined
+
   const relationship = (selectedTable?.relationships ?? []).find(
     (r) =>
       r.source_schema === selectedTable?.schema &&

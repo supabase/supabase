@@ -90,6 +90,7 @@ export type QueryType =
   | 'postgrest'
   | 'warehouse'
   | 'workflow_run'
+  | 'pg_cron'
 
 export type Mode = 'simple' | 'custom'
 
