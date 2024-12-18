@@ -3,12 +3,13 @@
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
 
-	let { data } = $props();
-	let { supabase, session } = data;
+	let $data;
+	let $supabase;
+	let $session;
 
 	$effect(() => {
-		const { data } = supabase.auth.onAuthStateChange((event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) {
+		const { data } = $supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== $session?.expires_at) {
 				invalidate('supabase:auth')
 			}
 		})
@@ -22,5 +23,5 @@
 </svelte:head>
 
 <div class="container" style="padding: 50px 0 100px 0">
-	<slot />
+	{@render $$slots.default()}
 </div>
