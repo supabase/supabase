@@ -12,7 +12,7 @@
 
 	let avatarUrl = $svelteState<string | null>(null)
 	let uploading = $svelteState(false)
-	let files = $svelteState<FileList | null>(null)
+	let fileInput = $svelteState<HTMLInputElement | null>(null)
 
 	const dispatch = createEventDispatcher()
 
@@ -33,9 +33,11 @@
 		}
 	}
 
-	const uploadAvatar = async () => {
+	const uploadAvatar = async (event: Event) => {
 		try {
 			uploading = true
+			const input = event.target as HTMLInputElement
+			const files = input.files
 
 			if (!files || files.length === 0) {
 				throw new Error('You must select an image to upload.')
@@ -91,8 +93,8 @@
 			type="file"
 			id="single"
 			accept="image/*"
-			bind:files={files}
-			onchange={uploadAvatar}
+			bind:this={fileInput}
+			on:change={uploadAvatar}
 			disabled={uploading}
 		/>
 	</div>

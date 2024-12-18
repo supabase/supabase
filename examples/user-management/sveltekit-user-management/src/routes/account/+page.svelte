@@ -5,7 +5,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
 
-	let { data, form } = $svelteProps()
+	let { data, form } = $svelteProps<{ data: any; form?: any }>()
 	let { session, supabase, profile } = data
 
 	let profileForm = $svelteState<HTMLFormElement | null>(null)
@@ -15,16 +15,17 @@
 	let website = $svelteState(profile?.website ?? '')
 	let avatarUrl = $svelteState(profile?.avatar_url ?? '')
 
-	const handleSubmit: SubmitFunction = () => {
+	const handleSubmit = () => {
 		loading = true
-		return async () => {
+		return async ({ update }: { update: () => void }) => {
 			loading = false
+			update()
 		}
 	}
 
-	const handleSignOut: SubmitFunction = () => {
+	const handleSignOut = () => {
 		loading = true
-		return async ({ update }) => {
+		return async ({ update }: { update: () => void }) => {
 			loading = false
 			update()
 		}
