@@ -140,7 +140,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            moveSnippetAsync({
+            await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -164,7 +164,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       snippets.forEach((snippet) => {
         snapV2.updateSnippet({
           id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? (null as any) : selectedId },
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : selectedId },
           skipSave: true,
         })
       })

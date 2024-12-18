@@ -115,22 +115,37 @@ export const SQLEditorNav = ({
     [id: string]: { snippets?: Snippet[]; isLoading: boolean }
   }>({})
 
-  const filteredSnippets = useMemo(
-    () =>
-      Object.values(subResults).reduce(
-        (acc, curr) => {
-          return {
-            snippets: [...(acc.snippets ?? []), ...(curr.snippets ?? [])],
-            isLoading: acc.isLoading || curr.isLoading,
-          }
+  const filteredSnippets = useMemo(() => {
+    const rootSnippets = privateSnippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? []
+
+    return Object.values(subResults).reduce(
+      (
+        acc: {
+          snippets: Snippet[]
+          isLoading: boolean
+          snippetIds: Set<string>
         },
-        {
-          snippets: privateSnippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? [],
-          isLoading: isLoading || (isPreviousData && isFetching),
+        curr
+      ) => {
+        // filter out snippets that already exist
+        const newSnippets = (curr.snippets ?? []).filter(
+          (snippet) => !acc.snippetIds.has(snippet.id)
+        )
+        const newSnippetIds = new Set(newSnippets.map((snippet) => snippet.id))
+
+        return {
+          snippets: [...acc.snippets, ...(curr.snippets ?? [])],
+          isLoading: acc.isLoading || curr.isLoading,
+          snippetIds: new Set<string>([...acc.snippetIds, ...newSnippetIds]),
         }
-      ),
-    [subResults, privateSnippetsPages?.pages, isLoading, isPreviousData, isFetching]
-  )
+      },
+      {
+        snippets: rootSnippets,
+        isLoading: isLoading || (isPreviousData && isFetching),
+        snippetIds: new Set<string>(rootSnippets.map((snippet) => snippet.id)),
+      }
+    )
+  }, [subResults, privateSnippetsPages?.pages, isLoading, isPreviousData, isFetching])
   useEffect(() => {
     setIsSearching?.(filteredSnippets.isLoading)
   }, [filteredSnippets.isLoading, setIsSearching])
