@@ -2,17 +2,17 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { state, effect, props } from 'svelte'
+	import { state as svelteState, effect as svelteEffect, props as svelteProps } from 'svelte'
 
-	let { size = 10, url = '', supabase } = $props<{
+	let { size = 10, url = '', supabase } = $svelteProps<{
 		size?: number
 		url: string
 		supabase: SupabaseClient
 	}>()
 
-	let $avatarUrl = $state<string | null>(null)
-	let $uploading = $state(false)
-	let $files = $state<FileList | null>(null)
+	let avatarUrl = $svelteState<string | null>(null)
+	let uploading = $svelteState(false)
+	let files = $svelteState<FileList | null>(null)
 
 	const dispatch = createEventDispatcher()
 
@@ -25,7 +25,7 @@
 			}
 
 			const imageUrl = URL.createObjectURL(imageData)
-			$avatarUrl = imageUrl
+			avatarUrl = imageUrl
 		} catch (error) {
 			if (error instanceof Error) {
 				console.log('Error downloading image: ', error.message)
@@ -35,13 +35,13 @@
 
 	const uploadAvatar = async () => {
 		try {
-			$uploading = true
+			uploading = true
 
-			if (!$files || $files.length === 0) {
+			if (!files || files.length === 0) {
 				throw new Error('You must select an image to upload.')
 			}
 
-			const file = $files[0]
+			const file = files[0]
 			const fileExt = file.name.split('.').pop()
 			const filePath = `${Math.random()}.${fileExt}`
 
@@ -60,20 +60,20 @@
 				alert(error.message)
 			}
 		} finally {
-			$uploading = false
+			uploading = false
 		}
 	}
 
-	$effect(() => {
+	$svelteEffect(() => {
 		if (url) downloadImage(url)
 	})
 </script>
 
 <div>
-	{#if $avatarUrl}
+	{#if avatarUrl}
 		<img
-			src={$avatarUrl}
-			alt={$avatarUrl ? 'Avatar' : 'No image'}
+			src={avatarUrl}
+			alt={avatarUrl ? 'Avatar' : 'No image'}
 			class="avatar image"
 			style="height: {size}em; width: {size}em;"
 		/>
@@ -84,16 +84,16 @@
 
 	<div style="width: {size}em;">
 		<label class="button primary block" for="single">
-			{$uploading ? 'Uploading ...' : 'Upload'}
+			{uploading ? 'Uploading ...' : 'Upload'}
 		</label>
 		<input
 			style="visibility: hidden; position:absolute;"
 			type="file"
 			id="single"
 			accept="image/*"
-			bind:files={$files}
+			bind:files={files}
 			onchange={uploadAvatar}
-			disabled={$uploading}
+			disabled={uploading}
 		/>
 	</div>
 </div>
