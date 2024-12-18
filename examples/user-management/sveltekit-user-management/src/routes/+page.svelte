@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
 	import type { ActionData } from './$types'
-	import { props, state } from '@sveltejs/kit/experimental/runes'
+	import { props, state } from 'svelte'
 
 	const form = props<{ message?: string; success?: boolean; email?: string; errors?: { email?: string } } | null>()
 	const loading = state(false)

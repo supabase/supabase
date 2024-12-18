@@ -2,7 +2,7 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	import { props, effect } from '@sveltejs/kit/experimental/runes'
+	import { props, effect } from 'svelte'
 
 	const data = props<{ supabase: any; session: any }>()
 	const { supabase, session } = data
