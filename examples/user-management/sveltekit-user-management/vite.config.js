@@ -10,6 +10,10 @@ export default defineConfig({
 		})
 	],
 	build: {
-		ssr: false
+		target: 'esnext',
+		minify: true
+	},
+	optimizeDeps: {
+		include: ['@supabase/supabase-js']
 	}
 });

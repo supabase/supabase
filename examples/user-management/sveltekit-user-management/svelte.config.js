@@ -17,7 +17,8 @@ const config = {
 		paths: {
 			base: ''
 		},
-		// Disable SSR for SPA mode
+		// Configure for client-side rendering
+		csr: true,
 		ssr: false
 	},
 

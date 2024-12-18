@@ -10,10 +10,10 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/adapter-static": "^3.0.6",
+		"@sveltejs/kit": "^2.12.1",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
-		"svelte": "^5.0.0-next.58",
+		"svelte": "^5.0.0-next.272",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.6.0",
 		"typescript": "^5.0.0",
