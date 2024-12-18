@@ -767,6 +767,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'DBeaver',
       url: '/guides/database/dbeaver',
     },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
   ],
 }
 
