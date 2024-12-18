@@ -1,10 +1,24 @@
 import { post } from './fetchWrappers'
 
-export function handlePageTelemetry(API_URL: string, route: string, telemetryProps: any) {
-  const { page_url } = telemetryProps
+interface TelemetryData {
+  page_url: string
+  page_title: string
+  pathname: string
+  ph: {
+    referrer: string
+    language: string
+    search: string
+    viewport_height: number
+    viewport_width: number
+    user_agent: string
+  }
+}
+
+export function handlePageTelemetry(API_URL: string, route: string, telemetryData: TelemetryData) {
+  const { page_url } = telemetryData
 
   // check if ph exists, if not use an empty object
-  const ph = telemetryProps?.ph || {}
+  const ph = telemetryData?.ph || {}
   const { search = '', language = '', viewport_height = 0, viewport_width = 0 } = ph
 
   return post(

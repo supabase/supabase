@@ -9,6 +9,7 @@ import {
 } from 'common'
 
 import { noop } from 'lodash'
+import router from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
@@ -106,10 +107,24 @@ export const useConsent = () => {
           console.error('Invalid telemetry data:', error)
         }
       } else {
+        const telemetryData = {
+          page_url: telemetryProps.page_url,
+          page_title: typeof document !== 'undefined' ? document?.title : '',
+          pathname: router.pathname,
+          ph: {
+            referrer: typeof document !== 'undefined' ? document?.referrer : '',
+            language: telemetryProps.language,
+            search: telemetryProps.search,
+            viewport_height: telemetryProps.viewport_height,
+            viewport_width: telemetryProps.viewport_width,
+            user_agent: navigator.userAgent,
+          },
+        }
+
         handlePageTelemetry(
           process.env.NEXT_PUBLIC_API_URL!,
           window.location.pathname,
-          telemetryProps
+          telemetryData
         )
       }
     } else {
@@ -181,8 +196,23 @@ export const useConsentValue = (KEY_NAME: string) => {
     setConsentValue(value)
     localStorage.setItem(KEY_NAME, value)
     window.dispatchEvent(new Event('storage'))
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (value === 'true') {
+      const telemetryData = {
+        page_url: telemetryProps.page_url,
+        page_title: typeof document !== 'undefined' ? document?.title : '',
+        pathname: router.pathname,
+        ph: {
+          referrer: typeof document !== 'undefined' ? document?.referrer : '',
+          language: telemetryProps.language,
+          search: telemetryProps.search,
+          viewport_height: telemetryProps.viewport_height,
+          viewport_width: telemetryProps.viewport_width,
+          user_agent: navigator.userAgent,
+        },
+      }
+
+      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryData)
+    }
   }
 
   return {
