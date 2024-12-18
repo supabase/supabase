@@ -156,7 +156,7 @@ const UtilityTabResults = ({
   } else if (!result) {
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
-        <p className="m-0 border-0 px-6 py-4 text-sm text-foreground-light">
+        <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
           Click <code>Run</code> to execute your query.
         </p>
       </div>
