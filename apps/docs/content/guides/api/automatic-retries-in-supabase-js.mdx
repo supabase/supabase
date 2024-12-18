@@ -31,7 +31,7 @@ const supabase = createClient('https://your-supabase-url.supabase.co', 'your-ano
 });
 ```
 
-## 3. Configure retry Options
+## 3. Configure retry options
 
 You can configure `fetch-retry` options to control retry behavior, such as the number of retries, retry delay, and which errors should trigger a retry.
 
@@ -67,7 +67,7 @@ async function fetchData() {
 fetchData();
 ```
 
-## 5. Fine-Tuning retries for Specific Requests
+## 5. Fine-Tuning retries for specific Requests
 
 If you need different retry logic for certain requests, you can use the `retryOn` with a custom function to inspect the URL or response and decide whether to retry the request.
 
