@@ -34,7 +34,7 @@ import {
   DatabaseConnectionType,
 } from './Connect.constants'
 import { CodeBlockFileHeader, ConnectionPanel } from './ConnectionPanel'
-import { getConnectionStrings, getPoolerTld } from './DatabaseSettings.utils'
+import { getConnectionStrings } from './DatabaseSettings.utils'
 import examples, { Example } from './DirectConnectionExamples'
 
 const StepLabel = ({
@@ -93,11 +93,16 @@ export const DatabaseConnectionString = () => {
   const emptyState = { db_user: '', db_host: '', db_port: '', db_name: '' }
   const connectionInfo = pluckObjectFields(selectedDatabase || emptyState, DB_FIELDS)
 
-  const handleCopy = (id: string) => {
-    const connectionType = DATABASE_CONNECTION_TYPES.find((type) => type.id === id)?.label
+  const handleCopy = (
+    connectionTypeId: string,
+    connectionMethod: 'direct' | 'transaction_pooler' | 'session_pooler'
+  ) => {
+    const connectionInfo = DATABASE_CONNECTION_TYPES.find((type) => type.id === connectionTypeId)
+    const connectionType = connectionInfo?.label ?? 'Unknown'
+    const lang = connectionInfo?.lang ?? 'Unknown'
     sendEvent({
       action: TelemetryActions.CONNECTION_STRING_COPIED,
-      properties: { connectionType },
+      properties: { connectionType, lang, connectionMethod },
     })
   }
 
@@ -130,11 +135,6 @@ export const DatabaseConnectionString = () => {
             sqlalchemy: '',
           },
         }
-
-  const poolerTld =
-    isSuccessPoolingInfo && poolingConfiguration !== undefined
-      ? getPoolerTld(poolingConfiguration?.connectionString)
-      : 'com'
 
   // @mildtomato - Possible reintroduce later
   //
@@ -289,7 +289,7 @@ export const DatabaseConnectionString = () => {
                   { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
                   { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
                 ]}
-                onCopyCallback={() => handleCopy(selectedTab)}
+                onCopyCallback={() => handleCopy(selectedTab, 'direct')}
               />
               <ConnectionPanel
                 contentType={contentType}
@@ -311,11 +311,11 @@ export const DatabaseConnectionString = () => {
                     ...CONNECTION_PARAMETERS.port,
                     value: poolingConfiguration?.db_port.toString() ?? '6543',
                   },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'transaction' },
                 ]}
-                onCopyCallback={() => handleCopy(selectedTab)}
+                onCopyCallback={() => handleCopy(selectedTab, 'transaction_pooler')}
               />
               {ipv4Addon && (
                 <Admonition
@@ -345,11 +345,11 @@ export const DatabaseConnectionString = () => {
                 parameters={[
                   { ...CONNECTION_PARAMETERS.host, value: poolingConfiguration?.db_host ?? '' },
                   { ...CONNECTION_PARAMETERS.port, value: '5432' },
-                  { ...CONNECTION_PARAMETERS.database, value: connectionInfo.db_name },
-                  { ...CONNECTION_PARAMETERS.user, value: connectionInfo.db_user },
+                  { ...CONNECTION_PARAMETERS.database, value: poolingConfiguration?.db_name ?? '' },
+                  { ...CONNECTION_PARAMETERS.user, value: poolingConfiguration?.db_user ?? '' },
                   { ...CONNECTION_PARAMETERS.pool_mode, value: 'session' },
                 ]}
-                onCopyCallback={() => handleCopy(selectedTab)}
+                onCopyCallback={() => handleCopy(selectedTab, 'session_pooler')}
               />
             </div>
           </div>

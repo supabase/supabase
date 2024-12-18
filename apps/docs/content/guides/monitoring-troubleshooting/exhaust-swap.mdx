@@ -6,7 +6,7 @@ description: 'Learn what high Swap usage could mean for your Supabase instance a
 
 Learn what high Swap usage means, what can cause it, and how to solve it.
 
-## What is Swap for?
+## What is swap for?
 
 <Admonition type="tip">
 
@@ -20,7 +20,7 @@ Swap is a portion of your instance's disk that is reserved for the operating sys
 
 Swap can be used even if your instance has plenty of RAM. If this is the case, do not worry. Your instance might try to "preemptively swap" by swapping background processes to make space for your traffic in RAM.
 
-### When is high Swap concerning?
+### When is high swap concerning?
 
 High Swap is concerning if your instance is using all of the available RAM (i.e. consistently using more than 75%).
 
@@ -30,7 +30,7 @@ High Swap usage can affect your database performance. For example, you might see
 - **Degraded performance due to swapping regularly between RAM and disk.**
 - **Higher Disk I/O due to swapping regularly.**
 
-## Monitor your Swap
+## Monitor your swap
 
 You can check your Swap usage directly on the Supabase Platform. Navigate to the [**Database** page](https://supabase.com/dashboard/project/_/reports/database) of the **Reports** section.
 
@@ -45,7 +45,7 @@ Some useful metrics to monitor are (this is not an exhaustive list):
 - `node_memory_MemTotal_bytes` and `node_memory_MemFree_bytes` - The total RAM and available RAM.
 - `node_vmstat_pswpin` and `node_vmstat_pswpout` - The number of pages that have been swapped in or out (monitoring this for spikes means that your instance is swapping).
 
-## Common reasons for high Swap usage
+## Common reasons for high swap usage
 
 Everything you do with your Supabase project requires compute. Hence, there can be many reasons for high Swap usage. Here are some common ones:
 
@@ -55,10 +55,10 @@ Everything you do with your Supabase project requires compute. Hence, there can 
 - **Workload style:** The usage pattern of your Supabase project might be more read heavy, or involve large amounts of data.
 - **Extensions:** You might be using extensions that perform intensive operations on large datasets. This increases resource usage.
 
-## Solving high Swap usage
+## Solving high swap usage
 
 If you find that your RAM and Swap usage are high, you have three options:
 
 1. **Optimize performance:** Get more out of your instance's resources by optimizing your usage. See the [performance tuning guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) and our [production readiness guide](https://supabase.com/docs/guides/platform/going-into-prod#performance).
-2. **Upgrade your compute:** You can get a Compute Add-on for your project. Navigate to [the **Addons** section in project settings](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to see your upgrade options.
+2. **Upgrade your compute:** You can get a Compute Add-on for your project. Follow [this link](https://supabase.com/dashboard/project/_/settings/compute-and-disk) and select your project to see your upgrade options.
 3. **Read Replicas:** You can spread the load on your Supabase project by creating a Read Replica. See [the read replicas guide](https://supabase.com/docs/guides/platform/read-replicas) for more information.
