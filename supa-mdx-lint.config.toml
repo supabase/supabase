@@ -8,7 +8,6 @@ Rule003Spelling = false
 # Error message: "Word not found in dictionary"
 # Rule003Spelling = "include('supa-mdx-lint/Rule003Spelling.toml')"
 
-Rule002AdmonitionTypes = false
-# [Rule002AdmonitionTypes]
+[Rule002AdmonitionTypes]
 # Allowed admonition types are:
-# admonition_types = ["note", "tip", "caution", "deprecation", "danger"]
+admonition_types = ["note", "tip", "caution", "deprecation", "danger"]

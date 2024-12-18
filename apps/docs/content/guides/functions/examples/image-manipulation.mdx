@@ -8,7 +8,7 @@ If you need to do anything custom beyond what Supabase Storage provides, you can
 
 In this example, we will use [magick-wasm](https://github.com/dlemstra/magick-wasm) to perform image manipulations. `magick-wasm` is the WebAssembly port of the popular ImageMagick library and supports processing over 100 file formats.
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 Edge Functions currently doesn't support image processing libraries such as `Sharp`, which depend on native libraries. Only WASM-based libraries are supported.
 
@@ -69,7 +69,7 @@ supabase functions deploy image-blur
 
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 Hosted Edge Functions have [limits](https://supabase.com/docs/guides/functions/limits) on memory and CPU usage.
 

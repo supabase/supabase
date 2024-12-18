@@ -204,7 +204,7 @@ select cron.alter_job(
 select cron.unschedule('permanent-cron-job-name');
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 Unscheduling a Job will permanently delete the Job from `cron.job` table but its run history remain in `cron.job_run_details` table.
 
@@ -246,7 +246,7 @@ order by start_time desc
 limit 10;
 ```
 
-<Admonition type="warning">
+<Admonition type="caution">
 
 The records in the `cron.job_run_details` table are not cleaned up automatically. They are also not removed when jobs are unscheduled, which will take up disk space in your database.
 
