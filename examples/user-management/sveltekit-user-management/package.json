@@ -10,7 +10,6 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
 		"svelte": "^5.0.0-next.58",
@@ -24,6 +23,7 @@
 		"@supabase/auth-ui-shared": "^0.1.8",
 		"@supabase/auth-ui-svelte": "^0.2.9",
 		"@supabase/ssr": "^0.4.0",
-		"@supabase/supabase-js": "^2.44.2"
+		"@supabase/supabase-js": "^2.44.2",
+		"@sveltejs/adapter-static": "^3.0.6"
 	}
 }
