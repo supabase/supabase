@@ -3,12 +3,17 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -32,11 +37,6 @@ import {
   identifyQueryType,
   isReadOnlySelect,
 } from './AIAssistant.utils'
-import { useParams } from 'common'
-import { useQueryClient } from '@tanstack/react-query'
-import { Markdown } from 'components/interfaces/Markdown'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 
 interface SqlSnippetWrapperProps {
   sql: string
@@ -183,6 +183,9 @@ export const SqlCard = ({
                 : 'This query involves running a function.'}{' '}
               Are you sure you want to execute it?
             </p>
+            <p className="text-foreground-light">
+              Make sure you are not accidentally removing something important.
+            </p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
@@ -193,7 +196,7 @@ export const SqlCard = ({
                 Cancel
               </Button>
               <Button
-                type="outline"
+                type="danger"
                 size="tiny"
                 className="w-full flex-1"
                 onClick={() => {
@@ -210,10 +213,11 @@ export const SqlCard = ({
                   })
 
                   sendEvent({
-                    action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                    value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
-                    label: 'mutation',
-                    category: identifyQueryType(sql) ?? 'unknown',
+                    action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                    properties: {
+                      type: 'mutation',
+                      category: identifyQueryType(sql) ?? 'unknown',
+                    },
                   })
                 }}
               >
@@ -257,10 +261,7 @@ export const SqlCard = ({
                     icon={<Edit size={14} />}
                     onClick={() => {
                       handleEditInSQLEditor()
-                      sendEvent({
-                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                        value: TELEMETRY_VALUES.EDIT_IN_SQL_EDITOR,
-                      })
+                      sendEvent({ action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED })
                     }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
@@ -305,9 +306,8 @@ export const SqlCard = ({
                     handleExecute()
                     if (isReadOnlySelect(sql)) {
                       sendEvent({
-                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                        value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
-                        label: 'select',
+                        action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                        properties: { type: 'select' },
                       })
                     }
                   }}
