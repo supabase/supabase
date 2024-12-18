@@ -134,7 +134,7 @@ export const SQLEditorNav = ({
         const newSnippetIds = new Set(newSnippets.map((snippet) => snippet.id))
 
         return {
-          snippets: [...acc.snippets, ...(curr.snippets ?? [])],
+          snippets: [...acc.snippets, ...newSnippets],
           isLoading: acc.isLoading || curr.isLoading,
           snippetIds: new Set<string>([...acc.snippetIds, ...newSnippetIds]),
         }
