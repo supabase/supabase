@@ -47,8 +47,6 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
-
     Navigate to the React app and install the Supabase libraries.
 
     </StepHikeCompact.Details>
@@ -56,7 +54,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
+      cd my-app && npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -68,45 +66,102 @@ hideToc: true
 
     In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
-    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
       ```js src/App.js
-        import './index.css'
-        import { useState, useEffect } from 'react'
-        import { createClient } from '@supabase/supabase-js'
-        import { Auth } from '@supabase/auth-ui-react'
-        import { ThemeSupa } from '@supabase/auth-ui-shared'
+      import React, { useState, useEffect } from 'react';
+      import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-        export default function App() {
-          const [session, setSession] = useState(null)
-
-          useEffect(() => {
+      function App() {
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+        const [loading, setLoading] = useState(false);
+        useEffect(() => {
             supabase.auth.getSession().then(({ data: { session } }) => {
               setSession(session)
             })
-
             const {
               data: { subscription },
             } = supabase.auth.onAuthStateChange((_event, session) => {
-              setSession(session)
+            setSession(session)
             })
+          return () => subscription.unsubscribe()
+        }, [])
 
-            return () => subscription.unsubscribe()
-          }, [])
-
-          if (!session) {
-            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
-          }
-          else {
-            return (<div>Logged in!</div>)
-          }
+        async function signInWithEmail(e) {
+            e.preventDefault();
+            setLoading(true);
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+            setLoading(false);
         }
+
+        async function signUpWithEmail() {
+            setLoading(true);
+            const { data: { session }, error } = await supabase.auth.signUp({ email, password });
+            if (error) alert(error.message);
+            if (!error) alert('Please check your inbox for email verification!');
+            setLoading(false);
+        }
+
+        return (
+            <div>
+                {session ? (
+                    <div> Logged in </div>
+                ) : (
+                <form>
+                    <div>
+                        <label htmlFor="email">
+                        Email:
+                        <input
+                            id="email"
+                            name="email"
+                            type="email"
+                            value={email}
+                            autocomplete="email"
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="email@address.com"
+                        />
+                        </label>
+                    </div>
+                    <div>
+                        <label htmlFor="password">
+                        Password:
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Password"
+                        />
+                        </label>
+                    </div>
+                    <button
+                        type="button"
+                        onClick={signInWithEmail}
+                        disabled={loading}
+                        >
+                    Sign in
+                    </button>
+                    <button
+                        type="button"
+                        onClick={signUpWithEmail}
+                        disabled={loading}
+                        >
+                    Sign up
+                    </button>
+                </form>
+                )}
+            </div>
+        );
+      }
+      export default App;
       ```
 
     </StepHikeCompact.Code>
