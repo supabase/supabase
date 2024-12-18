@@ -11,6 +11,8 @@ import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
+import { Button } from 'ui'
+import Link from 'next/link'
 
 export interface AccountLayoutProps {
   title: string
@@ -40,107 +42,32 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
     }
   }, [router])
 
-  const organizationsLinks = (organizations ?? [])
-    .map((organization) => ({
-      isActive:
-        router.pathname.startsWith('/org/') && selectedOrganization?.slug === organization.slug,
-      label: organization.name,
-      href: `/org/${organization.slug}/general`,
-      key: organization.slug,
-      icon: <PartnerIcon organization={organization} />,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label))
-
-  const sectionsWithHeaders: SidebarSection[] = [
+  const links = [
     {
-      heading: 'Projects',
-      key: 'projects',
-      links: [
-        {
-          isActive: router.pathname === '/projects',
-          label: 'All projects',
-          href: '/projects',
-          key: 'all-projects-item',
-        },
-      ],
+      isActive: router.pathname === `/account/me`,
+      label: 'Preferences',
+      href: `/account/me`,
+      key: `/account/me`,
     },
-    ...(IS_PLATFORM && organizationsLinks?.length > 0
-      ? [
-          {
-            heading: 'Organizations',
-            key: 'organizations',
-            links: organizationsLinks,
-          },
-        ]
-      : []),
-    ...(IS_PLATFORM
-      ? [
-          {
-            heading: 'Account',
-            key: 'account',
-            links: [
-              {
-                isActive: router.pathname === `/account/me`,
-                label: 'Preferences',
-                href: `/account/me`,
-                key: `/account/me`,
-              },
-              {
-                isActive: router.pathname === `/account/tokens`,
-                label: 'Access Tokens',
-                href: `/account/tokens`,
-                key: `/account/tokens`,
-              },
-
-              {
-                isActive: router.pathname === `/account/security`,
-                label: 'Security',
-                href: `/account/security`,
-                key: `/account/security`,
-              },
-              {
-                isActive: router.pathname === `/account/audit`,
-                label: 'Audit Logs',
-                href: `/account/audit`,
-                key: `/account/audit`,
-              },
-            ],
-          },
-        ]
-      : []),
     {
-      heading: 'Documentation',
-      key: 'documentation',
-      links: [
-        {
-          key: 'ext-guides',
-          label: 'Guides',
-          href: 'https://supabase.com/docs',
-          isExternal: true,
-        },
-        {
-          key: 'ext-guides',
-          label: 'API Reference',
-          href: 'https://supabase.com/docs/guides/api',
-          isExternal: true,
-        },
-      ],
+      isActive: router.pathname === `/account/tokens`,
+      label: 'Access Tokens',
+      href: `/account/tokens`,
+      key: `/account/tokens`,
     },
-    ...(IS_PLATFORM
-      ? [
-          {
-            key: 'logout-link',
-            links: [
-              {
-                key: `logout`,
-                label: 'Log out',
-                href: undefined,
-                onClick: onClickLogout,
-              },
-            ],
-          },
-        ]
-      : []),
+
+    {
+      isActive: router.pathname === `/account/security`,
+      label: 'Security',
+      href: `/account/security`,
+      key: `/account/security`,
+    },
+    {
+      isActive: router.pathname === `/account/audit`,
+      label: 'Audit Logs',
+      href: `/account/audit`,
+      key: `/account/audit`,
+    },
   ]
 
   return (
@@ -150,9 +77,22 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
         <meta name="description" content="Supabase Studio" />
       </Head>
       <div className="flex flex-col h-screen w-screen">
-        <WithSidebar title={title} breadcrumbs={breadcrumbs} sections={sectionsWithHeaders}>
-          {children}
-        </WithSidebar>
+        <div className="flex flex-row min-w-5xl max-w-5xl mx-auto py-20">
+          <nav className="py-5">
+            <ul className="flex flex-col gap-1">
+              {links.map((link) => (
+                <li key={link.key}>
+                  <Link href={link.href}>
+                    <Button type={link.isActive ? 'default' : 'text'} className="border-0">
+                      {link.label}
+                    </Button>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div className="flex-1 flex-grow">{children}</div>
+        </div>
       </div>
     </>
   )
