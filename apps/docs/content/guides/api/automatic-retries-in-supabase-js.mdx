@@ -6,7 +6,7 @@ subtitle: 'Learn how to add automatic retries to your Supabase API requests usin
 
 The `fetch-retry` package allows you to add retry logic to `fetch` requests, making it a useful tool for enhancing the resilience of API calls in your Supabase applications. Here's a step-by-step guide on how to integrate `fetch-retry` with the `supabase-js` library.
 
-## 1. Install Dependencies
+## 1. Install dependencies
 
 To get started, ensure you have both `supabase-js` and `fetch-retry` installed in your project:
 
@@ -14,7 +14,7 @@ To get started, ensure you have both `supabase-js` and `fetch-retry` installed i
 npm install @supabase/supabase-js fetch-retry
 ```
 
-## 2. Wrap the Fetch Function
+## 2. Wrap the fetch Function
 
 The `fetch-retry` package works by wrapping the native `fetch` function. You can create a custom fetch instance with retry logic and pass it to the `supabase-js` client.
 
@@ -31,7 +31,7 @@ const supabase = createClient('https://your-supabase-url.supabase.co', 'your-ano
 });
 ```
 
-## 3. Configure Retry Options
+## 3. Configure retry Options
 
 You can configure `fetch-retry` options to control retry behavior, such as the number of retries, retry delay, and which errors should trigger a retry.
 
@@ -47,7 +47,7 @@ const fetchWithRetry = fetchRetry(fetch, {
 
 In this example, the `retryDelay` function implements an exponential backoff strategy, and retries are triggered only for specific HTTP status codes.
 
-## 4. Using the Supabase Client
+## 4. Using the Supabase client
 
 With `fetch-retry` integrated, you can use the Supabase client as usual. The retry logic will automatically apply to all network requests made by `supabase-js`.
 
@@ -67,7 +67,7 @@ async function fetchData() {
 fetchData();
 ```
 
-## 5. Fine-Tuning Retries for Specific Requests
+## 5. Fine-Tuning retries for Specific Requests
 
 If you need different retry logic for certain requests, you can use the `retryOn` with a custom function to inpsect the URL or response and decide whether to retry the request.
 
