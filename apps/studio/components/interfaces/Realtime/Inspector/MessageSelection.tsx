@@ -6,6 +6,7 @@ import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { Button, cn } from 'ui'
 import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 export interface MessageSelectionProps {
   log: LogData | null
@@ -73,11 +74,7 @@ const MessageSelection = ({ log, onClose }: MessageSelectionProps) => {
                 type="default"
                 title="Copy log to clipboard"
                 onClick={() => {
-                  sendEvent({
-                    category: 'realtime_inspector',
-                    action: 'copied_message',
-                    label: 'realtime_inspector_results',
-                  })
+                  sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED })
                 }}
               />
             </div>
