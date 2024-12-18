@@ -2,7 +2,8 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { props as svelteProps, state as svelteState, effect as svelteEffect } from 'svelte'
+	import { runes } from 'svelte/runes'
+	const { props: svelteProps, state: svelteState, effect: svelteEffect } = runes
 
 	const size = $svelteProps<number>(10)
 	const urlProp = $svelteProps<string>('')
@@ -92,7 +93,7 @@
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
-		<div class="avatar no-image" style="height: {size}em; width: {size}em;" />
+		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
 	<input type="hidden" name="avatarUrl" value={currentUrl} />
 
@@ -106,7 +107,7 @@
 			id="single"
 			accept="image/*"
 			bind:this={fileInput}
-			on:change={uploadAvatar}
+			onchange={uploadAvatar}
 			disabled={uploading}
 		/>
 	</div>

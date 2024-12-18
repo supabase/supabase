@@ -2,7 +2,8 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	import { props as svelteProps, effect as svelteEffect } from 'svelte'
+	import { runes } from 'svelte/runes'
+	const { props: svelteProps, effect: svelteEffect } = runes
 
 	const data = $svelteProps<{ supabase: any; session: any }>()
 	const { supabase, session } = data
