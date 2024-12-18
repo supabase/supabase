@@ -389,43 +389,41 @@ export const SQLEditorNav = ({
     if (!snippet) return console.error('Snippet ID is required')
 
     const storeSnippet = snapV2.snippets[snippet.id]
+    let snippetContent = storeSnippet?.snippet?.content
 
-    if (storeSnippet) {
-      let snippetContent = storeSnippet.snippet.content
-      if (snippetContent === undefined) {
-        const { content } = await getContentById({ projectRef: storeSnippet.projectRef, id })
-        snippetContent = content as unknown as SqlSnippets.Content
-      }
-
-      if (snippetContent === undefined) {
-        // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
-        return toast.error('Unable to update snippet visibility: Content is missing')
-      }
-
-      upsertContent(
-        {
-          projectRef,
-          payload: {
-            ...snippet,
-            visibility: action === 'share' ? 'project' : 'user',
-            folder_id: null,
-            content: snippetContent,
-          },
-        },
-        {
-          onSuccess: () => {
-            setSelectedSnippetToShare(undefined)
-            setSelectedSnippetToUnshare(undefined)
-            setShowSharedSnippets(true)
-            toast.success(
-              action === 'share'
-                ? 'Snippet is now shared to the project'
-                : 'Snippet is now unshared from the project'
-            )
-          },
-        }
-      )
+    if (snippetContent === undefined) {
+      const { content } = await getContentById({ projectRef, id: snippet.id })
+      snippetContent = content as unknown as SqlSnippets.Content
     }
+
+    // [Joshen] Just as a final check - to ensure that the content is minimally there (empty string is fine)
+    if (snippetContent === undefined) {
+      return toast.error('Unable to update snippet visibility: Content is missing')
+    }
+
+    upsertContent(
+      {
+        projectRef,
+        payload: {
+          ...snippet,
+          visibility: action === 'share' ? 'project' : 'user',
+          folder_id: null,
+          content: snippetContent,
+        },
+      },
+      {
+        onSuccess: () => {
+          setSelectedSnippetToShare(undefined)
+          setSelectedSnippetToUnshare(undefined)
+          setShowSharedSnippets(true)
+          toast.success(
+            action === 'share'
+              ? 'Snippet is now shared to the project'
+              : 'Snippet is now unshared from the project'
+          )
+        },
+      }
+    )
   }
 
   const onSelectCopyPersonal = async (snippet: SnippetWithContent) => {
