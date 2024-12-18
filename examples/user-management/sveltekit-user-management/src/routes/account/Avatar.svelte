@@ -2,15 +2,15 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { props, state, effect } from '@sveltejs/kit/experimental/runes'
+	import { props as defineProps, state as defineState, effect as defineEffect } from '$app/experimental/runes'
 
-	const size = $props<number>(10)
-	const urlProp = $props<string>('')
-	const supabase = $props<SupabaseClient>()
+	const size = $defineProps<number>(10)
+	const urlProp = $defineProps<string>('')
+	const supabase = $defineProps<SupabaseClient>()
 
-	const avatarUrl = $state<string | null>(null)
-	const uploading = $state(false)
-	const currentUrl = $state(urlProp)
+	const avatarUrl = $defineState<string | null>(null)
+	const uploading = $defineState(false)
+	const currentUrl = $defineState(urlProp)
 	let fileInput: HTMLInputElement | null = null
 
 	const dispatch = createEventDispatcher<{
@@ -18,12 +18,12 @@
 		upload: void;
 	}>()
 
-	$effect(() => {
+	$defineEffect(() => {
 		// Update currentUrl when urlProp changes
 		currentUrl.set(urlProp)
 	})
 
-	$effect(() => {
+	$defineEffect(() => {
 		// Dispatch urlChange event when currentUrl changes
 		dispatch('urlChange', currentUrl)
 	})
@@ -78,7 +78,7 @@
 		}
 	}
 
-	$effect(() => {
+	$defineEffect(() => {
 		if (currentUrl) downloadImage(currentUrl)
 	})
 </script>
