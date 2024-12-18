@@ -2,13 +2,14 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
+	import { props, state } from 'svelte'
 
-	export let size = 10
-	export let url = ''
-	export let supabase: SupabaseClient
+	const size = $props<number>(10)
+	const url = $props<string>('')
+	const supabase = $props<SupabaseClient>()
 
-	let avatarUrl: string | null = null
-	let uploading = false
+	const avatarUrl = $state<string | null>(null)
+	const uploading = $state(false)
 	let fileInput: HTMLInputElement | null = null
 
 	const dispatch = createEventDispatcher()

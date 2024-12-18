@@ -2,9 +2,10 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	export let data
+	import { props } from 'svelte'
 
-	let { supabase, session } = data
+	const data = $props<{ supabase: any; session: any }>()
+	const { supabase, session } = data
 
 	$: {
 		const { data: authData } = supabase.auth.onAuthStateChange((event, _session) => {

@@ -3,17 +3,18 @@
 	import { enhance } from '$app/forms'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
+	import { props, state } from 'svelte'
 
-	export let data
-	export let form
+	const data = $props<{ session: any; supabase: any; profile: any }>()
+	const form = $props<any>()
 
-	let { session, supabase, profile } = data
+	const { session, supabase, profile } = data
 	let profileForm: HTMLFormElement | null = null
-	let loading = false
-	let fullName = profile?.full_name ?? ''
-	let username = profile?.username ?? ''
-	let website = profile?.website ?? ''
-	let avatarUrl = profile?.avatar_url ?? ''
+	const loading = $state(false)
+	const fullName = $state(profile?.full_name ?? '')
+	const username = $state(profile?.username ?? '')
+	const website = $state(profile?.website ?? '')
+	const avatarUrl = $state(profile?.avatar_url ?? '')
 
 	const handleSubmit = () => {
 		loading = true
