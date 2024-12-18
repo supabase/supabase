@@ -1053,10 +1053,21 @@ const WizardForm = () => {
                                           />
                                         </div>
                                       )}
-
-                                      <SecurityOptions form={form} />
+                                      <div className="py-4 border-b">
+                                        <SecurityOptions
+                                          layout="vertical"
+                                          collapsible={false}
+                                          form={form}
+                                        />
+                                      </div>
                                       {allowOrioleDB && !!availableOrioleVersion && (
-                                        <AdvancedConfiguration form={form} />
+                                        <div className="py-4">
+                                          <AdvancedConfiguration
+                                            layout="vertical"
+                                            collapsible={false}
+                                            form={form}
+                                          />
+                                        </div>
                                       )}
                                     </div>
                                   </div>

@@ -21,17 +21,27 @@ import { DocsButton } from 'components/ui/DocsButton'
 
 interface AdvancedConfigurationProps {
   form: UseFormReturn<CreateProjectForm>
+  layout?: 'vertical' | 'horizontal'
+  collapsible?: boolean
 }
 
-export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
-  return (
-    <div className="py-4 border-b">
+export const AdvancedConfiguration = ({
+  form,
+  layout = 'horizontal',
+  collapsible = true,
+}: AdvancedConfigurationProps) => {
+  const content = (
+    <>
       <FormField_Shadcn_
         name="useOrioleDb"
         control={form.control}
         render={({ field }) => (
           <>
-            <FormItemLayout label="Postgres Type" className="[&>div>label]:!break-normal">
+            <FormItemLayout
+              layout={layout}
+              label="Postgres Type"
+              className="[&>div>label]:!break-normal"
+            >
               <FormControl_Shadcn_>
                 <RadioGroupStacked
                   // Due to radio group not supporting boolean values
@@ -97,10 +107,31 @@ export const AdvancedConfiguration = ({ form }: AdvancedConfigurationProps) => {
           </>
         )}
       />
-
       <p className="text-xs text-foreground-lighter mt-3">
         These settings cannot be changed after the project is created
       </p>
-    </div>
+    </>
   )
+
+  const collapsibleContent = (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+        Advanced Configuration
+        <ChevronRight
+          size={16}
+          strokeWidth={1}
+          className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+        />
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_
+        className={cn(
+          'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+        )}
+      >
+        {content}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
+  )
+
+  return <Panel.Content>{collapsible ? collapsibleContent : content}</Panel.Content>
 }

@@ -20,17 +20,24 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
+  layout?: 'vertical' | 'horizontal'
+  collapsible?: boolean
 }
 
-export const SecurityOptions = ({ form }: SecurityOptionsProps) => {
-  return (
-    <div className="py-4 border-b">
+export const SecurityOptions = ({
+  form,
+  layout = 'horizontal',
+  collapsible = true,
+}: SecurityOptionsProps) => {
+  const content = (
+    <>
       <FormField_Shadcn_
         name="dataApi"
         control={form.control}
         render={({ field }) => (
           <>
             <FormItemLayout
+              layout={layout}
               className="[&>div>label]:!break-normal"
               label="What connections do you plan to use?"
             >
@@ -87,7 +94,7 @@ export const SecurityOptions = ({ form }: SecurityOptionsProps) => {
           control={form.control}
           render={({ field }) => (
             <>
-              <FormItemLayout className="mt-6" label="Data API Configuration">
+              <FormItemLayout className="mt-6" layout={layout} label="Data API Configuration">
                 <FormControl_Shadcn_>
                   <RadioGroupStacked
                     defaultValue={field.value.toString()}
@@ -142,6 +149,32 @@ export const SecurityOptions = ({ form }: SecurityOptionsProps) => {
       <p className="text-xs text-foreground-lighter mt-3">
         These settings can be changed after the project is created via the project's settings
       </p>
-    </div>
+    </>
+  )
+
+  const collapsibleContent = (
+    <Collapsible_Shadcn_>
+      <CollapsibleTrigger_Shadcn_ className="group/advanced-trigger font-mono uppercase tracking-widest text-xs flex items-center gap-1 text-foreground-lighter/75 hover:text-foreground-light transition data-[state=open]:text-foreground-light">
+        Security options
+        <ChevronRight
+          size={16}
+          strokeWidth={1}
+          className="mr-2 group-data-[state=open]/advanced-trigger:rotate-90 group-hover/advanced-trigger:text-foreground-light transition"
+        />
+      </CollapsibleTrigger_Shadcn_>
+      <CollapsibleContent_Shadcn_
+        className={cn(
+          'pt-5 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+        )}
+      >
+        {content}
+      </CollapsibleContent_Shadcn_>
+    </Collapsible_Shadcn_>
+  )
+
+  return (
+    <Panel.Content className={!collapsible ? 'p-0' : ''}>
+      {collapsible ? collapsibleContent : content}
+    </Panel.Content>
   )
 }
