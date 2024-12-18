@@ -2,16 +2,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
 	import type { ActionData } from './$types'
-	import { props as svelteProps, state as svelteState } from 'svelte'
+	import { props, state } from '@sveltejs/kit/experimental/runes'
 
-	const form = $svelteProps<{ message?: string; success?: boolean; email?: string; errors?: { email?: string } } | null>()
-	const loading = $svelteState(false)
+	const form = props<{ message?: string; success?: boolean; email?: string; errors?: { email?: string } } | null>()
+	const loading = state(false)
 
 	const handleSubmit = () => {
-		loading.set(true)
+		$loading = true
 		return async ({ update }: { update: () => void }) => {
 			update()
-			loading.set(false)
+			$loading = false
 		}
 	}
 </script>
@@ -47,7 +47,7 @@
 		{/if}
 		<div>
 			<button class="button primary block">
-				{ loading ? 'Loading' : 'Send magic link' }
+				{ $loading ? 'Loading' : 'Send magic link' }
 			</button>
 		</div>
 	</div>
