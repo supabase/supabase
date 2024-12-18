@@ -91,7 +91,7 @@ export const sqlEditorState = proxy({
     skipSave = false,
   }: {
     id: string
-    snippet: Snippet
+    snippet: Partial<Snippet>
     skipSave?: boolean
   }) => {
     if (sqlEditorState.snippets[id]) {

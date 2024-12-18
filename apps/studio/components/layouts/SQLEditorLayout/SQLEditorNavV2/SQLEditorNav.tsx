@@ -146,7 +146,7 @@ export const SQLEditorNav = ({
       }
     )
 
-    if (snippet && !snippetInfo.snippetIds.has(snippet.id)) {
+    if (snippet && snippet.visibility === 'user' && !snippetInfo.snippetIds.has(snippet.id)) {
       snippetInfo.snippetIds.add(snippet.id)
       snippetInfo.snippets = [...snippetInfo.snippets, snippet]
     }
@@ -401,12 +401,14 @@ export const SQLEditorNav = ({
       return toast.error('Unable to update snippet visibility: Content is missing')
     }
 
+    const visibility = action === 'share' ? 'project' : 'user'
+
     upsertContent(
       {
         projectRef,
         payload: {
           ...snippet,
-          visibility: action === 'share' ? 'project' : 'user',
+          visibility,
           folder_id: null,
           content: snippetContent,
         },
@@ -416,6 +418,7 @@ export const SQLEditorNav = ({
           setSelectedSnippetToShare(undefined)
           setSelectedSnippetToUnshare(undefined)
           setShowSharedSnippets(true)
+          snapV2.updateSnippet({ id: snippet.id, snippet: { visibility } })
           toast.success(
             action === 'share'
               ? 'Snippet is now shared to the project'
