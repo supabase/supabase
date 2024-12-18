@@ -246,9 +246,12 @@ Create a magic link login/signup page for your application:
 	import { enhance } from '$app/forms'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let form: ActionData;
+	interface Props {
+		form: ActionData
+	}
+	let { form }: Props = $props()
 
-	let loading = false
+	let loading = $state(false)
 
 	const handleSubmit: SubmitFunction = () => {
 		loading = true
