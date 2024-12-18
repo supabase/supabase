@@ -67,8 +67,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '2 December',
     published_at: '2024-12-02T08:00:00.000-07:00',
-    title: 'Supabase AI Assistant V2',
-    description: 'Supabase AI Assistant V2',
+    title: 'Supabase AI Assistant v2',
+    description: 'Supabase AI Assistant v2',
     links: [
       {
         type: 'video',
@@ -143,7 +143,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/supabase-cron',
     date: '4 December',
@@ -183,49 +183,84 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
+    shipped: true,
     isToday: false,
-    hasCountdown: true,
-    blog: '',
+    hasCountdown: false,
+    blog: '/blog/supabase-queues',
     date: '5 December',
     published_at: '2024-12-05T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'Supabase Queues',
+    description: (
+      <>
+        Supabase Queues:
+        <br className="hidden sm:block" /> Durable Message Queues with Guaranteed Delivery
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'UEwfaElBnZk',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1ynKODOwObyGR',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d4/d4-queues-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d4/d4-queues-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d4/d4-queues-light.png',
+            mobileImgLight: '/images/launchweek/13/releases/d4/d4-queues-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
+    shipped: true,
     isToday: false,
     hasCountdown: false,
-    blog: '',
+    blog: '/blog/database-build-v2',
     date: '6 December',
     published_at: '2024-12-06T08:00:00.000-07:00',
-    title: '',
-    description: null,
+    title: 'database.build v2: Bring-Your-Own-LLM',
+    description: (
+      <>
+        database.build v2: <br className="hidden sm:block" />
+        Bring-Your-Own-LLM
+      </>
+    ),
     links: [
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'IQ8xqmht-gk',
+      },
       {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1zqKVYOEODYxB',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: '',
+        bg_layers: [
+          {
+            img: '/images/launchweek/13/releases/d5/d5-database-build-v2-dark.png',
+            mobileImg: '/images/launchweek/13/releases/d5/d5-database-build-v2-mobile-dark.png',
+            imgLight: '/images/launchweek/13/releases/d5/d5-database-build-v2-light.png',
+            mobileImgLight:
+              '/images/launchweek/13/releases/d5/d5-database-build-v2-mobile-light.png',
+          },
+        ],
+      },
+    ],
   },
 ]
 
