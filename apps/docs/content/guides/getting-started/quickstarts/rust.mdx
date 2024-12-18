@@ -1,0 +1,205 @@
+---
+title: 'Use Supabase with Rust'
+subtitle: 'Learn how to create a Supabase project, register users, and store files.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Get Started">
+
+    Go to <a href="https://database.new">database.new</a> and create a new Supabase project. You will need the associated Project URL, Service Role (Secret) Key, and JWT Secret for this quickstart.
+
+    You can find the necessary keys in your Project Settings under Configuration > API.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create A Rust App">
+
+    Create a rust app using the `cargo new` command.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      cargo new
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client crates">
+
+    To get started install the `supabase-auth` and `supabase-storage-rs` crates which provides an interface for working with Supabase in rust.
+
+    Navigate to the root directory of your cargo app and install `supabase-auth` and `supabase-storage-rs`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      cargo add supabase-auth && cargo add supabase-storage-rs
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    You can organize your code however you want, but for this example add the following code to your `main.rs` file to initialize the supabase clients with your project URL, JWT Secret, and private API (service role) key:
+
+    <ProjectConfigVariables variable="url" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```rs main.rs
+    	let auth_client = AuthClient::new_from_env().unwrap();
+        let storage_client = StorageClient::new_from_env().await.unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Register a user">
+
+    You have many methods for registering users available to you, but we'll use the `sign_up_with_email_and_password` for a basic example.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```rs main.rs
+    	let auth_client = AuthClient::new_from_env().unwrap();
+        let storage_client = StorageClient::new_from_env().await.unwrap();
+
+    	// Sign up methods return the session which you can use for creating cookies
+    	let session = auth_client
+    		.sign_up_with_email_and_password(demo_email, demo_password)
+    		.await
+    		.unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="Log in the user">
+
+    Now that users can register, they will need to be able to log in. To do so, we will use the 'login_with_email_and_password' method.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```rs main.rs
+    	let session = auth_client
+    	    .login_with_email(&demo_email, &demo_password)
+    	    .await
+    	    .unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Create a storage bucket">
+
+    To create a new bucket we will use `create_bucket` from the `supabase-storage-rs` crate.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```rs main.rs
+    	// Here we create a `private` bucket named `a-cool-name-for-a-bucket` with default settings
+    	let name = client
+    	    .create_bucket("a-cool-name-for-a-bucket", None, false, None, None)
+    		.await
+    		.unwrap();
+
+    	// You can also change settings such as the allowed MIME types, or maximum file size like so
+        let name = client
+            .create_bucket(
+                "a-cool-name-for-a-bucket-with-options",
+                None,
+                false,
+                Some(vec![
+                    MimeType::WAV,
+                    MimeType::PNG,
+                    MimeType::Custom("image/*"),
+                ]),
+                Some(12431243),
+            )
+            .await
+            .unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Upload a file">
+
+    To upload a file to our new bucket we will use the `upload_file` method. Files are uploaded as `Vec<u8>`, otherwise called byte arrays.
+
+    Here we will upload the file to the bucket we created earlier. We will store it in the root of the bucket, and give it the name `file_name.txt`. We don't need to pass any other options.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```rs main.rs
+    	// Here we create a small byte array from a `&str` for demonstration purposes
+    	let file = "byte array".as_bytes().to_vec();
+
+    	let upload = client
+        	.upload_file("a-cool-name-for-a-bucket", file, "file_name.txt", None)
+     		.await
+    		.unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={8}>
+    <StepHikeCompact.Details title="Download a file">
+
+    To download a file we will use the `download_file` method.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```rs main.rs
+        let file = client
+            .download_file("a-cool-name-for-a-bucket", "file_name.txt", None)
+            .await
+            .unwrap();
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+## Next steps
+
+- Check out the documentation for the [Auth](https://crates.io/crates/supabase-auth) and [Storage](https://crates.io/crates/supabase-storage-rs) crates on crates.io
