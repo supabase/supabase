@@ -118,7 +118,7 @@ export const SQLEditorNav = ({
   const filteredSnippets = useMemo(() => {
     const rootSnippets = privateSnippetsPages?.pages.flatMap((page) => page.contents ?? []) ?? []
 
-    return Object.values(subResults).reduce(
+    let snippetInfo = Object.values(subResults).reduce(
       (
         acc: {
           snippets: Snippet[]
@@ -145,7 +145,14 @@ export const SQLEditorNav = ({
         snippetIds: new Set<string>(rootSnippets.map((snippet) => snippet.id)),
       }
     )
-  }, [subResults, privateSnippetsPages?.pages, isLoading, isPreviousData, isFetching])
+
+    if (snippet && !snippetInfo.snippetIds.has(snippet.id)) {
+      snippetInfo.snippetIds.add(snippet.id)
+      snippetInfo.snippets = [...snippetInfo.snippets, snippet]
+    }
+
+    return snippetInfo
+  }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
   useEffect(() => {
     setIsSearching?.(filteredSnippets.isLoading)
   }, [filteredSnippets.isLoading, setIsSearching])
