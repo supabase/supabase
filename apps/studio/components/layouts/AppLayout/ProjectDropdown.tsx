@@ -25,6 +25,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 
 // [Fran] the idea is to let users change projects without losing the current page,
@@ -95,6 +96,7 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   const { ref } = useParams()
   const projectDetails = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const project = useSelectedProject()
   const { data: allProjects, isLoading: isLoadingProjects } = useProjectsQuery()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
@@ -122,7 +124,11 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
         <Button
           type="default"
           size="tiny"
-          className="pr-2 justify-start [&_span]:w-full [&_span]:text-left"
+          className={cn(
+            'pr-2 justify-start [&_span]:w-full [&_span]:text-left',
+            // handle rounded-l-none for project dropdown
+            project && 'rounded-l-none'
+          )}
           iconRight={<ChevronsUpDown />}
           block
           icon={<Box />}

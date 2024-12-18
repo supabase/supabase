@@ -8,11 +8,15 @@ import { RestrictionBanner } from 'components/layouts/AppLayout/RestrictionBanne
 import { getTheme } from 'components/ui/CodeEditor/CodeEditor.utils'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useProfile } from 'lib/profile'
+import { OrganizationResourceBanner } from '../Organization/resource-banner'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useParams } from 'common'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
   const { profile } = useProfile()
   const { resolvedTheme } = useTheme()
+  const { ref } = useParams()
 
   const ongoingIncident = useFlag('ongoingIncident')
   const showNoticeBanner = useFlag('showNoticeBanner')
@@ -29,18 +33,10 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col">
       <div className="flex-shrink-0">
-        {ongoingIncident && (
-          // true
-          //
-          <IncidentBanner />
-        )}
-        {showNoticeBanner && (
-          //
-          // true
-          //
-          <NoticeBanner />
-        )}
-        {profile !== undefined && <RestrictionBanner />}
+        {ongoingIncident && <IncidentBanner />}
+        {/* {showNoticeBanner && <NoticeBanner />} */}
+        {/* {profile !== undefined && <RestrictionBanner />} */}
+        {/* {ref && <OrganizationResourceBanner />} */}
       </div>
       {children}
     </div>

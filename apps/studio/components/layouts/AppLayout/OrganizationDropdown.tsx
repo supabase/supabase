@@ -22,12 +22,15 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
+  cn,
 } from 'ui'
 import PartnerIcon from 'components/ui/PartnerIcon'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 
 const OrganizationDropdown = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
+  const project = useSelectedProject()
   const { data: organizations, isLoading: isLoadingOrganizations } = useOrganizationsQuery()
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
@@ -43,83 +46,81 @@ const OrganizationDropdown = () => {
   }
 
   return (
-    <div className="flex items-center">
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            type="default"
-            className="pr-2 pl-2"
-            iconRight={<ChevronsUpDown />}
-            icon={<Boxes />}
-          >
-            {orgName}
-            {/* <div className="flex items-center space-x-2"> */}
-            {/* <p className={''}>{orgName}</p> */}
-            {/* {isSuccess && (
+    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          type="default"
+          className={cn('pr-2 pl-2', project && 'rounded-r-none')}
+          iconRight={<ChevronsUpDown />}
+          icon={<Boxes />}
+        >
+          {orgName}
+          {/* <div className="flex items-center space-x-2"> */}
+          {/* <p className={''}>{orgName}</p> */}
+          {/* {isSuccess && (
                 <Badge variant="default" size={'small'}>
                   {subscription?.plan.name}
                 </Badge>
               )} */}
-            {/* </div> */}
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="right" align="start">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Find organization..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
-                <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
-                  {organizations?.map((org) => {
-                    const href = `/org/${org.slug}`
-                    return (
-                      <CommandItem_Shadcn_
-                        key={org.slug}
-                        value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
-                        className="cursor-pointer w-full"
-                        onSelect={() => {
-                          setOpen(false)
-                          router.push(href)
-                        }}
-                        onClick={() => setOpen(false)}
-                      >
-                        <Link href={href} className="w-full flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span>{org.name}</span>
-                            <PartnerIcon organization={org} />
-                          </div>
-                          {org.slug === slug && <Check size={16} />}
-                        </Link>
-                      </CommandItem_Shadcn_>
-                    )
-                  })}
-                </ScrollArea>
-              </CommandGroup_Shadcn_>
-              {organizationCreationEnabled && (
-                <>
-                  <CommandSeparator_Shadcn_ />
-                  <CommandGroup_Shadcn_>
+          {/* </div> */}
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+        <Command_Shadcn_>
+          <CommandInput_Shadcn_ placeholder="Find organization..." />
+          <CommandList_Shadcn_>
+            <CommandEmpty_Shadcn_>No organizations found</CommandEmpty_Shadcn_>
+            <CommandGroup_Shadcn_>
+              <ScrollArea className={(organizations || []).length > 7 ? 'h-[210px]' : ''}>
+                {organizations?.map((org) => {
+                  const href = `/org/${org.slug}`
+                  return (
                     <CommandItem_Shadcn_
+                      key={org.slug}
+                      value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
                       className="cursor-pointer w-full"
-                      onSelect={(e) => {
+                      onSelect={() => {
                         setOpen(false)
-                        router.push(`/new`)
+                        router.push(href)
                       }}
                       onClick={() => setOpen(false)}
                     >
-                      <Link href="/new" className="flex items-center gap-2 w-full">
-                        <Plus size={14} strokeWidth={1.5} />
-                        <p>New organization</p>
+                      <Link href={href} className="w-full flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span>{org.name}</span>
+                          <PartnerIcon organization={org} />
+                        </div>
+                        {org.slug === slug && <Check size={16} />}
                       </Link>
                     </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
-                </>
-              )}
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-    </div>
+                  )
+                })}
+              </ScrollArea>
+            </CommandGroup_Shadcn_>
+            {organizationCreationEnabled && (
+              <>
+                <CommandSeparator_Shadcn_ />
+                <CommandGroup_Shadcn_>
+                  <CommandItem_Shadcn_
+                    className="cursor-pointer w-full"
+                    onSelect={(e) => {
+                      setOpen(false)
+                      router.push(`/new`)
+                    }}
+                    onClick={() => setOpen(false)}
+                  >
+                    <Link href="/new" className="flex items-center gap-2 w-full">
+                      <Plus size={14} strokeWidth={1.5} />
+                      <p>New organization</p>
+                    </Link>
+                  </CommandItem_Shadcn_>
+                </CommandGroup_Shadcn_>
+              </>
+            )}
+          </CommandList_Shadcn_>
+        </Command_Shadcn_>
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
