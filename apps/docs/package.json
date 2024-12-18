@@ -13,6 +13,7 @@
     "postbuild": "npm run build:sitemap",
     "start": "next start",
     "lint": "next lint",
+    "lint:mdx": "supa-mdx-lint content/guides --config ../../supa-mdx-lint.config.toml",
     "typecheck": "tsc --noEmit",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
     "test:smoke": "npm run codegen:references && vitest -t \"prod smoke test\"",
@@ -108,6 +109,7 @@
   },
   "devDependencies": {
     "@aws-sdk/client-secrets-manager": "^3.410.0",
+    "@supabase/supa-mdx-lint": "^0.1.7-alpha",
     "@types/estree": "1.0.5",
     "@types/hast": "^2.3.4",
     "@types/jsrsasign": "^10.5.12",
