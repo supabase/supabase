@@ -3,7 +3,7 @@
 	import { enhance } from '$app/forms'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
-	import { props, state } from 'svelte'
+	import { props, state } from '@sveltejs/kit/experimental/runes'
 
 	const data = $props<{ session: any; supabase: any; profile: any }>()
 	const form = $props<any>()

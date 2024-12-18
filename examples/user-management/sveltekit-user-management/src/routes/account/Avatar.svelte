@@ -2,7 +2,7 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { props, state, effect } from 'svelte'
+	import { props, state, effect } from '@sveltejs/kit/experimental/runes'
 
 	const size = $props<number>(10)
 	const urlProp = $props<string>('')
