@@ -27,7 +27,9 @@ const fetchWithRetry = fetchRetry(fetch);
 
 // Create a Supabase client instance with the custom fetch
 const supabase = createClient('https://your-supabase-url.supabase.co', 'your-anon-key', {
-  fetch: fetchWithRetry,
+  global: {
+    fetch: fetchWithRetry,
+  },
 });
 ```
 
