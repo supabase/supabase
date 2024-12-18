@@ -15,7 +15,7 @@ import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import {
   Button,
   Form_Shadcn_,
@@ -264,16 +264,13 @@ export const CreateCronJobSheet = ({
             toast.success(`Successfully created cron job ${name}`)
           }
 
-          // We should allow sending custom properties with events
           sendEvent({
-            action: TELEMETRY_EVENTS.CRON_JOBS,
-            value: isEditing
-              ? TELEMETRY_VALUES.CRON_JOB_UPDATED
-              : TELEMETRY_VALUES.CRON_JOB_CREATED,
-            label: isEditing ? 'Cron job was updated' : 'Cron job was created',
+            action: isEditing
+              ? TelemetryActions.CRON_JOB_UPDATED
+              : TelemetryActions.CRON_JOB_CREATED,
             properties: {
-              cron_job_type: values.type,
-              cron_job_schedule: schedule,
+              type: values.type,
+              schedule: schedule,
             },
           })
 

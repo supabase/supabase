@@ -1,3 +1,5 @@
+// @ts-check
+
 /* eslint-disable turbo/no-undeclared-env-vars */
 
 /**
@@ -42,7 +44,7 @@ const REPOSITORY_NAME = 'supabase'
  */
 let octokitInstance
 /**
- * @type {SupabaseClient<import('../../../../packages/common').Database>}
+ * @type {import('@supabase/supabase-js').SupabaseClient<import('../../../../packages/common').Database>}
  */
 let supabaseAdminClient
 
@@ -64,8 +66,8 @@ function octokit() {
 export function supabaseAdmin() {
   if (!supabaseAdminClient) {
     supabaseAdminClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SECRET_KEY
+      /** @type {string} */ (process.env.NEXT_PUBLIC_SUPABASE_URL),
+      /** @type {string} */ (process.env.SUPABASE_SECRET_KEY)
     )
   }
 
@@ -252,7 +254,7 @@ async function updateChecksumIfNeeded(entry) {
  * @param {TroubleshootingEntry} entry
  */
 function addCanonicalUrl(entry) {
-  const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry.data)
+  const docsUrl = 'https://supabase.com/docs/guides/troubleshooting/' + getArticleSlug(entry)
   const content =
     `_This is a copy of a troubleshooting article on Supabase's docs site. It may be missing some details from the original. View the [original article](${docsUrl})._\n\n` +
     entry.contentWithoutJsx

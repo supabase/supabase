@@ -29,6 +29,7 @@ export const days: AdventDay[] = [
     description: 'A better Postgres storage engine replacing Heap storage',
     id: 'orioledb',
     is_shipped: true,
+    className: 'xl:col-span-2',
     links: [
       {
         url: '/blog/orioledb-launch',
@@ -118,5 +119,6 @@ export const days: AdventDay[] = [
       },
     ],
     icon: <Flag />,
+    className: 'sm:col-span-2 xl:col-span-3',
   },
 ]
