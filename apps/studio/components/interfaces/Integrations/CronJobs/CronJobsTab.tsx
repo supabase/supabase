@@ -8,7 +8,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { CronJob, useCronJobsQuery } from 'data/database-cron-jobs/database-cron-jobs-query'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { Button, Input, Sheet, SheetContent } from 'ui'
 import { CronJobCard } from './CronJobCard'
 import { DeleteCronJob } from './DeleteCronJob'
@@ -63,11 +63,7 @@ export const CronjobsTab = () => {
   const filteredCronJobs = (cronJobs ?? []).filter((cj) => cj?.jobname?.includes(searchQuery || ''))
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({
-      action: TELEMETRY_EVENTS.CRON_JOBS,
-      value: TELEMETRY_VALUES.CRON_JOB_CREATE_CLICKED,
-      label: 'User clicked create job',
-    })
+    sendEvent({ action: TelemetryActions.CRON_JOB_CREATE_CLICKED })
     setCreateCronJobSheetShown(true)
   }
 

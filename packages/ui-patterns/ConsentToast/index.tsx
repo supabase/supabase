@@ -7,7 +7,9 @@ import {
   useBreakpoint,
   useTelemetryProps,
 } from 'common'
+
 import { noop } from 'lodash'
+import router from 'next/router'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
@@ -77,7 +79,7 @@ export const ConsentToast = ({ onAccept = noop, onOptOut = noop }: ConsentToastP
 }
 
 export const useConsent = () => {
-  const { TELEMETRY_CONSENT } = LOCAL_STORAGE_KEYS
+  const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
   const telemetryProps = useTelemetryProps()
 
@@ -86,12 +88,56 @@ export const useConsent = () => {
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
+
+    if (value === 'true') {
+      const cookies = document.cookie.split(';')
+      const telemetryCookie = cookies.find((cookie) => cookie.trim().startsWith(TELEMETRY_DATA))
+      if (telemetryCookie) {
+        try {
+          const encodedData = telemetryCookie.split('=')[1]
+          const telemetryData = JSON.parse(decodeURIComponent(encodedData))
+          handlePageTelemetry(
+            process.env.NEXT_PUBLIC_API_URL!,
+            window.location.pathname,
+            telemetryData
+          )
+          // remove the telemetry cookie
+          document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+        } catch (error) {
+          console.error('Invalid telemetry data:', error)
+        }
+      } else {
+        const telemetryData = {
+          page_url: telemetryProps.page_url,
+          page_title: typeof document !== 'undefined' ? document?.title : '',
+          pathname: router.pathname,
+          ph: {
+            referrer: typeof document !== 'undefined' ? document?.referrer : '',
+            language: telemetryProps.language,
+            search: telemetryProps.search,
+            viewport_height: telemetryProps.viewport_height,
+            viewport_width: telemetryProps.viewport_width,
+            user_agent: navigator.userAgent,
+          },
+        }
+
+        handlePageTelemetry(
+          process.env.NEXT_PUBLIC_API_URL!,
+          window.location.pathname,
+          telemetryData
+        )
+      }
+    } else {
+      // remove the telemetry cookie
+      document.cookie = `${TELEMETRY_DATA}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    }
+
     setConsentValue(value)
     localStorage.setItem(TELEMETRY_CONSENT, value)
 
-    if (consentToastId.current) toast.dismiss(consentToastId.current)
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (consentToastId.current) {
+      toast.dismiss(consentToastId.current)
+    }
   }
 
   const triggerConsentToast = useCallback(() => {
@@ -135,7 +181,6 @@ export const useConsent = () => {
 
   return {
     consentValue,
-    setConsentValue,
     hasAcceptedConsent: consentValue === 'true',
     triggerConsentToast,
   }
@@ -151,8 +196,23 @@ export const useConsentValue = (KEY_NAME: string) => {
     setConsentValue(value)
     localStorage.setItem(KEY_NAME, value)
     window.dispatchEvent(new Event('storage'))
-    if (value === 'true')
-      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryProps)
+    if (value === 'true') {
+      const telemetryData = {
+        page_url: telemetryProps.page_url,
+        page_title: typeof document !== 'undefined' ? document?.title : '',
+        pathname: router.pathname,
+        ph: {
+          referrer: typeof document !== 'undefined' ? document?.referrer : '',
+          language: telemetryProps.language,
+          search: telemetryProps.search,
+          viewport_height: telemetryProps.viewport_height,
+          viewport_width: telemetryProps.viewport_width,
+          user_agent: navigator.userAgent,
+        },
+      }
+
+      handlePageTelemetry(process.env.NEXT_PUBLIC_API_URL!, location.pathname, telemetryData)
+    }
   }
 
   return {
