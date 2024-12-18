@@ -22,6 +22,7 @@ export enum TelemetryActions {
   CRON_JOB_CREATE_CLICKED = 'cron_job_create_clicked',
   CRON_JOB_HISTORY_CLICKED = 'cron_job_history_clicked',
 
+  FEATURE_PREVIEWS_CLICKED = 'feature_previews_clicked',
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
@@ -158,4 +159,34 @@ export interface CronJobDeleteClickedEvent {
  */
 export interface CronJobHistoryClickedEvent {
   action: TelemetryActions.CRON_JOB_HISTORY_CLICKED
+}
+
+/**
+ * The FeaturePreviewModal was opened.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewsClickedEvent {
+  action: TelemetryActions.FEATURE_PREVIEWS_CLICKED
+}
+
+/**
+ * A feature preview was disabled by the user through the FeaturePreviewModal.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewDisabledEvent {
+  action: TelemetryActions.FEATURE_PREVIEW_DISABLED
+  properties: {
+    /**
+     * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
+     */
+    feature: string
+  }
 }
