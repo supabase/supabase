@@ -135,17 +135,6 @@ const DatabaseUsage = () => {
               {dateRange && (
                 <ChartHandler
                   provider="infra-monitoring"
-                  attribute="swap_usage"
-                  label="Swap usage"
-                  interval={dateRange.interval}
-                  startDate={dateRange?.period_start?.date}
-                  endDate={dateRange?.period_end?.date}
-                />
-              )}
-
-              {dateRange && (
-                <ChartHandler
-                  provider="infra-monitoring"
                   attribute="avg_cpu_usage"
                   label="Average CPU usage"
                   interval={dateRange.interval}
