@@ -132,7 +132,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   const handleDelete = async () => {
     await timeout(200)
     if (!projectRef) return console.error('Project ref is required')
-    deleteUser({ projectRef, user })
+    if (user.id === undefined) {
+      return toast.error(`Failed to delete user: User ID not found`)
+    }
+    deleteUser({ projectRef, userId: user.id })
   }
 
   const handleDeleteFactors = async () => {
@@ -142,7 +145,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   }
 
   const handleUnban = () => {
-    if (projectRef === undefined) return console.error('Proejct ref is required')
+    if (projectRef === undefined) return console.error('Project ref is required')
     if (user.id === undefined) {
       return toast.error(`Failed to ban user: User ID not found`)
     }

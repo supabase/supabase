@@ -27,6 +27,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { InlineLink } from 'components/ui/InlineLink'
 
 const Home: NextPageWithLayout = () => {
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -65,15 +66,9 @@ const Home: NextPageWithLayout = () => {
               <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
                 This project is using Postgres with OrioleDB which is currently in preview and not
                 suitable for production workloads. View our{' '}
-                {/* [Refactor] Make this into a reusable component to use links inline */}
-                <a
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground"
-                  href="https://supabase.com/docs/guides/database/orioledb"
-                >
+                <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
                   documentation
-                </a>{' '}
+                </InlineLink>{' '}
                 for all limitations.
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>

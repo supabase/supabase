@@ -107,6 +107,18 @@ export const Message = function Message({
             code: (props: any) => {
               return <code className={cn('text-xs', props.className)}>{props.children}</code>
             },
+            a: (props: any) => {
+              return (
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={props.href}
+                  className="underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground"
+                >
+                  {props.children}
+                </a>
+              )
+            },
           }}
         >
           {content}

@@ -172,14 +172,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "reset_on_push": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
-                  },
-                  "reset_on_push": {
-                    "type": "boolean"
                   },
                   "persistent": {
                     "type": "boolean"
@@ -213,8 +215,9 @@
                       "format": "int32"
                     },
                     "latest_check_run_id": {
-                      "type": "integer",
-                      "format": "int64"
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
                     },
                     "id": {
                       "type": "string"
@@ -233,9 +236,6 @@
                     },
                     "git_branch": {
                       "type": "string"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
                     },
                     "persistent": {
                       "type": "boolean"
@@ -264,7 +264,6 @@
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
                     "status",
                     "created_at",
@@ -319,6 +318,54 @@
           },
           "500": {
             "description": "Failed to delete database branch"
+          }
+        },
+        "tags": ["Environments"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/branches/{branch_id}/push": {
+      "post": {
+        "operationId": "v1-push-a-branch",
+        "summary": "Pushes a database branch",
+        "description": "Pushes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["workflow_run_id", "message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to push database branch"
           }
         },
         "tags": ["Environments"],
@@ -497,7 +544,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "Name of your project, should not contain dots"
+                    "description": "Name of your project"
                   },
                   "organization_id": {
                     "type": "string",
@@ -886,6 +933,48 @@
                 }
               }
             }
+          }
+        },
+        "tags": ["OAuth"],
+        "security": [
+          {
+            "oauth2": ["write"]
+          }
+        ]
+      }
+    },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "v1-revoke-token",
+        "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["client_id", "client_secret", "refresh_token"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
           }
         },
         "tags": ["OAuth"],
@@ -1753,8 +1842,9 @@
                         "format": "int32"
                       },
                       "latest_check_run_id": {
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "number",
+                        "deprecated": true,
+                        "description": "This field is deprecated and will not be populated."
                       },
                       "id": {
                         "type": "string"
@@ -1773,9 +1863,6 @@
                       },
                       "git_branch": {
                         "type": "string"
-                      },
-                      "reset_on_push": {
-                        "type": "boolean"
                       },
                       "persistent": {
                         "type": "boolean"
@@ -1804,7 +1891,6 @@
                       "project_ref",
                       "parent_project_ref",
                       "is_default",
-                      "reset_on_push",
                       "persistent",
                       "status",
                       "created_at",
@@ -1905,8 +1991,9 @@
                       "format": "int32"
                     },
                     "latest_check_run_id": {
-                      "type": "integer",
-                      "format": "int64"
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
                     },
                     "id": {
                       "type": "string"
@@ -1925,9 +2012,6 @@
                     },
                     "git_branch": {
                       "type": "string"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
                     },
                     "persistent": {
                       "type": "boolean"
@@ -1956,7 +2040,6 @@
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
                     "status",
                     "created_at",
@@ -8021,6 +8104,39 @@
         ]
       }
     },
+    "/v1/projects/{ref}/pause": {
+      "post": {
+        "operationId": "v1-pause-a-project",
+        "summary": "Pauses the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -10072,14 +10188,16 @@
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
+          "reset_on_push": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
-          },
-          "reset_on_push": {
-            "type": "boolean"
           },
           "persistent": {
             "type": "boolean"
@@ -10105,8 +10223,9 @@
             "format": "int32"
           },
           "latest_check_run_id": {
-            "type": "integer",
-            "format": "int64"
+            "type": "number",
+            "deprecated": true,
+            "description": "This field is deprecated and will not be populated."
           },
           "id": {
             "type": "string"
@@ -10125,9 +10244,6 @@
           },
           "git_branch": {
             "type": "string"
-          },
-          "reset_on_push": {
-            "type": "boolean"
           },
           "persistent": {
             "type": "boolean"
@@ -10156,7 +10272,6 @@
           "project_ref",
           "parent_project_ref",
           "is_default",
-          "reset_on_push",
           "persistent",
           "status",
           "created_at",
@@ -10172,7 +10287,7 @@
         },
         "required": ["message"]
       },
-      "BranchResetResponse": {
+      "BranchUpdateResponse": {
         "type": "object",
         "properties": {
           "workflow_run_id": {
@@ -10285,7 +10400,7 @@
           },
           "name": {
             "type": "string",
-            "description": "Name of your project, should not contain dots"
+            "description": "Name of your project"
           },
           "organization_id": {
             "type": "string",
@@ -10478,6 +10593,23 @@
           }
         },
         "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+      },
+      "OAuthRevokeTokenBodyDto": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": ["client_id", "client_secret", "refresh_token"],
+        "additionalProperties": false
       },
       "SnippetProject": {
         "type": "object",
