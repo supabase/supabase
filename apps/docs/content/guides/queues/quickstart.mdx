@@ -158,7 +158,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 const QueuesTest: React.FC = () => {
   //Add a Message
   const sendToQueue = async () => {
-    const result = await supabase.rpc('send', {
+    const result = await supabase.schema('pgmq_public').rpc('send', {
       queue_name: 'foo',
       message: { hello: 'world' },
       sleep_seconds: 30,
@@ -168,7 +168,7 @@ const QueuesTest: React.FC = () => {
 
   //Dequeue Message
   const popFromQueue = async () => {
-    const result = await supabase.rpc('pop', { queue_name: 'foo' })
+    const result = await supabase.schema('pgmq_public').rpc('pop', { queue_name: 'foo' })
     console.log(result)
   }
 
