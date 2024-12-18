@@ -145,7 +145,7 @@ const TransferProjectButton = () => {
 
             <li className="flex gap-4">
               <span className="shrink-0 mt-1">
-                <Wrench size={14} className="flex-shrink-0" />
+                <Wrench size={24} className="flex-shrink-0" />
               </span>
               <div>
                 <p className="font-bold">Features</p>

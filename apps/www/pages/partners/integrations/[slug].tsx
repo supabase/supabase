@@ -13,7 +13,7 @@ import 'swiper/css'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
