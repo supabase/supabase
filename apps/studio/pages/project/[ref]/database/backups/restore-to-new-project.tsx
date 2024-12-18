@@ -180,6 +180,16 @@ const RestoreToNewProject = () => {
     }
   }
 
+  if (isFreePlan) {
+    return (
+      <UpgradeToPro
+        buttonText="Upgrade"
+        primaryText="Restore to a new project requires a pro plan or above."
+        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+      />
+    )
+  }
+
   if (isOrioleDb) {
     return (
       <Admonition
@@ -190,10 +200,6 @@ const RestoreToNewProject = () => {
         <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
       </Admonition>
     )
-  }
-
-  if (isLoading) {
-    return <GenericSkeletonLoader />
   }
 
   if (!canReadPhysicalBackups) {
@@ -244,14 +250,8 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (plan === 'free') {
-    return (
-      <UpgradeToPro
-        buttonText="Upgrade"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
-      />
-    )
+  if (isLoading) {
+    return <GenericSkeletonLoader />
   }
 
   if (IS_CLONED_PROJECT) {
