@@ -2,7 +2,7 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
-	import { $state, $effect, $props } from 'svelte/internal'
+	import { state, effect, props } from 'svelte'
 
 	let { size = 10, url = '', supabase } = $props<{
 		size?: number

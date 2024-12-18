@@ -2,7 +2,7 @@
 <script lang="ts">
 	import '../styles.css'
 	import { invalidate } from '$app/navigation'
-	import { $state, $effect, $props } from 'svelte/internal'
+	import { state, effect, props } from 'svelte'
 
 	let { data } = $props()
 	let { supabase, session } = data

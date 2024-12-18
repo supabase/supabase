@@ -11,8 +11,8 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/kit": "^2.0.0-next.1",
-		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
+		"@sveltejs/kit": "^2.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"svelte": "^5.0.0-next.58",
 		"svelte-check": "^3.6.0",
 		"tslib": "^2.6.0",
@@ -25,9 +25,5 @@
 		"@supabase/auth-ui-svelte": "^0.2.9",
 		"@supabase/ssr": "^0.4.0",
 		"@supabase/supabase-js": "^2.44.2"
-	},
-	"overrides": {
-		"@sveltejs/vite-plugin-svelte": "^4.0.0-next.6",
-		"svelte": "^5.0.0-next.58"
 	}
 }
