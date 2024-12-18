@@ -436,7 +436,7 @@ Create a new `src/routes/account/+page.svelte` file with the content below.
 
 	let { session, supabase, profile } = $derived(data)
 
-	let profileForm: HTMLFormElement = $state()
+	let profileForm: HTMLFormElement
 	let loading = $state(false)
 	let fullName: string = profile?.full_name ?? ''
 	let username: string = profile?.username ?? ''
@@ -662,7 +662,7 @@ Let's create an avatar for the user so that they can upload a profile photo. We 
 
 	$effect(() => {
 		if (url) downloadImage(url)
-	});
+	})
 </script>
 
 <div>

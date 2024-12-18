@@ -3,13 +3,16 @@
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
 
-	export let size = 10
-	export let url: string
-	export let supabase: SupabaseClient
+	interface Props {
+		size?: number
+		url: string
+		supabase: SupabaseClient
+	}
+	let { size = 10, url = $bindable(), supabase }: Props = $props()
 
-	let avatarUrl: string | null = null
-	let uploading = false
-	let files: FileList
+	let avatarUrl: string | null = $state(null)
+	let uploading = $state(false)
+	let files: FileList = $state()
 
 	const dispatch = createEventDispatcher()
 
@@ -61,7 +64,9 @@
 		}
 	}
 
-	$: if (url) downloadImage(url)
+	$effect(() => {
+		if (url) downloadImage(url)
+	})
 </script>
 
 <div>
@@ -73,7 +78,7 @@
 			style="height: {size}em; width: {size}em;"
 		/>
 	{:else}
-		<div class="avatar no-image" style="height: {size}em; width: {size}em;" />
+		<div class="avatar no-image" style="height: {size}em; width: {size}em;"></div>
 	{/if}
 	<input type="hidden" name="avatarUrl" value={url} />
 
@@ -87,7 +92,7 @@
 			id="single"
 			accept="image/*"
 			bind:files
-			on:change={uploadAvatar}
+			onchange={uploadAvatar}
 			disabled={uploading}
 		/>
 	</div>
