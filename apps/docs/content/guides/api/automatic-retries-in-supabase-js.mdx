@@ -19,18 +19,18 @@ npm install @supabase/supabase-js fetch-retry
 The `fetch-retry` package works by wrapping the native `fetch` function. You can create a custom fetch instance with retry logic and pass it to the `supabase-js` client.
 
 ```javascript
-import { createClient } from '@supabase/supabase-js';
-import fetchRetry from 'fetch-retry';
+import { createClient } from '@supabase/supabase-js'
+import fetchRetry from 'fetch-retry'
 
 // Wrap the global fetch with fetch-retry
-const fetchWithRetry = fetchRetry(fetch);
+const fetchWithRetry = fetchRetry(fetch)
 
 // Create a Supabase client instance with the custom fetch
 const supabase = createClient('https://your-supabase-url.supabase.co', 'your-anon-key', {
   global: {
     fetch: fetchWithRetry,
   },
-});
+})
 ```
 
 ## 3. Configure retry options
@@ -44,7 +44,7 @@ const fetchWithRetry = fetchRetry(fetch, {
   retries: 3, // Number of retry attempts
   retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), // Exponential backoff
   retryOn: [500, 502, 503, 504], // Retry on server errors
-});
+})
 ```
 
 In this example, the `retryDelay` function implements an exponential backoff strategy, and retries are triggered only for specific HTTP status codes.
@@ -55,18 +55,16 @@ With `fetch-retry` integrated, you can use the Supabase client as usual. The ret
 
 ```javascript
 async function fetchData() {
-  const { data, error } = await supabase
-    .from('your_table')
-    .select('*');
+  const { data, error } = await supabase.from('your_table').select('*')
 
   if (error) {
-    console.error('Error fetching data:', error);
+    console.error('Error fetching data:', error)
   } else {
-    console.log('Fetched data:', data);
+    console.log('Fetched data:', data)
   }
 }
 
-fetchData();
+fetchData()
 ```
 
 ## 5. Fine-Tuning retries for specific requests
@@ -112,4 +110,3 @@ By using `retryOn` with a custom function, you can define specific conditions fo
 ## Conclusion
 
 Integrating `fetch-retry` with `supabase-js` is a straightforward way to add robustness to your Supabase API requests. By handling transient errors and implementing retry strategies, you can improve the reliability of your application while maintaining a seamless user experience.
-
