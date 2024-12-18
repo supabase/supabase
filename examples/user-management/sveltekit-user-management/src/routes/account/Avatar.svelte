@@ -2,10 +2,13 @@
 <script lang="ts">
 	import type { SupabaseClient } from '@supabase/supabase-js'
 	import { createEventDispatcher } from 'svelte'
+	import { $state, $effect, $props } from 'svelte/internal'
 
-	export let size = 10
-	export let url = ''
-	export let supabase: SupabaseClient
+	let { size = 10, url = '', supabase } = $props<{
+		size?: number
+		url: string
+		supabase: SupabaseClient
+	}>()
 
 	let $avatarUrl = $state<string | null>(null)
 	let $uploading = $state(false)

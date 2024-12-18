@@ -1,12 +1,11 @@
 <!-- src/routes/account/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import { $state, $props } from 'svelte/internal'
 	import type { SubmitFunction } from '@sveltejs/kit'
 	import Avatar from './Avatar.svelte'
 
-	export let data
-	export let form
-
+	let { data, form } = $props()
 	let { session, supabase, profile } = data
 
 	let $profileForm = $state<HTMLFormElement | null>(null)

@@ -1,9 +1,10 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import { $state, $props } from 'svelte/internal'
 	import type { ActionData, SubmitFunction } from './$types.js'
 
-	export let form: ActionData
+	let { form } = $props<{ form: ActionData }>()
 	let $loading = $state(false)
 
 	const handleSubmit: SubmitFunction = () => {
