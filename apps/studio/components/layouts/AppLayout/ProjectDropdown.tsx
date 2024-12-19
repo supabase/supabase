@@ -119,65 +119,66 @@ const ProjectDropdown = ({ isNewNav = false }: ProjectDropdownProps) => {
   }
 
   return IS_PLATFORM ? (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          type="default"
-          size="tiny"
-          className={cn(
-            'pr-2 justify-start [&_span]:w-full [&_span]:text-left',
-            // handle rounded-l-none for project dropdown
-            project && 'rounded-l-none'
-          )}
-          iconRight={<ChevronsUpDown />}
-          block
-          icon={<Box />}
-        >
-          {selectedProject?.name}
-        </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Find project..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
-              <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
-                {projects?.map((project) => (
-                  <ProjectLink key={project.ref} project={project} setOpen={setOpen} />
-                ))}
-              </ScrollArea>
-            </CommandGroup_Shadcn_>
-            {projectCreationEnabled && (
-              <>
-                <CommandSeparator_Shadcn_ />
-                <CommandGroup_Shadcn_>
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={() => {
-                      setOpen(false)
-                      router.push(`/new/${selectedOrganization?.slug}`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link
-                      href={`/new/${selectedOrganization?.slug}`}
-                      onClick={() => {
+    <>
+      <Link
+        href={`/project/${project?.ref}`}
+        className="flex items-center gap-2 flex-shrink-0 text-sm"
+      >
+        <Box size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+        <span className="text-foreground">{project?.name}</span>
+      </Link>
+      <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+        <PopoverTrigger_Shadcn_ asChild>
+          <Button
+            type="text"
+            size="tiny"
+            className={cn('pr-1 pl-1 ')}
+            iconRight={<ChevronsUpDown />}
+          ></Button>
+        </PopoverTrigger_Shadcn_>
+        <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+          <Command_Shadcn_>
+            <CommandInput_Shadcn_ placeholder="Find project..." />
+            <CommandList_Shadcn_>
+              <CommandEmpty_Shadcn_>No projects found</CommandEmpty_Shadcn_>
+              <CommandGroup_Shadcn_>
+                <ScrollArea className={(projects || []).length > 7 ? 'h-[210px]' : ''}>
+                  {projects?.map((project) => (
+                    <ProjectLink key={project.ref} project={project} setOpen={setOpen} />
+                  ))}
+                </ScrollArea>
+              </CommandGroup_Shadcn_>
+              {projectCreationEnabled && (
+                <>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={() => {
                         setOpen(false)
+                        router.push(`/new/${selectedOrganization?.slug}`)
                       }}
-                      className="w-full flex items-center gap-2"
+                      onClick={() => setOpen(false)}
                     >
-                      <Plus size={14} strokeWidth={1.5} />
-                      <p>New project</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
-              </>
-            )}
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+                      <Link
+                        href={`/new/${selectedOrganization?.slug}`}
+                        onClick={() => {
+                          setOpen(false)
+                        }}
+                        className="w-full flex items-center gap-2"
+                      >
+                        <Plus size={14} strokeWidth={1.5} />
+                        <p>New project</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </>
+              )}
+            </CommandList_Shadcn_>
+          </Command_Shadcn_>
+        </PopoverContent_Shadcn_>
+      </Popover_Shadcn_>
+    </>
   ) : (
     <Button type="text">
       <span className={isNewNav ? 'text-sm' : 'text-xs'}>{selectedProject?.name}</span>

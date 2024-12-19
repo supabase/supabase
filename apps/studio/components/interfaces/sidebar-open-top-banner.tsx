@@ -13,9 +13,29 @@ import { IS_PLATFORM } from 'lib/constants'
 import { CornerLeftUp } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useSidebar } from 'ui'
+import { cn, useSidebar } from 'ui'
 import Connect from './Connect/Connect'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
+import Image from 'next/image'
+import Link from 'next/link'
+
+const LayoutHeaderDivider = () => (
+  <span className="text-border-stronger mr-1">
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      stroke="currentColor"
+      strokeWidth="1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      fill="none"
+      shapeRendering="geometricPrecision"
+    >
+      <path d="M16 3.549L7.12 20.600" />
+    </svg>
+  </span>
+)
 
 export function SidebarOpenTopBanner() {
   const connectDialogUpdate = useFlag('connectDialogUpdate')
@@ -49,10 +69,34 @@ export function SidebarOpenTopBanner() {
         //   paddingLeft: open ? '16px' : '8px',
         //   paddingRight: open ? '16px' : '8px',
         // }}
-        className="relative items-center flex w-full gap-5 pt-[6px] pb-[1px] px-2"
+        className="relative items-center flex w-full gap-4 pt-[6px] pb-[1px] px-4"
       >
+        <Link
+          href={IS_PLATFORM ? `/org/${org?.slug}` : `/project/${project?.ref}`}
+          className="flex items-center justify-center flex-shrink-0"
+        >
+          <Image
+            alt="Supabase"
+            src={`${router.basePath}/img/supabase-logo.svg`}
+            width={18}
+            height={18}
+            className="w-[18px] h-[18px]"
+          />
+          <AnimatePresence>
+            {open && (
+              <motion.span
+                initial={{ opacity: 0, x: -20, width: 0 }}
+                animate={{ opacity: 1, x: 0, width: '160px' }}
+                exit={{ opacity: 0, x: -20, width: 0 }}
+                className="pl-2 w-[160px] text-foreground font-medium"
+              >
+                supabase
+              </motion.span>
+            )}
+          </AnimatePresence>
+        </Link>
         {/* <SidebarOpenButton /> */}
-        <AnimatePresence>
+        {/* <AnimatePresence>
           {project && (
             <motion.button
               onClick={() => router.push(`/org/${org?.slug}`)}
@@ -70,13 +114,13 @@ export function SidebarOpenTopBanner() {
               Organization
             </motion.button>
           )}
-        </AnimatePresence>
-        <div className="flex items-center -space-x-px">
+        </AnimatePresence> */}
+        <div className={cn('flex items-center transition-all duration-100')}>
           <OrganizationDropdown />
           <AnimatePresence>
             {project && (
               <motion.div
-                className="flex items-center gap-x-3"
+                className="flex items-center gap-x-0"
                 initial={{ opacity: 0, x: -20, width: 0 }}
                 animate={{ opacity: 1, x: 0, width: 'auto' }}
                 exit={{ opacity: 0, x: -20, width: 0 }}
@@ -85,6 +129,7 @@ export function SidebarOpenTopBanner() {
                   ease: 'easeOut',
                 }}
               >
+                <LayoutHeaderDivider />
                 <ProjectDropdown />
                 {isBranchingEnabled && (
                   <motion.div
@@ -96,11 +141,14 @@ export function SidebarOpenTopBanner() {
                       ease: 'easeOut',
                     }}
                   >
+                    <LayoutHeaderDivider />
                     <BranchDropdown />
                   </motion.div>
                 )}
-                {connectDialogUpdate && <Connect />}
-                {!isBranchingEnabled && <EnableBranchingButton />}
+                <div className="ml-3 flex items-center gap-x-2">
+                  {connectDialogUpdate && <Connect />}
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
