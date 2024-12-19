@@ -10,7 +10,7 @@ import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
-import { useAppStateSnapshot } from 'state/app-state'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -33,9 +33,13 @@ import ConnectDropdown from './ConnectDropdown'
 import ConnectTabContent from './ConnectTabContent'
 
 const Connect = () => {
-  const state = useAppStateSnapshot()
   const { ref: projectRef } = useParams()
   const connectDialogUpdate = useFlag('connectDialogUpdate')
+
+  const [showConnect, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false)
+  )
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -148,141 +152,135 @@ const Connect = () => {
   })
 
   return (
-    <>
-      <Dialog open={state.showConnectDialog} onOpenChange={state.setShowConnectDialog}>
-        <DialogTrigger asChild>
-          <Button
-            type={connectDialogUpdate ? 'default' : 'primary'}
-            className={cn(connectDialogUpdate && 'rounded-full')}
-            icon={<Plug className="rotate-90" />}
-          >
-            <span>Connect</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
-          <DialogHeader className={DIALOG_PADDING_X}>
-            <DialogTitle>Connect to your project</DialogTitle>
-            <DialogDescription>
-              Get the connection strings and environment variables for your app
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
+      <DialogTrigger asChild>
+        <Button
+          type={connectDialogUpdate ? 'default' : 'primary'}
+          className={cn(connectDialogUpdate && 'rounded-full')}
+          icon={<Plug className="rotate-90" />}
+        >
+          <span>Connect</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className={cn('sm:max-w-5xl p-0')} centered={false}>
+        <DialogHeader className={DIALOG_PADDING_X}>
+          <DialogTitle>Connect to your project</DialogTitle>
+          <DialogDescription>
+            Get the connection strings and environment variables for your app
+          </DialogDescription>
+        </DialogHeader>
 
-          <Tabs_Shadcn_
-            defaultValue="direct"
-            onValueChange={(value) => handleConnectionType(value)}
-          >
-            <TabsList_Shadcn_ className={cn('flex gap-x-4', DIALOG_PADDING_X)}>
-              {CONNECTION_TYPES.map((type) => (
-                <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
-                  {type.label}
-                </TabsTrigger_Shadcn_>
-              ))}
-            </TabsList_Shadcn_>
+        <Tabs_Shadcn_ defaultValue="direct" onValueChange={(value) => handleConnectionType(value)}>
+          <TabsList_Shadcn_ className={cn('flex gap-x-4', DIALOG_PADDING_X)}>
+            {CONNECTION_TYPES.map((type) => (
+              <TabsTrigger_Shadcn_ key={type.key} value={type.key} className="px-0">
+                {type.label}
+              </TabsTrigger_Shadcn_>
+            ))}
+          </TabsList_Shadcn_>
 
-            {CONNECTION_TYPES.map((type) => {
-              const hasChildOptions =
-                (connectionObject.find((parent) => parent.key === selectedParent)?.children
-                  .length || 0) > 0
-              const hasGrandChildOptions =
-                (connectionObject
-                  .find((parent) => parent.key === selectedParent)
-                  ?.children.find((child) => child.key === selectedChild)?.children.length || 0) > 0
+          {CONNECTION_TYPES.map((type) => {
+            const hasChildOptions =
+              (connectionObject.find((parent) => parent.key === selectedParent)?.children.length ||
+                0) > 0
+            const hasGrandChildOptions =
+              (connectionObject
+                .find((parent) => parent.key === selectedParent)
+                ?.children.find((child) => child.key === selectedChild)?.children.length || 0) > 0
 
-              if (type.key === 'direct') {
-                return (
-                  <TabsContent_Shadcn_
-                    key="direct"
-                    value="direct"
-                    className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
-                  >
-                    <div className={DIALOG_PADDING_Y}>
-                      {connectDialogUpdate ? (
-                        <DatabaseConnectionString />
-                      ) : (
-                        <div className="px-7">
-                          <OldDatabaseConnectionString appearance="minimal" />
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent_Shadcn_>
-                )
-              }
-
+            if (type.key === 'direct') {
               return (
                 <TabsContent_Shadcn_
-                  key={`content-${type.key}`}
-                  value={type.key}
-                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+                  key="direct"
+                  value="direct"
+                  className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
                 >
-                  <div className="flex justify-between">
-                    <div className="flex items-center gap-3">
-                      <ConnectDropdown
-                        state={selectedParent}
-                        updateState={handleParentChange}
-                        label={
-                          connectionObject === FRAMEWORKS || connectionObject === MOBILES
-                            ? 'Framework'
-                            : 'Tool'
-                        }
-                        items={connectionObject}
-                      />
-                      {selectedParent && hasChildOptions && (
-                        <ConnectDropdown
-                          state={selectedChild}
-                          updateState={handleChildChange}
-                          label="Using"
-                          items={getChildOptions()}
-                        />
-                      )}
-                      {selectedChild && hasGrandChildOptions && (
-                        <ConnectDropdown
-                          state={selectedGrandchild}
-                          updateState={handleGrandchildChange}
-                          label="With"
-                          items={getGrandchildrenOptions()}
-                        />
-                      )}
-                    </div>
-                    {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                        <a
-                          target="_blank"
-                          rel="noreferrer"
-                          href={
-                            connectionObject.find((item) => item.key === selectedParent)
-                              ?.guideLink || ''
-                          }
-                        >
-                          {connectionObject.find((item) => item.key === selectedParent)?.label}{' '}
-                          guide
-                        </a>
-                      </Button>
+                  <div className={DIALOG_PADDING_Y}>
+                    {connectDialogUpdate ? (
+                      <DatabaseConnectionString />
+                    ) : (
+                      <div className="px-7">
+                        <OldDatabaseConnectionString appearance="minimal" />
+                      </div>
                     )}
                   </div>
-                  <p className="text-xs text-foreground-lighter my-3">
-                    Add the following files below to your application
-                  </p>
-                  <ConnectTabContent
-                    projectKeys={projectKeys}
-                    filePath={filePath}
-                    className="rounded-b-none"
-                  />
-                  <Panel.Notice
-                    className="border border-t-0 rounded-lg rounded-t-none"
-                    title="New API keys coming Q4 2024"
-                    description={`
-\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
-`}
-                    href="https://github.com/orgs/supabase/discussions/29260"
-                    buttonText="Read the announcement"
-                  />
                 </TabsContent_Shadcn_>
               )
-            })}
-          </Tabs_Shadcn_>
-        </DialogContent>
-      </Dialog>
-    </>
+            }
+
+            return (
+              <TabsContent_Shadcn_
+                key={`content-${type.key}`}
+                value={type.key}
+                className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
+              >
+                <div className="flex justify-between">
+                  <div className="flex items-center gap-3">
+                    <ConnectDropdown
+                      state={selectedParent}
+                      updateState={handleParentChange}
+                      label={
+                        connectionObject === FRAMEWORKS || connectionObject === MOBILES
+                          ? 'Framework'
+                          : 'Tool'
+                      }
+                      items={connectionObject}
+                    />
+                    {selectedParent && hasChildOptions && (
+                      <ConnectDropdown
+                        state={selectedChild}
+                        updateState={handleChildChange}
+                        label="Using"
+                        items={getChildOptions()}
+                      />
+                    )}
+                    {selectedChild && hasGrandChildOptions && (
+                      <ConnectDropdown
+                        state={selectedGrandchild}
+                        updateState={handleGrandchildChange}
+                        label="With"
+                        items={getGrandchildrenOptions()}
+                      />
+                    )}
+                  </div>
+                  {connectionObject.find((item) => item.key === selectedParent)?.guideLink && (
+                    <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        href={
+                          connectionObject.find((item) => item.key === selectedParent)?.guideLink ||
+                          ''
+                        }
+                      >
+                        {connectionObject.find((item) => item.key === selectedParent)?.label} guide
+                      </a>
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-foreground-lighter my-3">
+                  Add the following files below to your application
+                </p>
+                <ConnectTabContent
+                  projectKeys={projectKeys}
+                  filePath={filePath}
+                  className="rounded-b-none"
+                />
+                <Panel.Notice
+                  className="border border-t-0 rounded-lg rounded-t-none"
+                  title="New API keys coming Q4 2024"
+                  description={`
+\`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.   
+`}
+                  href="https://github.com/orgs/supabase/discussions/29260"
+                  buttonText="Read the announcement"
+                />
+              </TabsContent_Shadcn_>
+            )
+          })}
+        </Tabs_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }
 
