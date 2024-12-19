@@ -96,7 +96,10 @@ export function LogsSidebarMenuV2() {
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery(ref)
+  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   const savedQueries = [...(savedQueriesRes?.content ?? [])]
     .filter((c) => c.type === 'log_sql')

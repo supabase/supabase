@@ -120,7 +120,6 @@
     "tus-js-client": "^4.1.0",
     "ui": "*",
     "ui-patterns": "*",
-    "use-debounce": "^7.0.1",
     "uuid": "^9.0.1",
     "valtio": "^1.12.0",
     "vite-tsconfig-paths": "^4.3.2",
@@ -171,7 +170,7 @@
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
-    "prettier": "^4.0.0-alpha.8",
+    "prettier": "3.2.4",
     "tailwindcss": "^3.4.1",
     "typescript": "~5.5.0"
   }
