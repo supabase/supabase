@@ -60,7 +60,6 @@ const RemoveRestrictionModal = ({
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}
