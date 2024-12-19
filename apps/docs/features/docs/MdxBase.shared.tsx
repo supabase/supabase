@@ -28,6 +28,7 @@ import {
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
 } from '~/components/MDX/partials'
 import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
@@ -83,6 +84,7 @@ const components = {
   ShowUntil,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
+  PostgresInstallation,
   SqlToRest,
   StepHikeCompact,
   Tabs,
