@@ -205,6 +205,9 @@ limit ${limit}
     case 'supavisor_logs':
       return `select id, ${table}.timestamp, event_message from ${table} ${joins} ${where} ${orderBy} limit ${limit}`
 
+    case 'workflow_run_logs':
+      return `select id, workflow_run, ${table}.timestamp, event_message from ${table} ${where} ${orderBy} limit ${limit}`
+
     default:
       return `select id, ${table}.timestamp, event_message from ${table}
   ${where}
