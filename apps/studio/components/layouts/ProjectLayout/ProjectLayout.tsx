@@ -1,14 +1,6 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import {
-  forwardRef,
-  Fragment,
-  PropsWithChildren,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react'
+import { forwardRef, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
@@ -22,24 +14,17 @@ import { withAuth } from 'hooks/misc/withAuth'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import {
-  Alert_Shadcn_,
-  cn,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  Sheet,
-  SheetContent,
-} from 'ui'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
-import NavigationBar from './NavigationBar/NavigationBar'
 import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
 import MobileViewNav from './NavigationBar/MobileViewNav'
+import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
 import PausingState from './PausingState'
@@ -50,8 +35,6 @@ import RestartingState from './RestartingState'
 import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
-import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
-import { useServiceRoleKeyLeakQuery } from 'data/lint/service-role-key-leak-query'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -130,9 +113,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     const [isClient, setIsClient] = useState(false)
 
-    const { data: serviceRoleKeyLeakData } = useServiceRoleKeyLeakQuery({ projectRef: projectRef })
-
-    console.log('serviceRoleKeyLeakData', serviceRoleKeyLeakData)
     useEffect(() => {
       setIsClient(true)
     }, [])
@@ -236,9 +216,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                         </div>
                       ) : (
                         <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
-                          <Alert_Shadcn_ variant="destructive">
-                            Your `service_role` key has been leaked...warning / docs / etc
-                          </Alert_Shadcn_>
                           <ResourceExhaustionWarningBanner />
                           {children}
                         </ContentWrapper>

@@ -38,7 +38,8 @@ async function handleGet(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const data = await response.json()
-    return res.json(data)
+
+    return res.json(data.result.length > 0)
   } catch (error) {
     console.error('Error fetching service role key leak data:', error)
     return res.status(500).json({

@@ -9,13 +9,12 @@ export type ServiceRoleKeyLeakVariables = {
   projectRef?: string
 }
 
-// TODO: type this
-export type ServiceRoleKeyLeakResponse = any[]
+export type ServiceRoleKeyLeakResponse = boolean
 
 export async function checkServiceRoleKeyLeak(
   { projectRef }: ServiceRoleKeyLeakVariables,
   signal?: AbortSignal
-) {
+): Promise<ServiceRoleKeyLeakResponse> {
   if (!projectRef) throw new Error('Project ref is required')
 
   const res = await fetch(`${BASE_PATH}/api/check-service-role-key-leak`, {
