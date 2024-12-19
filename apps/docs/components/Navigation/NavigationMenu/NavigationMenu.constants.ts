@@ -1971,6 +1971,21 @@ export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof Ico
     url: '/guides/platform/migrating-to-supabase/mssql',
   },
 ]
+export const INTERNAL_MIGRATION_PAGES: Partial<
+  NavMenuSection & ComponentProps<typeof IconPanel>
+>[] = [
+  {
+    name: 'Restore Dashboard backup',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-within-supabase/dashboard_restore',
+  },
+  {
+    name: 'Backup and Restore using the CLI',
+    icon: '/docs/img/icons/auth0-icon',
+    url: '/guides/platform/migrating-within-supabase/backup-restore',
+    hasLightIcon: true,
+  },
+]
 
 export const platform: NavMenuConstant = {
   icon: 'platform',
@@ -1995,6 +2010,7 @@ export const platform: NavMenuConstant = {
         {
           name: 'Migrating within Supabase',
           url: '/guides/platform/migrating-within-supabase',
+          items: INTERNAL_MIGRATION_PAGES,
         },
         {
           name: 'Migrating to Supabase',
@@ -2636,6 +2652,7 @@ export const references = [
 
 export const navDataForMdx = {
   migrationPages: MIGRATION_PAGES,
+  internalMigrationPages: INTERNAL_MIGRATION_PAGES,
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialLoginItems: SocialLoginItems,
