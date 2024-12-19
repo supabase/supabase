@@ -172,7 +172,7 @@ export const SQLEditorNav = ({
     visibility: 'user',
     name: debouncedSearchText,
   })
-  const numPrivateSnippets = privateSnippetCountData?.count ?? 0
+  const numPrivateSnippets = privateSnippets.length
 
   const privateSnippetsTreeState = useMemo(
     () =>
@@ -243,7 +243,7 @@ export const SQLEditorNav = ({
     favorite: true,
     name: debouncedSearchText,
   })
-  const numFavoriteSnippets = favoritedSnippetCountData?.count ?? 0
+  const numFavoriteSnippets = favoriteSnippets.length
 
   const favoritesTreeState = useMemo(
     () =>
@@ -312,7 +312,7 @@ export const SQLEditorNav = ({
     visibility: 'project',
     name: debouncedSearchText,
   })
-  const numProjectSnippets = sharedSnippetCountData?.count ?? 0
+  const numProjectSnippets = sharedSnippets.length
 
   const projectSnippetsTreeState = useMemo(
     () =>
@@ -557,9 +557,7 @@ export const SQLEditorNav = ({
         onOpenChange={setShowSharedSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`Shared`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -615,9 +613,7 @@ export const SQLEditorNav = ({
         open={showFavoriteSnippets}
         onOpenChange={setShowFavoriteSnippets}
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`Favorites`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
@@ -678,10 +674,7 @@ export const SQLEditorNav = ({
         onOpenChange={setShowPrivateSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`PRIVATE
-            ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`PRIVATE`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <SQLEditorLoadingSnippets />
