@@ -13,6 +13,9 @@ import {
   CronJobHistoryClickedEvent,
   CronJobUpdateClickedEvent,
   CronJobUpdatedEvent,
+  FeaturePreviewsClickedEvent,
+  FeaturePreviewEnabledEvent,
+  FeaturePreviewDisabledEvent,
   TelemetryActions,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
@@ -27,6 +30,9 @@ export type SendEventVariables =
   | CronJobUpdateClickedEvent
   | CronJobDeleteClickedEvent
   | CronJobHistoryClickedEvent
+  | FeaturePreviewsClickedEvent
+  | FeaturePreviewEnabledEvent
+  | FeaturePreviewDisabledEvent
 
   // TODO remove this once all events are documented
   | {
