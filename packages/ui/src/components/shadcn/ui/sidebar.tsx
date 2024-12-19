@@ -214,7 +214,9 @@ const Sidebar = React.forwardRef<
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            'duration-200 relative h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
+            'relative', // sidebar custom changes - to contain the absolute sidebar below
+            //
+            'duration-200 h-svh w-[--sidebar-width] bg-transparent transition-[width] ease-linear',
             'group-data-[collapsible=offcanvas]:w-0',
             'group-data-[side=right]:rotate-180',
             variant === 'floating' || variant === 'inset'
@@ -224,9 +226,8 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            'absolute', // make sure to remove 'fixed', and 'h-svh'
-            'top-0', // add this
-            'h-full', // add this
+            'absolute top-0 h-full', // sidebar custom changes - We have also removed 'fixed', and 'h-svh'
+            //
             'duration-200 inset-y-0 z-10 hidden w-[--sidebar-width] transition-[left,right,width] ease-linear md:flex',
             side === 'left'
               ? 'left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]'
