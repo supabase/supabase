@@ -29,7 +29,6 @@ interface ExtensionCardProps {
 
 const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const { project } = useProjectContext()
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || ''
   const isOn = extension.installed_version !== null
   const isOrioleDb = useIsOrioleDb()
 
@@ -44,12 +43,10 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   const disabled = !canUpdateExtensions || orioleDbCheck
 
   const X_PADDING = 'px-5'
-  const extensionMeta = extensions.find((item: any) => item.name === extension.name)
+  const extensionMeta = extensions.find((item) => item.name === extension.name)
   const docsUrl = extensionMeta?.link.startsWith('/guides')
-    ? siteUrl === 'http://localhost:8082'
-      ? `http://localhost:3001/docs${extensions.find((item) => item.name === extension.name)?.link}`
-      : `https://supabase.com/docs${extensions.find((item) => item.name === extension.name)?.link}`
-    : extensions.find((item: any) => item.name === extension.name)?.link ?? undefined
+    ? `https://supabase.com/docs${extensionMeta?.link}`
+    : extensionMeta?.link ?? undefined
 
   const { mutate: disableExtension, isLoading: isDisabling } = useDatabaseExtensionDisableMutation({
     onSuccess: () => {

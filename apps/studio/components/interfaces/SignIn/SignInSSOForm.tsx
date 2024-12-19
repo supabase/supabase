@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { BASE_PATH } from 'lib/constants'
+
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
 import { useLastSignIn } from 'hooks/misc/useLastSignIn'
