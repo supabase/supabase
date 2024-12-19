@@ -16,14 +16,31 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
-import { ArrowRight, Plus, PlusCircle, Save, Settings } from 'lucide-react'
-import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { ArrowRight, Plus, PlusCircle, Save, Settings, ArrowUpDown } from 'lucide-react'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  Input_Shadcn_,
+  Label_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
+
+interface ParameterMetadata {
+  name: string
+  value: string
+  defaultValue?: string
+  occurrences: number
+}
 
 const Reports = () => {
   const { id, ref } = useParams()
@@ -33,6 +50,9 @@ const Reports = () => {
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
   const [hasEdits, setHasEdits] = useState<any>(false)
+  const [parameters, setParameters] = useState<Record<string, string>>({})
+  const [parameterMetadata, setParameterMetadata] = useState<ParameterMetadata[]>([])
+  const [tempParameters, setTempParameters] = useState<Record<string, string>>({})
 
   const { data: userContents, isLoading } = useContentQuery(ref)
   const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
@@ -210,6 +230,10 @@ const Reports = () => {
     checkEditState()
   }
 
+  const handleParametersSubmit = () => {
+    setParameters(tempParameters)
+  }
+
   if (isLoading) {
     return <Loading />
   }
@@ -217,6 +241,8 @@ const Reports = () => {
   if (!canReadReport) {
     return <NoPermission isFullPage resourceText="access this custom report" />
   }
+
+  console.log('parameterMetadata', parameterMetadata)
 
   return (
     <div className="flex flex-col" style={{ maxHeight: '100%' }}>
@@ -254,7 +280,7 @@ const Reports = () => {
             loading={isLoading}
           />
 
-          {startDate && endDate && (
+          {/* {startDate && endDate && (
             <div className="hidden items-center space-x-1 lg:flex ">
               <span className="text-sm text-foreground-light">
                 {dayjs(startDate).format('MMM D, YYYY')}
@@ -266,6 +292,56 @@ const Reports = () => {
                 {dayjs(endDate).format('MMM D, YYYY')}
               </span>
             </div>
+          )} */}
+          {parameterMetadata.length > 0 && (
+            <Popover_Shadcn_ modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" icon={<ArrowUpDown size={14} />}>
+                  <div className="flex items-center gap-1">
+                    <span className="text-foreground-muted">Parameters</span>
+                    <span>{parameterMetadata.length}</span>
+                  </div>
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ side="bottom" align="start" className="w-[300px] p-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    {parameterMetadata.map((param) => (
+                      <div key={param.name} className="grid gap-2">
+                        <Label_Shadcn_ className="flex items-center gap-2">
+                          {param.name}
+                          {param.occurrences > 1 && (
+                            <span className="text-xs text-foreground-light">
+                              (used {param.occurrences} times)
+                            </span>
+                          )}
+                        </Label_Shadcn_>
+                        <Input_Shadcn_
+                          size="tiny"
+                          value={
+                            tempParameters[param.name] ||
+                            parameters[param.name] ||
+                            param.defaultValue ||
+                            ''
+                          }
+                          onChange={(e) =>
+                            setTempParameters((prev) => ({
+                              ...prev,
+                              [param.name]: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button type="primary" size="tiny" onClick={handleParametersSubmit}>
+                      Apply changes
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           )}
         </div>
 
@@ -339,6 +415,8 @@ const Reports = () => {
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
               setEditableReport={handleSetConfig}
+              parameters={parameters}
+              onSetParameter={setParameterMetadata}
             />
           )}
         </div>

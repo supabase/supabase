@@ -254,7 +254,7 @@ export const SQLEditor = () => {
   }, [formatQuery, id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
-    async (force: boolean = false) => {
+    async (force: boolean = false, parameters: any) => {
       if (isDiffOpen) return
 
       // use the latest state
@@ -266,9 +266,31 @@ export const SQLEditor = () => {
         const selection = editor.getSelection()
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
-        const sql = snippet
+        let sql = snippet
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
+
+        // Parse @set parameter defaults from SQL
+        const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
+        const paramDefaults: Record<string, string> = {}
+        let match
+        while ((match = setParamRegex.exec(sql)) !== null) {
+          const [_, paramName, paramValue] = match
+          paramDefaults[paramName] = paramValue.trim()
+        }
+
+        // Remove @set lines from SQL
+        sql = sql.replace(/@set\s+\w+\s*=\s*[^;\n]+[\n;]*/g, '')
+
+        // Replace {{parameters}} with values
+        const paramRegex = /\{\{(\w+)\}\}/g
+        sql = sql.replace(paramRegex, (match, paramName) => {
+          const value = parameters?.[paramName] ?? paramDefaults[paramName]
+          if (value === undefined) {
+            throw new Error(`Missing value for parameter: ${paramName}`)
+          }
+          return value
+        })
 
         let queryHasIssues = false
 

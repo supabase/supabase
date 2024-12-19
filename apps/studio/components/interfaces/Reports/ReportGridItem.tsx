@@ -26,6 +26,7 @@ import {
   Checkbox_Shadcn_,
   ToggleGroup,
   ToggleGroupItem,
+  Input_Shadcn_,
 } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
@@ -86,6 +87,13 @@ interface LayoutItem {
   // ... other existing fields ...
 }
 
+interface Parameter {
+  name: string
+  value: string
+  defaultValue?: string
+  occurrences: number
+}
+
 interface ReportGridItemProps {
   item: LayoutItem
   disableUpdate: boolean
@@ -95,6 +103,41 @@ interface ReportGridItemProps {
   interval?: string
   editableReport: any
   setEditableReport: (payload: any) => void
+  parameters?: Record<string, string>
+  onSetParameter?: (params: Parameter[]) => void
+}
+
+const parseParameters = (sql: string | undefined) => {
+  if (!sql) return []
+
+  // Parse @set parameter defaults
+  const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
+  const paramDefaults: Record<string, string> = {}
+  let match
+
+  while ((match = setParamRegex.exec(sql)) !== null) {
+    const [_, paramName, paramValue] = match
+    paramDefaults[paramName] = paramValue.trim()
+  }
+
+  // Find all {{parameter}} occurrences and count them
+  const paramRegex = /\{\{(\w+)\}\}/g
+  const paramOccurrences: Record<string, number> = {}
+  const uniqueParams = new Set<string>()
+
+  while ((match = paramRegex.exec(sql)) !== null) {
+    const [_, paramName] = match
+    paramOccurrences[paramName] = (paramOccurrences[paramName] || 0) + 1
+    uniqueParams.add(paramName)
+  }
+
+  // Create parameter objects for unique parameters
+  return Array.from(uniqueParams).map((paramName) => ({
+    name: paramName,
+    value: paramDefaults[paramName] || '',
+    defaultValue: paramDefaults[paramName],
+    occurrences: paramOccurrences[paramName],
+  }))
 }
 
 const ReportGridItem = ({
@@ -106,6 +149,8 @@ const ReportGridItem = ({
   interval,
   editableReport,
   setEditableReport,
+  parameters: externalParameters,
+  onSetParameter,
 }: ReportGridItemProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
@@ -113,6 +158,9 @@ const ReportGridItem = ({
 
   const [sql, setSql] = useState<string>()
   const [queryResult, setQueryResult] = useState<any>()
+  const [localParameters, setLocalParameters] = useState<Parameter[]>([])
+  const [hasLocalChanges, setHasLocalChanges] = useState<Record<string, boolean>>({})
+  const [tempParameters, setTempParameters] = useState<Parameter[]>([])
 
   const { data: snippetData } = useContentIdQuery(
     { projectRef: ref, id: item.id },
@@ -159,16 +207,100 @@ const ReportGridItem = ({
     setEditableReport({ ...editableReport, layout: updatedLayout })
   }
 
-  // Add effect to execute query when SQL is first loaded
+  // Run once on mount to parse parameters and notify parent
   useEffect(() => {
-    if (sql && !queryResult) {
+    const params = parseParameters(sql)
+    console.log('params', params, sql)
+    if (onSetParameter) {
+      console.log('parsed params:', params)
+      onSetParameter(params)
+    }
+  }, [sql])
+
+  // Handle parameter updates (external or local)
+  useEffect(() => {
+    if (!sql) return
+
+    const params = parseParameters(sql)
+    const updatedParams = params.map((param) => ({
+      ...param,
+      value: hasLocalChanges[param.name]
+        ? localParameters.find((p) => p.name === param.name)?.value || param.value
+        : externalParameters?.[param.name] || param.value,
+    }))
+
+    setLocalParameters(updatedParams)
+    setTempParameters(updatedParams)
+  }, [sql, externalParameters, hasLocalChanges])
+
+  useEffect(() => {
+    handleExecute()
+  }, [localParameters])
+
+  const handleParameterChange = (paramName: string, value: string) => {
+    setHasLocalChanges((prev) => ({ ...prev, [paramName]: true }))
+    setLocalParameters((prev) => prev.map((p) => (p.name === paramName ? { ...p, value } : p)))
+  }
+
+  // Helper to get parameter values
+  const getParameterValues = () => {
+    return localParameters.reduce(
+      (acc, param) => {
+        acc[param.name] = param.value
+        return acc
+      },
+      {} as Record<string, string>
+    )
+  }
+
+  // Update execute call to include parameters
+  const handleExecute = () => {
+    if (!sql) return
+
+    try {
+      let processedSql = sql
+
+      // Parse @set parameter defaults from SQL
+      const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
+      const paramDefaults: Record<string, string> = {}
+      let match
+
+      while ((match = setParamRegex.exec(sql)) !== null) {
+        const [_, paramName, paramValue] = match
+        paramDefaults[paramName] = paramValue.trim()
+      }
+
+      // Remove @set lines from SQL
+      processedSql = processedSql.replace(/@set\s+\w+\s*=\s*[^;\n]+[\n;]*/g, '')
+
+      // Replace {{parameters}} with values
+      const paramRegex = /\{\{(\w+)\}\}/g
+      processedSql = processedSql.replace(paramRegex, (match, paramName) => {
+        const value =
+          localParameters.find((p) => p.name === paramName)?.value ?? paramDefaults[paramName]
+        if (value === undefined) {
+          throw new Error(`Missing value for parameter: ${paramName}`)
+        }
+        return value
+      })
+
+      console.log('processedSql', processedSql)
+
       execute({
         projectRef: ref,
         connectionString: project?.connectionString,
-        sql: sql,
+        sql: processedSql,
       })
+    } catch (error: any) {
+      toast.error(`Failed to execute query: ${error.message}`)
     }
-  }, [sql, execute, project?.connectionString, ref])
+  }
+
+  // Add submit handler
+  const handleParametersSubmit = () => {
+    setHasLocalChanges(tempParameters.reduce((acc, param) => ({ ...acc, [param.name]: true }), {}))
+    setLocalParameters(tempParameters)
+  }
 
   if (item.isSnippet) {
     return (
@@ -177,104 +309,157 @@ const ReportGridItem = ({
           <h3 className="text-sm text-foreground-light">{item.label}</h3>
           <div className="flex gap-2">
             {queryResult && (
-              <Popover_Shadcn_ modal={false}>
-                <PopoverTrigger_Shadcn_ asChild>
-                  <Button
-                    icon={<Settings2 size={14} />}
-                    type="outline"
-                    size="tiny"
-                    className="w-7 h-7"
-                  />
-                </PopoverTrigger_Shadcn_>
-                <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
-                  <form className="grid gap-2">
-                    <ToggleGroup
-                      type="single"
-                      value={item.isChart ? 'chart' : 'table'}
-                      className="w-full"
-                      onValueChange={(value) => {
-                        if (value) onToggleChart(item)
-                      }}
-                    >
-                      <ToggleGroupItem className="w-full" value="table" aria-label="Show as table">
-                        <Table className="h-4 w-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem className="w-full" value="chart" aria-label="Show as chart">
-                        <BarChart2 className="h-4 w-4" />
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-
-                    {item.isChart && (
-                      <>
-                        <Select_Shadcn_
-                          value={item.chartConfig?.xKey}
-                          onValueChange={(value) =>
-                            onUpdateChartConfig(item, { ...item.chartConfig, xKey: value })
-                          }
-                        >
-                          <SelectTrigger_Shadcn_>
-                            X Axis {item.chartConfig?.xKey && `- ${item.chartConfig.xKey}`}
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              {Object.keys(queryResult[0] || {}).map((key) => (
-                                <SelectItem_Shadcn_ value={key} key={key}>
-                                  {key}
-                                </SelectItem_Shadcn_>
-                              ))}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-
-                        <Select_Shadcn_
-                          value={item.chartConfig?.yKey}
-                          onValueChange={(value) =>
-                            onUpdateChartConfig(item, { ...item.chartConfig, yKey: value })
-                          }
-                        >
-                          <SelectTrigger_Shadcn_>
-                            Y Axis {item.chartConfig?.yKey && `- ${item.chartConfig.yKey}`}
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
-                            <SelectGroup_Shadcn_>
-                              {Object.keys(queryResult[0] || {}).map((key) => (
-                                <SelectItem_Shadcn_ value={key} key={key}>
-                                  {key}
-                                </SelectItem_Shadcn_>
-                              ))}
-                            </SelectGroup_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-
-                        <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
-                          <Label_Shadcn_ htmlFor="cumulative">
-                            <Checkbox_Shadcn_
-                              id="cumulative"
-                              checked={item.chartConfig?.cumulative}
-                              onClick={() =>
-                                onUpdateChartConfig(item, {
-                                  ...item.chartConfig,
-                                  cumulative: !item.chartConfig?.cumulative,
-                                })
-                              }
-                            />
-                            Cumulative
-                          </Label_Shadcn_>
+              <>
+                {localParameters.length > 0 && (
+                  <Popover_Shadcn_ modal={false}>
+                    <PopoverTrigger_Shadcn_ asChild>
+                      <Button
+                        icon={<ArrowUpDown size={14} />}
+                        type="outline"
+                        size="tiny"
+                        className="w-7 h-7"
+                      />
+                    </PopoverTrigger_Shadcn_>
+                    <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          {localParameters.map((param) => (
+                            <div key={param.name} className="grid gap-2">
+                              <Label_Shadcn_ className="flex items-center gap-2">
+                                {param.name}
+                                {param.occurrences > 1 && (
+                                  <span className="text-xs text-foreground-light">
+                                    (used {param.occurrences} times)
+                                  </span>
+                                )}
+                              </Label_Shadcn_>
+                              <Input_Shadcn_
+                                size="tiny"
+                                value={
+                                  tempParameters.find((p) => p.name === param.name)?.value ??
+                                  param.value
+                                }
+                                onChange={(e) =>
+                                  setTempParameters((prev) =>
+                                    prev.map((p) =>
+                                      p.name === param.name ? { ...p, value: e.target.value } : p
+                                    )
+                                  )
+                                }
+                              />
+                            </div>
+                          ))}
                         </div>
-                      </>
-                    )}
-                  </form>
-                </PopoverContent_Shadcn_>
-              </Popover_Shadcn_>
+                        <div className="flex justify-end">
+                          <Button type="primary" size="tiny" onClick={handleParametersSubmit}>
+                            Apply changes
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent_Shadcn_>
+                  </Popover_Shadcn_>
+                )}
+                <Popover_Shadcn_ modal={false}>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <Button
+                      icon={<Settings2 size={14} />}
+                      type="outline"
+                      size="tiny"
+                      className="w-7 h-7"
+                    />
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
+                    <form className="grid gap-2">
+                      <ToggleGroup
+                        type="single"
+                        value={item.isChart ? 'chart' : 'table'}
+                        className="w-full"
+                        onValueChange={(value) => {
+                          if (value) onToggleChart(item)
+                        }}
+                      >
+                        <ToggleGroupItem
+                          className="w-full"
+                          value="table"
+                          aria-label="Show as table"
+                        >
+                          <Table className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem
+                          className="w-full"
+                          value="chart"
+                          aria-label="Show as chart"
+                        >
+                          <BarChart2 className="h-4 w-4" />
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+
+                      {item.isChart && (
+                        <>
+                          <Select_Shadcn_
+                            value={item.chartConfig?.xKey}
+                            onValueChange={(value) =>
+                              onUpdateChartConfig(item, { ...item.chartConfig, xKey: value })
+                            }
+                          >
+                            <SelectTrigger_Shadcn_>
+                              X Axis {item.chartConfig?.xKey && `- ${item.chartConfig.xKey}`}
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectGroup_Shadcn_>
+                                {Object.keys(queryResult[0] || {}).map((key) => (
+                                  <SelectItem_Shadcn_ value={key} key={key}>
+                                    {key}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectGroup_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+
+                          <Select_Shadcn_
+                            value={item.chartConfig?.yKey}
+                            onValueChange={(value) =>
+                              onUpdateChartConfig(item, { ...item.chartConfig, yKey: value })
+                            }
+                          >
+                            <SelectTrigger_Shadcn_>
+                              Y Axis {item.chartConfig?.yKey && `- ${item.chartConfig.yKey}`}
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectGroup_Shadcn_>
+                                {Object.keys(queryResult[0] || {}).map((key) => (
+                                  <SelectItem_Shadcn_ value={key} key={key}>
+                                    {key}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectGroup_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+
+                          <div className="*:flex *:gap-2 *:items-center grid gap-2 *:text-foreground-light *:p-1.5 *:pl-0">
+                            <Label_Shadcn_ htmlFor="cumulative">
+                              <Checkbox_Shadcn_
+                                id="cumulative"
+                                checked={item.chartConfig?.cumulative}
+                                onClick={() =>
+                                  onUpdateChartConfig(item, {
+                                    ...item.chartConfig,
+                                    cumulative: !item.chartConfig?.cumulative,
+                                  })
+                                }
+                              />
+                              Cumulative
+                            </Label_Shadcn_>
+                          </div>
+                        </>
+                      )}
+                    </form>
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
+              </>
             )}
             <Button
-              onClick={() =>
-                execute({
-                  projectRef: ref,
-                  connectionString: project?.connectionString,
-                  sql: sql || '',
-                })
-              }
+              onClick={handleExecute}
               loading={isExecuting}
               icon={<Play size={14} />}
               type="outline"

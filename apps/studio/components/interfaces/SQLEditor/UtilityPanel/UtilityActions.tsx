@@ -8,8 +8,11 @@ import {
   Keyboard,
   Loader2,
   MoreVertical,
+  ChevronDown,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useState, useEffect } from 'react'
+import { Input_Shadcn_ } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -31,8 +34,12 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
   cn,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
+import { Label } from '@ui/components/shadcn/ui/label'
 
 export type UtilityActionsProps = {
   id: string
@@ -40,7 +47,7 @@ export type UtilityActionsProps = {
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
-  executeQuery: () => void
+  executeQuery: (force?: boolean, parameters?: Record<string, string>) => void
 }
 
 const UtilityActions = ({
@@ -62,8 +69,36 @@ const UtilityActions = ({
     true
   )
 
+  const [parameters, setParameters] = useState<Record<string, string>>({})
+
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
+
+  useEffect(() => {
+    if (!snippet) return
+
+    const sql = snippet.snippet.content.sql
+    // Parse @set parameter defaults
+    const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
+    const paramDefaults: Record<string, string> = {}
+    let match
+
+    while ((match = setParamRegex.exec(sql)) !== null) {
+      const [_, paramName, paramValue] = match
+      paramDefaults[paramName] = paramValue.trim()
+    }
+
+    // Find all {{parameter}} occurrences
+    const paramRegex = /\{\{(\w+)\}\}/g
+    const params: Record<string, string> = {}
+
+    while ((match = paramRegex.exec(sql)) !== null) {
+      const [_, paramName] = match
+      params[paramName] = paramDefaults[paramName] || ''
+    }
+
+    setParameters(params)
+  }, [snippet])
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -119,6 +154,8 @@ const UtilityActions = ({
       }
     )
   }
+
+  const hasParameters = Object.keys(parameters).length > 0
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
@@ -227,9 +264,48 @@ const UtilityActions = ({
             variant="connected-on-right"
             onSelectId={() => snapV2.resetResult(id)}
           />
-          <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
+          {hasParameters && (
+            <Popover_Shadcn_ modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  size="tiny"
+                  type="default"
+                  className="h-[26px] pr-3 gap-0 rounded-none border-x-0"
+                >
+                  <div className="flex items-center gap-1">
+                    <span className="text-foreground-muted">Params</span>
+                    <span>{Object.keys(parameters).length}</span>
+                    <ChevronDown className="text-muted" strokeWidth={1} size={12} />
+                  </div>
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_ className="w-[300px]" side="bottom" align="end">
+                <div className="space-y-2">
+                  {Object.entries(parameters).map(([name, value]) => (
+                    <div key={name}>
+                      <Label className="text-xs mb-2 block">{name}</Label>
+                      <Input_Shadcn_
+                        size="tiny"
+                        value={value}
+                        onChange={(e) =>
+                          setParameters((prev) => ({
+                            ...prev,
+                            [name]: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
+          <RoleImpersonationPopover
+            serviceRoleLabel="postgres"
+            variant={hasParameters ? 'connected-on-both' : 'connected-on-both'}
+          />
           <Button
-            onClick={() => executeQuery()}
+            onClick={() => executeQuery(false, parameters)}
             disabled={isDisabled || isExecuting}
             type="primary"
             size="tiny"

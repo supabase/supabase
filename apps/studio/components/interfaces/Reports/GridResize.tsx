@@ -24,7 +24,7 @@ import {
   Checkbox_Shadcn_,
 } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useCallback } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import BarChart from 'components/ui/Charts/BarChart'
 import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
@@ -40,6 +40,8 @@ interface GridResizeProps {
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   setEditableReport: (payload: any) => void
+  parameters?: Record<string, string>
+  onSetParameter: (params: ParameterMetadata[]) => void
 }
 
 // Add chart config type
@@ -64,6 +66,13 @@ interface LayoutItem {
   // ... other existing fields ...
 }
 
+interface ParameterMetadata {
+  name: string
+  value: string
+  defaultValue?: string
+  occurrences: number
+}
+
 const GridResize = ({
   startDate,
   endDate,
@@ -72,7 +81,11 @@ const GridResize = ({
   disableUpdate,
   onRemoveChart,
   setEditableReport,
+  parameters,
+  onSetParameter,
 }: GridResizeProps) => {
+  const [collectedParams, setCollectedParams] = useState<ParameterMetadata[]>([])
+
   function onLayoutChange(layout: any) {
     let updatedLayout = [...editableReport.layout]
     layout.map((item: any) => {
@@ -87,6 +100,26 @@ const GridResize = ({
       layout: updatedLayout,
     })
   }
+
+  // Merge parameters from all charts and notify parent once all are collected
+  const handleChartParameters = (params: ParameterMetadata[]) => {
+    setCollectedParams((prev) => {
+      const merged = [...prev]
+      params.forEach((param) => {
+        const existingIndex = merged.findIndex((p) => p.name === param.name)
+        if (existingIndex === -1) {
+          merged.push(param)
+        }
+      })
+      return merged
+    })
+    console.log('collected params:', collectedParams)
+  }
+
+  // Notify parent when all parameters are collected
+  useEffect(() => {
+    onSetParameter(collectedParams)
+  }, [collectedParams])
 
   if (!editableReport) return null
 
@@ -128,6 +161,8 @@ const GridResize = ({
             interval={interval}
             editableReport={editableReport}
             setEditableReport={setEditableReport}
+            parameters={parameters}
+            onSetParameter={handleChartParameters}
           />
         </div>
       ))}
