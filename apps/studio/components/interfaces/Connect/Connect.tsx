@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
 import { DatabaseConnectionString as OldDatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
@@ -10,6 +10,7 @@ import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
+import { useUrlState } from 'hooks/ui/useUrlState'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
@@ -34,8 +35,10 @@ import ConnectTabContent from './ConnectTabContent'
 
 const Connect = () => {
   const state = useAppStateSnapshot()
+  const { showConnectDialog, setShowConnectDialog } = state
   const { ref: projectRef } = useParams()
   const connectDialogUpdate = useFlag('connectDialogUpdate')
+  const [{ showConnect }, setParams] = useUrlState({ replace: true })
 
   const [connectionObject, setConnectionObject] = useState<ConnectionType[]>(FRAMEWORKS)
   const [selectedParent, setSelectedParent] = useState(connectionObject[0].key) // aka nextjs
@@ -147,9 +150,20 @@ const Connect = () => {
     selectedGrandchild,
   })
 
+  useEffect(() => {
+    if (showConnect === 'true') setShowConnectDialog(true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showConnect])
+
   return (
     <>
-      <Dialog open={state.showConnectDialog} onOpenChange={state.setShowConnectDialog}>
+      <Dialog
+        open={state.showConnectDialog}
+        onOpenChange={(open) => {
+          if (!open) setParams({ showConnect: undefined })
+          state.setShowConnectDialog(open)
+        }}
+      >
         <DialogTrigger asChild>
           <Button
             type={connectDialogUpdate ? 'default' : 'primary'}
