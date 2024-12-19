@@ -27,13 +27,17 @@ export async function getContentCount(
   if (favorite) query.favorite = favorite
   if (name) query.name = name
 
-  const { data, error } = await get('/platform/projects/{ref}/content/count', {
-    params: { path: { ref: projectRef }, query: { type, visibility, favorite, name } },
-    signal,
-  })
+  return {
+    count: 0,
+  }
 
-  if (error) throw handleError(error)
-  return data
+  // const { data, error } = await get('/platform/projects/{ref}/content/count', {
+  //   params: { path: { ref: projectRef }, query: { type, visibility, favorite, name } },
+  //   signal,
+  // })
+
+  // if (error) throw handleError(error)
+  // return data
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentCount>>
