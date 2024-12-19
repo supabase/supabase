@@ -163,8 +163,8 @@ export const ProjectVisual = ({
             y: sqlStatements.length > 0 ? '-35%' : '-50%',
           }}
           animate={{
-            scale: showInfo ? '100%' : '95%',
-            x: showInfo ? '0%' : '10%',
+            scale: showInfo ? '100%' : '90%',
+            x: showInfo ? (sqlStatements.length > 0 ? '20%' : '0%') : '10%',
             opacity: showInfo ? 1 : 0.3,
             width: sqlStatements.length > 0 ? '50%' : '100%',
             top: sqlStatements.length > 0 ? '0' : '50%',

@@ -15,6 +15,7 @@ interface SupabaseService {
 
 interface Props {
   onSqlGenerated: (sql: string) => void
+  onReset: () => void
   onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
   isOneOff?: boolean
@@ -24,6 +25,7 @@ export const SchemaGenerator = ({
   onSqlGenerated,
   onServicesUpdated,
   onTitleUpdated,
+  onReset,
   isOneOff = false,
 }: Props) => {
   const [input, setInput] = useState('')
@@ -60,6 +62,24 @@ export const SchemaGenerator = ({
         }
       }
 
+      if (toolCall.toolName === 'reset') {
+        try {
+          setHasSql(false)
+          onSqlGenerated('')
+          onReset()
+          return {
+            success: true,
+            message: 'Database successfully reset',
+          }
+        } catch (error) {
+          console.error('Failed to reset the database', error)
+          return {
+            success: false,
+            error: `Resetting the database failed: ${error instanceof Error ? error.message : String(error)}`,
+          }
+        }
+      }
+
       if (toolCall.toolName === 'setServices') {
         const newServices = (toolCall.args as { services: SupabaseService[] }).services
         onServicesUpdated(newServices)
@@ -86,9 +106,10 @@ export const SchemaGenerator = ({
               type="outline"
               size="tiny"
               onClick={() => {
+                setInput('Reset the database, services and start over')
                 append({
                   role: 'user',
-                  content: 'Undo everything you have done and create a blank database',
+                  content: 'Reset the database, services and start over',
                 })
               }}
             >

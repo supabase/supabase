@@ -63,7 +63,47 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
     const updateSchema = async () => {
       if (!db.current) return
 
-      console.log('updateSchema', sqlStatements)
+      // Reset if statements is empty
+      if (sqlStatements.length === 0) {
+        setNodes([])
+        setEdges([])
+        executedStatements.current.clear()
+        // Reset database
+        db.current = new PGlite()
+        // Re-run initial auth schema setup
+        db.current.exec(`
+          CREATE SCHEMA auth;
+          CREATE TABLE auth.users (
+              instance_id uuid,
+              id uuid NOT NULL,
+              aud character varying(255),
+              role character varying(255),
+              email character varying(255),
+              encrypted_password character varying(255),
+              confirmed_at timestamp with time zone,
+              invited_at timestamp with time zone,
+              confirmation_token character varying(255),
+              confirmation_sent_at timestamp with time zone,
+              recovery_token character varying(255),
+              recovery_sent_at timestamp with time zone,
+              email_change_token character varying(255),
+              email_change character varying(255),
+              email_change_sent_at timestamp with time zone,
+              last_sign_in_at timestamp with time zone,
+              raw_app_meta_data jsonb,
+              raw_user_meta_data jsonb,
+              is_super_admin boolean,
+              created_at timestamp with time zone,
+              updated_at timestamp with time zone
+          );
+          ALTER TABLE ONLY auth.users
+          ADD CONSTRAINT users_email_key UNIQUE (email);
+          ALTER TABLE ONLY auth.users
+          ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+        `)
+        return
+      }
+
       // Execute only new statements
       const newStatements = sqlStatements.filter((sql) => !executedStatements.current.has(sql))
 
@@ -79,7 +119,7 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
           query: async (sql: string) => {
             try {
               const res = await db.current?.query(sql)
-              console.log('response:', sql, res)
+              if (!res) throw new Error('No response from database')
               return wrapResult<any[]>(res.rows)
             } catch (error) {
               console.error('Query failed:', error)
@@ -115,8 +155,6 @@ export const SchemaVisualizer = ({ sqlStatements, className }: SchemaVisualizerP
 
     updateSchema()
   }, [sqlStatements])
-
-  console.log('nodes', nodes)
 
   return (
     <div className={className}>

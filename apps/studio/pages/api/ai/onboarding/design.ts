@@ -22,6 +22,11 @@ const getTools = () => {
       }),
     }),
 
+    reset: tool({
+      description: 'Reset the database, services and start over',
+      parameters: z.object({}),
+    }),
+
     setServices: tool({
       description:
         'Set the entire list of Supabase services needed for the project. Always include the full list',
@@ -67,7 +72,6 @@ const getTools = () => {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  console.log('received!')
   if (!openAiKey) {
     return res.status(400).json({
       error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
@@ -87,8 +91,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { messages } = req.body
-
-  console.log('messages', messages)
 
   const result = await streamText({
     model: openai('gpt-4o-mini'),
@@ -111,7 +113,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       2. Set the services required for the user's use case by calling the setServices tool.
       3. Set the project title by calling the setTitle tool.
       4. Always respond with a short single paragraph of less than 80 words of what you changed and the current state of the schema.
-    `,
+    
+      If user requests to reset the database, call the reset tool.
+      `,
     messages,
     tools: getTools(),
   })
