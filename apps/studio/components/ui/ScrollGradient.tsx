@@ -4,18 +4,19 @@ import { AnimatePresence, motion } from 'framer-motion'
 interface ScrollGradientProps {
   scrollRef: React.RefObject<HTMLElement>
   className?: string
+  offset?: number // Pixels to offset from bottom before showing gradient
 }
 
-export const ScrollGradient = ({ scrollRef, className = '' }: ScrollGradientProps) => {
+export const ScrollGradient = ({ scrollRef, className = '', offset = 0 }: ScrollGradientProps) => {
   const [showGradient, setShowGradient] = useState(false)
 
   const handleScroll = useCallback(() => {
     if (!scrollRef.current) return
 
     const { scrollTop, scrollHeight, clientHeight } = scrollRef.current
-    const isAtBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight
+    const isAtBottom = Math.ceil(scrollTop + clientHeight + offset) >= scrollHeight
     setShowGradient(!isAtBottom)
-  }, [scrollRef])
+  }, [scrollRef, offset])
 
   useEffect(() => {
     const container = scrollRef.current

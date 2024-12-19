@@ -1087,7 +1087,7 @@ const WizardForm = () => {
                                 </div>
                               </>
                               <div className="sticky bottom-0 z-20 bg-background-200 pb-6">
-                                <ScrollGradient scrollRef={scrollRef} />
+                                <ScrollGradient offset={60} scrollRef={scrollRef} />
                                 <Button
                                   form="project-create-form"
                                   htmlType="submit"
