@@ -1,0 +1,11 @@
+---
+title = "Supavisor timeout"
+topics = ["database", "supavisor"]
+keywords = ["connections", "pooler"]
+
+[[errors]]
+code = ":badrpc"
+message = "Subscribe error: {:error, {:badrpc, {:error, {:erpc, :timeout}}}}"
+---
+
+This is a timeout error when the communication between different Supavisor nodes takes longer than expected. Try reconnecting to the database.
