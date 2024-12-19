@@ -58,7 +58,7 @@ const TeamSettings = () => {
     onSuccess: () => {
       setIsLeaving(false)
       setIsLeaveTeamModalOpen(false)
-      window?.location.replace('/') // Force reload to clear Store
+      window?.location.replace('/dashboard') // Force reload to clear Store
     },
     onError: (error) => {
       setIsLeaving(false)
