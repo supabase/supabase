@@ -4,6 +4,7 @@ import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { IS_PLATFORM } from 'lib/constants'
 
 export type ProjectStorageConfigVariables = {
   projectRef?: string
@@ -39,5 +40,5 @@ export const useProjectStorageConfigQuery = <TData = ProjectStorageConfigData>(
   useQuery<ProjectStorageConfigData, ProjectStorageConfigError, TData>(
     configKeys.storage(projectRef),
     ({ signal }) => getProjectStorageConfig({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined', ...options }
   )
