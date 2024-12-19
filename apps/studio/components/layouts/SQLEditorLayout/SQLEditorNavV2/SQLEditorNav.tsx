@@ -172,7 +172,7 @@ export const SQLEditorNav = ({
     visibility: 'user',
     name: debouncedSearchText,
   })
-  const numPrivateSnippets = privateSnippetCountData?.count ?? 0
+  const numPrivateSnippets = privateSnippets.length
 
   const privateSnippetsTreeState = useMemo(
     () =>
@@ -243,7 +243,7 @@ export const SQLEditorNav = ({
     favorite: true,
     name: debouncedSearchText,
   })
-  const numFavoriteSnippets = favoritedSnippetCountData?.count ?? 0
+  const numFavoriteSnippets = favoriteSnippets.length
 
   const favoritesTreeState = useMemo(
     () =>
@@ -312,7 +312,7 @@ export const SQLEditorNav = ({
     visibility: 'project',
     name: debouncedSearchText,
   })
-  const numProjectSnippets = sharedSnippetCountData?.count ?? 0
+  const numProjectSnippets = sharedSnippets.length
 
   const projectSnippetsTreeState = useMemo(
     () =>
@@ -557,13 +557,11 @@ export const SQLEditorNav = ({
         onOpenChange={setShowSharedSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Shared ${numProjectSnippets > 0 ? ` (${numProjectSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`Shared`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numProjectSnippets === 0 && sharedSnippets.length === 0 ? (
+          ) : numProjectSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
               title={isSearching ? 'No results found based on your search' : 'No shared queries'}
@@ -615,13 +613,11 @@ export const SQLEditorNav = ({
         open={showFavoriteSnippets}
         onOpenChange={setShowFavoriteSnippets}
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`Favorites ${numFavoriteSnippets > 0 ? ` (${numFavoriteSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`Favorites`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numFavoriteSnippets === 0 && favoriteSnippets.length === 0 ? (
+          ) : numFavoriteSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               title={isSearching ? 'No results found based on your search' : 'No favorite queries'}
               className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
@@ -678,14 +674,11 @@ export const SQLEditorNav = ({
         onOpenChange={setShowPrivateSnippets}
         className="px-0"
       >
-        <InnerSideMenuCollapsibleTrigger
-          title={`PRIVATE
-            ${numPrivateSnippets > 0 ? ` (${numPrivateSnippets})` : ''}`}
-        />
+        <InnerSideMenuCollapsibleTrigger title={`PRIVATE`} />
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <SQLEditorLoadingSnippets />
-          ) : folders.length === 0 && numPrivateSnippets === 0 && privateSnippets.length === 0 ? (
+          ) : folders.length === 0 && numPrivateSnippets === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-3 px-4"
               title="No queries created yet"
