@@ -16,6 +16,8 @@ const HOSTED_SUPPORTED_API_URLS = [
   '/ai/sql/cron',
   '/ai/docs',
   '/get-ip-address',
+  '/get-ip-address',
+  '/check-service-role-key-leak',
 ]
 
 export function middleware(request: NextRequest) {
