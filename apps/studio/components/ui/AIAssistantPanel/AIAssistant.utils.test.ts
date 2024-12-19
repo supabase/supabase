@@ -1,3 +1,4 @@
+import { describe, expect, test } from 'vitest'
 import { isReadOnlySelect } from './AIAssistant.utils'
 
 describe('AIAssistant.utils.ts:isReadOnlySelect', () => {

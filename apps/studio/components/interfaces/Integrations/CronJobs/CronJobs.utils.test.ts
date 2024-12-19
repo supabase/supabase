@@ -1,4 +1,4 @@
-import { it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { cronPattern, parseCronJobCommand, secondsPattern } from './CronJobs.utils'
 
 describe('parseCronJobCommand', () => {

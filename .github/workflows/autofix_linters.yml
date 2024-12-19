@@ -23,15 +23,21 @@ jobs:
           sparse-checkout: apps
           ref: ${{ github.head_ref }}
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 9.10.0
+          run_install: false
+
       - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
 
       - name: Install required dependencies
-        run: npm ci
+        run: pnpm i
 
       - name: Run Prettier in fix mode
-        run: npm run format
+        run: pnpm run format
 
       - name: Commit changes and push to existing branch
         run: |
