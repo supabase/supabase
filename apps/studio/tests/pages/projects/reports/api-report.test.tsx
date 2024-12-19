@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react'
-import { test, vi } from 'vitest'
+import { beforeAll, test, vi } from 'vitest'
 
 import { ApiReport } from 'pages/project/[ref]/reports/api-overview'
 import { render } from '../../../helpers'

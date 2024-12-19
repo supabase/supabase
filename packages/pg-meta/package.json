@@ -5,6 +5,10 @@
   "author": "Supabase",
   "main": "./src/index.ts",
   "repository": "supabase/supabase",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules"
+  },
   "dependencies": {
     "zod": "^3.22.4"
   },
