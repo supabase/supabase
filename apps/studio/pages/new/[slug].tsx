@@ -1,29 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useChat } from 'ai/react'
-import { components } from 'api-types'
-import { useParams } from 'common'
 import { debounce } from 'lodash'
-import {
-  ArrowUp,
-  ChevronLeft,
-  Database,
-  ExteImport,
-  ExternalLink,
-  Import,
-  rnalLink,
-  Settings,
-} from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
-import { AnimatePresence, motion } from 'framer-motion'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
+import { components } from 'api-types'
+import { useParams } from 'common'
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
@@ -35,10 +23,11 @@ import {
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
+import Panel from 'components/ui/Panel'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
-import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
@@ -57,7 +46,6 @@ import { useFlag } from 'hooks/ui/useFlag'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import {
   AWS_REGIONS_DEFAULT,
-  BASE_PATH,
   DEFAULT_MINIMUM_PASSWORD_STRENGTH,
   DEFAULT_PROVIDER,
   FLY_REGIONS_DEFAULT,
@@ -71,7 +59,6 @@ import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -88,19 +75,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Label_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import { Markdown } from 'components/interfaces/Markdown'
-import LogoLoader from '@ui/components/LogoLoader'
-import InitialStep from 'components/interfaces/ProjectCreation/InitialStep'
-import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
-import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
-import { ScrollGradient } from 'components/ui/ScrollGradient'
+import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -146,34 +126,13 @@ const FormSchema = z.object({
   useApiSchema: z.boolean(),
   postgresVersionSelection: z.string(),
   useOrioleDb: z.boolean(),
-  sql: z.string().optional(),
 })
 
 export type CreateProjectForm = z.infer<typeof FormSchema>
 
-export const TABLE_NODE_WIDTH = 640
-export const TABLE_NODE_ROW_HEIGHT = 80
-
-interface SupabaseService {
-  name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
-  reason: string
-}
-
-const WizardForm = () => {
+const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug, projectName } = useParams()
-
-  const [showAdvanced, setShowAdvanced] = useState<Boolean>(false)
-  const [services, setServices] = useState<SupabaseService[]>([])
-  const [sqlStatements, setSqlStatements] = useState<string[]>([])
-  const [showVisual, setShowVisual] = useState(false)
-
-  const [step, setStep] = useState(1)
-  const [aiDescription, setAiDescription] = useState('')
-  const [formTitle, setFormTitle] = useState('Create a new project')
-  const [formDescription, setFormDescription] = useState(
-    'Get started by choosing how you want to create your project'
-  )
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const projectVersionSelectionDisabled = useFlag('disableProjectVersionSelection')
@@ -283,7 +242,6 @@ const WizardForm = () => {
       useApiSchema: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
-      sql: '',
     },
   })
 
@@ -328,7 +286,6 @@ const WizardForm = () => {
       useApiSchema,
       postgresVersionSelection,
       useOrioleDb,
-      sql,
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
@@ -346,7 +303,6 @@ const WizardForm = () => {
       dbRegion: dbRegion,
       // gets ignored due to org billing subscription anyway
       dbPricingTierId: 'tier_free',
-      dbSql: sql,
       // only set the compute size on pro+ plans. Free plans always use micro (nano in the future) size.
       dbInstanceSize:
         orgSubscription?.plan.id === 'free' ? undefined : (instanceSize as DesiredInstanceSize),
@@ -354,7 +310,6 @@ const WizardForm = () => {
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
-      initialSql: sql,
     }
 
     if (postgresVersion) {
@@ -411,740 +366,547 @@ const WizardForm = () => {
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
-  const selectedRegionObject = useMemo(() => {
-    const dbRegion = form.getValues('dbRegion')
-    const awsRegion = Object.entries(AWS_REGIONS).find(
-      ([_, region]) => region.displayName === dbRegion
-    )
-    const flyRegion = Object.entries(FLY_REGIONS).find(
-      ([_, region]) => region.displayName === dbRegion
-    )
-
-    if (awsRegion) {
-      const [name, details] = awsRegion
-      return {
-        name,
-        location: details.location,
-        code: details.code,
-        displayName: details.displayName,
-      }
-    }
-
-    if (flyRegion) {
-      const [name, details] = flyRegion
-      return {
-        name,
-        location: details.location,
-        code: details.code,
-        displayName: details.displayName,
-      }
-    }
-
-    return null
-  }, [form.getValues('dbRegion')])
-
-  // set sql fields anytime the sqlStatements array changes
-  useEffect(() => {
-    form.setValue('sql', sqlStatements.join('\n\n'))
-  }, [sqlStatements])
-
-  const scrollRef = useRef<HTMLDivElement>(null)
-
   return (
-    <div
-      ref={scrollRef}
-      className="flex lg:flex-row flex-col w-full overflow-auto h-screen items-start"
-    >
-      <div className="w-full lg:max-w-[600px] relative p-16 lg:p-24 lg:pr-0 min-h-screen lg:flex lg:items-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={step}
-            initial={{ opacity: 0, scale: 1.02 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.3 }}
-          >
-            {step === 1 ? (
-              <InitialStep
-                onSqlGenerated={(sql) => {
-                  setSqlStatements((prev) => [...prev, sql])
-                }}
-                onServicesUpdated={setServices}
-                onTitleUpdated={(title) => {
-                  if (!form.getValues('projectName')) {
-                    form.setValue('projectName', title)
-                  }
-                }}
-                isLoading={!!(aiDescription && sqlStatements.length === 0)}
-                onSubmit={(value) => {
-                  setAiDescription(value)
-                  setFormTitle('Create a project')
-                  setFormDescription(
-                    'We have generated a starting schema for you based on your description'
-                  )
-                  setStep(2)
-                }}
-                onStartBlank={() => {
-                  setFormTitle('Start from Scratch')
-                  setFormDescription('Configure your new blank project')
-                  setStep(2)
-                }}
-                onMigrate={() => {
-                  setFormTitle('Migrate Existing Database')
-                  setFormDescription(
-                    'First we need to create a new project to migrate your database to'
-                  )
-                  setStep(2)
-                }}
-              />
-            ) : (
-              <Form_Shadcn_ {...form}>
-                <form
-                  id="project-create-form"
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="w-full"
+    <Form_Shadcn_ {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <Panel
+          loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
+          title={
+            <div key="panel-title">
+              <h3>Create a new project</h3>
+              <p className="text-sm text-foreground-lighter">
+                Your project will have its own dedicated instance and full Postgres database.
+                <br />
+                An API will be set up so you can easily interact with your new database.
+                <br />
+              </p>
+            </div>
+          }
+          footer={
+            <div key="panel-footer" className="flex items-center justify-between w-full">
+              <Button
+                type="default"
+                disabled={isCreatingNewProject || isSuccessNewProject}
+                onClick={() => router.push('/projects')}
+              >
+                Cancel
+              </Button>
+              <div className="items-center space-x-3">
+                {!projectCreationDisabled && (
+                  <span className="text-xs text-foreground-lighter">
+                    You can rename your project later
+                  </span>
+                )}
+                <Button
+                  htmlType="submit"
+                  loading={isCreatingNewProject || isSuccessNewProject}
+                  disabled={!canCreateProject || isCreatingNewProject || isSuccessNewProject}
                 >
-                  <section className="relative">
-                    <div>
-                      <div className="mb-2">
-                        <h3 className="mb-1">{formTitle}</h3>
-                        <p className="text-sm text-foreground-lighter">{formDescription}</p>
-                      </div>
-                      <>
-                        {projectCreationDisabled ? (
-                          <div className="pb-8">
-                            <DisabledWarningDueToIncident title="Project creation is currently disabled" />
-                          </div>
-                        ) : !isAdmin ? (
-                          <NotOrganizationOwnerWarning />
-                        ) : freePlanWithExceedingLimits ? (
-                          isAdmin &&
-                          slug && (
-                            <div className="py-5">
-                              <FreeProjectLimitWarning
-                                membersExceededLimit={membersExceededLimit || []}
-                                orgSlug={slug}
-                              />
-                            </div>
-                          )
-                        ) : isManagedByVercel ? (
-                          <div className="py-5">
-                            <PartnerManagedResource
-                              partner="vercel-marketplace"
-                              resource="Projects"
-                              cta={{
-                                installationId: currentOrg?.partner_id,
-                                message: 'Visit Vercel to create a project',
-                              }}
-                            />
-                          </div>
-                        ) : hasOutstandingInvoices ? (
-                          <div className="py-5">
-                            <Admonition
-                              type="default"
-                              title="Your organization has overdue invoices"
-                              description={
-                                <div className="space-y-3">
-                                  <p className="text-sm leading-normal">
-                                    Please resolve all outstanding invoices first before creating a
-                                    new project
-                                  </p>
+                  Create new project
+                </Button>
+              </div>
+            </div>
+          }
+        >
+          <>
+            {projectCreationDisabled ? (
+              <Panel.Content className="pb-8">
+                <DisabledWarningDueToIncident title="Project creation is currently disabled" />
+              </Panel.Content>
+            ) : (
+              <div className="divide-y divide-border-muted">
+                <Panel.Content className={['space-y-4'].join(' ')}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="organization"
+                    render={({ field }) => (
+                      <FormItemLayout label="Organization" layout="horizontal">
+                        {(organizations?.length ?? 0) > 0 && (
+                          <Select_Shadcn_
+                            onValueChange={(slug) => {
+                              field.onChange(slug)
+                              router.push(`/new/${slug}`)
+                            }}
+                            defaultValue={field.value}
+                          >
+                            <FormControl_Shadcn_>
+                              <SelectTrigger_Shadcn_>
+                                <SelectValue_Shadcn_ placeholder="Select an organization" />
+                              </SelectTrigger_Shadcn_>
+                            </FormControl_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              <SelectGroup_Shadcn_>
+                                {organizations?.map((x: any) => (
+                                  <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                                    {x.name}
+                                  </SelectItem_Shadcn_>
+                                ))}
+                              </SelectGroup_Shadcn_>
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        )}
+                      </FormItemLayout>
+                    )}
+                  />
 
-                                  <div>
-                                    <Button asChild type="default">
-                                      <Link href={`/org/${slug}/invoices`}>View invoices</Link>
-                                    </Button>
+                  {!isAdmin && <NotOrganizationOwnerWarning />}
+                </Panel.Content>
+
+                {canCreateProject && (
+                  <>
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="projectName"
+                        render={({ field }) => (
+                          <FormItemLayout label="Project name" layout="horizontal">
+                            <FormControl_Shadcn_>
+                              <Input_Shadcn_
+                                placeholder="Project name"
+                                {...field}
+                                onChange={(event) => {
+                                  field.onChange(event.target.value.replace(/\./g, ''))
+                                }}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
+                        )}
+                      />
+                    </Panel.Content>
+
+                    {cloudProviderEnabled && showNonProdFields && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="cloudProvider"
+                          render={({ field }) => (
+                            <FormItemLayout label="Cloud provider" layout="horizontal">
+                              <Select_Shadcn_
+                                onValueChange={(value) => {
+                                  field.onChange(value)
+                                  form.setValue(
+                                    'dbRegion',
+                                    value === 'FLY'
+                                      ? FLY_REGIONS_DEFAULT.displayName
+                                      : AWS_REGIONS_DEFAULT.displayName
+                                  )
+                                }}
+                                defaultValue={field.value}
+                              >
+                                <FormControl_Shadcn_>
+                                  <SelectTrigger_Shadcn_>
+                                    <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
+                                  </SelectTrigger_Shadcn_>
+                                </FormControl_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    {Object.values(PROVIDERS).map((providerObj) => {
+                                      const label = providerObj['name']
+                                      const value = providerObj['id']
+                                      return (
+                                        <SelectItem_Shadcn_ key={value} value={value}>
+                                          {label}
+                                        </SelectItem_Shadcn_>
+                                      )
+                                    })}
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="instanceSize"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label={
+                                <div className="flex flex-col gap-y-4">
+                                  <span>Compute Size</span>
+
+                                  <div className="flex flex-col gap-y-2">
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Add-Ons</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
+                                    <Link
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
+                                    >
+                                      <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                        <p className="text-sm m-0">Compute Billing</p>
+                                        <ExternalLink size={16} strokeWidth={1.5} />
+                                      </div>
+                                    </Link>
                                   </div>
                                 </div>
                               }
-                            />
-                          </div>
-                        ) : (
-                          <div className="">
-                            <div className="">
-                              <div className="py-5 border-b grid grid-cols-2 gap-2">
-                                <FormField_Shadcn_
-                                  control={form.control}
-                                  name="organization"
-                                  render={({ field }) => (
-                                    <FormItemLayout label="Organization">
-                                      {(organizations?.length ?? 0) > 0 && (
-                                        <Select_Shadcn_
-                                          onValueChange={(slug) => {
-                                            field.onChange(slug)
-                                            router.push(`/new/${slug}`)
-                                          }}
-                                          defaultValue={field.value}
-                                        >
-                                          <FormControl_Shadcn_>
-                                            <SelectTrigger_Shadcn_>
-                                              <SelectValue_Shadcn_ placeholder="Select an organization" />
-                                            </SelectTrigger_Shadcn_>
-                                          </FormControl_Shadcn_>
-                                          <SelectContent_Shadcn_>
-                                            <SelectGroup_Shadcn_>
-                                              {organizations?.map((x: any) => (
-                                                <SelectItem_Shadcn_ key={x.id} value={x.slug}>
-                                                  {x.name}
-                                                </SelectItem_Shadcn_>
-                                              ))}
-                                            </SelectGroup_Shadcn_>
-                                          </SelectContent_Shadcn_>
-                                        </Select_Shadcn_>
-                                      )}
-                                    </FormItemLayout>
-                                  )}
-                                />
-                                <div>
-                                  <FormField_Shadcn_
-                                    control={form.control}
-                                    name="projectName"
-                                    render={({ field }) => (
-                                      <FormItemLayout label="Project name">
-                                        <FormControl_Shadcn_>
-                                          <Input_Shadcn_
-                                            autoFocus
-                                            placeholder="Project name"
-                                            {...field}
-                                            onChange={(event) => {
-                                              field.onChange(event.target.value.replace(/\./g, ''))
-                                            }}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItemLayout>
-                                    )}
-                                  />
-                                </div>
-                              </div>
-
-                              <>
-                                <div className="py-5 border-b">
-                                  <FormField_Shadcn_
-                                    control={form.control}
-                                    name="dbRegion"
-                                    render={({ field }) => (
-                                      <RegionSelector
-                                        layout="vertical"
-                                        field={field}
-                                        form={form}
-                                        cloudProvider={
+                              description={
+                                <>
+                                  <p>
+                                    The size for your dedicated database. You can change this later.
+                                  </p>
+                                </>
+                              }
+                            >
+                              <Select_Shadcn_
+                                value={field.value}
+                                onValueChange={(value) => field.onChange(value)}
+                              >
+                                <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
+                                  <SelectValue_Shadcn_ placeholder="Select a compute size" />
+                                </SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectGroup_Shadcn_>
+                                    {sizes
+                                      .filter((option) =>
+                                        instanceSizeSpecs[option].cloud_providers.includes(
                                           form.getValues('cloudProvider') as CloudProvider
-                                        }
-                                      />
-                                    )}
-                                  />
-                                </div>
-                                <div className="py-5">
-                                  <FormField_Shadcn_
-                                    control={form.control}
-                                    name="dbPass"
-                                    render={({ field }) => (
-                                      <FormItemLayout
-                                        label="Database Password"
-                                        description={
-                                          <PasswordStrengthBar
-                                            passwordStrengthScore={form.getValues('dbPassStrength')}
-                                            password={field.value}
-                                            passwordStrengthMessage={passwordStrengthMessage}
-                                            generateStrongPassword={generatePassword}
-                                          />
-                                        }
-                                      >
-                                        <FormControl_Shadcn_>
-                                          <Input
-                                            copy={field.value.length > 0}
-                                            type="password"
-                                            placeholder="Type in a strong password"
-                                            {...field}
-                                            autoComplete="off"
-                                            onChange={async (event) => {
-                                              field.onChange(event)
-                                              form.trigger('dbPassStrength')
-                                              const value = event.target.value
-                                              if (event.target.value === '') {
-                                                await form.setValue('dbPassStrength', 0)
-                                                await form.trigger('dbPass')
-                                              } else {
-                                                await delayedCheckPasswordStrength(value)
-                                              }
-                                            }}
-                                          />
-                                        </FormControl_Shadcn_>
-                                      </FormItemLayout>
-                                    )}
-                                  />
-                                </div>
-                                <div className="py-5 border-t border-b">
-                                  <FormItemLayout>
-                                    <SchemaGenerator
-                                      onReset={() => {
-                                        setSqlStatements([])
-                                        setServices([])
-                                      }}
-                                      onSqlGenerated={(sql) => {
-                                        setSqlStatements((prev) => [...prev, sql])
-                                      }}
-                                      onServicesUpdated={setServices}
-                                      onTitleUpdated={(title) => {
-                                        if (!form.getValues('projectName')) {
-                                          form.setValue('projectName', title)
-                                        }
-                                      }}
-                                    />
-                                  </FormItemLayout>
-                                  {sqlStatements.length > 0 && (
-                                    <Button
-                                      type="default"
-                                      className="w-full mt-2 lg:hidden"
-                                      onClick={() => setShowVisual(!showVisual)}
-                                    >
-                                      View the schema
-                                    </Button>
-                                  )}
-                                </div>
-                                {orgSubscription?.plan && orgSubscription?.plan.id !== 'free' && (
-                                  <div className="py-5 border-b">
-                                    <FormField_Shadcn_
-                                      control={form.control}
-                                      name="instanceSize"
-                                      render={({ field }) => (
-                                        <FormItemLayout
-                                          label={
-                                            <div className="flex gap-4 w-full justify-between group:block">
-                                              <span className="flex-1">Compute Size</span>
-                                            </div>
-                                          }
-                                          description={
-                                            <div className="flex flex gap-2">
-                                              <Link
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/compute-add-ons"
-                                              >
-                                                <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                                  <p className="text-sm m-0">Compute Add-Ons</p>
-                                                  <ExternalLink size={16} strokeWidth={1.5} />
-                                                </div>
-                                              </Link>
-                                              <Link
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                href="https://supabase.com/docs/guides/platform/org-based-billing#billing-for-compute-compute-hours"
-                                              >
-                                                <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
-                                                  <p className="text-sm m-0">Compute Billing</p>
-                                                  <ExternalLink size={16} strokeWidth={1.5} />
-                                                </div>
-                                              </Link>
-                                            </div>
-                                          }
-                                        >
-                                          <Select_Shadcn_
-                                            value={field.value}
-                                            onValueChange={(value) => field.onChange(value)}
-                                          >
-                                            <SelectTrigger_Shadcn_ className="[&_.instance-details]:hidden">
-                                              <SelectValue_Shadcn_ placeholder="Select a compute size" />
-                                            </SelectTrigger_Shadcn_>
-                                            <SelectContent_Shadcn_>
-                                              <SelectGroup_Shadcn_>
-                                                {sizes
-                                                  .filter((option) =>
-                                                    instanceSizeSpecs[
-                                                      option
-                                                    ].cloud_providers.includes(
-                                                      form.getValues(
-                                                        'cloudProvider'
-                                                      ) as CloudProvider
-                                                    )
-                                                  )
-                                                  .map((option) => {
-                                                    return (
-                                                      <SelectItem_Shadcn_
-                                                        key={option}
-                                                        value={option}
-                                                      >
-                                                        <div className="flex flex-row i gap-2">
-                                                          <div className="text-center w-[80px]">
-                                                            <Badge
-                                                              variant={
-                                                                option === 'micro'
-                                                                  ? 'default'
-                                                                  : 'brand'
-                                                              }
-                                                              className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                                                            >
-                                                              {instanceSizeSpecs[option].label}
-                                                            </Badge>
-                                                          </div>
-                                                          <div className="text-sm">
-                                                            <span className="text-foreground">
-                                                              {instanceSizeSpecs[option].ram} RAM /{' '}
-                                                              {instanceSizeSpecs[option].cpu}{' '}
-                                                              {getCloudProviderArchitecture(
-                                                                form.getValues(
-                                                                  'cloudProvider'
-                                                                ) as CloudProvider
-                                                              )}{' '}
-                                                              CPU
-                                                            </span>
-                                                            <p className="text-xs text-muted instance-details">
-                                                              $
-                                                              {
-                                                                instanceSizeSpecs[option]
-                                                                  .priceHourly
-                                                              }
-                                                              /hour (~$
-                                                              {
-                                                                instanceSizeSpecs[option]
-                                                                  .priceMonthly
-                                                              }
-                                                              /month)
-                                                            </p>
-                                                          </div>
-                                                        </div>
-                                                      </SelectItem_Shadcn_>
-                                                    )
-                                                  })}
-                                              </SelectGroup_Shadcn_>
-                                            </SelectContent_Shadcn_>
-                                          </Select_Shadcn_>
-                                        </FormItemLayout>
-                                      )}
-                                    />
-
-                                    <FormItemLayout>
-                                      <div className="flex justify-between mr-2 mt-4">
-                                        <span>Additional Monthly Compute Costs</span>
-                                        <div className="text-brand flex gap-1 items-center">
-                                          {organizationProjects.length > 0 ? (
-                                            <>
-                                              <span>${additionalMonthlySpend}</span>
-                                            </>
-                                          ) : (
-                                            <>
-                                              <span className="text-foreground-lighter line-through">
-                                                $
-                                                {
-                                                  instanceSizeSpecs[instanceSize as DbInstanceSize]!
-                                                    .priceMonthly
-                                                }
-                                              </span>
-                                              <span>${additionalMonthlySpend}</span>
-                                            </>
-                                          )}
-                                          <InfoTooltip side="top" className="max-w-[450px] p-0">
-                                            <Table className="mt-2">
-                                              <TableHeader className="[&_th]:h-7">
-                                                <TableRow className="py-2">
-                                                  <TableHead className="w-[170px]">
-                                                    Project
-                                                  </TableHead>
-                                                  <TableHead>Compute Size</TableHead>
-                                                  <TableHead className="text-right">
-                                                    Monthly Costs
-                                                  </TableHead>
-                                                </TableRow>
-                                              </TableHeader>
-                                              <TableBody className="[&_td]:py-2">
-                                                {organizationProjects.map((project) => (
-                                                  <TableRow
-                                                    key={project.ref}
-                                                    className="text-foreground-light"
-                                                  >
-                                                    <TableCell className="w-[170px] truncate">
-                                                      {project.name}
-                                                    </TableCell>
-                                                    <TableCell className="text-center">
-                                                      {instanceLabel(project.infra_compute_size)}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                      $
-                                                      {monthlyInstancePrice(
-                                                        project.infra_compute_size
-                                                      )}
-                                                    </TableCell>
-                                                  </TableRow>
-                                                ))}
-
-                                                <TableRow>
-                                                  <TableCell className="w-[170px] flex gap-2">
-                                                    <span className="truncate">
-                                                      {form.getValues('projectName')
-                                                        ? form.getValues('projectName')
-                                                        : 'New project'}
-                                                    </span>
-                                                    <Badge size={'small'} variant={'default'}>
-                                                      NEW
-                                                    </Badge>
-                                                  </TableCell>
-                                                  <TableCell className="text-center">
-                                                    {instanceLabel(instanceSize)}
-                                                  </TableCell>
-                                                  <TableCell className="text-right">
-                                                    ${monthlyInstancePrice(instanceSize)}
-                                                  </TableCell>
-                                                </TableRow>
-                                              </TableBody>
-                                            </Table>
-                                            <PopoverSeparator />
-                                            <Table>
-                                              <TableHeader className="[&_th]:h-7">
-                                                <TableRow>
-                                                  <TableHead colSpan={2}>Compute Credits</TableHead>
-                                                  <TableHead colSpan={1} className="text-right">
-                                                    -$10
-                                                  </TableHead>
-                                                </TableRow>
-                                              </TableHeader>
-                                              <TableBody className="[&_td]:py-2">
-                                                <TableRow className="text-foreground">
-                                                  <TableCell colSpan={2}>
-                                                    Total Monthly Compute Costs
-                                                    {/**
-                                                     * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
-                                                     *
-                                                     * Will be adjusted in the future [kevin]
-                                                     */}
-                                                    {organizationProjects.length > 0 && (
-                                                      <p className="text-xs text-foreground-lighter">
-                                                        Excluding Read replicas
-                                                      </p>
-                                                    )}
-                                                  </TableCell>
-                                                  <TableCell colSpan={1} className="text-right">
-                                                    ${monthlyComputeCosts}
-                                                  </TableCell>
-                                                </TableRow>
-                                              </TableBody>
-                                            </Table>
-
-                                            <div className="p-4 text-xs text-foreground-light space-y-1">
-                                              <p>
-                                                Compute is charged usage-based whenever your billing
-                                                cycle resets. Given compute charges are hourly, your
-                                                invoice will contain "Compute Hours" for each hour a
-                                                project ran on a specific compute size.
-                                              </p>
-                                              {monthlyComputeCosts > 0 && (
-                                                <p>
-                                                  Compute costs are applied on top of your
-                                                  subscription plan costs.
+                                        )
+                                      )
+                                      .map((option) => {
+                                        return (
+                                          <SelectItem_Shadcn_ key={option} value={option}>
+                                            <div className="flex flex-row i gap-2">
+                                              <div className="text-center w-[80px]">
+                                                <Badge
+                                                  variant={option === 'micro' ? 'default' : 'brand'}
+                                                  className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                                >
+                                                  {instanceSizeSpecs[option].label}
+                                                </Badge>
+                                              </div>
+                                              <div className="text-sm">
+                                                <span className="text-foreground">
+                                                  {instanceSizeSpecs[option].ram} RAM /{' '}
+                                                  {instanceSizeSpecs[option].cpu}{' '}
+                                                  {getCloudProviderArchitecture(
+                                                    form.getValues('cloudProvider') as CloudProvider
+                                                  )}{' '}
+                                                  CPU
+                                                </span>
+                                                <p className="text-xs text-muted instance-details">
+                                                  ${instanceSizeSpecs[option].priceHourly}/hour (~$
+                                                  {instanceSizeSpecs[option].priceMonthly}/month)
                                                 </p>
-                                              )}
+                                              </div>
                                             </div>
-                                          </InfoTooltip>
-                                        </div>
-                                      </div>
+                                          </SelectItem_Shadcn_>
+                                        )
+                                      })}
+                                  </SelectGroup_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormItemLayout layout="horizontal">
+                          <div className="flex justify-between mr-2">
+                            <span>Additional Monthly Compute Costs</span>
+                            <div className="text-brand flex gap-1 items-center">
+                              {organizationProjects.length > 0 ? (
+                                <>
+                                  <span>${additionalMonthlySpend}</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-foreground-lighter line-through">
+                                    $
+                                    {
+                                      instanceSizeSpecs[instanceSize as DbInstanceSize]!
+                                        .priceMonthly
+                                    }
+                                  </span>
+                                  <span>${additionalMonthlySpend}</span>
+                                </>
+                              )}
+                              <InfoTooltip side="top" className="max-w-[450px] p-0">
+                                <Table className="mt-2">
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow className="py-2">
+                                      <TableHead className="w-[170px]">Project</TableHead>
+                                      <TableHead>Compute Size</TableHead>
+                                      <TableHead className="text-right">Monthly Costs</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="[&_td]:py-2">
+                                    {organizationProjects.map((project) => (
+                                      <TableRow key={project.ref} className="text-foreground-light">
+                                        <TableCell className="w-[170px] truncate">
+                                          {project.name}
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                          {instanceLabel(project.infra_compute_size)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                          ${monthlyInstancePrice(project.infra_compute_size)}
+                                        </TableCell>
+                                      </TableRow>
+                                    ))}
 
-                                      <div className="mt-2 text-foreground-lighter space-y-1">
-                                        {additionalMonthlySpend > 0 &&
-                                        availableComputeCredits === 0 ? (
-                                          <p>
-                                            Your monthly spend will increase, and can be more than
-                                            above if you exceed your plan's usage quota. Your
-                                            organization includes $10/month of compute credits,
-                                            which you already exceed with your existing projects.
-                                          </p>
-                                        ) : additionalMonthlySpend > 0 &&
-                                          availableComputeCredits > 0 ? (
-                                          <p>
-                                            Your monthly spend will increase, and can be more than
-                                            above if you exceed your plan's usage quota. Your
-                                            organization includes $10/month of compute credits,
-                                            which you exceed with the selected compute size.
-                                          </p>
-                                        ) : (
-                                          <p>
-                                            Your monthly spend won't increase, unless you exceed
-                                            your plan's usage quota. Your organization includes
-                                            $10/month of compute credits, which cover this project.
+                                    <TableRow>
+                                      <TableCell className="w-[170px] flex gap-2">
+                                        <span className="truncate">
+                                          {form.getValues('projectName')
+                                            ? form.getValues('projectName')
+                                            : 'New project'}
+                                        </span>
+                                        <Badge size={'small'} variant={'default'}>
+                                          NEW
+                                        </Badge>
+                                      </TableCell>
+                                      <TableCell className="text-center">
+                                        {instanceLabel(instanceSize)}
+                                      </TableCell>
+                                      <TableCell className="text-right">
+                                        ${monthlyInstancePrice(instanceSize)}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                                <PopoverSeparator />
+                                <Table>
+                                  <TableHeader className="[&_th]:h-7">
+                                    <TableRow>
+                                      <TableHead colSpan={2}>Compute Credits</TableHead>
+                                      <TableHead colSpan={1} className="text-right">
+                                        -$10
+                                      </TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="[&_td]:py-2">
+                                    <TableRow className="text-foreground">
+                                      <TableCell colSpan={2}>
+                                        Total Monthly Compute Costs
+                                        {/**
+                                         * API currently doesnt output replica information on the projects list endpoint. Until then, we cannot correctly calculate the costs including RRs.
+                                         *
+                                         * Will be adjusted in the future [kevin]
+                                         */}
+                                        {organizationProjects.length > 0 && (
+                                          <p className="text-xs text-foreground-lighter">
+                                            Excluding Read replicas
                                           </p>
                                         )}
-                                      </div>
-                                    </FormItemLayout>
-                                  </div>
-                                )}
-                                <div>
-                                  {!showAdvanced && (
-                                    <Button
-                                      onClick={() => setShowAdvanced(true)}
-                                      icon={<Settings size={16} />}
-                                      type="outline"
-                                      className="w-full mb-2 mt-4"
-                                    >
-                                      Advanced Configuration
-                                    </Button>
+                                      </TableCell>
+                                      <TableCell colSpan={1} className="text-right">
+                                        ${monthlyComputeCosts}
+                                      </TableCell>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+
+                                <div className="p-4 text-xs text-foreground-light space-y-1">
+                                  <p>
+                                    Compute is charged usage-based whenever your billing cycle
+                                    resets. Given compute charges are hourly, your invoice will
+                                    contain "Compute Hours" for each hour a project ran on a
+                                    specific compute size.
+                                  </p>
+                                  {monthlyComputeCosts > 0 && (
+                                    <p>
+                                      Compute costs are applied on top of your subscription plan
+                                      costs.
+                                    </p>
                                   )}
-                                  <div className={cn(showAdvanced ? 'block' : 'hidden')}>
-                                    {cloudProviderEnabled && showNonProdFields && (
-                                      <div className="py-5 border-b">
-                                        <FormField_Shadcn_
-                                          control={form.control}
-                                          name="cloudProvider"
-                                          render={({ field }) => (
-                                            <FormItemLayout label="Cloud provider">
-                                              <Select_Shadcn_
-                                                onValueChange={(value) => {
-                                                  field.onChange(value)
-                                                  form.setValue(
-                                                    'dbRegion',
-                                                    value === 'FLY'
-                                                      ? FLY_REGIONS_DEFAULT.displayName
-                                                      : AWS_REGIONS_DEFAULT.displayName
-                                                  )
-                                                }}
-                                                defaultValue={field.value}
-                                              >
-                                                <FormControl_Shadcn_>
-                                                  <SelectTrigger_Shadcn_>
-                                                    <SelectValue_Shadcn_ placeholder="Select a cloud provider" />
-                                                  </SelectTrigger_Shadcn_>
-                                                </FormControl_Shadcn_>
-                                                <SelectContent_Shadcn_>
-                                                  <SelectGroup_Shadcn_>
-                                                    {Object.values(PROVIDERS).map((providerObj) => {
-                                                      const label = providerObj['name']
-                                                      const value = providerObj['id']
-                                                      return (
-                                                        <SelectItem_Shadcn_
-                                                          key={value}
-                                                          value={value}
-                                                        >
-                                                          {label}
-                                                        </SelectItem_Shadcn_>
-                                                      )
-                                                    })}
-                                                  </SelectGroup_Shadcn_>
-                                                </SelectContent_Shadcn_>
-                                              </Select_Shadcn_>
-                                            </FormItemLayout>
-                                          )}
-                                        />
-                                      </div>
-                                    )}
-
-                                    {!projectVersionSelectionDisabled && (
-                                      <div className="py-5 border-b">
-                                        <FormField_Shadcn_
-                                          control={form.control}
-                                          name="postgresVersionSelection"
-                                          render={({ field }) => (
-                                            <PostgresVersionSelector
-                                              layout="vertical"
-                                              field={field}
-                                              form={form}
-                                              cloudProvider={
-                                                form.getValues('cloudProvider') as CloudProvider
-                                              }
-                                              organizationSlug={slug}
-                                              dbRegion={form.getValues('dbRegion')}
-                                            />
-                                          )}
-                                        />
-                                      </div>
-                                    )}
-
-                                    {showNonProdFields && (
-                                      <div className="py-5 border-b">
-                                        <FormField_Shadcn_
-                                          control={form.control}
-                                          name="postgresVersion"
-                                          render={({ field }) => (
-                                            <FormItemLayout
-                                              label="Custom Postgres version"
-                                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
-                                            >
-                                              <FormControl_Shadcn_>
-                                                <Input_Shadcn_
-                                                  placeholder="Postgres version"
-                                                  {...field}
-                                                  autoComplete="off"
-                                                />
-                                              </FormControl_Shadcn_>
-                                            </FormItemLayout>
-                                          )}
-                                        />
-                                      </div>
-                                    )}
-                                    <div className="py-4 border-b mb-4">
-                                      <SecurityOptions
-                                        layout="vertical"
-                                        collapsible={false}
-                                        form={form}
-                                      />
-                                    </div>
-                                    {allowOrioleDB && !!availableOrioleVersion && (
-                                      <div className="py-4 border-b mb-4">
-                                        <AdvancedConfiguration
-                                          layout="vertical"
-                                          collapsible={false}
-                                          form={form}
-                                        />
-                                      </div>
-                                    )}
-                                  </div>
                                 </div>
-                              </>
-                              <div className="sticky bottom-0 z-20 bg-background-200 pb-6">
-                                <ScrollGradient scrollRef={scrollRef} />
-                                <Button
-                                  form="project-create-form"
-                                  htmlType="submit"
-                                  size="large"
-                                  className="w-full"
-                                >
-                                  Create project
-                                </Button>
-                              </div>
+                              </InfoTooltip>
                             </div>
                           </div>
+
+                          <div className="mt-2 text-foreground-lighter space-y-1">
+                            {additionalMonthlySpend > 0 && availableComputeCredits === 0 ? (
+                              <p>
+                                Your monthly spend will increase, and can be more than above if you
+                                exceed your plan's usage quota. Your organization includes $10/month
+                                of compute credits, which you already exceed with your existing
+                                projects.
+                              </p>
+                            ) : additionalMonthlySpend > 0 && availableComputeCredits > 0 ? (
+                              <p>
+                                Your monthly spend will increase, and can be more than above if you
+                                exceed your plan's usage quota. Your organization includes $10/month
+                                of compute credits, which you exceed with the selected compute size.
+                              </p>
+                            ) : (
+                              <p>
+                                Your monthly spend won't increase, unless you exceed your plan's
+                                usage quota. Your organization includes $10/month of compute
+                                credits, which cover this project.
+                              </p>
+                            )}
+                          </div>
+                        </FormItemLayout>
+                      </Panel.Content>
+                    )}
+
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="dbPass"
+                        render={({ field }) => (
+                          <FormItemLayout
+                            label="Database Password"
+                            layout="horizontal"
+                            description={
+                              <PasswordStrengthBar
+                                passwordStrengthScore={form.getValues('dbPassStrength')}
+                                password={field.value}
+                                passwordStrengthMessage={passwordStrengthMessage}
+                                generateStrongPassword={generatePassword}
+                              />
+                            }
+                          >
+                            <FormControl_Shadcn_>
+                              <Input
+                                copy={field.value.length > 0}
+                                type="password"
+                                placeholder="Type in a strong password"
+                                {...field}
+                                autoComplete="off"
+                                onChange={async (event) => {
+                                  field.onChange(event)
+                                  form.trigger('dbPassStrength')
+                                  const value = event.target.value
+                                  if (event.target.value === '') {
+                                    await form.setValue('dbPassStrength', 0)
+                                    await form.trigger('dbPass')
+                                  } else {
+                                    await delayedCheckPasswordStrength(value)
+                                  }
+                                }}
+                              />
+                            </FormControl_Shadcn_>
+                          </FormItemLayout>
                         )}
-                      </>
-                    </div>
-                  </section>
-                </form>
-              </Form_Shadcn_>
+                      />
+                    </Panel.Content>
+
+                    <Panel.Content>
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="dbRegion"
+                        render={({ field }) => (
+                          <RegionSelector
+                            field={field}
+                            form={form}
+                            cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                          />
+                        )}
+                      />
+                    </Panel.Content>
+
+                    {!projectVersionSelectionDisabled && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersionSelection"
+                          render={({ field }) => (
+                            <PostgresVersionSelector
+                              field={field}
+                              form={form}
+                              cloudProvider={form.getValues('cloudProvider') as CloudProvider}
+                              organizationSlug={slug}
+                              dbRegion={form.getValues('dbRegion')}
+                            />
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    {showNonProdFields && (
+                      <Panel.Content>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="postgresVersion"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="Custom Postgres version"
+                              layout="horizontal"
+                              description="Specify a custom version of Postgres (Defaults to the latest). This is only applicable for local/staging projects"
+                            >
+                              <FormControl_Shadcn_>
+                                <Input_Shadcn_
+                                  placeholder="Postgres version"
+                                  {...field}
+                                  autoComplete="off"
+                                />
+                              </FormControl_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </Panel.Content>
+                    )}
+
+                    <SecurityOptions form={form} />
+                    {allowOrioleDB && !!availableOrioleVersion && (
+                      <AdvancedConfiguration form={form} />
+                    )}
+                  </>
+                )}
+
+                {freePlanWithExceedingLimits ? (
+                  isAdmin &&
+                  slug && (
+                    <Panel.Content>
+                      <FreeProjectLimitWarning
+                        membersExceededLimit={membersExceededLimit || []}
+                        orgSlug={slug}
+                      />
+                    </Panel.Content>
+                  )
+                ) : isManagedByVercel ? (
+                  <Panel.Content>
+                    <PartnerManagedResource
+                      partner="vercel-marketplace"
+                      resource="Projects"
+                      cta={{
+                        installationId: currentOrg?.partner_id,
+                        message: 'Visit Vercel to create a project',
+                      }}
+                    />
+                  </Panel.Content>
+                ) : hasOutstandingInvoices ? (
+                  <Panel.Content>
+                    <Admonition
+                      type="default"
+                      title="Your organization has overdue invoices"
+                      description={
+                        <div className="space-y-3">
+                          <p className="text-sm leading-normal">
+                            Please resolve all outstanding invoices first before creating a new
+                            project
+                          </p>
+
+                          <div>
+                            <Button asChild type="default">
+                              <Link href={`/org/${slug}/invoices`}>View invoices</Link>
+                            </Button>
+                          </div>
+                        </div>
+                      }
+                    />
+                  </Panel.Content>
+                ) : null}
+              </div>
             )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      <section
-        className={cn(
-          'bg-background-200 lg:bg-transparent lg:z-10 lg:flex-1 flex-0 shrink-0 w-full lg:h-screen overflow-hidden',
-          // Mobile styles
-          'lg:sticky lg:top-0', // Always relative on desktop
-          showVisual ? 'fixed inset-0 z-40' : 'hidden lg:block' // Toggle visibility on mobile
-        )}
-      >
-        <ProjectVisual
-          showInfo={step === 2}
-          sqlStatements={sqlStatements}
-          services={services}
-          selectedRegion={selectedRegionObject}
-          projectDetails={{
-            dbRegion: form.getValues('dbRegion'),
-            cloudProvider: form.getValues('cloudProvider'),
-            computeSize: form.getValues('computeSize'),
-            postgresVersion: form.getValues('postgresVersionSelection'),
-          }}
-          instanceLabel={instanceLabel}
-        />
-
-        {/* Add close button when showing visual on mobile */}
-        {showVisual && (
-          <Button
-            type="default"
-            iconLeft={ChevronLeft}
-            className="absolute top-4 left-4 lg:hidden"
-            onClick={() => setShowVisual(false)}
-          >
-            Back
-          </Button>
-        )}
-      </section>
-    </div>
+          </>
+        </Panel>
+      </form>
+    </Form_Shadcn_>
   )
 }
 
@@ -1162,37 +924,19 @@ const instanceLabel = (instance: string | undefined): string => {
   return instanceSizeSpecs[instance as DbInstanceSize]?.label || 'Micro'
 }
 
-const Wizard: NextPageWithLayout = () => {
-  const { slug, projectName } = useParams()
+const PageLayout = withAuth(({ children }: PropsWithChildren) => {
+  const { slug } = useParams()
 
-  const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
-  const currentOrg = organizations?.find((o: any) => o.slug === slug)
-
-  const { data: membersExceededLimit, isLoading: isLoadingFreeProjectLimitCheck } =
-    useFreeProjectLimitCheckQuery({ slug })
-
-  if (!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck) return null
+  const { data: organizations } = useOrganizationsQuery()
+  const currentOrg = organizations?.find((o) => o.slug === slug)
 
   return (
-    <>
-      <Link
-        href="/projects"
-        className="fixed top-4 left-4 rounded border p-2 hover:border-white border-default z-30"
-      >
-        <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" style={{ height: 16 }} />
-      </Link>
-      <AnimatePresence mode="wait">
-        <motion.div
-          initial={{ opacity: 0, scale: 1.02 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.98 }}
-          transition={{ duration: 0.3 }}
-        >
-          <WizardForm />
-        </motion.div>
-      </AnimatePresence>
-    </>
+    <WizardLayoutWithoutAuth organization={currentOrg} project={null}>
+      {children}
+    </WizardLayoutWithoutAuth>
   )
-}
+})
 
-export default withAuth(Wizard)
+Wizard.getLayout = (page) => <PageLayout>{page}</PageLayout>
+
+export default Wizard
