@@ -11,6 +11,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "openapi-typescript": "^6.7.4"
+    "openapi-typescript": "^6.7.4",
+    "prettier": "3.2.4"
   }
 }
