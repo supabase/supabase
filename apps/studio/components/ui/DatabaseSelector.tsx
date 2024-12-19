@@ -2,6 +2,7 @@ import { noop } from 'lodash'
 import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { useParams } from 'common'
@@ -9,6 +10,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -26,7 +28,6 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
@@ -45,6 +46,7 @@ const DatabaseSelector = ({
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [open, setOpen] = useState(false)
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const appState = useAppStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
@@ -206,7 +208,7 @@ const DatabaseSelector = ({
                   onClick={() => {
                     setOpen(false)
                     // [Joshen] This is used in the Connect UI which is available across all pages
-                    appState.setShowConnectDialog(false)
+                    setShowConnect(null)
                   }}
                   className="w-full flex items-center gap-2"
                 >
