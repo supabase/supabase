@@ -1,7 +1,7 @@
-import { useDebounce } from '@uidotdev/usehooks'
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
+import { useDebounce } from 'use-debounce'
 
 import { useCompletion } from 'ai/react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -25,7 +25,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { CreateCronJobForm } from './CreateCronJobSheet'
-import { formatScheduleString, getScheduleMessage, secondsPattern } from './CronJobs.utils'
+import { formatScheduleString, getScheduleMessage } from './CronJobs.utils'
 import CronSyntaxChart from './CronSyntaxChart'
 
 interface CronJobScheduleSectionProps {
