@@ -25,6 +25,9 @@ export const generateSettingsMenu = (
   const storageEnabled = features?.storage ?? true
   const newDiskComputeEnabled = features?.diskAndCompute ?? false
 
+  // If user is in self hosted mode, show log drains, otherwise show only if they are enabled
+  const showLogDrains = IS_PLATFORM ? logDrainsEnabled : true
+
   return [
     {
       title: 'Project Settings',
@@ -80,18 +83,22 @@ export const generateSettingsMenu = (
     {
       title: 'Configuration',
       items: [
-        {
-          name: 'Database',
-          key: 'database',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
-          items: [],
-        },
-        {
-          name: 'API',
-          key: 'api',
-          url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
-          items: [],
-        },
+        ...(IS_PLATFORM
+          ? [
+              {
+                name: 'Database',
+                key: 'database',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/database`,
+                items: [],
+              },
+              {
+                name: 'API',
+                key: 'api',
+                url: isProjectBuilding ? buildingUrl : `/project/${ref}/settings/api`,
+                items: [],
+              },
+            ]
+          : []),
         ...(IS_PLATFORM && authEnabled
           ? [
               {
@@ -135,23 +142,27 @@ export const generateSettingsMenu = (
       ],
     },
 
-    {
-      title: 'Billing',
-      items: [
-        {
-          name: 'Subscription',
-          key: 'subscription',
-          url: `/org/${organization?.slug}/billing`,
-          items: [],
-        },
+    ...(IS_PLATFORM
+      ? [
+          {
+            title: 'Billing',
+            items: [
+              {
+                name: 'Subscription',
+                key: 'subscription',
+                url: `/org/${organization?.slug}/billing`,
+                items: [],
+              },
 
-        {
-          name: 'Usage',
-          key: 'usage',
-          url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
-          items: [],
-        },
-      ],
-    },
+              {
+                name: 'Usage',
+                key: 'usage',
+                url: `/org/${organization?.slug}/usage?projectRef=${ref}`,
+                items: [],
+              },
+            ],
+          },
+        ]
+      : []),
   ]
 }
