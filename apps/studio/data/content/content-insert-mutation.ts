@@ -7,10 +7,7 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<
-  components['schemas']['CreateContentBodyDto'],
-  'content'
-> & {
+export type InsertContentPayload = Omit<components['schemas']['CreateContentBodyV2'], 'content'> & {
   content: Content['content']
 }
 
@@ -40,9 +37,7 @@ export async function insertContent(
     signal,
   })
   if (error) handleError(error)
-
-  // [Joshen] There's an issue with the API codegen due to content endpoint having 2 versions
-  return data as unknown as InsertContentResponse[]
+  return data
 }
 
 export type InsertContentData = Awaited<ReturnType<typeof insertContent>>
