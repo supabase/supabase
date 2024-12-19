@@ -14,8 +14,6 @@ import { toast } from 'sonner'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Content, ContentData } from 'data/content/content-query'
-import { contentKeys } from 'data/content/keys'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
@@ -74,50 +72,10 @@ const UtilityActions = ({
 
   const addFavorite = async () => {
     snapV2.addFavorite(id)
-
-    client.setQueryData<ContentData>(
-      contentKeys.list(project?.ref),
-      (oldData: ContentData | undefined) => {
-        if (!oldData) return
-
-        return {
-          ...oldData,
-          content: oldData.content.map((content: Content) => {
-            if (content.type === 'sql' && content.id === id) {
-              return {
-                ...content,
-                content: { ...content.content, favorite: true },
-              }
-            }
-            return content
-          }),
-        }
-      }
-    )
   }
 
   const removeFavorite = async () => {
     snapV2.removeFavorite(id)
-
-    client.setQueryData<ContentData>(
-      contentKeys.list(project?.ref),
-      (oldData: ContentData | undefined) => {
-        if (!oldData) return
-
-        return {
-          ...oldData,
-          content: oldData.content.map((content: Content) => {
-            if (content.type === 'sql' && content.id === id) {
-              return {
-                ...content,
-                content: { ...content.content, favorite: false },
-              }
-            }
-            return content
-          }),
-        }
-      }
-    )
   }
 
   return (

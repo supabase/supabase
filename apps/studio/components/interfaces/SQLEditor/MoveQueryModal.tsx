@@ -9,8 +9,12 @@ import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
 import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
-import { Snippet, SnippetDetail } from 'data/content/sql-folders-query'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
+import { Snippet } from 'data/content/sql-folders-query'
+import {
+  SnippetWithContent,
+  useSnippetFolders,
+  useSqlEditorV2StateSnapshot,
+} from 'state/sql-editor-v2'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -125,16 +129,18 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
       await Promise.all(
         snippets.map(async (snippet) => {
-          let snippetContent = (snippet as SnippetDetail)?.content
+          let snippetContent = (snippet as SnippetWithContent)?.content
           if (snippetContent === undefined) {
             const { content } = await getContentById({ projectRef: ref, id: snippet.id })
-            snippetContent = content
+            if ('sql' in content) {
+              snippetContent = content
+            }
           }
 
           if (snippetContent === undefined) {
             return toast.error('Failed to save snippet: Unable to retrieve snippet contents')
           } else {
-            moveSnippetAsync({
+            await moveSnippetAsync({
               projectRef: ref,
               payload: {
                 id: snippet.id,
@@ -144,7 +150,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 visibility: snippet.visibility,
                 project_id: snippet.project_id,
                 owner_id: snippet.owner_id,
-                folder_id: selectedId === 'root' ? (null as any) : folderId,
+                folder_id: selectedId === 'root' ? null : folderId,
                 content: snippetContent as any,
               },
             })
@@ -158,7 +164,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       snippets.forEach((snippet) => {
         snapV2.updateSnippet({
           id: snippet.id,
-          snippet: { ...snippet, folder_id: selectedId === 'root' ? (null as any) : selectedId },
+          snippet: { ...snippet, folder_id: selectedId === 'root' ? null : selectedId },
           skipSave: true,
         })
       })
