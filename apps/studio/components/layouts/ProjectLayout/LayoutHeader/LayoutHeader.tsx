@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { ReactNode, useMemo } from 'react'
 
 import Connect from 'components/interfaces/Connect/Connect'
 import { useParams } from 'common'
@@ -39,7 +39,22 @@ const LayoutHeaderDivider = () => (
   </span>
 )
 
-const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
+interface LayoutHeaderProps {
+  customHeaderComponents?: ReactNode
+  breadcrumbs?: any[]
+  headerBorder?: boolean
+  showProductMenu?: boolean
+  customSidebarContent?: ReactNode
+  handleMobileMenu: Function
+}
+
+const LayoutHeader = ({
+  customHeaderComponents,
+  breadcrumbs = [],
+  headerBorder = true,
+  showProductMenu,
+  handleMobileMenu,
+}: LayoutHeaderProps) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
@@ -72,51 +87,69 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         headerBorder ? 'border-b border-default' : ''
       )}
     >
-      <div className="flex items-center justify-between py-2 px-3 flex-1">
-        <div className="flex items-center text-sm">
-          {projectRef && (
-            <>
-              <div className="flex items-center">
-                <OrganizationDropdown />
-                <LayoutHeaderDivider />
-                <ProjectDropdown />
-
-                {exceedingLimits && (
-                  <div className="ml-2">
-                    <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge variant="destructive">Exceeding usage limits</Badge>
-                    </Link>
-                  </div>
-                )}
-
-                {selectedProject && isBranchingEnabled && (
-                  <>
-                    <LayoutHeaderDivider />
-                    <BranchDropdown />
-                  </>
-                )}
-              </div>
-
-              <div className="ml-3 flex items-center gap-x-3">
-                {connectDialogUpdate && <Connect />}
-                {!isBranchingEnabled && <EnableBranchingButton />}
-              </div>
-            </>
-          )}
-
-          {/* Additional breadcrumbs are supplied */}
-          <BreadcrumbsView defaultValue={breadcrumbs} />
+      {showProductMenu && (
+        <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
+          <button
+            title="Menu dropdown button"
+            className={cn(
+              'group/view-toggle ml-4 flex justify-center flex-col border-none space-x-0 items-start gap-1 !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px]'
+            )}
+            onClick={() => handleMobileMenu()}
+          >
+            <div className="h-px inline-block left-0 w-4 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+            <div className="h-px inline-block left-0 w-3 transition-all ease-out bg-foreground-lighter group-hover/view-toggle:bg-foreground p-0 m-0" />
+          </button>
         </div>
-        <div className="flex items-center gap-x-2">
-          {customHeaderComponents && customHeaderComponents}
-          {IS_PLATFORM && (
-            <>
-              <FeedbackDropdown />
-              <NotificationsPopoverV2 />
-              <HelpPopover />
-            </>
-          )}
+      )}
+      <div className="relative flex flex-1 overflow-hidden">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-scroll">
+          <div className="flex items-center text-sm">
+            {projectRef && (
+              <>
+                <div className="flex items-center">
+                  <OrganizationDropdown />
+                  <LayoutHeaderDivider />
+                  <ProjectDropdown />
+
+                  {exceedingLimits && (
+                    <div className="ml-2">
+                      <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Badge variant="destructive">Exceeding usage limits</Badge>
+                      </Link>
+                    </div>
+                  )}
+
+                  {selectedProject && isBranchingEnabled && (
+                    <>
+                      <LayoutHeaderDivider />
+                      <BranchDropdown />
+                    </>
+                  )}
+                </div>
+
+                <div className="ml-3 flex items-center gap-x-3">
+                  {connectDialogUpdate && <Connect />}
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </div>
+              </>
+            )}
+
+            {/* Additional breadcrumbs are supplied */}
+            <BreadcrumbsView defaultValue={breadcrumbs} />
+          </div>
+          <div className="flex items-center gap-x-2">
+            {customHeaderComponents && customHeaderComponents}
+            {IS_PLATFORM && (
+              <>
+                <FeedbackDropdown />
+                <NotificationsPopoverV2 />
+                <HelpPopover />
+              </>
+            )}
+          </div>
         </div>
+        <div className="absolute md:hidden left-0 h-full w-3 bg-gradient-to-r from-background-dash-sidebar to-transparent pointer-events-none" />
+        <div className="absolute md:hidden right-0 h-full w-3 bg-gradient-to-l from-background-dash-sidebar to-transparent pointer-events-none" />
       </div>
       {!!projectRef && (
         <div className="border-l flex-0 h-full">
