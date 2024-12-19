@@ -81,6 +81,7 @@ const TeamSettings = () => {
         <ScaffoldFilterAndContent>
           <ScaffoldActionsContainer className="justify-between">
             <Input
+              autoComplete="off"
               icon={<Search size={12} />}
               size="small"
               value={searchString}
