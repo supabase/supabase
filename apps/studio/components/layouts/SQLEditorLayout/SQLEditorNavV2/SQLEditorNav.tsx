@@ -153,9 +153,6 @@ export const SQLEditorNav = ({
 
     return snippetInfo
   }, [privateSnippetsPages?.pages, subResults, isLoading, isPreviousData, isFetching, snippet])
-  useEffect(() => {
-    setIsSearching?.(filteredSnippets.isLoading)
-  }, [filteredSnippets.isLoading, setIsSearching])
 
   const privateSnippets = useMemo(
     () =>
@@ -524,6 +521,14 @@ export const SQLEditorNav = ({
 
     setSelectedSnippets(_selectedSnippets)
   }
+
+  // ===============
+  // useEffects
+  // ===============
+
+  useEffect(() => {
+    setIsSearching?.(filteredSnippets.isLoading)
+  }, [filteredSnippets.isLoading, setIsSearching])
 
   useEffect(() => {
     if (snippet !== undefined && !mountedId) {

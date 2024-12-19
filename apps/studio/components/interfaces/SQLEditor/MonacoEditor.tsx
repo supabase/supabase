@@ -114,10 +114,7 @@ const MonacoEditor = ({
     }
   }
 
-  // [Joshen] Also needs updating here
-  const debouncedSetSql = debounce((id, value) => {
-    snapV2.setSql(id, value)
-  }, 1000)
+  const debouncedSetSql = debounce((id, value) => snapV2.setSql(id, value), 1000)
 
   function handleEditorChange(value: string | undefined) {
     const snippetCheck = snapV2.snippets[id]

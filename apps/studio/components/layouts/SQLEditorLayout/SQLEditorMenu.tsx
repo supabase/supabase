@@ -50,11 +50,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
   })
 
   const createNewFolder = () => {
-    // [Joshen] LEFT OFF: We need to figure out a good UX for creating folders
-    // - Modal? Directly chuck into the tree view like storage explorer?
     if (!ref) return console.error('Project ref is required')
     snapV2.addNewFolder({ projectRef: ref })
-    // createFolder({ projectRef: ref, name: 'test' })
   }
 
   const handleNewQuery = async () => {
@@ -64,17 +61,8 @@ export const SQLEditorMenu = ({ onViewOngoingQueries }: SQLEditorMenuProps) => {
     if (!canCreateSQLSnippet) {
       return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
-
     try {
-      const snippet = createSqlSnippetSkeletonV2({
-        id: uuidv4(),
-        name: untitledSnippetTitle,
-        owner_id: profile.id,
-        project_id: project.id,
-        sql: '',
-      })
-      snapV2.addSnippet({ projectRef: ref, snippet })
-      router.push(`/project/${ref}/sql/${snippet.id}`)
+      router.push(`/project/${ref}/sql/new?skip=true`)
       setSearchText('')
     } catch (error: any) {
       toast.error(`Failed to create new query: ${error.message}`)

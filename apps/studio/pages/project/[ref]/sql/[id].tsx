@@ -23,7 +23,7 @@ import type { NextPageWithLayout } from 'types'
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref, content } = useParams()
+  const { id, ref, content, skip } = useParams()
 
   const { project } = useProjectContext()
   const appSnap = useAppStateSnapshot()
@@ -118,11 +118,18 @@ const SqlEditor: NextPageWithLayout = () => {
     pgInfoRef.current.functions = functions
   }
 
+  // Load the last visited snippet when landing on /new
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
+    if (
+      id === 'new' &&
+      skip !== 'true' && // [Joshen] Skip flag implies to skip loading the last visited snippet
+      appSnap.dashboardHistory.sql !== undefined &&
+      content === undefined
+    ) {
       const snippet = allSnippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, allSnippets, content])
 
   // Enable pgsql format
@@ -138,6 +145,7 @@ const SqlEditor: NextPageWithLayout = () => {
       })
       return () => formatProvider.dispose()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [monaco])
 
   // Register auto completion item provider for pgsql
@@ -162,6 +170,7 @@ const SqlEditor: NextPageWithLayout = () => {
         signatureHelpProvider?.dispose()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPgInfoReady])
 
   return (
