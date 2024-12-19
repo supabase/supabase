@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "These tests can be run with Docker.",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "docker:up": "cd ../docker && ENABLE_EMAIL_AUTOCONFIRM=true docker compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml up -d",
     "docker:down": "cd ../docker && docker compose --env-file ./.env -f docker-compose.yml -f dev/docker-compose.dev.yml down",
     "test": "jest",

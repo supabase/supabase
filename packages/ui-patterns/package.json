@@ -5,6 +5,7 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit"

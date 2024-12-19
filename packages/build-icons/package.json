@@ -9,6 +9,7 @@
     "build-icons": "src/main.mjs"
   },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules"
   },
   "engines": {

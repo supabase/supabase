@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generate-env.js",
     "pretest": "pnpm run env:setup",
     "test": "playwright test",

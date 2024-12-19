@@ -6,6 +6,7 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit",
     "test": "jest"
