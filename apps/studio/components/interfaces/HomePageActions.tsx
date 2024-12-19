@@ -21,6 +21,7 @@ import {
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
+import { useFlag } from 'hooks/ui/useFlag'
 
 interface HomePageActionsProps {
   organizations: { name: string; slug: string }[]
@@ -41,8 +42,9 @@ const HomePageActions = ({
 
   const organizationCreationEnabled = useIsFeatureEnabled('organizations:create')
   const { isSuccess: orgsLoaded } = useOrganizationsQuery()
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
 
-  const newProjectPath = true ? '/new/v2' : '/new'
+  const newProjectPath = projectCreationExperimentGroup === 'group-b' ? '/new/v2' : '/new'
 
   return (
     <div className="flex flex-col gap-2 md:gap-3 md:flex-row">
