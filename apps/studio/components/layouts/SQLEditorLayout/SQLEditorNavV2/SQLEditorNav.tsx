@@ -563,7 +563,7 @@ export const SQLEditorNav = ({
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingSharedSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numProjectSnippets === 0 ? (
+          ) : numProjectSnippets === 0 && sharedSnippets.length === 0 ? (
             <InnerSideBarEmptyPanel
               className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
               title={isSearching ? 'No results found based on your search' : 'No shared queries'}
@@ -621,7 +621,7 @@ export const SQLEditorNav = ({
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoadingFavoriteSqlSnippets ? (
             <SQLEditorLoadingSnippets />
-          ) : numFavoriteSnippets === 0 ? (
+          ) : numFavoriteSnippets === 0 && favoriteSnippets.length === 0 ? (
             <InnerSideBarEmptyPanel
               title={isSearching ? 'No results found based on your search' : 'No favorite queries'}
               className={cn('mx-2 px-3', isSearching ? '[&>div>p]:text-foreground-lighter' : '')}
@@ -685,7 +685,7 @@ export const SQLEditorNav = ({
         <InnerSideMenuCollapsibleContent className="group-data-[state=open]:pt-2">
           {isLoading ? (
             <SQLEditorLoadingSnippets />
-          ) : folders.length === 0 && numPrivateSnippets === 0 ? (
+          ) : folders.length === 0 && numPrivateSnippets === 0 && privateSnippets.length === 0 ? (
             <InnerSideBarEmptyPanel
               className="mx-3 px-4"
               title="No queries created yet"
