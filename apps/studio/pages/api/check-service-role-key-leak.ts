@@ -15,16 +15,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
 async function handleGet(req: NextApiRequest, res: NextApiResponse) {
   const projectRef = req.headers['x-project'] as string
-  const project = 'bzembqluzmwrjuidwley'
   console.log('the ref', projectRef)
 
-  if (!project) {
+  if (!projectRef) {
     return res.status(400).json({ error: 'Project reference is required' })
   }
 
   try {
     const response = await fetch(
-      `https://api.logflare.app/api/endpoints/query/exposed%20service_role%20advisor%20hack?project=${project}`,
+      `https://api.logflare.app/api/endpoints/query/exposed%20service_role%20advisor%20hack?project=${projectRef}`,
       {
         method: 'GET',
         headers: {
