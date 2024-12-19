@@ -174,6 +174,24 @@ export interface FeaturePreviewsClickedEvent {
 }
 
 /**
+ * A feature preview was enabled by the user through the FeaturePreviewModal.
+ *
+ * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface FeaturePreviewEnabledEvent {
+  action: TelemetryActions.FEATURE_PREVIEW_ENABLED
+  properties: {
+    /**
+     * Feature key of the preview that was enabled. e.g. supabase-ui-api-side-panel
+     */
+    feature: string
+  }
+}
+
+/**
  * A feature preview was disabled by the user through the FeaturePreviewModal.
  *
  * The FeaturePreviewModal can be opened clicking at the profile icon at the bottom left corner of the project sidebar.
