@@ -307,7 +307,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     },
     onSuccess: (values) => {
       setSaveModalOpen(false)
-      toast.success(`Saved "${values[0].name}" log query`)
+      toast.success(`Saved "${values.name}" log query`)
     },
   })
 
