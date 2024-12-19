@@ -25,11 +25,11 @@ Putting all that aside, congratulations to all those that participated. We had a
 
 Despite only announcing the challenge several days before launch, we saw some impressive participation from the community.
 
-* 291 sign ups  
-* 184 found at least one flag  
-* 22 captured all nine flags  
-* 1 minute 35 seconds: Time to capture the first flag  
-* 47 hours 46 minutes: Time to capture the last flag
+- 291 sign ups
+- 184 found at least one flag
+- 22 captured all nine flags
+- 1 minute 35 seconds: Time to capture the first flag
+- 47 hours 46 minutes: Time to capture the last flag
 
 If you weren’t able to find all the flags, or are just interested in learning some intelligence gathering techniques hackers use to find and capture flags, read on as we detail all nine flags and how to find them.
 
@@ -37,10 +37,10 @@ If you weren’t able to find all the flags, or are just interested in learning 
 
 You will need the following tools installed on your computer to follow along in this walkthrough:
 
-* cURL  
-* Web Browser  
-* psql client  
-* Burp Suite (optional)
+- cURL
+- Web Browser
+- psql client
+- Burp Suite (optional)
 
 To follow along with this walkthrough practically, you will need to run the challenge app locally. Clone [this repo here](https://github.com/supabase/hack-the-base) and follow the README instructions in the dec-24 directory. You will only need to run the web app locally as the Supabase backend project is still up and usable (for the foreseeable future).
 
@@ -178,9 +178,9 @@ curl 'https://ubssibzsnwtwbbvbhbvb.supabase.co/rest/v1/bulletins?select=*' \
  -H "authorization: Bearer $ANON_KEY"
 ```
 
-“The schema must be one of the following: public, information\_schema, storage”
+“The schema must be one of the following: public, information_schema, storage”
 
-It would appear that the information\_schema schema is exposed on this project. Information schemas, you should be aware, are a really bad thing to expose publicly. This is where all of the information about our database can be queried, including tables, and roles.
+It would appear that the information_schema schema is exposed on this project. Information schemas, you should be aware, are a really bad thing to expose publicly. This is where all of the information about our database can be queried, including tables, and roles.
 
 Lets check out the tables table in the information schema, specifically the tables in the public schema. To do this we modify our cURL command like this, noting the changes to the accept-profile header, and the parameters in the url:
 
@@ -195,7 +195,7 @@ This returns a JSON array that containing all the table names in the public sche
 
 `[{"table_name": "bulletins","table_schema":"public"}, {"table_name":"staff","table_schema":"public"}, {"table_name":"staff_only","table_schema":"public"}]`
 
-The bulletins table we already knew about, but staff and staff\_only are new to us. The staff\_only table will be relevant for the next flag, here we are interested in the staff table.
+The bulletins table we already knew about, but staff and staff_only are new to us. The staff_only table will be relevant for the next flag, here we are interested in the staff table.
 
 We are almost there, and now that we understand how to query the schema with our cURL commands, its as simple as updating our request to query the staff table in the public schema:
 
@@ -244,7 +244,7 @@ Should I have included a password higher up on most wordlists? Yes, yes I should
 
 Once you have found the right password (Password123), it’s not over yet. Logging in with these credentials will only show you the old client side validation flag.
 
-Remember the staff\_only table we discovered in the “open schema” flag previously? Well now is our chance to exploit this. The last thing we need to do is leverage our staff authorisation to query this table.
+Remember the staff_only table we discovered in the “open schema” flag previously? Well now is our chance to exploit this. The last thing we need to do is leverage our staff authorisation to query this table.
 
 In your browser with DevTools open and while logged in as Herbert West refresh the home page to get the request to bulletins we used in the “scoped bulletins” flag above. In the Network panel, right click and “copy as curl”. In the command line, modify the path from `/bulletins?select=*&date=gt.2001-01-01` to `/staff_only` this will return our second intermediate flag.
 
@@ -325,7 +325,7 @@ Now that we have our EC2 setup, lets use our connection string to successfully c
 
 Our quest is not over yet however. Checking out the data in the database using `\\dt` will reveal a table called “secrets”. Trying to query that data only get us a permission denied error.
 
-Now we need to do some database spelunking. Cutting to the chase, we are able to query the available roles in the pg\_roles table: `SELECT * FROM pg_roles;` this will reveal all the roles within the db including a lot of built in and default roles. One that should have caught our eyes is the “devotee” role. Assume this role using the command `SET ROLE devotee;` , we can now query the secrets table using `SELECT * FROM secrets;`
+Now we need to do some database spelunking. Cutting to the chase, we are able to query the available roles in the pg_roles table: `SELECT * FROM pg_roles;` this will reveal all the roles within the db including a lot of built in and default roles. One that should have caught our eyes is the “devotee” role. Assume this role using the command `SET ROLE devotee;` , we can now query the secrets table using `SELECT * FROM secrets;`
 
 And with that you have now collected all the flags. Congratulations\!
 
