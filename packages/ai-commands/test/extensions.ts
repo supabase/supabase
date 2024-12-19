@@ -1,12 +1,12 @@
-import { expect } from '@jest/globals'
+import { expect } from 'vitest'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
 
-const openAiKey = process.env.OPENAI_API_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
-
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {
+    const openAiKey = process.env.OPENAI_API_KEY
+    const openai = new OpenAI({ apiKey: openAiKey })
+
     const model = 'gpt-4o-2024-05-13'
 
     const completionResponse = await openai.chat.completions.create({
