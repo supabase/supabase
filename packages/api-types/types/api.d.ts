@@ -854,15 +854,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/platform/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -872,7 +869,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/platform/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/platform/projects/{ref}/content/folders': {
@@ -1863,15 +1860,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/v0/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -1881,7 +1875,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/v0/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/v0/projects/{ref}/content/item/{id}': {
@@ -2936,9 +2930,13 @@ export interface components {
       tableId: number
       type: string
     }
-    CreateContentBody: {
-      content?: Record<string, never>
+    CreateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name: string
       owner_id?: number
@@ -2947,20 +2945,9 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
-    CreateContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
+    CreateContentFolderBodyDto: {
       name: string
-      owner_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    CreateContentFolderBody: {
-      name: string
+      /** Format: uuid */
       parent_id?: string
     }
     CreateExtensionBody: {
@@ -3774,7 +3761,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3788,6 +3775,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentFolderResponse: {
+      cursor?: string
       data: {
         contents?: components['schemas']['UserContentObjectMeta'][]
         folders?: components['schemas']['UserContentFolder'][]
@@ -3796,6 +3784,8 @@ export interface components {
     GetUserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3817,6 +3807,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentResponse: {
+      cursor?: string
       data: components['schemas']['GetUserContentObject'][]
     }
     GetUserOrganizationIntegrationResponse: {
@@ -5615,6 +5606,7 @@ export interface components {
       sql: string
     }
     SnippetList: {
+      cursor?: string
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
@@ -6162,9 +6154,13 @@ export interface components {
       name?: string
       type?: string
     }
-    UpdateContentBody: {
-      content?: Record<string, never>
+    UpdateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name?: string
       owner_id?: number
@@ -6173,7 +6169,7 @@ export interface components {
       /** @enum {string} */
       visibility?: 'user' | 'project' | 'org' | 'public'
     }
-    UpdateContentFolderBody: {
+    UpdateContentFolderBodyDto: {
       name: string
     }
     UpdateCustomHostnameBody: {
@@ -6700,25 +6696,16 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       target_version: string
     }
-    UpsertContentBody: {
-      content?: Record<string, never>
+    UpsertContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
-      id?: string
+      /** Format: uuid */
+      folder_id?: null | string
+      id: string
       name: string
-      owner_id?: number
-      project_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UpsertContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
-      name: string
-      owner_id?: number
+      owner_id: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -6780,6 +6767,8 @@ export interface components {
     UserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -6794,25 +6783,8 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
-      favorite: boolean | null
-      folder_id?: string
-      id: string
-      inserted_at: string
-      last_updated_by?: number
-      name: string
-      owner_id: number
-      project_id: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      updated_at: string
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UserContentObjectV2: {
-      content: Record<string, never>
-      description?: string
-      favorite: boolean | null
-      folder_id?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -12726,14 +12698,20 @@ export interface operations {
       }
     }
   }
-  /**
-   * Gets project's content
-   * @deprecated
-   */
+  /** Gets project's content */
   ContentController_getContent: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        name?: string
+        favorite?: boolean
+      }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12750,16 +12728,15 @@ export interface operations {
     }
   }
   /** Updates project's content */
-  ContentController_updateWholeContentV2: {
+  ContentController_updateWholeContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpsertContentBodyV2']
+        'application/json': components['schemas']['UpsertContentBodyDto']
       }
     }
     responses: {
@@ -12773,22 +12750,21 @@ export interface operations {
     }
   }
   /** Creates project's content */
-  ContentController_createContentV2: {
+  ContentController_createContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentBodyV2']
+        'application/json': components['schemas']['CreateContentBodyDto']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['UserContentObjectV2']
+          'application/json': components['schemas']['UserContentObject']
         }
       }
       /** @description Failed to create project's content */
@@ -12804,7 +12780,6 @@ export interface operations {
         ids: string[]
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12829,10 +12804,13 @@ export interface operations {
       query: {
         id: string
       }
+      path: {
+        ref: string
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentBody']
+        'application/json': components['schemas']['UpdateContentBodyDto']
       }
     }
     responses: {
@@ -12847,14 +12825,16 @@ export interface operations {
       }
     }
   }
-  /** Gets the count of a user's content by type */
+  /** Gets the count of a user's content */
   ContentController_getContentCount: {
     parameters: {
       query?: {
-        type?: string
+        visibility?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        favorite?: boolean
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12874,10 +12854,15 @@ export interface operations {
   ContentFoldersController_getRootFolder: {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12897,13 +12882,12 @@ export interface operations {
   ContentFoldersController_createFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentFolderBody']
+        'application/json': components['schemas']['CreateContentFolderBodyDto']
       }
     }
     responses: {
@@ -12924,6 +12908,9 @@ export interface operations {
       query: {
         ids: string[]
       }
+      path: {
+        ref: string
+      }
     }
     responses: {
       200: {
@@ -12938,11 +12925,17 @@ export interface operations {
   /** Gets project's content folder */
   ContentFoldersController_getFolder: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        name?: string
+      }
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -12961,15 +12954,14 @@ export interface operations {
   ContentFoldersController_updateFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentFolderBody']
+        'application/json': components['schemas']['UpdateContentFolderBodyDto']
       }
     }
     responses: {
@@ -12986,10 +12978,8 @@ export interface operations {
   ContentController_getContentById: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Content id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -17434,6 +17424,10 @@ export interface operations {
   'v1-list-all-snippets': {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         project_ref?: string
       }
     }
