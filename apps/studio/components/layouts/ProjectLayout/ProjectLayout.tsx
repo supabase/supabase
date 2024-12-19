@@ -43,6 +43,7 @@ import RestoreFailedState from './RestoreFailedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
+import { useFlag } from 'hooks/ui/useFlag'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -98,13 +99,15 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
-    const { ref: projectRef } = useParams()
+    const { ref: projectRef, showConnect } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
-    const { aiAssistantPanel, setAiAssistantPanel } = useAppStateSnapshot()
+    const { aiAssistantPanel, setAiAssistantPanel, setShowConnectDialog } = useAppStateSnapshot()
     const { open } = aiAssistantPanel
 
+    const connectDialogUpdate = useFlag('connectDialogUpdate')
     const projectName = selectedProject?.name
     const organizationName = selectedOrganization?.name
 
@@ -119,11 +122,18 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const [isClient, setIsClient] = useState(false)
+    const handleMobileMenu = () => {
+      setIsSheetOpen(true)
+    }
 
     useEffect(() => {
       setIsClient(true)
     }, [])
+
+    useEffect(() => {
+      if (showConnect === 'true' && connectDialogUpdate) setShowConnectDialog(true)
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showConnect, connectDialogUpdate])
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
@@ -137,10 +147,6 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       return () => window.removeEventListener('keydown', handler)
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open])
-
-    const handleMobileMenu = () => {
-      setIsSheetOpen(true)
-    }
 
     return (
       <AppLayout>
