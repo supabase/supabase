@@ -1,11 +1,10 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { useTrackedState } from 'components/grid/store/Store'
 import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -25,7 +24,7 @@ import {
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   PopoverContent_Shadcn_,
@@ -60,7 +59,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isMaterializedView = isTableLikeMaterializedView(table)
 
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
-  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
+  const isLocked = PROTECTED_SCHEMAS.includes(table.schema)
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {

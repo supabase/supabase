@@ -48,11 +48,26 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/realtime',
             level: 'realtime',
           },
+        ],
+        [
+          { label: 'Postgres Modules' },
           {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
             level: 'ai',
+          },
+          {
+            label: 'Cron',
+            icon: 'cron',
+            href: '/guides/cron',
+            level: 'cron',
+          },
+          {
+            label: 'Queues',
+            icon: 'queues',
+            href: '/guides/queues',
+            level: 'queues',
           },
         ],
       ],
@@ -70,6 +85,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'local_development',
           },
           {
+            label: 'Deployment',
+            icon: 'deployment',
+            href: '/guides/deployment',
+            level: 'deployment',
+          },
+          {
             label: 'Self-Hosting',
             icon: 'self-hosting',
             href: '/guides/self-hosting',
@@ -81,12 +102,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations',
             level: 'integrations',
-          },
-          {
-            label: 'Deployment',
-            icon: 'deployment',
-            href: '/guides/deployment',
-            level: 'deployment',
           },
         ],
       ],
@@ -346,6 +361,16 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift',
+        },
+      ],
+    },
+    {
+      name: 'AI Prompts',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/getting-started/ai-prompts',
         },
       ],
     },
@@ -742,6 +767,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'DBeaver',
       url: '/guides/database/dbeaver',
     },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
   ],
 }
 
@@ -815,6 +844,16 @@ export const database: NavMenuConstant = {
         {
           name: 'Managing connections',
           url: '/guides/database/connection-management',
+        },
+      ],
+    },
+    {
+      name: 'OrioleDB',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/orioledb',
         },
       ],
     },
@@ -942,7 +981,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
-          name: 'pg_cron: Job Scheduling',
+          name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron',
         },
         {
@@ -970,6 +1009,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_stat_monitor',
         },
         {
+          name: 'postgres_fdw: query data from an external Postgres server',
+          url: '/guides/database/extensions/postgres_fdw',
+        },
+        {
           name: 'pgvector: Embeddings and vector similarity',
           url: '/guides/database/extensions/pgvector',
         },
@@ -980,6 +1023,10 @@ export const database: NavMenuConstant = {
         {
           name: 'PostGIS: Geo queries',
           url: '/guides/database/extensions/postgis',
+        },
+        {
+          name: 'pgmq: Queues',
+          url: '/guides/database/extensions/pgmq',
         },
         {
           name: 'pgsodium (pending deprecation): Encryption Features',
@@ -1089,6 +1136,45 @@ export const database: NavMenuConstant = {
           name: 'Replicating from Supabase to External Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
+      ],
+    },
+  ],
+}
+
+export const cron: NavMenuConstant = {
+  icon: 'cron',
+  title: 'Cron',
+  url: '/guides/cron',
+  items: [
+    { name: 'Overview', url: '/guides/cron' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [
+        { name: 'Install', url: '/guides/cron/install' },
+        { name: 'Quickstart', url: '/guides/cron/quickstart' },
+      ],
+    },
+  ],
+}
+
+export const queues: NavMenuConstant = {
+  icon: 'queues',
+  title: 'Queues',
+  url: '/guides/queues',
+  items: [
+    { name: 'Overview', url: '/guides/queues' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+    },
+    {
+      name: 'References',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/queues/api' },
+        { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
       ],
     },
   ],
@@ -1251,6 +1337,14 @@ export const functions: NavMenuConstant = {
         {
           name: 'Background Tasks',
           url: '/guides/functions/background-tasks',
+        },
+        {
+          name: 'Ephemeral Storage',
+          url: '/guides/functions/ephemeral-storage',
+        },
+        {
+          name: 'WebSockets',
+          url: '/guides/functions/websockets',
         },
         {
           name: 'Running AI Models',
@@ -1474,6 +1568,7 @@ export const realtime: NavMenuConstant = {
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
     {
@@ -1942,6 +2037,7 @@ export const platform: NavMenuConstant = {
         { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
+        { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions',
@@ -2122,6 +2218,7 @@ export const deployment: NavMenuConstant = {
       name: 'Environments',
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
         { name: 'Branching', url: '/guides/deployment/branching' },
       ],
     },

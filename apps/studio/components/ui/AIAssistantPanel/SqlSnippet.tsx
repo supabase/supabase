@@ -1,14 +1,19 @@
-import { Code, DatabaseIcon, Edit, Play } from 'lucide-react'
+import { Code, Edit, Play } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import useNewQuery from 'components/interfaces/SQLEditor/hooks'
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { suffixWithLimit } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import Results from 'components/interfaces/SQLEditor/UtilityPanel/Results'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
@@ -21,20 +26,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SQL_ICON,
   cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { ButtonTooltip } from '../ButtonTooltip'
 import {
+  containsUnknownFunction,
   getContextualInvalidationKeys,
   identifyQueryType,
   isReadOnlySelect,
 } from './AIAssistant.utils'
-import { useParams } from 'common'
-import { useQueryClient } from '@tanstack/react-query'
-import { Markdown } from 'components/interfaces/Markdown'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
 
 interface SqlSnippetWrapperProps {
   sql: string
@@ -54,12 +56,13 @@ const SqlSnippetWrapper = ({
   const updatedFormatted = formatted?.replace(/--\s*props:\s*\{[^}]+\}/, '').trim()
 
   return (
-    <div className="-mx-8 my-3 mt-2 border-b overflow-hidden">
+    <div className="overflow-hidden">
       <SqlCard
         sql={updatedFormatted}
         isChart={props.isChart === 'true'}
         xAxis={props.xAxis}
         yAxis={props.yAxis}
+        runQuery={props.runQuery === 'true'}
         title={title}
         readOnly={readOnly}
         isLoading={isLoading}
@@ -74,6 +77,7 @@ interface ParsedSqlProps {
   isLoading?: boolean
   readOnly?: boolean
   isChart: boolean
+  runQuery?: boolean
   xAxis: string
   yAxis: string
 }
@@ -81,6 +85,7 @@ interface ParsedSqlProps {
 export const SqlCard = ({
   sql,
   isChart,
+  runQuery = false,
   xAxis,
   yAxis,
   title,
@@ -98,11 +103,11 @@ export const SqlCard = ({
   const isInSQLEditor = router.pathname.includes('/sql')
   const isInNewSnippet = router.pathname.endsWith('/sql')
 
-  const [showCode, setShowCode] = useState(readOnly || !isReadOnlySelect(sql))
+  const [showCode, setShowCode] = useState(readOnly || !runQuery || !isReadOnlySelect(sql))
   const [showResults, setShowResults] = useState(false)
   const [results, setResults] = useState<any[]>()
   const [error, setError] = useState<QueryResponseError>()
-  const [showWarning, setShowWarning] = useState(false)
+  const [showWarning, setShowWarning] = useState<'hasWriteOperation' | 'hasUnknownFunctions'>()
 
   const { mutate: sendEvent } = useSendEventMutation()
 
@@ -116,12 +121,12 @@ export const SqlCard = ({
 
       setShowResults(true)
       setResults(res.result)
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
     onError: (error) => {
       setError(error)
       setResults([])
-      setShowWarning(false)
+      setShowWarning(undefined)
     },
   })
 
@@ -129,8 +134,10 @@ export const SqlCard = ({
     if (!project?.ref || !sql || readOnly) return
 
     if (!isReadOnlySelect(sql)) {
+      const hasUnknownFunctions = containsUnknownFunction(sql)
+
       setShowCode(true)
-      setShowWarning(true)
+      setShowWarning(hasUnknownFunctions ? 'hasUnknownFunctions' : 'hasWriteOperation')
       return
     }
 
@@ -159,33 +166,41 @@ export const SqlCard = ({
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
   useEffect(() => {
-    if (isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
+    if (runQuery && isReadOnlySelect(sql) && !results && !readOnly && !isLoading) {
       handleExecute()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sql, readOnly, isLoading])
+  }, [sql, readOnly, isLoading, runQuery])
 
   return (
-    <div className="overflow-hidden">
-      <div className={cn('flex items-center gap-2 border-t', showWarning ? '' : 'px-5 py-2')}>
-        {showWarning ? (
+    <div className="overflow-hidden rounded border w-auto bg-surface-100">
+      <div className={cn('flex items-center gap-2', showWarning ? '' : 'px-3 pr-1 py-1')}>
+        {!!showWarning ? (
           <Admonition type="warning" className="mb-0 rounded-none border-0">
-            <p>This query contains write operations. Are you sure you want to execute it?</p>
+            <p>
+              {showWarning === 'hasWriteOperation'
+                ? 'This query contains write operations.'
+                : 'This query involves running a function.'}{' '}
+              Are you sure you want to execute it?
+            </p>
+            <p className="text-foreground-light">
+              Make sure you are not accidentally removing something important.
+            </p>
             <div className="flex justify-stretch mt-2 gap-2">
               <Button
                 type="outline"
                 size="tiny"
                 className="w-full flex-1"
-                onClick={() => setShowWarning(false)}
+                onClick={() => setShowWarning(undefined)}
               >
                 Cancel
               </Button>
               <Button
-                type="outline"
+                type="danger"
                 size="tiny"
                 className="w-full flex-1"
                 onClick={() => {
-                  setShowWarning(false)
+                  setShowWarning(undefined)
                   executeSql({
                     sql: suffixWithLimit(sql, 100),
                     projectRef: project?.ref,
@@ -198,10 +213,11 @@ export const SqlCard = ({
                   })
 
                   sendEvent({
-                    action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                    value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
-                    label: 'mutation',
-                    category: identifyQueryType(sql) ?? 'unknown',
+                    action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                    properties: {
+                      type: 'mutation',
+                      category: identifyQueryType(sql) ?? 'unknown',
+                    },
                   })
                 }}
               >
@@ -211,8 +227,18 @@ export const SqlCard = ({
           </Admonition>
         ) : (
           <>
-            <DatabaseIcon size={16} strokeWidth={1.5} />
-            <h3 className="text-sm font-medium flex-1">{title}</h3>
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5 shrink-0',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
+            <h3 className="text-xs font-medium flex-1">{title}</h3>
 
             {!readOnly && (
               <div className="flex">
@@ -222,7 +248,9 @@ export const SqlCard = ({
                   className="w-7 h-7"
                   icon={<Code size={14} />}
                   onClick={() => setShowCode(!showCode)}
-                  tooltip={{ content: { side: 'bottom', text: 'Show query' } }}
+                  tooltip={{
+                    content: { side: 'bottom', text: showCode ? 'Hide query' : 'Show query' },
+                  }}
                 />
 
                 {!isInSQLEditor || isInNewSnippet ? (
@@ -233,10 +261,7 @@ export const SqlCard = ({
                     icon={<Edit size={14} />}
                     onClick={() => {
                       handleEditInSQLEditor()
-                      sendEvent({
-                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                        value: TELEMETRY_VALUES.EDIT_IN_SQL_EDITOR,
-                      })
+                      sendEvent({ action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED })
                     }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
@@ -281,9 +306,8 @@ export const SqlCard = ({
                     handleExecute()
                     if (isReadOnlySelect(sql)) {
                       sendEvent({
-                        action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-                        value: TELEMETRY_VALUES.RAN_SQL_SUGGESTION,
-                        label: 'select',
+                        action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                        properties: { type: 'select' },
                       })
                     }
                   }}
@@ -311,18 +335,19 @@ export const SqlCard = ({
       {showCode && (
         <CodeBlock
           hideLineNumbers
+          wrapLines={false}
           value={sql}
           language="sql"
           className={cn(
-            'max-w-full max-h-96 block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
-            '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap [&>code]:block [&>code>span]:text-foreground'
+            'max-h-96 max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 border-t text-foreground !rounded-none w-full',
+            '[&>code]:m-0 [&>code>span]:text-foreground'
           )}
         />
       )}
 
       {/* Results Section */}
       {results !== undefined && results.length > 0 && isChart && xAxis && yAxis ? (
-        <div className="p-5 border-t">
+        <div className="p-3 border-t">
           <ChartContainer config={{}} className="aspect-auto h-[250px] w-full">
             <BarChart
               data={results}

@@ -15,8 +15,8 @@ export const LogPage: NextPageWithLayout = () => {
     <LogsPreviewer
       projectRef={ref as string}
       condensedLayout={true}
-      tableName={LogsTableName.CRON_JOBS}
-      queryType={'cron'}
+      tableName={LogsTableName.PG_CRON}
+      queryType={'pg_cron'}
     />
   )
 }

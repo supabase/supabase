@@ -172,14 +172,16 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "reset_on_push": {
+                    "type": "boolean",
+                    "deprecated": true,
+                    "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+                  },
                   "branch_name": {
                     "type": "string"
                   },
                   "git_branch": {
                     "type": "string"
-                  },
-                  "reset_on_push": {
-                    "type": "boolean"
                   },
                   "persistent": {
                     "type": "boolean"
@@ -213,8 +215,9 @@
                       "format": "int32"
                     },
                     "latest_check_run_id": {
-                      "type": "integer",
-                      "format": "int64"
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
                     },
                     "id": {
                       "type": "string"
@@ -233,9 +236,6 @@
                     },
                     "git_branch": {
                       "type": "string"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
                     },
                     "persistent": {
                       "type": "boolean"
@@ -264,7 +264,6 @@
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
                     "status",
                     "created_at",
@@ -319,6 +318,54 @@
           },
           "500": {
             "description": "Failed to delete database branch"
+          }
+        },
+        "tags": ["Environments"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/v1/branches/{branch_id}/push": {
+      "post": {
+        "operationId": "v1-push-a-branch",
+        "summary": "Pushes a database branch",
+        "description": "Pushes the specified database branch",
+        "parameters": [
+          {
+            "name": "branch_id",
+            "required": true,
+            "in": "path",
+            "description": "Branch ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "workflow_run_id": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["workflow_run_id", "message"]
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to push database branch"
           }
         },
         "tags": ["Environments"],
@@ -497,7 +544,7 @@
                   },
                   "name": {
                     "type": "string",
-                    "description": "Name of your project, should not contain dots"
+                    "description": "Name of your project"
                   },
                   "organization_id": {
                     "type": "string",
@@ -561,12 +608,12 @@
                   },
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"],
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
                     "description": "Release channel. If not provided, GA will be used."
                   },
                   "postgres_engine": {
                     "type": "string",
-                    "enum": ["15"],
+                    "enum": ["15", "17-oriole"],
                     "description": "Postgres engine version. If not provided, the latest version will be used."
                   }
                 },
@@ -896,6 +943,48 @@
         ]
       }
     },
+    "/v1/oauth/revoke": {
+      "post": {
+        "operationId": "v1-revoke-token",
+        "summary": "[Beta] Revoke oauth app authorization and it's corresponding tokens",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  },
+                  "refresh_token": {
+                    "type": "string"
+                  }
+                },
+                "required": ["client_id", "client_secret", "refresh_token"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "tags": ["OAuth"],
+        "security": [
+          {
+            "oauth2": ["write"]
+          }
+        ]
+      }
+    },
     "/v1/snippets": {
       "get": {
         "operationId": "v1-list-all-snippets",
@@ -1027,7 +1116,8 @@
             "required": true,
             "in": "path",
             "schema": {
-              "type": "uuid"
+              "format": "uuid",
+              "type": "string"
             }
           }
         ],
@@ -1752,8 +1842,9 @@
                         "format": "int32"
                       },
                       "latest_check_run_id": {
-                        "type": "integer",
-                        "format": "int64"
+                        "type": "number",
+                        "deprecated": true,
+                        "description": "This field is deprecated and will not be populated."
                       },
                       "id": {
                         "type": "string"
@@ -1772,9 +1863,6 @@
                       },
                       "git_branch": {
                         "type": "string"
-                      },
-                      "reset_on_push": {
-                        "type": "boolean"
                       },
                       "persistent": {
                         "type": "boolean"
@@ -1803,7 +1891,6 @@
                       "project_ref",
                       "parent_project_ref",
                       "is_default",
-                      "reset_on_push",
                       "persistent",
                       "status",
                       "created_at",
@@ -1866,12 +1953,12 @@
                   },
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   },
                   "postgres_engine": {
                     "type": "string",
                     "description": "Postgres engine version. If not provided, the latest version will be used.",
-                    "enum": ["15"]
+                    "enum": ["15", "17-oriole"]
                   },
                   "branch_name": {
                     "type": "string"
@@ -1904,8 +1991,9 @@
                       "format": "int32"
                     },
                     "latest_check_run_id": {
-                      "type": "integer",
-                      "format": "int64"
+                      "type": "number",
+                      "deprecated": true,
+                      "description": "This field is deprecated and will not be populated."
                     },
                     "id": {
                       "type": "string"
@@ -1924,9 +2012,6 @@
                     },
                     "git_branch": {
                       "type": "string"
-                    },
-                    "reset_on_push": {
-                      "type": "boolean"
                     },
                     "persistent": {
                       "type": "boolean"
@@ -1955,7 +2040,6 @@
                     "project_ref",
                     "parent_project_ref",
                     "is_default",
-                    "reset_on_push",
                     "persistent",
                     "status",
                     "created_at",
@@ -4052,7 +4136,7 @@
                 "properties": {
                   "release_channel": {
                     "type": "string",
-                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                    "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                   },
                   "target_version": {
                     "type": "string"
@@ -4122,7 +4206,7 @@
                   "properties": {
                     "current_app_version_release_channel": {
                       "type": "string",
-                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                      "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                     },
                     "duration_estimate_hours": {
                       "type": "integer"
@@ -4144,11 +4228,11 @@
                           "postgres_version": {
                             "type": "string",
                             "description": "Postgres engine version. If not provided, the latest version will be used.",
-                            "enum": ["15"]
+                            "enum": ["15", "17-oriole"]
                           },
                           "release_channel": {
                             "type": "string",
-                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                           },
                           "app_version": {
                             "type": "string"
@@ -8020,6 +8104,39 @@
         ]
       }
     },
+    "/v1/projects/{ref}/pause": {
+      "post": {
+        "operationId": "v1-pause-a-project",
+        "summary": "Pauses the given project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "403": {
+            "description": ""
+          }
+        },
+        "tags": ["Projects"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/v1/projects/{ref}/database/query": {
       "post": {
         "operationId": "v1-run-a-query",
@@ -8182,11 +8299,13 @@
             }
           },
           {
-            "name": "resource_multiplier",
+            "name": "compute_multiplier",
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string"
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
             }
           }
         ],
@@ -8210,8 +8329,10 @@
                   "verify_jwt": {
                     "type": "boolean"
                   },
-                  "resource_multiplier": {
-                    "type": "string"
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8234,8 +8355,10 @@
                   "verify_jwt": {
                     "type": "boolean"
                   },
-                  "resource_multiplier": {
-                    "type": "string"
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 },
                 "required": ["slug", "name", "body"]
@@ -8287,8 +8410,8 @@
                     "import_map_path": {
                       "type": "string"
                     },
-                    "resource_multiplier": {
-                      "type": "string"
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -8381,8 +8504,8 @@
                       "import_map_path": {
                         "type": "string"
                       },
-                      "resource_multiplier": {
-                        "type": "string"
+                      "compute_multiplier": {
+                        "type": "number"
                       }
                     },
                     "required": [
@@ -8486,8 +8609,8 @@
                     "import_map_path": {
                       "type": "string"
                     },
-                    "resource_multiplier": {
-                      "type": "string"
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -8593,11 +8716,13 @@
             }
           },
           {
-            "name": "resource_multiplier",
+            "name": "compute_multiplier",
             "required": false,
             "in": "query",
             "schema": {
-              "type": "string"
+              "minimum": 1,
+              "maximum": 4,
+              "type": "number"
             }
           }
         ],
@@ -8617,8 +8742,10 @@
                   "verify_jwt": {
                     "type": "boolean"
                   },
-                  "resource_multiplier": {
-                    "type": "string"
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8636,8 +8763,10 @@
                   "verify_jwt": {
                     "type": "boolean"
                   },
-                  "resource_multiplier": {
-                    "type": "string"
+                  "compute_multiplier": {
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 4
                   }
                 }
               }
@@ -8688,8 +8817,8 @@
                     "import_map_path": {
                       "type": "string"
                     },
-                    "resource_multiplier": {
-                      "type": "string"
+                    "compute_multiplier": {
+                      "type": "number"
                     }
                   },
                   "required": [
@@ -9961,7 +10090,7 @@
                       "type": "array",
                       "items": {
                         "type": "string",
-                        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                       }
                     },
                     "id": {
@@ -10059,14 +10188,16 @@
       "UpdateBranchBody": {
         "type": "object",
         "properties": {
+          "reset_on_push": {
+            "type": "boolean",
+            "deprecated": true,
+            "description": "This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead."
+          },
           "branch_name": {
             "type": "string"
           },
           "git_branch": {
             "type": "string"
-          },
-          "reset_on_push": {
-            "type": "boolean"
           },
           "persistent": {
             "type": "boolean"
@@ -10092,8 +10223,9 @@
             "format": "int32"
           },
           "latest_check_run_id": {
-            "type": "integer",
-            "format": "int64"
+            "type": "number",
+            "deprecated": true,
+            "description": "This field is deprecated and will not be populated."
           },
           "id": {
             "type": "string"
@@ -10112,9 +10244,6 @@
           },
           "git_branch": {
             "type": "string"
-          },
-          "reset_on_push": {
-            "type": "boolean"
           },
           "persistent": {
             "type": "boolean"
@@ -10143,7 +10272,6 @@
           "project_ref",
           "parent_project_ref",
           "is_default",
-          "reset_on_push",
           "persistent",
           "status",
           "created_at",
@@ -10159,7 +10287,7 @@
         },
         "required": ["message"]
       },
-      "BranchResetResponse": {
+      "BranchUpdateResponse": {
         "type": "object",
         "properties": {
           "workflow_run_id": {
@@ -10272,7 +10400,7 @@
           },
           "name": {
             "type": "string",
-            "description": "Name of your project, should not contain dots"
+            "description": "Name of your project"
           },
           "organization_id": {
             "type": "string",
@@ -10336,12 +10464,12 @@
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"],
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"],
             "description": "Release channel. If not provided, GA will be used."
           },
           "postgres_engine": {
             "type": "string",
-            "enum": ["15"],
+            "enum": ["15", "17-oriole"],
             "description": "Postgres engine version. If not provided, the latest version will be used."
           }
         },
@@ -10465,6 +10593,23 @@
           }
         },
         "required": ["expires_in", "token_type", "access_token", "refresh_token"]
+      },
+      "OAuthRevokeTokenBodyDto": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": ["client_id", "client_secret", "refresh_token"],
+        "additionalProperties": false
       },
       "SnippetProject": {
         "type": "object",
@@ -10898,12 +11043,12 @@
       },
       "ReleaseChannel": {
         "type": "string",
-        "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+        "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
       },
       "PostgresEngine": {
         "type": "string",
         "description": "Postgres engine version. If not provided, the latest version will be used.",
-        "enum": ["15"]
+        "enum": ["15", "17-oriole"]
       },
       "CreateBranchBody": {
         "type": "object",
@@ -10925,12 +11070,12 @@
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "postgres_engine": {
             "type": "string",
             "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15"]
+            "enum": ["15", "17-oriole"]
           },
           "branch_name": {
             "type": "string"
@@ -11647,7 +11792,7 @@
         "properties": {
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "target_version": {
             "type": "string"
@@ -11670,11 +11815,11 @@
           "postgres_version": {
             "type": "string",
             "description": "Postgres engine version. If not provided, the latest version will be used.",
-            "enum": ["15"]
+            "enum": ["15", "17-oriole"]
           },
           "release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "app_version": {
             "type": "string"
@@ -11687,7 +11832,7 @@
         "properties": {
           "current_app_version_release_channel": {
             "type": "string",
-            "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+            "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
           },
           "duration_estimate_hours": {
             "type": "integer"
@@ -11709,11 +11854,11 @@
                 "postgres_version": {
                   "type": "string",
                   "description": "Postgres engine version. If not provided, the latest version will be used.",
-                  "enum": ["15"]
+                  "enum": ["15", "17-oriole"]
                 },
                 "release_channel": {
                   "type": "string",
-                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+                  "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
                 },
                 "app_version": {
                   "type": "string"
@@ -13823,8 +13968,10 @@
           "verify_jwt": {
             "type": "boolean"
           },
-          "resource_multiplier": {
-            "type": "string"
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         },
         "required": ["slug", "name", "body"]
@@ -13868,8 +14015,8 @@
           "import_map_path": {
             "type": "string"
           },
-          "resource_multiplier": {
-            "type": "string"
+          "compute_multiplier": {
+            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -13913,8 +14060,8 @@
           "import_map_path": {
             "type": "string"
           },
-          "resource_multiplier": {
-            "type": "string"
+          "compute_multiplier": {
+            "type": "number"
           }
         },
         "required": ["version", "created_at", "updated_at", "id", "slug", "name", "status"]
@@ -13931,8 +14078,10 @@
           "verify_jwt": {
             "type": "boolean"
           },
-          "resource_multiplier": {
-            "type": "string"
+          "compute_multiplier": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
           }
         }
       },
@@ -14952,7 +15101,7 @@
             "type": "array",
             "items": {
               "type": "string",
-              "enum": ["internal", "alpha", "beta", "ga", "withdrawn"]
+              "enum": ["internal", "alpha", "beta", "ga", "withdrawn", "preview"]
             }
           },
           "id": {

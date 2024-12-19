@@ -5,7 +5,6 @@ import { Search } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useIsAssistantV2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -17,7 +16,7 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AiIconAnimation, Input } from 'ui'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
@@ -38,7 +37,6 @@ const FunctionsList = ({
   const { search } = useParams()
   const { project } = useProjectContext()
   const { setAiAssistantPanel } = useAppStateSnapshot()
-  const isAssistantV2Enabled = useIsAssistantV2Enabled()
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const filterString = search ?? ''
@@ -63,7 +61,7 @@ const FunctionsList = ({
     connectionString: project?.connectionString,
   })
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
@@ -144,30 +142,26 @@ const FunctionsList = ({
                   >
                     Create a new function
                   </ButtonTooltip>
-                  {isAssistantV2Enabled && (
-                    <ButtonTooltip
-                      type="default"
-                      disabled={!canCreateFunctions}
-                      className="px-1 pointer-events-auto"
-                      icon={
-                        <AiIconAnimation className="scale-75 [&>div>div]:border-black dark:[&>div>div]:border-white" />
-                      }
-                      onClick={() =>
-                        setAiAssistantPanel({
-                          open: true,
-                          initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
-                        })
-                      }
-                      tooltip={{
-                        content: {
-                          side: 'bottom',
-                          text: !canCreateFunctions
-                            ? 'You need additional permissions to create functions'
-                            : 'Create with Supabase Assistant',
-                        },
-                      }}
-                    />
-                  )}
+                  <ButtonTooltip
+                    type="default"
+                    disabled={!canCreateFunctions}
+                    className="px-1 pointer-events-auto"
+                    icon={<AiIconAnimation size={16} />}
+                    onClick={() =>
+                      setAiAssistantPanel({
+                        open: true,
+                        initialInput: `Create a new function for the schema ${selectedSchema} that does ...`,
+                      })
+                    }
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: !canCreateFunctions
+                          ? 'You need additional permissions to create functions'
+                          : 'Create with Supabase Assistant',
+                      },
+                    }}
+                  />
                 </>
               )}
             </div>

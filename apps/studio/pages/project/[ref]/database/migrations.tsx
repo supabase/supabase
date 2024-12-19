@@ -24,10 +24,10 @@ const MigrationsPage: NextPageWithLayout = () => {
             description="History of migrations that have been run on your database"
           />
         </ScaffoldSectionContent>
-        <ScaffoldSectionDetail className="flex items-center justify-end gap-x-2">
+        <ScaffoldSectionDetail className="flex items-center md:justify-end gap-x-2">
           <DocsButton
             className="no-underline"
-            href="https://supabase.com/docs/guides/getting-started/local-development#database-migrations"
+            href="https://supabase.com/docs/guides/deployment/database-migrations"
           />
         </ScaffoldSectionDetail>
         <div className="col-span-12 mt-3">

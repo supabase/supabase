@@ -37,6 +37,9 @@ import { MultiSelectOption } from 'ui-patterns/MultiSelectDeprecated'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelectDeprecated/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
+import { Admonition } from 'ui-patterns'
+import { DocsButton } from 'components/ui/DocsButton'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -46,6 +49,8 @@ interface CreateIndexSidePanelProps {
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
+  const isOrioleDb = useIsOrioleDb()
+
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
@@ -336,6 +341,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 isReactForm={false}
               >
                 <Select_Shadcn_
+                  disabled={isOrioleDb}
                   value={selectedIndexType}
                   onValueChange={setSelectedIndexType}
                   name="selected-index-type"
@@ -367,6 +373,17 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                   </SelectContent_Shadcn_>
                 </Select_Shadcn_>
               </FormItemLayout>
+              {isOrioleDb && (
+                <Admonition
+                  type="default"
+                  className="!mt-2"
+                  title="OrioleDB currently only supports the B-tree index type"
+                  description="More index types may be supported when OrioleDB is no longer in preview"
+                >
+                  {/* [Joshen Oriole] Hook up proper docs URL */}
+                  <DocsButton className="mt-2" abbrev={false} href="https://supabase.com/docs" />
+                </Admonition>
+              )}
             </SidePanel.Content>
             <SidePanel.Separator />
             <SidePanel.Content>

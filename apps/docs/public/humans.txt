@@ -56,6 +56,7 @@ Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
+Laurence Isla
 Long Hoang
 Łukasz Niemier
 Margarita Sandomirskaia
@@ -83,6 +84,7 @@ Terry Sutton
 Thomas E
 Thor Schaeff
 Tom Ashley
+Tom G
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
