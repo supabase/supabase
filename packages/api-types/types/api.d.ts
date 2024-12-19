@@ -12950,6 +12950,7 @@ export interface operations {
   ContentFoldersController_updateFolder: {
     parameters: {
       path: {
+        /** @description Content folder id */
         id: string
         ref: string
       }

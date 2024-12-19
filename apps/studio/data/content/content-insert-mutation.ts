@@ -7,7 +7,10 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type InsertContentPayload = Omit<components['schemas']['CreateContentBodyV2'], 'content'> & {
+export type InsertContentPayload = Omit<
+  components['schemas']['CreateContentBodyDto'],
+  'content'
+> & {
   content: Content['content']
 }
 
