@@ -361,6 +361,8 @@ export const SQLEditorNav = ({
   // ===============
 
   const postDeleteCleanup = (ids: string[]) => {
+    // [Refactor] To investigate - deleting a snippet while it's open, will have it in the side nav
+    // for a bit, before it gets removed (assumingly invalidated)
     setShowDeleteModal(false)
     setSelectedSnippets([])
     const existingSnippetIds = Object.keys(snapV2.snippets).filter((x) => !ids.includes(x))

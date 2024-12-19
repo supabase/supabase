@@ -37,6 +37,8 @@ const SqlEditor: NextPageWithLayout = () => {
     true
   )
 
+  // [Refactor] There's an unnecessary request getting triggered when we start typing while on /new
+  // the URL ID gets updated and we attempt to fetch content for a snippet that's not been created yet
   const { data } = useContentIdQuery(
     { projectRef: ref, id },
     {

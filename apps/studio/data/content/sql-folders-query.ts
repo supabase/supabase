@@ -16,8 +16,7 @@ export type SQLSnippetFolderVariables = {
   sort?: 'name' | 'inserted_at'
 }
 
-// [Joshen TODO] Change this to 50 at the end before merging
-export const SNIPPET_PAGE_LIMIT = 3
+export const SNIPPET_PAGE_LIMIT = 100
 
 export async function getSQLSnippetFolders(
   { projectRef, cursor, sort, name }: SQLSnippetFolderVariables,
