@@ -16,14 +16,9 @@
     "postbuild": "node ./internals/generate-sitemap.mjs"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.0.7",
     "@code-hike/mdx": "^0.9.0",
-    "@dagrejs/dagre": "^1.1.4",
-    "@electric-sql/pglite": "^0.2.15",
-    "@gregnr/postgres-meta": "^0.82.0-dev.2",
     "@heroicons/react": "^1.0.6",
     "@mdx-js/react": "^2.3.0",
-    "@nanostores/react": "github:ai/react",
     "@next/bundle-analyzer": "^14.2.3",
     "@next/mdx": "^14.2.3",
     "@octokit/auth-app": "^6.0.3",
@@ -37,8 +32,6 @@
     "@supabase/auth-ui-react": "^0.4.5",
     "@supabase/supabase-js": "^2.44.3",
     "@vercel/og": "^0.6.2",
-    "@xyflow/react": "^12.3.5",
-    "ai": "^4.0.13",
     "ai-commands": "*",
     "animejs": "^3.2.2",
     "classnames": "^2.3.1",
@@ -74,7 +67,6 @@
     "react-tooltip": "^4.2.17",
     "react-transition-group": "^4.4.1",
     "react-use": "^17.4.0",
-    "reactflow": "^11.11.4",
     "recharts": "^2.8.0",
     "rehype-slug": "^5.1.0",
     "remark": "^15.0.1",
@@ -89,8 +81,7 @@
     "ui-patterns": "*",
     "use-debounce": "^7.0.1",
     "vanilla-tilt": "1.7.0",
-    "yup": "^1.4.0",
-    "zod": "^3.23.8"
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@types/animejs": "^3.1.12",
