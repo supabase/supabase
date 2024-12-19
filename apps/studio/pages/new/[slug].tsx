@@ -624,6 +624,7 @@ const WizardForm = () => {
                                     name="dbRegion"
                                     render={({ field }) => (
                                       <RegionSelector
+                                        layout="vertical"
                                         field={field}
                                         form={form}
                                         cloudProvider={
@@ -1030,6 +1031,7 @@ const WizardForm = () => {
                                           name="postgresVersionSelection"
                                           render={({ field }) => (
                                             <PostgresVersionSelector
+                                              layout="vertical"
                                               field={field}
                                               form={form}
                                               cloudProvider={
