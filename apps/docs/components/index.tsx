@@ -80,6 +80,7 @@ import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
 import { RealtimeLimitsEstimator } from './RealtimeLimitsEstimator'
+import LegacyApiKeys from './LegacyApiKeys'
 
 const components = {
   ...markdownComponents,
@@ -147,6 +148,7 @@ const components = {
   Image: (props: any) => <Image fill className="object-contain" {...props} />,
   JwtGenerator,
   KotlinProjectSetup,
+  LegacyApiKeys,
   Link,
   MigrationWarnings,
   NavData,
