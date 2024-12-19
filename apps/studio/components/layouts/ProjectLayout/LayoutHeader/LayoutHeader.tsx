@@ -102,7 +102,7 @@ const LayoutHeader = ({
         </div>
       )}
       <div className="relative flex flex-1 overflow-hidden">
-        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-scroll">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto">
           <div className="flex items-center text-sm">
             {projectRef && (
               <>
