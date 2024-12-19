@@ -30,6 +30,7 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import WorkflowRunColumnRenderer from './LogColumnRenderers/WorkflowRunColumnRenderer'
 import LogSelection from './LogSelection'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import { isDefaultLogPreviewFormat } from './Logs.utils'
@@ -175,6 +176,10 @@ const LogTable = ({
         break
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
+        break
+
+      case 'workflow_run':
+        columns = WorkflowRunColumnRenderer
         break
 
       default:

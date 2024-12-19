@@ -8,6 +8,7 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -15,8 +16,8 @@ import DefaultPreviewSelectionRenderer from './LogSelectionRenderers/DefaultPrev
 import FunctionInvocationSelectionRender from './LogSelectionRenderers/FunctionInvocationSelectionRender'
 import FunctionLogsSelectionRender from './LogSelectionRenderers/FunctionLogsSelectionRender'
 import type { LogData, QueryType } from './Logs.types'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { WarehouseSelectionRenderer } from './LogSelectionRenderers/WarehouseSelectionRenderer'
+import WorkflowRunSelectionRenderer from './LogSelectionRenderers/WorkflowRunSelectionRenderer'
 
 export interface LogSelectionProps {
   log?: LogData
@@ -53,6 +54,8 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
 
       case 'auth':
         return <AuthSelectionRenderer log={log} />
+      case 'workflow_run':
+        return <WorkflowRunSelectionRenderer log={log} />
       default:
         return <DefaultPreviewSelectionRenderer log={log} />
     }

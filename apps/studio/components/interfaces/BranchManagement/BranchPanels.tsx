@@ -18,6 +18,7 @@ import { PropsWithChildren, ReactNode, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
@@ -37,7 +38,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
-import WorkflowLogs from './WorkflowLogs'
 
 interface BranchManagementSectionProps {
   header: string
@@ -225,7 +225,14 @@ export const BranchRow = ({
                     View Repository
                   </Link>
                 </Button>
-                <WorkflowLogs projectRef={branch.project_ref} />
+
+                <Button type="default" asChild>
+                  <Link href={`/project/${branch.project_ref}/logs/workflow-run-logs`}>
+                    View Logs
+                  </Link>
+                </Button>
+
+                {/* <WorkflowLogs projectRef={branch.project_ref} /> */}
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
                     <Button type="text" icon={<MoreVertical />} className="px-1" />
@@ -272,7 +279,7 @@ export const BranchRow = ({
                 </Button>
               </div>
             )}
-            <WorkflowLogs projectRef={branch.project_ref} />
+            {/* <WorkflowLogs projectRef={branch.project_ref} /> */}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<MoreVertical />} className="px-1" />

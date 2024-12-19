@@ -10,15 +10,13 @@ import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
-import { ArrowUpRight, ChevronRight, DatabaseIcon, FilePlus, Plus } from 'lucide-react'
+import { ArrowUpRight, ChevronRight, FilePlus, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Button,
   Collapsible_Shadcn_,
   CollapsibleContent_Shadcn_,
@@ -91,6 +89,10 @@ export function LogsSidebarMenuV2() {
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
   const warehouseEnabled = useFlag('warehouse')
+  const branchingWorkflowsFlag = useFlag('branchingWorkflowLogs')
+  const selectedProject = useSelectedProject()
+  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
+
   const { data: whCollections, isLoading: whCollectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef: ref },
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
@@ -167,6 +169,14 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/edge-functions-logs`,
       items: [],
     },
+    branchingWorkflowsFlag && isBranchingEnabled
+      ? {
+          name: 'Branching logs',
+          key: 'workflow-run-logs',
+          url: `/project/${ref}/logs/workflow-run-logs`,
+          items: [],
+        }
+      : null,
     {
       name: 'Cron',
       key: 'pg_cron',
