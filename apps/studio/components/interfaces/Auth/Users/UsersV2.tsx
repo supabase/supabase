@@ -84,7 +84,7 @@ export const UsersV2 = () => {
   const [selectedUsers, setSelectedUsers] = useState<Set<any>>(new Set([]))
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedProviders, setSelectedProviders] = useState<string[]>([])
-  const [selectedRow, setSelectedRow] = useState<number>()
+  const [selectedUser, setSelectedUser] = useState<string>()
   const [sortByValue, setSortByValue] = useState<string>('created_at:desc')
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [isDeletingUsers, setIsDeletingUsers] = useState(false)
@@ -184,13 +184,12 @@ export const UsersV2 = () => {
 
   const handleDeleteUsers = async () => {
     if (!projectRef) return console.error('Project ref is required')
+    const userIds = [...selectedUsers]
 
     setIsDeletingUsers(true)
     try {
       await Promise.all(
-        [...selectedUsers].map((id) =>
-          deleteUser({ projectRef, userId: id, skipInvalidation: true })
-        )
+        userIds.map((id) => deleteUser({ projectRef, userId: id, skipInvalidation: true }))
       )
       // [Joshen] Skip invalidation within RQ to prevent multiple requests, then invalidate once at the end
       await Promise.all([
@@ -202,6 +201,8 @@ export const UsersV2 = () => {
       )
       setShowDeleteModal(false)
       setSelectedUsers(new Set([]))
+
+      if (userIds.includes(selectedUser)) setSelectedUser(undefined)
     } catch (error: any) {
       toast.error(`Failed to delete selected users: ${error.message}`)
       setIsDeletingUsers(false)
@@ -444,8 +445,8 @@ export const UsersV2 = () => {
                 headerRowHeight={36}
                 columns={columns}
                 rows={formatUsersData(users ?? [])}
-                rowClass={(_, idx) => {
-                  const isSelected = idx === selectedRow
+                rowClass={(row) => {
+                  const isSelected = row.id === selectedUser
                   return [
                     `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
                     '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
@@ -474,8 +475,8 @@ export const UsersV2 = () => {
                         key={props.row.id}
                         onClick={() => {
                           const idx = users.indexOf(users.find((u) => u.id === id) ?? {})
-                          if (typeof idx === 'number' && idx >= 0) {
-                            setSelectedRow(idx)
+                          if (props.row.id) {
+                            setSelectedUser(props.row.id)
                             gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                           }
                         }}
@@ -511,10 +512,10 @@ export const UsersV2 = () => {
               />
             </div>
           </ResizablePanel>
-          {selectedRow !== undefined && (
+          {selectedUser !== undefined && (
             <UserPanel
-              selectedUser={users?.[selectedRow]}
-              onClose={() => setSelectedRow(undefined)}
+              selectedUser={users.find((u) => u.id === selectedUser)}
+              onClose={() => setSelectedUser(undefined)}
             />
           )}
         </ResizablePanelGroup>
