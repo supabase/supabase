@@ -1,8 +1,10 @@
-declare module 'expect' {
-  interface AsymmetricMatchers {
-    toMatchCriteria(criteria: string): void
-  }
-  interface Matchers<R> {
-    toMatchCriteria(criteria: string): R
-  }
+import 'vitest'
+
+interface CustomMatchers<R = unknown> {
+  toMatchCriteria(criteria: string): R
+}
+
+declare module 'vitest' {
+  interface Assertion<T = any> extends CustomMatchers<T> {}
+  interface AsymmetricMatchersContaining extends CustomMatchers {}
 }
