@@ -18,7 +18,7 @@ A pull-based Queue is a Message storage and delivery system where consumers acti
 
 A Message in a Queue is a json object that is stored until a consumer explicitly processes and removes it, like a task waiting in a to-do list until someone checks and completes it.
 
-### Queue Types
+### Queue types
 
 Supabase Queues offers three types of Queues:
 
@@ -141,7 +141,7 @@ The permissions required for each Queue API database function:
 
 </Admonition>
 
-### Enqueuing and Dequeuing Messages
+### Enqueuing and dequeuing messages
 
 Once your Queue has been created, you can begin enqueuing and dequeuing Messages.
 
@@ -158,7 +158,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 const QueuesTest: React.FC = () => {
   //Add a Message
   const sendToQueue = async () => {
-    const result = await supabase.rpc('send', {
+    const result = await supabase.schema('pgmq_public').rpc('send', {
       queue_name: 'foo',
       message: { hello: 'world' },
       sleep_seconds: 30,
@@ -168,7 +168,7 @@ const QueuesTest: React.FC = () => {
 
   //Dequeue Message
   const popFromQueue = async () => {
-    const result = await supabase.rpc('pop', { queue_name: 'foo' })
+    const result = await supabase.schema('pgmq_public').rpc('pop', { queue_name: 'foo' })
     console.log(result)
   }
 

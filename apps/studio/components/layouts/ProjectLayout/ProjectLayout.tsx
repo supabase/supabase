@@ -7,7 +7,7 @@ import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { AIAssistantPanel } from 'components/ui/AIAssistantPanel/AIAssistantPanel'
 import AISettingsModal from 'components/ui/AISettingsModal'
 import { Loading } from 'components/ui/Loading'
-import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
+import { ResourceExhaustionWarningBanner } from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { withAuth } from 'hooks/misc/withAuth'
@@ -15,12 +15,15 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
 import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
+import MobileNavigationBar from './NavigationBar/MobileNavigationBar'
+import MobileViewNav from './NavigationBar/MobileViewNav'
 import NavigationBar from './NavigationBar/NavigationBar'
 import { ProjectPausedState } from './PausedState/ProjectPausedState'
 import PauseFailedState from './PauseFailedState'
@@ -87,6 +90,8 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
     ref
   ) => {
     const router = useRouter()
+    const [isClient, setIsClient] = useState(false)
+    const [isSheetOpen, setIsSheetOpen] = useState(false)
     const { ref: projectRef } = useParams()
     const selectedOrganization = useSelectedOrganization()
     const selectedProject = useSelectedProject()
@@ -107,7 +112,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
       router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
     const showPausedState = isPaused && !ignorePausedState
 
-    const [isClient, setIsClient] = useState(false)
+    const handleMobileMenu = () => {
+      setIsSheetOpen(true)
+    }
 
     useEffect(() => {
       setIsClient(true)
@@ -115,7 +122,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
 
     useEffect(() => {
       const handler = (e: KeyboardEvent) => {
-        if (e.metaKey && e.code === 'KeyI' && !e.altKey && !e.shiftKey) {
+        if (e.metaKey && e.key === 'i' && !e.altKey && !e.shiftKey) {
           setAiAssistantPanel({ open: !open })
           e.preventDefault()
           e.stopPropagation()
@@ -143,21 +150,32 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
             </title>
             <meta name="description" content="Supabase Studio" />
           </Head>
-          <div className="flex h-full">
+          <div className="flex flex-col md:flex-row h-full">
             {/* Left-most navigation side bar to access products */}
             {!hideIconBar && <NavigationBar />}
+            {/* Top Nav to access products from mobile */}
+            {!hideIconBar && <MobileNavigationBar />}
+            {showProductMenu && productMenu && !(!hideHeader && IS_PLATFORM) && (
+              <MobileViewNav title={product} handleMobileMenu={handleMobileMenu} />
+            )}
+
             {/* Product menu bar */}
             <ResizablePanelGroup
               className="flex h-full"
               direction="horizontal"
               autoSaveId="project-layout"
             >
+              {/* Existing desktop menu */}
               <ResizablePanel
                 id="panel-left"
-                className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64', {
-                  hidden: !showProductMenu || !productMenu,
-                })}
-                defaultSize={0} // forces panel to smallest width possible, at w-64
+                className={cn(
+                  'hidden md:flex',
+                  resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64',
+                  {
+                    '!hidden': !showProductMenu || !productMenu,
+                  }
+                )}
+                defaultSize={0}
               >
                 <MenuBarWrapper
                   isLoading={isLoading}
@@ -168,18 +186,23 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                 </MenuBarWrapper>
               </ResizablePanel>
               <ResizableHandle
-                className={cn({ hidden: !showProductMenu || !productMenu })}
+                className={cn('hidden md:flex', { '!hidden': !showProductMenu || !productMenu })}
                 withHandle
                 disabled={resizableSidebar ? false : true}
               />
               <ResizablePanel id="panel-right" className="h-full flex flex-col">
-                {!hideHeader && IS_PLATFORM && <LayoutHeader />}
+                {!hideHeader && IS_PLATFORM && (
+                  <LayoutHeader
+                    showProductMenu={!!(showProductMenu && productMenu)}
+                    handleMobileMenu={handleMobileMenu}
+                  />
+                )}
                 <ResizablePanelGroup
                   className="h-full w-full overflow-x-hidden flex-1"
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className=" w-full min-w-[600px]">
+                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}
@@ -222,6 +245,9 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
           <AISettingsModal />
           <ProjectAPIDocs />
         </ProjectContextProvider>
+        <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+          {productMenu}
+        </MobileSheetNav>
       </AppLayout>
     )
   }

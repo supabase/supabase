@@ -5,6 +5,7 @@
   "types": "./index.tsx",
   "license": "MIT",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules",
     "tsdoc:dereference:functions:v1": "tsx ./tsdoc.ts --input ../../apps/docs/spec/enrichments/tsdoc_v1/functions.json --output ../../apps/docs/spec/enrichments/tsdoc_v1/functions_dereferenced.json",
     "tsdoc:dereference:gotrue:v1": "tsx ./tsdoc.ts --input ../../apps/docs/spec/enrichments/tsdoc_v1/gotrue.json --output ../../apps/docs/spec/enrichments/tsdoc_v1/gotrue_dereferenced.json",
@@ -26,11 +27,6 @@
     "@types/lodash": "^4.14.202",
     "json-stringify-safe": "^5.0.1",
     "lodash": "^4.17.21",
-    "prettier": "^4.0.0-alpha.8",
     "tsx": "^4.7.0"
-  },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true
   }
 }

@@ -6,6 +6,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { IS_PLATFORM } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'
@@ -34,13 +35,10 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
 
   useEffect(() => {
     if (isMounted.current) {
-      sendEvent({
-        category: 'realtime_inspector',
-        action: 'changed_database_role',
-        label: 'realtime_inspector_config',
-      })
+      sendEvent({ action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED })
     }
     isMounted.current = true
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.role])
 
   useEffect(() => {
@@ -67,6 +65,7 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
     }
 
     triggerUpdateTokenBearer()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [snap.role, anonKey, serviceKey])
 
   return <RoleImpersonationPopover align="start" variant="connected-on-both" />

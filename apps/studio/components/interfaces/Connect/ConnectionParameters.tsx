@@ -14,7 +14,6 @@ import {
 interface Parameter {
   key: string
   value: string
-  description?: string
 }
 
 interface ConnectionParametersProps {
