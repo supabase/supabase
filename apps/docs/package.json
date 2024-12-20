@@ -115,7 +115,7 @@
     "@types/hast": "^2.3.4",
     "@types/jsrsasign": "^10.5.12",
     "@types/mdast": "^3.0.0",
-    "@types/node": "^20.11.16",
+    "@types/node": "catalog:",
     "@types/react": "^18.2.24",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/unist": "^2.0.6",

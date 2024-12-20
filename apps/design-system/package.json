@@ -49,7 +49,6 @@
   "devDependencies": {
     "@shikijs/compat": "^1.1.7",
     "@types/lodash.template": "4.5.0",
-    "@types/node": "^20",
     "@types/react": "^18.2.65",
     "@types/react-dom": "^18.2.22",
     "autoprefixer": "^10.0.1",

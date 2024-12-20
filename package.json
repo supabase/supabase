@@ -38,6 +38,7 @@
     "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "eslint": "^8.57.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",

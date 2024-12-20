@@ -101,6 +101,7 @@
     "@tokens-studio/sd-transforms": "^0.8.5",
     "@types/common-tags": "^1.8.1",
     "@types/lodash": "4.17.5",
+    "@types/node": "catalog:",
     "@types/react": "^18.2.24",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "^18.2.8",

@@ -3,5 +3,7 @@ packages:
   - "packages/*"
   - "tests"
   - "playwright-tests"
+
 catalog:
+  '@types/node': ^20.0.0
   next: 14.2.15

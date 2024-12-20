@@ -146,6 +146,7 @@
     "@types/lodash": "^4.14.172",
     "@types/markdown-table": "^3.0.0",
     "@types/mime-db": "^1.43.5",
+    "@types/node": "catalog:",
     "@types/papaparse": "^5.3.1",
     "@types/randombytes": "^2.0.3",
     "@types/react": "^18.2.24",

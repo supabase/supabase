@@ -51,6 +51,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/common-tags": "^1.8.4",
     "@types/lodash": "^4.17.5",
+    "@types/node": "catalog:",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "api-types": "workspace:*",
