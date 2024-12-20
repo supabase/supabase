@@ -114,7 +114,6 @@
     "tsconfig": "workspace:*",
     "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "~5.5.0",
-    "vite": "^5.0.0",
     "vitest": "^2.0.0"
   },
   "peerDependencies": {

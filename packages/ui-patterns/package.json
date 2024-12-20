@@ -56,7 +56,6 @@
     "api-types": "workspace:*",
     "next-router-mock": "^0.9.13",
     "typescript": "~5.5.0",
-    "vite": "^5.2.14",
     "vitest": "^2.0.3"
   },
   "peerDependencies": {

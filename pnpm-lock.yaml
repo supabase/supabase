@@ -1771,9 +1771,6 @@ importers:
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
-      vite:
-        specifier: ^5.0.0
-        version: 5.2.14(@types/node@22.7.5)(sass@1.72.0)(terser@5.32.0)
       vitest:
         specifier: ^2.0.0
         version: 2.1.8(@types/node@22.7.5)(jsdom@20.0.3)(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(terser@5.32.0)
@@ -1919,9 +1916,6 @@ importers:
       typescript:
         specifier: ~5.5.0
         version: 5.5.2
-      vite:
-        specifier: ^5.2.14
-        version: 5.2.14(@types/node@22.7.5)(sass@1.72.0)(terser@5.32.0)
       vitest:
         specifier: ^2.0.3
         version: 2.1.8(@types/node@22.7.5)(jsdom@20.0.3)(msw@2.4.11(typescript@5.5.2))(sass@1.72.0)(terser@5.32.0)
