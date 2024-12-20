@@ -42,7 +42,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
   const isApiKeysEmpty = apiKeys.length === 0
 
   const { data: hasServiceRoleKeyLeak } = useServiceRoleKeyLeakQuery({
-    projectRef: projectRef,
+    projectRef: 'bzembqluzmwrjuidwley',
   })
 
   return (
@@ -149,8 +149,9 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
                   <AlertDescription_Shadcn_ className="max-w-2xl">
                     <p>
                       Your service role key may be compromised. Rotate it immediately and ensure
-                      it's used only on a private server, never in a browser.{' '}
-                      <span className="font-bold">Generate a new secret</span> below in JWT Settings
+                      it's used only on a private server. We detected that it is likely being used
+                      on the client-side, in a browser or mobile app.{' '}
+                      <span className="font-bold">Generate new API keys</span> below in JWT Settings
                       to rotate this key.
                     </p>
                     <p></p>
@@ -172,7 +173,7 @@ const DisplayApiSettings = ({ legacy }: { legacy?: boolean }) => {
         )}
         <Panel.Notice
           className="border-t"
-          title="New API keys coming Q4 2024"
+          title="New API keys coming 2025"
           description={`
 \`anon\` and \`service_role\` API keys will be changing to \`publishable\` and \`secret\` API keys.
 `}
