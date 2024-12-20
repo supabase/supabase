@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
@@ -31,28 +32,23 @@ import {
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { Parameter } from 'lib/sql-parameters'
+import ParametersPopover from './ParametersPopover'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
 
-interface ParameterMetadata {
-  name: string
-  value: string
-  defaultValue?: string
-  occurrences: number
-}
-
 const Reports = () => {
   const { id, ref } = useParams()
+  const router = useRouter()
   const { profile } = useProfile()
 
   const [config, setConfig] = useState<any>(undefined)
   const [startDate, setStartDate] = useState<any>(null)
   const [endDate, setEndDate] = useState<any>(null)
   const [hasEdits, setHasEdits] = useState<any>(false)
-  const [parameters, setParameters] = useState<Record<string, string>>({})
-  const [parameterMetadata, setParameterMetadata] = useState<ParameterMetadata[]>([])
-  const [tempParameters, setTempParameters] = useState<Record<string, string>>({})
+  const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
+  const [parameterMetadata, setParameterMetadata] = useState<Parameter[]>([])
 
   const { data: userContents, isLoading } = useContentQuery(ref)
   const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
@@ -230,9 +226,52 @@ const Reports = () => {
     checkEditState()
   }
 
-  const handleParametersSubmit = () => {
-    setParameters(tempParameters)
+  const handleParametersSubmit = (parameters: Record<string, string>) => {
+    setParameterValues(parameters)
+
+    // Create new query object with existing query params
+    const newQuery = { ...router.query }
+
+    // Remove old parameter values
+    Object.keys(newQuery).forEach((key) => {
+      if (key.startsWith('param_')) {
+        delete newQuery[key]
+      }
+    })
+
+    // Add new parameter values
+    Object.entries(parameters).forEach(([key, value]) => {
+      newQuery[`param_${key}`] = value
+    })
+
+    // Update URL with new query params
+    router.replace(
+      {
+        pathname: router.pathname,
+        query: newQuery,
+      },
+      undefined,
+      { shallow: true }
+    )
   }
+
+  useEffect(() => {
+    if (router.isReady) {
+      const paramValues: Record<string, string> = {}
+
+      // Extract parameter values from router.query
+      Object.entries(router.query).forEach(([key, value]) => {
+        if (key.startsWith('param_') && typeof value === 'string') {
+          paramValues[key.replace('param_', '')] = value
+        }
+      })
+
+      // Only set if there are parameters in query
+      if (Object.keys(paramValues).length > 0) {
+        setParameterValues(paramValues)
+      }
+    }
+  }, [router.isReady])
 
   if (isLoading) {
     return <Loading />
@@ -294,54 +333,11 @@ const Reports = () => {
             </div>
           )} */}
           {parameterMetadata.length > 0 && (
-            <Popover_Shadcn_ modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button type="default" icon={<ArrowUpDown size={14} />}>
-                  <div className="flex items-center gap-1">
-                    <span className="text-foreground-muted">Parameters</span>
-                    <span>{parameterMetadata.length}</span>
-                  </div>
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ side="bottom" align="start" className="w-[300px] p-4">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    {parameterMetadata.map((param) => (
-                      <div key={param.name} className="grid gap-2">
-                        <Label_Shadcn_ className="flex items-center gap-2">
-                          {param.name}
-                          {param.occurrences > 1 && (
-                            <span className="text-xs text-foreground-light">
-                              (used {param.occurrences} times)
-                            </span>
-                          )}
-                        </Label_Shadcn_>
-                        <Input_Shadcn_
-                          size="tiny"
-                          value={
-                            tempParameters[param.name] ||
-                            parameters[param.name] ||
-                            param.defaultValue ||
-                            ''
-                          }
-                          onChange={(e) =>
-                            setTempParameters((prev) => ({
-                              ...prev,
-                              [param.name]: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="primary" size="tiny" onClick={handleParametersSubmit}>
-                      Apply changes
-                    </Button>
-                  </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+            <ParametersPopover
+              parameters={parameterMetadata}
+              parameterValues={parameterValues}
+              onSubmit={handleParametersSubmit}
+            />
           )}
         </div>
 
@@ -415,7 +411,7 @@ const Reports = () => {
               disableUpdate={!canUpdateReport}
               onRemoveChart={popChart}
               setEditableReport={handleSetConfig}
-              parameters={parameters}
+              parameterValues={parameterValues}
               onSetParameter={setParameterMetadata}
             />
           )}

@@ -28,9 +28,11 @@ import { useCallback, useState, useEffect } from 'react'
 import BarChart from 'components/ui/Charts/BarChart'
 import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
-import ReportGridItem from './ReportGridItem'
+import ReportGridItem from 'components/interfaces/Reports/ReportGridItem'
 
 const ReactGridLayout = WidthProvider(Responsive)
+
+import { Parameter } from 'lib/sql-parameters'
 
 interface GridResizeProps {
   startDate: string
@@ -40,8 +42,8 @@ interface GridResizeProps {
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
   setEditableReport: (payload: any) => void
-  parameters?: Record<string, string>
-  onSetParameter: (params: ParameterMetadata[]) => void
+  parameterValues?: Record<string, string>
+  onSetParameter: (params: Parameter[]) => void
 }
 
 // Add chart config type
@@ -66,13 +68,6 @@ interface LayoutItem {
   // ... other existing fields ...
 }
 
-interface ParameterMetadata {
-  name: string
-  value: string
-  defaultValue?: string
-  occurrences: number
-}
-
 const GridResize = ({
   startDate,
   endDate,
@@ -81,10 +76,10 @@ const GridResize = ({
   disableUpdate,
   onRemoveChart,
   setEditableReport,
-  parameters,
+  parameterValues,
   onSetParameter,
 }: GridResizeProps) => {
-  const [collectedParams, setCollectedParams] = useState<ParameterMetadata[]>([])
+  const [collectedParams, setCollectedParams] = useState<Parameter[]>([])
 
   function onLayoutChange(layout: any) {
     let updatedLayout = [...editableReport.layout]
@@ -101,8 +96,8 @@ const GridResize = ({
     })
   }
 
-  // Merge parameters from all charts and notify parent once all are collected
-  const handleChartParameters = (params: ParameterMetadata[]) => {
+  // Merge parameters from all blocks and notify parent once all are collected
+  const handleBlockParameters = (params: Parameter[]) => {
     setCollectedParams((prev) => {
       const merged = [...prev]
       params.forEach((param) => {
@@ -113,7 +108,6 @@ const GridResize = ({
       })
       return merged
     })
-    console.log('collected params:', collectedParams)
   }
 
   // Notify parent when all parameters are collected
@@ -161,8 +155,8 @@ const GridResize = ({
             interval={interval}
             editableReport={editableReport}
             setEditableReport={setEditableReport}
-            parameters={parameters}
-            onSetParameter={handleChartParameters}
+            parameterValues={parameterValues}
+            onSetParameter={handleBlockParameters}
           />
         </div>
       ))}

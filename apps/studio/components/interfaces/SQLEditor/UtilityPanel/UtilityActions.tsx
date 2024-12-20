@@ -40,6 +40,8 @@ import {
 } from 'ui'
 import SavingIndicator from './SavingIndicator'
 import { Label } from '@ui/components/shadcn/ui/label'
+import { parseParameters, processParameterizedSql, Parameter } from 'lib/sql-parameters'
+import ParametersPopover from 'components/interfaces/Reports/ParametersPopover'
 
 export type UtilityActionsProps = {
   id: string
@@ -63,42 +65,20 @@ const UtilityActions = ({
   const { project } = useProjectContext()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
+  const [parameterValues, setParameterValues] = useState<Record<string, string> | undefined>({})
+
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
 
-  const [parameters, setParameters] = useState<Record<string, string>>({})
-
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
 
-  useEffect(() => {
-    if (!snippet) return
-
-    const sql = snippet.snippet.content.sql
-    // Parse @set parameter defaults
-    const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
-    const paramDefaults: Record<string, string> = {}
-    let match
-
-    while ((match = setParamRegex.exec(sql)) !== null) {
-      const [_, paramName, paramValue] = match
-      paramDefaults[paramName] = paramValue.trim()
-    }
-
-    // Find all {{parameter}} occurrences
-    const paramRegex = /\{\{(\w+)\}\}/g
-    const params: Record<string, string> = {}
-
-    while ((match = paramRegex.exec(sql)) !== null) {
-      const [_, paramName] = match
-      params[paramName] = paramDefaults[paramName] || ''
-    }
-
-    setParameters(params)
-  }, [snippet])
+  const parameters = snippet?.snippet?.content?.sql
+    ? parseParameters(snippet.snippet.content.sql)
+    : undefined
 
   const toggleIntellisense = () => {
     setIntellisenseEnabled(!intellisenseEnabled)
@@ -155,7 +135,7 @@ const UtilityActions = ({
     )
   }
 
-  const hasParameters = Object.keys(parameters).length > 0
+  const hasParameters = parameters && Object.keys(parameters).length > 0
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
@@ -259,53 +239,24 @@ const UtilityActions = ({
       </div>
 
       <div className="flex items-center justify-between gap-x-2">
+        {hasParameters && (
+          <ParametersPopover
+            parameters={parameters}
+            parameterValues={parameterValues}
+            onChange={setParameterValues}
+          />
+        )}
         <div className="flex items-center">
           <DatabaseSelector
             variant="connected-on-right"
             onSelectId={() => snapV2.resetResult(id)}
           />
-          {hasParameters && (
-            <Popover_Shadcn_ modal={false}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  size="tiny"
-                  type="default"
-                  className="h-[26px] pr-3 gap-0 rounded-none border-x-0"
-                >
-                  <div className="flex items-center gap-1">
-                    <span className="text-foreground-muted">Params</span>
-                    <span>{Object.keys(parameters).length}</span>
-                    <ChevronDown className="text-muted" strokeWidth={1} size={12} />
-                  </div>
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="w-[300px]" side="bottom" align="end">
-                <div className="space-y-2">
-                  {Object.entries(parameters).map(([name, value]) => (
-                    <div key={name}>
-                      <Label className="text-xs mb-2 block">{name}</Label>
-                      <Input_Shadcn_
-                        size="tiny"
-                        value={value}
-                        onChange={(e) =>
-                          setParameters((prev) => ({
-                            ...prev,
-                            [name]: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          )}
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             variant={hasParameters ? 'connected-on-both' : 'connected-on-both'}
           />
           <Button
-            onClick={() => executeQuery(false, parameters)}
+            onClick={() => executeQuery(false, parameterValues)}
             disabled={isDisabled || isExecuting}
             type="primary"
             size="tiny"

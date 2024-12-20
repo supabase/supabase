@@ -1,6 +1,6 @@
 import { useContentIdQuery } from 'data/content/content-id-query'
 import { useParams } from 'common'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
 import { X, Settings2, ArrowUpDown, Play } from 'lucide-react'
@@ -40,13 +40,9 @@ import { CartesianGrid, Bar, BarChart, XAxis, YAxis } from 'recharts'
 import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { BarChart2, Table } from 'lucide-react'
-
-// Add helper function for date formatting
-const getDateFormat = (value: any) => {
-  if (typeof value === 'number') return 'number'
-  if (dayjs(value).isValid()) return 'date'
-  return 'string'
-}
+import { toast } from 'sonner'
+import { parseParameters, processParameterizedSql, Parameter } from 'lib/sql-parameters'
+import ParametersPopover from './ParametersPopover'
 
 // Add helper function for cumulative results
 const getCumulativeResults = (results: { rows: any[] }, config: ChartConfig) => {
@@ -87,13 +83,6 @@ interface LayoutItem {
   // ... other existing fields ...
 }
 
-interface Parameter {
-  name: string
-  value: string
-  defaultValue?: string
-  occurrences: number
-}
-
 interface ReportGridItemProps {
   item: LayoutItem
   disableUpdate: boolean
@@ -103,41 +92,8 @@ interface ReportGridItemProps {
   interval?: string
   editableReport: any
   setEditableReport: (payload: any) => void
-  parameters?: Record<string, string>
+  parameterValues?: Record<string, string>
   onSetParameter?: (params: Parameter[]) => void
-}
-
-const parseParameters = (sql: string | undefined) => {
-  if (!sql) return []
-
-  // Parse @set parameter defaults
-  const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
-  const paramDefaults: Record<string, string> = {}
-  let match
-
-  while ((match = setParamRegex.exec(sql)) !== null) {
-    const [_, paramName, paramValue] = match
-    paramDefaults[paramName] = paramValue.trim()
-  }
-
-  // Find all {{parameter}} occurrences and count them
-  const paramRegex = /\{\{(\w+)\}\}/g
-  const paramOccurrences: Record<string, number> = {}
-  const uniqueParams = new Set<string>()
-
-  while ((match = paramRegex.exec(sql)) !== null) {
-    const [_, paramName] = match
-    paramOccurrences[paramName] = (paramOccurrences[paramName] || 0) + 1
-    uniqueParams.add(paramName)
-  }
-
-  // Create parameter objects for unique parameters
-  return Array.from(uniqueParams).map((paramName) => ({
-    name: paramName,
-    value: paramDefaults[paramName] || '',
-    defaultValue: paramDefaults[paramName],
-    occurrences: paramOccurrences[paramName],
-  }))
 }
 
 const ReportGridItem = ({
@@ -149,7 +105,7 @@ const ReportGridItem = ({
   interval,
   editableReport,
   setEditableReport,
-  parameters: externalParameters,
+  parameterValues: externalParameterValues,
   onSetParameter,
 }: ReportGridItemProps) => {
   const { ref } = useParams()
@@ -158,9 +114,9 @@ const ReportGridItem = ({
 
   const [sql, setSql] = useState<string>()
   const [queryResult, setQueryResult] = useState<any>()
-  const [localParameters, setLocalParameters] = useState<Parameter[]>([])
-  const [hasLocalChanges, setHasLocalChanges] = useState<Record<string, boolean>>({})
-  const [tempParameters, setTempParameters] = useState<Parameter[]>([])
+  const [parameterValues, setParameterValues] = useState<Record<string, string>>({})
+
+  const combinedParameterValues = { ...externalParameterValues, ...parameterValues }
 
   const { data: snippetData } = useContentIdQuery(
     { projectRef: ref, id: item.id },
@@ -209,48 +165,21 @@ const ReportGridItem = ({
 
   // Run once on mount to parse parameters and notify parent
   useEffect(() => {
+    if (!sql) return
     const params = parseParameters(sql)
-    console.log('params', params, sql)
     if (onSetParameter) {
-      console.log('parsed params:', params)
       onSetParameter(params)
     }
   }, [sql])
 
-  // Handle parameter updates (external or local)
-  useEffect(() => {
-    if (!sql) return
+  const parameters = useMemo(() => {
+    if (!sql) return []
+    return parseParameters(sql)
+  }, [sql])
 
-    const params = parseParameters(sql)
-    const updatedParams = params.map((param) => ({
-      ...param,
-      value: hasLocalChanges[param.name]
-        ? localParameters.find((p) => p.name === param.name)?.value || param.value
-        : externalParameters?.[param.name] || param.value,
-    }))
-
-    setLocalParameters(updatedParams)
-    setTempParameters(updatedParams)
-  }, [sql, externalParameters, hasLocalChanges])
-
-  useEffect(() => {
-    handleExecute()
-  }, [localParameters])
-
-  const handleParameterChange = (paramName: string, value: string) => {
-    setHasLocalChanges((prev) => ({ ...prev, [paramName]: true }))
-    setLocalParameters((prev) => prev.map((p) => (p.name === paramName ? { ...p, value } : p)))
-  }
-
-  // Helper to get parameter values
-  const getParameterValues = () => {
-    return localParameters.reduce(
-      (acc, param) => {
-        acc[param.name] = param.value
-        return acc
-      },
-      {} as Record<string, string>
-    )
+  // Update handleParametersSubmit to work with Record type
+  const handleParametersSubmit = (newParameters: Record<string, string>) => {
+    setParameterValues(newParameters)
   }
 
   // Update execute call to include parameters
@@ -258,32 +187,7 @@ const ReportGridItem = ({
     if (!sql) return
 
     try {
-      let processedSql = sql
-
-      // Parse @set parameter defaults from SQL
-      const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
-      const paramDefaults: Record<string, string> = {}
-      let match
-
-      while ((match = setParamRegex.exec(sql)) !== null) {
-        const [_, paramName, paramValue] = match
-        paramDefaults[paramName] = paramValue.trim()
-      }
-
-      // Remove @set lines from SQL
-      processedSql = processedSql.replace(/@set\s+\w+\s*=\s*[^;\n]+[\n;]*/g, '')
-
-      // Replace {{parameters}} with values
-      const paramRegex = /\{\{(\w+)\}\}/g
-      processedSql = processedSql.replace(paramRegex, (match, paramName) => {
-        const value =
-          localParameters.find((p) => p.name === paramName)?.value ?? paramDefaults[paramName]
-        if (value === undefined) {
-          throw new Error(`Missing value for parameter: ${paramName}`)
-        }
-        return value
-      })
-
+      const processedSql = processParameterizedSql(sql, combinedParameterValues)
       console.log('processedSql', processedSql)
 
       execute({
@@ -296,68 +200,26 @@ const ReportGridItem = ({
     }
   }
 
-  // Add submit handler
-  const handleParametersSubmit = () => {
-    setHasLocalChanges(tempParameters.reduce((acc, param) => ({ ...acc, [param.name]: true }), {}))
-    setLocalParameters(tempParameters)
-  }
+  useEffect(() => {
+    handleExecute()
+  }, [sql, parameterValues, externalParameterValues])
+
+  console.log('localParameters', item.label, parameterValues)
 
   if (item.isSnippet) {
     return (
       <div className="h-full flex flex-col">
-        <div className="flex justify-between px-5 py-4 items-center z-10 border-b">
+        <div className="flex justify-between px-5 py-2 items-center z-10 border-b">
           <h3 className="text-sm text-foreground-light">{item.label}</h3>
           <div className="flex gap-2">
             {queryResult && (
               <>
-                {localParameters.length > 0 && (
-                  <Popover_Shadcn_ modal={false}>
-                    <PopoverTrigger_Shadcn_ asChild>
-                      <Button
-                        icon={<ArrowUpDown size={14} />}
-                        type="outline"
-                        size="tiny"
-                        className="w-7 h-7"
-                      />
-                    </PopoverTrigger_Shadcn_>
-                    <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          {localParameters.map((param) => (
-                            <div key={param.name} className="grid gap-2">
-                              <Label_Shadcn_ className="flex items-center gap-2">
-                                {param.name}
-                                {param.occurrences > 1 && (
-                                  <span className="text-xs text-foreground-light">
-                                    (used {param.occurrences} times)
-                                  </span>
-                                )}
-                              </Label_Shadcn_>
-                              <Input_Shadcn_
-                                size="tiny"
-                                value={
-                                  tempParameters.find((p) => p.name === param.name)?.value ??
-                                  param.value
-                                }
-                                onChange={(e) =>
-                                  setTempParameters((prev) =>
-                                    prev.map((p) =>
-                                      p.name === param.name ? { ...p, value: e.target.value } : p
-                                    )
-                                  )
-                                }
-                              />
-                            </div>
-                          ))}
-                        </div>
-                        <div className="flex justify-end">
-                          <Button type="primary" size="tiny" onClick={handleParametersSubmit}>
-                            Apply changes
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent_Shadcn_>
-                  </Popover_Shadcn_>
+                {parameters.length > 0 && (
+                  <ParametersPopover
+                    parameters={parameters}
+                    parameterValues={combinedParameterValues}
+                    onSubmit={handleParametersSubmit}
+                  />
                 )}
                 <Popover_Shadcn_ modal={false}>
                   <PopoverTrigger_Shadcn_ asChild>
@@ -491,26 +353,12 @@ const ReportGridItem = ({
                 }
               >
                 <CartesianGrid vertical={false} />
-                {/* <XAxis
+                <XAxis
                   dataKey={item.chartConfig?.xKey}
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
-                  hide={!item.chartConfig?.showLabels}
-                  tickFormatter={(value) => {
-                    if (getDateFormat(value) === 'date') {
-                      return dayjs(value).format('MMM D YYYY')
-                    }
-                    return value
-                  }}
                 />
-                <YAxis
-                  tickLine={false}
-                  tickMargin={10}
-                  axisLine={false}
-                  hide={!item.chartConfig?.showLabels}
-                  tickFormatter={(value) => value.toLocaleString()}
-                /> */}
                 <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey={item.chartConfig?.yKey} fill="var(--chart-1)" radius={4} />
               </BarChart>

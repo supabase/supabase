@@ -69,6 +69,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { parseParameters, processParameterizedSql, Parameter } from 'lib/sql-parameters'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -254,7 +255,7 @@ export const SQLEditor = () => {
   }, [formatQuery, id, isDiffOpen, project, snapV2])
 
   const executeQuery = useCallback(
-    async (force: boolean = false, parameters: any) => {
+    async (force: boolean = false, parameterValues?: Record<string, string>) => {
       if (isDiffOpen) return
 
       // use the latest state
@@ -270,27 +271,9 @@ export const SQLEditor = () => {
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content.sql
           : selectedValue || editorRef.current?.getValue()
 
-        // Parse @set parameter defaults from SQL
-        const setParamRegex = /@set\s+(\w+)\s*=\s*([^;\n]+)/g
-        const paramDefaults: Record<string, string> = {}
-        let match
-        while ((match = setParamRegex.exec(sql)) !== null) {
-          const [_, paramName, paramValue] = match
-          paramDefaults[paramName] = paramValue.trim()
+        if (parameterValues) {
+          sql = processParameterizedSql(sql, parameterValues)
         }
-
-        // Remove @set lines from SQL
-        sql = sql.replace(/@set\s+\w+\s*=\s*[^;\n]+[\n;]*/g, '')
-
-        // Replace {{parameters}} with values
-        const paramRegex = /\{\{(\w+)\}\}/g
-        sql = sql.replace(paramRegex, (match, paramName) => {
-          const value = parameters?.[paramName] ?? paramDefaults[paramName]
-          if (value === undefined) {
-            throw new Error(`Missing value for parameter: ${paramName}`)
-          }
-          return value
-        })
 
         let queryHasIssues = false
 

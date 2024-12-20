@@ -113,7 +113,7 @@ const ChartHandler = ({
     'maximum' in chartData
   const shouldHighlightTotalGroupedValue = chartData !== undefined && 'totalGrouped' in chartData
 
-  console.log('chart data:', chartData)
+  console.log('chart data:', label, chartData)
 
   const _highlightedValue =
     highlightedValue !== undefined
@@ -150,9 +150,9 @@ const ChartHandler = ({
         <div>
           <h3 className="text-sm text-foreground-light">{label}</h3>
           <div>
-            {chartData?.format === '%'
+            {/* {chartData?.format === '%'
               ? `${_highlightedValue.toFixed(1)}%`
-              : _highlightedValue?.toLocaleString()}
+              : _highlightedValue?.toLocaleString()} */}
           </div>
         </div>
         <div className="flex gap-2">{children}</div>
