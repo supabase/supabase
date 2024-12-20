@@ -7,7 +7,7 @@ import {
   MultiSelectorItem,
   MultiSelectorList,
   MultiSelectorTrigger,
-} from 'ui-patterns/multi-select'
+} from './index'
 import { useState } from 'react'
 
 // This fixes a "ReferenceError: ResizeObserver is not defined" error in the test
