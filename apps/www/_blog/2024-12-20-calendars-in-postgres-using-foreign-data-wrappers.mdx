@@ -2,6 +2,8 @@
 title: 'Calendars in Postgres using Foreign Data Wrappers'
 description: 'Calendar data integration with Cal.com using Wasm foreign data wrapper on Supabase'
 author: bo_lu
+image: 2024-12-20-cal-wrapper/og-calcom.png
+thumb: 2024-12-20-cal-wrapper/og-calcom.png
 categories:
   - developers
   - product
@@ -13,11 +15,11 @@ date: '2024-12-20'
 toc_depth: 3
 ---
 
-Today we’re releasing Foreign Data Wrappers for [Cal.com](http://Cal.com) so that you can create event bookings directly from Postgres.
+Today we're releasing Foreign Data Wrappers for [Cal.com](https://cal.com) so that you can create event bookings directly from Postgres.
 
 This is especially useful for signup forms where you create an event in your database and schedule an event simultaneously: now you can do all this in a single Postgres transaction.
 
-## What’s Cal.com?
+## What's Cal.com?
 
 [Cal.com](http://cal.com/) is an open-source scheduling platform that allows individuals and businesses to book and manage appointments. It is designed to work with a variety of use cases, from personal calendars to enterprise-grade scheduling systems. They have a great [developer toolkit](https://cal.com/platform).
 
@@ -25,7 +27,7 @@ This is especially useful for signup forms where you create an event in your dat
 
 [Cal.com](http://Cal.com) offers various scheduling features. One of the most common scenarios for developers is creating a new event in a calendar (for example, after someone has purchased a flight).
 
-Let’s use your Supabase database to create an event in [Cal.com](http://cal.com/), using Postgres Foreign Data Wrappers.
+Let's use your Supabase database to create an event in [Cal.com](http://cal.com/), using Postgres Foreign Data Wrappers.
 
 ### Set up a Cal.com account
 
@@ -85,7 +87,7 @@ create server cal_server
 
 ### Set up foreign tables
 
-Now let’s setup the foreign tables. First of all, create a dedicate schema for the foreign tables:
+Now let's setup the foreign tables. First of all, create a dedicate schema for the foreign tables:
 
 ```sql
 create schema if not exists cal;
@@ -120,7 +122,7 @@ Note the `rowid_column` option which is required to insert data into `cal.bookin
 
 ### Query Event Types and Bookings from Cal.com
 
-Great, now we are all set, it’s time to query some juicy data from Cal.com! Let’s start query from [Event Types](https://app.cal.com/event-types) first:
+Great, now we are all set, it's time to query some juicy data from Cal.com! Let's start query from [Event Types](https://app.cal.com/event-types) first:
 
 ```sql
 -- extract event types
@@ -162,7 +164,7 @@ from cal.bookings t
   }}
 />
 
-Oops, it looks like we haven’t booked any meetings with anybody yet. Now it’s the fun part, let’s make a booking on [Cal.com](http://Cal.com) from Supabase!
+Oops, it looks like we haven't booked any meetings with anybody yet. Now it's the fun part, let's make a booking on [Cal.com](http://Cal.com) from Supabase!
 
 ### Make a bookings on Cal.com from Supabase
 
