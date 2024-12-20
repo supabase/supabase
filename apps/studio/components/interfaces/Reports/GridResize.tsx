@@ -28,7 +28,7 @@ import { useCallback, useState, useEffect } from 'react'
 import BarChart from 'components/ui/Charts/BarChart'
 import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
-import ReportGridItem from 'components/interfaces/Reports/ReportGridItem'
+import QueryBlock from 'components/interfaces/Reports/QueryBlock'
 
 const ReactGridLayout = WidthProvider(Responsive)
 
@@ -98,6 +98,7 @@ const GridResize = ({
 
   // Merge parameters from all blocks and notify parent once all are collected
   const handleBlockParameters = (params: Parameter[]) => {
+    console.log('collected:', params)
     setCollectedParams((prev) => {
       const merged = [...prev]
       params.forEach((param) => {
@@ -122,7 +123,7 @@ const GridResize = ({
       autoSize={true}
       layout={editableReport}
       onLayoutChange={(layout) => onLayoutChange(layout)}
-      rowHeight={60}
+      rowHeight={100}
       cols={{ lg: LAYOUT_COLUMN_COUNT, md: 2, sm: 1, xs: 1, xxs: 1 }}
       containerPadding={[0, 0]}
       compactType="vertical"
@@ -136,9 +137,9 @@ const GridResize = ({
           key={x.id}
           data-grid={{
             ...x,
-            minH: 4,
+            minH: 3,
             minW: 1,
-            maxH: 12,
+            maxH: 6,
             maxW: LAYOUT_COLUMN_COUNT,
           }}
           className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border shadow-sm hover:border-green-900"
@@ -146,7 +147,7 @@ const GridResize = ({
           <div className="grid-item-drag-handle absolute left-1 top-1 z-20 cursor-move opacity-0 transition-opacity group-hover:opacity-100">
             <GripHorizontal size={14} strokeWidth={1.5} />
           </div>
-          <ReportGridItem
+          <QueryBlock
             item={x}
             disableUpdate={disableUpdate}
             onRemoveChart={onRemoveChart}

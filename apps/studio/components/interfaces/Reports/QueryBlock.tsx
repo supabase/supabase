@@ -83,7 +83,7 @@ interface LayoutItem {
   // ... other existing fields ...
 }
 
-interface ReportGridItemProps {
+interface QueryBlockProps {
   item: LayoutItem
   disableUpdate: boolean
   onRemoveChart: ({ metric }: { metric: { key: string } }) => void
@@ -96,7 +96,7 @@ interface ReportGridItemProps {
   onSetParameter?: (params: Parameter[]) => void
 }
 
-const ReportGridItem = ({
+const QueryBlock = ({
   item,
   disableUpdate,
   onRemoveChart,
@@ -107,7 +107,7 @@ const ReportGridItem = ({
   setEditableReport,
   parameterValues: externalParameterValues,
   onSetParameter,
-}: ReportGridItemProps) => {
+}: QueryBlockProps) => {
   const { ref } = useParams()
   const { project } = useProjectContext()
   const state = useDatabaseSelectorStateSnapshot()
@@ -230,7 +230,7 @@ const ReportGridItem = ({
                       className="w-7 h-7"
                     />
                   </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
+                  <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-3">
                     <form className="grid gap-2">
                       <ToggleGroup
                         type="single"
@@ -394,4 +394,4 @@ const ReportGridItem = ({
   )
 }
 
-export default ReportGridItem
+export default QueryBlock
