@@ -619,14 +619,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/platform/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/platform/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -692,10 +684,6 @@ export interface paths {
   '/platform/profile/search': {
     /** Search profiles by username, email with the given keywords */
     post: operations['SearchProfileController_searchProfile']
-  }
-  '/platform/profile/subscriptions': {
-    /** Gets the user's subscription statistics */
-    get: operations['SubscriptionsController_getSubscriptionsStatistics']
   }
   '/platform/projects': {
     /**
@@ -866,15 +854,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/platform/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -884,7 +869,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/platform/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/platform/projects/{ref}/content/folders': {
@@ -1129,6 +1114,14 @@ export interface paths {
     /** Sends analytics server event */
     post: operations['TelemetryEventController_sendServerEventV2']
   }
+  '/platform/telemetry/feature-flags': {
+    /** Call feature flags */
+    get: operations['TelemetryFeatureFlagsController_callFeatureFlag']
+  }
+  '/platform/telemetry/feature-flags/track': {
+    /** Track feature flag called */
+    post: operations['TelemetryFeatureFlagsController_trackFeatureFlag']
+  }
   '/platform/telemetry/groups/identify': {
     /** Send analytics group identify event */
     post: operations['TelemetryGroupsController_groupIdentify']
@@ -1369,6 +1362,10 @@ export interface paths {
   '/system/projects/email-abuse': {
     /** Reports email abuse from a postmark */
     post: operations['ProjectEmailAbuseController_reportEmailAbuseWebhookPostmark']
+  }
+  '/system/projects/email-abuse/validate': {
+    /** Validates the email address */
+    post: operations['ProjectEmailAbuseController_validateEmailAddress']
   }
   '/system/stripe/webhooks': {
     /** Processes Stripe event */
@@ -1673,14 +1670,6 @@ export interface paths {
     /** Searches project pg.tables. Return maximum 50 results. */
     post: operations['SearchController_searchTables']
   }
-  '/v0/pg-meta/{ref}/table-privileges': {
-    /** Retrieve table privileges */
-    get: operations['TablePrivilegesController_getTablePrivileges']
-    /** Grant table privileges */
-    post: operations['TablePrivilegesController_grantTablePrivileges']
-    /** Revoke table privileges */
-    delete: operations['TablePrivilegesController_revokeTablePrivileges']
-  }
   '/v0/pg-meta/{ref}/tables': {
     /** Gets project pg.tables or pg.table with the given ID */
     get: operations['TablesController_getTables']
@@ -1871,15 +1860,12 @@ export interface paths {
     patch: operations['v1-update-supavisor-config']
   }
   '/v0/projects/{ref}/content': {
-    /**
-     * Gets project's content
-     * @deprecated
-     */
+    /** Gets project's content */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContentV2']
+    put: operations['ContentController_updateWholeContent']
     /** Creates project's content */
-    post: operations['ContentController_createContentV2']
+    post: operations['ContentController_createContent']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
     /**
@@ -1889,7 +1875,7 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/v0/projects/{ref}/content/count': {
-    /** Gets the count of a user's content by type */
+    /** Gets the count of a user's content */
     get: operations['ContentController_getContentCount']
   }
   '/v0/projects/{ref}/content/item/{id}': {
@@ -2079,6 +2065,13 @@ export interface paths {
      */
     patch: operations['v1-update-a-branch-config']
   }
+  '/v1/branches/{branch_id}/push': {
+    /**
+     * Pushes a database branch
+     * @description Pushes the specified database branch
+     */
+    post: operations['v1-push-a-branch']
+  }
   '/v1/branches/{branch_id}/reset': {
     /**
      * Resets a database branch
@@ -2089,6 +2082,10 @@ export interface paths {
   '/v1/oauth/authorize': {
     /** [Beta] Authorize user through oauth */
     get: operations['v1-authorize-user']
+  }
+  '/v1/oauth/revoke': {
+    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    post: operations['v1-revoke-token']
   }
   '/v1/oauth/token': {
     /** [Beta] Exchange auth code for user's access and refresh token */
@@ -2300,6 +2297,10 @@ export interface paths {
   '/v1/projects/{ref}/network-restrictions/apply': {
     /** [Beta] Updates project's network restrictions */
     post: operations['v1-update-network-restrictions']
+  }
+  '/v1/projects/{ref}/pause': {
+    /** Pauses the given project */
+    post: operations['v1-pause-a-project']
   }
   '/v1/projects/{ref}/pgsodium': {
     /** [Beta] Gets project's pgsodium config */
@@ -2795,16 +2796,15 @@ export interface components {
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
-    BranchResetResponse: {
-      message: string
-      workflow_run_id: string
-    }
     BranchResponse: {
       created_at: string
       git_branch?: string
       id: string
       is_default: boolean
-      /** Format: int64 */
+      /**
+       * @deprecated
+       * @description This field is deprecated and will not be populated.
+       */
       latest_check_run_id?: number
       name: string
       parent_project_ref: string
@@ -2812,7 +2812,6 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
-      reset_on_push: boolean
       /** @enum {string} */
       status:
         | 'CREATING_PROJECT'
@@ -2822,6 +2821,10 @@ export interface components {
         | 'FUNCTIONS_DEPLOYED'
         | 'FUNCTIONS_FAILED'
       updated_at: string
+    }
+    BranchUpdateResponse: {
+      message: string
+      workflow_run_id: string
     }
     Buffer: Record<string, never>
     BulkDeleteUserContentResponse: {
@@ -2927,9 +2930,13 @@ export interface components {
       tableId: number
       type: string
     }
-    CreateContentBody: {
-      content?: Record<string, never>
+    CreateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name: string
       owner_id?: number
@@ -2938,20 +2945,9 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
     }
-    CreateContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
+    CreateContentFolderBodyDto: {
       name: string
-      owner_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    CreateContentFolderBody: {
-      name: string
+      /** Format: uuid */
       parent_id?: string
     }
     CreateExtensionBody: {
@@ -3765,7 +3761,7 @@ export interface components {
       content: Record<string, never>
       description?: string
       favorite: boolean | null
-      folder_id?: string
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3779,6 +3775,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentFolderResponse: {
+      cursor?: string
       data: {
         contents?: components['schemas']['UserContentObjectMeta'][]
         folders?: components['schemas']['UserContentFolder'][]
@@ -3787,6 +3784,8 @@ export interface components {
     GetUserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -3808,6 +3807,7 @@ export interface components {
       visibility: 'user' | 'project' | 'org' | 'public'
     }
     GetUserContentResponse: {
+      cursor?: string
       data: components['schemas']['GetUserContentObject'][]
     }
     GetUserOrganizationIntegrationResponse: {
@@ -3842,11 +3842,6 @@ export interface components {
         prev?: number | null
       }
       projects: components['schemas']['IntegrationVercelProject'][]
-    }
-    GitConfig: {
-      owner: string
-      ref: string
-      repo: string
     }
     GitHubAuthorization: {
       id: number
@@ -4031,21 +4026,6 @@ export interface components {
       is_grantable?: boolean
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    GrantTablePrivilegesBody: {
-      grantee: string
-      is_grantable?: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
     }
     HCaptchaBody: {
       hcaptchaToken: string
@@ -4350,6 +4330,12 @@ export interface components {
         | 'storage:write'
       )[]
       website: string
+    }
+    OAuthRevokeTokenBodyDto: {
+      /** Format: uuid */
+      client_id: string
+      client_secret: string
+      refresh_token: string
     }
     OAuthTokenBody: {
       client_id: string
@@ -4782,12 +4768,6 @@ export interface components {
       rls_forced: boolean
       schema: string
       size: string
-    }
-    PostgresTablePrivileges: {
-      kind: string
-      name: string
-      privileges: components['schemas']['TablePrivilege'][]
-      schema: string
     }
     PostgrestConfigResponse: {
       db_anon_role: string
@@ -5424,20 +5404,6 @@ export interface components {
       /** @enum {string} */
       privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
     }
-    RevokeTablePrivilegesBody: {
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      relation_id: number
-    }
     RunQueryBody: {
       query: string
     }
@@ -5640,6 +5606,7 @@ export interface components {
       sql: string
     }
     SnippetList: {
+      cursor?: string
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
@@ -5748,16 +5715,6 @@ export interface components {
     SubdomainAvailabilityResponse: {
       available: boolean
     }
-    SubscriptionStatisticsResponse: {
-      total_active_free_projects: number
-      total_enterprise_projects: number
-      total_free_projects: number
-      total_paid_projects: number
-      total_paused_free_projects: number
-      total_payg_projects: number
-      total_pro_projects: number
-      total_team_projects: number
-    }
     SupavisorConfigResponse: {
       connectionString: string
       /** @enum {string} */
@@ -5849,22 +5806,8 @@ export interface components {
       name: string
       schema: string
     }
-    TablePrivilege: {
-      grantee: string
-      grantor: string
-      is_grantable: boolean
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
     TargetClonedProject: {
+      name: string
       ref: string
     }
     TargetCloneStatus: {
@@ -5884,6 +5827,9 @@ export interface components {
     TaxIdResponse: {
       tax_id: components['schemas']['TaxId'] | null
     }
+    TelemetryCallFeatureFlagsResponseDto: {
+      [key: string]: unknown
+    }
     TelemetryEventBodyV2: {
       action: string
       custom_properties: Record<string, never>
@@ -5899,6 +5845,10 @@ export interface components {
       user_agent: string
       viewport_height: number
       viewport_width: number
+    }
+    TelemetryFeatureFlagBodyDto: {
+      feature_flag_name: string
+      feature_flag_value?: unknown
     }
     TelemetryGroupsIdentityBody: {
       organization_slug?: string
@@ -6170,6 +6120,10 @@ export interface components {
       branch_name?: string
       git_branch?: string
       persistent?: boolean
+      /**
+       * @deprecated
+       * @description This field is deprecated and will be ignored. Use v1-reset-a-branch endpoint directly instead.
+       */
       reset_on_push?: boolean
       /** @enum {string} */
       status?:
@@ -6196,9 +6150,13 @@ export interface components {
       name?: string
       type?: string
     }
-    UpdateContentBody: {
-      content?: Record<string, never>
+    UpdateContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
+      /** Format: uuid */
+      folder_id?: null | string
       id?: string
       name?: string
       owner_id?: number
@@ -6207,7 +6165,7 @@ export interface components {
       /** @enum {string} */
       visibility?: 'user' | 'project' | 'org' | 'public'
     }
-    UpdateContentFolderBody: {
+    UpdateContentFolderBodyDto: {
       name: string
     }
     UpdateCustomHostnameBody: {
@@ -6473,7 +6431,7 @@ export interface components {
       /** Format: email */
       billing_email?: string
       name?: string
-      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
+      opt_in_tags?: 'AI_SQL_GENERATOR_OPT_IN'[]
     }
     UpdateOrganizationResponse: {
       billing_email?: string
@@ -6634,12 +6592,15 @@ export interface components {
     }
     UpdateSubscriptionV2AdminBody: {
       payment_method?: string
+      price?: number
       price_id?: string
       skip_free_plan_validations?: boolean
       skip_outstanding_invoice_check?: boolean
       skip_payment_method_available_check?: boolean
+      skip_project_updates_enabled_check?: boolean
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
+      usage_discounts?: Record<string, never>[]
     }
     UpdateSupavisorConfigBody: {
       default_pool_size?: number | null
@@ -6731,25 +6692,16 @@ export interface components {
       release_channel: components['schemas']['ReleaseChannel']
       target_version: string
     }
-    UpsertContentBody: {
-      content?: Record<string, never>
+    UpsertContentBodyDto: {
+      content?: {
+        [key: string]: unknown
+      }
       description?: string
-      id?: string
+      /** Format: uuid */
+      folder_id?: null | string
+      id: string
       name: string
-      owner_id?: number
-      project_id?: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UpsertContentBodyV2: {
-      content?: Record<string, never>
-      description?: string
-      folder_id?: string
-      id?: string
-      name: string
-      owner_id?: number
+      owner_id: number
       project_id?: number
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
@@ -6811,6 +6763,8 @@ export interface components {
     UserContentObject: {
       content: Record<string, never>
       description?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -6825,25 +6779,8 @@ export interface components {
     }
     UserContentObjectMeta: {
       description?: string
-      favorite: boolean | null
-      folder_id?: string
-      id: string
-      inserted_at: string
-      last_updated_by?: number
-      name: string
-      owner_id: number
-      project_id: number
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      updated_at: string
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-    }
-    UserContentObjectV2: {
-      content: Record<string, never>
-      description?: string
-      favorite: boolean | null
-      folder_id?: string
+      favorite?: boolean | null
+      folder_id?: string | null
       id: string
       inserted_at: string
       last_updated_by?: number
@@ -7104,6 +7041,10 @@ export interface components {
       name?: string
       verify_jwt?: boolean
     }
+    ValidateEmailBodyDto: {
+      /** Format: email */
+      email: string
+    }
     ValidateQueryBody: {
       query: string
     }
@@ -7161,7 +7102,7 @@ export interface components {
       branch_id: string
       check_run_id: number | null
       created_at: string
-      git_config: components['schemas']['GitConfig'] | null
+      git_config: unknown
       id: string
       /** @enum {string} */
       status:
@@ -8595,13 +8536,13 @@ export interface operations {
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
     parameters: {
-      query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
-        org_slug?: string[]
-        project_ref?: string[]
-        offset: number
-        limit: number
+      query?: {
+        limit?: string
+        offset?: string
+        priority?: 'Critical' | 'Warning' | 'Info'
+        status?: 'new' | 'seen' | 'archived'
+        org_slug?: string
+        project_ref?: string
       }
     }
     responses: {
@@ -11134,94 +11075,6 @@ export interface operations {
       }
     }
   }
-  /** Retrieve table privileges */
-  TablePrivilegesController_getTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to retrieve table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Grant table privileges */
-  TablePrivilegesController_grantTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['GrantTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to grant table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Revoke table privileges */
-  TablePrivilegesController_revokeTablePrivileges: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RevokeTablePrivilegesBody'][]
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to revoke table privileges */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets project pg.tables or pg.table with the given ID */
   TablesController_getTables: {
     parameters: {
@@ -11751,20 +11604,6 @@ export interface operations {
         }
       }
       /** @description Failed to search profiles with the given keywords */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the user's subscription statistics */
-  SubscriptionsController_getSubscriptionsStatistics: {
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SubscriptionStatisticsResponse']
-        }
-      }
-      /** @description Failed to retrieve user's subscription statistics */
       500: {
         content: never
       }
@@ -12855,14 +12694,20 @@ export interface operations {
       }
     }
   }
-  /**
-   * Gets project's content
-   * @deprecated
-   */
+  /** Gets project's content */
   ContentController_getContent: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        name?: string
+        favorite?: boolean
+      }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12879,16 +12724,15 @@ export interface operations {
     }
   }
   /** Updates project's content */
-  ContentController_updateWholeContentV2: {
+  ContentController_updateWholeContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpsertContentBodyV2']
+        'application/json': components['schemas']['UpsertContentBodyDto']
       }
     }
     responses: {
@@ -12902,22 +12746,21 @@ export interface operations {
     }
   }
   /** Creates project's content */
-  ContentController_createContentV2: {
+  ContentController_createContent: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentBodyV2']
+        'application/json': components['schemas']['CreateContentBodyDto']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['UserContentObjectV2']
+          'application/json': components['schemas']['UserContentObject']
         }
       }
       /** @description Failed to create project's content */
@@ -12933,7 +12776,6 @@ export interface operations {
         ids: string[]
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -12958,10 +12800,13 @@ export interface operations {
       query: {
         id: string
       }
+      path: {
+        ref: string
+      }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentBody']
+        'application/json': components['schemas']['UpdateContentBodyDto']
       }
     }
     responses: {
@@ -12976,14 +12821,16 @@ export interface operations {
       }
     }
   }
-  /** Gets the count of a user's content by type */
+  /** Gets the count of a user's content */
   ContentController_getContentCount: {
     parameters: {
       query?: {
-        type?: string
+        visibility?: string
+        type?: 'sql' | 'report' | 'log_sql'
+        favorite?: boolean
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -13003,10 +12850,15 @@ export interface operations {
   ContentFoldersController_getRootFolder: {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
+        name?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -13026,13 +12878,12 @@ export interface operations {
   ContentFoldersController_createFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentFolderBody']
+        'application/json': components['schemas']['CreateContentFolderBodyDto']
       }
     }
     responses: {
@@ -13053,6 +12904,9 @@ export interface operations {
       query: {
         ids: string[]
       }
+      path: {
+        ref: string
+      }
     }
     responses: {
       200: {
@@ -13067,11 +12921,17 @@ export interface operations {
   /** Gets project's content folder */
   ContentFoldersController_getFolder: {
     parameters: {
+      query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
+        name?: string
+      }
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -13090,15 +12950,14 @@ export interface operations {
   ContentFoldersController_updateFolder: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
         /** @description Content folder id */
         id: string
+        ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateContentFolderBody']
+        'application/json': components['schemas']['UpdateContentFolderBodyDto']
       }
     }
     responses: {
@@ -13115,10 +12974,8 @@ export interface operations {
   ContentController_getContentById: {
     parameters: {
       path: {
-        /** @description Project ref */
-        ref: string
-        /** @description Content id */
         id: string
+        ref: string
       }
     }
     responses: {
@@ -14477,6 +14334,38 @@ export interface operations {
       }
     }
   }
+  /** Call feature flags */
+  TelemetryFeatureFlagsController_callFeatureFlag: {
+    responses: {
+      /** @description Feature flags called */
+      200: {
+        content: {
+          'application/json': components['schemas']['TelemetryCallFeatureFlagsResponseDto']
+        }
+      }
+      /** @description Failed to call feature flags */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Track feature flag called */
+  TelemetryFeatureFlagsController_trackFeatureFlag: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TelemetryFeatureFlagBodyDto']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to track feature flag called */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Send analytics group identify event */
   TelemetryGroupsController_groupIdentify: {
     requestBody: {
@@ -15006,7 +14895,7 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      204: {
         content: never
       }
       /** @description Failed to update subscription */
@@ -15773,6 +15662,28 @@ export interface operations {
       }
     }
   }
+  /** Validates the email address */
+  ProjectEmailAbuseController_validateEmailAddress: {
+    parameters: {
+      header: {
+        apikey: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ValidateEmailBodyDto']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to validate email address */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Processes Stripe event */
   StripeWebhooksController_processEvent: {
     parameters: {
@@ -15889,6 +15800,29 @@ export interface operations {
     }
   }
   /**
+   * Pushes a database branch
+   * @description Pushes the specified database branch
+   */
+  'v1-push-a-branch': {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['BranchUpdateResponse']
+        }
+      }
+      /** @description Failed to push database branch */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
    * Resets a database branch
    * @description Resets the specified database branch
    */
@@ -15902,7 +15836,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['BranchResetResponse']
+          'application/json': components['schemas']['BranchUpdateResponse']
         }
       }
       /** @description Failed to reset database branch */
@@ -15927,6 +15861,19 @@ export interface operations {
     }
     responses: {
       303: {
+        content: never
+      }
+    }
+  }
+  /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+  'v1-revoke-token': {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OAuthRevokeTokenBodyDto']
+      }
+    }
+    responses: {
+      204: {
         content: never
       }
     }
@@ -16980,6 +16927,23 @@ export interface operations {
       }
     }
   }
+  /** Pauses the given project */
+  'v1-pause-a-project': {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+    }
+  }
   /** [Beta] Gets project's pgsodium config */
   'v1-get-pgsodium-config': {
     parameters: {
@@ -17456,6 +17420,10 @@ export interface operations {
   'v1-list-all-snippets': {
     parameters: {
       query?: {
+        cursor?: string
+        limit?: string
+        sort_by?: 'name' | 'inserted_at'
+        sort_order?: 'asc' | 'desc'
         project_ref?: string
       }
     }
