@@ -461,13 +461,7 @@ const Wizard: NextPageWithLayout = () => {
                         render={({ field }) => (
                           <FormItemLayout label="Project name" layout="horizontal">
                             <FormControl_Shadcn_>
-                              <Input_Shadcn_
-                                placeholder="Project name"
-                                {...field}
-                                onChange={(event) => {
-                                  field.onChange(event.target.value.replace(/\./g, ''))
-                                }}
-                              />
+                              <Input_Shadcn_ {...field} placeholder="Project name" />
                             </FormControl_Shadcn_>
                           </FormItemLayout>
                         )}
