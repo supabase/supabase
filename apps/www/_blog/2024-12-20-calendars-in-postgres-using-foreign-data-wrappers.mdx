@@ -30,7 +30,7 @@ Let’s use your Supabase database to create an event in [Cal.com](http://cal.co
 ### Set up a Cal.com account
 
 - Sign up on [Cal.com](http://Cal.com)
-- Visit [`Settings -> Developer -> API keys`](https://app.cal.com/settings/developer/api-keys) to create an API key
+- Visit [Settings -> Developer -> API keys](https://app.cal.com/settings/developer/api-keys) to create an API key
 
 <Img
   alt="create API key on Cal.com"
@@ -56,7 +56,7 @@ Let’s use your Supabase database to create an event in [Cal.com](http://cal.co
 
 ### Create Wasm wrapper and a foreign server
 
-Visit [Supabase SQL Editor](https://supabase.com/dashboard/project/zxlmzmulviknyqbvxtjm/sql/new), use below SQL to create the Wasm foreign data wrapper:
+Visit [Supabase SQL Editor](https://supabase.com/dashboard/project/\_/sql/new), use below SQL to create the Wasm foreign data wrapper:
 
 ```sql
 create foreign data wrapper wasm_wrapper
@@ -78,14 +78,9 @@ create server cal_server
   );
 ```
 
-<aside>
-ℹ️
-
-Find the latest version and checksum in the docs:
-
-[fdw.dev/catalog/cal](https://fdw.dev/catalog/cal/)
-
-</aside>
+<Admonition>
+Find the latest version and checksum in the docs: [fdw.dev/catalog/cal](https://fdw.dev/catalog/cal/)
+</Admonition>
 
 ### Set up foreign tables
 
@@ -208,7 +203,7 @@ After inserting the booking record, we can verify it appears on our upcoming lis
   }}
 />
 
-When we query `cal.bookings` again using the previous SQL, we can see our new booking record in the results as well.
+When we query `cal.bookings` again using the previous SQL, we can see our new booking record is in the results as well.
 
 <Img
   alt="verify bookings on Supabase"
