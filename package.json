@@ -45,6 +45,7 @@
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
+    "supports-color": "^8.0.0",
     "turbo": "2.0.4",
     "typescript": "~5.5.0"
   },
