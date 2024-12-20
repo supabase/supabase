@@ -22,7 +22,6 @@ import {
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-import { sanitizeRoute } from './ProjectDropdown'
 
 const BranchLink = ({
   branch,
@@ -34,18 +33,28 @@ const BranchLink = ({
   setOpen: (value: boolean) => void
 }) => {
   const router = useRouter()
-  const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const href =
-    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+  const { ref } = useParams()
+  const projectDetails = useSelectedProject()
+
+  const isBranch = projectDetails?.parent_project_ref !== undefined
+  const projectRef =
+    projectDetails !== undefined ? (isBranch ? projectDetails.parent_project_ref : ref) : undefined
+
+  const { data: branches, isLoading, isError, isSuccess } = useBranchesQuery({ projectRef })
+
+  const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+
+  const currentPath = router.asPath
+  const baseHref = currentPath.replace(`/${ref}/`, `/${branch.project_ref}/`)
 
   return (
-    <Link passHref href={href}>
+    <Link passHref href={baseHref}>
       <CommandItem_Shadcn_
         value={branch.name.replaceAll('"', '')}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           setOpen(false)
-          router.push(href)
+          router.push(baseHref)
         }}
         onClick={() => {
           setOpen(false)
@@ -54,7 +63,7 @@ const BranchLink = ({
         <p className="truncate w-60" title={branch.name}>
           {branch.name}
         </p>
-        {isSelected && <Check />}
+        {isSelected && <Check size={14} strokeWidth={1.5} />}
       </CommandItem_Shadcn_>
     </Link>
   )
