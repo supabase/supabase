@@ -52,7 +52,7 @@
     "lodash": "^4.0.0",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",
-    "next": "^14.2.10",
+    "next": "catalog:",
     "next-contentlayer2": "0.5.3",
     "next-mdx-remote": "^4.4.1",
     "next-seo": "^6.5.0",

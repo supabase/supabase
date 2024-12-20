@@ -3,3 +3,5 @@ packages:
   - "packages/*"
   - "tests"
   - "playwright-tests"
+catalog:
+  next: 14.2.15

@@ -74,7 +74,7 @@
     "mdast-util-to-string": "^3.1.1",
     "micromark-extension-gfm": "^2.0.3",
     "micromark-extension-mdxjs": "^1.0.0",
-    "next": "^14.2.10",
+    "next": "catalog:",
     "next-mdx-remote": "^4.4.1",
     "next-plugin-yaml": "^1.0.1",
     "next-seo": "^6.5.0",

@@ -60,7 +60,7 @@
     "vitest": "^2.0.3"
   },
   "peerDependencies": {
-    "next": "*",
+    "next": "catalog:",
     "react": "*",
     "react-dom": "*"
   }
