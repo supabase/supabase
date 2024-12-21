@@ -8,6 +8,7 @@ import { authKeys } from './keys'
 export type UserDeleteVariables = {
   projectRef: string
   userId: string
+  skipInvalidation?: boolean
 }
 
 export async function deleteUser({ projectRef, userId }: UserDeleteVariables) {
@@ -34,12 +35,14 @@ export const useUserDeleteMutation = ({
     (vars) => deleteUser(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+        const { projectRef, skipInvalidation = false } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
-          queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
-        ])
+        if (!skipInvalidation) {
+          await Promise.all([
+            queryClient.invalidateQueries(authKeys.usersInfinite(projectRef)),
+            queryClient.invalidateQueries(authKeys.usersCount(projectRef)),
+          ])
+        }
 
         await onSuccess?.(data, variables, context)
       },

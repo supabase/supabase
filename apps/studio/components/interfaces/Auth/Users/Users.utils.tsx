@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 import { UserIcon } from 'lucide-react'
 import { UIEvent } from 'react'
-import { Column } from 'react-data-grid'
+import { Column, useRowSelection } from 'react-data-grid'
 
 import { User } from 'data/auth/users-infinite-query'
 import { BASE_PATH } from 'lib/constants'
-import { cn } from 'ui'
-import { HeaderCell } from './UsersGridComponents'
+import { Checkbox_Shadcn_, cn } from 'ui'
+import { HeaderCell, SelectHeaderCell } from './UsersGridComponents'
 import { ColumnConfiguration, USERS_TABLE_COLUMNS } from './UsersV2'
 
 const SUPPORTED_CSP_AVATAR_URLS = [
@@ -262,10 +262,18 @@ export const formatUserColumns = ({
       minWidth: col.minWidth ?? 120,
       headerCellClass: 'z-50 outline-none !shadow-none',
       renderHeaderCell: () => {
+        // [Joshen] I'm on the fence to support "Select all" for users, as the results are infinitely paginated
+        // "Select all" wouldn't be an accurate representation if not all the pages have been fetched, but if decide
+        // to support - the component is ready as such: Just pass selectedUsers and allRowsSelected as props from parent
+        // <SelectHeaderCell selectedUsers={selectedUsers} allRowsSelected={allRowsSelected} />
         if (col.id === 'img') return undefined
         return <HeaderCell col={col} setSortByValue={setSortByValue} />
       },
       renderCell: ({ row }) => {
+        // This is actually a valid React component, so we can use hooks here
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+        const [isRowSelected, onRowSelectionChange] = useRowSelection()
+
         const value = row?.[col.id]
         const user = users?.find((u) => u.id === row.id)
         const formattedValue =
@@ -278,7 +286,19 @@ export const formatUserColumns = ({
 
         if (col.id === 'img') {
           return (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center gap-x-2">
+              <Checkbox_Shadcn_
+                checked={isRowSelected}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onRowSelectionChange({
+                    row,
+                    type: 'ROW',
+                    checked: !isRowSelected,
+                    isShiftClick: e.shiftKey,
+                  })
+                }}
+              />
               <div
                 className={cn(
                   'flex items-center justify-center w-6 h-6 rounded-full bg-center bg-cover bg-no-repeat',
