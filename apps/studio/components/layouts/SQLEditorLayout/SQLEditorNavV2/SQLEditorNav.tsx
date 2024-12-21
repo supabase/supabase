@@ -524,6 +524,24 @@ export const SQLEditorNav = ({
     setSelectedSnippets(_selectedSnippets)
   }
 
+  const onAddFavorite = async (snippet: Snippet) => {
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!projectRef) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    snapV2.addFavorite(snippet.id)
+  }
+
+  const onRemoveFavorite = async (snippet: Snippet) => {
+    if (!profile) return console.error('Profile is required')
+    if (!project) return console.error('Project is required')
+    if (!projectRef) return console.error('Project ref is required')
+    if (!id) return console.error('Snippet ID is required')
+
+    snapV2.removeFavorite(snippet.id)
+  }
+
   // ===============
   // useEffects
   // ===============
@@ -596,6 +614,12 @@ export const SQLEditorNav = ({
                   onSelectUnshare={() => {
                     setSelectedSnippetToUnshare(element.metadata as Snippet)
                   }}
+                  onAddFavorite={() => {
+                    onAddFavorite(element.metadata as Snippet)
+                  }}
+                  onRemoveFavorite={() => {
+                    onRemoveFavorite(element.metadata as Snippet)
+                  }}
                   isLastItem={projectSnippetsLastItemIds.has(element.id as string)}
                   hasNextPage={hasMoreSharedSqlSnippets}
                   fetchNextPage={fetchNextSharedSqlSnippets}
@@ -656,6 +680,9 @@ export const SQLEditorNav = ({
                   onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                   onSelectUnshare={() => {
                     setSelectedSnippetToUnshare(element.metadata as Snippet)
+                  }}
+                  onRemoveFavorite={() => {
+                    onRemoveFavorite(element.metadata as Snippet)
                   }}
                   isLastItem={favoriteSnippetsLastItemIds.has(element.id as string)}
                   hasNextPage={hasMoreFavoriteSqlSnippets}
@@ -748,6 +775,12 @@ export const SQLEditorNav = ({
                     } else if (name.length > 0) {
                       snapV2.saveFolder({ id: element.id as string, name })
                     }
+                  }}
+                  onAddFavorite={() => {
+                    onAddFavorite(element.metadata as Snippet)
+                  }}
+                  onRemoveFavorite={() => {
+                    onRemoveFavorite(element.metadata as Snippet)
                   }}
                   hasNextPage={hasNextPage}
                   fetchNextPage={fetchNextPage}
