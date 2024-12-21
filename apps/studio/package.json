@@ -79,7 +79,7 @@
     "mobx": "^6.10.2",
     "mobx-react-lite": "^4.0.5",
     "monaco-editor": "0.33.0",
-    "next": "^14.2.10",
+    "next": "catalog:",
     "next-themes": "^0.3.0",
     "nuqs": "^1.17.8",
     "openai": "^4.20.1",
@@ -146,6 +146,7 @@
     "@types/lodash": "^4.14.172",
     "@types/markdown-table": "^3.0.0",
     "@types/mime-db": "^1.43.5",
+    "@types/node": "catalog:",
     "@types/papaparse": "^5.3.1",
     "@types/randombytes": "^2.0.3",
     "@types/react": "^18.2.24",
@@ -177,7 +178,6 @@
     "next-router-mock": "^0.9.13",
     "postcss": "^8.4.31",
     "prettier": "3.2.4",
-    "supports-color": "5.5.0",
     "tailwindcss": "^3.4.1",
     "typescript": "~5.5.0"
   }
