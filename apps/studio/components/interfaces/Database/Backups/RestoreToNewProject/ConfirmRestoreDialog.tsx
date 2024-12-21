@@ -43,13 +43,6 @@ export const ConfirmRestoreDialog = ({
             <li>
               Project region will stay the same: <code>{project?.region || ''}</code>
             </li>
-            <li>
-              A project can only be restored to another project once. <br />
-              <span className="text-foreground-lighter text-xs">
-                This is a temporary limitation. Please contact us if you need to restore a project
-                to multiple other projects.
-              </span>
-            </li>
           </ul>
           <ul>
             <li>What will be transferred?</li>
