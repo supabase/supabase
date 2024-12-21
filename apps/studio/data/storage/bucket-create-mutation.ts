@@ -1,8 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { storageKeys } from './keys'
 
@@ -22,16 +21,28 @@ export async function createBucket({
   allowed_mime_types,
 }: BucketCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
-  if (!id) throw new Error('Bucket name is requried')
+  if (!id) throw new Error('Bucket name is required')
 
-  const response = await post(`${API_URL}/storage/${projectRef}/buckets`, {
-    id,
-    public: isPublic,
-    file_size_limit,
-    allowed_mime_types,
+  const { data, error } = await post(`/platform/storage/{ref}/buckets`, {
+    params: {
+      path: {
+        ref: projectRef,
+      },
+    },
+    body: {
+      id,
+      public: isPublic,
+      // @ts-expect-error - file_size_limit is actually optional
+      file_size_limit,
+      // @ts-expect-error - allowed_mime_types is actually optional
+      allowed_mime_types,
+    },
   })
-  if (response.error) throw response.error
-  return response
+
+  if (error) handleError(error)
+
+  // data is actually {name: string}
+  return data as unknown as { name: string }
 }
 
 type BucketCreateData = Awaited<ReturnType<typeof createBucket>>

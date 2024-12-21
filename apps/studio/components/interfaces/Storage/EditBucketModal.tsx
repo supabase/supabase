@@ -36,6 +36,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
   const [selectedUnit, setSelectedUnit] = useState<StorageSizeUnits>(StorageSizeUnits.BYTES)
   const [showConfiguration, setShowConfiguration] = useState(false)
+  const [showBYOB, setShowBYOB] = useState(false)
 
   const validate = (values: any) => {
     const errors = {} as any
@@ -96,6 +97,10 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
 
                 has_file_size_limit: bucket.file_size_limit !== null,
                 formatted_size_limit: fileSizeLimit ?? 0,
+                s3_endpoint: '',
+                s3_region: '',
+                s3_access_key: '',
+                s3_secret: '',
               }
               resetForm({ values, initialValues: values })
             }
@@ -232,7 +237,59 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                   </div>
                 </Collapsible.Content>
               </Collapsible>
+
+              {IS_PLATFORM && (
+                <Collapsible
+                  open={showBYOB}
+                  onOpenChange={() => setShowBYOB((showBYOB) => !showBYOB)}
+                >
+                  <Collapsible.Trigger asChild>
+                    <div className="w-full cursor-pointer py-3 px-5 flex items-center justify-between border-t border-default">
+                      <p className="text-sm">Bring your own bucket</p>
+                      <ChevronDown
+                        size={18}
+                        strokeWidth={2}
+                        className={cn('text-foreground-light', showBYOB && 'rotate-180')}
+                      />
+                    </div>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content className="py-4">
+                    <div className="w-full space-y-5 px-5">
+                      <Input
+                        id="s3_endpoint"
+                        name="s3_endpoint"
+                        layout="vertical"
+                        label="S3-compatible endpoint"
+                        placeholder="http://your-bucket.s3.us-east-1.amazonaws.com"
+                      />
+                      <Input
+                        id="s3_region"
+                        name="s3_region"
+                        layout="vertical"
+                        label="Region"
+                        placeholder="us-east-1"
+                      />
+                      <Input
+                        id="s3_access_key"
+                        name="s3_access_key"
+                        layout="vertical"
+                        label="Access key ID"
+                        placeholder="afda96b7fdca83e7xxxxxx"
+                      />
+                      <Input
+                        id="s3_secret_key"
+                        name="s3_secret_key"
+                        layout="vertical"
+                        label="Secret access key"
+                        placeholder="xxxxxxxxxxxxx"
+                      />
+                    </div>
+                  </Collapsible.Content>
+                </Collapsible>
+              )}
+
               <Modal.Separator />
+
               <Modal.Content className="flex items-center space-x-2 justify-end">
                 <Button type="default" disabled={isUpdating} onClick={() => onClose()}>
                   Cancel
