@@ -261,3 +261,14 @@ export function jsonSyntaxHighlight(input: Object) {
 
   return jsonWithLineWraps.join('\n')
 }
+
+export const IDFormatter: React.FC<{ value: string }> = ({ value }) => (
+  <span
+    className={`
+      font-mono text-xs bg-surface-100 text-foreground-light
+      px-1.5 py-0.5 rounded-full !border !border-solid !border-border-strong block
+    `}
+  >
+    {value}
+  </span>
+)

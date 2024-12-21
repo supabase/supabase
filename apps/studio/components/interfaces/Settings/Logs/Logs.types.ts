@@ -35,6 +35,7 @@ export interface PreviewLogData extends CustomLogData {
   timestamp: number
   event_message: string
   metadata?: Metadata
+  workflow_run?: string
 }
 export type LogData = CustomLogData & PreviewLogData
 
@@ -88,6 +89,7 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
+  | 'workflow_run'
   | 'pg_cron'
 
 export type Mode = 'simple' | 'custom'
