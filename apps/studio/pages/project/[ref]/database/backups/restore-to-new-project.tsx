@@ -82,7 +82,7 @@ const RestoreToNewProject = () => {
     PermissionAction.INFRA_EXECUTE,
     'queue_job.restore.prepare'
   )
-  const hasPITREnabled = cloneBackups?.pitr_enabled
+  const PITR_ENABLED = cloneBackups?.pitr_enabled
 
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
@@ -100,9 +100,10 @@ const RestoreToNewProject = () => {
       refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        const hasTransientState = data.clones.some((c) => c.status === 'IN_PROGRESS')
+        const hasTransientState = data?.clones.some((c) => c.status === 'IN_PROGRESS')
         if (!hasTransientState) setRefetchInterval(false)
       },
+      enabled: PHYSICAL_BACKUPS_ENABLED || PITR_ENABLED,
     }
   )
   const IS_CLONED_PROJECT = (cloneStatus?.cloned_from?.source_project as any)?.ref ? true : false
@@ -150,7 +151,7 @@ const RestoreToNewProject = () => {
           <div>
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
-              value={clone.inserted_at ?? ''}
+              utcTimestamp={clone.inserted_at ?? ''}
             />
           </div>
         </div>
@@ -168,7 +169,7 @@ const RestoreToNewProject = () => {
           <div>
             <TimestampInfo
               className="font-mono text-xs text-foreground-lighter"
-              value={clone.inserted_at ?? ''}
+              utcTimestamp={clone.inserted_at ?? ''}
             />
           </div>
           <div className="flex items-center justify-end text-foreground-lighter group-hover:text-foreground">
@@ -177,6 +178,16 @@ const RestoreToNewProject = () => {
         </Link>
       )
     }
+  }
+
+  if (isFreePlan) {
+    return (
+      <UpgradeToPro
+        buttonText="Upgrade"
+        primaryText="Restore to a new project requires a pro plan or above."
+        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
+      />
+    )
   }
 
   if (isOrioleDb) {
@@ -189,10 +200,6 @@ const RestoreToNewProject = () => {
         <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
       </Admonition>
     )
-  }
-
-  if (isLoading) {
-    return <GenericSkeletonLoader />
   }
 
   if (!canReadPhysicalBackups) {
@@ -243,14 +250,8 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (plan === 'free') {
-    return (
-      <UpgradeToPro
-        buttonText="Upgrade"
-        primaryText="Restore to a new project requires a pro plan or above."
-        secondaryText="To restore to a new project, you need to upgrade to a Pro plan and have physical backups enabled."
-      />
-    )
+  if (isLoading) {
+    return <GenericSkeletonLoader />
   }
 
   if (IS_CLONED_PROJECT) {
@@ -286,7 +287,7 @@ const RestoreToNewProject = () => {
 
   if (
     !isLoading &&
-    hasPITREnabled &&
+    PITR_ENABLED &&
     !cloneBackups?.physicalBackupData.earliestPhysicalBackupDateUnix
   ) {
     return (
@@ -298,7 +299,7 @@ const RestoreToNewProject = () => {
     )
   }
 
-  if (!isLoading && !hasPITREnabled && cloneBackups?.backups.length === 0) {
+  if (!isLoading && !PITR_ENABLED && cloneBackups?.backups.length === 0) {
     return (
       <>
         <Admonition
@@ -354,7 +355,7 @@ const RestoreToNewProject = () => {
           </Panel>
         </div>
       ) : null}
-      {hasPITREnabled ? (
+      {PITR_ENABLED ? (
         <>
           <PITRForm
             disabled={isRestoring}
