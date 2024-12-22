@@ -27,13 +27,14 @@ export const formatDateTime = (isoString: string, timezone: string) => {
   const time = timeFormatter.format(date)
 
   // Add timezone abbreviation (PT, ET, etc.)
-  const tzFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZoneName: 'short',
-    timeZone: timezone,
-  })
-  const timeZoneAbbreviation = tzFormatter
-    .formatToParts(date)
-    .find((part) => part.type === 'timeZoneName')?.value
+  // const tzFormatter = new Intl.DateTimeFormat('en-US', {
+  //   timeZoneName: 'short',
+  //   timeZone: timezone,
+  // })
+  // const timeZoneAbbreviation = tzFormatter
+  //   .formatToParts(date)
+  //   .find((part) => part.type === 'timeZoneName')?.value
 
-  return `${day} ${month} / ${time.replace(':00', '')} ${timeZoneAbbreviation}`
+  // return `${day} ${month} / ${time.replace(':00', '')} ${timeZoneAbbreviation}`
+  return `${day} ${month} / ${time.replace(':00', '')}`
 }

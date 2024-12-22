@@ -96,7 +96,10 @@ export function LogsSidebarMenuV2() {
     { enabled: IS_PLATFORM && warehouseEnabled && !!tenantData }
   )
 
-  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery(ref)
+  const { data: savedQueriesRes, isLoading: savedQueriesLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'log_sql',
+  })
 
   const savedQueries = [...(savedQueriesRes?.content ?? [])]
     .filter((c) => c.type === 'log_sql')
@@ -165,9 +168,9 @@ export function LogsSidebarMenuV2() {
       items: [],
     },
     {
-      name: 'Cron Jobs',
-      key: 'cron-logs',
-      url: `/project/${ref}/logs/cron-logs`,
+      name: 'Cron',
+      key: 'pg_cron',
+      url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
   ]
@@ -241,14 +244,6 @@ export function LogsSidebarMenuV2() {
           href={`/project/${ref}/logs/explorer/templates`}
         >
           Templates
-        </InnerSideMenuItem>
-        <InnerSideMenuItem
-          title="Settings"
-          isActive={isActive(`/project/${ref}/settings/warehouse`)}
-          href={`/project/${ref}/settings/warehouse`}
-        >
-          Settings
-          <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
         </InnerSideMenuItem>
       </div>
       <Separator className="my-4" />

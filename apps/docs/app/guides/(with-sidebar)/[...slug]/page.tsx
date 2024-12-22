@@ -5,7 +5,6 @@ import {
 } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
 
-// Serve 404 when accessing pages that aren't prebuilt
 export const dynamicParams = false
 
 type Params = { slug: string[] }
