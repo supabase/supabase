@@ -58,7 +58,7 @@ export const INFRA_ACTIVITY_METRICS: CategoryMeta[] = [
         name: 'Memory',
         unit: 'percentage',
         description:
-          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services is running under the hood resulting in an elevated base memory usage.',
+          'Memory usage of your server.\nYou might observe elevated memory usage, even with little to no load. Besides Postgres, a wide range of services are running under the hood resulting in an elevated base memory usage.',
         chartDescription: '',
         links: [
           {
