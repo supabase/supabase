@@ -66,7 +66,7 @@ breadcrumb: 'Migrations'
 <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Check your backup file format" fullWidth>
     By default, your backup file might be gzipped and have a .gz file extension. You will need to
-    decompress it and the file you use should look like this: **backup_name.backup**
+    decompress it and the file you use should look like this: ```backup_name.backup ```
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>
 
@@ -76,7 +76,7 @@ breadcrumb: 'Migrations'
 
       ```bash
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
-        ```
+      ```
 
       You will want to use the direct connection string if you are able to (you need to have an IPv6 compatible network or have purchased the IPv4 addon). Otherwise, you will need to use the Session pooler connection string.
 
@@ -98,7 +98,7 @@ breadcrumb: 'Migrations'
 
 </StepHikeCompact>
 
-## Migrate Storage Objects to S3 storage (optional)
+## Migrate Storage objects to S3 storage
 
 After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
 
