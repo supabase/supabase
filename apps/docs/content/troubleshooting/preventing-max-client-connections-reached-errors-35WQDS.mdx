@@ -1,0 +1,105 @@
+---
+title = 'Preventing "Max client connections reached" Errors'
+github_url = "https://github.com/orgs/supabase/discussions/22305"
+date_created = "2024-03-28T06:05:26+00:00"
+topics = ["database", "supavisor"]
+keywords = ["connections", "pooler"]
+
+[[errors]]
+message = "Max client connections reached"
+---
+
+> Based on [comment](https://github.com/orgs/supabase/discussions/18986#discussioncomment-8763582) by Chasers from the Supavisor Team.
+
+# What causes "Max client connections reached" Errors
+
+The amount of connections the Supavisor pooler can support is determined by your [database compute size](https://supabase.com/docs/guides/platform/compute-add-ons), which can be viewed in the [Add-On Dashboard](https://supabase.com/dashboard/project/_/settings/addons).
+
+When working in transaction mode (port 6543), The error "Max client connections reached" occurs when clients try to form more connections with the pooler than it can support. For example, if you were using a compute size that supported 200 max clients, and tried to form 201 connections with the pooler, the 201th connection would receive the error message.
+
+When working in session mode (port 5432), the max amount of clients is restricted to the "Pool Size" value in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+
+If the "Pool Size" is set to 15, even if the pooler can handle 200 client connections, it will still be effectively capped at 15 for each unique ["database-role+database" combination](https://github.com/orgs/supabase/discussions/21566). If there are 16 connection attempts, only the first 15 will be accepted. The 16th connection will queue in the pooler for up to a minute. It will encounter a "Max client connections reached" error and be rejected If no other clients disconnect voluntarily during this time.
+
+# How to fix the error
+
+### 1. If you are using session mode, consider using transaction mode, instead
+
+> most relevant to serverless environments, such as Vercel.
+
+Transaction mode typically enables higher query throughput and supports more clients than session mode. It's especially suitable for serverless applications like those deployed on Supabase Edge Functions, Vercel Functions, or AWS Lambda. For a more in-depth explanation, check out the [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566)
+
+Transaction mode does not support prepared statements. They're pre-parsed queries that some libraries may create for moderate performance benefits. You should look at how to disable prepared statements ([guide](https://github.com/orgs/supabase/discussions/28239)) for your connection library to prevent the following error from occurring:
+
+> ... prepared statement "`<statement name>`" already exists"
+
+### 2. Reduce the number of connections created by your application servers
+
+> Most relevant for serverless deployments
+
+A single client-server can establish multiple connections with a pooler. For instance, using the Prisma library, you could hypothetically set the connection_limit configuration to spawn 1000 client connections. Here's an example:
+
+```js
+datasource db {
+  provider = "postgresql"
+  url  = "postgres://[db-user].[project-ref]:[db-password]@aws-0-[aws-region].pooler.supabase.com:6543/[db-name]?pgbouncer=true&connection_limit=1000
+}
+```
+
+Typically, a server doesn't need that many connections. Starting with fewer, like five or three, or even just one, is often sufficient. In serverless setups, begin with `connection_limit=1`, increasing cautiously if needed to avoid maxing out connections.
+
+The way this is done differs across libraries. In Prisma, the `connection_limit=1` parameter is used, but in another library, such as Drizzle or SQLAlchemy, the configurations would be different.
+
+To track your connection usage and set appropriate limits, utilize the Supabase Grafana Dashboard. It offers real-time visibility into over 200 database metrics, including CPU, EBS, and active connections. This tool is invaluable for monitoring and debugging instances.
+
+You can check the [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/).
+
+### 3. Increase your pool size
+
+If the pooler lacks sufficient direct connections (due to a small pool size), it may struggle to allocate database connections to clients, leading to an overflow in the queue of waiting clients. This overflow could result in exceeding the client connection limits.
+
+Typically, when using the REST API, you can increase your "Pool Size" in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database) to 40% of your total database connections, and up to 80% if you're not using the REST API. For example, if your instance supported 60 direct connections, you could cautiously raise the pool size to 24 if you were relying on the REST API or 48 if you were not.
+
+However, the recommended maximums provided are imperfect estimates and it may be possible that your usage patterns may allow for higher values. It's also possible that you'd end up using too many database connections, preventing critical servers from interacting with your database.
+
+It's best to tailor the number based on your current usage. For more insight into how to determine the best size for your application, check out the [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566).
+
+### 4. Disconnect Appropriately
+
+If your connection framework allows for it, you should free up unused connections.
+
+### 5. Decrease Query Time
+
+Reduce query complexity or add [strategic indexes](https://supabase.com/docs/guides/database/postgres/indexes) to your tables to speed up queries.
+
+### 6. Increase Compute Size
+
+Sometimes the best option is to increase your compute size, which also increases your max client size and query execution speed
+
+### 7. Check for `idle in transaction` queries with the following query:
+
+```sql
+SELECT
+   pg_stat_activity.pid,
+   ssl AS ssl_connection,
+   datname AS database,
+   usename AS connected_role,
+   application_name,
+   client_addr,
+   query,
+   query_start,
+   state,
+   backend_start
+FROM pg_stat_ssl
+JOIN pg_stat_activity
+ ON pg_stat_ssl.pid = pg_stat_activity.pid;
+```
+
+If there are any queries with the state "idle in transaction" Google how to resolve the issue for your specific ORM. These are hanging queries that can last indefinitely and hog the pool
+
+## Useful Links:
+
+- [How to Monitor Postgres and Supavisor Connections](https://github.com/orgs/supabase/discussions/27141)
+- [Prisma Error Management](https://github.com/orgs/supabase/discussions/27395)
+- [Supavisor FAQ](https://github.com/orgs/supabase/discussions/21566)
+- [Supabase & Your Network: IPv4 and IPv6 compatibility](https://github.com/orgs/supabase/discussions/27034)
