@@ -1,6 +1,6 @@
 ---
 title: 'Restore Dashboard backup'
-subtitle: 'Learn how to restore your dashboard backup to a new project'
+subtitle: 'Learn how to restore your dashboard backup to a new Supabase project'
 breadcrumb: 'Migrations'
 ---
 
@@ -32,7 +32,7 @@ breadcrumb: 'Migrations'
 
       <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create New project" fullWidth>
-          You can create a new [Supabase project here](https://database.new)
+          Create a new [Supabase project](https://database.new)
         </StepHikeCompact.Details>
       </StepHikeCompact.Step>
 
@@ -44,7 +44,6 @@ breadcrumb: 'Migrations'
                 - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
                 - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
           </StepHikeCompact.Details>
-
         </StepHikeCompact.Step>
       </StepHikeCompact>
 
@@ -57,49 +56,78 @@ breadcrumb: 'Migrations'
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Get your database password" fullWidth>
-      If you do not have your database password, you can reset your database password in your
-      [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
-    </StepHikeCompact.Details>
-  </StepHikeCompact.Step>
-
-<StepHikeCompact.Step step={2}>
-  <StepHikeCompact.Details title="Check your backup file format" fullWidth>
-    By default, your backup file might be gzipped and have a .gz file extension. You will need to
-    decompress it and the file you use should look like this: ```backup_name.backup ```
-  </StepHikeCompact.Details>
-</StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Restore your backup" fullWidth>
-      Go to your [project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look something like this:
+    <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
+      Go to your [Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
 
       ```bash
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
       ```
 
-      You will want to use the direct connection string if you are able to (you need to have an IPv6 compatible network or have purchased the IPv4 addon). Otherwise, you will need to use the Session pooler connection string.
-
-      Run this command after replacing the connection string as well as the password below with your connection string from your project:
-
-      <StepHikeCompact.Code>
-
-        ```sql
-        psql -d "postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres" -f /path/to/your/file
-        ```
-      </StepHikeCompact.Code>
-
-      <Admonition type="tip">
-        For example, if you are running the command from your Desktop (Open terminal > run "cd Desktop") and your downloaded backup is in your Desktop folder, your /path/to/your/file could be "./db_cluster-29-05-2024@19-24-14.backup"
-      </Admonition>
+      If you are unsure about which connection string to use, use the Session pooler connection string.
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
+<StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Get your database password" fullWidth>
+    If you do not have your database password, you can reset your password in your [Database
+    Settings](https://supabase.com/dashboard/project/_/settings/database)
+
+    Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
+
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={3}>
+  <StepHikeCompact.Details title="Get your file path to your downloaded backup" fullWidth>
+    You will want to get your filepath relative to what directory you are running your terminal
+    from. If you are running your terminal from the Desktop folder, your "/file/path" would be:
+    ```./filename.backup```
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={4}>
+  <StepHikeCompact.Details title="Verify your backup file format" fullWidth>
+    The backup file might be gzipped and have a .gz file extension. You will need to decompress it
+    and the file you use should look like this: ```backup_name.backup ```
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Restore your backup" fullWidth>
+      Run this command after replacing ```[CONNECTION_STRING]``` and ```/file/path``` with the values from the previous steps:
+
+      <StepHikeCompact.Code>
+
+        ```sql
+        psql -d [CONNECTION_STRING] -f /file/path
+        ```
+
+      </StepHikeCompact.Code>
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
 </StepHikeCompact>
 
 ## Migrate Storage objects to S3 storage
 
 After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
 
-You can use this [Google colab script](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing) to migrate your downloaded storage objects to the new s3 buckets. Follow the instructions in the comments to fill out the required fields then run the scripts.
+The easiest option would be to use this [Google colab script](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing) to migrate your downloaded storage objects to the new s3 buckets. Follow the instructions when running the scripts.
+
+<Admonition type="info">
+  The Google Colab script would require uploading the storage objects to Google colab first and then
+  upload it to your S3 buckets. This can add significant time to the process if your storage objects
+  are large.
+</Admonition>
+
+Here are some scripts to run this process locally to avoid the additional upload step:
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+  <TabPanel id="js" label="Javascript">
+    ```JS code```
+  </TabPanel>
+  <TabPanel id="py" label="Python">
+    ```Python Code```
+  </TabPanel>
+</Tabs>

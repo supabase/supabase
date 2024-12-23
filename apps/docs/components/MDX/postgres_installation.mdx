@@ -9,7 +9,7 @@
 
         <StepHikeCompact.Step step={1}>
           <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-            Get and run the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+            Download and run the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 
           </StepHikeCompact.Details>
 
@@ -18,7 +18,7 @@
         <StepHikeCompact.Step step={2}>
 
           <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
-            You can add the Postgresql installation path to your PATH environment variable following this guide: [Add postgresql to PATH in Windows](https://www.commandprompt.com/education/how-to-set-windows-path-for-postgres-tools/)
+            Add the Postgresql installation path to your PATH environment variable following this guide if necessary: [Add postgresql to PATH in Windows](https://www.commandprompt.com/education/how-to-set-windows-path-for-postgres-tools/)
           </StepHikeCompact.Details>
 
           </StepHikeCompact.Step>
@@ -27,7 +27,7 @@
 
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-              Open your terminal (eg cmd/powershell) and run the following command:
+              Open your terminal (For example, cmd or powershell) and run the following command:
 
               <StepHikeCompact.Code>
                 ```sql
@@ -35,7 +35,7 @@
                 ```
               </StepHikeCompact.Code>
 
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
+              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
             </StepHikeCompact.Details>
 
           </StepHikeCompact.Step>
@@ -45,23 +45,22 @@
       <TabPanel id="mac" label="MacOS">
         <StepHikeCompact>
         <StepHikeCompact.Step step={1}>
+          <StepHikeCompact.Details title="Install Homebrew" fullWidth>
+            Install Homebrew if needed by following the instructions on [https://brew.sh](https://brew.sh/).
+          </StepHikeCompact.Details>
+        </StepHikeCompact.Step>
+        <StepHikeCompact.Step step={2}>
           <StepHikeCompact.Details title="Install Postgresql via Homebrew" fullWidth>
-            Install Homebrew if needed by following the instructions on [https://brew.sh](https://brew.sh/). Once Homebrew is installed, run the following in your terminal:
+            Run the following in your terminal:
 
             <StepHikeCompact.Code>
                 ```sql
                   brew install postgresql@15
                 ```
-              </StepHikeCompact.Code>
-
-              <Admonition type="tip">
-                If you prefer to install Postgresql via the installation file directly, you can download and run the installer via the [PostgreSQL downloads page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads).
-              </Admonition>
+            </StepHikeCompact.Code>
           </StepHikeCompact.Details>
-
         </StepHikeCompact.Step>
-        <StepHikeCompact.Step step={2}>
-
+        <StepHikeCompact.Step step={3}>
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
               Open your shell/terminal and run the following command:
