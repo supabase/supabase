@@ -19,13 +19,18 @@ interface RegionSelectorProps {
   cloudProvider: CloudProvider
   field: ControllerRenderProps<any, 'dbRegion'>
   form: UseFormReturn<any>
+  layout?: 'vertical' | 'horizontal'
 }
 
 // [Joshen] Let's use a library to maintain the flag SVGs in the future
 // I tried using https://flagpack.xyz/docs/development/react/ but couldn't get it to render
 // ^ can try again next time
 
-export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) => {
+export const RegionSelector = ({
+  cloudProvider,
+  field,
+  layout = 'horizontal',
+}: RegionSelectorProps) => {
   const router = useRouter()
 
   const showNonProdFields =
@@ -41,7 +46,7 @@ export const RegionSelector = ({ cloudProvider, field }: RegionSelectorProps) =>
 
   return (
     <FormItemLayout
-      layout="horizontal"
+      layout={layout}
       label="Region"
       description={
         <>
