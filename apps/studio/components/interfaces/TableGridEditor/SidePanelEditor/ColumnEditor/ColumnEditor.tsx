@@ -119,7 +119,6 @@ const ColumnEditor = ({
       const columnFields = isNewRecord
         ? generateColumnField({ schema: selectedTable.schema, table: selectedTable.name })
         : generateColumnFieldFromPostgresColumn(column, selectedTable, foreignKeyMeta)
-      console.log(column)
       setColumnFields(columnFields)
       setFkRelations(formatForeignKeys(foreignKeys))
     }
