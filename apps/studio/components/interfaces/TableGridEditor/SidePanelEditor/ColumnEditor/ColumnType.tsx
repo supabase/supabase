@@ -1,7 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
+import {
+  Calendar,
+  Check,
+  ChevronsUpDown,
+  ExternalLink,
+  Hash,
+  ListPlus,
+  ToggleRight,
+  Type,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
+
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,19 +34,6 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
-} from 'lucide-react'
-
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -68,9 +67,7 @@ const ColumnType = ({
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   const availableTypes = POSTGRES_DATA_TYPES.concat(
-    enumTypes.map((type) =>
-      type.schema === 'public' ? type.format.replaceAll('"', '') : type.format
-    )
+    enumTypes.map((type) => type.format.replaceAll('"', ''))
   )
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
