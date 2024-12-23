@@ -132,7 +132,7 @@ const ParametersPopover = ({
   return (
     <Popover_Shadcn_ modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
-        <Button icon={<ArrowUpDown size={14} />} type="outline" size="tiny" className="w-7 h-7" />
+        <Button icon={<ArrowUpDown size={14} />} type="text" size="tiny" className="w-7 h-7" />
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ side="bottom" align="end" className="w-[300px] p-4">
         <div className="space-y-4">

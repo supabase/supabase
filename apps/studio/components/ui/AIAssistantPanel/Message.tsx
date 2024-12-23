@@ -7,6 +7,8 @@ import remarkGfm from 'remark-gfm'
 import { AiIconAnimation, cn, CodeBlock, markdownComponents, WarningIcon } from 'ui'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { SqlSnippet } from './SqlSnippet'
+import QueryBlock from 'components/interfaces/Reports/QueryBlock'
+import QueryBlockWithProps from './QueryBlockWithProps'
 
 interface MessageProps {
   id: string
@@ -75,10 +77,10 @@ export const Message = function Message({
                         hideLineNumbers
                       />
                     ) : (
-                      <SqlSnippet
+                      <QueryBlockWithProps
+                        sql={props.children[0].props.children[0]}
                         readOnly={readOnly}
                         isLoading={isLoading}
-                        sql={props.children[0].props.children}
                       />
                     )
                   ) : (

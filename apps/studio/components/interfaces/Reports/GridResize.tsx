@@ -29,6 +29,7 @@ import BarChart from 'components/ui/Charts/BarChart'
 import dayjs from 'dayjs'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import QueryBlock from 'components/interfaces/Reports/QueryBlock'
+import QueryBlockWrapper from './QueryBlockWrapper'
 
 const ReactGridLayout = WidthProvider(Responsive)
 
@@ -60,12 +61,11 @@ const DEFAULT_CHART_CONFIG: ChartConfig = {
 interface LayoutItem {
   id: string
   label: string
-  sql?: string
-  isSnippet?: boolean
-  results?: any
-  isChart?: boolean
+  sql: string
+  isChart: boolean
   chartConfig?: ChartConfig
-  // ... other existing fields ...
+  results?: any
+  // ... any other existing fields ...
 }
 
 const GridResize = ({
@@ -81,6 +81,44 @@ const GridResize = ({
 }: GridResizeProps) => {
   const [collectedParams, setCollectedParams] = useState<Parameter[]>([])
 
+  // Merge parameters from all blocks
+  const handleBlockParameters = (params: Parameter[]) => {
+    setCollectedParams((prev) => {
+      const merged = [...prev]
+      params.forEach((param) => {
+        const existingIndex = merged.findIndex((p) => p.name === param.name)
+        if (existingIndex === -1) {
+          merged.push(param)
+        }
+      })
+      return merged
+    })
+  }
+
+  const handleToggleChart = (itemId: string) => {
+    const updatedLayout = editableReport.layout.map((x: LayoutItem) => {
+      if (x.id === itemId) {
+        return {
+          ...x,
+          isChart: !x.isChart,
+          chartConfig: x.chartConfig || DEFAULT_CHART_CONFIG,
+        }
+      }
+      return x
+    })
+    setEditableReport({ ...editableReport, layout: updatedLayout })
+  }
+
+  const handleUpdateChartConfig = (itemId: string, config: ChartConfig) => {
+    const updatedLayout = editableReport.layout.map((x: LayoutItem) => {
+      if (x.id === itemId) {
+        return { ...x, chartConfig: config }
+      }
+      return x
+    })
+    setEditableReport({ ...editableReport, layout: updatedLayout })
+  }
+
   function onLayoutChange(layout: any) {
     let updatedLayout = [...editableReport.layout]
     layout.map((item: any) => {
@@ -93,21 +131,6 @@ const GridResize = ({
     setEditableReport({
       ...editableReport,
       layout: updatedLayout,
-    })
-  }
-
-  // Merge parameters from all blocks and notify parent once all are collected
-  const handleBlockParameters = (params: Parameter[]) => {
-    console.log('collected:', params)
-    setCollectedParams((prev) => {
-      const merged = [...prev]
-      params.forEach((param) => {
-        const existingIndex = merged.findIndex((p) => p.name === param.name)
-        if (existingIndex === -1) {
-          merged.push(param)
-        }
-      })
-      return merged
     })
   }
 
@@ -132,32 +155,32 @@ const GridResize = ({
       isResizable={true}
       draggableHandle=".grid-item-drag-handle"
     >
-      {editableReport.layout.map((x: LayoutItem) => (
+      {editableReport.layout.map((item: LayoutItem) => (
         <div
-          key={x.id}
+          key={item.id}
           data-grid={{
-            ...x,
+            ...item,
             minH: 3,
             minW: 1,
             maxH: 6,
             maxW: LAYOUT_COLUMN_COUNT,
           }}
-          className="react-grid-layout__report-item bg-surface-100 border-overlay group relative rounded border shadow-sm hover:border-green-900"
+          className="react-grid-layout__report-item hover:border-green-900 group"
         >
-          <div className="grid-item-drag-handle absolute left-1 top-1 z-20 cursor-move opacity-0 transition-opacity group-hover:opacity-100">
+          <div className="grid-item-drag-handle absolute left-1 top-1 z-40 cursor-move opacity-0 transition-opacity group-hover:opacity-100">
             <GripHorizontal size={14} strokeWidth={1.5} />
           </div>
-          <QueryBlock
-            item={x}
+          <QueryBlockWrapper
+            item={item}
             disableUpdate={disableUpdate}
             onRemoveChart={onRemoveChart}
             startDate={startDate}
             endDate={endDate}
             interval={interval}
-            editableReport={editableReport}
-            setEditableReport={setEditableReport}
             parameterValues={parameterValues}
             onSetParameter={handleBlockParameters}
+            onToggleChart={() => handleToggleChart(item.id)}
+            onUpdateChartConfig={(config) => handleUpdateChartConfig(item.id, config)}
           />
         </div>
       ))}
