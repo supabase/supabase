@@ -44,8 +44,9 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import AddUserDropdown from './AddUserDropdown'
 import { UserPanel } from './UserPanel'
-import { PROVIDER_FILTER_OPTIONS } from './Users.constants'
+import { MAX_BULK_DELETE, PROVIDER_FILTER_OPTIONS } from './Users.constants'
 import { formatUserColumns, formatUsersData, isAtBottom } from './Users.utils'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 export type Filter = 'all' | 'verified' | 'unverified' | 'anonymous'
 export type UsersTableColumn = {
@@ -247,6 +248,13 @@ export const UsersV2 = () => {
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
+              <ButtonTooltip
+                type="default"
+                icon={<X />}
+                className="px-1.5"
+                onClick={() => setSelectedUsers(new Set([]))}
+                tooltip={{ content: { side: 'bottom', text: 'Cancel selection' } }}
+              />
             </div>
           ) : (
             <>
@@ -456,7 +464,11 @@ export const UsersV2 = () => {
                 rowKeyGetter={(row) => row.id}
                 selectedRows={selectedUsers}
                 onScroll={handleScroll}
-                onSelectedRowsChange={setSelectedUsers}
+                onSelectedRowsChange={(rows) => {
+                  if (rows.size > MAX_BULK_DELETE) {
+                    toast(`Only up to ${MAX_BULK_DELETE} users can be selected at a time`)
+                  } else setSelectedUsers(rows)
+                }}
                 onColumnResize={(idx, width) => saveColumnConfiguration('resize', { idx, width })}
                 onColumnsReorder={(source, target) => {
                   const sourceIdx = columns.findIndex((col) => col.key === source)
