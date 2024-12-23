@@ -1,27 +1,33 @@
 import { toString as CronToString } from 'cronstrue'
+import dayjs from 'dayjs'
 import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+import parser from 'cron-parser'
 
 import { useParams } from 'common'
 import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-query'
+import { useCronJobRunQuery } from 'data/database-cron-jobs/database-cron-jobs-run-query'
 import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from 'lib/constants/telemetry'
 import {
+  Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Input,
   Label_Shadcn_,
   Switch,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { TimestampInfo } from 'ui-patterns'
 
 interface CronJobCardProps {
   job: CronJob
@@ -29,11 +35,47 @@ interface CronJobCardProps {
   onDeleteCronJob: (job: CronJob) => void
 }
 
+const getNextRun = (schedule: string, lastRun?: string) => {
+  // cron-parser can only deal with the traditional cron syntax but technically users can also
+  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
+  // (can't guarantee as scope is quite big)
+  if (schedule.includes('*')) {
+    try {
+      const interval = parser.parseExpression(schedule)
+      return interval.next().getTime()
+    } catch (error) {
+      return undefined
+    }
+  } else {
+    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n seconds", "n minutes", or "n days"
+    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
+    const [value, unit] = schedule.split(' ')
+    if (
+      ['seconds', 'minutes', 'days'].includes(unit) &&
+      !Number.isNaN(Number(value)) &&
+      lastRun !== undefined
+    ) {
+      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
+      return parsedLastRun.valueOf()
+    } else {
+      return undefined
+    }
+  }
+}
+
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
   const { ref } = useParams()
   const { project: selectedProject } = useProjectContext()
 
   const [toggleConfirmationModalShown, showToggleConfirmationModal] = useState(false)
+
+  const { data } = useCronJobRunQuery({
+    projectRef: ref,
+    connectionString: selectedProject?.connectionString,
+    jobId: job.jobid,
+  })
+  const lastRun = data?.start_time ? dayjs(data.start_time).valueOf() : undefined
+  const nextRun = getNextRun(job.schedule, data?.start_time)
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
@@ -120,12 +162,56 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
               <div className="grid grid-cols-10 gap-3 items-center">
                 <span className="text-foreground-light col-span-1">Schedule</span>
                 <div className="col-span-9">
-                  <Input
-                    title={schedule}
-                    readOnly
-                    className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
-                    value={schedule}
-                  />
+                  <Input readOnly title={schedule} value={schedule} className="w-96" />
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Last run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !lastRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {lastRun ? (
+                      <>
+                        <TimestampInfo
+                          utcTimestamp={lastRun}
+                          labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                          className="font-sans text-sm"
+                        />
+                        {data?.status && (
+                          <Badge variant="success" className="capitalize ml-2">
+                            {data.status}
+                          </Badge>
+                        )}
+                      </>
+                    ) : (
+                      'Job has not been run yet'
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-10 gap-3 items-center">
+                <span className="text-foreground-light col-span-1">Next run</span>
+                <div className="col-span-9">
+                  <div
+                    className={cn(
+                      'border border-control bg-foreground/[0.026] rounded-md px-3 py-1.5 w-96',
+                      !nextRun && 'text-foreground-lighter'
+                    )}
+                  >
+                    {nextRun ? (
+                      <TimestampInfo
+                        utcTimestamp={nextRun}
+                        labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
+                        className="font-sans text-sm"
+                      />
+                    ) : (
+                      'Unable to parse next run for job'
+                    )}
+                  </div>
                 </div>
               </div>
               <div className="grid grid-cols-10 gap-3">
