@@ -86,7 +86,6 @@ const RestoreToNewProject = () => {
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
-  const isFly = project?.cloud_provider === 'FLY'
 
   const {
     data: cloneStatus,
@@ -198,20 +197,6 @@ const RestoreToNewProject = () => {
         description="OrioleDB is currently in public alpha and projects created are strictly ephemeral with no database backups"
       >
         <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-      </Admonition>
-    )
-  }
-
-  if (isFly) {
-    return (
-      <Admonition
-        type="default"
-        title="Restoring to new projects are not available for Fly hosted projects"
-      >
-        <Markdown
-          className="max-w-full [&>p]:!leading-normal"
-          content={`If you need to a Fly project, please reach out via [support](/support/new?ref=${project?.ref}).`}
-        />
       </Admonition>
     )
   }
