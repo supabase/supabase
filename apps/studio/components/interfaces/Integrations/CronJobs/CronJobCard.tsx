@@ -1,4 +1,3 @@
-import parser from 'cron-parser'
 import dayjs from 'dayjs'
 import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
@@ -27,40 +26,12 @@ import {
 import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { convertCronToString } from './CronJobs.utils'
+import { convertCronToString, getNextRun } from './CronJobs.utils'
 
 interface CronJobCardProps {
   job: CronJob
   onEditCronJob: (job: CronJob) => void
   onDeleteCronJob: (job: CronJob) => void
-}
-
-const getNextRun = (schedule: string, lastRun?: string) => {
-  // cron-parser can only deal with the traditional cron syntax but technically users can also
-  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
-  // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
-    try {
-      const interval = parser.parseExpression(schedule)
-      return interval.next().getTime()
-    } catch (error) {
-      return undefined
-    }
-  } else {
-    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n seconds", "n minutes", or "n days"
-    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
-    const [value, unit] = schedule.split(' ')
-    if (
-      ['seconds', 'minutes', 'days'].includes(unit) &&
-      !Number.isNaN(Number(value)) &&
-      lastRun !== undefined
-    ) {
-      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
-      return parsedLastRun.valueOf()
-    } else {
-      return undefined
-    }
-  }
 }
 
 export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCardProps) => {
