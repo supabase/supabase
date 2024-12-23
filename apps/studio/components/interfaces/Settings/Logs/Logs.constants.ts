@@ -363,6 +363,7 @@ export enum LogsTableName {
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
+  WORKFLOW_RUN = 'workflow_run_logs',
   PG_CRON = 'pg_cron_logs',
 }
 
@@ -377,6 +378,7 @@ export const LOGS_TABLES = {
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
+  workflow_run: LogsTableName.WORKFLOW_RUN,
   pg_cron: LogsTableName.POSTGRES,
 }
 
@@ -391,6 +393,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
+  [LogsTableName.WORKFLOW_RUN]: 'Logs obtained from workflow runs',
   [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
 
