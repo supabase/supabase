@@ -83,10 +83,10 @@ const RestoreToNewProject = () => {
     'queue_job.restore.prepare'
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
-
-  const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
-  const IS_PG15_OR_ABOVE = dbVersion >= 15
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
+  const IS_PG15_OR_ABOVE = dbVersion >= 15
+  const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
+  const isFly = project?.cloud_provider === 'FLY'
 
   const {
     data: cloneStatus,
@@ -202,6 +202,20 @@ const RestoreToNewProject = () => {
     )
   }
 
+  if (isFly) {
+    return (
+      <Admonition
+        type="default"
+        title="Restoring to new projects are not available for Fly hosted projects"
+      >
+        <Markdown
+          className="max-w-full [&>p]:!leading-normal"
+          content={`If you need to a Fly project, please reach out via [support](/support/new?ref=${project?.ref}).`}
+        />
+      </Admonition>
+    )
+  }
+
   if (!canReadPhysicalBackups) {
     return <NoPermission resourceText="view backups" />
   }
@@ -260,7 +274,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
           <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
