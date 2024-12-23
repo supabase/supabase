@@ -24,6 +24,7 @@
   "devDependencies": {
     "@ai-sdk/openai": "^0.0.72",
     "@types/common-tags": "^1.8.4",
+    "@types/node": "catalog:",
     "api-types": "workspace:*",
     "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
