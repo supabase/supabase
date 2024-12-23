@@ -4,16 +4,7 @@ import { useChat } from 'ai/react'
 import { components } from 'api-types'
 import { useParams } from 'common'
 import { debounce } from 'lodash'
-import {
-  ArrowUp,
-  ChevronLeft,
-  Database,
-  ExteImport,
-  ExternalLink,
-  Import,
-  rnalLink,
-  Settings,
-} from 'lucide-react'
+import { ChevronLeft, ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
@@ -88,15 +79,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Label_Shadcn_,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import { Markdown } from 'components/interfaces/Markdown'
-import LogoLoader from '@ui/components/LogoLoader'
 import InitialStep from 'components/interfaces/ProjectCreation/InitialStep'
 import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
