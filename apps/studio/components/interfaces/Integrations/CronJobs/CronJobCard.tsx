@@ -1,9 +1,8 @@
-import { toString as CronToString } from 'cronstrue'
+import parser from 'cron-parser'
 import dayjs from 'dayjs'
 import { Clock, History, Loader2, MoreVertical } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import parser from 'cron-parser'
 
 import { useParams } from 'common'
 import { SQLCodeBlock } from 'components/interfaces/Auth/ThirdPartyAuthForm/SqlCodeBlock'
@@ -25,9 +24,10 @@ import {
   Label_Shadcn_,
   Switch,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { TimestampInfo } from 'ui-patterns'
+import { convertCronToString } from './CronJobs.utils'
 
 interface CronJobCardProps {
   job: CronJob
@@ -76,17 +76,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
   })
   const lastRun = data?.start_time ? dayjs(data.start_time).valueOf() : undefined
   const nextRun = getNextRun(job.schedule, data?.start_time)
+  const schedule = convertCronToString(job.schedule)
 
   const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: toggleDatabaseCronJob, isLoading } = useDatabaseCronJobToggleMutation()
-
-  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
-  // original schedule when cronstrue throws
-  let schedule = job.schedule
-  try {
-    const scheduleString = CronToString(job.schedule)
-    schedule = scheduleString
-  } catch {}
 
   return (
     <>

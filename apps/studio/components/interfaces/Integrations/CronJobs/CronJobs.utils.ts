@@ -190,3 +190,13 @@ export const formatScheduleString = (value: string) => {
     return ''
   }
 }
+
+export const convertCronToString = (schedule: string) => {
+  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
+  // original schedule when cronstrue throws
+  try {
+    return CronToString(schedule)
+  } catch (error) {
+    return schedule
+  }
+}
