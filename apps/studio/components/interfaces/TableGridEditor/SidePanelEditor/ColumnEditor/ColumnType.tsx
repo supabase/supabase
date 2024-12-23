@@ -68,7 +68,7 @@ const ColumnType = ({
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
   // @ts-ignore
-  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.format))
+  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
@@ -78,7 +78,7 @@ const ColumnType = ({
     if (pgOption) return pgOption
 
     // handle custom enums
-    const enumType = enumTypes.find((type) => type.format === name)
+    const enumType = enumTypes.find((type) => type.name === name)
     return enumType ? { ...enumType, type: 'enum' } : undefined
   }
 
@@ -246,12 +246,9 @@ const ColumnType = ({
                     <CommandGroup_Shadcn_>
                       {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
-                          key={option.format}
-                          value={option.format}
-                          className={cn(
-                            'relative',
-                            option.format === value ? 'bg-surface-200' : ''
-                          )}
+                          key={option.name}
+                          value={option.name}
+                          className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
                           onSelect={(value: string) => {
                             onOptionSelect(value)
                             setOpen(false)
@@ -261,7 +258,7 @@ const ColumnType = ({
                             <div>
                               <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
                             </div>
-                            <span className="text-foreground">{option.format}</span>
+                            <span className="text-foreground">{option.name}</span>
                             {option.comment !== undefined && (
                               <span
                                 title={option.comment ?? ''}
@@ -271,7 +268,7 @@ const ColumnType = ({
                               </span>
                             )}
                             <span className="flex items-center gap-1.5">
-                              {option.format === value ? <Check size={13} /> : ''}
+                              {option.name === value ? <Check size={13} /> : ''}
                             </span>
                           </div>
                         </CommandItem_Shadcn_>
