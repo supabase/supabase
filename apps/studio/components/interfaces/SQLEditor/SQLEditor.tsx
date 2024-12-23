@@ -267,7 +267,7 @@ export const SQLEditor = () => {
         const selection = editor.getSelection()
         const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
 
-        const sql = snippet
+        let sql = snippet
           ? (selectedValue || editorRef.current?.getValue()) ?? snippet.snippet.content?.sql
           : selectedValue || editorRef.current?.getValue()
 
