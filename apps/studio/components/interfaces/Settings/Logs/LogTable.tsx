@@ -92,15 +92,10 @@ const LogTable = ({
   const { profile } = useProfile()
   const { show: showContextMenu } = useContextMenu()
 
+  const downloadCsvRef = useRef<HTMLDivElement>(null)
   const [cellPosition, setCellPosition] = useState<any>()
-
   const [selectionOpen, setSelectionOpen] = useState(false)
-
-  useEffect(() => {
-    if (selectedLog || isSelectedLogLoading) {
-      setSelectionOpen(true)
-    }
-  }, [selectedLog, isSelectedLogLoading])
+  const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
 
   const canCreateLogQuery = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'log_sql', owner_id: profile?.id },
@@ -148,6 +143,7 @@ const LogTable = ({
   })
 
   let columns = DEFAULT_COLUMNS
+
   if (!queryType) {
     columns
   } else {
@@ -235,21 +231,10 @@ const LogTable = ({
     }
   }
 
-  const copyResultsToClipboard = () => {
-    copyToClipboard(stringData, () => {
-      toast.success('Results copied to clipboard')
-    })
-  }
-
-  const downloadCsvRef = useRef<HTMLDivElement>(null)
-  function downloadCSV() {
-    downloadCsvRef.current?.click()
-  }
-
   const LogsExplorerTableHeader = () => (
     <div
       className={cn(
-        'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
+        'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
         className,
         { hidden: !showHeader }
       )}
@@ -262,11 +247,23 @@ const LogTable = ({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={downloadCSV} className="space-x-2">
+            <DropdownMenuItem
+              onClick={() => {
+                downloadCsvRef.current?.click()
+              }}
+              className="space-x-2"
+            >
               <Download size={14} />
               <div>Download CSV</div>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={copyResultsToClipboard} className="space-x-2">
+            <DropdownMenuItem
+              onClick={() => {
+                copyToClipboard(stringData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
               <Clipboard size={14} />
               <div>Copy to clipboard</div>
             </DropdownMenuItem>
@@ -352,14 +349,22 @@ const LogTable = ({
     else return <LogsTableEmptyState />
   }
 
-  const [selectedRow, setSelectedRow] = useState<LogData | null>(null)
-
   function onRowClick(row: LogData) {
     setSelectedRow(row)
     onSelectedLogChange?.(row)
   }
 
+  useEffect(() => {
+    if (selectedLog || isSelectedLogLoading) {
+      setSelectionOpen(true)
+    }
+    if (!isSelectedLogLoading && !selectedLog) {
+      setSelectedRow(null)
+    }
+  }, [selectedLog, isSelectedLogLoading])
+
   if (!data) return null
+
   return (
     <section className={'h-full flex w-full flex-col flex-1'}>
       {!queryType && <LogsExplorerTableHeader />}
@@ -369,7 +374,7 @@ const LogTable = ({
           <DataGrid
             role="table"
             style={{ height: '100%' }}
-            className={cn('flex-1 flex-grow h-full border-none', {
+            className={cn('flex-1 flex-grow h-full border-0', {
               'data-grid--simple-logs': queryType,
               'data-grid--logs-explorer': !queryType,
             })}

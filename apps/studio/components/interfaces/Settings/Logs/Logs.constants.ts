@@ -350,6 +350,9 @@ export const SQL_FILTER_TEMPLATES: any = {
     ..._SQL_FILTER_COMMON,
     database: (value: string) => `m.project like '${value}%'`,
   },
+  pg_cron_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
