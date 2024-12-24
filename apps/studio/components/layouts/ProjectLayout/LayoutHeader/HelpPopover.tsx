@@ -1,10 +1,10 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import SVG from 'react-inlinesvg'
 
-import { Activity, BookOpen, HelpCircle, Mail, MessageCircle, Wrench } from 'lucide-react'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import {
   Button,
   Popover,
@@ -22,33 +22,15 @@ const HelpPopover = () => {
 
   return (
     <Popover_Shadcn_>
-      <Tooltip.Root delayDuration={0}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Tooltip.Trigger asChild>
-            <div className="relative flex items-center">
-              <Button
-                id="help-popover-button"
-                type="text"
-                className="px-1"
-                icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
-              />
-            </div>
-          </Tooltip.Trigger>
-        </PopoverTrigger_Shadcn_>
-        <Tooltip.Portal>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'space-y-2 border border-background',
-              ].join(' ')}
-            >
-              <p className="text-xs text-foreground">Help</p>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+      <PopoverTrigger_Shadcn_ asChild>
+        <ButtonTooltip
+          id="help-popover-button"
+          type="text"
+          className="px-1"
+          icon={<HelpCircle size={16} strokeWidth={1.5} className="text-foreground-light" />}
+          tooltip={{ content: { side: 'bottom', text: 'Help' } }}
+        />
+      </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="w-[400px] space-y-4 p-0 py-5" align="end" side="bottom">
         <div className="mb-5 space-y-4 px-5">
           <h5 className="text-foreground">Need help with your project?</h5>
