@@ -113,7 +113,15 @@ export function getTableEditorSql(id?: number) {
                             else 'USER-DEFINED'
                         end
                 end,
-                'format', coalesce(bt.typname, t.typname),
+                'format', case
+                    when t.typtype = 'e' then
+                        case
+                            when nt.nspname <> 'public' then concat(nt.nspname, '.', coalesce(bt.typname, t.typname))
+                            else coalesce(bt.typname, t.typname)
+                        end
+                    else
+                        coalesce(bt.typname, t.typname)
+                end,
                 'is_identity', a.attidentity in ('a', 'd'),
                 'identity_generation', case a.attidentity
                     when 'a' then 'ALWAYS'
