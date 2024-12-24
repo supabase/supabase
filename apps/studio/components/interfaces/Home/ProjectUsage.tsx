@@ -62,7 +62,7 @@ const ProjectUsage = () => {
       'total_storage_requests',
       'total_realtime_requests',
     ],
-    0,
+    '',
     startDateLocal.toISOString(),
     endDateLocal.toISOString(),
     20
