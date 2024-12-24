@@ -36,7 +36,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
     <Table.tr
       key={item.id}
       onClick={() => {
-        router.push(`/project/${ref}/functions/${item.slug}/details`)
+        router.push(`/project/${ref}/functions/${item.slug}`)
       }}
     >
       <Table.td>
