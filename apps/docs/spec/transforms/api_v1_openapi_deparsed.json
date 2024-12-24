@@ -991,6 +991,42 @@
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
           {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "sort_by",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["name", "inserted_at"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": ["asc", "desc"],
+              "type": "string"
+            }
+          },
+          {
             "name": "project_ref",
             "required": false,
             "in": "query",
@@ -1087,6 +1123,9 @@
                           "updated_by"
                         ]
                       }
+                    },
+                    "cursor": {
+                      "type": "string"
                     }
                   },
                   "required": ["data"]
@@ -10798,6 +10837,9 @@
                 "updated_by"
               ]
             }
+          },
+          "cursor": {
+            "type": "string"
           }
         },
         "required": ["data"]
