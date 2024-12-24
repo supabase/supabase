@@ -456,7 +456,7 @@ export const fillTimeseries = (
   timeseriesData: any[],
   timestampKey: string,
   valueKey: string | string[],
-  defaultValue: number | string,
+  defaultValue: number,
   min?: string,
   max?: string,
   minPointsToFill: number = 20
