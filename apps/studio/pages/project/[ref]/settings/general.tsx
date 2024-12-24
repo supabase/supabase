@@ -20,6 +20,13 @@ const ProjectSettings: NextPageWithLayout = () => {
 
   const isBranch = !!project?.parent_project_ref
   const { projectsTransfer: projectTransferEnabled } = useIsFeatureEnabled(['projects:transfer'])
+  const router = useRouter()
+
+  useEffect(() => {
+    if (!IS_PLATFORM) {
+      router.push(`/project/default/settings/log-drains`)
+    }
+  }, [router])
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)

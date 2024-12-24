@@ -244,7 +244,8 @@ export function LogDrainDestinationSheetForm({
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists = logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists =
+                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
