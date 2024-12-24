@@ -112,9 +112,10 @@ const BarChart = ({
         format={format}
         customDateFormat={customDateFormat}
         highlightedValue={
-          typeof resolvedHighlightedValue === 'number'
-            ? numberFormatter(resolvedHighlightedValue, valuePrecision)
-            : resolvedHighlightedValue
+          resolvedHighlightedValue
+          // typeof resolvedHighlightedValue === 'number'
+          //   ? numberFormatter(resolvedHighlightedValue, valuePrecision)
+          //   : resolvedHighlightedValue
         }
         highlightedLabel={resolvedHighlightedLabel}
         minimalHeader={minimalHeader}
