@@ -1,13 +1,19 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
 import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
 import Table from 'components/to-be-cleaned/Table'
 import { copyToClipboard } from 'lib/helpers'
-import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
 import { logConstants } from 'shared-data'
-import { Button, SidePanel, Tabs } from 'ui'
+import {
+  Button,
+  SidePanel,
+  Tabs,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { DocsButton } from '../DocsButton'
 
 export interface LogsExplorerHeaderProps {
@@ -147,43 +153,23 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
               <Check size={14} strokeWidth={3} className="text-brand" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copied</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+              Copied
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
               <Clipboard size={14} strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copy value</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+              Copy value
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         )}
       </Table.td>
       <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
