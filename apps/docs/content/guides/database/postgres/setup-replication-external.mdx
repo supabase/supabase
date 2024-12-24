@@ -25,7 +25,7 @@ select pg_create_logical_replication_slot('example_slot', 'pgoutput');
 
 3. Now we will connect to our **external database** and subscribe to our `publication` Note: ):
 
-<Admonition type="info">
+<Admonition type="note">
 
 This will need a direct connection to your database and you can find the connection info in the [Dashboard](https://supabase.com/dashboard/project/_/settings/database).
 
@@ -42,7 +42,7 @@ PUBLICATION example_pub
 WITH (copy_data = true, create_slot=false, slot_name=example_slot);
 ```
 
-<Admonition type="info">
+<Admonition type="note">
 
 `create_slot` is set to `false` because `slot_name` is provided and the slot was already created in Step 2.
 To copy data from before the slot was created, set `copy_data` to `true`.
