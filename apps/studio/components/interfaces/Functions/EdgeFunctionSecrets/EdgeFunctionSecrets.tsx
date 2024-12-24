@@ -13,11 +13,11 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Badge } from 'ui'
+import { Badge, Separator } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
+import AddNewSecretForm from './AddNewSecretForm'
 
 const EdgeFunctionSecrets = () => {
   const { ref: projectRef } = useParams()
@@ -48,11 +48,17 @@ const EdgeFunctionSecrets = () => {
   return (
     <>
       {isLoading && <GenericSkeletonLoader />}
-
       {isError && <AlertError error={error} subject="Failed to retrieve project secrets" />}
 
+      {canUpdateSecrets && (
+        <div className="grid gap-5">
+          <AddNewSecretForm onComplete={() => setShowCreateSecret(false)} />
+          <Separator />
+        </div>
+      )}
+
       {isSuccess && (
-        <div className="space-y-4">
+        <div className="space-y-4 mt-4">
           {!canReadSecrets ? (
             <NoPermission resourceText="view this project's edge function secrets" />
           ) : (
@@ -61,28 +67,11 @@ const EdgeFunctionSecrets = () => {
                 <Input
                   size="small"
                   className="w-80"
-                  placeholder="Search for a secret"
+                  placeholder="Search..."
                   value={searchString}
                   onChange={(e: any) => setSearchString(e.target.value)}
                   icon={<Search size={14} />}
                 />
-                <div className="flex items-center space-x-2">
-                  <DocsButton href="https://supabase.com/docs/guides/functions/secrets" />
-                  <ButtonTooltip
-                    disabled={!canUpdateSecrets}
-                    onClick={() => setShowCreateSecret(true)}
-                    tooltip={{
-                      content: {
-                        side: 'bottom',
-                        text: !canUpdateSecrets
-                          ? 'You need additional permissions to update edge function secrets'
-                          : undefined,
-                      },
-                    }}
-                  >
-                    Add new secret
-                  </ButtonTooltip>
-                </div>
               </div>
               <Table
                 head={[
@@ -129,8 +118,6 @@ const EdgeFunctionSecrets = () => {
           )}
         </div>
       )}
-
-      <AddNewSecretModal visible={showCreateSecret} onClose={() => setShowCreateSecret(false)} />
 
       <ConfirmationModal
         variant="warning"
