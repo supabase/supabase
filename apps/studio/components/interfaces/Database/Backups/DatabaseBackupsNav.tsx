@@ -11,7 +11,7 @@ type Props = {
 
 function DatabaseBackupsNav({ active }: Props) {
   const isCloneToNewProjectEnabled = useFlag('clonetonewproject')
-  const { ref, cloud_provider } = useProjectContext()?.project
+  const { ref, cloud_provider } = useProjectContext()?.project || {}
 
   const navMenuItems = [
     {
