@@ -16,6 +16,11 @@ import {
   FeaturePreviewsClickedEvent,
   FeaturePreviewEnabledEvent,
   FeaturePreviewDisabledEvent,
+  SqlEditorQuickstartClickedEvent,
+  SqlEditorTemplateClickedEvent,
+  SqlEditorResultDownloadCsvClickedEvent,
+  SqlEditorResultCopyMarkdownClickedEvent,
+  SqlEditorResultCopyJsonClickedEvent,
   TelemetryActions,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
@@ -33,6 +38,11 @@ export type SendEventVariables =
   | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | SqlEditorQuickstartClickedEvent
+  | SqlEditorTemplateClickedEvent
+  | SqlEditorResultDownloadCsvClickedEvent
+  | SqlEditorResultCopyMarkdownClickedEvent
+  | SqlEditorResultCopyJsonClickedEvent
 
   // TODO remove this once all events are documented
   | {

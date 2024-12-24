@@ -208,3 +208,70 @@ export interface FeaturePreviewDisabledEvent {
     feature: string
   }
 }
+
+/**
+ * Quickstart card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorQuickstartClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED
+  properties: {
+    /**
+     * The title of the quickstart card clicked.
+     */
+    quickstartName: string
+  }
+}
+
+/**
+ * Template card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorTemplateClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED
+  properties: {
+    /**
+     * The name of the template card clicked.
+     */
+    templateName: string
+  }
+}
+
+/**
+ * Result download CSV button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultDownloadCsvClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
+}
+
+/**
+ * Result copy markdown button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyMarkdownClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
+}
+
+/**
+ * Result copy JSON button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyJsonClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+}
