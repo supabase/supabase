@@ -113,17 +113,18 @@ breadcrumb: 'Migrations'
 
 After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
 
-The easiest option would be to use this [Google colab script](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing) to migrate your downloaded storage objects to the new s3 buckets. Follow the instructions when running the scripts.
+The easiest option would be to use the Google colab script to migrate your downloaded storage objects to the new s3 buckets. However, if you want to run this process locally, scripts are also provided for you to use.
 
 <Admonition type="info">
   The Google Colab script would require uploading the storage objects to Google colab first and then
   upload it to your S3 buckets. This can add significant time to the process if your storage objects
-  are large.
+  are large in size.
 </Admonition>
 
-Here are some scripts to run this process locally to avoid the additional upload step:
-
-<Tabs scrollable size="small" type="underlined" defaultActiveId="js">
+<Tabs scrollable size="small" type="underlined" defaultActiveId="colab">
+  <TabPanel id="colab" label="Google Colab">
+    [https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing)
+  </TabPanel>
   <TabPanel id="js" label="Javascript">
     ```JS code```
   </TabPanel>

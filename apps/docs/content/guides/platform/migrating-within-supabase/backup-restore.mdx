@@ -15,53 +15,8 @@ breadcrumb: 'Migrations'
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header="Install Postgresql which includes psql"
-      id="item-1"
-    >
+    <AccordionItem header="Install Postgresql which includes psql" id="item-1">
       <PostgresInstallation />
-    </AccordionItem>
-  </div>
-
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header="Create and configure a new Supabase project (Backup Restore only)"
-      id="item-2"
-    >
-      <StepHikeCompact>
-      <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create New project" fullWidth>
-          You can create a new [Supabase project here](https://database.new)
-        </StepHikeCompact.Details>
-      </StepHikeCompact.Step>
-
-        <StepHikeCompact.Step step={2}>
-          <StepHikeCompact.Details title="Configure your new project" fullWidth>
-                In your new project:
-
-                - If you were using Webhooks, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
-                - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
-                - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
-          </StepHikeCompact.Details>
-
-        </StepHikeCompact.Step>
-      </StepHikeCompact>
-    </AccordionItem>
-
-  </div>
-
-<div className="border-b mt-3 pb-3">
-  <AccordionItem header="Install the latest version of the Supabase CLI" id="item-3">
-    Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
-  </AccordionItem>
-</div>
-
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
-      header="Install Docker Desktop"
-      id="item-4"
-    >
-    Install [Docker Desktop](https://www.docker.com) for your platform.
     </AccordionItem>
   </div>
 </Accordion>
@@ -70,6 +25,18 @@ breadcrumb: 'Migrations'
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Install the Supabase CLI" fullWidth>
+    Install the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
+    </StepHikeCompact.Details>
+  </StepHikeCompact.Step>
+
+<StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Details title="Install Docker Desktop" fullWidth>
+    Install [Docker Desktop](https://www.docker.com) for your platform.
+  </StepHikeCompact.Details>
+</StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Get your database connection string" fullWidth>
       Go to your [Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
 
@@ -82,30 +49,30 @@ breadcrumb: 'Migrations'
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={2}>
+  <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Get your database password" fullWidth>
       If you do not have your database password, you can reset your password in your [Database
       Settings](https://supabase.com/dashboard/project/_/settings/database)
 
-      Replace "[YOUR-PASSWORD]" with your actual database password in the connection string from Step 1.
+      Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
 
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={3}>
+  <StepHikeCompact.Step step={5}>
       <StepHikeCompact.Details title="Backup your Project with the CLI" fullWidth>
-       Run these commands after replacing "[CONNECTION_STRING]" with your connection string from the previous steps:
+       Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
 
        ```bash
-        supabase db dump --db-url "[CONNECTION_STRING]" -f roles.sql --role-only
+        supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
         ```
         ```bash
-        supabase db dump --db-url "[CONNECTION_STRING]" -f schema.sql
+        supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
         ```
 
       ```bash
-        supabase db dump --db-url "[CONNECTION_STRING]" -f data.sql --use-copy --data-only
+        supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
         ```
       </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -115,6 +82,23 @@ breadcrumb: 'Migrations'
 ## Restore to new database using CLI
 
 <StepHikeCompact>
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Create New project" fullWidth>
+          You can create a new [Supabase project here](https://database.new)
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={1}>
+      <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
+        In your new project:
+
+        - If you were using Webhooks, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
+        - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
+        - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
+      </StepHikeCompact.Details>
+
+    </StepHikeCompact.Step>
+
     <StepHikeCompact.Step step={1}>
       <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
         Go to your [new Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
