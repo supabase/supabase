@@ -84,8 +84,8 @@ const RestoreToNewProject = () => {
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
-  const IS_PG15_OR_ABOVE = dbVersion >= 15
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
+  const IS_PG15_OR_ABOVE = dbVersion >= 15
 
   const {
     data: cloneStatus,
