@@ -11,6 +11,7 @@ const FunctionsNav = ({ item }: any) => {
       defaultActiveId="1"
       type="underlined"
       size="medium"
+      baseClassNames="!space-y-0"
       activeId={!activeRoute ? 'metrics' : activeRoute}
       onChange={(e: string) => {
         if (item?.slug) {

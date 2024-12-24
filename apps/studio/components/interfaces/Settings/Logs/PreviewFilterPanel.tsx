@@ -8,7 +8,14 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import {
+  Button,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 import DatePickers from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
@@ -39,6 +46,7 @@ interface PreviewFilterPanelProps {
   onFiltersChange: (filters: Filters) => void
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
+  className?: string
 }
 
 /**
@@ -62,6 +70,7 @@ const PreviewFilterPanel = ({
   filters,
   table,
   onSelectedDatabaseChange,
+  className,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -122,7 +131,13 @@ const PreviewFilterPanel = ({
   const handleInputSearch = (query: string) => onSearch('search-input-change', { query })
 
   return (
-    <div className={'flex w-full items-center justify-between' + (condensedLayout ? ' p-3' : '')}>
+    <div
+      className={cn(
+        'flex w-full items-center justify-between',
+        condensedLayout ? ' p-3' : '',
+        className
+      )}
+    >
       <div className="flex flex-row items-center gap-x-2">
         <form
           id="log-panel-search"

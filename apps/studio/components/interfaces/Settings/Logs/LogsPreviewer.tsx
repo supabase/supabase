@@ -39,6 +39,7 @@ interface LogsPreviewerProps {
   condensedLayout?: boolean
   tableName?: LogsTableName
   EmptyState?: React.ReactNode
+  filterPanelClassName?: string
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -48,6 +49,7 @@ export const LogsPreviewer = ({
   tableName,
   children,
   EmptyState,
+  filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -200,6 +202,7 @@ export const LogsPreviewer = ({
   return (
     <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
+        className={filterPanelClassName}
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}
