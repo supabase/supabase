@@ -83,10 +83,9 @@ const RestoreToNewProject = () => {
     'queue_job.restore.prepare'
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
-
+  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
-  const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
 
   const {
     data: cloneStatus,
@@ -260,7 +259,7 @@ const RestoreToNewProject = () => {
         <Markdown
           className="max-w-full [&>p]:!leading-normal"
           content={`This is a temporary limitation whereby projects that were originally restored from another project cannot be restored to yet another project. 
-          If you need to restore a project to multiple other projects, please reach out via [support](/support/new?ref=${project?.ref}).`}
+          If you need to restore from a restored project, please reach out via [support](/support/new?ref=${project?.ref}).`}
         />
         <Button asChild type="default">
           <Link href={`/project/${(cloneStatus?.cloned_from?.source_project as any)?.ref || ''}`}>
