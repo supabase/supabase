@@ -93,7 +93,6 @@ const LogTable = ({
   const { show: showContextMenu } = useContextMenu()
 
   const [cellPosition, setCellPosition] = useState<any>()
-
   const [selectionOpen, setSelectionOpen] = useState(false)
 
   useEffect(() => {
@@ -249,7 +248,7 @@ const LogTable = ({
   const LogsExplorerTableHeader = () => (
     <div
       className={cn(
-        'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
+        'flex w-full items-center justify-between border-t bg-surface-100 px-5 py-2',
         className,
         { hidden: !showHeader }
       )}
@@ -369,7 +368,7 @@ const LogTable = ({
           <DataGrid
             role="table"
             style={{ height: '100%' }}
-            className={cn('flex-1 flex-grow h-full border-none', {
+            className={cn('flex-1 flex-grow h-full border-0', {
               'data-grid--simple-logs': queryType,
               'data-grid--logs-explorer': !queryType,
             })}

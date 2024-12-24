@@ -2,12 +2,13 @@ import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 import { useParams } from 'common'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
+import { Button, Input, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import DatePickers from './Logs.DatePickers'
 import {
   FILTER_OPTIONS,
@@ -17,7 +18,6 @@ import {
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string

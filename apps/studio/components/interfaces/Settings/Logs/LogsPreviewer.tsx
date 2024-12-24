@@ -150,6 +150,7 @@ export const LogsPreviewer = ({
   }
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
+      setSelectedLogId(null)
       setFilters((prev) => ({ ...prev, search_query: query }))
       router.push({
         pathname: router.pathname,
