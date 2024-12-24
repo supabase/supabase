@@ -12,17 +12,17 @@ const FunctionsNav = ({ item }: any) => {
       type="underlined"
       size="medium"
       baseClassNames="!space-y-0"
-      activeId={!activeRoute ? 'metrics' : activeRoute}
+      activeId={!activeRoute ? 'overview' : activeRoute}
       onChange={(e: string) => {
         if (item?.slug) {
-          router.push(`/project/${ref}/functions/${item.slug}/${e === 'metrics' ? '' : e}`)
+          router.push(`/project/${ref}/functions/${item.slug}/${e === 'overview' ? '' : e}`)
         }
       }}
     >
-      <Tabs.Panel id="details" label="Details" />
-      <Tabs.Panel id="metrics" label="Metrics" />
+      <Tabs.Panel id="overview" label="Overview" />
       <Tabs.Panel id="invocations" label="Invocations" />
       <Tabs.Panel id="logs" label="Logs" />
+      <Tabs.Panel id="details" label="Details" />
     </Tabs>
   )
 }
