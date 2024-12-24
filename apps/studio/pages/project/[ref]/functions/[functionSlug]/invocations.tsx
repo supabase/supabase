@@ -19,9 +19,11 @@ export const LogPage: NextPageWithLayout = () => {
 
   return (
     <LogsPreviewer
+      condensedLayout
       projectRef={ref as string}
       queryType={'fn_edge'}
       filterOverride={{ function_id: selectedFunction.id }}
+      filterPanelClassName="px-0"
     />
   )
 }
