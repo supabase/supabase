@@ -1,4 +1,4 @@
-import { Eye, EyeOff, RefreshCw, Search, Terminal } from 'lucide-react'
+import { Eye, EyeOff, RefreshCw, Search, Terminal, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -17,6 +17,7 @@ import {
 } from './Logs.constants'
 import type { Filters, LogSearchCallback, LogTemplate } from './Logs.types'
 import LogsFilterPopover from './LogsFilterPopover'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface PreviewFilterPanelProps {
   defaultSearchValue?: string
@@ -147,14 +148,27 @@ const PreviewFilterPanel = ({
             }
             value={search}
             actions={
-              hasEdits && (
-                <button
-                  onClick={() => handleInputSearch(search)}
-                  className="mx-2 text-foreground-light hover:text-foreground"
-                >
-                  {'↲'}
-                </button>
-              )
+              <div className="flex items-center gap-x-1 mr-0.5">
+                {hasEdits && (
+                  <ButtonTooltip
+                    icon={<span>↲</span>}
+                    type="text"
+                    className="px-1 h-[20px]"
+                    onClick={() => handleInputSearch(search)}
+                    tooltip={{ content: { side: 'bottom', text: 'Search for events' } }}
+                  />
+                )}
+
+                {search.length > 0 && (
+                  <ButtonTooltip
+                    icon={<X />}
+                    type="text"
+                    className="p-[1px] h-[20px]"
+                    onClick={() => handleInputSearch('')}
+                    tooltip={{ content: { side: 'bottom', text: 'Clear search' } }}
+                  />
+                )}
+              </div>
             }
           />
         </form>
