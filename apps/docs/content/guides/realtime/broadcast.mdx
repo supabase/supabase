@@ -652,7 +652,7 @@ Broadcast Changes allows you to trigger messages from your database. To achieve 
 
 It uses partitioned tables per day which allows the deletion your previous images in a performant way by dropping the physical tables of this partitioned table. Tables older than 3 days old are deleted.
 
-Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON packages. [Realtime Authorization]/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
+Broadcasting from the database works like a client-side broadcast, using WebSockets to send JSON packages. [Realtime Authorization](/docs/guides/realtime/authorization) is required and enabled by default to protect your data.
 
 The database broadcast feature provides two functions to help you send messages:
 
