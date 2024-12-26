@@ -51,7 +51,7 @@ export const getConnectionStrings = (
 
   const directUriString = `postgresql://${directUser}:${password}@${directHost}:${directPort}/${directName}`
 
-  const directGolangString = `DATABASE_URL=${poolingInfo.connectionString}`
+  const directGolangString = `DATABASE_URL=${directUriString}`
 
   const directJdbcString = `jdbc:postgresql://${directHost}:${directPort}/${directName}?user=${directUser}&password=${password}`
 
@@ -68,6 +68,8 @@ export const getConnectionStrings = (
     "DefaultConnection": "User Id=${poolerUser};Password=${password};Server=${poolerHost};Port=${poolerPort};Database=${poolerName}${isMd5 ? `;Options='reference=${projectRef}'` : ''}"
   }
 }`
+
+  const directNodejsString = `DATABASE_URL=${directUriString}`
 
   // Pooler connection strings
   const poolerPsqlString = isMd5
@@ -105,7 +107,7 @@ dbname=${poolerName}`
       golang: directGolangString,
       jdbc: directJdbcString,
       dotnet: directDotNetString,
-      nodejs: nodejsPoolerUriString,
+      nodejs: directNodejsString,
       php: directGolangString,
       python: directGolangString,
       sqlalchemy: sqlalchemyString,
