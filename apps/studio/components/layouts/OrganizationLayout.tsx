@@ -78,7 +78,7 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
             {selectedOrganization?.name ?? 'Organization'} settings
           </ScaffoldTitle>
           <NavMenu
-            className="border-none max-w-full overflow-hidden overflow-x-scroll"
+            className="border-none max-w-full overflow-y-hidden overflow-x-auto"
             aria-label="Organization menu navigation"
           >
             {filteredNavMenuItems.map((item) => (
