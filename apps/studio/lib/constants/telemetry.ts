@@ -55,11 +55,10 @@ export interface SignUpEvent {
 }
 
 /**
- * Triggered when a user signs in.
+ * Triggered when a user signs in with Github, Email and Password or SSO.
  *
  * Some unintuitive behavior:
  *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
- *   - Sign in is not triggered at all when signing up with Email and Password.
  *
  * @group Events
  * @source studio
