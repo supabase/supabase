@@ -41,6 +41,38 @@ export enum TelemetryActions {
 }
 
 /**
+ * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-up
+ */
+export interface SignUpEvent {
+  action: TelemetryActions.SIGN_UP
+  properties: {
+    category: 'conversion'
+  }
+}
+
+/**
+ * Triggered when a user signs in.
+ *
+ * Some unintuitive behavior:
+ *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *   - Sign in is not triggered at all when signing up with Email and Password.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in-mfa
+ */
+export interface SignInEvent {
+  action: TelemetryActions.SIGN_IN
+  properties: {
+    category: 'account'
+  }
+}
+
+/**
  * User copied the database connection string.
  *
  * @group Events
