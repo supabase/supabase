@@ -39,10 +39,10 @@ export async function getNotifications(options: NotificationVariables, signal?: 
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
   const { data, error } = await get('/platform/notifications', {
     params: {
-      // @ts-ignore
+      // @ts-expect-error maybe the types from the API aren't quite right?
       query: {
-        offset: page * limit,
-        limit,
+        offset: String(page * limit),
+        limit: String(limit),
         ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
         ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
         ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),

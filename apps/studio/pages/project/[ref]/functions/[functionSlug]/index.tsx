@@ -151,7 +151,7 @@ const PageLayout: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
   return (
-    <div className="space-y-6 py-2">
+    <div className="space-y-6 py-3">
       <div className="flex flex-row items-center gap-2">
         <div className="flex items-center">
           {CHART_INTERVALS.map((item, i) => {

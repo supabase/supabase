@@ -39,6 +39,7 @@ interface LogsPreviewerProps {
   condensedLayout?: boolean
   tableName?: LogsTableName
   EmptyState?: React.ReactNode
+  filterPanelClassName?: string
 }
 export const LogsPreviewer = ({
   projectRef,
@@ -48,6 +49,7 @@ export const LogsPreviewer = ({
   tableName,
   children,
   EmptyState,
+  filterPanelClassName,
 }: PropsWithChildren<LogsPreviewerProps>) => {
   const router = useRouter()
   const { s, ite, its, db } = useParams()
@@ -150,6 +152,7 @@ export const LogsPreviewer = ({
   }
   const handleSearch: LogSearchCallback = async (event, { query, to, from }) => {
     if (event === 'search-input-change') {
+      setSelectedLogId(null)
       setFilters((prev) => ({ ...prev, search_query: query }))
       router.push({
         pathname: router.pathname,
@@ -199,6 +202,7 @@ export const LogsPreviewer = ({
   return (
     <div className="flex-1 flex flex-col h-full">
       <PreviewFilterPanel
+        className={filterPanelClassName}
         csvData={logData}
         isLoading={isLoading}
         newCount={newCount}

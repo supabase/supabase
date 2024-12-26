@@ -47,7 +47,6 @@ const UtilityPanel = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
-  const queryKeys = contentKeys.list(ref)
   const result = snapV2.results[id]?.[0]
 
   const { mutate: upsertContent } = useContentUpsertMutation({
@@ -59,9 +58,6 @@ const UtilityPanel = ({
       // No need to update the cache for non-SQL content
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
-
-      // Cancel any existing queries so that the new content is fetched
-      await queryClient.cancelQueries(queryKeys)
 
       const newSnippet = {
         ...snippet,
@@ -83,7 +79,7 @@ const UtilityPanel = ({
       return DEFAULT_CHART_CONFIG
     }
 
-    if (!snippet.content.chart) {
+    if (!snippet.content?.chart) {
       return DEFAULT_CHART_CONFIG
     }
 
