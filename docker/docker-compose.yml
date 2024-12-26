@@ -17,7 +17,7 @@ services:
           "CMD",
           "node",
           "-e",
-          "fetch('http://studio:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
+          "fetch('http://studio:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status); process.exit(0);})"
         ]
       timeout: 10s
       interval: 5s
