@@ -1,13 +1,22 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
+import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
 type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBody']
 
-export async function sendPageLeave(body: SendPageLeaveBody) {
+export async function sendPageLeave({ body }: { body: SendPageLeaveBody }) {
+  const consent =
+    (typeof window !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
+      : null) === 'true'
+
+  if (!consent || !IS_PLATFORM) return undefined
+
   const { data, error } = await post(`/platform/telemetry/page-leave`, {
     body,
     credentials: 'include',
@@ -24,6 +33,7 @@ export const useSendPageLeaveMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageLeaveData, ResponseError>, 'mutationFn'> = {}) => {
   const router = useRouter()
+
   const url = typeof window !== 'undefined' ? window.location.href : ''
   const title = typeof document !== 'undefined' ? document?.title : ''
 
@@ -33,7 +43,7 @@ export const useSendPageLeaveMutation = ({
     pathname: router.pathname,
   } as SendPageLeaveBody
 
-  return useMutation<SendPageLeaveData, ResponseError>((vars) => sendPageLeave(body), {
+  return useMutation<SendPageLeaveData, ResponseError>((vars) => sendPageLeave({ body }), {
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

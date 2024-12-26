@@ -150,9 +150,7 @@ The following code samples are for App Router. For help with Pages Router, see t
 >
 <TabPanel id="client" label="Client-side">
 
-```ts utils/supabase/client.tsx
-'use client'
-
+```ts utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
 export function createClient() {
@@ -167,12 +165,12 @@ export function createClient() {
 
 <TabPanel id="server" label="Server-side">
 
-```ts utils/supabase/server.tsx
+```ts utils/supabase/server.ts
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -518,6 +516,36 @@ export async function GET(context: APIContext) {
 
   return ...
 }
+```
+
+</TabPanel>
+
+<TabPanel id="astro-middleware" label="Middleware">
+
+```ts middleware.ts
+import { createServerClient, parseCookieHeader } from '@supabase/ssr'
+import { defineMiddleware } from 'astro:middleware'
+
+export const onRequest = defineMiddleware(async (context, next) => {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        getAll() {
+          return parseCookieHeader(context.request.headers.get('Cookie') ?? '')
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            context.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  return next()
+})
 ```
 
 </TabPanel>

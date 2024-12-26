@@ -77,7 +77,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-hooks',
         name: 'Webhooks',
         value: 'Database: Webhooks',
-        route: `/project/${ref}/database/hooks`,
+        route: `/project/${ref}/integrations/hooks`,
         defaultHidden: true,
       },
       {
@@ -91,7 +91,7 @@ export function useDatabaseGotoCommands(options?: CommandOptions) {
         id: 'nav-database-wrappers',
         name: 'Wrappers',
         value: 'Database: Wrappers',
-        route: `/project/${ref}/database/wrappers`,
+        route: `/project/${ref}/integrations/wrappers`,
         defaultHidden: true,
       },
       {

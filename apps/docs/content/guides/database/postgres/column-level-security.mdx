@@ -12,7 +12,7 @@ PostgreSQL's [Row Level Security (RLS)](https://www.postgresql.org/docs/current/
   roles.
 </Admonition>
 
-## Policies at the Row Level
+## Policies at the row level
 
 Policies in Row Level Security (RLS) are used to restrict access to rows in a table. Think of them like adding a `WHERE` clause to every query.
 
@@ -35,7 +35,7 @@ update
 
 However, this gives the post owner full access to update the row, including all of the columns.
 
-## Privileges at the Column Level
+## Privileges at the column level
 
 To restrict access to columns, you can use [Privileges](https://www.postgresql.org/docs/current/ddl-priv.html).
 
@@ -80,9 +80,9 @@ You can view and edit the privileges in the [Supabase Studio](https://supabase.c
 
 ![Column level privileges](/docs/img/guides/privileges/column-level-privileges-2.png)
 
-## Manage column privileges in Migrations
+## Manage column privileges in migrations
 
-While you can manage privileges directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](https://supabase.com/docs/guides/getting-started/local-development#database-migrations) guide.
+While you can manage privileges directly from the Dashboard, as your project grows you may want to manage them in your migrations. Read about database migrations in the [Local Development](https://supabase.com/docs/guides/deployment/database-migrations) guide.
 
 <StepHikeCompact>
 

@@ -60,6 +60,8 @@ A Read Replica is deployed by using a physical backup as a starting point, and a
 
 Along with the progress of the deployment, the dashboard displays rough estimates for each component.
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### What does it mean when "Init failed" is observed?
 
 The status `Init failed` indicates that the Read Replica has failed to deploy. Some possible scenarios as to why a Read Replica may have failed to be deployed:
@@ -101,6 +103,65 @@ The load balancer uses a round-robin strategy to route `GET` requests to all ava
 To call a read-only Postgres function on Read Replicas through the REST API, use the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
 
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
+
+#### Experimental routing
+
+The API load balancer offers an experimental routing mode that builds on top of the existing functionality. It is now possible to use a load balancer endpoint for all Supabase services (Auth, Edge Functions, Realtime, and Storage) meaning there is no need to worry about which endpoint to use in which situations.
+
+<Admonition type="note">
+
+Due to the requirements of the Auth service, all Auth requests are handled by the Primary, even when sent over the load balancer endpoint. This is similar to how non-Read requests for the Data API (PostgREST) are exclusively handled by the Primary.
+
+</Admonition>
+
+The experimental routing mode can be enabled by sending the header `sb-lb-routing-mode: alpha-all-services` along with requests. This gives the option to opt-in and try out the new routing, but still have the peace of mind that the original behavior is there should it be needed.
+
+What follows is an example of using the `supabase-js` library to create a new client with the appropriate headers and make an Auth request to create a new user.
+
+```ts ./create-user.ts
+import { createClient } from '@supabase/supabase-js'
+import * as dotenv from 'dotenv'
+
+// Load environment variables from .env file
+dotenv.config()
+
+// Supabase credentials
+const supabaseUrl = process.env.SUPABASE_URL as string
+const supabaseKey = process.env.SUPABASE_KEY as string
+
+// Initialize the Supabase client with custom headers
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  global: {
+    headers: {
+      'sb-lb-routing-mode': 'alpha-all-services',
+    },
+  },
+})
+
+/**
+ * @description simple user creation function
+ */
+async function createUser() {
+  // Make the Auth call to create a user
+  const { data, error } = await supabase.auth.signUp({
+    email: 'valid.email@supabase.io',
+    password: 'my--really-strong-password',
+  })
+
+  // Throw on an error
+  if (error) {
+    throw new Error(error.message)
+  }
+
+  // Output the response
+  console.dir(data)
+}
+
+// Register a random user
+createUser()
+```
+
+The client creation function, with experimental routing header, can be used throughout an application to take advantage of load balancer experimental routing.
 
 <Admonition type="caution">
 

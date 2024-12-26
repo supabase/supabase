@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useTheme } from 'next-themes'
+import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
-import { Button, buttonVariants, cn } from 'ui'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { Announcement, Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -13,36 +14,35 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
+
 import ScrollProgress from '~/components/ScrollProgress'
+import { getMenu } from '~/data/nav'
 import GitHubButton from './GitHubButton'
 import HamburgerButton from './HamburgerMenu'
-import MobileMenu from './MobileMenu'
 import MenuItem from './MenuItem'
+import MobileMenu from './MobileMenu'
 import RightClickBrandLogo from './RightClickBrandLogo'
-import { allBlogPosts } from 'contentlayer/generated'
-import { getMenu } from '~/data/nav'
-import { sortDates } from '~/lib/helpers'
 
 interface Props {
   hideNavbar: boolean
+  stickyNavbar?: boolean
 }
 
-const Nav = (props: Props) => {
+const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
-  const latestBlogPosts = allBlogPosts.sort(sortDates).slice(0, 2)
-  const menu = getMenu(latestBlogPosts)
+  const menu = getMenu()
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('/launch-week')
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isGAWeekSection = router.pathname.startsWith('/ga-week')
-  const hasStickySubnav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage
+  const disableStickyNav = isLaunchWeekXPage || isGAWeekSection || isLaunchWeekPage || !stickyNavbar
   const showLaunchWeekNavMode = (isLaunchWeekPage || isGAWeekSection) && !open
 
   React.useEffect(() => {
@@ -59,7 +59,7 @@ const Nav = (props: Props) => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  if (props.hideNavbar) {
+  if (hideNavbar) {
     return null
   }
 
@@ -67,11 +67,8 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      {/* <Announcement>
-        Uncomment to show announcement banner
-      </Announcement> */}
       <div
-        className={cn('sticky top-0 z-40 transform', hasStickySubnav && 'relative')}
+        className={cn('sticky top-0 z-40 transform', disableStickyNav && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
@@ -156,7 +153,7 @@ const Nav = (props: Props) => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
+          <MobileMenu open={open} setOpen={setOpen} menu={menu} />
         </nav>
 
         <ScrollProgress />

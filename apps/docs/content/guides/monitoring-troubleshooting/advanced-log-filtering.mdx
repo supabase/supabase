@@ -7,7 +7,7 @@ description: 'Filter logs with regular expressions'
 
 ## Understanding field references
 
-The log tables are queried with subset of BigQuery SQL syntax. They all have three columns: `event_message`, `timestamp`, and `metadata`.
+The log tables are queried with a subset of BigQuery SQL syntax. They all have three columns: `event_message`, `timestamp`, and `metadata`.
 
 | column        | description                 |
 | ------------- | --------------------------- |
@@ -129,7 +129,7 @@ regexp_contains(event_message, 'hello world\.')
 regexp_contains(event_message, 'started host|authenticated')
 ```
 
-### and/or/not statements in SQL:
+### `and`/`or`/`not` statements in SQL:
 
 `and`, `or`, and `not` are all native terms in SQL and can be used in conjunction with regular expressions to filter results
 

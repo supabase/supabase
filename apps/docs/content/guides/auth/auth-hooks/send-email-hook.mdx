@@ -6,6 +6,17 @@ subtitle: 'Use a custom email provider to send authentication messages'
 
 The Send Email Hook runs before an email is sent and allows for flexibility around email sending. You can use this hook to configure a back-up email provider or add internationalization to your emails.
 
+## Email sending behavior
+
+Email sending depends on two settings: Email Provider and Auth Hook status.
+
+| Email Provider | Auth Hook | Result                                                               |
+| -------------- | --------- | -------------------------------------------------------------------- |
+| Enabled        | Enabled   | Auth Hook handles email sending (SMTP not used)                      |
+| Enabled        | Disabled  | SMTP handles email sending (custom if configured, default otherwise) |
+| Disabled       | Enabled   | Email Signups Disabled                                               |
+| Disabled       | Disabled  | Email Signups Disabled                                               |
+
 **Inputs**
 
 | Field   | Type                                              | Description                                                                        |
@@ -26,14 +37,14 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
     "id": "8484b834-f29e-4af2-bf42-80644d154f76",
     "aud": "authenticated",
     "role": "authenticated",
-    "email": "john@soupbase.io",
+    "email": "valid.email@supabase.io",
     "phone": "",
     "app_metadata": {
       "provider": "email",
       "providers": ["email"]
     },
     "user_metadata": {
-      "email": "john@soupbase.io",
+      "email": "valid.email@supabase.io",
       "email_verified": false,
       "phone_verified": false,
       "sub": "8484b834-f29e-4af2-bf42-80644d154f76"
@@ -44,7 +55,7 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
         "id": "8484b834-f29e-4af2-bf42-80644d154f76",
         "user_id": "8484b834-f29e-4af2-bf42-80644d154f76",
         "identity_data": {
-          "email": "john@soupbase.io",
+          "email": "valid.email@supabase.io",
           "email_verified": false,
           "phone_verified": false,
           "sub": "8484b834-f29e-4af2-bf42-80644d154f76"
@@ -53,7 +64,7 @@ The Send Email Hook runs before an email is sent and allows for flexibility arou
         "last_sign_in_at": "2024-05-14T12:56:33.824231484Z",
         "created_at": "2024-05-14T12:56:33.824261Z",
         "updated_at": "2024-05-14T12:56:33.824261Z",
-        "email": "john@soupbase.io"
+        "email": "valid.email@supabase.io"
       }
     ],
     "created_at": "2024-05-14T12:56:33.821567Z",
@@ -351,7 +362,7 @@ create table job_queue (
 Create the hook
 
 ```sql
-create or replace function send_email(event jsonb) returns void as $$
+create or replace function send_email(event jsonb) returns jsonb as $$
 declare
     job_data jsonb;
     scheduled_time timestamp;
@@ -371,8 +382,10 @@ begin
     -- Assign priority dynamically (example logic: higher priority for earlier scheduled time)
     priority := extract('epoch' from (scheduled_time - now()))::int;
 
-    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    insert into public.job_queue (job_data, priority, scheduled_at, max_retries)
     values (job_data, priority, scheduled_time, 2);
+
+    return '{}'::jsonb;
 end;
 $$ language plpgsql;
 
@@ -628,6 +641,11 @@ const templates = {
   },
 }
 
+function generateConfirmationURL(email_data) {
+  // TODO: replace the ref with your project ref
+  return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+}
+
 Deno.serve(async (req) => {
   const payload = await req.text()
   const serverToken = Deno.env.get('POSTMARK_SERVER_TOKEN')
@@ -640,8 +658,9 @@ Deno.serve(async (req) => {
   const subject = subjects[language][email_data.email_action_type] || 'Notification'
 
   let template = templates[language][email_data.email_action_type]
+  const confirmation_url = generateConfirmationURL(email_data)
   let htmlBody = template
-    .replace('{{confirmation_url}}', email_data.confirmation_url)
+    .replace('{{confirmation_url}}', confirmation_url)
     .replace('{{token}}', email_data.token || '')
     .replace('{{new_token}}', email_data.new_token || '')
     .replace('{{site_url}}', email_data.site_url || '')
@@ -734,10 +753,16 @@ const templates = {
     reauthentication: `<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>`
 };
 
+function generateConfirmationURL(email_data) {
+   // TODO: replace the ref with your project ref
+   return `https://<ref>.supabase.co/auth/v1/verify?token=${email_data.token}&type=${email_data.email_action_type}&redirect_to=${email_data.redirect_to}`
+}
+
 async function sendEmailWithPostmark(user: any, email_data: any, serverToken: string): Promise<Response> {
     const subject = subjects[email_data.email_action_type] || 'Notification';
+    const confirmation_url = generateConfirmationURL(email_data)
     let template = templates[email_data.email_action_type];
-    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+    let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')
@@ -765,7 +790,8 @@ async function sendEmailWithPostmark(user: any, email_data: any, serverToken: st
 async function sendEmailWithSendGrid(user: any, email_data: any, apiKey: string): Promise<Response> {
     const subject = subjects[email_data.email_action_type] || 'Notification';
     let template = templates[email_data.email_action_type];
-    let htmlBody = template.replace('{{confirmation_url}}', email_data.confirmation_url)
+    cont confirmation_url = generateConfirmationURL(email_data)
+    let htmlBody = template.replace('{{confirmation_url}}', confirmation_url)
         .replace('{{token}}', email_data.token || '')
         .replace('{{new_token}}', email_data.new_token || '')
         .replace('{{site_url}}', email_data.site_url || '')

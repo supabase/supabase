@@ -1,6 +1,13 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, sortBy } from 'lodash'
+import { Check, Edit, Edit2, MoreVertical, Trash, X } from 'lucide-react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   Badge,
   Button,
@@ -8,13 +15,11 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import { useDatabaseTriggersQuery } from 'data/database-triggers/database-triggers-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { Check, X, MoreVertical, Edit3, Trash } from 'lucide-react'
+import { generateTriggerCreateSQL } from './TriggerList.utils'
 
 interface TriggerListProps {
   schema: string
@@ -32,6 +37,7 @@ const TriggerList = ({
   deleteTrigger,
 }: TriggerListProps) => {
   const { project } = useProjectContext()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const { data: triggers } = useDatabaseTriggersQuery({
     projectRef: project?.ref,
@@ -78,9 +84,14 @@ const TriggerList = ({
       {_triggers.map((x: any) => (
         <Table.tr key={x.id}>
           <Table.td className="space-x-2">
-            <p title={x.name} className="truncate">
-              {x.name}
-            </p>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ className="cursor-default truncate max-w-48 inline-block">
+                {x.name}
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="center">
+                {x.name}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </Table.td>
 
           <Table.td className="break-all">
@@ -125,42 +136,55 @@ const TriggerList = ({
                 {canUpdateTriggers ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" className="px-1">
-                        <MoreVertical />
-                      </Button>
+                      <Button type="default" className="px-1" icon={<MoreVertical />} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end" className="w-36">
+                    <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem className="space-x-2" onClick={() => editTrigger(x)}>
-                        <Edit3 size="14" />
+                        <Edit2 size={14} />
                         <p>Edit trigger</p>
                       </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="space-x-2"
+                        onClick={() => {
+                          const sql = generateTriggerCreateSQL(x)
+                          setAiAssistantPanel({
+                            open: true,
+                            initialInput: `Update this trigger which exists on the ${x.schema}.${x.table} table to...`,
+                            suggestions: {
+                              title:
+                                'I can help you make a change to this trigger, here are a few example prompts to get you started:',
+                              prompts: [
+                                'Rename this trigger to ...',
+                                'Change the events this trigger responds to ...',
+                                'Modify this trigger to run after instead of before ...',
+                              ],
+                            },
+                            sqlSnippets: [sql],
+                          })
+                        }}
+                      >
+                        <Edit size={14} />
+                        <p>Edit with Assistant</p>
+                      </DropdownMenuItem>
                       <DropdownMenuItem className="space-x-2" onClick={() => deleteTrigger(x)}>
-                        <Trash stroke="red" size="14" />
+                        <Trash stroke="red" size={14} />
                         <p>Delete trigger</p>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 ) : (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button disabled type="default" icon={<MoreVertical />} />
-                    </Tooltip.Trigger>
-                    <Tooltip.Portal>
-                      <Tooltip.Content side="left">
-                        <Tooltip.Arrow className="radix-tooltip-arrow" />
-                        <div
-                          className={[
-                            'rounded bg-alternative py-1 px-2 leading-none shadow',
-                            'border border-background',
-                          ].join(' ')}
-                        >
-                          <span className="text-xs text-foreground">
-                            You need additional permissions to update triggers
-                          </span>
-                        </div>
-                      </Tooltip.Content>
-                    </Tooltip.Portal>
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    disabled
+                    type="default"
+                    className="px-1"
+                    icon={<MoreVertical />}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: 'You need additional permissions to update triggers',
+                      },
+                    }}
+                  />
                 )}
               </div>
             )}

@@ -29,12 +29,15 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
-  TELEMETRY_CONSENT: 'supabase-consent',
+
+  AI_ASSISTANT_STATE: 'supabase-ai-assistant-state',
 
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_CLS: 'supabase-ui-cls',
   UI_ONBOARDING_NEW_PAGE_SHOWN: 'supabase-ui-onboarding-new-page-shown',
+
+  SQL_SCRATCH_PAD_BANNER_ACKNOWLEDGED: 'supabase-sql-scratch-pad-banner-acknowledged',
 
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
@@ -70,8 +73,6 @@ export const LOCAL_STORAGE_KEYS = {
   AUTH_SMTP_CHANGES_WARNING: 'auth-smtp-changes-warning-dismissed',
 
   AUTH_USERS_COLUMNS_CONFIGURATION: (ref: string) => `supabase-auth-users-columns-${ref}`,
-  AUTH_EMAIL_WARNING_BANNER_ACKNOWLEDGE: (ref: string) =>
-    `supabase-auth-email-warning-banner-${ref}`,
 }
 
 export const OPT_IN_TAGS = {

@@ -9,7 +9,7 @@ name: supabase
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240923-2e3e90c
+    image: supabase/studio:20241202-71e5240
     restart: unless-stopped
     healthcheck:
       test:
@@ -17,21 +17,21 @@ services:
           "CMD",
           "node",
           "-e",
-          "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode); process.exit(0);})"
+          "fetch('http://studio:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status); process.exit(0);})"
         ]
-      timeout: 5s
+      timeout: 10s; process.exit(0);
       interval: 5s
       retries: 3
     depends_on:
       analytics:
         condition: service_healthy
     environment:
-      HOSTNAME: 0.0.0.0
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
       DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION}
       DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
 
       SUPABASE_URL: http://kong:8000
       SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL}
@@ -77,7 +77,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.158.1
+    image: supabase/gotrue:v2.164.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -119,6 +119,10 @@ services:
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
       GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
+
+      # Uncomment to bypass nonce check in ID Token flow. Commonly set to true when using Google Sign In on mobile.
+      # GOTRUE_EXTERNAL_SKIP_NONCE_CHECK: true
+
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
       GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL}
@@ -181,7 +185,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.30.34
+    image: supabase/realtime:v2.33.70
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -221,11 +225,12 @@ services:
       RLIMIT_NOFILE: "10000"
       APP_NAME: realtime
       SEED_SELF_HOST: true
+      RUN_JANITOR: true
 
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.10.1
+    image: supabase/storage-api:v1.11.13
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -242,7 +247,7 @@ services:
           "--no-verbose",
           "--tries=1",
           "--spider",
-          "http://localhost:5000/status"
+          "http://storage:5000/status"
         ]
       timeout: 5s
       interval: 5s
@@ -284,7 +289,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.83.2
+    image: supabase/postgres-meta:v0.84.2
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -302,7 +307,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.58.3
+    image: supabase/edge-runtime:v1.65.3
     restart: unless-stopped
     depends_on:
       analytics:
@@ -367,7 +372,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.1.78
+    image: supabase/postgres:15.6.1.146
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
@@ -434,7 +439,7 @@ services:
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
     environment:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
-    command: [ "--config", "etc/vector/vector.yml" ]
+    command: [ "--config", "/etc/vector/vector.yml" ]
 
   # Update the DATABASE_URL if you are using an external Postgres database
   supavisor:
@@ -456,14 +461,14 @@ services:
       - /app/bin/migrate && /app/bin/supavisor eval "$$(cat /etc/pooler/pooler.exs)" && /app/bin/server
     restart: unless-stopped
     ports:
-      - ${POSTGRES_PORT}:${POSTGRES_PORT}
-      - ${POOLER_PROXY_PORT_TRANSACTION}:${POOLER_PROXY_PORT_TRANSACTION}
+      - ${POSTGRES_PORT}:5432
+      - ${POOLER_PROXY_PORT_TRANSACTION}:6543
     environment:
       - PORT=4000
       - POSTGRES_PORT=${POSTGRES_PORT}
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - DATABASE_URL=ecto://postgres:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
+      - DATABASE_URL=ecto://supabase_admin:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT}/_supabase
       - CLUSTER_POSTGRES=true
       - SECRET_KEY_BASE=UpNVntn3cDxHJpq99YMc1T1AQgQpc8kfYTuRgBiYa15BLrx8etQoXz3gZv1/u2oq
       - VAULT_ENC_KEY=your-encryption-key-32-chars-min
@@ -471,7 +476,7 @@ services:
       - METRICS_JWT_SECRET=${JWT_SECRET}
       - REGION=local
       - ERL_AFLAGS=-proto_dist inet_tcp
-      - POOLER_TENANT_ID=your-tenant-id
+      - POOLER_TENANT_ID=${POOLER_TENANT_ID}
       - POOLER_DEFAULT_POOL_SIZE=${POOLER_DEFAULT_POOL_SIZE}
       - POOLER_MAX_CLIENT_CONN=${POOLER_MAX_CLIENT_CONN}
       - POOLER_POOL_MODE=transaction

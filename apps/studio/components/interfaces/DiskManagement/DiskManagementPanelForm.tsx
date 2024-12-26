@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { HelpCircle, InfoIcon, RotateCcw } from 'lucide-react'
 import Link from 'next/link'
@@ -7,7 +8,9 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import DiskSpaceBar from 'components/interfaces/DiskManagement/DiskSpaceBar'
+import DiskSpaceBar from 'components/interfaces/DiskManagement/ui/DiskSpaceBar'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { DocsButton } from 'components/ui/DocsButton'
 import { FormHeader } from 'components/ui/Forms/FormHeader'
 import {
   useDiskAttributesQuery,
@@ -18,7 +21,9 @@ import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useFlag } from 'hooks/ui/useFlag'
 import { GB } from 'lib/constants'
 import {
   Alert_Shadcn_,
@@ -40,39 +45,50 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
-import BillingChangeBadge from './BillingChangeBadge'
-import { DiskCountdownRadial } from './DiskCountdownRadial'
-import {
-  COMPUTE_SIZE_MAX_IOPS,
-  COMPUTE_SIZE_MAX_THROUGHPUT,
-  DiskType,
-  IOPS_RANGE,
-  PLAN_DETAILS,
-  THROUGHPUT_RANGE,
-} from './DiskManagement.constants'
+import { Markdown } from '../Markdown'
+import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
 import {
   calculateDiskSizePrice,
   calculateIOPSPrice,
   calculateThroughputPrice,
 } from './DiskManagement.utils'
+import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { BillingChangeBadge } from './ui/BillingChangeBadge'
+import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
+import {
+  COMPUTE_MAX_IOPS,
+  COMPUTE_MAX_THROUGHPUT,
+  DiskType,
+  IOPS_RANGE,
+  PLAN_DETAILS,
+  THROUGHPUT_RANGE,
+} from './ui/DiskManagement.constants'
 import {
   DiskManagementDiskSizeReadReplicas,
   DiskManagementIOPSReadReplicas,
   DiskManagementThroughputReadReplicas,
-} from './DiskManagementReadReplicas'
-import { DiskStorageSchema, DiskStorageSchemaType } from './DiskManagementPanelSchema'
-import { DiskManagementPlanUpgradeRequired } from './DiskManagementPlanUpgradeRequired'
-import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+} from './ui/DiskManagementReadReplicas'
+import { NoticeBar } from './ui/NoticeBar'
+import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementPanelForm() {
+  const { project } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
+  const diskAndComputeFormEnabled = useFlag('diskAndComputeForm')
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
   const [remainingTime, setRemainingTime] = useState(0)
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
+
+  const canUpdateDiskConfiguration = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
+    resource: {
+      project_id: project?.id,
+    },
+  })
 
   const { data: databases } = useReadReplicasQuery({ projectRef })
   const readReplicas = (databases ?? []).filter((db) => db.identifier !== projectRef)
@@ -102,7 +118,7 @@ export function DiskManagementPanelForm() {
       },
     }
   )
-  // @ts-ignore [Joshen TODO] check whats happening here
+  // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
   const isRequestingChanges = data?.requested_modification !== undefined
 
@@ -113,19 +129,19 @@ export function DiskManagementPanelForm() {
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const currentCompute = (addons?.selected_addons ?? []).find(
-    (x) => x.type === 'compute_instance'
+    (x: { type: string }) => x.type === 'compute_instance'
   )?.variant
   const maxIopsBasedOnCompute =
-    COMPUTE_SIZE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_IOPS]
+    COMPUTE_MAX_IOPS[(currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_IOPS]
   const maxThroughputBasedOnCompute =
-    COMPUTE_SIZE_MAX_THROUGHPUT[
-      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_SIZE_MAX_THROUGHPUT
+    COMPUTE_MAX_THROUGHPUT[
+      (currentCompute?.identifier ?? '') as keyof typeof COMPUTE_MAX_THROUGHPUT
     ]
 
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
-  const planId = subscription?.plan.id ?? ''
+  const planId = subscription?.plan.id ?? 'free'
   const isPlanUpgradeRequired =
     subscription?.plan.id === 'pro' && !subscription.usage_billing_enabled
 
@@ -146,13 +162,14 @@ export function DiskManagementPanelForm() {
     })
 
   const defaultValues = {
-    storageType: type,
+    storageType: type || DiskType.GP3,
     provisionedIOPS: iops,
     throughput: throughput_mbps,
     totalSize: size_gb,
+    computeSize: undefined,
   }
   const form = useForm<DiskStorageSchemaType>({
-    resolver: zodResolver(DiskStorageSchema),
+    resolver: zodResolver(CreateDiskStorageSchema(defaultValues.totalSize)),
     defaultValues,
     mode: 'onBlur',
     reValidateMode: 'onChange',
@@ -164,10 +181,13 @@ export function DiskManagementPanelForm() {
   const watchedIOPS = watch('provisionedIOPS')
   const { dirtyFields } = formState // Destructure dirtyFields from formState
   const isAllocatedStorageDirty = !!dirtyFields.totalSize // Check if 'allocatedStorage' is dirty
-  const disableInput = isRequestingChanges || isPlanUpgradeRequired || isWithinCooldownWindow
+  const disableInput =
+    isRequestingChanges ||
+    isPlanUpgradeRequired ||
+    isWithinCooldownWindow ||
+    !canUpdateDiskConfiguration
 
-  const { includedDiskGB: includedDiskGBMeta } =
-    PLAN_DETAILS?.[planId as keyof typeof PLAN_DETAILS] ?? {}
+  const { includedDiskGB: includedDiskGBMeta } = PLAN_DETAILS[planId]
   const includedDiskGB = includedDiskGBMeta[watchedStorageType]
 
   const minIOPS = IOPS_RANGE[watchedStorageType]?.min ?? 0
@@ -187,12 +207,21 @@ export function DiskManagementPanelForm() {
     updateDiskConfigurationRQ({ ref: projectRef, ...data })
   }
 
+  // i hate typescript enums
+  // gotta clean this up but it allows me to remove type casts for now
+  function getEnumFromFormValue(value: string) {
+    if (value === 'io2') return DiskType.IO2
+    if (value === 'gp3') return DiskType.GP3
+    return DiskType.IO2
+  }
+
+  const newStorageType = form.getValues('storageType')
   const diskSizePrice = calculateDiskSizePrice({
     planId,
     oldSize: form.formState.defaultValues?.totalSize || 0,
-    oldStorageType: form.formState.defaultValues?.storageType as DiskType,
+    oldStorageType: getEnumFromFormValue(form.formState.defaultValues?.storageType || 'io2'),
     newSize: form.getValues('totalSize'),
-    newStorageType: form.getValues('storageType') as DiskType,
+    newStorageType: getEnumFromFormValue(newStorageType),
   })
 
   const iopsPrice = calculateIOPSPrice({
@@ -240,6 +269,30 @@ export function DiskManagementPanelForm() {
 
     return () => clearInterval(timer)
   }, [remainingTime])
+
+  if (diskAndComputeFormEnabled) {
+    return (
+      <div id="disk-management">
+        <FormHeader
+          title="Disk Management"
+          docsUrl="https://supabase.com/docs/guides/platform/database-size#disk-management"
+        />
+        <NoticeBar
+          visible={true}
+          type="default"
+          title="Disk Management has moved"
+          description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
+          actions={
+            <Button type="default" asChild>
+              <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                Go to Compute and Disk
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    )
+  }
 
   if (planId === 'free') {
     return (
@@ -594,8 +647,28 @@ export function DiskManagementPanelForm() {
                       label="Disk Size"
                       layout="horizontal"
                       description={
-                        includedDiskGB > 0 &&
-                        `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`
+                        <>
+                          {includedDiskGB > 0 &&
+                            `Your plan includes ${includedDiskGB} GB of disk size for ${watchedStorageType}.`}
+                          {field.value < size_gb && (
+                            <Admonition
+                              className="mt-2"
+                              type="default"
+                              title="Reducing your project's disk size?"
+                              description={
+                                <Markdown
+                                  className="[&>p]:!leading-normal"
+                                  content={`Your disk size will automatically "right-size" when you [upgrade your project](/project/${projectRef}/settings/infrastructure).`}
+                                />
+                              }
+                            >
+                              <DocsButton
+                                abbrev={false}
+                                href="https://supabase.com/docs/guides/platform/database-size#reducing-disk-size"
+                              />
+                            </Admonition>
+                          )}
+                        </>
                       }
                     >
                       <div className="mt-1 relative flex gap-2 items-center">
@@ -657,18 +730,13 @@ export function DiskManagementPanelForm() {
                     </FormItemLayout>
                   )}
                 />
-                <div className="grid grid-cols-12 gap-3">
+                <div className="grid grid-cols-12 gap-10">
                   {/* You can add additional content in the remaining 4 columns if needed */}
                   <div className="col-span-4">
                     {/* Additional content or information can go here */}
                   </div>
                   <div className="col-span-8 space-y-6 mt-6">
-                    <DiskSpaceBar
-                      showNewBar={form.formState.dirtyFields.totalSize !== undefined}
-                      totalSize={size_gb}
-                      usedSize={mainDiskUsed}
-                      newTotalSize={watchedTotalSize}
-                    />
+                    <DiskSpaceBar form={form} />
                     <DiskManagementDiskSizeReadReplicas
                       isDirty={form.formState.dirtyFields.totalSize !== undefined}
                       totalSize={size_gb * 1.25}
@@ -696,10 +764,10 @@ export function DiskManagementPanelForm() {
                 </CardContent>
               </Card>
             ) : (
-              <DiskCountdownRadial remainingTime={remainingTime} />
+              <DiskCountdownRadial />
             )}
 
-            {isPlanUpgradeRequired && <DiskManagementPlanUpgradeRequired />}
+            <SpendCapDisabledSection />
 
             <Card className="bg-surface-100 rounded-t-none">
               <CardContent className="flex items-center pb-0 py-3 px-8 gap-3 justify-end">
@@ -717,9 +785,10 @@ export function DiskManagementPanelForm() {
                     form={form}
                     numReplicas={readReplicas.length}
                     isDialogOpen={isDialogOpen}
-                    isWithinCooldown={disableInput}
+                    disabled={disableInput}
                     onSubmit={onSubmit}
                     setIsDialogOpen={setIsDialogOpen}
+                    buttonSize={'tiny'}
                   />
                 </div>
               </CardContent>

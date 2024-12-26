@@ -1,24 +1,32 @@
 import Link from 'next/link'
 
-import type { AutoApiService } from 'data/config/project-api-query'
+import { useParams } from 'common'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import CodeSnippet from './CodeSnippet'
 import Snippets from './Snippets'
 
 interface AuthenticationProps {
-  autoApiService: AutoApiService
   selectedLang: 'bash' | 'js'
   showApiKey: string
 }
 
-const Authentication = ({ autoApiService, selectedLang, showApiKey }: AuthenticationProps) => {
+const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
+  const { ref: projectRef } = useParams()
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
+
+  const { anonKey, serviceKey } = getAPIKeys(settings)
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
+  const endpoint = `${protocol}://${hostEndpoint ?? ''}`
+
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.defaultApiKey ?? 'SUPABASE_CLIENT_API_KEY'
+      ? anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
       : 'SUPABASE_CLIENT_API_KEY'
   const serviceApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? autoApiService?.serviceApiKey ?? 'SUPABASE_SERVICE_KEY'
+      ? serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY'
       : 'SUPABASE_SERVICE_KEY'
 
   return (
@@ -40,7 +48,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
       </div>
 
       <h2 className="doc-heading">Client API Keys</h2>
-      <div className="doc-section ">
+      <div className="doc-section">
         <article className="code-column text-foreground">
           <p>
             Client keys allow "anonymous access" to your database, until the user has logged in.
@@ -53,8 +61,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you a Client Key to get started. You will soon be able to add as many
             keys as you like. You can find the <code>anon</code> key in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
-            page.
+            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">
@@ -64,7 +71,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           />
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authKeyExample(defaultApiKey, autoApiService.endpoint, {
+            snippet={Snippets.authKeyExample(defaultApiKey, endpoint, {
               showBearer: false,
             })}
           />
@@ -72,7 +79,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
       </div>
 
       <h2 className="doc-heading">Service Keys</h2>
-      <div className="doc-section ">
+      <div className="doc-section">
         <article className="code-column text-foreground">
           <p>
             Service keys have FULL access to your data, bypassing any security policies. Be VERY
@@ -85,8 +92,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           <p>
             We have provided you with a Service Key to get started. Soon you will be able to add as
             many keys as you like. You can find the <code>service_role</code> in the{' '}
-            <Link href={`/project/${autoApiService.project.ref}/settings/api`}>API Settings</Link>{' '}
-            page.
+            <Link href={`/project/${projectRef}/settings/api`}>API Settings</Link> page.
           </p>
         </article>
         <article className="code">
@@ -96,9 +102,7 @@ const Authentication = ({ autoApiService, selectedLang, showApiKey }: Authentica
           />
           <CodeSnippet
             selectedLang={selectedLang}
-            snippet={Snippets.authKeyExample(serviceApiKey, autoApiService.endpoint, {
-              keyName: 'SERVICE_KEY',
-            })}
+            snippet={Snippets.authKeyExample(serviceApiKey, endpoint, { keyName: 'SERVICE_KEY' })}
           />
         </article>
       </div>

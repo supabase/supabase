@@ -9,7 +9,7 @@ const dismissToast = async (page: Page) => {
 test.describe('Table Editor page', () => {
   test.beforeEach(async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
     await page.goto('/project/default/editor')
@@ -77,11 +77,10 @@ test.describe('Table Editor page', () => {
     await page.getByTestId('table-editor-pick-column-to-sort-button').click()
     await page.getByLabel('Pick a column to sort by').getByText('defaultValueColumn').click()
     await page.getByRole('button', { name: 'Apply sorting' }).click()
+
     // click away to close the sorting dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .click()
+    await page.locator('#spec-click-target').click()
+
     // expect the row to be sorted by defaultValueColumn. They're inserted in the order 100, 2
     await expect(page.locator('div.rdg-row:nth-child(2)')).toContainText('2')
     await expect(page.locator('div.rdg-row:nth-child(3)')).toContainText('100')
@@ -98,17 +97,14 @@ test.describe('Table Editor page', () => {
     await page.getByPlaceholder('Enter a value').fill('2')
     await page.getByRole('button', { name: 'Apply filter' }).click()
     // click away to close the filter dialog
-    await page
-      .locator('div')
-      .filter({ hasText: /^Table Editor$/ })
-      .click()
+    await page.locator('#spec-click-target').click()
     await expect(page.getByRole('grid')).toContainText('2')
     await expect(page.getByRole('grid')).not.toContainText('100')
   })
 
   test('should check the auth schema', async ({ page }) => {
     const tableResponsePromise = page.waitForResponse(
-      'http://localhost:8082/api/pg-meta/default/query?key=public-entity-types',
+      'http://localhost:8082/api/pg-meta/default/query?key=entity-types-public-0',
       { timeout: 0 }
     )
 

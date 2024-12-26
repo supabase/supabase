@@ -3,38 +3,43 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useFlag } from 'hooks/ui/useFlag'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
-import { Button, Modal, ScrollArea, cn } from 'ui'
-import APISidePanelPreview from './APISidePanelPreview'
-import CLSPreview from './CLSPreview'
-import { useFeaturePreviewContext } from './FeaturePreviewContext'
+import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
+import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
 
 const FeaturePreviewModal = () => {
-  // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
-  const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL,
-      name: 'Project API documentation',
-      content: <APISidePanelPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
-    },
-    {
-      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
-      name: 'Column-level privileges',
-      content: <CLSPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
-    },
-  ]
-
   const snap = useAppStateSnapshot()
   const featurePreviewContext = useFeaturePreviewContext()
   const { mutate: sendEvent } = useSendEventMutation()
+  const enableFunctionsAssistant = useFlag('functionsAssistantV2')
 
   const selectedFeaturePreview =
     snap.selectedFeaturePreview === '' ? FEATURE_PREVIEWS[0].key : snap.selectedFeaturePreview
 
   const [selectedFeatureKey, setSelectedFeatureKey] = useState<string>(selectedFeaturePreview)
+  const isNotReleased =
+    selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
+
+  const { flags, onUpdateFlag } = featurePreviewContext
+  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
+  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+
+  const toggleFeature = () => {
+    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+    sendEvent({
+      action: isSelectedFeatureEnabled
+        ? TelemetryActions.FEATURE_PREVIEW_DISABLED
+        : TelemetryActions.FEATURE_PREVIEW_ENABLED,
+      properties: { feature: selectedFeatureKey },
+    })
+  }
+
+  function handleCloseFeaturePreviewModal() {
+    snap.setShowFeaturePreviewModal(false)
+    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+  }
 
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
@@ -44,23 +49,11 @@ const FeaturePreviewModal = () => {
     }
   }, [snap.selectedFeaturePreview])
 
-  const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
-
-  const toggleFeature = () => {
-    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    sendEvent({
-      category: 'ui_feature_previews',
-      action: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-      label: selectedFeatureKey,
-    })
-  }
-
-  function handleCloseFeaturePreviewModal() {
-    snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
-  }
+  useEffect(() => {
+    if (snap.showFeaturePreviewModal) {
+      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
+    }
+  }, [snap.showFeaturePreviewModal])
 
   return (
     <Modal
@@ -103,8 +96,11 @@ const FeaturePreviewModal = () => {
           </div>
           <div className="flex-grow max-h-[550px] p-4 space-y-3 overflow-y-auto">
             <div className="flex items-center justify-between">
-              <p>{selectedFeature?.name}</p>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center gap-x-2">
+                <p>{selectedFeature?.name}</p>
+                {selectedFeature?.isNew && <Badge color="green">New</Badge>}
+              </div>
+              <div className="flex items-center gap-x-2">
                 {selectedFeature?.discussionsUrl !== undefined && (
                   <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <Link href={selectedFeature.discussionsUrl} target="_blank" rel="noreferrer">
@@ -112,9 +108,15 @@ const FeaturePreviewModal = () => {
                     </Link>
                   </Button>
                 )}
-                <Button type="default" onClick={() => toggleFeature()}>
-                  {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                </Button>
+                {isNotReleased ? (
+                  <Button disabled type="default">
+                    Coming soon
+                  </Button>
+                ) : (
+                  <Button type="default" onClick={() => toggleFeature()}>
+                    {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
+                  </Button>
+                )}
               </div>
             </div>
             {selectedFeature?.content}

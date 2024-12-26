@@ -30,6 +30,14 @@ const levelsData = {
     icon: 'database',
     name: 'Database',
   },
+  cron: {
+    icon: 'cron',
+    name: 'Cron',
+  },
+  queues: {
+    icon: 'queues',
+    name: 'Queues',
+  },
   api: {
     icon: 'rest',
     name: 'REST API',
@@ -300,6 +308,7 @@ const NavContainer = memo(function NavContainer({ children }: PropsWithChildren)
           'relative lg:sticky',
           'w-full lg:w-auto',
           'h-fit lg:h-screen overflow-y-scroll lg:overflow-auto',
+          '[overscroll-behavior:contain]',
           'backdrop-blur backdrop-filter bg-background',
           'flex flex-col flex-grow'
         )}
@@ -335,7 +344,7 @@ interface SkeletonProps extends PropsWithChildren {
   NavigationMenu?: ReactNode
   hideFooter?: boolean
   className?: string
-  additionalNavItems?: Partial<NavMenuSection>[]
+  additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
 function TopNavSkeleton({ children }) {

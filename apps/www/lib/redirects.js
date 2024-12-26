@@ -6,6 +6,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/platform/compute-add-ons',
+    destination: '/docs/guides/platform/compute-and-disk',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/storage-caching',
     destination: '/docs/guides/storage/cdn/fundamentals',
   },
@@ -2181,6 +2186,16 @@ module.exports = [
     destination: '/docs/guides/database/extensions/pg_repack',
   },
   {
+    permanent: false,
+    source: '/docs/guides/database/extensions/pgmq',
+    destination: '/docs/guides/database/extensions',
+  },
+  {
+    permanent: false,
+    source: '/docs/guides/database/extensions/pg_partman',
+    destination: '/docs/guides/database/extensions',
+  },
+  {
     permanent: true,
     source: '/docs/guides/ai/structured-unstructured-embeddings',
     destination: '/docs/guides/ai/structured-unstructured',
@@ -2806,6 +2821,29 @@ module.exports = [
     source: '/docs/guides/platform/log-drains',
     destination: '/docs/guides/monitoring-troubleshooting/log-drains',
   },
+  {
+    // [Charis] This is a nice URL and I'm not 100% on permanently
+    // decommissioning it yet (cache-busting a permanent redirect could be a
+    // hassle if we ever resurrect it with new content)
+    permanent: false,
+    source: '/docs/guides/resources/examples',
+    destination: '/docs/guides/getting-started',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/connecting-to-postgres/serverless-drivers',
+    destination: '/docs/guides/database/connecting-to-postgres',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts',
+    destination: '/partners',
+  },
+  {
+    permanent: true,
+    source: '/partners/experts/:path*',
+    destination: '/partners',
+  },
 
   // marketing
 
@@ -2813,5 +2851,12 @@ module.exports = [
     permanent: true,
     source: '/changelogpod',
     destination: 'https://forms.supabase.com/changelog-podcast-sponsorship',
+  },
+
+  // features
+  {
+    permanent: true,
+    source: '/features/ai-query-assistance',
+    destination: '/features/ai-assistant',
   },
 ]

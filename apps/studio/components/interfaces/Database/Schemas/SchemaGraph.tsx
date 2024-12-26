@@ -1,22 +1,22 @@
-import type { PostgresSchema, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresSchema } from '@supabase/postgres-meta'
 import { Loader2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useState } from 'react'
 import ReactFlow, { Background, BackgroundVariant, MiniMap, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { Button, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
-import { TableNode } from 'ui-patterns/SchemaTableNode'
 import { SchemaGraphLegend } from './SchemaGraphLegend'
 import { getGraphDataFromTables, getLayoutedElementsViaDagre } from './Schemas.utils'
-import { useParams } from 'common'
+import { TableNode } from './SchemaTableNode'
 
 // [Joshen] Persisting logic: Only save positions to local storage WHEN a node is moved OR when explicitly clicked to reset layout
 
@@ -95,13 +95,11 @@ export const SchemaGraph = () => {
   useEffect(() => {
     if (isSuccessTables && isSuccessSchemas && tables.length > 0) {
       const schema = schemas.find((s) => s.name === selectedSchema) as PostgresSchema
-      getGraphDataFromTables(ref as string, schema, tables as PostgresTable[]).then(
-        ({ nodes, edges }) => {
-          reactFlowInstance.setNodes(nodes)
-          reactFlowInstance.setEdges(edges)
-          setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
-        }
-      )
+      getGraphDataFromTables(ref as string, schema, tables).then(({ nodes, edges }) => {
+        reactFlowInstance.setNodes(nodes)
+        reactFlowInstance.setEdges(edges)
+        setTimeout(() => reactFlowInstance.fitView({})) // it needs to happen during next event tick
+      })
     }
   }, [isSuccessTables, isSuccessSchemas, tables, resolvedTheme])
 
@@ -119,22 +117,21 @@ export const SchemaGraph = () => {
         {isSuccessSchemas && (
           <>
             <SchemaSelector
-              className="w-[260px]"
-              size="small"
+              className="w-[180px]"
+              size="tiny"
               showError={false}
               selectedSchemaName={selectedSchema}
               onSelectSchema={setSelectedSchema}
             />
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button type="default" onClick={resetLayout}>
-                  Auto layout
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom">
-                Automatically arrange the layout of all nodes
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            <ButtonTooltip
+              type="default"
+              onClick={resetLayout}
+              tooltip={{
+                content: { side: 'bottom', text: 'Automatically arrange the layout of all nodes' },
+              }}
+            >
+              Auto layout
+            </ButtonTooltip>
           </>
         )}
       </div>

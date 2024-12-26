@@ -1,3 +1,7 @@
+import type { ComponentProps } from 'react'
+
+import type { IconPanel } from 'ui-patterns/IconPanel'
+
 import type { GlobalMenuItems, NavMenuConstant, NavMenuSection } from '../Navigation.types'
 
 export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
@@ -44,11 +48,26 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             href: '/guides/realtime',
             level: 'realtime',
           },
+        ],
+        [
+          { label: 'Postgres Modules' },
           {
             label: 'AI & Vectors',
             icon: 'ai',
             href: '/guides/ai',
             level: 'ai',
+          },
+          {
+            label: 'Cron',
+            icon: 'cron',
+            href: '/guides/cron',
+            level: 'cron',
+          },
+          {
+            label: 'Queues',
+            icon: 'queues',
+            href: '/guides/queues',
+            level: 'queues',
           },
         ],
       ],
@@ -66,6 +85,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'local_development',
           },
           {
+            label: 'Deployment',
+            icon: 'deployment',
+            href: '/guides/deployment',
+            level: 'deployment',
+          },
+          {
             label: 'Self-Hosting',
             icon: 'self-hosting',
             href: '/guides/self-hosting',
@@ -77,12 +102,6 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             hasLightIcon: true,
             href: '/guides/integrations',
             level: 'integrations',
-          },
-          {
-            label: 'Deployment',
-            icon: 'deployment',
-            href: '/guides/deployment',
-            level: 'deployment',
           },
         ],
       ],
@@ -342,6 +361,16 @@ export const gettingstarted: NavMenuConstant = {
         {
           name: 'Swift',
           url: '/guides/getting-started/tutorials/with-swift',
+        },
+      ],
+    },
+    {
+      name: 'AI Prompts',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/getting-started/ai-prompts',
         },
       ],
     },
@@ -697,6 +726,54 @@ export const auth = {
   ],
 }
 
+const ormQuickstarts: NavMenuSection = {
+  name: 'ORM Quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'Prisma',
+      url: '/guides/database/prisma',
+      items: [
+        {
+          name: 'Prisma troubleshooting',
+          url: '/guides/database/prisma/prisma-troubleshooting',
+        },
+      ],
+    },
+    {
+      name: 'Drizzle',
+      url: '/guides/database/drizzle',
+    },
+    {
+      name: 'Postgres.js',
+      url: '/guides/database/postgres-js',
+    },
+  ],
+}
+
+const guiQuickstarts: NavMenuSection = {
+  name: 'GUI quickstarts',
+  url: undefined,
+  items: [
+    {
+      name: 'pgAdmin',
+      url: '/guides/database/pgadmin',
+    },
+    {
+      name: 'PSQL',
+      url: '/guides/database/psql',
+    },
+    {
+      name: 'DBeaver',
+      url: '/guides/database/dbeaver',
+    },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
+  ],
+}
+
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
@@ -710,12 +787,6 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
-          items: [
-            {
-              name: 'Serverless Drivers',
-              url: '/guides/database/connecting-to-postgres/serverless-drivers',
-            },
-          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -773,6 +844,16 @@ export const database: NavMenuConstant = {
         {
           name: 'Managing connections',
           url: '/guides/database/connection-management',
+        },
+      ],
+    },
+    {
+      name: 'OrioleDB',
+      url: undefined,
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/database/orioledb',
         },
       ],
     },
@@ -860,48 +941,8 @@ export const database: NavMenuConstant = {
         },
       ],
     },
-    {
-      name: 'ORM Quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'Prisma',
-          url: '/guides/database/prisma',
-          items: [
-            {
-              name: 'Prisma troubleshooting',
-              url: '/guides/database/prisma/prisma-troubleshooting',
-            },
-          ],
-        },
-        {
-          name: 'Drizzle',
-          url: '/guides/database/drizzle',
-        },
-        {
-          name: 'Postgres.js',
-          url: '/guides/database/postgres-js',
-        },
-      ],
-    },
-    {
-      name: 'GUI quickstarts',
-      url: undefined,
-      items: [
-        {
-          name: 'pgAdmin',
-          url: '/guides/database/pgadmin',
-        },
-        {
-          name: 'PSQL',
-          url: '/guides/database/psql',
-        },
-        {
-          name: 'DBeaver',
-          url: '/guides/database/dbeaver',
-        },
-      ],
-    },
+    ormQuickstarts,
+    guiQuickstarts,
     {
       name: 'Extensions',
       url: undefined,
@@ -940,7 +981,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pgrouting',
         },
         {
-          name: 'pg_cron: Job Scheduling',
+          name: 'pg_cron: Schedule Recurring Jobs',
           url: '/guides/database/extensions/pg_cron',
         },
         {
@@ -960,16 +1001,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg_net',
         },
         {
-          name: 'pg_partman: Partition Maintenance',
-          url: '/guides/database/extensions/pg_partman',
-        },
-        {
           name: 'pg_plan_filter: Restrict Total Cost',
           url: '/guides/database/extensions/pg_plan_filter',
         },
         {
           name: 'pg_stat_monitor: Extended Query Performance Monitoring',
           url: '/guides/database/extensions/pg_stat_monitor',
+        },
+        {
+          name: 'postgres_fdw: query data from an external Postgres server',
+          url: '/guides/database/extensions/postgres_fdw',
         },
         {
           name: 'pgvector: Embeddings and vector similarity',
@@ -1095,6 +1136,45 @@ export const database: NavMenuConstant = {
           name: 'Replicating from Supabase to External Postgres',
           url: '/guides/database/postgres/setup-replication-external',
         },
+      ],
+    },
+  ],
+}
+
+export const cron: NavMenuConstant = {
+  icon: 'cron',
+  title: 'Cron',
+  url: '/guides/cron',
+  items: [
+    { name: 'Overview', url: '/guides/cron' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [
+        { name: 'Install', url: '/guides/cron/install' },
+        { name: 'Quickstart', url: '/guides/cron/quickstart' },
+      ],
+    },
+  ],
+}
+
+export const queues: NavMenuConstant = {
+  icon: 'queues',
+  title: 'Queues',
+  url: '/guides/queues',
+  items: [
+    { name: 'Overview', url: '/guides/queues' },
+    {
+      name: 'Getting Started',
+      url: undefined,
+      items: [{ name: 'Quickstart', url: '/guides/queues/quickstart' }],
+    },
+    {
+      name: 'References',
+      url: undefined,
+      items: [
+        { name: 'API', url: '/guides/queues/api' },
+        { name: 'PGMQ Extension', url: '/guides/queues/pgmq' },
       ],
     },
   ],
@@ -1253,6 +1333,18 @@ export const functions: NavMenuConstant = {
         {
           name: 'Handling Routing in Functions',
           url: '/guides/functions/routing',
+        },
+        {
+          name: 'Background Tasks',
+          url: '/guides/functions/background-tasks',
+        },
+        {
+          name: 'Ephemeral Storage',
+          url: '/guides/functions/ephemeral-storage',
+        },
+        {
+          name: 'WebSockets',
+          url: '/guides/functions/websockets',
         },
         {
           name: 'Running AI Models',
@@ -1467,6 +1559,10 @@ export const realtime: NavMenuConstant = {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
         },
+        {
+          name: 'Migrate to Broadcast Changes',
+          url: '/guides/realtime/migrate-from-postgres-changes',
+        },
       ],
     },
     {
@@ -1476,6 +1572,7 @@ export const realtime: NavMenuConstant = {
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
         { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
+        { name: 'Benchmarks', url: '/guides/realtime/benchmarks' },
       ],
     },
     {
@@ -1809,23 +1906,70 @@ export const local_development: NavMenuConstant = {
   ],
 }
 
-export const MIGRATION_PAGES: Partial<NavMenuSection>[] = [
-  { name: 'Amazon RDS', url: '/guides/platform/migrating-to-supabase/amazon-rds' },
-  { name: 'Auth0', url: '/guides/platform/migrating-to-supabase/auth0' },
-  { name: 'Firebase Auth', url: '/guides/platform/migrating-to-supabase/firebase-auth' },
+export const MIGRATION_PAGES: Partial<NavMenuSection & ComponentProps<typeof IconPanel>>[] = [
   {
-    name: 'Firebase Firestore',
+    name: 'Auth0',
+    icon: '/docs/img/icons/auth0-icon',
+    url: '/guides/platform/migrating-to-supabase/auth0',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Firebase Auth',
+    icon: '/docs/img/icons/firebase-icon',
+    url: '/guides/platform/migrating-to-supabase/firebase-auth',
+  },
+  {
+    name: 'Firestore Data',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firestore-data',
   },
   {
     name: 'Firebase Storage',
+    icon: '/docs/img/icons/firebase-icon',
     url: '/guides/platform/migrating-to-supabase/firebase-storage',
   },
-  { name: 'Heroku Postgres', url: '/guides/platform/migrating-to-supabase/heroku' },
-  { name: 'MySQL', url: '/guides/platform/migrating-to-supabase/mysql' },
-  { name: 'MSSQL', url: '/guides/platform/migrating-to-supabase/mssql' },
-  { name: 'Postgres', url: '/guides/platform/migrating-to-supabase/postgres' },
-  { name: 'Render', url: '/guides/platform/migrating-to-supabase/render' },
+  {
+    name: 'Heroku',
+    icon: '/docs/img/icons/heroku-icon',
+    url: '/guides/platform/migrating-to-supabase/heroku',
+  },
+  {
+    name: 'Render',
+    icon: '/docs/img/icons/render-icon',
+    url: '/guides/platform/migrating-to-supabase/render',
+  },
+  {
+    name: 'Amazon RDS',
+    icon: '/docs/img/icons/aws-rds-icon',
+    url: '/guides/platform/migrating-to-supabase/amazon-rds',
+  },
+  {
+    name: 'Postgres',
+    icon: '/docs/img/icons/postgres-icon',
+    url: '/guides/platform/migrating-to-supabase/postgres',
+  },
+  {
+    name: 'Vercel Postgres',
+    icon: '/docs/img/icons/vercel-icon',
+    url: '/guides/platform/migrating-to-supabase/vercel-postgres',
+    hasLightIcon: true,
+  },
+  {
+    name: 'Neon',
+    icon: '/docs/img/icons/neon-icon',
+    url: '/guides/platform/migrating-to-supabase/neon',
+    hasLightIcon: true,
+  },
+  {
+    name: 'MySQL',
+    icon: '/docs/img/icons/mysql-icon',
+    url: '/guides/platform/migrating-to-supabase/mysql',
+  },
+  {
+    name: 'MSSQL',
+    icon: '/docs/img/icons/mssql-icon',
+    url: '/guides/platform/migrating-to-supabase/mssql',
+  },
 ]
 
 export const platform: NavMenuConstant = {
@@ -1837,7 +1981,6 @@ export const platform: NavMenuConstant = {
       name: 'Add-ons',
       url: undefined,
       items: [
-        { name: 'Compute Add-ons', url: '/guides/platform/compute-add-ons' },
         { name: 'Custom Domains', url: '/guides/platform/custom-domains' },
         { name: 'Database Backups', url: '/guides/platform/backups' },
         { name: 'IPv4 Address', url: '/guides/platform/ipv4-address' },
@@ -1895,8 +2038,10 @@ export const platform: NavMenuConstant = {
       url: undefined,
       items: [
         { name: 'Regions', url: '/guides/platform/regions' },
+        { name: 'Compute and Disk', url: '/guides/platform/compute-and-disk' },
         { name: 'Database Size', url: '/guides/platform/database-size' },
         { name: 'Fly Postgres', url: '/guides/platform/fly-postgres' },
+        { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
         {
           name: 'Network Restrictions',
           url: '/guides/platform/network-restrictions',
@@ -2077,6 +2222,7 @@ export const deployment: NavMenuConstant = {
       name: 'Environments',
       items: [
         { name: 'Managing environments', url: '/guides/deployment/managing-environments' },
+        { name: 'Database migrations', url: '/guides/deployment/database-migrations' },
         { name: 'Branching', url: '/guides/deployment/branching' },
       ],
     },
@@ -2493,4 +2639,6 @@ export const navDataForMdx = {
   nativeMobileLoginItems: NativeMobileLoginItems,
   phoneLoginsItems: PhoneLoginsItems,
   socialLoginItems: SocialLoginItems,
+  ormQuickstarts,
+  guiQuickstarts,
 }

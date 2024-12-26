@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Calendar, ExternalLink } from 'lucide-react'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 
 import {
@@ -13,12 +13,12 @@ import AlertError from 'components/ui/AlertError'
 import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
-import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Alert, Button } from 'ui'
+import { Admonition } from 'ui-patterns'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
@@ -40,9 +40,6 @@ const Subscription = () => {
     isError,
     isSuccess,
   } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: canReadSubscriptions })
-
-  const { mutate: cancelSubscriptionSchedule, isLoading: cancelSubscriptionScheduleLoading } =
-    useOrganizationBillingSubscriptionCancelSchedule()
 
   const currentPlan = subscription?.plan
   const planName = currentPlan?.name ?? 'Unknown'
@@ -99,38 +96,6 @@ const Subscription = () => {
                     </p>
                   </div>
 
-                  {subscription?.scheduled_plan_change &&
-                    subscription?.scheduled_plan_change?.target_plan !== subscription.plan.id && (
-                      <Alert_Shadcn_ className="mb-2" title="Scheduled downgrade">
-                        <Calendar className="h-4 w-4" />
-                        <AlertTitle_Shadcn_>Scheduled downgrade</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                          <div>
-                            Your organization will automatically be downgraded from the{' '}
-                            <span>{subscription.plan.name}</span> plan to the{' '}
-                            <span className="capitalize">
-                              {subscription?.scheduled_plan_change?.target_plan}
-                            </span>{' '}
-                            plan on{' '}
-                            {dayjs(subscription?.scheduled_plan_change?.at).format('MMMM D, YYYY')}.
-                            If you would like to stay on the <span>{subscription.plan.name}</span>{' '}
-                            plan, cancel the scheduled downgrade.
-                          </div>
-                          <div>
-                            <Button
-                              type="default"
-                              loading={cancelSubscriptionScheduleLoading}
-                              onClick={() => {
-                                return cancelSubscriptionSchedule({ slug: slug! })
-                              }}
-                            >
-                              Cancel downgrade
-                            </Button>
-                          </div>
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
-
                   <div>
                     <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                       <Button
@@ -177,48 +142,30 @@ const Subscription = () => {
                   </div>
 
                   {!subscription?.usage_billing_enabled && (
-                    <Alert
-                      withIcon
-                      variant="info"
+                    <Admonition
+                      type="default"
                       title="This organization is limited by the included usage"
-                      actions={
-                        currentPlan?.id === 'free' ? (
-                          <Button
-                            type="default"
-                            onClick={() => snap.setPanelKey('subscriptionPlan')}
-                          >
-                            Upgrade Plan
-                          </Button>
-                        ) : (
-                          <Button type="default" onClick={() => snap.setPanelKey('costControl')}>
-                            Adjust Spend Cap
-                          </Button>
-                        )
-                      }
                     >
-                      <div className="text-sm text-foreground-light mr-2">
-                        When this organization exceeds its{' '}
-                        <Link
-                          href={`/org/${slug}/usage`}
-                          className="text-sm text-green-900 transition hover:text-green-1000"
-                        >
-                          included usage quotas
-                        </Link>
-                        , its projects may become unresponsive.{' '}
-                        {currentPlan?.id === 'free' ? (
-                          <p className="pr-4 mt-1">
-                            If you wish to exceed the included usage, you should upgrade to a paid
-                            plan.
-                          </p>
-                        ) : (
-                          <p className="pr-4 mt-1">
-                            You currently have Spend Cap enabled - when you exceed your plan's
-                            limit, you will experience restrictions. To scale seamlessly and pay for
-                            over-usage, you can adjust your Cost Control settings.
-                          </p>
-                        )}
+                      <div className="[&>p]:!leading-normal prose text-sm">
+                        Projects may become unresponsive when this organization exceeds its{' '}
+                        <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
+                        seamlessly and pay for over-usage,{' '}
+                        {currentPlan?.id === 'free'
+                          ? 'upgrade to a paid plan.'
+                          : 'you can disable Spend Cap under the Cost Control settings.'}
                       </div>
-                    </Alert>
+                      <Button
+                        type="default"
+                        className="mt-1"
+                        onClick={() =>
+                          snap.setPanelKey(
+                            currentPlan?.id === 'free' ? 'subscriptionPlan' : 'costControl'
+                          )
+                        }
+                      >
+                        {currentPlan?.id === 'free' ? 'Upgrade Plan' : 'Adjust Spend Cap'}
+                      </Button>
+                    </Admonition>
                   )}
 
                   <SparkBar
