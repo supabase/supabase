@@ -24,7 +24,7 @@ const signInSchema = object({
 const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const [lastSignIn, setLastSignIn] = useLastSignIn()
+  const [_, setLastSignIn] = useLastSignIn()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
