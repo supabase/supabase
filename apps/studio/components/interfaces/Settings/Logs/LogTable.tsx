@@ -5,6 +5,7 @@ import { ChevronDown, Clipboard, Download, Eye, EyeOff, Play } from 'lucide-reac
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
 import { toast } from 'sonner'
+import Papa from 'papaparse'
 
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import CSVButton from 'components/ui/CSVButton'
@@ -258,6 +259,18 @@ const LogTable = ({
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => {
+                const csvData = Papa.unparse(data)
+                copyToClipboard(csvData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
+              <Clipboard size={14} />
+              <div>Copy as CSV</div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
                 copyToClipboard(stringData, () => {
                   toast.success('Results copied to clipboard')
                 })
@@ -265,7 +278,7 @@ const LogTable = ({
               className="space-x-2"
             >
               <Clipboard size={14} />
-              <div>Copy to clipboard</div>
+              <div>Copy as JSON</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
