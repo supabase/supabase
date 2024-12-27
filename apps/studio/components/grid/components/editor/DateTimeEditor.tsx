@@ -73,7 +73,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           onEnter={saveChanges}
         >
           <Input
-            autoFocus
+            ref={ref}
             value={inputValue ?? ''}
             placeholder={FORMAT_MAP[type]}
             onChange={(e) => setInputValue(e.target.value)}
