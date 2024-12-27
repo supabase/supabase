@@ -267,6 +267,17 @@ const LogTable = ({
               <Clipboard size={14} />
               <div>Copy to clipboard</div>
             </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                copyToClipboard(stringData, () => {
+                  toast.success('Results copied to clipboard')
+                })
+              }}
+              className="space-x-2"
+            >
+              <Clipboard size={14} />
+              <div>Copy as JSON</div>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
