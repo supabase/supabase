@@ -26,6 +26,8 @@ export enum TelemetryActions {
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
+  PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
+
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
   REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
   REALTIME_INSPECTOR_MESSAGE_CLICKED = 'realtime_inspector_message_clicked',
@@ -206,5 +208,22 @@ export interface FeaturePreviewDisabledEvent {
      * Feature key of the preview that was disabled. e.g. supabase-ui-api-side-panel
      */
     feature: string
+  }
+}
+
+/**
+ * First step of project creation was submitted, where the user writes a prompt or select to start blank or to migrate.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
+  properties: {
+    /**
+     * Records what the user selected in the first step of project creation.
+     */
+    onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
   }
 }

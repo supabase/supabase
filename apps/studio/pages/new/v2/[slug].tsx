@@ -89,6 +89,8 @@ import InitialStep from 'components/interfaces/ProjectCreation/InitialStep'
 import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
 import { ScrollGradient } from 'components/ui/ScrollGradient'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -214,6 +216,8 @@ const WizardForm = () => {
       router.push(`/project/${res.ref}/building`)
     },
   })
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
@@ -470,11 +474,19 @@ const WizardForm = () => {
                   setFormDescription(
                     'We have generated a starting schema for you based on your description'
                   )
+                  sendEvent({
+                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                    properties: { onboardingPath: 'use_prompt' },
+                  })
                   setStep(2)
                 }}
                 onStartBlank={() => {
                   setFormTitle('Start from Scratch')
                   setFormDescription('Configure your new blank project')
+                  sendEvent({
+                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                    properties: { onboardingPath: 'start_blank' },
+                  })
                   setStep(2)
                 }}
                 onMigrate={() => {
@@ -482,6 +494,10 @@ const WizardForm = () => {
                   setFormDescription(
                     'First we need to create a new project to migrate your database to'
                   )
+                  sendEvent({
+                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED,
+                    properties: { onboardingPath: 'migrate' },
+                  })
                   setStep(2)
                 }}
               />
