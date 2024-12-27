@@ -61,6 +61,7 @@
     "js-yaml": "^3.14.1",
     "jsrsasign": "^11.0.0",
     "katex": "^0.16.10",
+    "libpg-query": "15.2.0",
     "lodash": "^4.17.21",
     "lucide-react": "*",
     "markdown-toc": "^1.2.0",
