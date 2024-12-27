@@ -475,9 +475,6 @@ importers:
       globby:
         specifier: ^13.2.2
         version: 13.2.2
-      nextjs-node-loader:
-        specifier: ^1.1.5
-        version: 1.1.5(webpack@5.94.0)
       npm-run-all:
         specifier: ^4.1.5
         version: 4.1.5
@@ -8829,10 +8826,6 @@ packages:
     resolution: {integrity: sha512-I5d00Pd/jwMD2QCduo657+YM/6L3KZu++pmX9VFncxaxvHcru9jx1lBaFft+r4Mt2jK0Yhp41XlRAihzPxHNCg==}
     engines: {node: '>=4.0.0'}
 
-  loader-utils@2.0.4:
-    resolution: {integrity: sha512-xXqpXoINfFhgua9xiqD8fPFHgkoq1mmmpE92WlDbm9rNRd/EbRb+Gqf908T2DMfuHjjJlksiK2RbHVOdD/MqSw==}
-    engines: {node: '>=8.9.0'}
-
   local-pkg@0.5.0:
     resolution: {integrity: sha512-ok6z3qlYyCDS4ZEU27HaU6x/xZa9Whf8jD4ptH5UZTQYZVYeb9bnZ3ojVhiJNLiXK1Hfc0GNbLXcmZ5plLDDBg==}
     engines: {node: '>=14'}
@@ -9716,12 +9709,6 @@ packages:
         optional: true
       sass:
         optional: true
-
-  nextjs-node-loader@1.1.5:
-    resolution: {integrity: sha512-tS2wWPh8QsQHBVNG8w7xzL3ua+OFnmFvcOFxrAQsfK4T017nOiCUrybVWVieilEn1z8CqODcRw1z70mFRPQi1Q==}
-    engines: {node: '>= 10.13.0'}
-    peerDependencies:
-      webpack: ^5.76.0
 
   nice-try@1.0.5:
     resolution: {integrity: sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==}
@@ -21279,12 +21266,6 @@ snapshots:
       emojis-list: 3.0.0
       json5: 1.0.2
 
-  loader-utils@2.0.4:
-    dependencies:
-      big.js: 5.2.2
-      emojis-list: 3.0.0
-      json5: 2.2.3
-
   local-pkg@0.5.0:
     dependencies:
       mlly: 1.7.1
@@ -22750,11 +22731,6 @@ snapshots:
     transitivePeerDependencies:
       - '@babel/core'
       - babel-plugin-macros
-
-  nextjs-node-loader@1.1.5(webpack@5.94.0):
-    dependencies:
-      loader-utils: 2.0.4
-      webpack: 5.94.0
 
   nice-try@1.0.5: {}
 
