@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "predev": "pnpm run codegen:references",
+    "predev": "pnpm run codegen:references && cp -r ../../examples ./content",
     "dev": "next dev --port 3001",
     "dev:secrets:pull": "AWS_PROFILE=supabase-dev node ../../scripts/getSecrets.js -n local/docs",
-    "prebuild": "pnpm run codegen:references",
+    "prebuild": "pnpm run codegen:references & cp -r ../../examples ./content",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
@@ -25,7 +25,7 @@
     "last-changed:reset": "pnpm run last-changed -- --reset",
     "codegen:references": "tsx features/docs/Reference.generated.script.ts",
     "codemod:frontmatter": "node ./scripts/codemod/mdx-meta.mjs && prettier --write \"content/**/*.mdx\"",
-    "clean": "rimraf node_modules ./docs/features/docs/generated"
+    "clean": "rimraf node_modules ./docs/features/docs/generated ./content/examples"
   },
   "dependencies": {
     "@code-hike/mdx": "^0.9.0",
