@@ -61,7 +61,7 @@ const nextConfig = {
       '/guides/**/*': [
         './content/guides/**/*',
         './content/troubleshooting/**/*',
-        './content/prompts/**/*',
+        './content/examples/**/*',
       ],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
