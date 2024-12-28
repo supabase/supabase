@@ -9,7 +9,7 @@ import { getAiPrompts } from './getting-started/ai-prompts/[slug]/AiPrompts.util
 
 // Revalidate occasionally to pick up changes to partners
 // 60 seconds/minute * 60 minutes/hour * 24 hours/day
-export const revalidate = 86_400
+// export const revalidate = 86_400
 
 const GuidesLayout = async ({ children }: PropsWithChildren) => {
   const [partnerNavItems, promptNavItems] = await Promise.all([getPartners(), getPrompts()])
