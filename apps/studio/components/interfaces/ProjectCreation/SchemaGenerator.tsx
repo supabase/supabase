@@ -7,6 +7,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Label_Shadcn_ } from 'ui'
 import { BASE_PATH } from 'lib/constants'
 import { useState, useEffect } from 'react'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from 'lib/constants/telemetry'
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
@@ -30,6 +32,9 @@ export const SchemaGenerator = ({
 }: Props) => {
   const [input, setInput] = useState('')
   const [hasSql, setHasSql] = useState(false)
+
+  const [promptIntendSent, setPromptIntendSent] = useState(false)
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const {
     messages,
@@ -151,6 +156,12 @@ export const SchemaGenerator = ({
             onKeyDown={(e) => {
               if (!(e.target instanceof HTMLTextAreaElement)) {
                 return
+              }
+              if (!promptIntendSent && e.target.value.length > 5) {
+                sendEvent({
+                  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED,
+                })
+                setPromptIntendSent(true)
               }
               if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
                 e.preventDefault()

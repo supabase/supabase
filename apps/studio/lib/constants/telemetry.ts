@@ -26,6 +26,7 @@ export enum TelemetryActions {
   FEATURE_PREVIEW_ENABLED = 'feature_preview_enabled',
   FEATURE_PREVIEW_DISABLED = 'feature_preview_disabled',
 
+  PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
   PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
 
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
@@ -209,6 +210,17 @@ export interface FeaturePreviewDisabledEvent {
      */
     feature: string
   }
+}
+
+/**
+ * At least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
 }
 
 /**
