@@ -44,17 +44,19 @@ breadcrumb: 'Migrations'
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
       ```
 
-      If you are unsure about which connection string to use, use the Session pooler connection string.
+      <Admonition type="info">
+        Use the Session pooler connection string if you are not sure which connection string to use.
+      </Admonition>
+
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Get your database password" fullWidth>
-      If you do not have your database password, you can reset your password in your [Database
-      Settings](https://supabase.com/dashboard/project/_/settings/database)
+      You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
 
-      Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
+      Replace ```[YOUR-PASSWORD]``` with the database password in the connection string from Step 3.
 
     </StepHikeCompact.Details>
 
@@ -64,14 +66,15 @@ breadcrumb: 'Migrations'
       <StepHikeCompact.Details title="Backup your Project with the CLI" fullWidth>
        Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
 
-       ```bash
+        ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
         ```
+
         ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
         ```
 
-      ```bash
+        ```bash
         supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only
         ```
       </StepHikeCompact.Details>
@@ -107,17 +110,18 @@ breadcrumb: 'Migrations'
           postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
         ```
 
-        If you are unsure about which connection string to use, use the Session pooler connection string.
+        <Admonition type="info">
+          Use the Session pooler connection string if you are not sure which connection string to use.
+        </Admonition>
       </StepHikeCompact.Details>
 
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
       <StepHikeCompact.Details title="Get your database password" fullWidth>
-        If you do not have your database password, you can reset your password in your [Database
-        Settings](https://supabase.com/dashboard/project/_/settings/database)
+        You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
 
-        Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
+        Replace ```[YOUR-PASSWORD]``` with the database password in the connection string from Step 1.
 
       </StepHikeCompact.Details>
 

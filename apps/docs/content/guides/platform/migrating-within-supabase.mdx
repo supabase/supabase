@@ -1,6 +1,6 @@
 ---
 title: Migrating within Supabase
-subtitle: Migrate from one Supabase project to another
+subtitle: Learn how to migrate from one Supabase project to another
 ---
 
 <Admonition type="caution">
@@ -8,14 +8,18 @@ subtitle: Migrate from one Supabase project to another
   to another project feature](/docs/guides/platform/backups#restore-to-a-new-project)
 </Admonition>
 
-### How to Migrate your Database
+## Database migration guides
 
-You can migrate your database to a different Supabase project. For example, one possible reason you may need to do this is if your project has been paused for longer than 90 days and is no longer restorable.
+If you need to migrate from one Supabase project to another, choose the appropriate guide below based on your backup file format:
 
-If you have a dashboard backup file (\*.backup), follow the [Restore dashboard backup guide](/docs/guides/platform/migrating-within-supabase/dashboard_restore)
+### Dashboard backup file (\*.backup)
 
-If you have SQL backup files (\*.sql), follow the [Backup and Restore using the CLI guide](/docs/guides/platform/migrating-within-supabase/backup-restore)
+Follow the [Restore dashboard backup guide](/docs/guides/platform/migrating-within-supabase/dashboard_restore)
 
-### Transfer my project to a different organization
+### SQL backup files (\*.sql)
+
+Follow the [Backup and Restore using the CLI guide](/docs/guides/platform/migrating-within-supabase/backup-restore)
+
+## Transfer my project to a different organization
 
 Project migration is primarily for changing regions or upgrading to new major versions of the platform in some scenarios. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).

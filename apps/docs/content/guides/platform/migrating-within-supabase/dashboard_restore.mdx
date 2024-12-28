@@ -29,13 +29,11 @@ breadcrumb: 'Migrations'
       id="item-2"
     >
       <StepHikeCompact>
-
       <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create New project" fullWidth>
           Create a new [Supabase project](https://database.new)
         </StepHikeCompact.Details>
       </StepHikeCompact.Step>
-
         <StepHikeCompact.Step step={2}>
           <StepHikeCompact.Details title="Configure your new project" fullWidth>
                 In your new project:
@@ -46,7 +44,6 @@ breadcrumb: 'Migrations'
           </StepHikeCompact.Details>
         </StepHikeCompact.Step>
       </StepHikeCompact>
-
     </AccordionItem>
 
   </div>
@@ -67,11 +64,9 @@ breadcrumb: 'Migrations'
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
-
 <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Get your database password" fullWidth>
-    If you do not have your database password, you can reset your password in your [Database
-    Settings](https://supabase.com/dashboard/project/_/settings/database)
+    You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
 
     Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
 
@@ -95,7 +90,7 @@ breadcrumb: 'Migrations'
 
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Restore your backup" fullWidth>
-      Run this command after replacing ```[CONNECTION_STRING]``` and ```/file/path``` with the values from the previous steps:
+      Run this command after replacing ```[CONNECTION_STRING]``` from Step 1 & 2 and ```/file/path``` with the path from Step 3:
 
       <StepHikeCompact.Code>
 
@@ -113,22 +108,15 @@ breadcrumb: 'Migrations'
 
 After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
 
-The easiest option would be to use the Google colab script to migrate your downloaded storage objects to the new s3 buckets. However, if you want to run this process locally, scripts are also provided for you to use.
+There is a Google colab script provided below to walk you through migrating your downloaded storage objects to your new project S3 buckets.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
 
 <Admonition type="info">
   The Google Colab script would require uploading the storage objects to Google colab first and then
   upload it to your S3 buckets. This can add significant time to the process if your storage objects
   are large in size.
-</Admonition>
 
-<Tabs scrollable size="small" type="underlined" defaultActiveId="colab">
-  <TabPanel id="colab" label="Google Colab">
-    [https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing](https://colab.research.google.com/drive/1uNh0fyWg27HuVmqMOj6piZOFZrTcG_KJ?usp=sharing)
-  </TabPanel>
-  <TabPanel id="js" label="Javascript">
-    ```JS code```
-  </TabPanel>
-  <TabPanel id="py" label="Python">
-    ```Python Code```
-  </TabPanel>
-</Tabs>
+You may want to potentially adapt the script to run locally if you have very large storage objects.
+
+</Admonition>
