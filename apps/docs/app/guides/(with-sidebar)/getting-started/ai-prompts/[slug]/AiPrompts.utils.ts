@@ -6,9 +6,9 @@ import { basename, extname, join } from 'node:path'
 import { cache } from 'react'
 import { visit, EXIT } from 'unist-util-visit'
 
-import { EXAMPLES_DIRECTORY } from '~/lib/docs'
+import { CONTENT_DIRECTORY } from '~/lib/docs'
 
-const PROMPTS_DIRECTORY = join(EXAMPLES_DIRECTORY, 'prompts')
+const PROMPTS_DIRECTORY = join(CONTENT_DIRECTORY, 'prompts')
 
 function parseMarkdown(markdown: string) {
   const mdast = fromMarkdown(markdown)
