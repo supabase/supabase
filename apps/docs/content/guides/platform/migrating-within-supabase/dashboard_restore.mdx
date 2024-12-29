@@ -25,7 +25,7 @@ breadcrumb: 'Migrations'
   </div>
   <div className="border-b mt-3 pb-3">
     <AccordionItem
-      header="Create and configure a new Supabase project"
+      header="Create and configure a new project"
       id="item-2"
     >
       <StepHikeCompact>
@@ -53,58 +53,97 @@ breadcrumb: 'Migrations'
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
-      Go to your [Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
-
-      ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
-      ```
+    <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
+      Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="info">
-        Use the Session pooler connection string if you are not sure which connection string to use.
+        Use the Session pooler connection string if there are any doubts. If you are sure that you have an IPv6 compatible connection, then you can use the direct connection string instead.
       </Admonition>
+
+      Session pooler connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+      ```
+
+      Direct connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+      ```
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 <StepHikeCompact.Step step={2}>
-  <StepHikeCompact.Details title="Get your database password" fullWidth>
-    You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+  <StepHikeCompact.Details title="Get the database password" fullWidth>
+    Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
-    Replace ```[YOUR-PASSWORD]``` with your actual database password in the connection string from Step 1.
+    Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
 
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>
 
 <StepHikeCompact.Step step={3}>
-  <StepHikeCompact.Details title="Get your file path to your downloaded backup" fullWidth>
-    You will want to get your filepath relative to what directory you are running your terminal
-    from. If you are running your terminal from the Desktop folder, your "/file/path" would be:
-    ```./filename.backup```
+  <StepHikeCompact.Details title="Get the downloaded backup file path" fullWidth>
+    Get the relative file path of the downloaded backup file. 
+    
+    If the restore is done in the same directory as the downloaded backup, the file path would look like this:
+
+    ```./backup_name.backup```
+
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>
 
 <StepHikeCompact.Step step={4}>
-  <StepHikeCompact.Details title="Verify your backup file format" fullWidth>
-    The backup file might be gzipped and have a .gz file extension. You will need to decompress it
-    and the file you use should look like this: ```backup_name.backup ```
+  <StepHikeCompact.Details title="Verify the backup file format" fullWidth>
+    The backup file will be gzipped with a .gz extension. You will need to unzip the file to look like this:
+
+    `backup_name.backup`
+
   </StepHikeCompact.Details>
 </StepHikeCompact.Step>
 
 <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Restore your backup" fullWidth>
-      Run this command after replacing ```[CONNECTION_STRING]``` from Step 1 & 2 and ```/file/path``` with the path from Step 3:
-
       <StepHikeCompact.Code>
-
         ```sql
         psql -d [CONNECTION_STRING] -f /file/path
         ```
       </StepHikeCompact.Code>
+
+      Replace ```[CONNECTION_STRING]``` with connection string from Steps 1 & 2.
+
+      Replace ```/file/path``` with the file path from Step 3.
+
+      Run the command with the replaced values to restore the backup to your new project.
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
-## Common issues
+
+## Migrate storage objects to new project's S3 storage
+
+<Admonition type="info">
+  The Google Colab migration script requires uploading to Google colab first and then to the S3
+  buckets. This could add significant upload time if there are large storage objects.
+</Admonition>
+After restoring the backup, the buckets and files metadata will show up in the dashboard of the new project.
+However, the storage files stored in the S3 buckets would not be present.
+
+Use the following Google colab script provided below to migrate your downloaded storage objects to your new project's S3 buckets.
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+
+## Common errors with the backup restore process
+
+"**ERROR: must be member of role ROLE**"
+"**ERROR: grant options cannot be granted back to your own grantor**"
+"**ERROR: constraint CONSTRAINT for relation RELATION already exists**"
+"**...Too many to list here**"
+
+These are expected to happen when restoring the backup to a new Supabase project. The backup provided by the dashboard is a full dump which contains the CREATE commands for all schemas. Upon Supabase project creation, the CREATE and other commands are run for schemas such as auth and storage before the restore process is run. As a result, the restoration process will fail when running these commands that have already been applied to the project on creation.
+
+This is by design as the full dump allows you to rebuild the entire database from scratch even outside of Supabase. It is not a problem because it will skip to the next command to run in these scenarios. Another reason that errors can happen is due to triggers in your database being run during the restoration. This can happen because this method of restoring the backup cannot set the session variable "session_replication_role" to "replica" to avoid this.
+
+There are circumstances where this method can fail and if it does, you should reach out to Supabase support for help.
 
 "**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: received invalid response to GSSAPI negotiation:**"
 
@@ -113,29 +152,3 @@ The most likely reason for this is that you are using psql and postgres version 
 "**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: error received from server in SCRAM exchange: Wrong password**"
 
 If you reset your password for your project, it may take a few minutes for it to reflect. Try again after a few minutes and it should be fine assuming you correctly set the password in the connection string.
-
-"**ERROR: must be member of role ROLE**"
-"**ERROR: grant options cannot be granted back to your own grantor**"
-"**ERROR: constraint CONSTRAINT for relation RELATION already exists**"
-"**ERROR: ...**"
-
-These are normal and expected unless something is broken in the project. The reason for these errors is due to the Dashboard backup being a full database dump that is ideal to completely rebuild the database from scratch. This is intended to give you the option to restore your database anywhere a Postgres database can be restored even outside of Supabase.
-
-However, as you created a new project to restore to, Supabase configures and sets up various aspects that the full database dump would also try to re-create. The errors are due to those parts already being created and setup.
-
-## Migrate storage objects to new project's S3 storage
-
-After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
-
-There is a Google colab script provided below to walk you through migrating your downloaded storage objects to your new project S3 buckets.
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
-
-<Admonition type="info">
-  The Google Colab script would require uploading the storage objects to Google colab first and then
-  upload it to your S3 buckets. This can add significant time to the process if your storage objects
-  are large in size.
-
-You may want to potentially adapt the script to run locally if you have very large storage objects.
-
-</Admonition>

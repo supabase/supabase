@@ -63,7 +63,7 @@
         <StepHikeCompact.Step step={3}>
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-              Close and re-open your shell/terminal and run the following command:
+              restart your terminal and run the following command:
 
               <StepHikeCompact.Code>
                 ```sql
@@ -71,7 +71,7 @@
                 ```
               </StepHikeCompact.Code>
 
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your shell/terminal.
+              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
 
               You can add the postgres installation path to your PATH variable by running the following to get the path for postgresql:
 
@@ -79,7 +79,7 @@
                 brew info postgresql@17
               ```
 
-              You should get a response that looks like this:
+              You should get a response containing something like this:
 
               ```
                 If you need to have postgresql@17 first in your PATH, run:

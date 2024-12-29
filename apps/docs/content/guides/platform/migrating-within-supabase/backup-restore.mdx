@@ -21,7 +21,7 @@ breadcrumb: 'Migrations'
   </div>
 </Accordion>
 
-## Backup your old database using the CLI
+## Backup database using the CLI
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
@@ -37,33 +37,38 @@ breadcrumb: 'Migrations'
 </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Get your database connection string" fullWidth>
-      Go to your [Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
-
-      ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
-      ```
+    <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
+      Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="info">
-        Use the Session pooler connection string if you are not sure which connection string to use.
+        Use the Session pooler connection string if there are any doubts. If you are sure that you have an IPv6 compatible connection, then you can use the direct connection string instead.
       </Admonition>
 
+      Session pooler connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+      ```
+
+      Direct connection string:
+      ```bash
+        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+      ```
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Get your database password" fullWidth>
-      You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+    <StepHikeCompact.Details title="Get the database password" fullWidth>
+      Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
-      Replace ```[YOUR-PASSWORD]``` with the database password in the connection string from Step 3.
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
 
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={5}>
-      <StepHikeCompact.Details title="Backup your Project with the CLI" fullWidth>
+      <StepHikeCompact.Details title="Backup database" fullWidth>
        Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
 
         ```bash
@@ -82,52 +87,58 @@ breadcrumb: 'Migrations'
 
 </StepHikeCompact>
 
-## Restore to new database using CLI
+## Restore backup using CLI
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create New project" fullWidth>
-          You can create a new [Supabase project here](https://database.new)
+        <StepHikeCompact.Details title="Create project" fullWidth>
+          Create a [new project](https://database.new)
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={1}>
-      <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
-        In your new project:
-
-        - If you were using Webhooks, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
-        - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
-        - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables where you had it enabled
-      </StepHikeCompact.Details>
-
-    </StepHikeCompact.Step>
-
-    <StepHikeCompact.Step step={1}>
-      <StepHikeCompact.Details title="Get your new database connection string" fullWidth>
-        Go to your [new Supabase project page](https://supabase.com/dashboard/project/_/) and click the connect button at the top of the page to get your project's connection string. It will look similar to this:
-
-        ```bash
-          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
-        ```
-
-        <Admonition type="info">
-          Use the Session pooler connection string if you are not sure which connection string to use.
-        </Admonition>
-      </StepHikeCompact.Details>
-
-    </StepHikeCompact.Step>
-
     <StepHikeCompact.Step step={2}>
-      <StepHikeCompact.Details title="Get your database password" fullWidth>
-        You can reset your database password if necessary in your [Database Settings](https://supabase.com/dashboard/project/_/settings/database)
+      <StepHikeCompact.Details title="Configure newly created project" fullWidth>
+        In the new project:
 
-        Replace ```[YOUR-PASSWORD]``` with the database password in the connection string from Step 1.
-
+        - If Webhooks were used in the old database, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
+        - If any non-default extensions were used in the old database, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
+        - If Replication for Realtime was used in the old database, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables necessary
       </StepHikeCompact.Details>
 
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
+      <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
+        Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+
+        <Admonition type="info">
+          Use the Session pooler connection string if there are any doubts. If you are sure that you have an IPv6 compatible connection, then you can use the direct connection string instead.
+        </Admonition>
+
+        Session pooler connection string:
+        ```bash
+          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:5432/postgres
+        ```
+
+        Direct connection string:
+        ```bash
+          postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+        ```
+      </StepHikeCompact.Details>
+
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Get the database password" fullWidth>
+      Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+
+      Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
+
+    </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={5}>
       <StepHikeCompact.Details title="Restore your Project with the CLI" fullWidth>
         <Tabs
           scrollable
