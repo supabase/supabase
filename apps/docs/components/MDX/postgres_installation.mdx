@@ -55,7 +55,7 @@
 
             <StepHikeCompact.Code>
                 ```sql
-                  brew install postgresql@15
+                  brew install postgresql@17
                 ```
             </StepHikeCompact.Code>
           </StepHikeCompact.Details>
@@ -63,7 +63,7 @@
         <StepHikeCompact.Step step={3}>
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-              Open your shell/terminal and run the following command:
+              Close and re-open your shell/terminal and run the following command:
 
               <StepHikeCompact.Code>
                 ```sql
@@ -76,19 +76,21 @@
               You can add the postgres installation path to your PATH variable by running the following to get the path for postgresql:
 
               ```sql
-                brew info postgresql@15
+                brew info postgresql@17
               ```
 
               You should get a response that looks like this:
 
               ```
-                If you need to have postgresql@15 first in your PATH, run:
+                If you need to have postgresql@17 first in your PATH, run:
 
-                echo 'export PATH="/usr/local/opt/postgresql@15/bin:$PATH"' >> ~/.zshrc
+                echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc
               ```
-              Run the command it shows and then restart the terminal. You should now be able call psql from the terminal successfully.
-            </StepHikeCompact.Details>
-        </StepHikeCompact.Step>
-        </StepHikeCompact>
-      </TabPanel>
-      </Tabs>
+
+Run the command it shows and then restart the terminal. You should now be able call psql from the terminal successfully.
+
+</StepHikeCompact.Details>
+</StepHikeCompact.Step>
+</StepHikeCompact>
+</TabPanel>
+</Tabs>

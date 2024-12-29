@@ -60,7 +60,9 @@ breadcrumb: 'Migrations'
         postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@[HOST].supabase.com:5432/postgres
       ```
 
-      If you are unsure about which connection string to use, use the Session pooler connection string.
+      <Admonition type="info">
+        Use the Session pooler connection string if you are not sure which connection string to use.
+      </Admonition>
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
@@ -97,14 +99,31 @@ breadcrumb: 'Migrations'
         ```sql
         psql -d [CONNECTION_STRING] -f /file/path
         ```
-
       </StepHikeCompact.Code>
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+## Common issues
 
-## Migrate Storage objects to S3 storage
+"**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: received invalid response to GSSAPI negotiation:**"
+
+The most likely reason for this is that you are using psql and postgres version 15 or lower. Completely remove the Postgresql installation and install the latest version as per the instructions above to resolve this issue.
+
+"**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: error received from server in SCRAM exchange: Wrong password**"
+
+If you reset your password for your project, it may take a few minutes for it to reflect. Try again after a few minutes and it should be fine assuming you correctly set the password in the connection string.
+
+"**ERROR: must be member of role ROLE**"
+"**ERROR: grant options cannot be granted back to your own grantor**"
+"**ERROR: constraint CONSTRAINT for relation RELATION already exists**"
+"**ERROR: ...**"
+
+These are normal and expected unless something is broken in the project. The reason for these errors is due to the Dashboard backup being a full database dump that is ideal to completely rebuild the database from scratch. This is intended to give you the option to restore your database anywhere a Postgres database can be restored even outside of Supabase.
+
+However, as you created a new project to restore to, Supabase configures and sets up various aspects that the full database dump would also try to re-create. The errors are due to those parts already being created and setup.
+
+## Migrate storage objects to new project's S3 storage
 
 After restoring the project above, the buckets and files will show up in the dashboard. However, the actual storage objects stored in S3 would not be present so it would cause issues if you try to retrieve or do any file operations.
 
