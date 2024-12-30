@@ -424,7 +424,10 @@ const WizardForm = () => {
       const [name, details] = awsRegion
       return {
         name,
-        location: details.location,
+        location: {
+          latitude: details.location[1],
+          longitude: details.location[0],
+        },
         code: details.code,
         displayName: details.displayName,
       }
@@ -434,7 +437,10 @@ const WizardForm = () => {
       const [name, details] = flyRegion
       return {
         name,
-        location: details.location,
+        location: {
+          latitude: details.location[1],
+          longitude: details.location[0],
+        },
         code: details.code,
         displayName: details.displayName,
       }
