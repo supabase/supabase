@@ -9,7 +9,6 @@ export enum TelemetryActions {
   ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',
   ASSISTANT_SUGGESTION_ACCEPTED = 'assistant_suggestion_accepted',
   ASSISTANT_SUGGESTION_REJECTED = 'assistant_suggestion_rejected',
-  ASSISTANT_SUGGESTION_COPIED = 'assistant_suggestion_copied',
   ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
@@ -371,4 +370,71 @@ export interface SqlEditorResultCopyMarkdownClickedEvent {
  */
 export interface SqlEditorResultCopyJsonClickedEvent {
   action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
+}
+
+/**
+ * User submitted a prompt to the assistant.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantPromptSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_PROMPT_SUBMITTED
+}
+
+/**
+ * User submitted a debug request to the assistant or prompt submitted has Help me to debug.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantDebugSubmittedEvent {
+  action: TelemetryActions.ASSISTANT_DEBUG_SUBMITTED
+}
+
+/**
+ * User ran a suggestion provided by the assistant.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantSuggestionRanEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_RAN
+  properties: {
+    /**
+     * The type of suggestion that was run by the user. Mutate or Select query types only.
+     */
+    type: string
+    category?: string
+  }
+}
+
+/**
+ * User accepted a suggestion after clicking any option in Edit in Sql Editor in suggestion provided by the assistant.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantSuggestionAcceptedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED
+}
+
+/**
+ * User rejected a suggestion after clicking any option in Edit in SQL Editor in suggestion provided by the assistant.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantSuggestionRejectedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED
+}
+
+/**
+ * User clicked to edit SQL in the assistant when user is not in SQL editor.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface AssistantEditSqlClickedEvent {
+  action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED
 }
