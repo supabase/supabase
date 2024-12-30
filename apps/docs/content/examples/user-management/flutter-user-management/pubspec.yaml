@@ -1,0 +1,27 @@
+name: supabase_quickstart
+description: Sample app on how to get started with Supabase on Flutter.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_dotenv: ^5.1.0
+  image_picker: ^1.0.5
+  supabase_flutter: ^2.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lint: ^2.3.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
