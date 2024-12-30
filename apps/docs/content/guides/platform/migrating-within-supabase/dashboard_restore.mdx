@@ -121,21 +121,19 @@ breadcrumb: 'Migrations'
 
 ## Migrate storage objects to new project's S3 storage
 
-<Admonition type="info">
-  This method requires uploading to Google colab and then to the S3 buckets. This could add
-  significant upload time if there are large storage objects.
-</Admonition>
 After restoring the backup, the buckets and files metadata will show up in the dashboard of the new project.
 However, the storage files stored in the S3 buckets would not be present.
 
-Use the following Google colab script provided below to migrate your downloaded storage objects to your new project's S3 buckets.
+Use the following Google Colab script provided below to migrate your downloaded storage objects to your new project's S3 buckets.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/PLyn/supabase-storage-migrate/blob/main/Supabase_Storage_migration.ipynb)
+
+This method requires uploading to Google Colab and then to the S3 buckets. This could add significant upload time if there are large storage objects.
 
 ## Common errors with the backup restore process
 
 "**object already exists**"
-"**constraint CONSTRAINT for relation RELATION already exists**"
+"**constraint x for relation y already exists**"
 "**Many other variations of errors**"
 
 These errors are expected when restoring to a new Supabase project. The backup from the dashboard is a full dump which contains the CREATE commands for all schemas. This is by design as the full dump allows you to rebuild the entire database from scratch even outside of Supabase.

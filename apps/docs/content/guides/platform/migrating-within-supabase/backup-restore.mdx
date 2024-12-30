@@ -211,7 +211,7 @@ psql \
 
 ### Schema changes to `auth` and `storage`
 
-If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security(RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
 
 ```bash
 supabase link --project-ref "$OLD_PROJECT_REF"
