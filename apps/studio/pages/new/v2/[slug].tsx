@@ -346,7 +346,6 @@ const WizardForm = () => {
       dataApiUseApiSchema: !dataApi ? false : useApiSchema,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
-      initialSql: sql,
     }
 
     if (postgresVersion) {
@@ -376,6 +375,7 @@ const WizardForm = () => {
     // While the form data does load immediately
     if (slug) form.setValue('organization', slug)
     if (projectName) form.setValue('projectName', projectName || '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug])
 
   useEffect(() => {
@@ -384,18 +384,21 @@ const WizardForm = () => {
     if (isInvalidSlug && isOrganizationsSuccess && (organizations?.length ?? 0) > 0) {
       router.push(`/new/${organizations?.[0].slug}`)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInvalidSlug, isOrganizationsSuccess, organizations])
 
   useEffect(() => {
     if (form.getValues('dbRegion') === undefined && defaultRegion) {
       form.setValue('dbRegion', defaultRegion)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultRegion])
 
   useEffect(() => {
     if (defaultRegionError) {
       form.setValue('dbRegion', PROVIDERS[DEFAULT_PROVIDER].default_region.displayName)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultRegionError])
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
@@ -403,7 +406,12 @@ const WizardForm = () => {
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
 
-  const selectedRegionObject = useMemo(() => {
+  const selectedRegionObject = useMemo((): {
+    name: string
+    location: { latitude: number; longitude: number }
+    code: string
+    displayName: string
+  } | null => {
     const dbRegion = form.getValues('dbRegion')
     const awsRegion = Object.entries(AWS_REGIONS).find(
       ([_, region]) => region.displayName === dbRegion
@@ -433,11 +441,13 @@ const WizardForm = () => {
     }
 
     return null
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.getValues('dbRegion')])
 
   // set sql fields anytime the sqlStatements array changes
   useEffect(() => {
     form.setValue('sql', sqlStatements.join('\n\n'))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sqlStatements])
 
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -1130,7 +1140,6 @@ const WizardForm = () => {
           projectDetails={{
             dbRegion: form.getValues('dbRegion'),
             cloudProvider: form.getValues('cloudProvider'),
-            computeSize: form.getValues('computeSize'),
             postgresVersion: form.getValues('postgresVersionSelection'),
           }}
           instanceLabel={instanceLabel}
@@ -1140,7 +1149,6 @@ const WizardForm = () => {
         {showVisual && (
           <Button
             type="default"
-            iconLeft={ChevronLeft}
             className="absolute top-4 left-4 lg:hidden"
             onClick={() => setShowVisual(false)}
           >

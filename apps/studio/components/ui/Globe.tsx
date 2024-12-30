@@ -1,10 +1,10 @@
-import createGlobe from 'cobe'
+import createGlobe, { Marker } from 'cobe'
 import { useCallback, useEffect, useRef } from 'react'
 import { useTheme } from 'next-themes'
 import { debounce } from 'lodash'
 
 interface GlobeProps {
-  readonly markers?: [number, number]
+  readonly markers?: [number, number][]
   readonly currentLocation?: [number, number]
 }
 
@@ -55,11 +55,11 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       markerColor: [62 / 255, 207 / 255, 142 / 255],
       glowColor: [100 / 255, 100 / 255, 100 / 255],
       markers: markers
-        ? markers.map((coords) => ({
+        ? (markers.map((coords) => ({
             location: coords,
             size: 0.05,
-          }))
-        : undefined,
+          })) as Marker[])
+        : undefined, // Return empty array instead of undefined to match Marker[] type
       onRender: (state) => {
         if (currentLocationRef.current) {
           state.phi = currentPhi
@@ -89,7 +89,7 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       window.removeEventListener('resize', debouncedResize)
       cobe.destroy()
     }
-  }, [resolvedTheme])
+  }, [resolvedTheme, markers])
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 }

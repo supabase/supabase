@@ -13,6 +13,7 @@ import {
   applyNodeChanges,
   MiniMap,
   NodeProps,
+  NodeChange,
 } from 'reactflow'
 import { useMemo, useState, useEffect, useCallback } from 'react'
 import { TableNode, TableNodeData } from '../Database/Schemas/SchemaTableNode'
@@ -44,7 +45,7 @@ export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaF
   }, [reactFlowInstance, nodes, edges])
 
   const onNodesChange = useCallback(
-    (changes) => {
+    (changes: NodeChange[]) => {
       setNodes((nds) => applyNodeChanges(changes, nds))
     },
     [setNodes]

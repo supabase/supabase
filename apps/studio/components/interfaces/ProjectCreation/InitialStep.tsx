@@ -3,6 +3,11 @@ import { Button, Textarea } from 'ui'
 import { Database, Import } from 'lucide-react'
 import { SchemaGenerator } from './SchemaGenerator'
 
+interface SupabaseService {
+  name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
+  reason: string
+}
+
 const Step1 = ({
   onSubmit,
   onStartBlank,
@@ -16,7 +21,7 @@ const Step1 = ({
   onStartBlank: () => void
   onMigrate: () => void
   onSqlGenerated: (sql: string) => void
-  onServicesUpdated: (services: string[]) => void
+  onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
   isLoading: boolean
 }) => {

@@ -17,7 +17,7 @@ interface SupabaseService {
 
 interface Props {
   onSqlGenerated: (sql: string) => void
-  onReset: () => void
+  onReset?: () => void
   onServicesUpdated: (services: SupabaseService[]) => void
   onTitleUpdated: (title: string) => void
   isOneOff?: boolean
@@ -71,7 +71,9 @@ export const SchemaGenerator = ({
         try {
           setHasSql(false)
           onSqlGenerated('')
-          onReset()
+          if (onReset) {
+            onReset()
+          }
           return {
             success: true,
             message: 'Database successfully reset',

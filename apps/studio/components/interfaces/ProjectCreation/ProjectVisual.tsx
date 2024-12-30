@@ -23,12 +23,12 @@ interface ProjectVisualProps {
   selectedRegion: {
     name: string
     location: { latitude: number; longitude: number }
+    code: string
     displayName: string
   } | null
   projectDetails: {
     dbRegion: string
     cloudProvider: string
-    computeSize: string
     postgresVersion: string
   }
   instanceLabel: (size: string) => string
@@ -94,10 +94,6 @@ export const ProjectVisual = ({
                   <p className="flex items-center gap-x-1">
                     <span className="text-sm text-foreground-light">
                       {projectDetails.cloudProvider}
-                    </span>
-                    <span className="text-sm text-foreground-light">•</span>
-                    <span className="text-sm text-foreground-light">
-                      {instanceLabel(projectDetails.computeSize)}
                     </span>
                     <span className="text-sm text-foreground-light">•</span>
                     <span className="text-sm text-foreground-light">
@@ -181,10 +177,14 @@ export const ProjectVisual = ({
             style={{ maskImage: 'linear-gradient(to top right, black, transparent 50%)' }}
           >
             <Globe
-              currentLocation={showInfo ? selectedRegion?.location : undefined}
+              currentLocation={
+                showInfo && selectedRegion?.location
+                  ? [selectedRegion.location.latitude, selectedRegion.location.longitude]
+                  : undefined
+              }
               markers={[
-                ...Object.values(AWS_REGIONS).map((region) => region.location),
-                ...Object.values(FLY_REGIONS).map((region) => region.location),
+                ...Object.values(AWS_REGIONS).map((region) => region.location as [number, number]),
+                ...Object.values(FLY_REGIONS).map((region) => region.location as [number, number]),
               ]}
             />
           </div>
