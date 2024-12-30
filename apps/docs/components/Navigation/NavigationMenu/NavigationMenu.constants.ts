@@ -1022,7 +1022,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_repack: Storage Optimization',
-          url: '/guides/database/extensions/pgrepack',
+          url: '/guides/database/extensions/pg_repack',
         },
         {
           name: 'PostGIS: Geo queries',
