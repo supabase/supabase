@@ -9,7 +9,7 @@
 
         <StepHikeCompact.Step step={1}>
           <StepHikeCompact.Details title="Install Postgresql" fullWidth>
-            Download and run the installation file for the latest version of Postgresql: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
+            Download and run the installation file for the latest version: [PostgreSQL installer download page](https://www.enterprisedb.com/downloads/postgres-postgresql-downloads)
 
           </StepHikeCompact.Details>
 
@@ -18,7 +18,7 @@
         <StepHikeCompact.Step step={2}>
 
           <StepHikeCompact.Details title="Add Postgresql to your system PATH environment variable" fullWidth>
-            Add the Postgresql installation path to your PATH environment variable following this guide if necessary: [Add postgresql to PATH in Windows](https://www.commandprompt.com/education/how-to-set-windows-path-for-postgres-tools/)
+            Add the Postgresql installation path to your PATH environment variable: [Add postgresql to PATH in Windows](https://www.commandprompt.com/education/how-to-set-windows-path-for-postgres-tools/)
           </StepHikeCompact.Details>
 
           </StepHikeCompact.Step>
@@ -27,7 +27,7 @@
 
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-              Open your terminal (For example, cmd or powershell) and run the following command:
+              Open your terminal (eg: cmd) and run the following command:
 
               <StepHikeCompact.Code>
                 ```sql
@@ -35,7 +35,7 @@
                 ```
               </StepHikeCompact.Code>
 
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
+              If you get an error that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
             </StepHikeCompact.Details>
 
           </StepHikeCompact.Step>
@@ -46,7 +46,7 @@
         <StepHikeCompact>
         <StepHikeCompact.Step step={1}>
           <StepHikeCompact.Details title="Install Homebrew" fullWidth>
-            Install Homebrew if needed by following the instructions on [https://brew.sh](https://brew.sh/).
+            Install Homebrew by following the instructions on [https://brew.sh](https://brew.sh/).
           </StepHikeCompact.Details>
         </StepHikeCompact.Step>
         <StepHikeCompact.Step step={2}>
@@ -63,7 +63,7 @@
         <StepHikeCompact.Step step={3}>
           <StepHikeCompact.Details title="Verify that psql is working" fullWidth>
 
-              restart your terminal and run the following command:
+              Restart your terminal and run the following command:
 
               <StepHikeCompact.Code>
                 ```sql
@@ -71,15 +71,15 @@
                 ```
               </StepHikeCompact.Code>
 
-              If you get any error messages that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
+              If you get an error that psql is not available or cannot be found then the PATH variable is likely either not correctly set or you need to restart your terminal.
 
-              You can add the postgres installation path to your PATH variable by running the following to get the path for postgresql:
+              You can add the postgres installation path to your PATH variable by running the following to get the postgresql path:
 
               ```sql
                 brew info postgresql@17
               ```
 
-              You should get a response containing something like this:
+              The above command will give an output like this:
 
               ```
                 If you need to have postgresql@17 first in your PATH, run:
@@ -87,7 +87,7 @@
                 echo 'export PATH="/opt/homebrew/opt/postgresql@17/bin:$PATH"' >> ~/.zshrc
               ```
 
-Run the command it shows and then restart the terminal. You should now be able call psql from the terminal successfully.
+              Run the command mentioned and restart the terminal. Run the command in step 2 again.
 
 </StepHikeCompact.Details>
 </StepHikeCompact.Step>
