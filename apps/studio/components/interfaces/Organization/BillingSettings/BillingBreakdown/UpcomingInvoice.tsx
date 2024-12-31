@@ -169,7 +169,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                         key={fee.description}
                         style={{ WebkitAppearance: 'initial' }}
                       >
-                        <td className="py-2 text-sm max-w-[200px]">
+                        <td className="py-2 text-sm max-w-[200px] cursor-pointer">
                           <Button
                             type="text"
                             className="!px-1"
@@ -224,7 +224,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       <>
                         {fee.breakdown?.map((breakdown) => (
                           <tr
-                            className="last:border-b cursor-pointer"
+                            className="last:border-b"
                             style={{ WebkitAppearance: 'initial' }}
                             key={breakdown.project_ref}
                           >
