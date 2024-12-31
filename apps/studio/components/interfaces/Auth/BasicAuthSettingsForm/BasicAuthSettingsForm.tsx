@@ -254,7 +254,7 @@ const BasicAuthSettingsForm = () => {
                               className="w-min"
                               icon={<ExternalLink />}
                             >
-                              <Link href="/docs/guides/auth/auth-anonymous#access-control">
+                              <Link href="https://supabase.com/docs/guides/auth/auth-anonymous#access-control">
                                 View access control docs
                               </Link>
                             </Button>
