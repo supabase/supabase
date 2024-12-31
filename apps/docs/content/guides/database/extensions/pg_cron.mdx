@@ -4,4 +4,41 @@ title: 'pg_cron: Schedule Recurring Jobs with Cron Syntax in Postgres'
 description: 'pg_cron: schedule recurring Jobs with cron syntax in Postgres.'
 ---
 
+The [pg_cron](https://github.com/citusdata/pg_cron) extension is a job scheduler for PostgreSQL (version 10 or higher) that operates within the database. [Supabase Cron](/docs/guides/cron) uses pg_cron to schedule recurring jobs in PostgreSQL.
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_cron" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+{/* prettier-ignore */}
+```sql
+-- Enable the "pg_cron" extension
+create extension pg_cron with schema pg_catalog;
+
+-- Disable the "pg_cron" extension
+drop extension if exists pg_cron;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension you can call `drop extension`.
+
+</TabPanel>
+</Tabs>
+
+## See also
+
 See the [Supabase Cron docs](/docs/guides/cron).
