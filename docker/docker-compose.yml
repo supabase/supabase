@@ -60,6 +60,10 @@ services:
       analytics:
         condition: service_healthy
     environment:
+      CORS_ENABLED: ${CORS_ENABLED}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      CORS_METHODS: ${CORS_METHODS}
+      CORS_ALLOWED_HEADERS: ${CORS_ALLOWED_HEADERS}    
       KONG_DATABASE: "off"
       KONG_DECLARATIVE_CONFIG: /home/kong/kong.yml
       # https://github.com/supabase/cli/issues/14
