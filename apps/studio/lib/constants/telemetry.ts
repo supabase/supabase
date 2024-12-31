@@ -373,7 +373,7 @@ export interface SqlEditorResultCopyJsonClickedEvent {
 }
 
 /**
- * User submitted a prompt to the assistant.
+ * User submitted a prompt to the assistant sidebar.
  *
  * @group Events
  * @source studio
@@ -383,7 +383,7 @@ export interface AssistantPromptSubmittedEvent {
 }
 
 /**
- * User submitted a debug request to the assistant or prompt submitted has Help me to debug.
+ * User submitted a debug request to the assistant sidebar or prompt submitted has Help me to debug.
  *
  * @group Events
  * @source studio
@@ -393,7 +393,7 @@ export interface AssistantDebugSubmittedEvent {
 }
 
 /**
- * User ran a suggestion provided by the assistant.
+ * User ran a suggestion provided by the assistant sidebar.
  *
  * @group Events
  * @source studio
@@ -414,6 +414,7 @@ export interface AssistantSuggestionRanEvent {
  *
  * @group Events
  * @source studio
+ * @page /dashboard/project/{ref}/sql
  */
 export interface AssistantSuggestionAcceptedEvent {
   action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED
@@ -424,13 +425,14 @@ export interface AssistantSuggestionAcceptedEvent {
  *
  * @group Events
  * @source studio
+ * @page /dashboard/project/{ref}/sql
  */
 export interface AssistantSuggestionRejectedEvent {
   action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED
 }
 
 /**
- * User clicked to edit SQL in the assistant when user is not in SQL editor.
+ * User clicked to edit SQL in the assistant when user is in any page that does not have 'sql' in url. Will be redirected to SQL editor after clicking.
  *
  * @group Events
  * @source studio
