@@ -1,0 +1,19 @@
+---
+id: 'storage-management'
+title: 'Object Exists'
+description: 'Learn how to check if an object exists'
+subtitle: 'Learn how to check if an object exists'
+sidebar_label: 'Object Exists'
+---
+
+To determine if an object exists in a bucket, use the `exists` method.
+RLS is applied to this method, meaning that the user must have the `read` permission on the object to check if it exists.
+
+```javascript
+const { data, error } = await supabase.storage.from('bucket_name').exists('path/your/object.png')
+
+console.log(data) // true or false
+```
+
+## Consistency Guarantees
+Storage provides [strong read-after-write consistency](https://aws.amazon.com/s3/consistency/) for object existence checks. When the object is uploaded or deleted, the `exists` method will return the correct result immediately.
