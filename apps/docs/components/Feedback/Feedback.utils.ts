@@ -30,6 +30,10 @@ const getNotionTeam = (pathname: string) => {
       return 'team-dev-workflows'
     case 'integrations':
       return 'team-api'
+    case 'warehouse':
+      return 'team-analytics'
+
+    // Ignoring platform for now because that section is a mix of teams.
     case 'platform':
     case 'monitoring-troubleshooting':
       return 'team-infra'
