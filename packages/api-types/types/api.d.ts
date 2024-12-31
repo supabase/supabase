@@ -1024,6 +1024,58 @@ export interface paths {
      */
     get: operations['PropsSettingsController_getProjectApi']
   }
+  '/platform/replication/{ref}/pipelines': {
+    /** Gets replication pipelines */
+    get: operations['ReplicationPipelinesController_getPipelines']
+    /** Creates a pipeline */
+    post: operations['ReplicationPipelinesController_createPipeline']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}': {
+    /** Deletes a pipeline */
+    delete: operations['ReplicationPipelinesController_deletePipeline']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/start': {
+    /** Starts a pipeline */
+    post: operations['ReplicationPipelinesController_startPipeline']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/status': {
+    /** Gets status of a pipeline */
+    get: operations['ReplicationPipelinesController_getPipelineStatus']
+  }
+  '/platform/replication/{ref}/pipelines/{pipeline_id}/stop': {
+    /** Stops a pipeline */
+    post: operations['ReplicationPipelinesController_stopPipeline']
+  }
+  '/platform/replication/{ref}/sinks': {
+    /** Gets replication sinks */
+    get: operations['ReplicationSinksController_getSinks']
+    /** Creates a sink */
+    post: operations['ReplicationSinksController_createSink']
+  }
+  '/platform/replication/{ref}/sinks/{sink_id}': {
+    /** Deletes a sink */
+    delete: operations['ReplicationSinksController_deleteSink']
+  }
+  '/platform/replication/{ref}/sources': {
+    /** Gets replication sources */
+    get: operations['ReplicationSourcesController_getSources']
+    /** Creates a replication source */
+    post: operations['ReplicationSourcesController_createSource']
+  }
+  '/platform/replication/{ref}/sources/{source_id}/publications': {
+    /** Gets source publications */
+    get: operations['ReplicationSourcesController_getPublications']
+    /** Creates a publication */
+    post: operations['ReplicationSourcesController_createPublication']
+  }
+  '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}': {
+    /** Deletes a publication */
+    delete: operations['ReplicationSourcesController_deletePublication']
+  }
+  '/platform/replication/{ref}/sources/{source_id}/tables': {
+    /** Gets source tables */
+    get: operations['ReplicationSourcesController_getTables']
+  }
   '/platform/reset-password': {
     /** Reset password for email */
     post: operations['ResetPasswordController_resetPassword']
@@ -3108,6 +3160,32 @@ export interface components {
       publish_update?: boolean
       tables?: string[] | null
     }
+    CreateReplicationPipelineBody: {
+      /** @description Pipeline config */
+      config: components['schemas']['ReplicationPipelineConfig']
+      /** @description Publication name */
+      publication_name: string
+      /** @description Sink id */
+      sink_id: number
+      /** @description Source id */
+      source_id: number
+    }
+    CreateReplicationPublicationBody: {
+      /** @description Publication name */
+      name: string
+      /** @description Publication tables */
+      tables: components['schemas']['ReplicationTable'][]
+    }
+    CreateReplicationSinkBody: {
+      /** @description BigQuery dataset id */
+      dataset_id: string
+      /** @description BigQuery project id */
+      project_id: string
+      /** @description BigQuery service account key */
+      service_account_key: string
+      /** @description Sink name */
+      sink_name: string
+    }
     CreateRoleBody: {
       admins?: string[]
       can_bypass_rls?: boolean
@@ -3136,6 +3214,9 @@ export interface components {
        */
       name: string
       value: string
+    }
+    CreateSourceResponse: {
+      id: number
     }
     CreateStorageBucketBody: {
       allowed_mime_types: string[]
@@ -5228,6 +5309,64 @@ export interface components {
     }
     RemoveReadReplicaBody: {
       database_identifier: string
+    }
+    ReplicationBatchConfig: {
+      max_fill_secs: number
+      max_size: number
+    }
+    ReplicationBigQueryConfig: {
+      dataset_id: string
+      project_id: string
+      service_account_key: string
+    }
+    ReplicationPipelineConfig: {
+      config: components['schemas']['ReplicationBatchConfig']
+    }
+    ReplicationPipelinesResponse: {
+      config: components['schemas']['ReplicationPipelineConfig']
+      id: number
+      publication_name: string
+      replicator_id: number
+      sink_id: number
+      sink_name: string
+      source_id: number
+      source_name: string
+      tenant_id: string
+    }
+    ReplicationPipelinesStatusResponse: {
+      pipeline_id: number
+      status: string
+    }
+    ReplicationPostgresConfig: {
+      host: string
+      name: string
+      port: number
+      slot_name: string
+      username: string
+    }
+    ReplicationPublication: {
+      name: string
+      tables: components['schemas']['ReplicationTable'][]
+    }
+    ReplicationSinksResponse: {
+      config: {
+        BigQuery?: components['schemas']['ReplicationBigQueryConfig']
+      }
+      id: number
+      name: string
+      tenant_id: string
+    }
+    ReplicationSourcesResponse: {
+      config: {
+        Postgres?: components['schemas']['ReplicationPostgresConfig']
+      }
+      id: number
+      name: string
+      tenant_id: string
+    }
+    ReplicationTable: {
+      name: string
+      schema: string
     }
     ReportStatusBody: {
       databaseIdentifier: string
@@ -13749,6 +13888,325 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication pipelines */
+  ReplicationPipelinesController_getPipelines: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesResponse'][]
+        }
+      }
+      /** @description Failed to get replication pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a pipeline */
+  ReplicationPipelinesController_createPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPipelineBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a pipeline */
+  ReplicationPipelinesController_deletePipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Starts a pipeline */
+  ReplicationPipelinesController_startPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to start pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets status of a pipeline */
+  ReplicationPipelinesController_getPipelineStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationPipelinesStatusResponse']
+        }
+      }
+      /** @description Failed to get pipeline status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Stops a pipeline */
+  ReplicationPipelinesController_stopPipeline: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Pipeline id */
+        pipeline_id: number
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to stop pipeline */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication sinks */
+  ReplicationSinksController_getSinks: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationSinksResponse'][]
+        }
+      }
+      /** @description Failed to get replication sinks */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a sink */
+  ReplicationSinksController_createSink: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationSinkBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create sink */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a sink */
+  ReplicationSinksController_deleteSink: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Sink id */
+        sink_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete sink */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets replication sources */
+  ReplicationSourcesController_getSources: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationSourcesResponse'][]
+        }
+      }
+      /** @description Failed to get replication sources */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a replication source */
+  ReplicationSourcesController_createSource: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateSourceResponse']
+        }
+      }
+      /** @description Failed to create replication source */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets source publications */
+  ReplicationSourcesController_getPublications: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationPublication'][]
+        }
+      }
+      /** @description Failed to get source publications */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a publication */
+  ReplicationSourcesController_createPublication: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReplicationPublicationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create publication */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes a publication */
+  ReplicationSourcesController_deletePublication: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+        /** @description Publication name */
+        publication_name: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete publication */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets source tables */
+  ReplicationSourcesController_getTables: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ReplicationTable'][]
+        }
+      }
+      /** @description Failed to get source tables */
       500: {
         content: never
       }
