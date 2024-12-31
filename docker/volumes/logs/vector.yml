@@ -5,6 +5,8 @@ api:
 sources:
   docker_host:
     type: docker_logs
+    include_containers:
+      - supabase
     exclude_containers:
       - supabase-vector
 
@@ -101,7 +103,7 @@ transforms:
       parsed, err = parse_regex(.event_message, r'^(?P<time>.*): (?P<msg>.*)$')
       if err == null {
           .event_message = parsed.msg
-          .timestamp = to_timestamp!(parsed.time)
+          .timestamp = timestamp!(parsed.time)
           .metadata.host = .project
       }
   # Realtime logs are structured so we parse the severity level using regex (ignore time because it has no date)
