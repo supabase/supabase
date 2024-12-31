@@ -213,7 +213,7 @@ export const SqlCard = ({
                   })
 
                   sendEvent({
-                    action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                    action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
                     properties: {
                       type: 'mutation',
                       category: identifyQueryType(sql) ?? 'unknown',
@@ -306,7 +306,7 @@ export const SqlCard = ({
                     handleExecute()
                     if (isReadOnlySelect(sql)) {
                       sendEvent({
-                        action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                        action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
                         properties: { type: 'select' },
                       })
                     }
