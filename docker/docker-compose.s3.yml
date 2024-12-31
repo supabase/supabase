@@ -31,7 +31,7 @@ services:
 
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.11.13
+    image: supabase/storage-api:v1.13.3
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -77,6 +77,7 @@ services:
       REGION: stub
       ENABLE_IMAGE_TRANSFORMATION: "true"
       IMGPROXY_URL: http://imgproxy:5001
+      REQUEST_ALLOW_X_FORWARDED_PATH: "true"
     volumes:
       - ./volumes/storage:/var/lib/storage:z
 
