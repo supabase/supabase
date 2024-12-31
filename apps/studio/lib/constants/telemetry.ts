@@ -6,9 +6,9 @@ export enum TelemetryActions {
 
   ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
   ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
-  ASSISTANT_SUGGESTION_RAN = 'assistant_suggestion_ran',
-  ASSISTANT_SUGGESTION_ACCEPTED = 'assistant_suggestion_accepted',
-  ASSISTANT_SUGGESTION_REJECTED = 'assistant_suggestion_rejected',
+  ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
+  ASSISTANT_SUGGESTION_ACCEPT_CLICKED = 'assistant_suggestion_accept_clicked',
+  ASSISTANT_SUGGESTION_REJECT_CLICKED = 'assistant_suggestion_reject_clicked',
   ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
@@ -393,13 +393,13 @@ export interface AssistantDebugSubmittedEvent {
 }
 
 /**
- * User ran a suggestion provided by the assistant sidebar.
+ * User clicked the run query button in the suggestion provided by the assistant sidebar.
  *
  * @group Events
  * @source studio
  */
-export interface AssistantSuggestionRanEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_RAN
+export interface AssistantSuggestionRunQueryClickedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED
   properties: {
     /**
      * The type of suggestion that was run by the user. Mutate or Select query types only.
@@ -416,8 +416,8 @@ export interface AssistantSuggestionRanEvent {
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
-export interface AssistantSuggestionAcceptedEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED
+export interface AssistantSuggestionAcceptClickedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPT_CLICKED
 }
 
 /**
@@ -427,8 +427,8 @@ export interface AssistantSuggestionAcceptedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
-export interface AssistantSuggestionRejectedEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED
+export interface AssistantSuggestionRejectClickedEvent {
+  action: TelemetryActions.ASSISTANT_SUGGESTION_REJECT_CLICKED
 }
 
 /**

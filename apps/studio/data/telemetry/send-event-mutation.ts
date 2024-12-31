@@ -32,9 +32,9 @@ import {
   RealtimeInspectorDatabaseRoleUpdatedEvent,
   AssistantPromptSubmittedEvent,
   AssistantDebugSubmittedEvent,
-  AssistantSuggestionRanEvent,
-  AssistantSuggestionAcceptedEvent,
-  AssistantSuggestionRejectedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
+  AssistantSuggestionAcceptClickedEvent,
+  AssistantSuggestionRejectClickedEvent,
   AssistantEditSqlClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
@@ -67,9 +67,9 @@ export type SendEventVariables =
   | SqlEditorResultCopyJsonClickedEvent
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
-  | AssistantSuggestionRanEvent
-  | AssistantSuggestionAcceptedEvent
-  | AssistantSuggestionRejectedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSuggestionAcceptClickedEvent
+  | AssistantSuggestionRejectClickedEvent
   | AssistantEditSqlClickedEvent
 
   // TODO remove this once all events are documented
