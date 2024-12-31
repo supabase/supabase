@@ -9,7 +9,7 @@ import {
 } from 'common'
 
 import { noop } from 'lodash'
-import router from 'next/router'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn } from 'ui'
@@ -82,6 +82,7 @@ export const useConsent = () => {
   const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
   const telemetryProps = useTelemetryProps()
+  const pathname = usePathname()
 
   const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
@@ -110,7 +111,7 @@ export const useConsent = () => {
         const telemetryData = {
           page_url: telemetryProps.page_url,
           page_title: typeof document !== 'undefined' ? document?.title : '',
-          pathname: router.pathname,
+          pathname,
           ph: {
             referrer: typeof document !== 'undefined' ? document?.referrer : '',
             language: telemetryProps.language,
@@ -190,6 +191,7 @@ export const useConsentValue = (KEY_NAME: string) => {
   const telemetryProps = useTelemetryProps()
   const initialValue = isBrowser ? localStorage?.getItem(KEY_NAME) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
+  const pathname = usePathname()
 
   const handleConsent = (value: 'true' | 'false') => {
     if (!isBrowser) return
@@ -200,7 +202,7 @@ export const useConsentValue = (KEY_NAME: string) => {
       const telemetryData = {
         page_url: telemetryProps.page_url,
         page_title: typeof document !== 'undefined' ? document?.title : '',
-        pathname: router.pathname,
+        pathname,
         ph: {
           referrer: typeof document !== 'undefined' ? document?.referrer : '',
           language: telemetryProps.language,
