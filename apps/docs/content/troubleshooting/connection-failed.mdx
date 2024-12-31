@@ -1,0 +1,15 @@
+---
+title = "Connection failed"
+topics = ["database", "supavisor"]
+keywords = ["connections", "pooler"]
+
+[[errors]]
+code = ":eaddrnotavail"
+message = "Connection failed {:error, :eaddrnotavail} to 'db.xxx.supabase.co':5432"
+
+[[errors]]
+code = ":nxdomain"
+message = "Connection failed {:error, :nxdomain} to 'db.xxx.supabase.co':5432"
+---
+
+Supavisor cannot connect to the customer database. This is usually caused if the target database is unable to respond.
