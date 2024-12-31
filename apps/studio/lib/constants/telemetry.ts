@@ -410,7 +410,7 @@ export interface AssistantSuggestionRanEvent {
 }
 
 /**
- * User accepted a suggestion after clicking any option in Edit in Sql Editor in suggestion provided by the assistant.
+ * User accepted a suggestion after clicking any option in Edit in Sql Editor in suggestion provided by the assistant. The options only appear in any page with 'sql' in url.
  *
  * @group Events
  * @source studio
@@ -421,7 +421,7 @@ export interface AssistantSuggestionAcceptedEvent {
 }
 
 /**
- * User rejected a suggestion after clicking any option in Edit in SQL Editor in suggestion provided by the assistant.
+ * User rejected a suggestion after clicking any option in Edit in SQL Editor in suggestion provided by the assistant. The options only appear in any page with 'sql' in url.
  *
  * @group Events
  * @source studio
