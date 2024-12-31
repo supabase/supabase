@@ -61,7 +61,7 @@ export const DiffActionBar = ({
         type="alternative"
         size="tiny"
         className="bg-brand-300 hover:bg-brand-400 dark:bg-brand-400 dark:hover:bg-brand-500 text-brand-600 group"
-        iconRight={<span className="dark:text-brand-500 group-hover:text-brand-600">ESC</span>}
+        iconRight={<span className="text-brand-600">ESC</span>}
         onClick={onCancel}
       >
         Discard

@@ -199,7 +199,7 @@ const UtilityActions = ({
                   {os === 'macos' ? (
                     <Command size={10} strokeWidth={1.5} />
                   ) : (
-                    <p className="text-xs text-foreground-light">CTRL</p>
+                    <p className="text-xs">CTRL</p>
                   )}
                   <CornerDownLeft size={10} strokeWidth={1.5} />
                 </div>
