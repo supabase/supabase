@@ -168,7 +168,7 @@ const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
+        <div className="flex flex-auto flex-col gap-2 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
@@ -269,7 +269,7 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-1 -mx-2" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
                     ItemComponent={EntityListItem}
