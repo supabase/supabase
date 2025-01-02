@@ -147,7 +147,7 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
-  // Temp: If user is part of project creation experiment, redirect to /new/v2
+  // TODO: Remove this after project creation experiment
   const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
   if (currentOrg && projectCreationExperimentGroup === 'group-b') {
     router.push(`/new/v2/${currentOrg.slug}`)
@@ -371,6 +371,15 @@ const Wizard: NextPageWithLayout = () => {
 
   const additionalMonthlySpend =
     instanceSizeSpecs[instanceSize as DbInstanceSize]!.priceMonthly - availableComputeCredits
+
+  // TODO: Remove this after project creation experiment as it delays rendering
+  if (
+    !currentOrg ||
+    !projectCreationExperimentGroup ||
+    projectCreationExperimentGroup === 'group-b'
+  ) {
+    return null
+  }
 
   return (
     <Form_Shadcn_ {...form}>
