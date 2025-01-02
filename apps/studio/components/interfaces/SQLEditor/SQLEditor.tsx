@@ -421,7 +421,10 @@ export const SQLEditor = () => {
         }
       }
 
-      sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPTED })
+      sendEvent({
+        action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+        properties: { handlerAccepted: true },
+      })
 
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
@@ -442,7 +445,10 @@ export const SQLEditor = () => {
   ])
 
   const discardAiHandler = useCallback(() => {
-    sendEvent({ action: TelemetryActions.ASSISTANT_SUGGESTION_REJECTED })
+    sendEvent({
+      action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED,
+      properties: { handlerAccepted: false },
+    })
     resetPrompt()
     closeDiff()
   }, [closeDiff, resetPrompt, sendEvent])
