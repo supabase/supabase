@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react'
 
-import { useConstant, useIsLoggedIn } from 'common'
+import { type Database, useConstant, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
 import { IS_PLATFORM } from '~/lib/constants'
@@ -82,7 +82,7 @@ function Feedback({ className }: { className?: string }) {
   const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
   const supabase = useConstant(() =>
     IS_PLATFORM
-      ? createClient(
+      ? createClient<Database>(
           process.env.NEXT_PUBLIC_SUPABASE_URL!,
           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         )
