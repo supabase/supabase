@@ -12,6 +12,7 @@ export async function deleteContents(
   signal?: AbortSignal
 ) {
   const { data, error } = await del('/platform/projects/{ref}/content', {
+    headers: { Version: '2' },
     params: {
       path: { ref: projectRef },
       query: { ids },
