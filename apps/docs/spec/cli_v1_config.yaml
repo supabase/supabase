@@ -503,6 +503,18 @@ parameters:
       External URL of the API server that frontend connects to.
     links: []
 
+  - id: 'studio.openai_api_key'
+    title: 'studio.openai_api_key'
+    tags: ['dashboard']
+    required: false
+    default: 'env(OPENAI_API_KEY)'
+    description: |
+      OpenAI API key used for AI features in the Studio dashboard.
+      DO NOT commit your OpenAI API key to git. Use environment variable substitution instead.
+    links:
+      - name: 'OpenAI API Keys'
+        link: 'https://platform.openai.com/api-keys'
+
   - id: 'inbucket.enabled'
     title: 'inbucket.enabled'
     tags: ['local']
