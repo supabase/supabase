@@ -532,6 +532,57 @@ Migrations are run in sequential order. Each migration builds upon the previous 
 
 The preview branch has a record of which migrations have been applied, and only applies new migrations for each commit. This can create an issue when rolling back migrations.
 
+## Branch configuration with remotes
+
+When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
+
+### Basic configuration
+
+To update configuration for a Supabase branch, simply modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+
+### Remote-specific configuration
+
+For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+
+Here's an example of configuring a separate seed script for a staging environment:
+
+```toml
+[remotes.staging]
+project_id = "your-project-ref"
+
+[remotes.staging.db.seed]
+sql_paths = ["./seeds/staging.sql"]
+```
+
+Since the `project_id` field must reference an existing branch, you need to create the persistent branch before adding its configuration. Use the CLI to create a persistent branch first:
+
+```bash
+supabase --experimental branches create --persistent
+# Do you want to create a branch named develop? [Y/n]
+```
+
+### Configuration merging
+
+When merging a PR into a persistent branch, the Supabase integration:
+
+1. Checks for configuration changes
+2. Logs the changes
+3. Applies them to the target remote
+
+If no remote is declared or the project ID is incorrect, the configuration step is skipped.
+
+### Available configuration options
+
+All standard configuration options are available in the `[remotes]` block. This includes:
+
+- Database settings
+- API configurations
+- Authentication settings
+- Edge Functions configuration
+- And more
+
+You can use this to maintain different configurations for different environments while keeping them all in version control.
+
 ### Rolling back migrations
 
 You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
