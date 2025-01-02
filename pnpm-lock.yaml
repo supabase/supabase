@@ -213,9 +213,6 @@ importers:
       '@radix-ui/react-collapsible':
         specifier: ^1.0.3
         version: 1.0.3(@types/react-dom@18.3.0)(@types/react@18.3.3)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
-      '@supabase/auth-helpers-react':
-        specifier: ^0.4.2
-        version: 0.4.2(@supabase/supabase-js@2.44.3)
       '@supabase/supabase-js':
         specifier: ^2.44.3
         version: 2.44.3
@@ -547,9 +544,6 @@ importers:
       '@stripe/stripe-js':
         specifier: ^3.0.5
         version: 3.0.5
-      '@supabase/auth-helpers-react':
-        specifier: ^0.4.2
-        version: 0.4.2(@supabase/supabase-js@2.44.3)
       '@supabase/auth-js':
         specifier: 2.64.2
         version: 2.64.2
@@ -1004,12 +998,6 @@ importers:
       '@react-three/fiber':
         specifier: ^7.0.29
         version: 7.0.29(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(three@0.170.0)
-      '@supabase/auth-helpers-react':
-        specifier: ^0.4.2
-        version: 0.4.2(@supabase/supabase-js@2.44.3)
-      '@supabase/auth-ui-react':
-        specifier: ^0.4.5
-        version: 0.4.5(@supabase/supabase-js@2.44.3)
       '@supabase/supabase-js':
         specifier: ^2.44.3
         version: 2.44.3
@@ -1877,9 +1865,6 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
     devDependencies:
-      '@supabase/auth-helpers-react':
-        specifier: ^0.4.2
-        version: 0.4.2(@supabase/supabase-js@2.44.3)
       '@testing-library/dom':
         specifier: ^10.1.0
         version: 10.1.0
@@ -4951,9 +4936,6 @@ packages:
     resolution: {integrity: sha512-qOiVORSPm6Ce4/Yu6hbSgNHABLP2VMv8QOC3tTDNHHlWY19pPyc++fBTbZPtx6egPXi4HQxKDnMxVxpbtX2GoA==}
     engines: {node: '>=14.0.0'}
 
-  '@stitches/core@1.2.8':
-    resolution: {integrity: sha512-Gfkvwk9o9kE9r9XNBmJRfV8zONvXThnm1tcuojL04Uy5uRyqg93DC83lDebl0rocZCfKSjUv+fWYtMQmEDJldg==}
-
   '@stripe/react-stripe-js@2.5.0':
     resolution: {integrity: sha512-ys5bnrufNoBlUPRblWkiN7dUCX3s2noBZS0Lf5GkHYO9x3SXJMZccif53IdP4X6tZyNLn7aSMgZBUZqsdzrvhg==}
     peerDependencies:
@@ -4965,24 +4947,8 @@ packages:
     resolution: {integrity: sha512-0BTd2bC+8gSKty7jXKRntLnvmWgFTmpZkY0oP7ADBYfdV0JtuGoDbfQawui0W5eUlwT3CcKh2IeRV4SPOBIeXQ==}
     engines: {node: '>=12.16'}
 
-  '@supabase/auth-helpers-react@0.4.2':
-    resolution: {integrity: sha512-zRj1leYMKJVYQeHFvZiUzlmHM+ATWFR/V7Q9F0yXSWEnMcNHL0CKnIBqhkjtSQ2trE+YaoCvFEHjxISppxIZXQ==}
-    deprecated: This package is now deprecated - please use the @supabase/ssr package instead.
-    peerDependencies:
-      '@supabase/supabase-js': ^2.19.0
-
   '@supabase/auth-js@2.64.2':
     resolution: {integrity: sha512-s+lkHEdGiczDrzXJ1YWt2y3bxRi+qIUnXcgkpLSrId7yjBeaXBFygNjTaoZLG02KNcYwbuZ9qkEIqmj2hF7svw==}
-
-  '@supabase/auth-ui-react@0.4.5':
-    resolution: {integrity: sha512-p7mZoD/iJKP7KorQ4F/RK4NfWDpXzop+LhMuHxkO5BahD+VpGIxwtykuXfZ0g7rijaKnA1BimdCBTCrV5EWTag==}
-    peerDependencies:
-      '@supabase/supabase-js': ^2.21.0
-
-  '@supabase/auth-ui-shared@0.1.7':
-    resolution: {integrity: sha512-ueqyfCHVYX/ioehwL1ErH0+cZwiSzsIfZfhf326yJdDI0XExTKPV4lxPtWT1xx6c8A4FPPmT3kJKQaWs27pxCw==}
-    peerDependencies:
-      '@supabase/supabase-js': ^2.21.0
 
   '@supabase/functions-js@2.4.1':
     resolution: {integrity: sha512-8sZ2ibwHlf+WkHDUZJUXqqmPvWQ3UHN0W30behOJngVh/qHHekhJLCFbh0AjkE9/FqqXtf9eoVvmYgfCLk5tNA==}
@@ -16761,8 +16727,6 @@ snapshots:
       '@smithy/util-buffer-from': 2.0.0
       tslib: 2.6.2
 
-  '@stitches/core@1.2.8': {}
-
   '@stripe/react-stripe-js@2.5.0(@stripe/stripe-js@3.0.5)(react-dom@18.2.0(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@stripe/stripe-js': 3.0.5
@@ -16772,26 +16736,9 @@ snapshots:
 
   '@stripe/stripe-js@3.0.5': {}
 
-  '@supabase/auth-helpers-react@0.4.2(@supabase/supabase-js@2.44.3)':
-    dependencies:
-      '@supabase/supabase-js': 2.44.3
-
   '@supabase/auth-js@2.64.2':
     dependencies:
       '@supabase/node-fetch': 2.6.15
-
-  '@supabase/auth-ui-react@0.4.5(@supabase/supabase-js@2.44.3)':
-    dependencies:
-      '@stitches/core': 1.2.8
-      '@supabase/auth-ui-shared': 0.1.7(@supabase/supabase-js@2.44.3)
-      '@supabase/supabase-js': 2.44.3
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-
-  '@supabase/auth-ui-shared@0.1.7(@supabase/supabase-js@2.44.3)':
-    dependencies:
-      '@supabase/supabase-js': 2.44.3
 
   '@supabase/functions-js@2.4.1':
     dependencies:

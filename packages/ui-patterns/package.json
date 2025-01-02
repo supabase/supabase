@@ -44,7 +44,6 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@supabase/auth-helpers-react": "^0.4.2",
     "@testing-library/dom": "^10.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
