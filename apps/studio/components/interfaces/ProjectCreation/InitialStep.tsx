@@ -36,7 +36,7 @@ const Step1 = ({
     <div className="w-full">
       <h3>What are you building?</h3>
       <p className="text-sm text-foreground-lighter mb-4">
-        We can generate a starting schema for you including sample data.
+        We can generate a schema for you to kick start your project.
       </p>
       <SchemaGenerator
         onSqlGenerated={(sql) => {

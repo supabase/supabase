@@ -43,6 +43,7 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
     const cobe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
       width: width * 2,
+      height: width * 2,
       phi: 0,
       theta: 0.3,
       dark: resolvedTheme?.includes('dark') ? 1 : 0,
@@ -54,20 +55,14 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       baseColor: [255 / 255, 255 / 255, 255 / 255],
       markerColor: [62 / 255, 207 / 255, 142 / 255],
       glowColor: [100 / 255, 100 / 255, 100 / 255],
-      markers: markers
-        ? (markers.map((coords) => {
-            console.log('coords:', coords, currentLocation)
-            const isCurrentLocation =
-              currentLocation &&
-              coords[0] === currentLocation[0] &&
-              coords[1] === currentLocation[1]
-
-            return {
-              location: coords,
-              size: isCurrentLocation ? 0.1 : 0.04,
-            }
-          }) as Marker[])
-        : undefined,
+      markers:
+        markers?.map((coords) => ({
+          location: coords,
+          size:
+            currentLocation && coords[0] === currentLocation[0] && coords[1] === currentLocation[1]
+              ? 0.1
+              : 0.04,
+        })) || [],
       onRender: (state) => {
         if (currentLocation) {
           const distPhiPositive =
