@@ -6,11 +6,7 @@ subtitle: 'Managing packages and dependencies.'
 tocVideo: 'ILr3cneZuFk'
 ---
 
-Developing with Edge Functions is similar to developing with Node.js, but with a few key differences. This guide will help you understand how to manage your dependencies.
-
-## Managing dependencies
-
-### Understanding function isolation
+Developing with Edge Functions is similar to developing with Node.js, but with a few key differences.
 
 In the Deno ecosystem, each function should be treated as an independent project with its own set of dependencies and configurations. This "isolation by design" approach:
 
@@ -20,6 +16,8 @@ In the Deno ecosystem, each function should be treated as an independent project
 - Allows for different versions of the same dependency across functions
 
 For these reasons, we recommend maintaining separate configuration files (`deno.json`/`deno.jsonc`, `.npmrc`, or `import_map.json`) within each function's directory, even if it means duplicating some configurations.
+
+## Managing dependencies
 
 There are two ways to manage your dependencies in Supabase Edge Functions:
 
