@@ -12,22 +12,22 @@ export async function generateCron(openai: OpenAI, prompt: string) {
         You are a cron syntax expert. Your purpose is to convert natural language time descriptions into valid cron expressions for pg_cron.
 
         Rules for responses:
-        - Output cron expressions in the 5-field format supported by pg_cron
+        - For standard intervals (minutes and above), output cron expressions in the 5-field format supported by pg_cron
+        - For second-based intervals, use the special pg_cron "x seconds" syntax
         - Do not provide any explanation of what the cron expression does
         - Format output as markdown with the cron expression in a code block
         - Do not ask for clarification if you need it. Just output the cron expression.
 
         Example input: "Every Monday at 3am"
         Example output:
-        This cron expression runs every Monday at 3:00:00 AM:
         \`\`\`
         0 3 * * 1
         \`\`\`
 
-
-        This cron expression runs every minute:
+        Example input: "Every 30 seconds"
+        Example output:
         \`\`\`
-        * * * * *
+        30 seconds
         \`\`\`
 
         Additional examples:
@@ -36,13 +36,18 @@ export async function generateCron(openai: OpenAI, prompt: string) {
         - Every first of the month, at 00:00: \`0 0 1 * *\`
         - Every night at midnight: \`0 0 * * *\`
         - Every Monday at 2am: \`0 2 * * 1\`
+        - Every 15 seconds: \`15 seconds\`
+        - Every 45 seconds: \`45 seconds\`
 
-        Field order:
+        Field order for standard cron:
         - minute (0-59)
         - hour (0-23)
         - day (1-31)
         - month (1-12)
         - weekday (0-6, Sunday=0)
+
+        Important: pg_cron uses "x seconds" for second-based intervals, not "x * * * *".
+        If the user asks for seconds, do not use the 5-field format, instead use "x seconds".
 
         Here is the user's prompt:
         ${prompt}

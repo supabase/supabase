@@ -3,13 +3,14 @@
 project_id = "edge-functions"
 
 [api]
+enabled = true
 # Port to use for the API URL.
 port = 54321
 # Schemas to expose in your API. Tables, views and stored procedures in this schema will get API
-# endpoints. public and storage are always included.
-schemas = []
-# Extra schemas to add to the search_path of every request.
-extra_search_path = ["extensions"]
+# endpoints. `public` is always included.
+schemas = ["public", "graphql_public"]
+# Extra schemas to add to the search_path of every request. `public` is always included.
+extra_search_path = ["public", "extensions"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
@@ -17,44 +18,58 @@ max_rows = 1000
 [db]
 # Port to use for the local database URL.
 port = 54322
+# Port used by db diff command to initialize the shadow database.
+shadow_port = 54320
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
-major_version = 14
+major_version = 15
 
-[studio]
-# Port to use for Supabase Studio.
-port = 54323
-
-# Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
-# are monitored, and you can view the emails that would have been sent from the web interface.
-[inbucket]
-# Port to use for the email testing server web interface.
-port = 54324
-
-[auth]
-# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
-# in emails.
-site_url = "http://localhost:3000"
-# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
-additional_redirect_urls = ["https://localhost:3000"]
-# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one
-# week).
-jwt_expiry = 3600
-# Allow/disallow new user signups to your project.
-enable_signup = true
-
-[auth.email]
-# Allow/disallow new user signups via email to your project.
-enable_signup = true
-# If enabled, a user will be required to confirm any email change on both the old, and new email
-# addresses. If disabled, only the new email is required to confirm.
-double_confirm_changes = true
-# If enabled, users need to confirm their email address before signing in.
-enable_confirmations = false
-
-# Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
-# `discord`, `facebook`, `github`, `gitlab`, `google`, `twitch`, `twitter`, `slack`, `spotify`.
-[auth.external.apple]
+[db.seed]
+# If enabled, seeds the database after migrations during a db reset.
 enabled = false
-client_id = ""
-secret = ""
+# Specifies an ordered list of seed files to load during db reset.
+# Supports glob patterns relative to supabase directory. For example:
+# sql_paths = ['./seeds/*.sql', '../project-src/seeds/*-load-testing.sql']
+
+[storage.buckets.my-bucket]
+[storage.buckets.videos]
+
+[storage.buckets.images]
+public = true
+objects_path = "./buckets/images"
+
+[functions.auth-hook-react-email-resend]
+[functions.background-upload-storage]
+[functions.browser-with-cors]
+[functions.cloudflare-turnstile]
+[functions.connect-supabase]
+[functions.discord-bot]
+[functions.file-upload-storage]
+[functions.get-tshirt-competition]
+[functions.github-action-deploy]
+[functions.huggingface-image-captioning]
+[functions.image-manipulation]
+[functions.location]
+[functions.oak-server]
+[functions.og-image-with-storage-cdn]
+[functions.openai]
+[functions.opengraph]
+[functions.postgres-on-the-edge]
+[functions.puppeteer]
+[functions.read-storage]
+[functions.restful-tasks]
+[functions.select-from-table-with-auth-rls]
+[functions.send-email-resend]
+[functions.send-email-smtp]
+[functions.sentry]
+[functions.sentryfied]
+[functions.slack-bot-mention]
+[functions.streams]
+[functions.stripe-webhooks]
+[functions.telegram-bot]
+[functions.tweet-to-image]
+[functions.upstash-redis-counter]
+[functions.upstash-redis-ratelimit]
+
+[functions.kysely-postgres]
+import_map = "./functions/import_map.json"

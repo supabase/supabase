@@ -39,9 +39,11 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
+  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
@@ -225,7 +227,7 @@ const InstanceConfigurationUI = () => {
               <div className="flex items-center justify-center">
                 <ButtonTooltip
                   type="default"
-                  disabled={!canManageReplicas}
+                  disabled={!canManageReplicas || isOrioleDb}
                   className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
                   onClick={() => setShowNewReplicaPanel(true)}
                   tooltip={{
@@ -233,7 +235,9 @@ const InstanceConfigurationUI = () => {
                       side: 'bottom',
                       text: !canManageReplicas
                         ? 'You need additional permissions to deploy replicas'
-                        : undefined,
+                        : isOrioleDb
+                          ? 'Read replicas are not supported with OrioleDB'
+                          : undefined,
                     },
                   }}
                 >

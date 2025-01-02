@@ -4,8 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useFlag } from 'hooks/ui/useFlag'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { TELEMETRY_EVENTS } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
 import { Badge, Button, Modal, ScrollArea, cn } from 'ui'
 import { FEATURE_PREVIEWS, useFeaturePreviewContext } from './FeaturePreviewContext'
@@ -23,6 +22,25 @@ const FeaturePreviewModal = () => {
   const isNotReleased =
     selectedFeatureKey === 'supabase-ui-functions-assistant' && !enableFunctionsAssistant
 
+  const { flags, onUpdateFlag } = featurePreviewContext
+  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
+  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
+
+  const toggleFeature = () => {
+    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
+    sendEvent({
+      action: isSelectedFeatureEnabled
+        ? TelemetryActions.FEATURE_PREVIEW_DISABLED
+        : TelemetryActions.FEATURE_PREVIEW_ENABLED,
+      properties: { feature: selectedFeatureKey },
+    })
+  }
+
+  function handleCloseFeaturePreviewModal() {
+    snap.setShowFeaturePreviewModal(false)
+    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
+  }
+
   // this modal can be triggered on other pages
   // Update local state when valtio state changes
   useEffect(() => {
@@ -31,30 +49,11 @@ const FeaturePreviewModal = () => {
     }
   }, [snap.selectedFeaturePreview])
 
-  const { flags, onUpdateFlag } = featurePreviewContext
-  const selectedFeature = FEATURE_PREVIEWS.find((preview) => preview.key === selectedFeatureKey)
-  const isSelectedFeatureEnabled = flags[selectedFeatureKey]
-
-  const toggleFeature = () => {
-    onUpdateFlag(selectedFeatureKey, !isSelectedFeatureEnabled)
-    sendEvent({
-      action: TELEMETRY_EVENTS.FEATURE_PREVIEWS,
-      label: selectedFeatureKey,
-      value: isSelectedFeatureEnabled ? 'disabled' : 'enabled',
-    })
-
-    if (
-      selectedFeatureKey === LOCAL_STORAGE_KEYS.UI_PREVIEW_ASSISTANT_V2 &&
-      isSelectedFeatureEnabled
-    ) {
-      snap.setAiAssistantPanel({ open: false })
+  useEffect(() => {
+    if (snap.showFeaturePreviewModal) {
+      sendEvent({ action: TelemetryActions.FEATURE_PREVIEWS_CLICKED })
     }
-  }
-
-  function handleCloseFeaturePreviewModal() {
-    snap.setShowFeaturePreviewModal(false)
-    snap.setSelectedFeaturePreview(FEATURE_PREVIEWS[0].key)
-  }
+  }, [snap.showFeaturePreviewModal])
 
   return (
     <Modal

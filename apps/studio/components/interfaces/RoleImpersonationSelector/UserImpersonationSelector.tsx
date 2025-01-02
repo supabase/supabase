@@ -32,7 +32,7 @@ const UserImpersonationSelector = () => {
       {
         projectRef: project?.ref,
         connectionString: project?.connectionString,
-        keywords: debouncedSearchText,
+        keywords: debouncedSearchText.trim().toLocaleLowerCase(),
       },
       {
         keepPreviousData: true,
@@ -95,7 +95,7 @@ const UserImpersonationSelector = () => {
               )
             }
             placeholder="Search for a user.."
-            onChange={(e) => setSearchText(e.target.value.trim())}
+            onChange={(e) => setSearchText(e.target.value)}
             value={searchText}
             size="small"
             actions={

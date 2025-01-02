@@ -31,9 +31,11 @@ import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, cn } from 'ui'
+import { Alert_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
+import PartnerManagedResource from 'components/ui/PartnerManagedResource'
+import PartnerIcon from 'components/ui/PartnerIcon'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const project = useSelectedProject()
@@ -164,6 +166,18 @@ You can change the scope of the access for Supabase by configuring
         <ScaffoldSectionContent>
           {!canReadVercelConnection ? (
             <NoPermission resourceText="view this organization's Vercel connections" />
+          ) : org?.managed_by === 'vercel-marketplace' ? (
+            <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
+              <PartnerIcon
+                organization={{ managed_by: 'vercel-marketplace' }}
+                showTooltip={false}
+                size="large"
+              />
+
+              <AlertTitle_Shadcn_ className="text-sm">
+                Vercel Integration is not available for Vercel Marketplace managed projects.
+              </AlertTitle_Shadcn_>
+            </Alert_Shadcn_>
           ) : (
             <>
               <Markdown content={VercelContentSectionTop} />

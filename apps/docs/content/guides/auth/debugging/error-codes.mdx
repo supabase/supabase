@@ -5,11 +5,11 @@ description: 'Supabase Auth Error Codes'
 subtitle: 'Learn about the Auth error codes and how to resolve them'
 ---
 
-## Auth Error Codes
+## Auth error codes
 
 Supabase Auth can return various errors when using its API. This guide explains how to handle these errors effectively across different programming languages.
 
-## Error Types
+## Error types
 
 Supabase Auth errors are generally categorized into two main types:
 
@@ -59,24 +59,25 @@ Errors originating from the server API classed as `AuthApiError` always have a `
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
-All errors originating from the `supabase.auth` namespace of the JavaScript client library will be wrapped by the `AuthError` class.
+All exceptions originating from the `supabase.auth` namespace of the Kotlin client library will be a subclass of `RestException`.
 
-Error objects are split in a few classes:
+Rest exceptions are split into a few classes:
 
-- `AuthApiError` -- errors which originate from the Supabase Auth API.
-  - Use `isAuthApiError` instead of `instanceof` checks to see if an error you caught is of this type.
-- `CustomAuthError` -- errors which generally originate from state in the client library.
-  - Use the `name` property on the error to identify the class of error received.
+- `AuthRestException` -- exceptions which originate from the Supabase Auth API and have a `errorCode` property that can be used to identify the error returned by the server.
+- `AuthWeakPasswordException` -- an `AuthRestException` which indicates that the password is too weak.
+- `AuthSessionMissingException` -- an `AuthRestException` which indicates that the session is missing, if the user was logged out or deleted.
 
-Errors originating from the server API classed as `AuthApiError` always have a `code` property that can be used to identify the error returned by the server. The `status` property is also present, encoding the HTTP status code received in the response.
+All instances and subclasses of a `AuthRestException` have a `errorCode` property that can be used to identify the error returned by the server.
 
 </TabPanel>
 
 </Tabs>
 
-## HTTP Status Codes
+## HTTP status codes
 
 Below are the most common HTTP status codes you might encounter, along with their meanings in the context of Supabase Auth:
+
+{/* supa-mdx-lint-disable Rule001HeadingCase */}
 
 ### [403 Forbidden](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403)
 
@@ -98,13 +99,15 @@ Indicate that the Auth server's service is degraded. Most often it points to iss
 
 Sent out when a feature is not enabled on the Auth server, and you are trying to use an API which requires it.
 
-The following table provides a comprehensive list of error codes you may encounter when working with Supabase Auth. Each error code is associated with a specific issue and includes a description to help you understand and resolve the problem efficiently.
+{/* supa-mdx-lint-enable Rule001HeadingCase */}
 
-## Auth Error Codes Table
+## Auth error codes table
+
+The following table provides a comprehensive list of error codes you may encounter when working with Supabase Auth. Each error code is associated with a specific issue and includes a description to help you understand and resolve the problem efficiently.
 
 <AuthErrorCodesTable />
 
-## Best Practices for Error Handling
+## Best practices for error handling
 
 - Always use `error.code` and `error.name` to identify errors, not string matching on error messages.
 - Avoid relying solely on HTTP status codes, as they may change unexpectedly.

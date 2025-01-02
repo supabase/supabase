@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { last } from 'lodash'
-import { FileText } from 'lucide-react'
+import { ArrowDown, FileText, Info, X } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { Message as MessageType } from 'ai/react'
 import { useChat } from 'ai/react'
+import { useParams, useSearchParamsShallow } from 'common/hooks'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 import OptInToOpenAIToggle from 'components/interfaces/Organization/GeneralSettings/OptInToOpenAIToggle'
@@ -23,9 +24,11 @@ import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH, IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { TELEMETRY_EVENTS, TELEMETRY_VALUES } from 'lib/constants/telemetry'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import uuidv4 from 'lib/uuid'
+import { useRouter } from 'next/router'
 import { useAppStateSnapshot } from 'state/app-state'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   Button,
@@ -37,13 +40,11 @@ import {
 } from 'ui'
 import { Admonition, AssistantChatForm, GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import DotGrid from '../DotGrid'
 import AIOnboarding from './AIOnboarding'
 import CollapsibleCodeBlock from './CollapsibleCodeBlock'
 import { Message } from './Message'
-import { useParams } from 'common/hooks'
-import { useSearchParamsShallow } from 'common/hooks'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useRouter } from 'next/router'
+import { useAutoScroll } from './hooks'
 
 const MemoizedMessage = memo(
   ({ message, isLoading }: { message: MessageType; isLoading: boolean }) => {
@@ -89,8 +90,7 @@ export const AIAssistant = ({
   const { open, initialInput, sqlSnippets, suggestions } = aiAssistantPanel
 
   const inputRef = useRef<HTMLTextAreaElement>(null)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const { ref: scrollContainerRef, isSticky, scrollToEnd } = useAutoScroll()
 
   const [value, setValue] = useState<string>(initialInput)
   const [assistantError, setAssistantError] = useState<string>()
@@ -118,11 +118,10 @@ export const AIAssistant = ({
   const currentSchema = searchParams?.get('schema') ?? 'public'
 
   const { mutate: sendEvent } = useSendEventMutation()
-  const sendTelemetryEvent = (value: string) => {
+  const sendTelemetryEvent = (action: TelemetryActions) => {
     sendEvent({
-      value,
-      action: TELEMETRY_EVENTS.AI_ASSISTANT_V2,
-      ...((sqlSnippets ?? []).length > 0 ? { label: 'context-added' } : {}),
+      action,
+      properties: { contextAdded: (sqlSnippets ?? []).length > 0 },
     })
   }
 
@@ -135,7 +134,6 @@ export const AIAssistant = ({
     id,
     api: `${BASE_PATH}/api/ai/sql/generate-v3`,
     maxSteps: 5,
-    // [Joshen] Not currently used atm, but initialMessages will be for...
     initialMessages,
     body: {
       includeSchemaMetadata,
@@ -143,6 +141,11 @@ export const AIAssistant = ({
       connectionString: project?.connectionString,
       schema: currentSchema,
       table: currentTable?.name,
+    },
+    onFinish: (message) => {
+      setAiAssistantPanel({
+        messages: [...chatMessages, message],
+      })
     },
   })
 
@@ -185,16 +188,20 @@ export const AIAssistant = ({
       headers: { Authorization: headerData.get('Authorization') ?? '' },
     })
 
-    setAiAssistantPanel({ sqlSnippets: undefined })
+    setAiAssistantPanel({ sqlSnippets: undefined, messages: [...messages, payload] })
     setValue('')
     setAssistantError(undefined)
     setLastSentMessage(payload)
 
     if (content.includes('Help me to debug')) {
-      sendTelemetryEvent(TELEMETRY_VALUES.DEBUG_SUBMITTED)
+      sendTelemetryEvent(TelemetryActions.ASSISTANT_DEBUG_SUBMITTED)
     } else {
-      sendTelemetryEvent(TELEMETRY_VALUES.PROMPT_SUBMITTED)
+      sendTelemetryEvent(TelemetryActions.ASSISTANT_PROMPT_SUBMITTED)
     }
+  }
+
+  const closeAssistant = () => {
+    setAiAssistantPanel({ open: false })
   }
 
   const confirmOptInToShareSchemaData = async () => {
@@ -221,33 +228,16 @@ export const AIAssistant = ({
     )
   }
 
-  const handleScroll = () => {
-    const container = scrollContainerRef.current
-    if (container) {
-      const scrollPercentage =
-        (container.scrollTop / (container.scrollHeight - container.clientHeight)) * 100
-      const isScrollable = container.scrollHeight > container.clientHeight
-      const isAtBottom = scrollPercentage >= 100
-
-      setShowFade(isScrollable && !isAtBottom)
-    }
-  }
-
-  // Add useEffect to set up scroll listener
+  // Update scroll behavior for new messages
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (container) {
-      container.addEventListener('scroll', handleScroll)
-      // Initial check
-      handleScroll()
+    if (!isChatLoading) {
+      if (inputRef.current) inputRef.current.focus()
     }
 
-    return () => {
-      if (container) {
-        container.removeEventListener('scroll', handleScroll)
-      }
+    if (isSticky) {
+      setTimeout(scrollToEnd, 0)
     }
-  }, [])
+  }, [isChatLoading, isSticky, scrollToEnd, messages])
 
   useEffect(() => {
     setValue(initialInput)
@@ -256,30 +246,6 @@ export const AIAssistant = ({
       inputRef.current.setSelectionRange(initialInput.length, initialInput.length)
     }
   }, [initialInput])
-
-  useEffect(() => {
-    if (!isChatLoading) {
-      if (inputRef.current) inputRef.current.focus()
-    }
-
-    setTimeout(
-      () => {
-        if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-      },
-      isChatLoading ? 100 : 500
-    )
-  }, [isChatLoading])
-
-  useEffect(() => {
-    if (bottomRef.current) bottomRef.current.scrollIntoView({ behavior: 'smooth' })
-    handleScroll()
-    // Load messages into state
-    if (!isChatLoading) {
-      setAiAssistantPanel({
-        messages,
-      })
-    }
-  }, [messages, isChatLoading, setAiAssistantPanel])
 
   // Remove suggestions if sqlSnippets were removed
   useEffect(() => {
@@ -295,37 +261,38 @@ export const AIAssistant = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, isInSQLEditor, snippetContent])
 
-  if (isLoadingTables) {
-    return (
-      <div className="h-full w-full flex justify-center items-center">
-        {/* [Joshen] We could try play around with a custom loader for the assistant here */}
-        <GenericSkeletonLoader className="w-4/5" />
-      </div>
-    )
-  }
-
   return (
     <>
       <div className={cn('flex flex-col h-full', className)}>
-        <div
-          ref={scrollContainerRef}
-          className={cn('flex-grow overflow-auto flex flex-col')}
-          onScroll={handleScroll}
-        >
-          <div className="z-30 bg-background/80 backdrop-blur-md sticky top-0">
-            <div className="border-b  flex items-center gap-x-3 px-5 h-[46px]">
-              <AiIconAnimation loading={false} allowHoverEffect />
+        <div ref={scrollContainerRef} className={cn('flex-grow overflow-auto flex flex-col')}>
+          <div className="z-30 sticky top-0">
+            <div className="border-b flex items-center bg gap-x-3 px-5 h-[46px]">
+              <AiIconAnimation allowHoverEffect />
 
-              <div className="text-sm flex-1">{hasMessages ? 'New chat' : 'Assistant'}</div>
-              <div className="flex gap-2">
-                {(hasMessages || suggestions || sqlSnippets) && (
-                  <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
-                    Reset
-                  </Button>
-                )}
+              <div className="text-sm flex-1">Assistant</div>
+              <div className="flex gap-4 items-center">
+                <Tooltip_Shadcn_ delayDuration={100}>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Info size={14} className="text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ className="w-80">
+                    The Assistant is in Alpha and your prompts might be rate limited.{' '}
+                    {includeSchemaMetadata
+                      ? 'Project metadata is being shared to improve Assistant responses.'
+                      : 'Project metadata is not being shared. Opt in to improve Assistant responses.'}
+                  </TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+                <div className="flex gap-2">
+                  {(hasMessages || suggestions || sqlSnippets) && (
+                    <Button type="default" disabled={isChatLoading} onClick={onResetConversation}>
+                      Reset
+                    </Button>
+                  )}
+                  <Button type="default" className="w-7" onClick={closeAssistant} icon={<X />} />
+                </div>
               </div>
             </div>
-            {!includeSchemaMetadata && (
+            {!includeSchemaMetadata && selectedOrganization && (
               <Admonition
                 type="default"
                 title="Project metadata is not shared"
@@ -334,7 +301,7 @@ export const AIAssistant = ({
                     ? 'Your organization has the HIPAA addon and will not send any project metadata with your prompts.'
                     : 'The Assistant can improve the quality of the answers if you send project metadata along with your prompts. Opt into sending anonymous data to share your schema and table definitions.'
                 }
-                className="border-0 border-b rounded-none"
+                className="border-0 border-b rounded-none bg-background"
               >
                 {!hasHipaaAddon && (
                   <Button
@@ -348,44 +315,43 @@ export const AIAssistant = ({
               </Admonition>
             )}
           </div>
+          {!hasMessages && (
+            <div className="h-48 flex-0 m-8">
+              <DotGrid rows={10} columns={10} count={33} />
+            </div>
+          )}
           {hasMessages ? (
-            <motion.div className="w-full p-8 flex flex-col">
-              <div className="text-xs text-foreground-lighter text-center mb-5">
-                {new Date(messages[0].createdAt || new Date()).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                })}
-              </div>
+            <motion.div className="w-full p-5">
               {renderedMessages}
               {(last(messages)?.role === 'user' || last(messages)?.content?.length === 0) && (
-                <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
-                  <span>Thinking</span>
-                  <div className="flex gap-1">
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
-                    >
-                      .
-                    </motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
-                    >
-                      .
-                    </motion.span>
-                    <motion.span
-                      animate={{ opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
-                    >
-                      .
-                    </motion.span>
-                  </div>
-                </motion.div>
+                <div className="flex gap-4 w-auto overflow-hidden">
+                  <AiIconAnimation size={20} className="text-foreground-muted shrink-0" />
+                  <motion.div className="text-foreground-lighter text-sm flex gap-1.5 items-center">
+                    <span>Thinking</span>
+                    <div className="flex gap-1">
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+                      >
+                        .
+                      </motion.span>
+                      <motion.span
+                        animate={{ opacity: [0, 1, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, delay: 0.6 }}
+                      >
+                        .
+                      </motion.span>
+                    </div>
+                  </motion.div>
+                </div>
               )}
-              <div ref={bottomRef} className="h-1" />
+              <div className="h-1" />
             </motion.div>
           ) : suggestions ? (
             <div className="w-full h-full px-8 py-0 flex flex-col flex-1 justify-end">
@@ -394,7 +360,7 @@ export const AIAssistant = ({
               </h3>
               {suggestions.title && <p>{suggestions.title}</p>}
               <div className="-mx-3 mt-4 mb-12">
-                {suggestions?.prompts?.map((prompt, idx) => (
+                {suggestions?.prompts?.map((prompt: string, idx: number) => (
                   <Button
                     key={`suggestion-${idx}`}
                     size="small"
@@ -414,48 +380,15 @@ export const AIAssistant = ({
                 ))}
               </div>
             </div>
+          ) : isLoadingTables ? (
+            <div className="w-full h-full flex-1 flex flex-col justify-end items-start p-5">
+              {/* [Joshen] We could try play around with a custom loader for the assistant here */}
+              <GenericSkeletonLoader className="w-4/5" />
+            </div>
           ) : (tables ?? [])?.length > 0 ? (
             <AIOnboarding setMessages={setMessages} onSendMessage={sendMessageToAssistant} />
           ) : (
-            <div className="w-full flex flex-col justify-end flex-1 h-full p-8">
-              <div className="flex-1">
-                <div className="shrink-0 h-64 mb-5 w-auto overflow-hidden -mx-8 -mt-8 relative">
-                  <motion.div
-                    initial={{ height: '800%', bottom: 0 }}
-                    animate={{ height: '100%', bottom: 0, transition: { duration: 8 } }}
-                    className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-b from-transparent to-background"
-                  />
-                  <div className="h-full w-full relative">
-                    <motion.div
-                      initial={{ x: 350, rotate: -45 }}
-                      animate={{
-                        x: 400,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                    <motion.div
-                      initial={{ x: 380, rotate: -45 }}
-                      animate={{
-                        x: 500,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                    <motion.div
-                      initial={{ x: 410, rotate: -45 }}
-                      animate={{
-                        x: 600,
-                        rotate: -45,
-                        transition: { duration: 5, ease: 'easeInOut' },
-                      }}
-                      className="absolute -inset-full bg-gradient-to-b from-black/[0.05] dark:from-white/[0.08] to-transparent "
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="w-full flex flex-col justify-end flex-1 h-full p-5">
               <h2 className="text-base mb-2">Welcome to Supabase!</h2>
               <p className="text-sm text-foreground-lighter mb-6">
                 This is the Supabase assistant which will help you create, debug and modify tables,
@@ -471,7 +404,7 @@ export const AIAssistant = ({
                   Generate a ...
                 </Button>
                 {SQL_TEMPLATES.filter((t) => t.type === 'quickstart').map((qs) => (
-                  <TooltipProvider_Shadcn_>
+                  <TooltipProvider_Shadcn_ key={qs.title}>
                     <Tooltip_Shadcn_>
                       <TooltipTrigger_Shadcn_ asChild>
                         <Button
@@ -508,16 +441,47 @@ export const AIAssistant = ({
           )}
         </div>
 
-        {showFade && (
-          <div className="pointer-events-none z-10 -mt-24">
-            <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
-          </div>
-        )}
+        <AnimatePresence>
+          {!isSticky && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="pointer-events-none z-10 -mt-24"
+              >
+                <div className="h-24 w-full bg-gradient-to-t from-background to-transparent" />
+              </motion.div>
+              <motion.div
+                className="absolute bottom-20 left-1/2 -translate-x-1/2"
+                variants={{
+                  hidden: { y: 5, opacity: 0 },
+                  show: { y: 0, opacity: 1 },
+                }}
+                transition={{ duration: 0.1 }}
+                initial="hidden"
+                animate="show"
+                exit="hidden"
+              >
+                <Button
+                  type="default"
+                  className="rounded-full w-8 h-8 p-1.5"
+                  onClick={() => {
+                    scrollToEnd()
+                    if (inputRef.current) inputRef.current.focus()
+                  }}
+                >
+                  <ArrowDown size={16} />
+                </Button>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
 
         <div className="p-5 pt-0 z-20 relative">
           {sqlSnippets && sqlSnippets.length > 0 && (
             <div className="mb-2">
-              {sqlSnippets.map((snippet, index) => (
+              {sqlSnippets.map((snippet: string, index: number) => (
                 <CollapsibleCodeBlock
                   key={index}
                   hideLineNumbers
@@ -565,7 +529,7 @@ export const AIAssistant = ({
                 ? 'Reply to the assistant...'
                 : (sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'How can we help you today?'
+                  : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
@@ -573,19 +537,17 @@ export const AIAssistant = ({
               event.preventDefault()
               if (includeSchemaMetadata) {
                 const sqlSnippetsString =
-                  sqlSnippets?.map((snippet) => '```sql\n' + snippet + '\n```').join('\n') || ''
+                  sqlSnippets
+                    ?.map((snippet: string) => '```sql\n' + snippet + '\n```')
+                    .join('\n') || ''
                 const valueWithSnippets = [value, sqlSnippetsString].filter(Boolean).join('\n\n')
                 sendMessageToAssistant(valueWithSnippets)
+                scrollToEnd()
               } else {
                 sendMessageToAssistant(value)
               }
             }}
           />
-          {!hasMessages && (
-            <p className="text-xs text-foreground-lighter mt-2">
-              The Assistant is in Alpha and your prompts might be rate limited
-            </p>
-          )}
         </div>
       </div>
 

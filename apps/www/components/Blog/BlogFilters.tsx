@@ -8,7 +8,7 @@ import { useKey } from 'react-use'
 import type { BlogView } from '~/pages/blog'
 import type PostTypes from '~/types/post'
 
-import { AlignJustify, ChevronDown, Grid, Search, X } from 'lucide-react'
+import { AlignJustify, ChevronDown, Grid, Search, X as CloseIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -259,7 +259,7 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
                     }}
                     className="text-foreground-light hover:text-foreground hover:bg-selection"
                   >
-                    <X size="14" />
+                    <CloseIcon size="14" />
                   </Button>
                 )
               }
@@ -271,9 +271,13 @@ function BlogFilters({ allPosts, setPosts, view, setView }: Props) {
         type="default"
         title={isList ? 'Grid View' : 'List View'}
         onClick={handleViewSelection}
-        className="h-full p-1.5"
+        className="h-full p-2 text-foreground-light"
       >
-        {isList ? <Grid /> : <AlignJustify />}
+        {isList ? (
+          <Grid className="w-4 h-4 stroke-1.5" />
+        ) : (
+          <AlignJustify className="w-4 h-4 stroke-1.5" />
+        )}
       </Button>
     </div>
   )

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
+import Connect from 'components/interfaces/Connect/Connect'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
-import Connect from 'components/interfaces/Home/Connect/Connect'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
 import { SecurityStatus } from 'components/interfaces/Home/SecurityStatus'
@@ -12,16 +12,30 @@ import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectL
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Badge,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
+import { InlineLink } from 'components/ui/InlineLink'
 
 const Home: NextPageWithLayout = () => {
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
+
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
 
+  const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
 
@@ -44,6 +58,21 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <div className="flex flex-row items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
+          {isOrioleDb && (
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
+                <Badge variant="warning">OrioleDB</Badge>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="start" className="max-w-80 text-center">
+                This project is using Postgres with OrioleDB which is currently in preview and not
+                suitable for production workloads. View our{' '}
+                <InlineLink href="https://supabase.com/docs/guides/database/orioledb">
+                  documentation
+                </InlineLink>{' '}
+                for all limitations.
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          )}
           <ComputeBadgeWrapper
             project={{
               ref: project?.ref,
@@ -56,7 +85,9 @@ const Home: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-3">
           {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
-          {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
+          {IS_PLATFORM &&
+            project?.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
+            !connectDialogUpdate && <Connect />}
         </div>
       </div>
 

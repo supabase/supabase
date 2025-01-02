@@ -8,7 +8,7 @@ module.exports = config({
     // purge styles from grid library
     //
     './../../packages/ui/src/**/*.{tsx,ts,js}',
-    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/!(node_modules)/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {
