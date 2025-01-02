@@ -1,4 +1,3 @@
-import { isNil } from 'lodash'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
@@ -65,8 +64,15 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   })
 
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
-  const initialValue = row[column.key as keyof TRow] as string
-  const jsonString = prettifyJSON(!isNil(initialValue) ? tryFormatInitialValue(initialValue) : '')
+
+  const rawInitialValue = row[column.key as keyof TRow] as unknown
+  const initialValue =
+    rawInitialValue === null || rawInitialValue === undefined || typeof rawInitialValue === 'string'
+      ? rawInitialValue
+      : JSON.stringify(rawInitialValue)
+
+  const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
+
   const isTruncated =
     typeof initialValue === 'string' &&
     initialValue.endsWith('...') &&
