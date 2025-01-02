@@ -7,9 +7,8 @@ export enum TelemetryActions {
   ASSISTANT_PROMPT_SUBMITTED = 'assistant_prompt_submitted',
   ASSISTANT_DEBUG_SUBMITTED = 'assistant_debug_submitted',
   ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED = 'assistant_suggestion_run_query_clicked',
-  ASSISTANT_SUGGESTION_ACCEPT_CLICKED = 'assistant_suggestion_accept_clicked',
-  ASSISTANT_SUGGESTION_REJECT_CLICKED = 'assistant_suggestion_reject_clicked',
-  ASSISTANT_EDIT_SQL_CLICKED = 'assistant_edit_sql_clicked',
+  ASSISTANT_SQL_DIFF_HANDLER_EVALUATED = 'assistant_sql_diff_handler_evaluated',
+  ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED = 'assistant_edit_in_sql_editor_clicked',
 
   CONNECTION_STRING_COPIED = 'connection_string_copied',
 
@@ -393,7 +392,7 @@ export interface AssistantDebugSubmittedEvent {
 }
 
 /**
- * User clicked the run query button in the suggestion provided by the assistant sidebar.
+ * User clicked the run query button in the suggestion provided in the assistant sidebar.
  *
  * @group Events
  * @source studio
@@ -404,39 +403,41 @@ export interface AssistantSuggestionRunQueryClickedEvent {
     /**
      * The type of suggestion that was run by the user. Mutate or Select query types only.
      */
-    type: string
+    queryType: string
     category?: string
   }
 }
 
 /**
- * User accepted a suggestion after clicking any option in Edit in Sql Editor in suggestion provided by the assistant. The options only appear in any page with 'sql' in url.
+ * User accepted or rejected changes in sql ai diff handler. They can accept change by clicking accept button or typing shortcut (CMD+Enter) or reject by clicking reject button or typing shortcut (Esc). Handler only appears after clicking any dropdown option in Edit in Sql Editor in suggestion provided by the assistant. The dropdown options only appear in any page with 'sql' in url.
  *
  * @group Events
  * @source studio
  * @page /dashboard/project/{ref}/sql
  */
-export interface AssistantSuggestionAcceptClickedEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_ACCEPT_CLICKED
+export interface AssistantSqlDiffHandlerEvaluatedEvent {
+  action: TelemetryActions.ASSISTANT_SQL_DIFF_HANDLER_EVALUATED
+  properties: {
+    /**
+     * Whether the user accepted or rejected the changes.
+     */
+    handlerAccepted: boolean
+  }
 }
 
 /**
- * User rejected a suggestion after clicking any option in Edit in SQL Editor in suggestion provided by the assistant. The options only appear in any page with 'sql' in url.
- *
- * @group Events
- * @source studio
- * @page /dashboard/project/{ref}/sql
- */
-export interface AssistantSuggestionRejectClickedEvent {
-  action: TelemetryActions.ASSISTANT_SUGGESTION_REJECT_CLICKED
-}
-
-/**
- * User clicked to edit SQL in the assistant when user is in any page that does not have 'sql' in url. Will be redirected to SQL editor after clicking.
+ * User clicked Edit in SQL Editor button in the assistant sidebar when user is in any page that does not have 'sql' in url or is in a new snippet.
  *
  * @group Events
  * @source studio
  */
-export interface AssistantEditSqlClickedEvent {
-  action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED
+export interface AssistantEditInSqlEditorClickedEvent {
+  action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED
+  properties: {
+    /**
+     * Whether the user is in the SQL editor page or in a new snippet.
+     */
+    isInSQLEditor: boolean
+    isInNewSnippet: boolean
+  }
 }

@@ -33,9 +33,8 @@ import {
   AssistantPromptSubmittedEvent,
   AssistantDebugSubmittedEvent,
   AssistantSuggestionRunQueryClickedEvent,
-  AssistantSuggestionAcceptClickedEvent,
-  AssistantSuggestionRejectClickedEvent,
-  AssistantEditSqlClickedEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantEditInSqlEditorClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
@@ -68,9 +67,8 @@ export type SendEventVariables =
   | AssistantPromptSubmittedEvent
   | AssistantDebugSubmittedEvent
   | AssistantSuggestionRunQueryClickedEvent
-  | AssistantSuggestionAcceptClickedEvent
-  | AssistantSuggestionRejectClickedEvent
-  | AssistantEditSqlClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
 
   // TODO remove this once all events are documented
   | {

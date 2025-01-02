@@ -261,7 +261,13 @@ export const SqlCard = ({
                     icon={<Edit size={14} />}
                     onClick={() => {
                       handleEditInSQLEditor()
-                      sendEvent({ action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED })
+                      sendEvent({
+                        action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED,
+                        properties: {
+                          isInSQLEditor,
+                          isInNewSnippet,
+                        },
+                      })
                     }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
