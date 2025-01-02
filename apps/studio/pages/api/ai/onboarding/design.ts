@@ -43,31 +43,6 @@ const getTools = () => {
         title: z.string().describe('The project title'),
       }),
     }),
-
-    saveUserInfo: tool({
-      description: 'Save information about the user and their requirements',
-      parameters: z.object({
-        platform: z
-          .enum(['NextJS', 'Vue', 'Vite', 'Swift', 'React Native'])
-          .optional()
-          .describe('The platform the user is building for'),
-        userCount: z.number().optional().describe('Expected number of users'),
-        industry: z.string().optional().describe('Industry or domain of the application'),
-        region: z.string().optional().describe('Geographic region for deployment'),
-        scale: z.string().optional().describe('Expected scale of the application'),
-      }),
-    }),
-
-    setDatabaseConfig: tool({
-      description: 'Save database configuration details',
-      parameters: z.object({
-        region: z.string().describe('The region where the database will be deployed'),
-        postgresVersion: z.string().describe('The version of Postgres to use'),
-        computeSize: z.string().optional().describe('The compute instance size'),
-        storageSize: z.number().optional().describe('The storage size in GB'),
-        highAvailability: z.boolean().optional().describe('Whether to enable high availability'),
-      }),
-    }),
   }
 }
 

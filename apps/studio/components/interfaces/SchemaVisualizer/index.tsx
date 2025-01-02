@@ -1,6 +1,6 @@
 import { PGlite } from '@electric-sql/pglite'
 import { PostgresMetaBase, wrapError, wrapResult } from '@gregnr/postgres-meta/base'
-import { Edge, Node, Position, ReactFlowProvider } from 'reactflow'
+import { Edge, Node, ReactFlowProvider } from 'reactflow'
 import { useEffect, useRef, useState } from 'react'
 import { SchemaFlow } from 'components/interfaces/ProjectCreation/SchemaFlow'
 import { getGraphDataFromTables } from '../Database/Schemas/Schemas.utils'
