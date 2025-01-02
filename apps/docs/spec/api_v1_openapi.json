@@ -336,6 +336,25 @@
         "operationId": "v1-list-all-snippets",
         "summary": "Lists SQL snippets for the logged in user",
         "parameters": [
+          { "name": "cursor", "required": false, "in": "query", "schema": { "type": "string" } },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": { "type": "string", "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "sort_by",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["name", "inserted_at"], "type": "string" }
+          },
+          {
+            "name": "sort_order",
+            "required": false,
+            "in": "query",
+            "schema": { "enum": ["asc", "desc"], "type": "string" }
+          },
           {
             "name": "project_ref",
             "required": false,
@@ -3062,7 +3081,8 @@
       "SnippetList": {
         "type": "object",
         "properties": {
-          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } }
+          "data": { "type": "array", "items": { "$ref": "#/components/schemas/SnippetMeta" } },
+          "cursor": { "type": "string" }
         },
         "required": ["data"]
       },
