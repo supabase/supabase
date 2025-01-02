@@ -24,10 +24,10 @@ export async function triggerClone({
   const { data, error } = await post('/platform/database/{ref}/clone', {
     params: { path: { ref: projectRef } },
     body: {
-      cloneBackupId: cloneBackupId ?? 0,
+      cloneBackupId,
       newProjectName,
       newDbPass,
-      recoveryTimeTarget: recoveryTimeTarget ?? 0,
+      recoveryTimeTarget,
     },
   })
 

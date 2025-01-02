@@ -8449,7 +8449,23 @@ export interface components {
       postgres_version: string
       ref: string
       release_channel: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
     }
     BranchResponse: {
       created_at: string
@@ -8467,7 +8483,14 @@ export interface components {
       /** Format: int32 */
       pr_number?: number
       project_ref: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status:
+        | 'CREATING_PROJECT'
+        | 'RUNNING_MIGRATIONS'
+        | 'MIGRATIONS_PASSED'
+        | 'MIGRATIONS_FAILED'
+        | 'FUNCTIONS_DEPLOYED'
+        | 'FUNCTIONS_FAILED'
       updated_at: string
     }
     BranchUpdateResponse: {
@@ -8486,11 +8509,11 @@ export interface components {
     }
     CloneProjectDto: {
       /** @default 0 */
-      cloneBackupId: number
+      cloneBackupId?: number
       newDbPass: string
       newProjectName: string
       /** @default 0 */
-      recoveryTimeTarget: number
+      recoveryTimeTarget?: number
     }
     Column: {
       id: number
@@ -10637,7 +10660,23 @@ export interface components {
       ref: string
       region: string
       restUrl: string
-      status: Record<string, never>
+      /** @enum {string} */
+      status:
+        | 'INACTIVE'
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'UNKNOWN'
+        | 'GOING_DOWN'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UPGRADING'
+        | 'PAUSING'
+        | 'RESTORE_FAILED'
+        | 'RESTARTING'
+        | 'PAUSE_FAILED'
+        | 'RESIZING'
       subscription_id: string
       volumeSizeGb?: number
     }
@@ -11377,7 +11416,8 @@ export interface components {
     }
     SupavisorConfigResponse: {
       connectionString: string
-      database_type: Record<string, never>
+      /** @enum {string} */
+      database_type: 'PRIMARY' | 'READ_REPLICA'
       db_host: string
       db_name: string
       db_port: number
@@ -11854,17 +11894,17 @@ export interface components {
        * @description Growth percentage for disk autoscaling
        * @default 50
        */
-      growth_percent: number
+      growth_percent?: number
       /**
        * @description Maximum limit the disk size will grow to in GB
        * @default 61440
        */
-      max_size_gb: number
+      max_size_gb?: number
       /**
        * @description Minimum increment size for disk autoscaling in GB
        * @default 4
        */
-      min_increment_gb: number
+      min_increment_gb?: number
     }
     UpdateFunctionBody: {
       args?: string[]
@@ -12352,7 +12392,7 @@ export interface components {
       updated_at?: string
     }
     UpdateVercelConnectionsBody: {
-      /** @enum {string} */
+      /** @enum {array} */
       env_sync_targets?: 'production' | 'preview' | 'development'
       public_env_var_prefix?: string
     }

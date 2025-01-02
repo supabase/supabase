@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { handleError, patch } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { UpdateConnectionPayload } from './integrations.types'
+import type { EnvironmentTargets, UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateVercelConnection({
@@ -16,6 +16,8 @@ export async function updateVercelConnection({
       path: { connection_id: id },
     },
     body: {
+      // @ts-expect-error for some reason openapi-typescript doesn't generate
+      // the array part of this type correctly
       env_sync_targets: envSyncTargets,
       public_env_var_prefix: publicEnvVarPrefix,
     },
