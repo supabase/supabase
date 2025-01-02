@@ -168,7 +168,7 @@ const TableEditorMenu = () => {
             )}
           </div>
         </div>
-        <div className="flex flex-auto flex-col gap-2 px-2">
+        <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
               autoFocus={!isMobile}
