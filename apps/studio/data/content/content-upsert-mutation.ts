@@ -25,17 +25,8 @@ export async function upsertContent(
 ) {
   const { data, error } = await put('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
-    body: {
-      id: payload.id,
-      name: payload.name,
-      description: payload.description,
-      project_id: payload.project_id,
-      owner_id: payload.owner_id,
-      type: payload.type,
-      visibility: payload.visibility,
-      content: payload.content as any,
-      folder_id: payload.folder_id,
-    },
+    body: payload,
+    headers: { Version: '2' },
     signal,
   })
   if (error) handleError(error)
