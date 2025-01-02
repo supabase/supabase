@@ -147,6 +147,12 @@ const Wizard: NextPageWithLayout = () => {
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
+  // Temp: If user is part of project creation experiment, redirect to /new/v2
+  const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
+  if (currentOrg && projectCreationExperimentGroup === 'group-b') {
+    router.push(`/new/v2/${currentOrg.slug}`)
+  }
+
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
