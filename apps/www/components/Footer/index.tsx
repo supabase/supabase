@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import SectionContainer from '../Layouts/SectionContainer'
+import { useEffect, useState } from 'react'
 
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
@@ -18,6 +19,14 @@ interface Props {
 
 const Footer = (props: Props) => {
   const { pathname } = useRouter()
+
+  const [year, setYear] = useState(new Date().getFullYear())
+
+  useEffect(() => {
+    fetch('https://getfullyear.com/api/year')
+      .then((response) => response.json())
+      .then((data) => setYear(data.year))
+  }, [])
 
   const isDarkLaunchWeek = useDarkLaunchWeeks()
   const isGAWeek = pathname.includes('/ga-week')
@@ -164,6 +173,7 @@ const Footer = (props: Props) => {
         </div>
         <div className="border-default mt-32 flex justify-between border-t pt-8">
           <small className="small">&copy; Supabase Inc</small>
+          <small>{year}</small>
           <div className={cn(forceDark && 'hidden')}>
             <ThemeToggle forceDark={forceDark} />
           </div>
