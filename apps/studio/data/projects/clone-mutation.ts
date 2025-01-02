@@ -23,7 +23,12 @@ export async function triggerClone({
   if (!projectRef) throw new Error('Project ref is required')
   const { data, error } = await post('/platform/database/{ref}/clone', {
     params: { path: { ref: projectRef } },
-    body: { cloneBackupId, newProjectName, newDbPass, recoveryTimeTarget },
+    body: {
+      cloneBackupId: cloneBackupId ?? 0,
+      newProjectName,
+      newDbPass,
+      recoveryTimeTarget: recoveryTimeTarget ?? 0,
+    },
   })
 
   if (error) handleError(error)
