@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { API_URL, IS_PLATFORM } from 'lib/constants'
+import { API_URL } from 'lib/constants'
 import { getAccessToken } from 'lib/gotrue'
 import { uuidv4 } from 'lib/helpers'
 import createClient from 'openapi-fetch'
