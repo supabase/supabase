@@ -5,9 +5,37 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Tue, 10 Dec 2024 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
+  <title>AI Hackathon at Y Combinator</title>
+  <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>
+  <description>Announcing the winners of the Supabase AI Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</guid>
+  <title>Calendars in Postgres using Foreign Data Wrappers</title>
+  <link>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</link>
+  <description>Calendar data integration with Cal.com using Wasm foreign data wrapper on Supabase</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw13-hackathon-winners</guid>
+  <title>Supabase Launch Week 13 Hackathon Winners</title>
+  <link>https://supabase.com/blog/lw13-hackathon-winners</link>
+  <description>Announcing the winners of the Supabase Launch Week 13 Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/how-to-hack-the-base</guid>
+  <title>How to Hack the Base!</title>
+  <link>https://supabase.com/blog/how-to-hack-the-base</link>
+  <description>Played cool games, won cool prizes.</description>
+  <pubDate>Thu, 19 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/durable-workflows-in-postgres-dbos</guid>
   <title>Running Durable Workflows in Postgres using DBOS</title>
   <link>https://supabase.com/blog/durable-workflows-in-postgres-dbos</link>

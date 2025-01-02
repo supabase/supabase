@@ -767,6 +767,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'DBeaver',
       url: '/guides/database/dbeaver',
     },
+    {
+      name: 'Metabase',
+      url: '/guides/database/metabase',
+    },
   ],
 }
 
@@ -1015,6 +1019,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pg_repack',
         },
         {
           name: 'PostGIS: Geo queries',
@@ -1554,6 +1562,10 @@ export const realtime: NavMenuConstant = {
         {
           name: 'Listening to Postgres Changes with Flutter',
           url: '/guides/realtime/realtime-listening-flutter',
+        },
+        {
+          name: 'Migrate to Broadcast Changes',
+          url: '/guides/realtime/migrate-from-postgres-changes',
         },
       ],
     },
