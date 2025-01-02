@@ -10,9 +10,14 @@ permissions:
 jobs:
   comment-on-external-pr:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.repository.full_name != github.repository
     steps:
+      - name: Log repository information
+        run: |
+          echo "PULL REQUEST REPO: ${{ github.event.pull_request.head.repo.full_name }}"
+          echo "BASE REPO: ${{ github.event.pull_request.base.repo.full_name }}"
+          echo "GITHUB REPO: ${{ github.repository }}"
       - name: Comment on PR
+        if: github.event.pull_request.head.repo.full_name != github.repository
         uses: actions/github-script@v7
         with:
           script: |
