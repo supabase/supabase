@@ -547,6 +547,7 @@ To update configuration for a Supabase branch, simply modify `config.toml` and p
 ### Remote-specific configuration
 
 For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+
 Here's an example of configuring a separate seed script for a staging environment:
 
 ```toml
@@ -557,19 +558,11 @@ project_id = "your-project-ref"
 sql_paths = ["./seeds/staging.sql"]
 ```
 
-<Admonition type="note" label="Create persistent branches before configuring">
-
 Since the `project_id` field must reference an existing branch, you need to create the persistent branch before adding its configuration. Use the CLI to create a persistent branch first:
 
 ```bash
 supabase --experimental branches create --persistent
 # Do you want to create a branch named develop? [Y/n]
-```
-
-Then add the returned project ID to your `config.toml`.
-
-</Admonition>
-
 ### Configuration merging
 
 When merging a PR into a persistent branch, the Supabase integration:
@@ -582,7 +575,7 @@ If no remote is declared or the project ID is incorrect, the configuration step 
 
 ### Available configuration options
 
-All standard configuration options are available in the `remotes` block. This includes:
+All standard configuration options are available in the `[remotes]` block. This includes:
 
 - Database settings
 - API configurations
