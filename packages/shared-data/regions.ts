@@ -5,75 +5,75 @@ export const AWS_REGIONS = {
   WEST_US: {
     code: 'us-west-1',
     displayName: 'West US (North California)',
-    location: [-122.419418, 37.774929],
+    location: [37.774929, -122.419418],
   },
   EAST_US: {
     code: 'us-east-1',
     displayName: 'East US (North Virginia)',
-    location: [37.431572, -78.656891],
+    location: [37.926868, -78.024902],
   },
-  EAST_US_2: { code: 'us-east-2', displayName: 'East US (Ohio)', location: [-82.9988, 39.9612] },
+  EAST_US_2: { code: 'us-east-2', displayName: 'East US (Ohio)', location: [39.9612, -82.9988] },
   CENTRAL_CANADA: {
     code: 'ca-central-1',
     displayName: 'Canada (Central)',
-    location: [-106.346771, 56.130367],
+    location: [56.130367, -106.346771],
   },
-  WEST_EU: { code: 'eu-west-1', displayName: 'West EU (Ireland)', location: [-6.2603, 53.3498] },
+  WEST_EU: { code: 'eu-west-1', displayName: 'West EU (Ireland)', location: [53.3498, -6.2603] },
   WEST_EU_2: {
     code: 'eu-west-2',
     displayName: 'West Europe (London)',
-    location: [-0.127758, 51.507351],
+    location: [51.507351, -0.127758],
   },
-  WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [48.856613, 2.352222] },
+  WEST_EU_3: { code: 'eu-west-3', displayName: 'West EU (Paris)', location: [2.352222, 48.856613] },
   CENTRAL_EU: {
     code: 'eu-central-1',
     displayName: 'Central EU (Frankfurt)',
-    location: [8.682127, 50.110924],
+    location: [50.110924, 8.682127],
   },
   CENTRAL_EU_2: {
     code: 'eu-central-2',
     displayName: 'Central Europe (Zurich)',
-    location: [8.5410422, 47.3744489],
+    location: [47.3744489, 8.5410422],
   },
   NORTH_EU: {
     code: 'eu-north-1',
     displayName: 'North EU (Stockholm)',
-    location: [18.0710935, 59.3251172],
+    location: [59.3251172, 18.0710935],
   },
   SOUTH_ASIA: {
     code: 'ap-south-1',
     displayName: 'South Asia (Mumbai)',
-    location: [72.8281049, 18.9733536],
+    location: [18.9733536, 72.8281049],
   },
   SOUTHEAST_ASIA: {
     code: 'ap-southeast-1',
     displayName: 'Southeast Asia (Singapore)',
-    location: [103.8194992, 1.357107],
+    location: [1.357107, 103.8194992],
   },
   NORTHEAST_ASIA: {
     code: 'ap-northeast-1',
     displayName: 'Northeast Asia (Tokyo)',
-    location: [139.6917, 35.6895],
+    location: [35.6895, 139.6917],
   },
   NORTHEAST_ASIA_2: {
     code: 'ap-northeast-2',
     displayName: 'Northeast Asia (Seoul)',
-    location: [126.978, 37.5665],
+    location: [37.5665, 126.978],
   },
   OCEANIA: {
     code: 'ap-southeast-2',
     displayName: 'Oceania (Sydney)',
-    location: [151.2093, -33.8688],
+    location: [-33.8688, 151.2093],
   },
   SOUTH_AMERICA: {
     code: 'sa-east-1',
     displayName: 'South America (São Paulo)',
-    location: [-47.1583944, -1.2043218],
+    location: [-1.2043218, -47.1583944],
   },
 } as const
 
 export type AWS_REGIONS_KEYS = keyof typeof AWS_REGIONS
 
 export const FLY_REGIONS = {
-  SOUTHEAST_ASIA: { code: 'sin', displayName: 'Singapore', location: [103.8198, 1.3521] },
+  SOUTHEAST_ASIA: { code: 'sin', displayName: 'Singapore', location: [1.3521, 103.8198] },
 } as const

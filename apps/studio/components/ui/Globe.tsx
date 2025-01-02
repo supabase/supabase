@@ -12,24 +12,24 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
   const { resolvedTheme } = useTheme()
   const canvasRef = useRef<any>()
   const locationToAngles = (lat: number, long: number) => {
-    return [Math.PI - ((long * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180]
+    return [Math.PI - ((long * Math.PI) / 180 - Math.PI / 2), (lat * Math.PI) / 180 + 0.2]
   }
-  const focusRef = useRef([0, 0])
-  const currentLocationRef = useRef(currentLocation)
+  const currentPhiRef = useRef(0)
+  const currentThetaRef = useRef(0.3)
+  const targetPhiRef = useRef(0)
+  const targetThetaRef = useRef(0.3)
 
   useEffect(() => {
-    currentLocationRef.current = currentLocation
     if (currentLocation) {
       const [lat, long] = currentLocation
-      focusRef.current = locationToAngles(lat, long)
+      const [targetPhi, targetTheta] = locationToAngles(lat, long)
+      targetPhiRef.current = targetPhi
+      targetThetaRef.current = targetTheta
     }
   }, [currentLocation])
 
   useEffect(() => {
     let width = 0
-    let currentPhi = 0
-    let currentTheta = 0
-    const doublePi = Math.PI * 2
 
     const onResize = () => {
       if (canvasRef.current) {
@@ -46,7 +46,7 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       phi: 0,
       theta: 0.3,
       dark: resolvedTheme?.includes('dark') ? 1 : 0,
-      diffuse: 3,
+      diffuse: 2,
       scale: 1,
       opacity: 1,
       mapSamples: 20000,
@@ -55,29 +55,40 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       markerColor: [62 / 255, 207 / 255, 142 / 255],
       glowColor: [100 / 255, 100 / 255, 100 / 255],
       markers: markers
-        ? (markers.map((coords) => ({
-            location: coords,
-            size: 0.05,
-          })) as Marker[])
-        : undefined, // Return empty array instead of undefined to match Marker[] type
-      onRender: (state) => {
-        if (currentLocationRef.current) {
-          state.phi = currentPhi
-          state.theta = currentTheta
-          const [focusPhi, focusTheta] = focusRef.current
-          const distPositive = (focusPhi - currentPhi + doublePi) % doublePi
-          const distNegative = (currentPhi - focusPhi + doublePi) % doublePi
+        ? (markers.map((coords) => {
+            console.log('coords:', coords, currentLocation)
+            const isCurrentLocation =
+              currentLocation &&
+              coords[0] === currentLocation[0] &&
+              coords[1] === currentLocation[1]
 
-          if (distPositive < distNegative) {
-            currentPhi += distPositive * 0.03
+            return {
+              location: coords,
+              size: isCurrentLocation ? 0.1 : 0.04,
+            }
+          }) as Marker[])
+        : undefined,
+      onRender: (state) => {
+        if (currentLocation) {
+          const distPhiPositive =
+            (targetPhiRef.current - currentPhiRef.current + Math.PI * 2) % (Math.PI * 2)
+          const distPhiNegative =
+            (currentPhiRef.current - targetPhiRef.current + Math.PI * 2) % (Math.PI * 2)
+
+          if (distPhiPositive < distPhiNegative) {
+            currentPhiRef.current += distPhiPositive * 0.03
           } else {
-            currentPhi -= distNegative * 0.03
+            currentPhiRef.current -= distPhiNegative * 0.03
           }
-          currentTheta = currentTheta * 0.97 + focusTheta * 0.03
+
+          currentThetaRef.current += (targetThetaRef.current - currentThetaRef.current) * 0.03
+
+          state.phi = currentPhiRef.current
+          state.theta = currentThetaRef.current
         } else {
-          // Slow constant rotation when no location is focused
-          state.phi = currentPhi
-          currentPhi += 0.002
+          currentPhiRef.current += 0.002
+          state.phi = currentPhiRef.current
+          state.theta = currentThetaRef.current
         }
 
         state.width = width * 2
@@ -89,7 +100,7 @@ const Globe = ({ markers, currentLocation }: GlobeProps) => {
       window.removeEventListener('resize', debouncedResize)
       cobe.destroy()
     }
-  }, [resolvedTheme, markers])
+  }, [resolvedTheme, markers, currentLocation])
 
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 }

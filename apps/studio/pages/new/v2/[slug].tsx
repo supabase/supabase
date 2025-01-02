@@ -420,26 +420,14 @@ const WizardForm = () => {
       ([_, region]) => region.displayName === dbRegion
     )
 
-    if (awsRegion) {
-      const [name, details] = awsRegion
+    const region = awsRegion || flyRegion
+    if (region) {
+      const [name, details] = region
       return {
         name,
         location: {
-          latitude: details.location[1],
-          longitude: details.location[0],
-        },
-        code: details.code,
-        displayName: details.displayName,
-      }
-    }
-
-    if (flyRegion) {
-      const [name, details] = flyRegion
-      return {
-        name,
-        location: {
-          latitude: details.location[1],
-          longitude: details.location[0],
+          latitude: details.location[0],
+          longitude: details.location[1],
         },
         code: details.code,
         displayName: details.displayName,
