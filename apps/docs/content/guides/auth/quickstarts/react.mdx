@@ -108,57 +108,153 @@ hideToc: true
             if (!error) alert('Please check your inbox for email verification!');
             setLoading(false);
         }
+        if (session) {
+          return <div className="container"><div className="form-card">Logged in</div></div>;
+        }
 
         return (
-            <div>
-                {session ? (
-                    <div> Logged in </div>
-                ) : (
-                <form>
-                    <div>
-                        <label htmlFor="email">
-                        Email:
-                        <input
-                            id="email"
-                            name="email"
-                            type="email"
-                            value={email}
-                            autocomplete="email"
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="email@address.com"
-                        />
-                        </label>
-                    </div>
-                    <div>
-                        <label htmlFor="password">
-                        Password:
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Password"
-                        />
-                        </label>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={signInWithEmail}
-                        disabled={loading}
-                        >
+            <div className="container">
+              <div className="form-card">
+                <div className="tabs">
+                  <button
+                    className={`tab ${activeTab === 'signin' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('signin')}
+                  >
                     Sign in
-                    </button>
-                    <button
-                        type="button"
-                        onClick={signUpWithEmail}
-                        disabled={loading}
-                        >
+                  </button>
+                  <button
+                    className={`tab ${activeTab === 'signup' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('signup')}
+                  >
                     Sign up
-                    </button>
-                </form>
-                )}
-            </div>
+                  </button>
+                </div>
+
+                <p className="info">Make changes to your account here.</p>
+
+        <form onSubmit={activeTab === 'signin' ? signInWithEmail : signUpWithEmail}>
+          <div className="input-group">
+            <label htmlFor="email" >Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@address.com"
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : activeTab === 'signin' ? 'Sign in' : 'Sign up'}
+          </button>
+        </form>
+
+        <style>{`
+          .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #6366f1;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          }
+
+          .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+
+          .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+          }
+
+          .tab {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+          }
+
+          .tab.active {
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+          }
+
+          .info {
+            color: #666;
+            margin-bottom: 24px;
+          }
+
+          .input-group {
+            margin-bottom: 16px;
+          }
+
+          label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+          }
+
+          input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+          }
+
+          input:focus {
+            outline: none;
+            border-color: #6366f1;
+          }
+
+          .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+          }
+
+          .submit-btn:hover {
+            background: #4f46e5;
+          }
+
+          .submit-btn:disabled {
+            background: #a5a6f6;
+            cursor: not-allowed;
+          }
+        `}</style>
+        </div>
+      </div>
         );
       }
       export default App;
