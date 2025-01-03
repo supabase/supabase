@@ -123,9 +123,9 @@ const EdgeFunctionSecrets = () => {
         variant="warning"
         loading={isDeleting}
         visible={selectedSecret !== undefined}
-        confirmLabel="Delete secret"
-        confirmLabelLoading="Deleting secret"
-        title={`Confirm to delete secret "${selectedSecret?.name}"`}
+        confirmLabel="Delete variable"
+        confirmLabelLoading="Deleting environment variable"
+        title={`Confirm to delete environment variable "${selectedSecret?.name}"`}
         onCancel={() => setSelectedSecret(undefined)}
         onConfirm={() => {
           if (selectedSecret !== undefined) {
@@ -134,8 +134,8 @@ const EdgeFunctionSecrets = () => {
         }}
       >
         <p className="text-sm">
-          Before removing this secret, do ensure that none of your edge functions are currently
-          actively using this secret. This action cannot be undone.
+          Before removing this environment variable, ensure none of your Edge Functions are actively
+          using it. This action cannot be undone.
         </p>
       </ConfirmationModal>
     </>
