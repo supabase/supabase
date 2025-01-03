@@ -306,6 +306,13 @@ const WizardForm = () => {
   }
 
   const onSubmit = async (values: z.infer<typeof FormSchema>) => {
+    // too important to cause disruption here, make sure to catch and skip any errors
+    try {
+      sendEvent({
+        action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED,
+      })
+    } catch (error) {}
+
     if (!currentOrg) return console.error('Unable to retrieve current organization')
 
     const {

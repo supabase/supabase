@@ -29,6 +29,7 @@ export enum TelemetryActions {
   PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
   PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
   PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
+  PROJECT_CREATION_SECOND_STEP_SUBMITTED = 'project_creation_second_step_submitted',
 
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
   REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
@@ -294,6 +295,18 @@ export interface ProjectCreationSecondStepPromptIntendedEvent {
      */
     isNewPrompt: boolean
   }
+}
+
+/**
+ * Second and final step of project creation was submitted. More precisely, right after the user clicks on "Create Project". To check,
+ * if the project creation was successful, please refer to project_created event.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationInitialStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
 }
 
 /**
