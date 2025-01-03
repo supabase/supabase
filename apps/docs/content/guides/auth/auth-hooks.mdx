@@ -79,11 +79,11 @@ revoke execute
   from authenticated, anon, public;
 ```
 
-<Admonition type="caution" label="Create postgres functions with security invoker">
+You will need to alter your row-level security (RLS) policies to allow the `supabase_auth_admin` role to access tables that you have RLS policies on. You can read more about RLS policies [here](/docs/guides/database/postgres/row-level-security).
 
-We do not recommend creating postgres functions with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
+Alternatively, you can create your postgres function via the dashboard with the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it.
 
-</Admonition>
+Currently, functions created via the dashboard take on the `postgres` role. Read more about the `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker)
 
 </TabPanel>
 <TabPanel id="http" label="HTTP">
