@@ -771,6 +771,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Metabase',
       url: '/guides/database/metabase',
     },
+    {
+      name: 'Beekeeper Studio',
+      url: '/guides/database/beekeeper-studio',
+    },
   ],
 }
 
