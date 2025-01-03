@@ -1,0 +1,118 @@
+---
+title: 'Migrate to Broadcast Changes'
+subtitle: 'How to migrate from Postgres Changes to Broadcast Changes'
+description: 'How to migrate from Postgres Changes to Broadcast Changes'
+sidebar_label: 'Migrate to Broadcast Changes'
+---
+
+Postgres Changes has some [limitations](/docs/guides/realtime/postgres-changes#limitations) as your application scales. To continue broadcasting database changes to users as you scale, you can use Broadcast Changes.
+
+## Example application using Postgres Changes
+
+Here we have a simple chess application that has a game id and we want to track whenever we have new moves happening for a given game id.
+
+We store this information in a `public.moves` table and every time a new move is added to a given `game_id` we want to receive the changes in our connected Realtime client
+
+<Image
+  alt="Schema used for our example"
+  src={{
+    light:
+      '/docs/img/guides/realtime/realtime-broadcast-changes-migration-schema-example-light.png',
+    dark: '/docs/img/guides/realtime/realtime-broadcast-changes-migration-schema-example-dark.png',
+  }}
+/>
+
+In our client we will have our implementation to receive insert events with the usual code:
+
+```javascript
+const gameId = '4a8bbe89-f601-4414-bd47-8d0f7ab2a31a'
+const changes = supabase
+  .channel('chess-moves')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'moves',
+      filter: `game_id=eq.${gameId}`,
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+  ...
+```
+
+## Migrate to broadcast changes
+
+To use Broadcast Changes, first familiarize yourself with the [Broadcast Changes implementation](/docs/guides/realtime/broadcast#trigger-broadcast-messages-from-your-database).
+
+### Set up authorization
+
+Broadcast Changes is private by default, using [Realtime Authorization](/docs/guides/realtime/authorization) to control access. First, set up RLS policies to control user access to relevant messages:
+
+```sql
+CREATE POLICY "authenticated can listen to game moves"
+ON "realtime"."messages"
+FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1
+    FROM game_users
+    WHERE (SELECT auth.uid()) = user_id
+      AND (select realtime.topic()) = 'games:' || game_id::text
+      AND realtime.messages.extension = 'broadcast'
+  )
+);
+```
+
+### Set up trigger function
+
+We need to define our trigger function to adapt to our use case and use the provided function `realtime.broadcast_changes`
+
+```sql
+CREATE OR REPLACE FUNCTION public.broadcast_moves() RETURNS trigger AS $$
+BEGIN
+    PERFORM realtime.broadcast_changes(
+	    'games:' || NEW.game_id::text,   -- topic
+		   TG_OP,                          -- event
+		   TG_OP,                          -- operation
+		   TG_TABLE_NAME,                  -- table
+		   TG_TABLE_SCHEMA,                -- schema
+		   NEW,                            -- new record
+		   OLD                             -- old record
+		);
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+### Setup trigger with created function
+
+Now we need to setup our trigger to capture the events we want
+
+```sql
+CREATE TRIGGER chess_move_changes
+AFTER INSERT ON public.moves
+FOR EACH ROW
+EXECUTE FUNCTION public.broadcast_moves();
+```
+
+### **Listen to changes in client**
+
+Finally you can setup your client to listen for your events
+
+```js
+const gameId = '4a8bbe89-f601-4414-bd47-8d0f7ab2a31a'
+await supabase.realtime.setAuth() // Needed for Realtime Authorization
+const changes = supabase
+  .channel(`games:${gameId}`)
+  .on(
+    'broadcast',
+    {
+      event: 'INSERT',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
