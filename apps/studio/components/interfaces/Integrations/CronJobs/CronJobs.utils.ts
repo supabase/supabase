@@ -52,7 +52,7 @@ export const parseCronJobCommand = (originalCommand: string): CronJobType => {
         /select net\.([^']+)\(\s*url:='([^']+)',\s*headers:=jsonb_build_object\(([^)]*)\),(?:\s*body:='(.*)',)?\s*timeout_milliseconds:=(\d+) \)/i
       ) || []
 
-    // if the match has been unsuccesful, the cron may be created with the previous encoding/parsing.
+    // if the match has been unsuccessful, the cron may be created with the previous encoding/parsing.
     if (matches.length === 0) {
       matches =
         command.match(

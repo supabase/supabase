@@ -34,6 +34,11 @@ import {
   ProjectCreationInitialStepSubmittedEvent,
   ProjectCreationSecondStepPromptIntendedEvent,
   ProjectCreationSecondStepSubmittedEvent,
+  AssistantPromptSubmittedEvent,
+  AssistantDebugSubmittedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantEditInSqlEditorClickedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
@@ -67,6 +72,11 @@ export type SendEventVariables =
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
 
   // TODO remove this once all events are documented
   | {
