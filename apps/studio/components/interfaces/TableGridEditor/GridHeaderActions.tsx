@@ -371,7 +371,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                     <Button type="default" asChild>
                       <Link
                         target="_blank"
-                        href="https://github.com/orgs/supabase/discussions/21647"
+                        href="https://supabase.com/docs/guides/database/extensions/wrappers/overview#security"
                       >
                         Learn more
                       </Link>
