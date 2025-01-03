@@ -17,9 +17,8 @@ type ExtractKeys<T> = T extends T ? keyof T : never
 /**
  * Unwraps a Node to get its underlying value.
  */
-type NodeValue<T extends Node, U extends ExtractKeys<Node>> = T extends Record<U, infer V>
-  ? V
-  : never
+type NodeValue<T extends Node, U extends ExtractKeys<Node>> =
+  T extends Record<U, infer V> ? V : never
 
 export class AssertionError extends Error {
   constructor(message: string) {

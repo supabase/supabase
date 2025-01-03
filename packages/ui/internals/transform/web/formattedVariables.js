@@ -15,7 +15,7 @@ const createPropertyFormatter = require('./createPropertyFormatter')
 const sortByReference = require('./sortByReference')
 
 const defaultFormatting = {
-  lineSeparator: '\n'
+  lineSeparator: '\n',
 }
 
 /**
@@ -38,7 +38,7 @@ const defaultFormatting = {
  * });
  * ```
  */
-function formattedVariables ({ format, dictionary, outputReferences = false, formatting = {} }) {
+function formattedVariables({ format, dictionary, outputReferences = false, formatting = {} }) {
   let { allTokens } = dictionary
 
   const { lineSeparator } = Object.assign({}, defaultFormatting, formatting)
@@ -57,7 +57,9 @@ function formattedVariables ({ format, dictionary, outputReferences = false, for
 
   return allTokens
     .map(createPropertyFormatter({ outputReferences, dictionary, format, formatting }))
-    .filter(function (strVal) { return !!strVal })
+    .filter(function (strVal) {
+      return !!strVal
+    })
     .join(lineSeparator)
 }
 
