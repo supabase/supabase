@@ -73,6 +73,7 @@ const DocsSearchPage = () => {
     handleDocsSearch: handleSearch,
     handleDocsSearchDebounced: debouncedSearch,
     resetSearch,
+    // @ts-expect-error remove this after we remove @supabase/auth-helpers-react
   } = useDocsSearch(supabaseClient)
   const setIsOpen = useSetCommandMenuOpen()
   const setQuery = useSetQuery()
