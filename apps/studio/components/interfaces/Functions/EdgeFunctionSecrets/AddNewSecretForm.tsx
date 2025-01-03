@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef, useState } from 'react'
-import { SubmitHandler, useForm, useFieldArray } from 'react-hook-form'
+import { useRef, useState } from 'react'
+import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import z from 'zod'
 
 import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
 import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
 import { Eye, EyeOff, MinusCircle } from 'lucide-react'
 import {
@@ -16,11 +17,14 @@ import {
   FormLabel_Shadcn_,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import Panel from 'components/ui/Panel'
 
 interface AddNewSecretFormProps {
   onComplete?: () => void
+}
+
+type SecretPair = {
+  name: string
+  value: string
 }
 
 const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
@@ -61,10 +65,8 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
     const text = e.clipboardData?.getData('text')
     if (!text) return
 
-    // Try to parse different formats
-    const pairs: Array<{ name: string; value: string }> = []
+    const pairs: Array<SecretPair> = []
 
-    // Try JSON format
     try {
       const jsonData = JSON.parse(text)
       Object.entries(jsonData).forEach(([key, value]) => {
@@ -107,7 +109,7 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
       <Panel.Content className="grid gap-4">
         <h2 className="text-sm">Add new environment variables</h2>
         <Form_Shadcn_ {...form}>
-          <form id="create-secret-form" className="w-full " onSubmit={form.handleSubmit(onSubmit)}>
+          <form id="create-secret-form" className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
             {fields.map((field, index) => (
               <div key={field.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
                 <FormField_Shadcn_
@@ -171,7 +173,13 @@ const AddNewSecretForm = ({ onComplete }: AddNewSecretFormProps) => {
               </div>
             ))}
 
-            <Button type="default" onClick={() => append({ name: '', value: '' })}>
+            <Button
+              type="default"
+              onClick={() => {
+                const isEmptyForm = fields.every((field) => !field.name && !field.value)
+                isEmptyForm ? form.reset(defaultValues) : append({ name: '', value: '' })
+              }}
+            >
               Add another
             </Button>
 
