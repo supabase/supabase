@@ -7,7 +7,7 @@ import * as z from 'zod'
 
 import { useParams } from 'common'
 import { getContentById } from 'data/content/content-id-query'
-import { useContentUpsertV2Mutation } from 'data/content/content-upsert-v2-mutation'
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from 'data/content/sql-folder-create-mutation'
 import { Snippet } from 'data/content/sql-folders-query'
 import {
@@ -69,7 +69,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
   const { mutateAsync: createFolder, isLoading: isCreatingFolder } =
     useSQLSnippetFolderCreateMutation()
-  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertV2Mutation({
+  const { mutateAsync: moveSnippetAsync, isLoading: isMovingSnippet } = useContentUpsertMutation({
     onError: (error) => {
       toast.error(`Failed to move query: ${error.message}`)
     },

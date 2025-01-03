@@ -771,6 +771,10 @@ const guiQuickstarts: NavMenuSection = {
       name: 'Metabase',
       url: '/guides/database/metabase',
     },
+    {
+      name: 'Beekeeper Studio',
+      url: '/guides/database/beekeeper-studio',
+    },
   ],
 }
 
@@ -1019,6 +1023,10 @@ export const database: NavMenuConstant = {
         {
           name: 'pg_stat_statements: SQL Planning and Execution Statistics',
           url: '/guides/database/extensions/pg_stat_statements',
+        },
+        {
+          name: 'pg_repack: Storage Optimization',
+          url: '/guides/database/extensions/pg_repack',
         },
         {
           name: 'PostGIS: Geo queries',
