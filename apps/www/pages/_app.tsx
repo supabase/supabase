@@ -2,7 +2,6 @@ import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
 import '../styles/index.css'
 
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import {
   AuthProvider,
   IS_PROD,
@@ -28,7 +27,6 @@ import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13C
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
-import supabase from '~/lib/supabase'
 import useDarkLaunchWeeks from '../hooks/useDarkLaunchWeeks'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -154,25 +152,24 @@ export default function App({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>
-          <ThemeProvider
-            themes={themes.map((theme) => theme.value)}
-            enableSystem
-            disableTransitionOnChange
-            forcedTheme={forceDarkMode ? 'dark' : undefined}
-          >
-            <CommandProvider>
-              <Announcement>
-                <LW13CountdownBanner />
-              </Announcement>
-              <SonnerToaster position="top-right" />
-              <Component {...pageProps} />
-              <WwwCommandMenu />
-            </CommandProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </SessionContextProvider>
+
+      <AuthProvider>
+        <ThemeProvider
+          themes={themes.map((theme) => theme.value)}
+          enableSystem
+          disableTransitionOnChange
+          forcedTheme={forceDarkMode ? 'dark' : undefined}
+        >
+          <CommandProvider>
+            <Announcement>
+              <LW13CountdownBanner />
+            </Announcement>
+            <SonnerToaster position="top-right" />
+            <Component {...pageProps} />
+            <WwwCommandMenu />
+          </CommandProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </>
   )
 }
