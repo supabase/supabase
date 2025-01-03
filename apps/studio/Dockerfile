@@ -30,7 +30,7 @@ WORKDIR /app
 FROM base AS turbo
 COPY . .
 
-RUN pnpm dlx turbo@2.0.4 prune studio --docker
+RUN pnpm dlx turbo@2.3.3 prune studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base AS deps
@@ -50,7 +50,7 @@ CMD ["pnpm", "dev:studio"]
 # Compile Next.js
 FROM dev AS builder
 
-RUN pnpm dlx turbo@2.0.4 run build --filter studio -- --no-lint
+RUN pnpm dlx turbo@2.3.3 run build --filter studio -- --no-lint
 
 # Copy only compiled code and dependencies
 FROM base AS production
