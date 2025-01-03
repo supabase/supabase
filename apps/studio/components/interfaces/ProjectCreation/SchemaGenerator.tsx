@@ -16,6 +16,7 @@ interface SupabaseService {
 }
 
 interface Props {
+  step: 'initial' | 'second'
   onSqlGenerated: (sql: string) => void
   onReset?: () => void
   onServicesUpdated: (services: SupabaseService[]) => void
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export const SchemaGenerator = ({
+  step,
   onSqlGenerated,
   onServicesUpdated,
   onTitleUpdated,
@@ -160,8 +162,18 @@ export const SchemaGenerator = ({
                 return
               }
               if (!promptIntendSent && e.target.value.length > 5) {
+                // distinguish between initial step or second step
+                const action =
+                  step === 'initial'
+                    ? TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
+                    : TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
+                // distinguish between a new prompt or an edit
+                const isNewPrompt = messages.length == 0
                 sendEvent({
-                  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED,
+                  action,
+                  properties: {
+                    isNewPrompt,
+                  },
                 })
                 setPromptIntendSent(true)
               }

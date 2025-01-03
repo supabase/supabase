@@ -684,6 +684,7 @@ const WizardForm = () => {
                                 <div className="py-5 border-t border-b">
                                   <FormItemLayout>
                                     <SchemaGenerator
+                                      step="second"
                                       onReset={() => {
                                         setSqlStatements([])
                                         setServices([])

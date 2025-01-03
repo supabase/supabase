@@ -39,6 +39,7 @@ const Step1 = ({
         We can generate a schema for you to kick start your project.
       </p>
       <SchemaGenerator
+        step="initial"
         onSqlGenerated={(sql) => {
           onSqlGenerated(sql)
           onSubmit(sql)

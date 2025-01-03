@@ -28,6 +28,7 @@ export enum TelemetryActions {
 
   PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED = 'project_creation_initial_step_prompt_intended',
   PROJECT_CREATION_INITIAL_STEP_SUBMITTED = 'project_creation_initial_step_submitted',
+  PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED = 'project_creation_second_step_prompt_intended',
 
   REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED = 'realtime_inspector_listen_channel_clicked',
   REALTIME_INSPECTOR_BROADCAST_SENT = 'realtime_inspector_broadcast_sent',
@@ -244,7 +245,8 @@ export interface FeaturePreviewDisabledEvent {
 }
 
 /**
- * At least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
+ * On the InitialStep.tsx screen, where user can chose to prompt, start blank or migrate, at least 5 characters were typed
+ * in the prompt textarea indicating an intention to use the prompt.
  *
  * @group Events
  * @source studio
@@ -252,6 +254,11 @@ export interface FeaturePreviewDisabledEvent {
  */
 export interface ProjectCreationInitialStepPromptIntendedEvent {
   action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
+  /**
+   * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+   * words, was this not just an edit. In this case, it should always be true.
+   */
+  isNewPrompt: boolean
 }
 
 /**
@@ -268,6 +275,24 @@ export interface ProjectCreationInitialStepSubmittedEvent {
      * Records what the user selected in the first step of project creation.
      */
     onboardingPath: 'use_prompt' | 'start_blank' | 'migrate'
+  }
+}
+
+/**
+ * After the InitialStep screen, at least 5 characters were typed in the prompt textarea indicating an intention to use the prompt.
+ *
+ * @group Events
+ * @source studio
+ * @page new/v2/{slug}
+ */
+export interface ProjectCreationSecondStepPromptIntendedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
+  properties: {
+    /**
+     * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
+     * words, was this not just an edit.
+     */
+    isNewPrompt: boolean
   }
 }
 
