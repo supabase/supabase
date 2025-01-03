@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -6,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { DatePicker } from 'components/ui/DatePicker'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -175,39 +175,24 @@ const AuditLogs = () => {
                     <div className="flex items-center space-x-2">
                       <p>Date</p>
 
-                      <Tooltip.Root delayDuration={0}>
-                        <Tooltip.Trigger asChild>
-                          <Button
-                            type="text"
-                            className="px-1"
-                            icon={
-                              dateSortDesc ? (
-                                <ArrowDown strokeWidth={1.5} size={14} />
-                              ) : (
-                                <ArrowUp strokeWidth={1.5} size={14} />
-                              )
-                            }
-                            onClick={() => setDateSortDesc(!dateSortDesc)}
-                          />
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Portal>
-                            <Tooltip.Content side="right">
-                              <Tooltip.Arrow className="radix-tooltip-arrow" />
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  {dateSortDesc ? 'Sort latest first' : 'Sort earliest first'}
-                                </span>
-                              </div>
-                            </Tooltip.Content>
-                          </Tooltip.Portal>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
+                      <ButtonTooltip
+                        type="text"
+                        className="px-1"
+                        icon={
+                          dateSortDesc ? (
+                            <ArrowDown strokeWidth={1.5} size={14} />
+                          ) : (
+                            <ArrowUp strokeWidth={1.5} size={14} />
+                          )
+                        }
+                        onClick={() => setDateSortDesc(!dateSortDesc)}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                          },
+                        }}
+                      />
                     </div>
                   </Table.th>,
                   <Table.th key="actions" className="py-2"></Table.th>,
