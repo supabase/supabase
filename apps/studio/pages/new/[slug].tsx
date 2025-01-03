@@ -150,7 +150,7 @@ const Wizard: NextPageWithLayout = () => {
   // TODO: Remove this after project creation experiment
   const projectCreationExperimentGroup = useFlag<string>('projectCreationExperimentGroup')
   if (currentOrg && projectCreationExperimentGroup === 'group-b') {
-    router.push(`/new/v2/${currentOrg.slug}`)
+    router.replace(`/new/v2/${currentOrg.slug}`)
   }
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
