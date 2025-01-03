@@ -31,9 +31,9 @@ Playwright has a nice [Codegen tool](https://playwright.dev/docs/codegen-intro#r
 record your actions:
 
 ```bash
-npm run codegen:setup
+pnpm codegen:setup
 # in a separate terminal
-npm run codegen
+pnpm codegen
 ```
 
 ## How to debug/fix tests
@@ -42,7 +42,7 @@ If you've run the tests locally and you want to see the results, Playwright has 
 which you can use to run and replay specific tests:
 
 ```bash
-npm run test -- --ui
+pnpm test -- --ui
 ```
 
 It will also record any failing tests when running `npm run test` in this folder.

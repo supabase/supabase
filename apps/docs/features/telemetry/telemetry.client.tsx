@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 import { useConsent } from 'ui-patterns/ConsentToast'
 import { IS_PLATFORM } from '~/lib/constants'
-import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
+import { post } from '~/lib/fetch/fetchWrappers'
 
 const useTelemetryWithConsent = () => {
   const pathname = usePathname()
@@ -17,7 +17,7 @@ const useTelemetryWithConsent = () => {
     const title = typeof document !== 'undefined' ? document?.title : ''
     const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
-    unauthedAllowedPost('/platform/telemetry/page', {
+    post('/platform/telemetry/page', {
       body: {
         pathname,
         page_url: isBrowser ? window.location.href : '',
@@ -43,7 +43,7 @@ const useTelemetryWithConsent = () => {
 
     const title = typeof document !== 'undefined' ? document?.title : ''
 
-    unauthedAllowedPost('/platform/telemetry/page-leave', {
+    post('/platform/telemetry/page-leave', {
       body: {
         pathname,
         page_url: isBrowser ? window.location.href : '',

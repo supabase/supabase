@@ -1,29 +1,24 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { isResponseOk, post } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { toast } from 'sonner'
+
+import { components } from 'api-types'
+import { handleError, post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import type { AccessToken } from './access-tokens-query'
 import { accessTokenKeys } from './keys'
 
-export type AccessTokenCreateVariables = {
-  name: string
-  scope: 'V0' | undefined
-}
-
-export type NewAccessToken = AccessToken & { token: string }
+export type AccessTokenCreateVariables = components['schemas']['CreateAccessTokenBody']
 
 export async function createAccessToken({ name, scope }: AccessTokenCreateVariables) {
-  const response = await post<NewAccessToken>(`${API_URL}/profile/access-tokens`, { name, scope })
+  const { data, error } = await post('/platform/profile/access-tokens', { body: { name, scope } })
 
-  if (!isResponseOk(response)) {
-    throw response.error
-  }
+  if (error) handleError(error)
 
-  return response
+  return data
 }
 
 type AccessTokenCreateData = Awaited<ReturnType<typeof createAccessToken>>
+
+export type NewAccessToken = AccessTokenCreateData
 
 export const useAccessTokenCreateMutation = ({
   onSuccess,

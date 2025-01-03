@@ -1,7 +1,7 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { paths } from 'api-types'
 import apiWrapper from 'lib/api/apiWrapper'
+import { NextApiRequest, NextApiResponse } from 'next'
 import type { UserContent } from 'types'
-import { extractResponse } from 'pages/api/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -23,35 +23,35 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-type GetResponseData = extractResponse<'/platform/projects/{ref}/content', 'get'>
+type ResponseData =
+  paths['/platform/projects/{ref}/content/item/{id}']['get']['responses']['200']['content']['application/json']
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetResponseData>) => {
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   // Platform specific endpoint
-  const snippets = [
-    {
-      id: '1',
-      owner_id: 1,
-      name: 'SQL Query',
-      description: '',
-      type: 'sql' as const,
-      visibility: 'user' as const,
-      content: {
-        content_id: '1.0',
-        sql: `select * from
+  const snippet = {
+    id: '1',
+    owner_id: 1,
+    name: 'SQL Query',
+    description: '',
+    type: 'sql' as const,
+    visibility: 'user' as const,
+    content: {
+      content_id: '1.0',
+      sql: `select * from
   (select version()) as version,
   (select current_setting('server_version_num')) as version_number;`,
-        schema_version: '1',
-        favorite: false,
-      } as any,
+      schema_version: '1',
       favorite: false,
-      inserted_at: '',
-      project_id: 0,
-      updated_at: '',
-      owner: {},
-      updated_by: {},
-    },
-  ]
-  return res.status(200).json({ data: snippets })
+    } as any,
+    favorite: false,
+    inserted_at: '',
+    project_id: 0,
+    updated_at: '',
+  }
+
+  return res.status(200).json({
+    ...snippet,
+  })
 }
 
 const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {

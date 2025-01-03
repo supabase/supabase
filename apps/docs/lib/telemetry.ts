@@ -1,7 +1,7 @@
 import { isBrowser } from 'common'
 import { usePathname } from 'next/navigation'
 import { useConsent } from 'ui-patterns/ConsentToast'
-import { unauthedAllowedPost } from './fetch/fetchWrappers'
+import { post } from './fetch/fetchWrappers'
 
 type TelemetryEvent = {
   action: string
@@ -26,7 +26,7 @@ const useSendTelemetryEvent = () => {
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
 
   return (event: TelemetryEvent) =>
-    unauthedAllowedPost('/platform/telemetry/event', {
+    post('/platform/telemetry/event', {
       body: {
         pathname,
         action: event.action,
