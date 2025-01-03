@@ -23,7 +23,7 @@
     "@supabase/supabase-js": "^2.44.3",
     "@testdeck/jest": "^0.3.3",
     "@types/jest": "^29.5.4",
-    "@types/node": "^20.11.16",
+    "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
     "allure-commandline": "^2.17.2",
