@@ -16,8 +16,8 @@ breadcrumb: 'Migrations'
 >
   <div className="border-b mt-3 pb-3">
     <AccordionItem
-      header="Install Postgresql which includes psql"
-      id="item-1"
+      header="Install Postgres and psql"
+      id="install-postgres"
     >
       <PostgresInstallation />
     </AccordionItem>
@@ -26,7 +26,7 @@ breadcrumb: 'Migrations'
   <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Create and configure a new project"
-      id="item-2"
+      id="create-project"
     >
       <StepHikeCompact>
       <StepHikeCompact.Step step={1}>
@@ -38,9 +38,9 @@ breadcrumb: 'Migrations'
           <StepHikeCompact.Details title="Configure your new project" fullWidth>
                 In your new project:
 
-                - If you were using Webhooks, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
-                - If you were using any extensions, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
-                - If you were using Replication for Realtime, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) where needed.
+                - If you were using Webhooks, enable [Database Webhooks](/dashboard/project/_/database/hooks).
+                - If you were using any extensions, enable the [Extensions](/dashboard/project/_/database/extensions).
+                - If you were using Replication for Realtime, enable [Publication](/dashboard/project/_/database/publications) where needed.
           </StepHikeCompact.Details>
         </StepHikeCompact.Step>
       </StepHikeCompact>
@@ -54,7 +54,7 @@ breadcrumb: 'Migrations'
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
     <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-      Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+      Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="info">
         Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
@@ -83,8 +83,8 @@ breadcrumb: 'Migrations'
 
 <StepHikeCompact.Step step={3}>
   <StepHikeCompact.Details title="Get the backup file path" fullWidth>
-    Get the relative file path of the downloaded backup file. 
-    
+    Get the relative file path of the downloaded backup file.
+
     If the restore is done in the same directory as the downloaded backup, the file path would look like this:
 
     ```./backup_name.backup```

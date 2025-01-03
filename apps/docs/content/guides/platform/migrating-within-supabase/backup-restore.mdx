@@ -15,7 +15,7 @@ breadcrumb: 'Migrations'
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b mt-3 pb-3">
-    <AccordionItem header="Install Postgresql which includes psql" id="item-1">
+    <AccordionItem header="Install Postgres and psql" id="install-postgres">
       <PostgresInstallation />
     </AccordionItem>
   </div>
@@ -38,7 +38,7 @@ breadcrumb: 'Migrations'
 
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-      Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+      Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="info">
         Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
@@ -59,7 +59,7 @@ breadcrumb: 'Migrations'
 
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Get the database password" fullWidth>
-      Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+      Reset the password in the [Database Settings](/dashboard/project/_/settings/database).
 
       Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
 
@@ -100,16 +100,16 @@ breadcrumb: 'Migrations'
       <StepHikeCompact.Details title="Configure newly created project" fullWidth>
         In the new project:
 
-        - If Webhooks were used in the old database, enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks).
-        - If any non-default extensions were used in the old database, enable the [Extensions](https://supabase.com/dashboard/project/_/database/extensions).
-        - If Replication for Realtime was used in the old database, enable [Publication](https://supabase.com/dashboard/project/_/database/publications) on the tables necessary
+        - If Webhooks were used in the old database, enable [Database Webhooks](/dashboard/project/_/database/hooks).
+        - If any non-default extensions were used in the old database, enable the [Extensions](/dashboard/project/_/database/extensions).
+        - If Replication for Realtime was used in the old database, enable [Publication](/dashboard/project/_/database/publications) on the tables necessary
       </StepHikeCompact.Details>
 
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
       <StepHikeCompact.Details title="Get the new database connection string" fullWidth>
-        Go to the [project page](https://supabase.com/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
+        Go to the [project page](/dashboard/project/_/) and click the "**Connect**" button at the top of the page for the connection string.
 
       <Admonition type="info">
         Use the Session pooler connection string by default. If your ISP supports IPv6, use the direct connection string.
@@ -131,7 +131,7 @@ breadcrumb: 'Migrations'
     <StepHikeCompact.Step step={4}>
 
     <StepHikeCompact.Details title="Get the database password" fullWidth>
-      Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
+      Reset the password in the [Database Settings](/dashboard/project/_/settings/database).
 
       Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
 
@@ -163,7 +163,7 @@ breadcrumb: 'Migrations'
 
           </TabPanel>
           <TabPanel id="column-encryption" label="Column encryption enabled">
-          If you use [column encryption](/docs/guides/database/column-encryption), copy the root encryption key to your new project using your [Personal Access Token](https://supabase.com/dashboard/account/tokens).
+          If you use [column encryption](/docs/guides/database/column-encryption), copy the root encryption key to your new project using your [Personal Access Token](/dashboard/account/tokens).
 
           You can restore the project using both the old and new project ref (the project ref is the value between "https://" and ".supabase.co" in the URL) instead of the URL.
 
@@ -191,7 +191,7 @@ breadcrumb: 'Migrations'
 ### Troubleshooting notes
 
 - Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
-- If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
+- If you have created any [custom roles](/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
 - If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
 
 ### Preserving migration history
