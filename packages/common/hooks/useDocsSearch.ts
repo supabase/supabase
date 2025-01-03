@@ -1,6 +1,5 @@
 'use client'
 
-import type { SupabaseClient } from '@supabase/supabase-js'
 import { compact, debounce, uniqBy } from 'lodash'
 import { useCallback, useMemo, useReducer, useRef } from 'react'
 
@@ -230,6 +229,17 @@ const useDocsSearch = () => {
             results: data,
           })
         }
+      })
+      .catch((error: unknown) => {
+        sourcesLoaded += 1
+        console.error(`[ERROR] Error fetching Full Text Search results: ${error}`)
+
+        dispatch({
+          type: 'errored',
+          key: localKey,
+          sourcesLoaded,
+          message: '',
+        })
       })
 
     fetch(`${SUPABASE_URL}${FUNCTIONS_URL}search-embeddings`, {

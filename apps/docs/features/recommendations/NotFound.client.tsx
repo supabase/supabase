@@ -25,8 +25,9 @@ function Recommendations() {
 
   const { searchState: state, handleDocsSearch: handleSearch } = useDocsSearch()
 
-  const loading = state.status === 'loading'
-  const recommendations = state.status === 'fullResults' ? state.results : []
+  const loading = state.status === 'initial' || state.status === 'loading'
+  const recommendations =
+    state.status === 'partialResults' || state.status === 'fullResults' ? state.results : []
 
   useEffect(() => {
     if (!pathname) return
