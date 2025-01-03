@@ -162,19 +162,24 @@ export const SchemaGenerator = ({
                 return
               }
               if (!promptIntendSent && e.target.value.length > 5) {
-                // distinguish between initial step or second step
-                const action =
-                  step === 'initial'
-                    ? TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED
-                    : TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED
                 // distinguish between a new prompt or an edit
                 const isNewPrompt = messages.length == 0
-                sendEvent({
-                  action,
-                  properties: {
-                    isNewPrompt,
-                  },
-                })
+                // distinguish between initial step or second step
+                if (step === 'initial') {
+                  sendEvent({
+                    action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_PROMPT_INTENDED,
+                    properties: {
+                      isNewPrompt,
+                    },
+                  })
+                } else {
+                  sendEvent({
+                    action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_PROMPT_INTENDED,
+                    properties: {
+                      isNewPrompt,
+                    },
+                  })
+                }
                 setPromptIntendSent(true)
               }
               if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {

@@ -30,6 +30,10 @@ import {
   RealtimeInspectorCopyMessageClickedEvent,
   RealtimeInspectorFiltersAppliedEvent,
   RealtimeInspectorDatabaseRoleUpdatedEvent,
+  ProjectCreationInitialStepPromptIntendedEvent,
+  ProjectCreationInitialStepSubmittedEvent,
+  ProjectCreationSecondStepPromptIntendedEvent,
+  ProjectCreationSecondStepSubmittedEvent,
 } from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
@@ -48,6 +52,10 @@ export type SendEventVariables =
   | FeaturePreviewsClickedEvent
   | FeaturePreviewEnabledEvent
   | FeaturePreviewDisabledEvent
+  | ProjectCreationInitialStepPromptIntendedEvent
+  | ProjectCreationInitialStepSubmittedEvent
+  | ProjectCreationSecondStepPromptIntendedEvent
+  | ProjectCreationSecondStepSubmittedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
   | RealtimeInspectorMessageClickedEvent

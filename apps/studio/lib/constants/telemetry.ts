@@ -259,7 +259,9 @@ export interface ProjectCreationInitialStepPromptIntendedEvent {
    * Is this a new prompt (e.g. when following the start blank route where no prompt has been filled in the InitialStep). In other
    * words, was this not just an edit. In this case, it should always be true.
    */
-  isNewPrompt: boolean
+  properties: {
+    isNewPrompt: boolean
+  }
 }
 
 /**
@@ -305,8 +307,8 @@ export interface ProjectCreationSecondStepPromptIntendedEvent {
  * @source studio
  * @page new/v2/{slug}
  */
-export interface ProjectCreationInitialStepSubmittedEvent {
-  action: TelemetryActions.PROJECT_CREATION_INITIAL_STEP_SUBMITTED
+export interface ProjectCreationSecondStepSubmittedEvent {
+  action: TelemetryActions.PROJECT_CREATION_SECOND_STEP_SUBMITTED
 }
 
 /**
