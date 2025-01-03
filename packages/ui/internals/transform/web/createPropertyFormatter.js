@@ -16,7 +16,7 @@ const defaultFormatting = {
   commentStyle: 'long',
   indentation: '',
   separator: ' =',
-  suffix: ';'
+  suffix: ';',
 }
 
 /**
@@ -47,38 +47,44 @@ const defaultFormatting = {
  * @param {Object} options.formatting - Custom formatting properties that define parts of a declaration line in code. The configurable strings are: prefix, indentation, separator, suffix, and commentStyle. Those are used to generate a line like this: `${indentation}${prefix}${prop.name}${separator} ${prop.value}${suffix}`
  * @returns {Function}
  */
-function createPropertyFormatter({outputReferences, dictionary, format, formatting={}}) {
-  let {prefix, commentStyle, indentation, separator, suffix} = Object.assign({}, defaultFormatting, formatting);
+function createPropertyFormatter({ outputReferences, dictionary, format, formatting = {} }) {
+  let { prefix, commentStyle, indentation, separator, suffix } = Object.assign(
+    {},
+    defaultFormatting,
+    formatting
+  )
 
-  switch(format) {
+  switch (format) {
     case 'css':
-      prefix = '--';
-      indentation = '  ';
-      separator = ':';
-      break;
+      prefix = '--'
+      indentation = '  '
+      separator = ':'
+      break
     case 'sass':
-      prefix = '$';
-      commentStyle = 'short';
-      indentation = '';
-      separator = ':';
-      break;
+      prefix = '$'
+      commentStyle = 'short'
+      indentation = ''
+      separator = ':'
+      break
     case 'less':
-      prefix = '@';
-      commentStyle = 'short';
-      indentation = '';
-      separator = ':';
-      break;
+      prefix = '@'
+      commentStyle = 'short'
+      indentation = ''
+      separator = ':'
+      break
     case 'stylus':
-      prefix = '$';
-      commentStyle = 'short';
-      indentation = '';
-      separator = '=';
-      break;
+      prefix = '$'
+      commentStyle = 'short'
+      indentation = ''
+      separator = '='
+      break
   }
 
-  return function(prop) {
-    let to_ret_prop = `${indentation}${prefix}${prop.name}${separator} `.replace('--dark-', '--').replace('--light-', '--');
-    let value = prop.value;
+  return function (prop) {
+    let to_ret_prop = `${indentation}${prefix}${prop.name}${separator} `
+      .replace('--dark-', '--')
+      .replace('--light-', '--')
+    let value = prop.value
 
     /**
      * A single value can have multiple references either by interpolation:
@@ -96,43 +102,43 @@ function createPropertyFormatter({outputReferences, dictionary, format, formatti
       // Formats that use this function expect `value` to be a string
       // or else you will get '[object Object]' in the output
       if (typeof value === 'string') {
-        const refs = dictionary.getReferences(prop.original.value);
-        refs.forEach(ref => {
+        const refs = dictionary.getReferences(prop.original.value)
+        refs.forEach((ref) => {
           // value should be a string that contains the resolved reference
           // because Style Dictionary resolved this in the resolution step.
           // Here we are undoing that by replacing the value with
           // the reference's name
           if (ref.value && ref.name) {
-            value = value.replace(ref.value, function() {
+            value = value.replace(ref.value, function () {
               if (format === 'css') {
                 return `var(${prefix}${ref.name})`
               } else {
-                return `${prefix}${ref.name}`;
+                return `${prefix}${ref.name}`
               }
-            });
+            })
           }
-        });
+        })
       }
     }
 
-    to_ret_prop += prop.attributes.category === 'asset' ? `"${value}"` : value;
+    to_ret_prop += prop.attributes.category === 'asset' ? `"${value}"` : value
 
     if (format == 'sass' && prop.themeable === true) {
-      to_ret_prop += ' !default';
+      to_ret_prop += ' !default'
     }
 
-    to_ret_prop += suffix;
+    to_ret_prop += suffix
 
     if (prop.comment && commentStyle !== 'none') {
       if (commentStyle === 'short') {
-        to_ret_prop = to_ret_prop.concat(` // ${prop.comment}`);
+        to_ret_prop = to_ret_prop.concat(` // ${prop.comment}`)
       } else {
-        to_ret_prop = to_ret_prop.concat(` /* ${prop.comment} */`);
+        to_ret_prop = to_ret_prop.concat(` /* ${prop.comment} */`)
       }
     }
 
-    return to_ret_prop;
+    return to_ret_prop
   }
 }
 
-module.exports = createPropertyFormatter;
+module.exports = createPropertyFormatter
