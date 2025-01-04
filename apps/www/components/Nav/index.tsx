@@ -4,8 +4,8 @@ import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { Announcement, Button, buttonVariants, cn } from 'ui'
+import { useIsLoggedIn } from 'common'
+import { Button, buttonVariants, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -14,7 +14,6 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from 'ui/src/components/shadcn/ui/navigation-menu'
-import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 
 import ScrollProgress from '~/components/ScrollProgress'
 import { getMenu } from '~/data/nav'
@@ -35,7 +34,6 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
   const isLoggedIn = useIsLoggedIn()
-  const isUserLoading = useIsUserLoading()
   const menu = getMenu()
 
   const isHomePage = router.pathname === '/'
@@ -128,22 +126,19 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
               </div>
               <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
-                {!isUserLoading && (
+
+                {isLoggedIn ? (
+                  <Button className="hidden lg:block" asChild>
+                    <Link href="/dashboard/projects">Dashboard</Link>
+                  </Button>
+                ) : (
                   <>
-                    {isLoggedIn ? (
-                      <Button className="hidden lg:block" asChild>
-                        <Link href="/dashboard/projects">Dashboard</Link>
-                      </Button>
-                    ) : (
-                      <>
-                        <Button type="default" className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Sign in</Link>
-                        </Button>
-                        <Button className="hidden lg:block" asChild>
-                          <Link href="https://supabase.com/dashboard">Start your project</Link>
-                        </Button>
-                      </>
-                    )}
+                    <Button type="default" className="hidden lg:block" asChild>
+                      <Link href="https://supabase.com/dashboard">Sign in</Link>
+                    </Button>
+                    <Button className="hidden lg:block" asChild>
+                      <Link href="https://supabase.com/dashboard">Start your project</Link>
+                    </Button>
                   </>
                 )}
               </div>
