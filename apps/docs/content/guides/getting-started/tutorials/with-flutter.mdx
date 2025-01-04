@@ -123,10 +123,10 @@ Supabase redirects do not work with Flutter's [default URL strategy](https://doc
 We can switch to the path URL strategy as follows:
 
 ```dart
-import 'package:flutter_web_plugins/url_strategy.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() {
-  usePathUrlStrategy();
+  setUrlStrategy(PathUrlStrategy());
   runApp(ExampleApp());
 }
 ```
