@@ -47,8 +47,6 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Install the Supabase client library">
 
-    The fastest way to get started is to use Supabase's `auth-ui-react` library which provides a convenient interface for working with Supabase Auth from a React app.
-
     Navigate to the React app and install the Supabase libraries.
 
     </StepHikeCompact.Details>
@@ -56,7 +54,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      cd my-app && npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
+      cd my-app && npm install @supabase/supabase-js
       ```
 
     </StepHikeCompact.Code>
@@ -68,45 +66,198 @@ hideToc: true
 
     In `App.js`, create a Supabase client using your [Project URL and public API (anon) key](https://supabase.com/dashboard/project/_/settings/api).
 
-    You can configure the Auth component to display whenever there is no session inside `supabase.auth.getSession()`
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
 
       ```js src/App.js
-        import './index.css'
-        import { useState, useEffect } from 'react'
-        import { createClient } from '@supabase/supabase-js'
-        import { Auth } from '@supabase/auth-ui-react'
-        import { ThemeSupa } from '@supabase/auth-ui-shared'
+      import React, { useState, useEffect } from 'react';
+      import { createClient } from '@supabase/supabase-js'
 
-        const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
 
-        export default function App() {
-          const [session, setSession] = useState(null)
-
-          useEffect(() => {
+      function App() {
+        const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+        const [loading, setLoading] = useState(false);
+        useEffect(() => {
             supabase.auth.getSession().then(({ data: { session } }) => {
               setSession(session)
             })
-
             const {
               data: { subscription },
             } = supabase.auth.onAuthStateChange((_event, session) => {
-              setSession(session)
+            setSession(session)
             })
+          return () => subscription.unsubscribe()
+        }, [])
 
-            return () => subscription.unsubscribe()
-          }, [])
-
-          if (!session) {
-            return (<Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />)
-          }
-          else {
-            return (<div>Logged in!</div>)
-          }
+        async function signInWithEmail(e) {
+            e.preventDefault();
+            setLoading(true);
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) alert(error.message);
+            setLoading(false);
         }
+
+        async function signUpWithEmail() {
+            setLoading(true);
+            const { data: { session }, error } = await supabase.auth.signUp({ email, password });
+            if (error) alert(error.message);
+            if (!error) alert('Please check your inbox for email verification!');
+            setLoading(false);
+        }
+        if (session) {
+          return <div className="container"><div className="form-card">Logged in</div></div>;
+        }
+
+        return (
+            <div className="container">
+              <div className="form-card">
+                <div className="tabs">
+                  <button
+                    className={`tab ${activeTab === 'signin' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('signin')}
+                  >
+                    Sign in
+                  </button>
+                  <button
+                    className={`tab ${activeTab === 'signup' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('signup')}
+                  >
+                    Sign up
+                  </button>
+                </div>
+
+                <p className="info">Make changes to your account here.</p>
+
+        <form onSubmit={activeTab === 'signin' ? signInWithEmail : signUpWithEmail}>
+          <div className="input-group">
+            <label htmlFor="email" >Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@address.com"
+              autoComplete="email"
+            />
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : activeTab === 'signin' ? 'Sign in' : 'Sign up'}
+          </button>
+        </form>
+
+        <style>{`
+          .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #6366f1;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+          }
+
+          .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+
+          .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+          }
+
+          .tab {
+            background: none;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #666;
+            cursor: pointer;
+          }
+
+          .tab.active {
+            color: #6366f1;
+            border-bottom: 2px solid #6366f1;
+          }
+
+          .info {
+            color: #666;
+            margin-bottom: 24px;
+          }
+
+          .input-group {
+            margin-bottom: 16px;
+          }
+
+          label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+          }
+
+          input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+          }
+
+          input:focus {
+            outline: none;
+            border-color: #6366f1;
+          }
+
+          .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+          }
+
+          .submit-btn:hover {
+            background: #4f46e5;
+          }
+
+          .submit-btn:disabled {
+            background: #a5a6f6;
+            cursor: not-allowed;
+          }
+        `}</style>
+        </div>
+      </div>
+        );
+      }
+      export default App;
       ```
 
     </StepHikeCompact.Code>
