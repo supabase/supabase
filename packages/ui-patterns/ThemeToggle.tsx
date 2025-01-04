@@ -26,7 +26,7 @@ export const ThemeToggle = ({
   triggerClassName,
   contentClassName,
 }: ThemeToggleProps) => {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -49,10 +49,10 @@ export const ThemeToggle = ({
             triggerClassName
           )}
         >
-          {theme === 'dark' && (
+          {resolvedTheme === 'dark' && (
             <Moon className="h-[20px] w-[20px] rotate-90 transition-all dark:rotate-0" />
           )}
-          {theme !== 'dark' && (
+          {resolvedTheme !== 'dark' && (
             <Sun className="w-[20px] h-[20px] rotate-0 transition-all dark:-rotate-90" />
           )}
 
