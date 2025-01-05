@@ -68,6 +68,13 @@ export const AddIntegrationDropdown = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
+        <div className="bg-surface-200">
+          <DropdownMenuLabel className="grid gap-1">
+            <p className="text-foreground-light">Select Provider</p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+        </div>
+
         <ProviderDropdownItem type="firebase" onSelectIntegrationType={onSelectIntegrationType} />
 
         {subscription?.plan.id === 'free' ? (
