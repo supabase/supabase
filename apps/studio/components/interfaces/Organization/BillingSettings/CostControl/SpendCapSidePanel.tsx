@@ -13,8 +13,9 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH, PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { pricing } from 'shared-data/pricing'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button, Collapsible, SidePanel, cn } from 'ui'
+import { Button, Collapsible, SidePanel, cn } from 'ui'
 import { ExternalLink, ChevronRight } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const SPEND_CAP_OPTIONS: {
   name: string
@@ -184,18 +185,15 @@ const SpendCapSidePanel = () => {
           </Collapsible>
 
           {isFreePlan && (
-            <Alert
-              withIcon
-              variant="info"
+            <Admonition
+              type="tip"
               title="Toggling of the spend cap is only available on the Pro Plan"
-              actions={
-                <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
-                  View available plans
-                </Button>
-              }
             >
-              Upgrade your plan to disable the spend cap
-            </Alert>
+              <p className="mb-2">Upgrade your plan to disable the spend cap</p>
+              <Button type="default" onClick={() => snap.setPanelKey('subscriptionPlan')}>
+                View available plans
+              </Button>
+            </Admonition>
           )}
 
           <div className="!mt-8 pb-4">
@@ -240,23 +238,18 @@ const SpendCapSidePanel = () => {
           </div>
 
           {selectedOption === 'on' ? (
-            <Alert
-              withIcon
-              variant="warning"
+            <Admonition
+              type="warning"
               title="Your projects could become unresponsive or enter read only mode"
             >
               Exceeding the included quota allowance with spend cap enabled can cause your projects
               to become unresponsive or enter read only mode.
-            </Alert>
+            </Admonition>
           ) : (
-            <Alert
-              withIcon
-              variant="info"
-              title="Charges apply for usage beyond included quota allowance"
-            >
+            <Admonition type="tip" title="Charges apply for usage beyond included quota allowance">
               Your projects will always remain responsive and active, and charges only apply when
               exceeding the included quota limit.
-            </Alert>
+            </Admonition>
           )}
 
           {hasChanges && (
