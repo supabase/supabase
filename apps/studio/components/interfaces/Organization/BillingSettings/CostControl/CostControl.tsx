@@ -18,9 +18,10 @@ import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useFlag } from 'hooks/ui/useFlag'
 import { BASE_PATH } from 'lib/constants'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
+import { Button } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import SpendCapSidePanel from './SpendCapSidePanel'
+import { Admonition } from 'ui-patterns'
 
 export interface CostControlProps {}
 
@@ -95,9 +96,8 @@ const CostControl = ({}: CostControlProps) => {
               {isSuccess && (
                 <div className="space-y-6">
                   {['team', 'enterprise'].includes(currentPlan?.id || '') ? (
-                    <Alert
-                      withIcon
-                      variant="info"
+                    <Admonition
+                      type="tip"
                       title={`You will be charged for any additional usage on the ${
                         currentPlan?.name || ''
                       } plan`}
@@ -111,7 +111,7 @@ const CostControl = ({}: CostControlProps) => {
                         included usage
                       </Link>{' '}
                       is exceeded will you be charged for any additional usage.
-                    </Alert>
+                    </Admonition>
                   ) : (
                     <p className="text-sm text-foreground-light">
                       You can control whether your organization is charged for additional usage
