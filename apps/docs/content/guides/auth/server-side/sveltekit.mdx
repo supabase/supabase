@@ -619,8 +619,30 @@ export const load: PageServerLoad = async ({ depends, locals: { supabase } }) =>
 
 </CH.Code>
 
+### Handling OAuth in SSR
+
+When using OAuth with SvelteKit SSR, you need to handle redirects for successful or failed authentication. 
+Here’s an example:
+
+```javascript
+import { redirect } from '@sveltejs/kit';
+
+export const load = async ({ fetch }) => {
+    const res = await fetch('/auth/oauth');
+    const data = await res.json();
+
+    if (data.error) {
+        console.error(data.error);
+        throw redirect(303, '/auth/error');
+    }
+
+    throw redirect(303, data.url);
+};
+
 </StepHikeCompact.Code>
 
 </StepHikeCompact.Step>
 
 </StepHikeCompact>
+
+
