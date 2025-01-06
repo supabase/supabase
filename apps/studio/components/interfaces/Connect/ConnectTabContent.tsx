@@ -50,7 +50,7 @@ const ConnectTabContentNew = forwardRef<HTMLDivElement, ConnectContentTabProps>(
     const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
 
     const ContentFile = useMemo(() => {
-      return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content`), {
+      return dynamic<ConnectContentTabProps>(() => import(`./content/${filePath}/content.tsx`), {
         loading: () => (
           <div className="p-4 min-h-[331px]">
             <GenericSkeletonLoader />

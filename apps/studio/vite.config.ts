@@ -47,6 +47,7 @@ export default defineConfig(({ mode }) => {
         'next/navigation': path.resolve(__dirname, 'lib', 'next-compat', 'navigation.ts'),
         'next/head': path.resolve(__dirname, 'lib', 'next-compat', 'head.ts'),
         'next/dynamic': path.resolve(__dirname, 'lib', 'next-compat', 'dynamic.ts'),
+        'next/image': path.resolve(__dirname, 'lib', 'next-compat', 'image.ts'),
         'next/legacy/image': path.resolve(__dirname, 'lib', 'next-compat', 'image.ts'),
         '@sentry/nextjs': path.resolve(__dirname, 'lib', 'next-compat', 'sentry.ts'),
       },
@@ -61,7 +62,13 @@ export default defineConfig(({ mode }) => {
     plugins: [
       circleDependency(),
       cjsInterop({
-        dependencies: ['react-use', 'lodash', 'awesome-debounce-promise', 'p-queue'],
+        dependencies: [
+          'react-use',
+          'lodash',
+          'awesome-debounce-promise',
+          'p-queue',
+          'react-copy-to-clipboard',
+        ],
       }),
       remix({
         basename: process.env.NEXT_PUBLIC_BASE_PATH ?? '/',
