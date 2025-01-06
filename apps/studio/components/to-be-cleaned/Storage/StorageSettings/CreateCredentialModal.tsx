@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
 import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
@@ -27,8 +28,6 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 interface CreateCredentialModalProps {
   visible: boolean
@@ -43,7 +42,8 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
-  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
+  // [Joshen clean up] Remove ?? true once storage BE changes are deployed
+  const isS3ConnectionEnabled = config?.features.s3Protocol?.enabled ?? true
   const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const FormSchema = z.object({

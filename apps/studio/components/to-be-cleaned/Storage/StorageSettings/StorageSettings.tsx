@@ -17,7 +17,6 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
@@ -132,9 +131,12 @@ const StorageSettings = () => {
     updateStorageConfig({
       projectRef,
       fileSizeLimit: convertToBytes(data.fileSizeLimit, data.unit),
+      // @ts-ignore [Joshen clean up] Remove this once storage changes are deployed'
       features: {
         imageTransformation: { enabled: data.imageTransformationEnabled },
-        s3Protocol: config.features.s3Protocol,
+        ...(config.features.s3Protocol !== undefined
+          ? { s3Protocol: config?.features.s3Protocol }
+          : {}),
       },
     })
   }
