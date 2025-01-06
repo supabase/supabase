@@ -7,7 +7,7 @@ interface InlineLinkProps {
 
 export const InlineLink = ({ href, children }: PropsWithChildren<InlineLinkProps>) => {
   const className =
-    'underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground'
+    'underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-foreground'
   if (href.startsWith('http')) {
     return (
       <a className={className} href={href} target="_blank" rel="noreferrer noopener">
