@@ -3,7 +3,7 @@ import { post } from './fetchWrappers'
 interface TelemetryData {
   page_url: string
   page_title: string
-  pathname: string
+  pathname?: string
   ph: {
     referrer: string
     language: string
