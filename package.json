@@ -20,8 +20,8 @@
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "test:prettier": "prettier -c 'apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
-    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\" \"packages/pg-meta/**/*.ts\"",
+    "test:prettier": "prettier -c '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
+    "format": "prettier --write '{apps,packages}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}'",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",
     "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
@@ -38,13 +38,15 @@
     "api:codegen": "cd packages/api-types && pnpm run codegen"
   },
   "devDependencies": {
+    "@types/node": "catalog:",
     "eslint": "^8.57.0",
     "prettier": "3.2.4",
     "prettier-plugin-sql-cst": "^0.11.0",
     "rimraf": "^6.0.0",
     "sass": "^1.72.0",
     "supabase": "^1.151.1",
-    "turbo": "2.0.4",
+    "supports-color": "^8.0.0",
+    "turbo": "2.3.3",
     "typescript": "~5.5.0"
   },
   "repository": {
