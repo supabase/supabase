@@ -89,12 +89,12 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                       </h1>
                     </Link>
                     {name && (
-                      <div className="mt-1.5 flex items-center space-x-4">
+                      <div className="flex items-center space-x-4">
                         <span className="text-foreground-light">
                           <svg
                             viewBox="0 0 24 24"
-                            width="16"
-                            height="16"
+                            width="24"
+                            height="24"
                             stroke="currentColor"
                             strokeWidth="1"
                             strokeLinecap="round"
@@ -105,7 +105,7 @@ const FunctionsLayout = ({ title, children }: PropsWithChildren<FunctionsLayoutP
                             <path d="M16 3.549L7.12 20.600"></path>
                           </svg>
                         </span>
-                        <h5 className="text-lg text-foreground">{name}</h5>
+                        <h1 className="text-2xl text-foreground">{name}</h1>
                       </div>
                     )}
                   </div>

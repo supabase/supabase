@@ -7,9 +7,10 @@ import Table from 'components/to-be-cleaned/Table'
 import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
-import { Alert, Button, Input, SidePanel } from 'ui'
+import { Button, Input, SidePanel } from 'ui'
 import MigrationsEmptyState from './MigrationsEmptyState'
 import { Search } from 'lucide-react'
+import { Admonition } from 'ui-patterns'
 
 const Migrations = () => {
   const [search, setSearch] = useState('')
@@ -39,26 +40,27 @@ const Migrations = () => {
 
       <div>
         {isError && (
-          <Alert
-            withIcon
-            variant="warning"
+          <Admonition
+            type="warning"
             title="Failed to retrieve migration history for database"
-            actions={[
-              <Button key="contact-support" asChild type="default" className="ml-4">
-                <Link
-                  href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
-                >
-                  Contact support
-                </Link>
-              </Button>,
-            ]}
+            description={
+              <>
+                <p className="mb-1">
+                  Try refreshing your browser, but if the issue persists, please reach out to us via
+                  support.
+                </p>
+                <p className="mb-4">Error: {(error as any)?.message ?? 'Unknown'}</p>
+              </>
+            }
           >
-            <p className="mb-1">
-              Try refreshing your browser, but if the issue persists, please reach out to us via
-              support.
-            </p>
-            <p>Error: {(error as any)?.message ?? 'Unknown'}</p>
-          </Alert>
+            <Button key="contact-support" asChild type="default">
+              <Link
+                href={`/support/new?ref=${project?.ref}&category=dashboard_bug&subject=Unable%20to%20view%20database%20migrations`}
+              >
+                Contact support
+              </Link>
+            </Button>
+          </Admonition>
         )}
         {isSuccess && (
           <div>
