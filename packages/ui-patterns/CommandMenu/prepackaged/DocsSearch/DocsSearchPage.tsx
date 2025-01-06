@@ -1,6 +1,5 @@
 'use client'
 
-import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 
@@ -67,13 +66,12 @@ const IconContainer = (
 )
 
 const DocsSearchPage = () => {
-  const supabaseClient = useSupabaseClient()
   const {
     searchState: state,
     handleDocsSearch: handleSearch,
     handleDocsSearchDebounced: debouncedSearch,
     resetSearch,
-  } = useDocsSearch(supabaseClient)
+  } = useDocsSearch()
   const setIsOpen = useSetCommandMenuOpen()
   const setQuery = useSetQuery()
   const query = useQuery()
