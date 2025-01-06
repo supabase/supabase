@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { Modal, Toggle } from 'ui'
 
-import { useConsentValue } from '../ConsentToast'
+import { useConsentValue } from '../ConsentToast/useConsentValue'
 
 export const PrivacySettings = ({
   children,

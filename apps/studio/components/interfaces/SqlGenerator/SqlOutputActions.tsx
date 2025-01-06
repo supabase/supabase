@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { codeBlock, stripIndent } from 'common-tags'
 import { Check, Clipboard, Save } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import CopyToClipboard from 'react-copy-to-clipboard'
+import reactCopyToClipboard from 'react-copy-to-clipboard'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -16,6 +16,8 @@ import { Button, cn } from 'ui'
 import type { Message } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { MessageRole, MessageStatus, queryAi } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { formatTitle } from './SqlGenerator.utils'
+
+const { CopyToClipboard } = reactCopyToClipboard
 
 const useSaveGeneratedSql = () => {
   const { ref } = useParams()
