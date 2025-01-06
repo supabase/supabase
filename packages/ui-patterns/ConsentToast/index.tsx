@@ -109,7 +109,7 @@ export const useConsent = () => {
         const telemetryData = {
           page_url: telemetryProps.page_url,
           page_title: typeof document !== 'undefined' ? document?.title : '',
-          pathname: telemetryProps?.pathname,
+          pathname: telemetryProps.pathname,
           ph: {
             referrer: typeof document !== 'undefined' ? document?.referrer : '',
             language: telemetryProps.language,
