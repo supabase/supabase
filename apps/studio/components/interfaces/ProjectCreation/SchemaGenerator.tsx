@@ -1,12 +1,10 @@
 import { useChat } from 'ai/react'
 import { Button, Textarea } from 'ui'
 import { ArrowUp } from 'lucide-react'
-import { motion } from 'framer-motion'
 import { Markdown } from 'components/interfaces/Markdown'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { Label_Shadcn_ } from 'ui'
 import { BASE_PATH } from 'lib/constants'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { TelemetryActions } from 'lib/constants/telemetry'
 
