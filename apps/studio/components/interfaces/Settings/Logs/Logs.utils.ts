@@ -458,8 +458,18 @@ export const fillTimeseries = (
   valueKey: string | string[],
   defaultValue: number,
   min?: string,
-  max?: string
+  max?: string,
+  minPointsToFill: number = 20
 ) => {
+  // If we have more points than minPointsToFill, just normalize timestamps and return
+  if (timeseriesData.length > minPointsToFill) {
+    return timeseriesData.map((datum) => {
+      const iso = dayjs.utc(datum[timestampKey]).toISOString()
+      datum[timestampKey] = iso
+      return datum
+    })
+  }
+
   if (timeseriesData.length <= 1 && !(min || max)) return timeseriesData
   const dates: unknown[] = timeseriesData.map((datum) => dayjs.utc(datum[timestampKey]))
 

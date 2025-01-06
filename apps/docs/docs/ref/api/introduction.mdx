@@ -17,9 +17,19 @@ hideTitle: true
 
       ## Authentication
 
-      All API requests require a Supabase Personal token to be included in the Authorization header: `Authorization Bearer <supabase_personal_token>`.
-      To generate or manage your API token, visit your [account](https://supabase.com/dashboard/account/tokens) page.
-      Your API tokens carry the same privileges as your user account, so be sure to keep it secret.
+      All API requests require an access token to be included in the Authorization header: `Authorization Bearer <access_token>`.
+
+      There are two ways to generate an access token:
+
+      1. **Personal access token (PAT):**
+      PATs are long-lived tokens that you manually generate to access the Management API. They are useful for automating workflows or developing against the Management API. PATs carry the same privileges as your user account, so be sure to keep it secret.
+
+          To generate or manage your personal access tokens, visit your [account](/dashboard/account/tokens) page.
+
+      2. **OAuth2:**
+      OAuth2 allows your application to generate tokens on behalf of a Supabase user, providing secure and limited access to their account without requiring their credentials. Use this if you're building a third-party app that needs to create or manage Supabase projects on behalf of your users. Tokens generated via OAuth2 are short-lived and tied to specific scopes to ensure your app can only perform actions that are explicitly approved by the user.
+
+          See [Build a Supabase Integration](/docs/guides/integrations/build-a-supabase-integration) to set up OAuth2 for your application.
 
       ```bash
         curl https://api.supabase.com/v1/projects \
