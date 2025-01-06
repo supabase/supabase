@@ -51,7 +51,11 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   }
 
   useEffect(() => {
-    if (ref.current) ref.current.focus()
+    try {
+      ref.current?.focus({ preventScroll: true })
+    } catch (e) {
+      ref.current?.focus()
+    }
   }, [])
 
   return (
@@ -69,7 +73,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           onEnter={saveChanges}
         >
           <Input
-            autoFocus
+            ref={ref}
             value={inputValue ?? ''}
             placeholder={FORMAT_MAP[type]}
             onChange={(e) => setInputValue(e.target.value)}

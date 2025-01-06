@@ -8,11 +8,32 @@
       <lastBuildDate>Fri, 20 Dec 2024 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/ai-hackathon-at-y-combinator</guid>
+  <title>AI Hackathon at Y Combinator</title>
+  <link>https://supabase.com/blog/ai-hackathon-at-y-combinator</link>
+  <description>Announcing the winners of the Supabase AI Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</guid>
+  <title>Calendars in Postgres using Foreign Data Wrappers</title>
+  <link>https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers</link>
+  <description>Calendar data integration with Cal.com using Wasm foreign data wrapper on Supabase</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/lw13-hackathon-winners</guid>
+  <title>Supabase Launch Week 13 Hackathon Winners</title>
+  <link>https://supabase.com/blog/lw13-hackathon-winners</link>
+  <description>Announcing the winners of the Supabase Launch Week 13 Hackathon.</description>
+  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/how-to-hack-the-base</guid>
   <title>How to Hack the Base!</title>
   <link>https://supabase.com/blog/how-to-hack-the-base</link>
   <description>Played cool games, won cool prizes.</description>
-  <pubDate>Fri, 20 Dec 2024 00:00:00 -0700</pubDate>
+  <pubDate>Thu, 19 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/durable-workflows-in-postgres-dbos</guid>
@@ -20,20 +41,6 @@
   <link>https://supabase.com/blog/durable-workflows-in-postgres-dbos</link>
   <description>Technical deep dive into the new DBOS integration for Supabase</description>
   <pubDate>Tue, 10 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/hack-the-base</guid>
-  <title>Hack the Base! with Supabase</title>
-  <link>https://supabase.com/blog/hack-the-base</link>
-  <description>Play cool games, win cool prizes.</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
-  <title>Top 10 Launches of Launch Week 13</title>
-  <link>https://supabase.com/blog/launch-week-13-top-10</link>
-  <description>Highlights from Launch Week 13</description>
-  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/database-build-v2</guid>
@@ -47,6 +54,20 @@
   <title>Restore to a New Project</title>
   <link>https://supabase.com/blog/restore-to-a-new-project</link>
   <description>Effortlessly Clone Data into a New Supabase Project</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/hack-the-base</guid>
+  <title>Hack the Base! with Supabase</title>
+  <link>https://supabase.com/blog/hack-the-base</link>
+  <description>Play cool games, win cool prizes.</description>
+  <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/launch-week-13-top-10</guid>
+  <title>Top 10 Launches of Launch Week 13</title>
+  <link>https://supabase.com/blog/launch-week-13-top-10</link>
+  <description>Highlights from Launch Week 13</description>
   <pubDate>Fri, 06 Dec 2024 00:00:00 -0700</pubDate>
 </item>
 <item>

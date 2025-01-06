@@ -1,7 +1,6 @@
 // @ts-check
 import { remarkCodeHike } from '@code-hike/mdx'
 import nextMdx from '@next/mdx'
-import os from 'node:os'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 
@@ -61,30 +60,7 @@ const nextConfig = {
       '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*'],
       '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     },
-  },
-  webpack: (config, options) => {
-    /**
-     * The SQL to REST API translator relies on libpg-query, which packages a
-     * native Node.js module that wraps the Postgres query parser.
-     *
-     * The default webpack config can't load native modules, so we need a custom
-     * loader for it, which calls process.dlopen to load C++ Addons.
-     *
-     * See https://github.com/eisberg-labs/nextjs-node-loader
-     */
-    config.module.rules.push({
-      test: /\.node$/,
-      use: [
-        {
-          loader: 'nextjs-node-loader',
-          options: {
-            flags: os.constants.dlopen.RTLD_NOW,
-            outputPath: config.output.path,
-          },
-        },
-      ],
-    })
-    return config
+    serverComponentsExternalPackages: ['libpg-query'],
   },
   async headers() {
     return [

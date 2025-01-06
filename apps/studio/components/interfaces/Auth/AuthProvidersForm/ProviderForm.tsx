@@ -15,7 +15,6 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import {
-  Alert,
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -29,6 +28,7 @@ import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 import { Markdown } from 'components/interfaces/Markdown'
+import { Admonition } from 'ui-patterns'
 
 export interface ProviderFormProps {
   config: components['schemas']['GoTrueConfigResponse']
@@ -264,9 +264,15 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                   ))}
 
                   {provider?.misc?.alert && (
-                    <Alert title={provider.misc.alert.title} variant="warning" withIcon>
-                      <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
-                    </Alert>
+                    <Admonition
+                      type="warning"
+                      title={provider.misc.alert.title}
+                      description={
+                        <>
+                          <ReactMarkdown>{provider.misc.alert.description}</ReactMarkdown>
+                        </>
+                      }
+                    />
                   )}
 
                   {provider.misc.requiresRedirect && (
