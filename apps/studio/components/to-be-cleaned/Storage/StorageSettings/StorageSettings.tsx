@@ -17,7 +17,6 @@ import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import {
   Button,
   FormControl_Shadcn_,
