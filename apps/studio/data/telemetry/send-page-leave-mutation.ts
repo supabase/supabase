@@ -2,12 +2,15 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { LOCAL_STORAGE_KEYS } from 'common'
+import FlagContext from 'components/ui/Flag/FlagContext'
+import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useContext } from 'react'
 import type { ResponseError } from 'types'
 
-type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBody']
+type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBodyDto']
 
 export async function sendPageLeave({ body }: { body: SendPageLeaveBody }) {
   const consent =
@@ -15,14 +18,13 @@ export async function sendPageLeave({ body }: { body: SendPageLeaveBody }) {
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent || !IS_PLATFORM) return undefined
+  if (!consent || !IS_PLATFORM) return
 
-  const { data, error } = await post(`/platform/telemetry/page-leave`, {
+  const { error } = await post(`/platform/telemetry/page-leave`, {
     body,
     credentials: 'include',
   })
   if (error) handleError(error)
-  return data
 }
 
 type SendPageLeaveData = Awaited<ReturnType<typeof sendPageLeave>>
@@ -33,6 +35,7 @@ export const useSendPageLeaveMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageLeaveData, ResponseError>, 'mutationFn'> = {}) => {
   const router = useRouter()
+  const flagStore = useContext(FlagContext) as FlagProviderStore
 
   const url = typeof window !== 'undefined' ? window.location.href : ''
   const title = typeof document !== 'undefined' ? document?.title : ''
@@ -41,6 +44,7 @@ export const useSendPageLeaveMutation = ({
     page_url: url,
     page_title: title,
     pathname: router.pathname,
+    feature_flags: flagStore.posthog,
   } as SendPageLeaveBody
 
   return useMutation<SendPageLeaveData, ResponseError>((vars) => sendPageLeave({ body }), {

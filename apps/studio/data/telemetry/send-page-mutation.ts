@@ -2,31 +2,33 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import FlagContext from 'components/ui/Flag/FlagContext'
+import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
+import { useContext } from 'react'
 import type { ResponseError } from 'types'
-
-type SendPage = components['schemas']['TelemetryPageBodyV2']
 
 export type SendPageVariables = {
   url: string
 }
 
-type SendPagePayload = any
+type SendPageBody = components['schemas']['TelemetryPageBodyV2Dto']
 
-export async function sendPage({ body }: { body: SendPagePayload }) {
+export async function sendPage({ body }: { body: SendPageBody }) {
   const consent =
     (typeof window !== 'undefined'
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent || !IS_PLATFORM) return undefined
+  if (!consent || !IS_PLATFORM) return
 
-  const headers = { Version: '2' }
-  const { data, error } = await post(`/platform/telemetry/page`, { body, headers })
+  const { error } = await post(`/platform/telemetry/page`, {
+    body,
+    headers: { Version: '2' },
+  })
   if (error) handleError(error)
-  return data
 }
 
 type SendPageData = Awaited<ReturnType<typeof sendPage>>
@@ -37,6 +39,7 @@ export const useSendPageMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
   const router = useRouter()
+  const flagStore = useContext(FlagContext) as FlagProviderStore
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''
@@ -44,8 +47,7 @@ export const useSendPageMutation = ({
   return useMutation<SendPageData, ResponseError, SendPageVariables>(
     (vars) => {
       const { url } = vars
-      const type = 'PH'
-      const body: SendPage = {
+      const body: SendPageBody = {
         page_url: url,
         page_title: title,
         pathname: router.pathname,
@@ -57,6 +59,7 @@ export const useSendPageMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
+        feature_flags: flagStore.posthog,
       }
       return sendPage({ body })
     },
