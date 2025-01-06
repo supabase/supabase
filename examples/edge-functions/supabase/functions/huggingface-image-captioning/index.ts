@@ -1,5 +1,5 @@
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Database } from './types.ts'
 
 console.log('Hello from `huggingface-image-captioning` function!')

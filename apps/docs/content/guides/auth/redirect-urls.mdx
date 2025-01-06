@@ -53,7 +53,7 @@ For deployments with Netlify, set the `SITE_URL` to your official site URL. Add 
 For deployments with Vercel, set the `SITE_URL` to your official site URL. Add the following additional redirect URLs for local development and deployment previews:
 
 - `http://localhost:3000/**`
-- `https://*-username.vercel.app/**`
+- `https://*-<team-or-account-slug>.vercel.app/**`
 
 Vercel provides an environment variable for the URL of the deployment called `NEXT_PUBLIC_VERCEL_URL`. See the [Vercel docs](https://vercel.com/docs/concepts/projects/environment-variables#system-environment-variables) for more details. You can use this variable to dynamically redirect depending on the environment. You should also set the value of the environment variable called NEXT_PUBLIC_SITE_URL, this should be set to your site URL in production environment to ensure that redirects function correctly.
 
@@ -100,7 +100,7 @@ For mobile applications you can use deep linking URIs. For example, for your `SI
 
 Read more about deep linking and find code examples for different frameworks [here](/docs/guides/auth/native-mobile-deep-linking).
 
-## Error Handling
+## Error handling
 
 When authentication fails, the user will still be redirected to the redirect URL provided. However, the error details will be returned as query fragments in the URL. You can parse these query fragments and show a custom error message to the user. For example:
 

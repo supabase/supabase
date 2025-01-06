@@ -1,7 +1,4 @@
-import {
-  // ChevronRight,
-  Search,
-} from 'lucide-react'
+import { ChevronRight, ChevronsDown, Loader2, Search } from 'lucide-react'
 import Link from 'next/link'
 import { ElementRef, forwardRef } from 'react'
 import {
@@ -13,8 +10,8 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconChevronsDown,
   Input_Shadcn_,
+  Skeleton,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -22,11 +19,33 @@ import {
 } from 'ui'
 import ShimmeringLoader from '../ShimmeringLoader'
 
+const InnerSideBarTitle = forwardRef<HTMLSpanElement, React.ComponentPropsWithoutRef<'span'>>(
+  (props, ref) => {
+    const { className, ...restProps } = props
+    return (
+      <span
+        ref={ref}
+        {...restProps}
+        className={cn(
+          'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide group-hover:not-disabled:text-foreground',
+          className
+        )}
+      />
+    )
+  }
+)
+
 const InnerSideMenuCollapsible = forwardRef<
   ElementRef<typeof Collapsible_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Collapsible_Shadcn_>
 >(({ ...props }, ref) => {
-  return <Collapsible_Shadcn_ {...props} className={cn('w-full px-2', props.className)} />
+  return (
+    <Collapsible_Shadcn_
+      ref={ref}
+      {...props}
+      className={cn('w-full px-2 group', props.className)}
+    />
+  )
 })
 
 const InnerSideMenuCollapsibleTrigger = forwardRef<
@@ -35,19 +54,18 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <CollapsibleTrigger_Shadcn_
-      disabled
       ref={ref}
       {...props}
       className={cn(
-        'w-full flex gap-1 items-center group px-3 text-xs font-normal font-mono uppercase text-lighter tracking-wide',
+        'w-full flex gap-1 items-center group px-3 text-sm font-normal font-mono uppercase text-lighter tracking-wide',
         props.className
       )}
     >
-      {/* <ChevronRight
+      <ChevronRight
         className="transition-all text-foreground-muted group-data-[state=open]:rotate-90"
         size={16}
         strokeWidth={1.5}
-      /> */}
+      />
       <span className="group-hover:not-disabled:text-foreground">{props.title}</span>
     </CollapsibleTrigger_Shadcn_>
   )
@@ -59,8 +77,9 @@ const InnerSideMenuCollapsibleContent = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <CollapsibleContent_Shadcn_
+      ref={ref}
       {...props}
-      className={cn('w-full data-[state=open]:pt-1 flex flex-col gap-2', props.className)}
+      className={cn('w-full flex flex-col gap-0', props.className)}
     />
   )
 })
@@ -96,6 +115,17 @@ const InnerSideMenuItem = forwardRef<
   )
 })
 
+function InnerSideMenuItemLoading({
+  className,
+  ...props
+}: React.ComponentPropsWithoutRef<typeof Skeleton>) {
+  return (
+    <div className="py-0.5 h-7">
+      <Skeleton {...props} className={cn('h-full w-full bg-surface-200', className)} />
+    </div>
+  )
+}
+
 const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>(
   (props, ref) => {
     return (
@@ -106,8 +136,12 @@ const InnerSideBarFilters = forwardRef<HTMLDivElement, React.ComponentPropsWitho
 
 const InnerSideBarFilterSearchInput = forwardRef<
   HTMLInputElement,
-  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & { 'aria-labelledby': string; name: string }
->(({ children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof Input_Shadcn_> & {
+    'aria-labelledby': string
+    name: string
+    isLoading?: boolean
+  }
+>(({ children, isLoading = false, ...props }, ref) => {
   return (
     <label htmlFor={props.name} className="relative w-full">
       <span className="sr-only">{props['aria-labelledby']}</span>
@@ -115,8 +149,8 @@ const InnerSideBarFilterSearchInput = forwardRef<
         ref={ref}
         type="text"
         className={cn(
-          'h-[28px] w-full',
-          'text-xs',
+          'h-[32px] md:h-[28px] w-full',
+          'text-base md:text-xs',
           'pl-7',
           'pr-7',
           'w-full',
@@ -129,7 +163,20 @@ const InnerSideBarFilterSearchInput = forwardRef<
         {...props}
       />
       {children}
-      <Search className="absolute left-2 top-2 text-foreground-muted" size={14} strokeWidth={1.5} />
+      {isLoading ? (
+        <Loader2
+          className="animate-spin absolute left-2 text-foreground-muted"
+          style={{ top: 7 }}
+          size={14}
+          strokeWidth={1.5}
+        />
+      ) : (
+        <Search
+          className="absolute left-2 top-2 text-foreground-muted"
+          size={14}
+          strokeWidth={1.5}
+        />
+      )}
     </label>
   )
 })
@@ -149,13 +196,13 @@ const InnerSideBarFilterSortDropdown = forwardRef<
         <DropdownMenuTrigger
           asChild
           className={cn(
-            'absolute right-1 top-[.3rem]',
+            'absolute right-1 top-[.4rem] md:top-[.3rem]',
             'text-foreground-muted transition-colors hover:text-foreground data-[state=open]:text-foreground',
             triggerClassName
           )}
         >
           <TooltipTrigger_Shadcn_>
-            <IconChevronsDown size={18} strokeWidth={1} />
+            <ChevronsDown size={18} strokeWidth={1} />
           </TooltipTrigger_Shadcn_>
         </DropdownMenuTrigger>
         <TooltipContent_Shadcn_ side="bottom">Sort By</TooltipContent_Shadcn_>
@@ -193,7 +240,7 @@ const InnerSideBarEmptyPanel = forwardRef<
   HTMLDivElement,
   React.ComponentPropsWithoutRef<'div'> & {
     title: string
-    description?: string
+    description?: string | React.ReactNode
     illustration?: React.ReactNode
     actions?: React.ReactNode
   }
@@ -203,7 +250,7 @@ const InnerSideBarEmptyPanel = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-3 py-4',
+        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-5 py-4',
         props.className
       )}
     >
@@ -220,15 +267,17 @@ const InnerSideBarEmptyPanel = forwardRef<
 })
 
 export {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
   InnerSideBarFilters,
   InnerSideBarShimmeringLoaders,
+  InnerSideBarTitle,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
+  InnerSideMenuItemLoading,
   InnerSideMenuSeparator,
-  InnerSideBarFilterSortDropdown,
-  InnerSideBarFilterSortDropdownItem,
-  InnerSideBarEmptyPanel,
 }

@@ -1,21 +1,26 @@
-import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import CopyButton from 'components/ui/CopyButton'
-import { WarehouseAccessTokensData, WarehouseCollectionsData } from 'data/analytics'
+import type { WarehouseAccessTokensData } from 'data/analytics/warehouse-access-tokens-query'
+import type { WarehouseCollectionsData } from 'data/analytics/warehouse-collections-query'
+import { Code } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import {
   Button,
   Checkbox_Shadcn_,
   CodeBlock,
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogSection,
   DialogSectionSeparator,
-  DialogTitle,
-  DialogTrigger,
-  Input,
+  Input_Shadcn_,
   Label_Shadcn_,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -28,6 +33,7 @@ export function TestCollectionDialog({
   collections,
   open,
   onOpenChange,
+  onSubmit,
 }: {
   accessTokens: WarehouseAccessTokensData['data']
   collections: WarehouseCollectionsData
@@ -35,7 +41,9 @@ export function TestCollectionDialog({
   projectRef: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  onSubmit: () => void
 }) {
+  const router = useRouter()
   const BASE_WAREHOUSE_URL = `https://api.warehouse.tech/api/events`
   const [testAccessToken, setTestAccessToken] = useState('')
   const [selectedCollection, setSelectedCollection] = useState(collectionToken || '')
@@ -57,7 +65,7 @@ export function TestCollectionDialog({
   function getcURL(accessToken: string) {
     return `curl -X "POST" "${BASE_WAREHOUSE_URL}?source=${selectedCollection}" \\
   -H 'Content-Type: application/json' \\
-  -H 'X-API-KEY: ${accessToken}' \\
+  -H 'Authorization: Bearer ${accessToken}' \\
   -d $'{
     "event_message": "Test event message",
     "metadata": {
@@ -77,14 +85,14 @@ export function TestCollectionDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Sheet open={open} onOpenChange={onOpenChange}>
       <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
-          <DialogTrigger asChild>
+          <SheetTrigger asChild>
             <Button disabled={accessTokens.length === 0} type="outline">
               Connect
             </Button>
-          </DialogTrigger>
+          </SheetTrigger>
         </TooltipTrigger_Shadcn_>
         {accessTokens.length === 0 && (
           <TooltipContent_Shadcn_>
@@ -93,83 +101,90 @@ export function TestCollectionDialog({
         )}
       </Tooltip_Shadcn_>
 
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Send events to this collection</DialogTitle>
-          <DialogDescription>
+      <SheetContent size="lg" className="h-screen overflow-auto flex flex-col">
+        <SheetHeader>
+          <SheetTitle>Send events to this collection</SheetTitle>
+          <SheetDescription>
             Use the following cURL command to send events to this collection
-          </DialogDescription>
-        </DialogHeader>
-        <DialogSectionSeparator />
-        <DialogSection className="flex flex-col gap-4 overflow-auto">
-          <div className="flex gap-2 *:flex-1">
-            <FormItemLayout label="Collection" isReactForm={false}>
-              <Select value={selectedCollection} onValueChange={setSelectedCollection}>
-                <SelectTrigger>
-                  <span className="truncate">{selectedCollectionName || 'Collection'}</span>
-                </SelectTrigger>
-                <SelectContent className="max-h-[260px]">
-                  {collections?.map((col) => (
-                    <SelectItem key={col.id} value={col.token}>
-                      {col.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItemLayout>
-            <FormItemLayout label="Token" isReactForm={false}>
-              <Select value={testAccessToken} onValueChange={setTestAccessToken}>
-                <SelectTrigger>
-                  <span className="truncate">
-                    {selectedAccessToken?.description || 'Access token'}
-                  </span>
-                </SelectTrigger>
-                <SelectContent className="max-h-[260px]">
-                  {accessTokens?.map((token: any) => (
-                    <SelectItem key={token.id + '-token'} value={token.token}>
-                      {token.description || 'No description'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItemLayout>
-          </div>
+          </SheetDescription>
+        </SheetHeader>
 
-          <FormItemLayout label="Ingest URL" isReactForm={false}>
-            <Input
-              className="font-mono tracking-tighter"
-              value={BASE_WAREHOUSE_URL}
-              readOnly
-              copy
-            />
+        <SheetSection className="flex flex-col gap-4 overflow-auto">
+          <FormItemLayout label="Collection" isReactForm={false} layout="horizontal">
+            <Select value={selectedCollection} onValueChange={setSelectedCollection}>
+              <SelectTrigger size="tiny">
+                <span className="truncate">{selectedCollectionName || 'Collection'}</span>
+              </SelectTrigger>
+              <SelectContent className="max-h-[260px]">
+                {collections?.map((col) => (
+                  <SelectItem key={col.id} value={col.token}>
+                    {col.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormItemLayout>
+          <FormItemLayout label="Token" isReactForm={false} layout="horizontal">
+            <Select value={testAccessToken} onValueChange={setTestAccessToken}>
+              <SelectTrigger size="tiny">
+                <span className="truncate">
+                  {selectedAccessToken?.description || 'Access token'}
+                </span>
+              </SelectTrigger>
+              <SelectContent className="max-h-[260px]">
+                {accessTokens?.map((token: any) => (
+                  <SelectItem key={token.id + '-token'} value={token.token}>
+                    {token.description || 'No description'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </FormItemLayout>
 
-          <div className="flex gap-2 items-center">
-            <Checkbox_Shadcn_
-              name="showAccessToken"
-              id="showAccessToken"
-              checked={showAccessToken}
-              onCheckedChange={() => setShowAccessToken(!showAccessToken)}
-            />
-            <Label_Shadcn_ htmlFor="showAccessToken">Show access token</Label_Shadcn_>
+          <FormItemLayout layout="horizontal" label="Ingest API URL" isReactForm={false}>
+            <Input_Shadcn_ size="tiny" className="font-mono" value={BASE_WAREHOUSE_URL} readOnly />
+          </FormItemLayout>
+          <FormItemLayout layout="horizontal" label="Collection ID" isReactForm={false}>
+            <Input_Shadcn_ size="tiny" className="font-mono" value={selectedCollection} readOnly />
+          </FormItemLayout>
+        </SheetSection>
+
+        <Separator />
+
+        <SheetSection className="flex-1">
+          <div className="flex justify-between items-center">
+            <div className="flex gap-2 items-center">
+              <Checkbox_Shadcn_
+                name="showAccessToken"
+                id="showAccessToken"
+                checked={showAccessToken}
+                onCheckedChange={() => setShowAccessToken(!showAccessToken)}
+              />
+              <Label_Shadcn_ htmlFor="showAccessToken">Show access token</Label_Shadcn_>
+            </div>
+            <CopyButton type="default" text={getcURL(testAccessToken)} />
           </div>
 
-          <div className="relative">
+          <div className="mt-4 relative">
             <CodeBlock
               hideCopy
-              className={'p-1 language-bash prose transition-colors'}
+              className={'p-1 language-bash prose max-w-full transition-colors'}
               language="bash"
             >
               {getcURL(showAccessToken ? testAccessToken : '********************')}
             </CodeBlock>
-            <CopyButton
-              type="default"
-              text={getcURL(testAccessToken)}
-              className="absolute top-2 right-2"
-            />
           </div>
-        </DialogSection>
-      </DialogContent>
-    </Dialog>
+        </SheetSection>
+
+        <SheetFooter className="mt-auto">
+          <p className="text-sm text-foreground-light mr-auto">
+            Once you send an event, refresh the page to see it in the collection.
+          </p>
+          <div className="flex justify-end">
+            <Button onClick={onSubmit}>Refresh results</Button>
+          </div>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }

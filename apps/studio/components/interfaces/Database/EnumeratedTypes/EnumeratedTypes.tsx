@@ -1,5 +1,19 @@
 import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useSchemasQuery } from 'data/database/schemas-query'
+import {
+  EnumeratedType,
+  useEnumeratedTypesQuery,
+} from 'data/enumerated-types/enumerated-types-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   DropdownMenu,
@@ -8,18 +22,6 @@ import {
   DropdownMenuTrigger,
   Input,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import {
-  EnumeratedType,
-  useEnumeratedTypesQuery,
-} from 'data/enumerated-types/enumerated-types-query'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateEnumeratedTypeSidePanel from './CreateEnumeratedTypeSidePanel'
 import DeleteEnumeratedTypeModal from './DeleteEnumeratedTypeModal'
@@ -28,7 +30,7 @@ import EditEnumeratedTypeSidePanel from './EditEnumeratedTypeSidePanel'
 const EnumeratedTypes = () => {
   const { project } = useProjectContext()
   const [search, setSearch] = useState('')
-  const [selectedSchema, setSelectedSchema] = useState('public')
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
   const [showCreateTypePanel, setShowCreateTypePanel] = useState(false)
   const [selectedTypeToEdit, setSelectedTypeToEdit] = useState<EnumeratedType>()
   const [selectedTypeToDelete, setSelectedTypeToDelete] = useState<EnumeratedType>()
@@ -51,7 +53,7 @@ const EnumeratedTypes = () => {
       : enumeratedTypes.filter((x) => x.schema === selectedSchema)
 
   const protectedSchemas = (schemas ?? []).filter((schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
@@ -59,28 +61,32 @@ const EnumeratedTypes = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-x-2">
           <SchemaSelector
-            className="w-[260px]"
-            size="small"
+            className="w-[180px]"
+            size="tiny"
             showError={false}
             selectedSchemaName={selectedSchema}
             onSelectSchema={setSelectedSchema}
           />
           <Input
-            size="small"
+            size="tiny"
             value={search}
-            className="w-64"
+            className="w-52"
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for a type"
             icon={<Search size={14} />}
           />
         </div>
-        {!isLocked && (
-          <Button type="primary" onClick={() => setShowCreateTypePanel(true)}>
-            Create type
-          </Button>
-        )}
+
+        <div className="flex items-center gap-x-2">
+          <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
+          {!isLocked && (
+            <Button className="ml-auto" type="primary" onClick={() => setShowCreateTypePanel(true)}>
+              Create type
+            </Button>
+          )}
+        </div>
       </div>
 
       {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="enumerated types" />}

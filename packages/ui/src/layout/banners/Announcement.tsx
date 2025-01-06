@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react'
 
-import { useRouter } from 'next/router'
+import { usePathname } from 'next/navigation'
 import { PropsWithChildren } from 'react'
-import IconX from '../../components/Icon/icons/IconX/IconX'
 import { cn } from '../../lib/utils/cn'
 import _announcement from './data/Announcement.json'
+import { X } from 'lucide-react'
 
 export interface AnnouncementProps {
   show: boolean
@@ -30,10 +30,10 @@ const Announcement = ({
   className,
   children,
 }: PropsWithChildren<AnnouncementComponentProps>) => {
-  const [hidden, setHidden] = useState(false)
+  const [hidden, setHidden] = useState(true)
 
-  const router = useRouter()
-  const isLaunchWeekSection = router.pathname.includes('launch-week')
+  const pathname = usePathname()
+  const isLaunchWeekSection = pathname?.includes('launch-week') ?? false
 
   // override to hide announcement
   if (!show || !announcement.show) return null
@@ -44,8 +44,12 @@ const Announcement = ({
   // window.localStorage is kept inside useEffect
   // to prevent error
   useEffect(function () {
+    if (window.localStorage.getItem(announcementKey) === 'hidden') {
+      setHidden(true)
+    }
+
     if (!window.localStorage.getItem(announcementKey)) {
-      return setHidden(false)
+      setHidden(false)
     }
   }, [])
 
@@ -56,7 +60,6 @@ const Announcement = ({
     return setHidden(true)
   }
 
-  // Always show if on LW section
   if (!isLaunchWeekSection && hidden) {
     return null
   } else {
@@ -64,10 +67,10 @@ const Announcement = ({
       <div className={cn('relative z-40 w-full', className)}>
         {dismissable && !isLaunchWeekSection && (
           <div
-            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-white transition-opacity hover:opacity-100"
+            className="absolute z-50 right-4 flex h-full items-center opacity-100 text-foreground transition-opacity hover:opacity-100"
             onClick={handleClose}
           >
-            <IconX size={16} />
+            <X size={16} />
           </div>
         )}
         {children}

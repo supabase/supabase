@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import saveAs from 'file-saver'
 import {
+  Clipboard,
   Copy,
   Download,
   Edit,
@@ -13,27 +14,41 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { IS_PLATFORM } from 'common'
-import { parseSupaTable } from 'components/grid'
-import { getEntityLintDetails } from 'components/interfaces/TableGridEditor/TableEntity.utils'
+import {
+  MAX_EXPORT_ROW_COUNT,
+  MAX_EXPORT_ROW_COUNT_MESSAGE,
+} from 'components/grid/components/header/Header'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
+import {
+  formatTableRowsToSQL,
+  getEntityLintDetails,
+} from 'components/interfaces/TableGridEditor/TableEntity.utils'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
+import { Entity } from 'data/entity-types/entity-types-infinite-query'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { EditorTablePageLink } from 'data/prefetchers/project.$ref.editor.$id'
+import { getTableEditor } from 'data/table-editor/table-editor-query'
+import { isTableLike } from 'data/table-editor/table-editor-types'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-  cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { copyToClipboard } from 'lib/helpers'
 
 export interface EntityListItemProps {
   id: number
@@ -49,8 +64,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 }) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema } = useQuerySchemaState()
 
   const isActive = Number(id) === entity.id
+  const canEdit = isActive && !isLocked
 
   const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -61,7 +78,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const viewHasLints: boolean = getEntityLintDetails(
@@ -69,7 +86,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const materializedViewHasLints: boolean = getEntityLintDetails(
@@ -77,7 +94,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
-    snap.selectedSchemaName
+    selectedSchema
   ).hasLint
 
   const formatTooltipText = (entityType: string) => {
@@ -95,22 +112,23 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
 
     try {
-      const table = await getTable({
+      const table = await getTableEditor({
         id: entity.id,
         projectRef,
         connectionString: project?.connectionString,
       })
-      const supaTable =
-        table &&
-        parseSupaTable(
-          {
-            table: table,
-            columns: table.columns ?? [],
-            primaryKeys: table.primary_keys,
-            relationships: table.relationships,
-          },
-          []
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
+          { id: toastId }
         )
+      }
+
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
 
       const rows = await fetchAllTableRows({
         projectRef,
@@ -140,29 +158,79 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
+  const exportTableAsSQL = async () => {
+    if (IS_PLATFORM && !project?.connectionString) {
+      return console.error('Connection string is required')
+    }
+    const toastId = toast.loading(`Exporting ${entity.name} as SQL...`)
+
+    try {
+      const table = await getTableEditor({
+        id: entity.id,
+        projectRef,
+        connectionString: project?.connectionString,
+      })
+
+      if (isTableLike(table) && table.live_rows_estimate > MAX_EXPORT_ROW_COUNT) {
+        return toast.error(
+          <div className="text-foreground prose text-sm">{MAX_EXPORT_ROW_COUNT_MESSAGE}</div>,
+          { id: toastId }
+        )
+      }
+
+      const supaTable = table && parseSupaTable(table)
+
+      if (!supaTable) {
+        return toast.error(`Failed to export table: ${entity.name}`, { id: toastId })
+      }
+
+      const rows = await fetchAllTableRows({
+        projectRef,
+        connectionString: project?.connectionString,
+        table: supaTable,
+      })
+      const formattedRows = rows.map((row) => {
+        const formattedRow = row
+        Object.keys(row).map((column) => {
+          if (typeof row[column] === 'object' && row[column] !== null)
+            formattedRow[column] = JSON.stringify(formattedRow[column])
+        })
+        return formattedRow
+      })
+
+      if (formattedRows.length > 0) {
+        const sqlStatements = formatTableRowsToSQL(supaTable, formattedRows)
+        const sqlData = new Blob([sqlStatements], { type: 'text/sql;charset=utf-8;' })
+        saveAs(sqlData, `${entity!.name}_rows.sql`)
+      }
+
+      toast.success(`Successfully exported ${entity.name} as SQL`, { id: toastId })
+    } catch (error: any) {
+      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
+    }
+  }
+
   const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
     let tooltipContent = null
 
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
         if (tableHasLints) {
-          tooltipContent = 'RLS Disabled'
+          tooltipContent = 'RLS disabled'
         }
         break
       case ENTITY_TYPE.VIEW:
         if (viewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
         if (materializedViewHasLints) {
-          tooltipContent = 'Security Definer view'
+          tooltipContent = 'Security definer view'
         }
-
         break
       case ENTITY_TYPE.FOREIGN_TABLE:
         tooltipContent = 'RLS is not enforced on foreign tables'
-
         break
       default:
         break
@@ -199,142 +267,198 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   return (
-    <Link
-      title={entity.name}
-      href={`/project/${projectRef}/editor/${entity.id}`}
-      role="button"
-      aria-label={`View ${entity.name}`}
-      className={cn(
-        'w-full',
-        'flex items-center gap-2',
-        'py-1 px-2',
-        'text-light',
-        'rounded-md',
-        isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
-        'group',
-        'transition'
-      )}
-    >
-      <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-        <Tooltip.Trigger className="min-w-4" asChild>
-          {entity.type === ENTITY_TYPE.TABLE ? (
-            <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-          ) : entity.type === ENTITY_TYPE.VIEW ? (
-            <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
-          ) : (
-            <div
-              className={cn(
-                'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
-                entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
-                entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
-                entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                  'text-foreground-light bg-border-stronger'
-              )}
-            >
-              {Object.entries(ENTITY_TYPE)
-                .find(([, value]) => value === entity.type)?.[0]?.[0]
-                ?.toUpperCase()}
-            </div>
-          )}
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content
-            side="bottom"
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background',
-              'text-xs text-foreground capitalize',
-            ].join(' ')}
-          >
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            {formatTooltipText(entity.type)}
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
-      <div
+    <div className="px-2">
+      <EditorTablePageLink
+        title={entity.name}
+        id={String(entity.id)}
+        href={`/project/${projectRef}/editor/${entity.id}?schema=${selectedSchema}`}
+        role="button"
+        aria-label={`View ${entity.name}`}
         className={cn(
-          'truncate',
-          'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
-          isActive && 'text-foreground'
+          'w-full',
+          'flex items-center gap-2',
+          'py-1 px-2',
+          'text-light',
+          'rounded-md',
+          isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
+          'group',
+          'transition'
         )}
       >
-        <span
+        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+          <Tooltip.Trigger className="min-w-4" asChild>
+            {entity.type === ENTITY_TYPE.TABLE ? (
+              <Table2
+                size={15}
+                strokeWidth={1.5}
+                className={cn(
+                  'text-foreground-muted group-hover:text-foreground-lighter',
+                  isActive && 'text-foreground-lighter',
+                  'transition-colors'
+                )}
+              />
+            ) : entity.type === ENTITY_TYPE.VIEW ? (
+              <Eye
+                size={15}
+                strokeWidth={1.5}
+                className={cn(
+                  'text-foreground-muted group-hover:text-foreground-lighter',
+                  isActive && 'text-foreground-lighter',
+                  'transition-colors'
+                )}
+              />
+            ) : (
+              <div
+                className={cn(
+                  'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+                  entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
+                  entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',
+                  entity.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                    'text-foreground-light bg-border-stronger'
+                )}
+              >
+                {Object.entries(ENTITY_TYPE)
+                  .find(([, value]) => value === entity.type)?.[0]?.[0]
+                  ?.toUpperCase()}
+              </div>
+            )}
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              side="bottom"
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
+                'text-xs text-foreground capitalize',
+              ].join(' ')}
+            >
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              {formatTooltipText(entity.type)}
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+        <div
           className={cn(
-            isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
-            'text-sm',
-            'transition',
-            'truncate'
+            'truncate',
+            'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            isActive && 'text-foreground'
           )}
         >
-          {entity.name}
-        </span>
-        <EntityTooltipTrigger entity={entity} />
-      </div>
+          <span
+            className={cn(
+              isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
+              'text-sm',
+              'transition',
+              'truncate'
+            )}
+          >
+            {entity.name}
+          </span>
+          <EntityTooltipTrigger entity={entity} />
+        </div>
 
-      {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
-        <DropdownMenu>
-          <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
-            <MoreHorizontal size={14} strokeWidth={2} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="start">
-            <DropdownMenuItem
-              key="edit-table"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                snap.onEditTable()
-              }}
-            >
-              <Edit size={12} />
-              <span>Edit Table</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              key="duplicate-table"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                snap.onDuplicateTable()
-              }}
-            >
-              <Copy size={12} />
-              <span>Duplicate Table</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
-              <Link
-                key="view-policies"
-                href={`/project/${projectRef}/auth/policies?schema=${snap.selectedSchemaName}&search=${entity.id}`}
+        {canEdit && (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="text-foreground-lighter transition-all hover:text-foreground data-[state=open]:text-foreground">
+              <MoreHorizontal size={14} strokeWidth={2} />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="bottom" align="start" className="w-44">
+              <DropdownMenuItem
+                key="copy-name"
+                className="space-x-2"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  copyToClipboard(entity.name)
+                }}
               >
-                <Lock size={12} />
-                <span>View Policies</span>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              key="download-table-csv"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                exportTableAsCSV()
-              }}
-            >
-              <Download size={12} />
-              <span>Export as CSV</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              key="delete-table"
-              className="space-x-2"
-              onClick={(e) => {
-                e.stopPropagation()
-                snap.onDeleteTable()
-              }}
-            >
-              <Trash size={12} />
-              <span>Delete Table</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-    </Link>
+                <Clipboard size={12} />
+                <span>Copy name</span>
+              </DropdownMenuItem>
+
+              {entity.type === ENTITY_TYPE.TABLE && (
+                <>
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem
+                    key="edit-table"
+                    className="space-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onEditTable()
+                    }}
+                  >
+                    <Edit size={12} />
+                    <span>Edit table</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    key="duplicate-table"
+                    className="space-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDuplicateTable()
+                    }}
+                  >
+                    <Copy size={12} />
+                    <span>Duplicate table</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
+                    <Link
+                      key="view-policies"
+                      href={`/project/${projectRef}/auth/policies?schema=${selectedSchema}&search=${entity.id}`}
+                    >
+                      <Lock size={12} />
+                      <span>View policies</span>
+                    </Link>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="gap-x-2">
+                      <Download size={12} />
+                      Export data
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem
+                        key="download-table-csv"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportTableAsCSV()
+                        }}
+                      >
+                        <span>Export table as CSV</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="download-table-sql"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          exportTableAsSQL()
+                        }}
+                      >
+                        <span>Export table as SQL</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-table"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteTable()
+                    }}
+                  >
+                    <Trash size={12} />
+                    <span>Delete table</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </EditorTablePageLink>
+    </div>
   )
 }
 

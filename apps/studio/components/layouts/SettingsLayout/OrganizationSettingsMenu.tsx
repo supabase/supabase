@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import SettingsMenuItem from './SettingsMenuItem'
 
 const OrganizationSettingsMenu = () => {

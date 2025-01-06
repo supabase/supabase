@@ -6,34 +6,33 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "vitest"
   },
   "dependencies": {
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "*",
-    "ai": "^2.2.29",
+    "ai": "^3.4.33",
     "common-tags": "^1.8.2",
-    "config": "*",
+    "config": "workspace:*",
     "js-tiktoken": "^1.0.10",
     "jsonrepair": "^3.5.0",
     "openai": "^4.26.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.23.6",
-    "@babel/preset-env": "^7.23.6",
-    "@jest/globals": "^29.7.0",
+    "@ai-sdk/openai": "^0.0.72",
     "@types/common-tags": "^1.8.4",
-    "babel-jest": "^29.7.0",
-    "babel-plugin-transform-import-meta": "^2.2.1",
+    "@types/node": "catalog:",
+    "api-types": "workspace:*",
     "chalk": "^5.3.0",
     "dotenv": "^16.3.1",
-    "jest": "^29.7.0",
-    "libpg-query": "^15.2.0",
+    "libpg-query": "15.2.0",
     "mdast-util-from-markdown": "^2.0.0",
     "sql-formatter": "^15.0.2",
-    "ts-jest": "^29.1.1",
-    "tsconfig": "*",
-    "typescript": "^5.5.0"
+    "tsconfig": "workspace:*",
+    "typescript": "~5.5.0",
+    "vitest": "^2.0.0"
   }
 }

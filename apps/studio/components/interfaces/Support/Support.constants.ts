@@ -22,7 +22,7 @@ export const CATEGORY_OPTIONS = [
   {
     value: SupportCategories.PERFORMANCE_ISSUES,
     label: 'Performance issues',
-    description: 'Reporting of performance issues is only available on the Pro plan',
+    description: 'Reporting of performance issues is only available on the Pro Plan',
     query: 'Performance',
   },
   {
@@ -123,4 +123,19 @@ export const SERVICE_OPTIONS = [
     value: 'Others',
     disabled: false,
   },
+]
+
+export const IPV4_MIGRATION_STRINGS = [
+  'ipv4',
+  'ipv6',
+  'supavisor',
+  'pgbouncer',
+  '5432',
+  'ENETUNREACH',
+  'ECONNREFUSED',
+  'P1001',
+  'connect: no route to',
+  'network is unreac',
+  'could not translate host name',
+  'address family not supported by protocol',
 ]

@@ -1,42 +1,42 @@
-import { CommandMenuProvider } from '@ui-patterns/Cmdk'
-import PromoToast from '@ui-patterns/PromoToast'
-import { ThemeProvider } from 'common'
-import { PortalToast } from 'ui'
 import { type PropsWithChildren } from 'react'
 
+import { ThemeProvider } from 'common'
+import { SonnerToaster } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+// import { PromoToast } from 'ui-patterns/PromoToast'
 import SiteLayout from '~/layouts/SiteLayout'
 import { AuthContainer } from './auth/auth.client'
+import { DocsCommandMenu } from './command'
 import { QueryClientProvider } from './data/queryClient.client'
-import { ShortcutPreviewBuild } from './envs/staging.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { ScrollRestoration } from './ui/helpers.scroll.client'
 import { ThemeSandbox } from './ui/theme.client'
+import { PromoToast } from 'ui-patterns'
 
 /**
  * Global providers that wrap the entire app
  */
 function GlobalProviders({ children }: PropsWithChildren) {
   return (
-    <ShortcutPreviewBuild>
-      <QueryClientProvider>
-        <AuthContainer>
-          <PageTelemetry />
-          <ScrollRestoration />
-          <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-            <CommandMenuProvider site="docs">
-              <div className="h-screen flex flex-col">
-                <SiteLayout>
-                  <PortalToast />
-                  <PromoToast />
-                  {children}
-                </SiteLayout>
-                <ThemeSandbox />
-              </div>
-            </CommandMenuProvider>
-          </ThemeProvider>
-        </AuthContainer>
-      </QueryClientProvider>
-    </ShortcutPreviewBuild>
+    <QueryClientProvider>
+      <AuthContainer>
+        <PageTelemetry />
+        <ScrollRestoration />
+        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+          <CommandProvider>
+            <div className="flex flex-col">
+              <SiteLayout>
+                <PromoToast />
+                {children}
+                <DocsCommandMenu />
+              </SiteLayout>
+              <ThemeSandbox />
+            </div>
+          </CommandProvider>
+          <SonnerToaster position="top-right" />
+        </ThemeProvider>
+      </AuthContainer>
+    </QueryClientProvider>
   )
 }
 

@@ -1,11 +1,7 @@
-/**
- * @jest-environment jsdom
- */
-
-import '@testing-library/jest-dom'
 import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Fragment, useState } from 'react'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { CommandProvider } from '../CommandProvider'
 import type { ICommand } from '../types'

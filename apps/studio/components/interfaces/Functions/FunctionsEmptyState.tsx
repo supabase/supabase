@@ -1,6 +1,6 @@
-import { Code, ExternalLink } from 'lucide-react'
-import Link from 'next/link'
+import { ExternalLink } from 'lucide-react'
 
+import { DocsButton } from 'components/ui/DocsButton'
 import { Button } from 'ui'
 import TerminalInstructions from './TerminalInstructions'
 
@@ -17,24 +17,16 @@ const FunctionsEmptyState = () => {
             close to your users. They can be used for listening to webhooks or integrating your
             Supabase project with third-parties.
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-x-2">
+            <DocsButton href="https://supabase.com/docs/guides/functions" />
             <Button asChild type="default" icon={<ExternalLink />}>
-              <Link
-                href="https://supabase.com/docs/guides/functions"
+              <a
                 target="_blank"
                 rel="noreferrer"
-              >
-                Documentation
-              </Link>
-            </Button>
-            <Button asChild type="default" icon={<Code />}>
-              <Link
                 href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                target="_blank"
-                rel="noreferrer"
               >
                 Examples
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

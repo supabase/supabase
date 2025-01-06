@@ -1,6 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import {
   Button,
   Collapsible,
@@ -9,16 +8,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Form,
-  IconChevronUp,
-  IconHelpCircle,
-  IconMoreVertical,
-  IconTrash,
   Toggle,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { PgRole } from 'data/database-roles/database-roles-query'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
+import { PgRole } from 'data/database-roles/database-roles-query'
+import { ChevronUp, HelpCircle, MoreVertical, Trash } from 'lucide-react'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {
@@ -99,7 +98,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                 }}
               >
                 <div className="flex items-start space-x-3">
-                  <IconChevronUp
+                  <ChevronUp
                     id="collapsible-trigger"
                     className="text-border-stronger transition data-open-parent:rotate-0 data-closed-parent:rotate-180"
                     strokeWidth={2}
@@ -135,7 +134,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button type="default" className="px-1">
-                          <IconMoreVertical />
+                          <MoreVertical />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="bottom" className="w-[120px]">
@@ -146,7 +145,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                             onSelectDelete(role)
                           }}
                         >
-                          <IconTrash className="text-red-800" size="tiny" strokeWidth={2} />
+                          <Trash className="text-red-800" size="14" strokeWidth={2} />
                           <p>Delete</p>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -169,36 +168,25 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                         disabled={disabled || ROLE_PERMISSIONS[permission].disabled}
                         className={[
                           'roles-toggle',
-                          disabled || ROLE_PERMISSIONS[permission].disabled ? 'opacity-50' : '',
+                          disabled || ROLE_PERMISSIONS[permission].disabled
+                            ? '[&>div>button]:opacity-30 [&>div>label]:text-foreground-lighter'
+                            : '',
                         ].join(' ')}
                         afterLabel={
-                          !disabled && ROLE_PERMISSIONS[permission].disabled ? (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger type="button">
-                                <IconHelpCircle
-                                  size="tiny"
+                          !disabled &&
+                          ROLE_PERMISSIONS[permission].disabled && (
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_>
+                                <HelpCircle
+                                  size="14"
                                   strokeWidth={2}
                                   className="ml-2 relative top-[3px]"
                                 />
-                              </Tooltip.Trigger>
-                              <Tooltip.Portal>
-                                <Tooltip.Content align="center" side="bottom">
-                                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                  <div
-                                    className={[
-                                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                      'border border-background space-y-1',
-                                    ].join(' ')}
-                                  >
-                                    <span className="text-xs">
-                                      This privilege cannot be updated via the dashboard
-                                    </span>
-                                  </div>
-                                </Tooltip.Content>
-                              </Tooltip.Portal>
-                            </Tooltip.Root>
-                          ) : (
-                            <></>
+                              </TooltipTrigger_Shadcn_>
+                              <TooltipContent_Shadcn_ side="bottom">
+                                This privilege cannot be updated via the dashboard
+                              </TooltipContent_Shadcn_>
+                            </Tooltip_Shadcn_>
                           )
                         }
                       />

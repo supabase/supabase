@@ -1,4 +1,5 @@
 import { removeCommentsFromSql } from 'lib/helpers'
+import type { SnippetWithContent } from 'state/sql-editor-v2'
 import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
@@ -7,6 +8,9 @@ import {
 } from './SQLEditor.constants'
 import { ContentDiff, DiffType } from './SQLEditor.types'
 
+/**
+ * @deprecated
+ */
 export const createSqlSnippetSkeleton = ({
   id,
   name,
@@ -31,6 +35,39 @@ export const createSqlSnippetSkeleton = ({
       content_id: id ?? '',
       sql: sql ?? '',
     },
+  }
+}
+
+export const createSqlSnippetSkeletonV2 = ({
+  id,
+  name,
+  sql,
+  owner_id,
+  project_id,
+  folder_id,
+}: {
+  id: string
+  name: string
+  sql: string
+  owner_id: number
+  project_id: number
+  folder_id?: string
+}): SnippetWithContent => {
+  return {
+    ...NEW_SQL_SNIPPET_SKELETON,
+    id,
+    owner_id,
+    project_id,
+    name,
+    folder_id,
+    favorite: false,
+    inserted_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    content: {
+      ...NEW_SQL_SNIPPET_SKELETON.content,
+      content_id: id ?? '',
+      sql: sql ?? '',
+    } as any,
   }
 }
 
@@ -61,41 +98,53 @@ export function getDiffTypeDropdownLabel(diffType: DiffType) {
 }
 
 export function checkDestructiveQuery(sql: string) {
-  return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
+  const cleanedSql = removeCommentsFromSql(sql)
+  return destructiveSqlRegex.some((regex) => regex.test(cleanedSql))
 }
 
-export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => `
+// Function to check for UPDATE queries without WHERE clause
+export function isUpdateWithoutWhere(sql: string): boolean {
+  const updateWithoutWhereRegex =
+    /(?:^|;)\s*update\s+(?:"[\w.]+"\."[\w.]+"|[\w.]+)\s+set\s+[\w\W]+?(?!\s*where\s)/is
+  const updateStatements = sql
+    .split(';')
+    .filter((statement) => statement.trim().toLowerCase().startsWith('update'))
+  return updateStatements.some(
+    (statement) => updateWithoutWhereRegex.test(statement) && !/where\s/i.test(statement)
+  )
+}
+
+export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
 ${isNpx ? 'npx ' : ''}supabase migration new ${name}
-`
+`.trim()
 
-export const generateSeedCliCommand = (id: string, isNpx = false) => `
+export const generateSeedCliCommand = (id: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
   supabase/seed.sql
-`
+`.trim()
 
-export const generateFileCliCommand = (id: string, name: string, isNpx = false) => `
+export const generateFileCliCommand = (id: string, name: string, isNpx = false) =>
+  `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
   ${name}.sql
-`
+`.trim()
 
 export const compareAsModification = (sqlDiff: ContentDiff) => {
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
 
   return {
     original: sqlDiff.original,
-    modified: `${sqlAiDisclaimerComment}\n\n${formattedModified}`,
+    modified: `${formattedModified}`,
   }
 }
 
 export const compareAsAddition = (sqlDiff: ContentDiff) => {
   const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
   const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-  const newModified =
-    sqlAiDisclaimerComment +
-    '\n\n' +
-    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
-    formattedModified
+  const newModified = (formattedOriginal ? formattedOriginal + '\n\n' : '') + formattedModified
 
   return {
     original: sqlDiff.original,

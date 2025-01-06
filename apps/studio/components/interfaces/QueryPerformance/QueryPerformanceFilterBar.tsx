@@ -5,8 +5,8 @@ import { useState } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,

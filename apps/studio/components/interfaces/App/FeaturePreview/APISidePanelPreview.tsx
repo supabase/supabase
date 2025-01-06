@@ -3,7 +3,7 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { BASE_PATH } from 'lib/constants'
 import Image from 'next/image'
 
-const APISidePanelPreview = () => {
+export const APISidePanelPreview = () => {
   const { ref } = useParams()
 
   return (
@@ -38,5 +38,3 @@ const APISidePanelPreview = () => {
     </div>
   )
 }
-
-export default APISidePanelPreview

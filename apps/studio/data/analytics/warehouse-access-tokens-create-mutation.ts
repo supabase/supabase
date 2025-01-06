@@ -1,23 +1,28 @@
 import { UseMutationOptions, useMutation, useQueryClient } from '@tanstack/react-query'
-import { analyticsKeys } from './keys'
 import { handleError, post } from 'data/fetchers'
+import { toast } from 'sonner'
 import { ResponseError } from 'types'
-import toast from 'react-hot-toast'
+import { analyticsKeys } from './keys'
 
 type WarehouseAccessTokenCreateVariables = {
   ref: string
   description: string
 }
+
+/**
+ * This will be deprecated or rewritten in favor of the new project API keys
+ */
 async function createWarehouseAccessToken({
   ref,
   description,
 }: WarehouseAccessTokenCreateVariables) {
-  const { data, error } = await post(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
+  // TODO: remove type cast when fetcher fn params are typed
+  const { data, error } = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: {
       path: { ref },
     },
     body: { description },
-  } as any) // TODO: remove type cast when fetcher fn params are typed
+  } as any)
 
   if (error) handleError(error)
 

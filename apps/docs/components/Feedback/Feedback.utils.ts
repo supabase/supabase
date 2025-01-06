@@ -24,11 +24,15 @@ const getNotionTeam = (pathname: string) => {
       return 'team-realtime'
     case 'ai':
       return 'team-ai'
-    case 'cli':
-      return 'team-cli'
-
-    // Ignoring platform for now because that section is a mix of teams.
+    case 'local-development':
+    case 'self-hosting':
+    case 'deployment':
+      return 'team-dev-workflows'
+    case 'integrations':
+      return 'team-api'
     case 'platform':
+    case 'monitoring-troubleshooting':
+      return 'team-infra'
     default:
       return DEFAULT_TEAM
   }

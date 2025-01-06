@@ -3,8 +3,11 @@ import Link from 'next/link'
 import { ReactNode } from 'react'
 
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_, cn } from 'ui'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { useFlag } from 'hooks/ui/useFlag'
+import { Button, cn } from 'ui'
 import { ButtonTooltip } from './ButtonTooltip'
 
 interface UpgradeToProProps {

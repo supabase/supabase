@@ -1,20 +1,36 @@
-import { describe, vi, test } from 'vitest'
-import LogTable from 'components/interfaces/Settings/Logs/LogTable'
-import { waitFor, screen, prettyDOM } from '@testing-library/react'
+import { prettyDOM, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import dayjs from 'dayjs'
+import { beforeAll, expect, test, vi } from 'vitest'
 import { render } from '../../helpers'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import utc from 'dayjs/plugin/utc'
+import timezone from 'dayjs/plugin/timezone'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(customParseFormat)
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
 
 beforeAll(() => {
-  vi.mock('next/router', () => require('next-router-mock'))
+  vi.mock('next/router', () => import('next-router-mock'))
+  vi.mock('nuqs', async () => {
+    let queryValue = 'example'
+    return {
+      useQueryState: () => [queryValue, (v: string) => (queryValue = v)],
+    }
+  })
 })
+
+const fakeMicroTimestamp = dayjs().unix() * 1000
 
 test.skip('can display log data', async () => {
   render(
     <>
       <LogTable
         projectRef="projectRef"
-        params={{}}
         data={[
           {
             id: 'some-uuid',
@@ -47,7 +63,6 @@ test('can run if no queryType provided', async () => {
 
   render(
     <LogTable
-      params={{}}
       projectRef="projectRef"
       data={[
         {
@@ -84,7 +99,6 @@ test('can run if no queryType provided', async () => {
         },
       ]}
       projectRef="abcd"
-      params={{}}
       onRun={mockRun}
     />
   )
@@ -99,7 +113,6 @@ test('dedupes log lines with exact id', async () => {
   render(
     <LogTable
       projectRef="projectRef"
-      params={{}}
       data={[
         {
           id: 'some-uuid',
@@ -122,10 +135,8 @@ test('dedupes log lines with exact id', async () => {
 })
 
 test('can display standard preview table columns', async () => {
-  const fakeMicroTimestamp = dayjs().unix() * 1000
   render(
     <LogTable
-      params={{}}
       projectRef="ref"
       queryType="auth"
       data={[{ id: '12345', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
@@ -140,9 +151,8 @@ test("closes the selection if the selected row's data changes", async () => {
   const { rerender } = render(
     <LogTable
       projectRef="ref"
-      params={{}}
       queryType="auth"
-      data={[{ id: '1', event_message: 'some event message' }]}
+      data={[{ id: '1', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
     />
   )
   const text = await screen.findByText(/some event message/)
@@ -150,10 +160,9 @@ test("closes the selection if the selected row's data changes", async () => {
 
   rerender(
     <LogTable
-      params={{}}
       projectRef="ref"
       queryType="auth"
-      data={[{ id: '2', event_message: 'some other message' }]}
+      data={[{ id: '2', event_message: 'some other message', timestamp: fakeMicroTimestamp }]}
     />
   )
   await expect(screen.findByText(/some event message/)).rejects.toThrow()
@@ -227,7 +236,7 @@ test.each([
     excludes: [/\{/, /\}/],
   },
 ])('table col renderer for $queryType', async ({ queryType, data, includes, excludes }) => {
-  render(<LogTable projectRef="ref" params={{}} queryType={queryType} data={data} />)
+  render(<LogTable projectRef="ref" queryType={queryType} data={data} />)
 
   await Promise.all([
     ...includes.map((text) => screen.findByText(text)),
@@ -235,37 +244,19 @@ test.each([
   ])
 })
 
-// [Terry] removing, doesn't look like the histogram is being rendered in the LogTable component anymore
-// test('toggle histogram', async () => {
-//   const mockFn = vi.fn()
-//   render(
-//     <LogTable
-//       projectRef="mockProjectRef" // Provide a mock value for projectRef
-//       params={{}} // Provide a mock value for params
-//       queryType={QueryType.Auth} // Provide a mock value for queryType
-//       onHistogramToggle={mockFn}
-//       isHistogramShowing={true}
-//     />
-//   )
-//   const toggle = await screen.getByText(/Histogram/)
-//   userEvent.click(toggle)
-//   expect(mockFn).toBeCalled()
-// })
-
 test('error message handling', async () => {
   // Render LogTable with error as a string
-  render(<LogTable projectRef="ref" params={{}} error="some \nstring" />)
-  await expect(screen.findByText('some \nstring')).rejects.toThrow()
-  await screen.findByDisplayValue(/some/)
-  await screen.findByDisplayValue(/string/)
+  render(<LogTable projectRef="ref" error={'some error message'} />)
+
+  expect(screen.getByText(`some error message`)).toBeTruthy()
 
   // Rerender LogTable with error as null
-  render(<LogTable projectRef="ref" params={{}} error={null} />)
+  render(<LogTable projectRef="ref" error={null} />)
   // Add any additional assertions if LogTable behaves differently when error is null
 })
 
 test('no results message handling', async () => {
-  render(<LogTable projectRef="ref" params={{}} data={[]} />)
+  render(<LogTable projectRef="ref" data={[]} />)
   await screen.findByText(/No results/)
   await screen.findByText(/Try another search/)
 })
@@ -289,7 +280,7 @@ test('custom error message: Resources exceeded during query execution', async ()
   }
 
   // logs explorer, custom query
-  const { rerender } = render(<LogTable projectRef="ref" params={{}} error={errorFromLogflare} />)
+  const { rerender } = render(<LogTable projectRef="ref" error={errorFromLogflare} />)
 
   // prompt user to reduce selected tables
   await screen.findByText(/This query requires too much memory to be executed/)
@@ -298,7 +289,7 @@ test('custom error message: Resources exceeded during query execution', async ()
   )
 
   // previewer, prompt to reduce time range
-  rerender(<LogTable params={{}} projectRef="ref" queryType="api" error={errorFromLogflare} />)
+  rerender(<LogTable projectRef="ref" queryType="api" error={errorFromLogflare} />)
   await screen.findByText(/This query requires too much memory to be executed/)
   await screen.findByText(/Avoid querying across a large datetime range/)
   await screen.findByText(/Please contact support if this error persists/)

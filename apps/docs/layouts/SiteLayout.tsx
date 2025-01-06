@@ -1,7 +1,5 @@
 import { PropsWithChildren } from 'react'
 
-const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
-  return <main className="grow overflow-hidden">{children}</main>
-}
+const SiteLayout = ({ children }: PropsWithChildren<{}>) => <div className="grow">{children}</div>
 
 export default SiteLayout

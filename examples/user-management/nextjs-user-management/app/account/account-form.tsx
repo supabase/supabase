@@ -1,29 +1,29 @@
 'use client'
 import { useCallback, useEffect, useState } from 'react'
+import { createClient } from '@/utils/supabase/client'
+import { type User } from '@supabase/supabase-js'
 import Avatar from './avatar'
-import { Database } from '../database.types'
-import { Session, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
-export default function AccountForm({ session }: { session: Session | null }) {
-  const supabase = createClientComponentClient<Database>()
+export default function AccountForm({ user }: { user: User | null }) {
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
-  const user = session?.user
 
   const getProfile = useCallback(async () => {
     try {
       setLoading(true)
 
-      let { data, error, status } = await supabase
+      const { data, error, status } = await supabase
         .from('profiles')
         .select(`full_name, username, website, avatar_url`)
         .eq('id', user?.id)
         .single()
 
       if (error && status !== 406) {
+        console.log(error)
         throw error
       }
 
@@ -57,7 +57,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
     try {
       setLoading(true)
 
-      let { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from('profiles').upsert({
         id: user?.id as string,
         full_name: fullname,
         username,
@@ -77,7 +77,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
   return (
     <div className="form-widget">
       <Avatar
-        uid={user!.id}
+        uid={user?.id ?? null}
         url={avatar_url}
         size={150}
         onUpload={(url) => {
@@ -87,7 +87,7 @@ export default function AccountForm({ session }: { session: Session | null }) {
       />
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+        <input id="email" type="text" value={user?.email} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>

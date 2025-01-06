@@ -1,18 +1,18 @@
-import { useParams } from 'common'
-import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import { FormHeader } from 'components/ui/Forms'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useSelectedProject } from 'hooks'
-import { useState, useMemo, useEffect } from 'react'
-import type { NextPageWithLayout } from 'types'
-import { LoadingLine } from 'ui'
+import { useEffect, useMemo, useState } from 'react'
 
+import { useParams } from 'common'
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import AdvisorsLayout from 'components/layouts/AdvisorsLayout/AdvisorsLayout'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import type { NextPageWithLayout } from 'types'
+import { LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()

@@ -11,7 +11,7 @@ export type InfraMonitoringAttribute =
   | 'disk_io_budget'
   | 'ram_usage'
   | 'disk_io_consumption'
-  | 'swap_usage'
+  | 'pg_stat_database_num_backends'
 
 export type InfraMonitoringVariables = {
   projectRef?: string

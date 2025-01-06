@@ -1,3 +1,5 @@
+'use client'
+
 import React, { createContext, useContext } from 'react'
 
 interface ContextProps {
@@ -21,9 +23,7 @@ export const MenuContextProvider = (props: Provider) => {
     type: type,
   }
 
-  return (
-    <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>
-  )
+  return <MenuContext.Provider value={value}>{props.children}</MenuContext.Provider>
 }
 
 // context helper to avoid using a consumer component

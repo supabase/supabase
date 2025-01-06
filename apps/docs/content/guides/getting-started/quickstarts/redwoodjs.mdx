@@ -90,19 +90,19 @@ hideToc: true
 
       In your `.env` file, add the following environment variables for your database connection:
 
-      * The `DIRECT_URL` should use the Transaction mode connection string you copied in Step 1.
+      * The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 1.
 
-      * The `DATABASE_URL` should use the Session mode connection string you copied in Step 1.
+      * The `DIRECT_URL` should use the Session mode connection string you copied in Step 1.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
       ```bash .env
       # Transaction mode connection string used for migrations
-      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
 
       # Session mode connection string — used by Prisma Client
-      DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
+      DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
       ```
     </StepHikeCompact.Code>
 
@@ -116,7 +116,7 @@ hideToc: true
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
-      ```prisma api/prisma/schema.prisma
+      ```prisma api/db/schema.prisma
       datasource db {
         provider  = "postgresql"
         url       = env("DATABASE_URL")

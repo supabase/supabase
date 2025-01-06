@@ -30,6 +30,12 @@ See the [Access control section](#access-control) for more details.
 
 </Admonition>
 
+<Admonition type="caution" label="Use Dynamic Rendering with Next.js">
+
+The Supabase team has received reports of user metadata being cached across unique anonymous users as a result of Next.js static page rendering. For the best user experience, utilize dynamic page rendering.
+
+</Admonition>
+
 <Admonition type="note" label="Self hosting and local development">
 
 For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
@@ -81,13 +87,22 @@ supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+Call the [`sign_in_anonymously()`](/docs/reference/python/auth-signinanonymously) method:
+
+```python
+response = supabase.auth.sign_in_anonymously()
+```
+
+</TabPanel>
 </Tabs>
 
 ## Convert an anonymous user to a permanent user
 
 Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/settings/auth) in your Supabase project.
 
-### Link an Email / Phone identity
+### Link an email / phone identity
 
 <Tabs
   scrollable
@@ -101,7 +116,7 @@ Converting an anonymous user to a permanent user requires [linking an identity](
 You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
-const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+const { data, error } = await supabase.auth.updateUser({ email: 'valid.email@supabase.io' })
 
 // verify the user's email by clicking on the email change link
 // or entering the 6-digit OTP sent to the email address
@@ -116,7 +131,7 @@ const { data, error } = await supabase.auth.updateUser({ password: 'password' })
 You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```dart
-await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+await supabase.auth.updateUser(UserAttributes(email: 'valid.email@supabase.io'));
 ```
 
 </TabPanel>
@@ -126,19 +141,38 @@ You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method t
 
 ```swift
 try await supabase.auth.updateUser(
-  user: UserAttributes(email: "example@email.com")
+  user: UserAttributes(email: "valid.email@supabase.io")
 )
 ```
 
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```kotlin
-supabase.auth.modifyUser {
-    email = "example@email.com"
+supabase.auth.updateUser {
+    email = "valid.email@supabase.io"
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+You can use the [`update_user()`](/docs/reference/python/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
+
+```python
+response = supabase.auth.update_user({
+  'email': 'valid.email@supabase.io',
+})
+
+# verify the user's email by clicking on the email change link
+# or entering the 6-digit OTP sent to the email address
+
+# once the user has been verified, update the password
+response = supabase.auth.update_user({
+  'password': 'password',
+})
 ```
 
 </TabPanel>
@@ -189,6 +223,15 @@ supabase.auth.linkIdentity(Google)
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+You can use the [`link_identity()`](/docs/reference/python/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```python
+response = supabase.auth.link_identity({'provider': 'google'})
+```
+
+</TabPanel>
 </Tabs>
 
 ## Access control
@@ -220,6 +263,53 @@ Depending on your application requirements, data conflicts can arise when an ano
 1. Overwrite the items in the cart with those in the existing account
 2. Overwrite the items in the cart with those from the anonymous user
 3. Merge the items in the cart together
+
+### Linking an anonymous user to an existing account
+
+In some cases, you may need to link an anonymous user to an existing account rather than creating a new permanent account. This process requires manual handling of potential conflicts. Here's a general approach:
+
+```javascript
+// 1. Sign in anonymously (assuming the user is already signed in anonymously)
+const { data: anonData, error: anonError } = await supabase.auth.getSession()
+
+// 2. Attempt to update the user with the existing email
+const { data: updateData, error: updateError } = await supabase.auth.updateUser({
+  email: 'valid.email@supabase.io',
+})
+
+// 3. Handle the error (since the email belongs to an existing user)
+if (updateError) {
+  console.log('This email belongs to an existing user. Please sign in to that account.')
+
+  // 4. Sign in to the existing account
+  const {
+    data: { user: existingUser },
+    error: signInError,
+  } = await supabase.auth.signInWithPassword({
+    email: 'valid.email@supabase.io',
+    password: 'user_password',
+  })
+
+  if (existingUser) {
+    // 5. Reassign entities tied to the anonymous user
+    // This step will vary based on your specific use case and data model
+    const { data: reassignData, error: reassignError } = await supabase
+      .from('your_table')
+      .update({ user_id: existingUser.id })
+      .eq('user_id', anonData.session.user.id)
+
+    // 6. Implement your chosen conflict resolution strategy
+    // This could involve merging data, overwriting, or other custom logic
+    await resolveDataConflicts(anonData.session.user.id, existingUser.id)
+  }
+}
+
+// Helper function to resolve data conflicts (implement based on your strategy)
+async function resolveDataConflicts(anonymousUserId, existingUserId) {
+  // Implement your conflict resolution logic here
+  // This could involve ignoring the anonymous user's metadata, overwriting the existing user's metadata, or merging the data of both the anonymous and existing user.
+}
+```
 
 ## Abuse prevention and rate limits
 

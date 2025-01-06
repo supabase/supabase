@@ -1,6 +1,6 @@
-import { GripVertical } from 'lucide-react'
+import { GripVertical, Trash } from 'lucide-react'
 import { Draggable, DraggableProvided } from 'react-beautiful-dnd'
-import { Button, IconTrash, Input_Shadcn_ } from 'ui'
+import { Button, Input_Shadcn_ } from 'ui'
 
 interface EnumeratedTypeValueRowProps {
   index: number
@@ -38,7 +38,7 @@ const EnumeratedTypeValueRow = ({
             type="default"
             size="small"
             disabled={isDisabled}
-            icon={<IconTrash strokeWidth={1.5} size={16} />}
+            icon={<Trash strokeWidth={1.5} size={16} />}
             className="px-2"
             onClick={() => onRemoveValue()}
           />

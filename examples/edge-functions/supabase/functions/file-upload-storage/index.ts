@@ -2,7 +2,7 @@
 // and write files to Supabase Storage and other fields to a database table.
 
 import { Application } from 'https://deno.land/x/oak@v11.1.0/mod.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
+import { createClient } from 'jsr:@supabase/supabase-js@2'
 
 const MB = 1024 * 1024
 

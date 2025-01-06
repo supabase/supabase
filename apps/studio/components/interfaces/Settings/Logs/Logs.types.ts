@@ -88,6 +88,7 @@ export type QueryType =
   | 'supavisor'
   | 'postgrest'
   | 'warehouse'
+  | 'pg_cron'
 
 export type Mode = 'simple' | 'custom'
 
@@ -137,4 +138,10 @@ export interface DatetimeHelper {
   calcFrom: () => string
   default?: boolean
   disabled?: boolean
+}
+
+export interface WarehouseCollection {
+  name: string
+  id: number
+  token: string
 }

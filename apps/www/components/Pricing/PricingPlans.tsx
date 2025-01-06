@@ -1,14 +1,21 @@
-import React, { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, cn, IconCheck } from 'ui'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-
-import gaEvents from '~/lib/gaEvents'
 import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
+import { Button, cn } from 'ui'
+import { Organization } from '~/data/organizations'
+import gaEvents from '~/lib/gaEvents'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import UpgradePlan from './UpgradePlan'
+import { Check } from 'lucide-react'
 
-const PricingPlans: FC = () => {
+interface PricingPlansProps {
+  organizations?: Organization[]
+  hasExistingOrganizations?: boolean
+}
+
+const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
 
@@ -21,33 +28,38 @@ const PricingPlans: FC = () => {
       <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-md grid lg:max-w-none lg:grid-cols-2 xl:grid-cols-4 gap-4 xl:gap-0">
           {plans.map((plan) => {
-            const isPromoPlan = plan.name === 'Pro'
+            const isProPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
+            const isUpgradablePlan = isProPlan || isTeamPlan
             const features = pickFeatures(plan)
             const footer = pickFooter(plan)
+
+            const sendPricingEvent = () => {
+              sendTelemetryEvent(gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`])
+            }
 
             return (
               <div
                 key={`row-${plan.name}`}
                 className={cn(
-                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-100 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
-                  isPromoPlan && 'border-brand !border-2 !rounded-xl xl:-my-8',
+                  'flex flex-col border xl:border-r-0 last:border-r bg-surface-75 rounded-xl xl:rounded-none first:rounded-l-xl last:rounded-r-xl',
+                  isProPlan && 'border-foreground-muted !border-2 !rounded-xl xl:-my-8',
                   isTeamPlan && 'xl:border-l-0'
                 )}
               >
                 <div
                   className={cn(
                     'px-8 xl:px-4 2xl:px-8 pt-6',
-                    isPromoPlan ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
+                    isProPlan ? 'rounded-tr-[9px] rounded-tl-[9px]' : ''
                   )}
                 >
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 pb-2">
-                      <h3 className="text-2xl font-normal uppercase flex items-center gap-4 font-mono">
+                      <h3 className="text-foreground text-2xl font-normal uppercase flex items-center gap-4 font-mono">
                         {plan.name}
                       </h3>
                       {plan.nameBadge && (
-                        <span className="bg-brand-500 text-brand-600 rounded-md bg-opacity-30 py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
+                        <span className="bg-foreground-light text-background rounded-md py-0.5 px-2 text-[13px] leading-4 inline-flex gap-1 items-center">
                           {plan.nameBadge}
                         </span>
                       )}
@@ -56,28 +68,25 @@ const PricingPlans: FC = () => {
                   <p
                     className={cn(
                       'text-foreground-light mb-4 text-sm 2xl:pr-4',
-                      isPromoPlan && 'xl:mb-12'
+                      isProPlan && 'xl:mb-12'
                     )}
                   >
                     {plan.description}
                   </p>
-                  <Button
-                    block
-                    size="small"
-                    type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                    asChild
-                  >
-                    <Link
-                      href={plan.href}
-                      onClick={() =>
-                        sendTelemetryEvent(
-                          gaEvents[`www_pricing_hero_plan_${plan.name.toLowerCase()}`]
-                        )
-                      }
+                  {isUpgradablePlan && hasExistingOrganizations ? (
+                    <UpgradePlan organizations={organizations} onClick={sendPricingEvent} />
+                  ) : (
+                    <Button
+                      block
+                      size="large"
+                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      asChild
                     >
-                      {plan.cta}
-                    </Link>
-                  </Button>
+                      <Link href={plan.href} onClick={sendPricingEvent}>
+                        {plan.cta}
+                      </Link>
+                    </Button>
+                  )}
 
                   <div
                     className={cn(
@@ -135,7 +144,7 @@ const PricingPlans: FC = () => {
                 <div
                   className={cn(
                     'border-default flex rounded-bl-[4px] rounded-br-[4px] flex-1 flex-col px-8 xl:px-4 2xl:px-8 py-6',
-                    isPromoPlan && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
+                    isProPlan && 'mb-0.5 rounded-bl-[4px] rounded-br-[4px]'
                   )}
                 >
                   {plan.preface && (
@@ -149,7 +158,7 @@ const PricingPlans: FC = () => {
                       >
                         <div className="flex items-center">
                           <div className="flex w-6">
-                            <IconCheck
+                            <Check
                               className={cn(
                                 'h-4 w-4',
                                 plan.name === 'Enterprise' ? 'text-foreground' : 'text-brand'

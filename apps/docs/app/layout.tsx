@@ -4,11 +4,13 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { genFaviconData } from 'common/MetaFavicons/app-router'
 import { type Metadata, type Viewport } from 'next'
 
-import { BASE_PATH } from '~/lib/constants'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+
 import { GlobalProviders } from '~/features/app.providers'
+import { TopNavSkeleton } from '~/layouts/MainSkeleton'
+import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 
 const metadata: Metadata = {
   applicationName: 'Supabase Docs',
@@ -18,8 +20,8 @@ const metadata: Metadata = {
   metadataBase: new URL('https://supabase.com'),
   icons: genFaviconData(BASE_PATH),
   robots: {
-    index: true,
-    follow: true,
+    index: IS_PRODUCTION,
+    follow: IS_PRODUCTION,
   },
   openGraph: {
     type: 'article',
@@ -45,7 +47,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body>
-        <GlobalProviders>{children}</GlobalProviders>
+        <GlobalProviders>
+          <TopNavSkeleton>{children}</TopNavSkeleton>
+        </GlobalProviders>
       </body>
     </html>
   )

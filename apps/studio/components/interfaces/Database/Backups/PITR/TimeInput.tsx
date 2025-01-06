@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { isNaN, noop } from 'lodash'
+import { Clock } from 'lucide-react'
 import { ChangeEvent, useEffect, useState } from 'react'
-import { IconClock } from 'ui'
 
 import type { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
@@ -90,7 +90,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
           }`,
         ].join(' ')}
       >
-        <IconClock className="text-foreground-light" size={18} strokeWidth={1.5} />
+        <Clock className="text-foreground-light" size={18} strokeWidth={1.5} />
         <Tooltip.Root delayDuration={0}>
           <Tooltip.Trigger className="w-1/4" tabIndex={-1}>
             <input

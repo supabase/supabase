@@ -1,0 +1,81 @@
+---
+id: 'Beekeeper Studio'
+title: 'Connecting with Beekeeper Studio'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+[`Beekeeper Studio Community`](https://www.beekeeperstudio.io/get-community) is a free GUI tool for interacting with databases.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Create a new connection">
+
+        In Beekeeper, create a new Postgres connection.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ![Postgres connection](/docs/img/guides/database/connecting-to-postgres/beekeeper-studio/new-connection.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Get your connection credentials">
+
+    Get your connection credentials from the [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database). You will need:
+    - host
+    - username
+    - password
+    - port
+
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        Add your credentials to Beekeeper's connection form
+
+        ![Credentials](/docs/img/guides/database/connecting-to-postgres/beekeeper-studio/beekeeper-credentials.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Download your SSL Certificate">
+
+    Download your SSL certificate from the Dashboard's [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database)
+    ![SSL](/docs/img/guides/database/connecting-to-postgres/beekeeper-studio/certificate.png)
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+        Add your SSL to the connection form
+        ![SSL](/docs/img/guides/database/connecting-to-postgres/beekeeper-studio/certificate-beekeeper.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Test and connect">
+
+    Test your connection and then connect
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+        ![SSL](/docs/img/guides/database/connecting-to-postgres/beekeeper-studio/connect.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

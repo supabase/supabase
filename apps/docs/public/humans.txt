@@ -3,21 +3,26 @@ TEAM
 Supabase is 100% remote.
 
 Alaister Young
+Aleksi Immonen
 Alexander Korotkov
 Amy Q
+Andrew Valleteau
 Angelico de los Reyes
 Ant Wilson
 Ariuna K
+Artur Zakirov
 Beng Eu
 Bo Lu
 Bobbie Soedirgo
-Bruno Andrade
+Carel de Waal
 Chandana Anumula
 Charis Lam
 Chase Granberry
 Chris Caruso
+Chris Chandler
 Chris Copplestone
 Chris Gwilliams
+Chris Stockton
 Craig Cannon
 Dave Wilson
 Deji I
@@ -27,18 +32,21 @@ Egor Romanov
 Etienne Stalmans
 Fabrizio Fenoglio
 Francesco Sansalvadore
+Greg P
 Greg Richardson
 Guilherme Souza
 Haydn Maley
 Hieu Pham
 Inian P
+Ivan Vasilov
+Jenny Kibiri
 Jess Shears
-Joel Lee
 John Pena
 Jon M
 Jonny Summers-Muir
 Jordi Enric
 Joshen Lim
+Julien Goux
 Kamil Ogórek
 Kang Ming Tay
 Karan S
@@ -47,9 +55,10 @@ Kevin Brolly
 Kevin Grüneberg
 Lakshan Perera
 Laura C
+Laurence Isla
 Long Hoang
+Łukasz Niemier
 Margarita Sandomirskaia
-Marijana Pavlinić
 Mark Burggraf
 Monica El Khoury
 Oli R
@@ -66,6 +75,7 @@ Rory Wilding
 Sam Rose
 Sreyas Udayavarman
 Stanislav M
+Stephen Morgan
 Steve Chavez
 Stojan Dimitrovski
 Supun Sudaraka Kalidasa
@@ -73,6 +83,7 @@ Terry Sutton
 Thomas E
 Thor Schaeff
 Tom Ashley
+Tom G
 Tyler Hillery
 Tyler Fontaine
 Tyler Shukert
@@ -92,7 +103,7 @@ TECHNOLOGIES
 
 Supabase would not be possible without the work of some other amazing open source contributors.
 
-- Postgres - https://www.postgresql.org/docs/devel/git.html
+- Postgres - https://www.postgresql.org/
 - PostgREST - https://github.com/PostgREST
 - Kong - https://github.com/kong/
 - Next.js - https://nextjs.org/

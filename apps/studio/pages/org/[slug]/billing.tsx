@@ -3,7 +3,7 @@ import { BillingSettings } from 'components/interfaces/Organization'
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useEffect } from 'react'
 import {
   ORG_SETTINGS_PANEL_KEYS,

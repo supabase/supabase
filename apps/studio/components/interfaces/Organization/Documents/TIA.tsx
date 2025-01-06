@@ -3,7 +3,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, IconExternalLink } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { Button } from 'ui'
 
 const TIA = () => {
   return (
@@ -19,12 +20,12 @@ const TIA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
         <a
-          href="https://supabase.com/downloads/docs/Supabase+TIA+240510.pdf"
+          href="https://supabase.com/downloads/docs/Supabase+TIA+241030.pdf"
           target="_blank"
           rel="noreferrer noopener"
           download={true}
         >
-          <Button type="default" iconRight={<IconExternalLink />}>
+          <Button type="default" iconRight={<ExternalLink />}>
             View TIA
           </Button>
         </a>

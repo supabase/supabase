@@ -128,6 +128,8 @@ After a user is signed in, you can allow them to edit their profile details and 
 Create a new view for that called `ProfileView.swift`.
 
 ```swift ProfileView.swift
+import SwiftUI
+
 struct ProfileView: View {
   @State var username = ""
   @State var fullName = ""
@@ -180,7 +182,7 @@ struct ProfileView: View {
     do {
       let currentUser = try await supabase.auth.session.user
 
-      let profile: Profile = try await supabase.database
+      let profile: Profile = try await supabase
         .from("profiles")
         .select()
         .eq("id", value: currentUser.id)
@@ -204,7 +206,7 @@ struct ProfileView: View {
       do {
         let currentUser = try await supabase.auth.session.user
 
-        try await supabase.database
+        try await supabase
           .from("profiles")
           .update(
             UpdateProfileParams(
@@ -260,6 +262,8 @@ Now that you've created all the views, add an entry point for the application. T
 Add a new `AppView.swift` file.
 
 ```swift AppView.swift
+import SwiftUI
+
 struct AppView: View {
   @State var isAuthenticated = false
 
@@ -288,6 +292,8 @@ Update the entry point to the newly created `AppView`. Run in Xcode to launch yo
 
 Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like
 photos and videos.
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Add PhotosPicker
 
@@ -327,6 +333,8 @@ enum TransferError: Error {
   case importFailed
 }
 ```
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 #### Add PhotosPicker to profile page
 

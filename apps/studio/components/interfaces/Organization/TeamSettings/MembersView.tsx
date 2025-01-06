@@ -15,6 +15,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { MemberRow } from './MemberRow'
+import { Admonition } from 'ui-patterns'
 
 export interface MembersViewProps {
   searchString: string
@@ -31,7 +32,12 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     isError: isErrorMembers,
     isSuccess: isSuccessMembers,
   } = useOrganizationMembersQuery({ slug })
-  const { error: rolesError, isError: isErrorRoles } = useOrganizationRolesV2Query({
+  const {
+    data: roles,
+    error: rolesError,
+    isSuccess: isSuccessRoles,
+    isError: isErrorRoles,
+  } = useOrganizationRolesV2Query({
     slug,
   })
 
@@ -56,6 +62,10 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       if (a.primary_email === profile?.primary_email) return -1
       return a.username.localeCompare(b.username)
     })
+
+  const userMember = allMembers.find((m) => m.primary_email === profile?.primary_email)
+  const orgScopedRoleIds = (roles?.org_scoped_roles ?? []).map((r) => r.id)
+  const isOrgScopedRole = orgScopedRoleIds.includes(userMember?.role_ids?.[0] ?? -1)
 
   return (
     <>
@@ -101,6 +111,20 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <Table.th key="header-action" />,
               ]}
               body={[
+                ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
+                  ? [
+                      <Table.tr key="project-scope-notice">
+                        <Table.td colSpan={12} className="!p-0">
+                          <Admonition
+                            type="note"
+                            title="You are currently assigned with project scoped roles in this organization"
+                            description="All the members within the organization will not be visible to you"
+                            className="m-0 bg-alternative border-0 rounded-none"
+                          />
+                        </Table.td>
+                      </Table.tr>,
+                    ]
+                  : []),
                 ...filteredMembers.map((member) => (
                   <MemberRow key={member.gotrue_id} member={member} />
                 )),

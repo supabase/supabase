@@ -1,5 +1,6 @@
 import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
-import { IconActivity, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { Activity } from 'lucide-react'
+import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -67,7 +68,7 @@ We're committed to our licenses - all of our public repos have OSI-compliant lic
 
 Self-hosting is easier than ever. You can get started in [less than 5 minutes](https://www.youtube.com/watch?v=FqiQKRKsfZE) on a hosted VPS.
 
-We're committed to our free plan - we know the importance of this for testing hobby projects and prototyping. Almost all of the largest databases on Supabase today started on the free plan, a clear indication that our free plan is important for building an enduring platform.
+We're committed to our Free Plan - we know the importance of this for testing hobby projects and prototyping. Almost all of the largest databases on Supabase today started on the Free Plan, a clear indication that our Free Plan is important for building an enduring platform.
 `,
   },
   communityStats: {
@@ -226,7 +227,7 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
       },
       {
         text: 'HIPAA',
-        icon: <IconActivity strokeWidth={1} className="text-foreground-lighter w-6" />,
+        icon: <Activity strokeWidth={1} className="text-foreground-lighter w-6" />,
       },
       {
         text: 'Data Encryption',
@@ -311,7 +312,7 @@ In addition to General Availability, we also have several other major announceme
 
 - [Supabase Branching](https://supabase.com/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability.
 
-- Supabase has [acquired Oriole](https://supabase.com/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postgres.
+- Supabase has [acquired Oriole](https://supabase.com/blog/supabase-acquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postgres.
 
 - We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](https://supabase.com/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework.
 

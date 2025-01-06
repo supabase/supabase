@@ -134,11 +134,11 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.user = user
 
   if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-    return redirect(303, '/auth')
+    redirect(303, '/auth')
   }
 
   if (event.locals.session && event.url.pathname === '/auth') {
-    return redirect(303, '/private')
+    redirect(303, '/private')
   }
 
   return resolve(event)
@@ -249,7 +249,8 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
 ```ts src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { session }, cookies }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession }, cookies }) => {
+  const { session } = await safeGetSession()
   return {
     session,
     cookies: cookies.getAll(),
@@ -275,24 +276,24 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 
 ```svelte src/routes/+layout.svelte
 <script>
-	import { invalidate } from '$app/navigation';
-	import { onMount } from 'svelte';
+  import { invalidate } from '$app/navigation'
+  import { onMount } from 'svelte'
 
-	export let data;
-	$: ({ session, supabase } = data);
+  let { data, children } = $props()
+  let { session, supabase } = $derived(data)
 
-	onMount(() => {
-		const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
-			if (newSession?.expires_at !== session?.expires_at) {
-				invalidate('supabase:auth');
-			}
-		});
+  onMount(() => {
+    const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+      if (newSession?.expires_at !== session?.expires_at) {
+        invalidate('supabase:auth')
+      }
+    })
 
-		return () => data.subscription.unsubscribe();
-	});
+    return () => data.subscription.unsubscribe()
+  })
 </script>
 
-<slot />
+{@render children()}
 ```
 
 </StepHikeCompact.Code>
@@ -326,15 +327,15 @@ export const load: PageServerLoad = async ({ locals: { supabase } }) => {
 
 ```svelte src/routes/+page.svelte
 <script>
-	export let data;
-	$: ({ countries } = data);
+  let { data } = $props()
+  let { countries } = $derived(data)
 </script>
 
 <h1>Welcome to Supabase!</h1>
 <ul>
-	{#each countries as country}
-		<li>{country.name}</li>
-	{/each}
+  {#each countries as country}
+    <li>{country.name}</li>
+  {/each}
 </ul>
 ```
 
@@ -352,7 +353,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`.
 
 </StepHikeCompact.Details>
 
@@ -384,9 +385,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signUp({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/')
+      redirect(303, '/')
     }
   },
   login: async ({ request, locals: { supabase } }) => {
@@ -397,9 +398,9 @@ export const actions: Actions = {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
       console.error(error)
-      return redirect(303, '/auth/error')
+      redirect(303, '/auth/error')
     } else {
-      return redirect(303, '/private')
+      redirect(303, '/private')
     }
   },
 }
@@ -407,26 +408,31 @@ export const actions: Actions = {
 
 ```svelte src/routes/auth/+page.svelte
 <form method="POST" action="?/login">
-	<label>
-		Email
-		<input name="email" type="email" />
-	</label>
-	<label>
-		Password
-		<input name="password" type="password" />
-	</label>
-	<button>Login</button>
-	<button formaction="?/signup">Sign up</button>
+  <label>
+    Email
+    <input name="email" type="email" />
+  </label>
+  <label>
+    Password
+    <input name="password" type="password" />
+  </label>
+  <button>Login</button>
+  <button formaction="?/signup">Sign up</button>
 </form>
 ```
 
 ```svelte src/routes/auth/+layout.svelte
+<script>
+  let { children } = $props()
+</script>
+
 <header>
-	<nav>
-		<a href="/">Home</a>
-	</nav>
+  <nav>
+    <a href="/">Home</a>
+  </nav>
 </header>
-<slot />
+
+{@render children()}
 ```
 
 ```svelte src/routes/auth/error/+page.svelte
@@ -449,7 +455,7 @@ Finish the signup flow by creating the API route to handle email verification.
 
 <StepHikeCompact.Code>
 
-```ts src/routes/api/auth/confirm/+server.ts
+```ts src/routes/auth/confirm/+server.ts
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from '@sveltejs/kit'
 
@@ -474,12 +480,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(303, redirectTo)
+      redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(303, redirectTo)
+  redirect(303, redirectTo)
 }
 ```
 
@@ -511,25 +517,25 @@ To ensure that `hooks.server.ts` runs for every nested path, put a `+layout.serv
 
 ```svelte src/routes/private/+layout.svelte
 <script>
-	export let data;
-	$: ({ supabase } = data);
+  let { data, children } = $props()
+  let { supabase } = $derived(data)
 
-	$: logout = async () => {
-		const { error } = await supabase.auth.signOut();
-		if (error) {
-			console.error(error);
-		}
-	};
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      console.error(error)
+    }
+  }
 </script>
 
 <header>
-	<nav>
-		<a href="/">Home</a>
-	</nav>
-	<button on:click={logout}>Logout</button>
+  <nav>
+    <a href="/">Home</a>
+  </nav>
+  <button onclick={logout}>Logout</button>
 </header>
 <main>
-	<slot />
+  {@render children()}
 </main>
 ```
 
@@ -560,55 +566,54 @@ using ((select auth.uid()) = user_id);
 ```
 
 ```svelte src/routes/private/+page.server.ts
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ depends, locals: { supabase } }) => {
-	depends('supabase:db:notes');
-	const { data: notes } = await supabase.from('notes').select('id,note').order('id');
-	return { notes: notes ?? [] };
-};
+  depends('supabase:db:notes')
+  const { data: notes } = await supabase.from('notes').select('id,note').order('id')
+  return { notes: notes ?? [] }
+}
 ```
 
 ```svelte src/routes/private/+page.svelte
 <script lang="ts">
-	import { invalidate } from '$app/navigation';
-	import type { EventHandler } from 'svelte/elements';
+  import { invalidate } from '$app/navigation'
+  import type { EventHandler } from 'svelte/elements'
 
-	import type { PageData } from './$types';
+  import type { PageData } from './$types'
 
-	export let data: PageData;
-	$: ({ notes, supabase, user } = data);
+  let { data } = $props()
+  let { notes, supabase, user } = $derived(data)
 
-	let handleSubmit: EventHandler<SubmitEvent, HTMLFormElement>;
-	$: handleSubmit = async (evt) => {
-		evt.preventDefault();
-		if (!evt.target) return;
+  const handleSubmit: EventHandler<SubmitEvent, HTMLFormElement> = async (evt) => {
+    evt.preventDefault()
+    if (!evt.target) return
 
-		const form = evt.target as HTMLFormElement;
+    const form = evt.target as HTMLFormElement
 
-		const note = (new FormData(form).get('note') ?? '') as string;
-		if (!note) return;
+    const note = (new FormData(form).get('note') ?? '') as string
+    if (!note) return
 
-		const { error } = await supabase.from('notes').insert({ note });
-		if (error) console.error(error);
+    const { error } = await supabase.from('notes').insert({ note })
+    if (error) console.error(error)
 
-		invalidate('supabase:db:notes');
-		form.reset();
-	};
+    invalidate('supabase:db:notes')
+    form.reset()
+  }
 </script>
 
 <h1>Private page for user: {user?.email}</h1>
 <h2>Notes</h2>
 <ul>
-	{#each notes as note}
-		<li>{note.note}</li>
-	{/each}
+  {#each notes as note}
+    <li>{note.note}</li>
+  {/each}
 </ul>
-<form on:submit={handleSubmit}>
-	<label>
-		Add a note
-		<input name="note" type="text" />
-	</label>
+<form onsubmit={handleSubmit}>
+  <label>
+    Add a note
+    <input name="note" type="text" />
+  </label>
 </form>
 ```
 

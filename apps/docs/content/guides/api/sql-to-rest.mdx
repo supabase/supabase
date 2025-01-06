@@ -14,19 +14,17 @@ PostgREST supports a subset of SQL, so not all SQL queries will translate.
 </Admonition>
 
 <SqlToRest
-  defaultValue={stripIndent`
-    select
-      title,
-      description
-    from
-      books
-    where
-      description ilike '%cheese%'
-    order by
-      title desc
-    limit
-      5
-    offset
-      10
-  `}
+  defaultValue={`select
+  title,
+  description
+from
+  books
+where
+  description ilike '%cheese%'
+order by
+  title desc
+limit
+  5
+offset
+  10`}
 />

@@ -1,8 +1,9 @@
-import { useParams } from 'common'
-import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
-import { useSelectedOrganization } from 'hooks'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+
+import { useParams } from 'common'
+import SettingsLayout from 'components/layouts/ProjectSettingsLayout/SettingsLayout'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectBillingUsage: NextPageWithLayout = () => {

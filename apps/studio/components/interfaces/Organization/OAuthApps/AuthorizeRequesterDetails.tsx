@@ -1,5 +1,5 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
-import { IconCheck } from 'ui'
+import { Check } from 'lucide-react'
 
 export interface AuthorizeRequesterDetailsProps {
   icon: string | null
@@ -37,7 +37,7 @@ const ScopeSection = ({
     return (
       <div className="first:border-t border-b flex flex-row space-x-1 text-sm text-foreground-light py-2 px-1">
         <div className="pt-0.5">
-          <IconCheck stroke="green" height={18} width={18} strokeWidth={1.5} />
+          <Check stroke="green" height={18} width={18} strokeWidth={1.5} />
         </div>
         <div>
           {perms} {description}
@@ -78,6 +78,11 @@ const AuthorizeRequesterDetails = ({
           <span className="text-amber-900">selected organization and all of its projects.</span>
         </p>
         <div className="pt-2">
+          <ScopeSection
+            description="access to analytics logs."
+            hasReadScope={scopes.includes(OAuthScope.ANALYTICS_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+          />
           <ScopeSection
             description="access to auth configurations and SSO providers."
             hasReadScope={scopes.includes(OAuthScope.AUTH_READ)}

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -9,13 +9,18 @@ import { useOrganizationCreateInvitationMutation } from 'data/organization-membe
 import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
 import {
   useOrganizationMembersQuery,
   type OrganizationMember,
 } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions, useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useProfile } from 'lib/profile'
 import {
   Button,
@@ -28,8 +33,6 @@ import {
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -47,7 +50,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { data: allProjects } = useProjectsQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles } = useOrganizationRolesV2Query({ slug })
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
@@ -59,7 +62,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     orgScopedRoles.some((r) => r.id === userMemberData?.role_ids[0])
 
   const { rolesRemovable } = useGetRolesManagementPermissions(
-    selectedOrganization?.id,
+    selectedOrganization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
@@ -104,8 +107,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
 
   const { mutate: deleteInvitation, isLoading: isDeletingInvite } =
     useOrganizationDeleteInvitationMutation()
-  const { mutate: deleteInvitationOld, isLoading: isDeletingInviteOld } =
-    useOrganizationMemberInviteDeleteMutation()
+  const { mutate: deleteInvitationOld } = useOrganizationMemberInviteDeleteMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
 
@@ -122,7 +124,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId, skipInvalidation: true },
         {
@@ -167,7 +169,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     if (!slug) return console.error('Slug is required')
     if (!invitedId) return console.error('Member invited ID is required')
 
-    if (projectLevelPermissionsEnabled) {
+    if (isOptedIntoProjectLevelPermissions) {
       deleteInvitation(
         { slug, id: invitedId },
         { onSuccess: () => toast.success('Successfully revoked the invitation.') }
@@ -230,7 +232,7 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end">
+          <DropdownMenuContent side="bottom" align="end" className="w-52">
             <>
               {isPendingInviteAcceptance ? (
                 <>
@@ -279,16 +281,45 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
       </div>
 
       <ConfirmationModal
+        size="large"
         visible={isDeleteModalOpen}
-        title="Confirm to remove"
+        loading={isDeletingMember}
+        title="Confirm to remove member"
         confirmLabel="Remove"
+        variant="warning"
+        alert={{
+          title: 'All user content from this member will be permanently removed.',
+          description: (
+            <div>
+              Removing a member will delete all of the user's saved content in all projects of this
+              organization, which includes:
+              <ul className="list-disc pl-4 my-2">
+                <li>
+                  SQL snippets{' '}
+                  <span className="text-foreground">
+                    (both <span className="underline">private</span> and{' '}
+                    <span className="underline">shared</span> snippets)
+                  </span>
+                </li>
+                <li>Custom reports</li>
+                <li>Log Explorer queries</li>
+              </ul>
+              <p className="mt-4 text-foreground-lighter">
+                If you'd like to retain the member's shared SQL snippets, right click on them and
+                "Duplicate personal copy" in the SQL Editor before removing this member.
+              </p>
+            </div>
+          ),
+        }}
         onCancel={() => setIsDeleteModalOpen(false)}
         onConfirm={() => {
           handleMemberDelete()
         }}
       >
         <p className="text-sm text-foreground-light">
-          This is permanent! Are you sure you want to remove {member.primary_email}
+          Are you sure you want to remove{' '}
+          <span className="text-foreground">{member.primary_email}</span> from{' '}
+          <span className="text-foreground">{selectedOrganization?.name}</span>?
         </p>
       </ConfirmationModal>
 

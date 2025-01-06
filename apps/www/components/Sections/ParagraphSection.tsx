@@ -1,8 +1,9 @@
+import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
-import React, { ReactNode } from 'react'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { ReactNode } from 'react'
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
-import { Button, IconArrowUpRight, cn } from 'ui'
+import { Button, cn } from 'ui'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Feature {
   icon: string
@@ -40,7 +41,7 @@ const FeaturesSection = ({
           </h2>
           <p className="text-lighter mb-4 font-mono">{paragraph}</p>
           {cta && (
-            <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
+            <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
               <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
             </Button>
           )}

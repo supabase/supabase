@@ -2,33 +2,25 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useContentQuery } from 'data/content/content-query'
 import { useContentUpdateMutation } from 'data/content/content-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { ArrowRight, Plus, Save, Settings } from 'lucide-react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import GridResize from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -42,7 +34,10 @@ const Reports = () => {
   const [endDate, setEndDate] = useState<any>(null)
   const [hasEdits, setHasEdits] = useState<any>(false)
 
-  const { data: userContents, isLoading } = useContentQuery(ref)
+  const { data: userContents, isLoading } = useContentQuery({
+    projectRef: ref,
+    type: 'report',
+  })
   const { mutate: saveReport, isLoading: isSaving } = useContentUpdateMutation({
     onSuccess: () => {
       setHasEdits(false)

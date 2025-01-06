@@ -6,12 +6,6 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".next/**"]
     },
-    "database-design#build": {
-      "dependsOn": ["^build"],
-      "env": ["NEXT_PUBLIC_*", "OPENAI_API_KEY", "VERCEL_URL"],
-      "inputs": ["$TURBO_DEFAULT$", ".env", ".env.local"],
-      "outputs": [".next/**", "!.next/cache/**"]
-    },
     "design-system#build": {
       "dependsOn": ["^build"],
       "env": ["NEXT_PUBLIC_*"],
@@ -21,11 +15,17 @@
       "dependsOn": ["^build"],
       "env": [
         "ANALYZE",
+        "DOCS_GITHUB_APP_ID",
+        "DOCS_GITHUB_APP_INSTALLATION_ID",
+        "DOCS_GITHUB_APP_PRIVATE_KEY",
+        "DOCS_REVALIDATION_KEYS",
+        "DOCS_REVALIDATION_OVERRIDE_KEYS",
         "NEXT_PUBLIC_*",
         "NODE_ENV",
         "OPENAI_API_KEY",
-        "SKIP_BUILD_STATIC_GENERATION"
+        "SUPABASE_SECRET_KEY"
       ],
+      "inputs": ["$TURBO_DEFAULT$", "../../examples"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {
@@ -35,6 +35,9 @@
         "AUTH_JWT_SECRET",
         "DEFAULT_ORGANIZATION_NAME",
         "DEFAULT_PROJECT_NAME",
+        "DOCS_GITHUB_APP_ID",
+        "DOCS_GITHUB_APP_INSTALLATION_ID",
+        "DOCS_GITHUB_APP_PRIVATE_KEY",
         "LOGFLARE_API_KEY",
         "LOGFLARE_URL",
         "NEXT_PUBLIC_*",
@@ -63,12 +66,22 @@
         "NEXT_PUBLIC_*",
         "NODE_ENV",
         "OPENAI_API_KEY",
-        "npm_lifecycle_event"
+        "npm_lifecycle_event",
+        "LIVE_SUPABASE_COM_SERVICE_ROLE_KEY",
+        "VERCEL_URL",
+        "HUBSPOT_PORTAL_ID",
+        "HUBSPOT_ENTERPRISE_FORM_GUID",
+        "EMAIL_REPORT_SLACK_WEBHOOK",
+        "EMAIL_ABUSE_SERVICE_KEY"
       ],
       "outputs": [".next/**", "!.next/cache/**", ".contentlayer/**"]
     },
     "lint": {
       "outputs": []
+    },
+    "clean": {
+      "outputs": [],
+      "cache": false
     },
     "dev": {
       "cache": false

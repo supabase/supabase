@@ -8,28 +8,152 @@ tocVideo: 'ILr3cneZuFk'
 
 Developing with Edge Functions is similar to developing with Node.js, but with a few key differences. This guide will help you understand how to manage your dependencies.
 
+## Managing dependencies
+
+There are two ways to manage your dependencies in Supabase Edge Functions:
+
+### Using deno.json (recommended)
+
+<Admonition type="info">
+
+This feature requires Supabase CLI version 1.215.0 or higher.
+
+</Admonition>
+
+Each function can have its own `deno.json` or `deno.jsonc` file to manage dependencies and configure Deno-specific settings. For a complete list of supported options, see the [official Deno configuration documentation](https://docs.deno.com/runtime/manual/getting_started/configuration_file).
+
+```json supabase/functions/my-function/deno.json
+{
+  "imports": {
+    "lodash": "https://cdn.skypack.dev/lodash"
+  }
+}
+```
+
+This allows you to use simplified imports:
+
+```ts
+import lodash from 'lodash'
+```
+
+The recommended file structure when using `deno.json`:
+
+```bash
+└── supabase
+    ├── functions
+    │   ├── function-one
+    │   │   ├── index.ts
+    │   │   └── deno.json # Function-specific Deno configuration
+    │   └── function-two
+    │       ├── index.ts
+    │       └── deno.json # Function-specific Deno configuration
+    └── config.toml
+```
+
+### Using import maps (legacy)
+
+Import Maps are a legacy way to manage dependencies, similar to a `package.json` file. While still supported, we recommend using `deno.json`. If both exist, `deno.json` takes precedence.
+
+```json supabase/functions/import_map.json
+{
+  "imports": {
+    "lodash": "https://cdn.skypack.dev/lodash"
+  }
+}
+```
+
+The import map should be placed in the `/supabase/functions` folder and will be applied to all functions:
+
+```bash
+└── supabase
+    ├── functions
+    │   ├── import_map.json # Top-level import map for all functions
+    │   ├── function-one
+    │   │   └── index.ts
+    │   └── function-two
+    │       └── index.ts
+    └── config.toml
+```
+
+You can override the import map location using the `--import-map <string>` flag with `serve` and `deploy` commands.
+
+If using import maps with VSCode, update your `.vscode/settings.json`:
+
+```json settings.json
+{
+  "deno.enable": true,
+  "deno.unstable": [
+    "bare-node-builtins",
+    "byonm"
+    // ... other flags ...
+  ],
+  "deno.importMap": "./supabase/functions/import_map.json"
+}
+```
+
+You can override the default import map location in two ways:
+
+1. Using the `--import-map <string>` flag with `serve` and `deploy` commands
+2. Setting the `import_map` property in your `config.toml` file for specific functions:
+
+```toml supabase/config.toml
+[functions.my-function]
+import_map = "./supabase/functions/my-function/custom_import_map.json"
+```
+
+For more configuration options, see the [CLI Configuration documentation](/docs/guides/local-development/cli/config#functions.function_name.import_map).
+
 ## Importing dependencies
 
-Supabase Edge Functions support:
+Supabase Edge Functions support several ways to import dependencies:
 
 - The Deno [standard library](https://deno.land/std)
-- Third party [modules](https://deno.land/x)
+- JavaScript modules from npm (https://docs.deno.com/examples/npm/)
 - Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
-- Node.js modules published to npm
+- Third party modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
 
-You can import npm modules using the `npm:` specifier or via CDNs like [esm.sh](https://esm.sh). For example, to import the `supabase-js` package:
+### NPM modules
+
+You can import npm modules using the `npm:` specifier:
 
 ```ts
 import { createClient } from 'npm:@supabase/supabase-js@2'
 ```
 
-If you are migrating an existing Node app and if it uses a built-in Node APIs, you can import them to Deno using `node:` specifiers. For example, if your code uses `process.env`, you can import it as follows:
+### Node.js built-ins
+
+For Node.js built-in APIs, use the `node:` specifier:
 
 ```ts
 import process from 'node:process'
 ```
 
-You can learn more about `npm:` specifiers and Node built-in APIs, in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
+Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
+
+### Importing from private registries
+
+<Admonition type="info">
+
+This feature requires Supabase CLI version 1.207.9 or higher.
+
+</Admonition>
+
+Create a `.npmrc` file within `supabase/functions`. This will allow you to import the private packages into multiple functions. Alternatively, you can place the `.npmrc` file directly inside `supabase/functions/function-name` directory.)
+
+Add your registry details in the `.npmrc` file. Follow [this guide](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) to learn more about the syntax of npmrc files.
+
+```
+@myorg:registry=https://npm.registryhost.com
+//npm.registryhost.com/:_authToken=VALID_AUTH_TOKEN
+```
+
+After that, you can import the package directly in your function code or add it to the import_map.json (/docs/guides/functions/import-maps#using-import-maps).
+
+```ts
+import MyPackage from 'npm:@myorg/private-package@v1.0.1'
+
+// use MyPackage
+```
 
 ## Importing types
 
@@ -47,54 +171,3 @@ To include types for built-in Node APIs, add the following line to the top of yo
 ```ts
 /// <reference types="npm:@types/node" />
 ```
-
-## Using import maps
-
-An [Import Map](https://github.com/WICG/import-maps#the-import-map) is similar to a `package.json` file. They are a way to manage your dependencies. Consider this code:
-
-```ts
-// without import maps:
-import lodash from 'https://cdn.skypack.dev/lodash'
-
-// with import maps:
-import lodash from 'lodash'
-```
-
-You can accomplish this using an Import Map, which is a JSON file with the following:
-
-```json supabase/functions/import_map.json
-{
-  "imports": {
-    "lodash": "https://cdn.skypack.dev/lodash"
-  }
-}
-```
-
-We recommend creating one `import_map.json` within the `/supabase/functions` folder, similar to a `package.json` file, to define imports that can be used across all of your project's functions.
-
-```bash
-└── supabase
-    ├── functions
-    │   ├── import_map.json # A top-level import map to use across functions..
-    │   ├── function-one
-    │   │   └── index.ts
-    └── config.toml
-```
-
-Alternatively, you can create one `import_map.json` file in each function folder, which will take priority over a top-level file.
-
-You can override this default behavior by providing the `--import-map <string>` flag to the `serve` and `deploy` commands.
-
-### Configuring VSCode
-
-In order for vscode to understand the imports correctly, you need to specify the `deno.importMap` flag in your `.vscode/settings.json` file:
-
-```json settings.json
-{
-  "deno.enable": true,
-  "deno.unstable": true,
-  "deno.importMap": "./supabase/functions/import_map.json"
-}
-```
-
-For a full guide on developing with Deno in Visual Studio Code, see [this guide](https://deno.land/manual@v1.25.4/vscode_deno).

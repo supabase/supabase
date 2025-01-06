@@ -1,0 +1,96 @@
+---
+id: 'dbeaver'
+title: 'Connecting with DBeaver'
+breadcrumb: 'GUI Quickstarts'
+hideToc: true
+---
+
+If you do not have DBeaver, you can download it from its [website](https://dbeaver.io/download/).
+
+<StepHikeCompact>
+
+    <StepHikeCompact.Step step={1}>
+        <StepHikeCompact.Details title="Create a new database connection">
+            Create a new database connection
+        </StepHikeCompact.Details>
+
+        <StepHikeCompact.Code>
+            ![new database connection](/docs/img/guides/database/connecting-to-postgres/dbeaver/new_database_connection.png)
+        </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Select PostgreSQL" />
+
+    <StepHikeCompact.Code>
+                    ![Selection Menu](/docs/img/guides/database/connecting-to-postgres/dbeaver/select_postgres.png)
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Get Your Credentials">
+      Inside the Dashboard's [Database Settings](https://supabase.com/dashboard/project/_/settings/database), note your session mode's:
+      - host
+      - username
+
+      You will also need your database's password. If you forgot it, you can generate a new one in the settings.
+      <Admonition type="note">
+        If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+      </Admonition>
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![database credentials](/docs/img/guides/database/connecting-to-postgres/dbeaver/session_mode.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Fill out credentials">
+        In DBeaver's Main menu, add your host, username, and password
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+                ![filling out form](/docs/img/guides/database/connecting-to-postgres/dbeaver/filling_credentials.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Download certificate">
+        In the [Database Settings](https://supabase.com/dashboard/project/_/settings/database), download your SSL certificate.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![filling out form](/docs/img/guides/database/connecting-to-postgres/dbeaver/certificate.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Secure your connection">
+        In DBeaver's SSL tab, add your SSL certificate
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![filling out form](/docs/img/guides/database/connecting-to-postgres/dbeaver/ssl_tab.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+      <StepHikeCompact.Step step={7}>
+    <StepHikeCompact.Details title="Connect">
+        Test your connection and then click finish. You should now be able to interact with your database with DBeaver
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ![connected dashboard](/docs/img/guides/database/connecting-to-postgres/dbeaver/finished.png)
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

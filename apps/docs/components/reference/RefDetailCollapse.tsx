@@ -1,6 +1,6 @@
 import * as Accordion from '@radix-ui/react-accordion'
+import { ChevronRight } from 'lucide-react'
 import React from 'react'
-import { IconChevronRight } from '~/../../packages/ui'
 
 const RefDetailCollapse: React.FC<
   React.PropsWithChildren<{ id: string; label: string; defaultOpen?: boolean }>
@@ -26,7 +26,7 @@ const RefDetailCollapse: React.FC<
             ].join(' ')}
           >
             <div className="data-open-parent:rotate-90 text-foreground-lighter">
-              <IconChevronRight size={12} strokeWidth={2} />
+              <ChevronRight size={12} strokeWidth={2} />
             </div>
             {props.label}
           </button>

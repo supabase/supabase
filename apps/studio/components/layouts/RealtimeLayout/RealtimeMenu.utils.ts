@@ -1,10 +1,7 @@
 import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import type { Project } from 'data/projects/project-detail-query'
 
-export const generateRealtimeMenu = (
-  project: Project,
-  { authzEnabled }: { authzEnabled: boolean }
-): ProductMenuGroup[] => {
+export const generateRealtimeMenu = (project: Project): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
 
   return [
@@ -19,20 +16,16 @@ export const generateRealtimeMenu = (
         },
       ],
     },
-    ...(authzEnabled
-      ? [
-          {
-            title: 'Configuration',
-            items: [
-              {
-                name: 'Policies',
-                key: 'policies',
-                url: `/project/${ref}/realtime/policies`,
-                items: [],
-              },
-            ],
-          },
-        ]
-      : []),
+    {
+      title: 'Configuration',
+      items: [
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: `/project/${ref}/realtime/policies`,
+          items: [],
+        },
+      ],
+    },
   ]
 }

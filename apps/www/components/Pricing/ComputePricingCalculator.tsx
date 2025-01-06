@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
+import { ChevronDown, Plus, Trash2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import {
-  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconPlus,
-  IconTrash2,
   Slider_Shadcn_,
   cn,
 } from 'ui'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
 
 const plans = [
@@ -128,7 +126,7 @@ const ComputePricingCalculator = () => {
                 <Button
                   size="tiny"
                   type="outline"
-                  iconRight={<IconChevronDown />}
+                  iconRight={<ChevronDown />}
                   icon={
                     activePlan.name === 'Pro' ? (
                       <svg
@@ -236,17 +234,9 @@ const ComputePricingCalculator = () => {
             >
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                    variant={
-                      findIntanceValueByColumn(activeInstance, 'plan') ===
-                      findIntanceValueByColumn(computeInstances[0], 'plan')
-                        ? 'default'
-                        : 'brand'
-                    }
-                  >
-                    {findIntanceValueByColumn(activeInstance, 'plan')}
-                  </Badge>
+                  <ComputeBadge
+                    infraComputeSize={findIntanceValueByColumn(activeInstance, 'plan')}
+                  />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
@@ -281,7 +271,7 @@ const ComputePricingCalculator = () => {
                       className="p-1 text-lighter hover:text-foreground rounded opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={() => removeInstance(activeInstance.position)}
                     >
-                      <IconTrash2 className="w-3 h-3" />
+                      <Trash2 className="w-3 h-3" />
                     </button>
                   )}
                 </div>
@@ -294,7 +284,7 @@ const ComputePricingCalculator = () => {
             size="tiny"
             type="outline"
             block
-            icon={<IconPlus />}
+            icon={<Plus />}
             onClick={() =>
               setActiveInstances([
                 ...activeInstances,

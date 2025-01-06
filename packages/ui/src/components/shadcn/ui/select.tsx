@@ -4,15 +4,29 @@ import * as SelectPrimitive from '@radix-ui/react-select'
 import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import * as React from 'react'
 
-import { cn } from '../../../lib/utils/cn'
 import { VariantProps, cva } from 'class-variance-authority'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../../lib/constants'
+import { cn } from '../../../lib/utils/cn'
 
 const Select = SelectPrimitive.Root
 
 const SelectGroup = SelectPrimitive.Group
 
-const SelectValue = SelectPrimitive.Value
+// If placeholder is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
+// https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
+const SelectValue = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Value>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Value> &
+    VariantProps<typeof SelectTriggerVariants>
+>(({ placeholder, ...props }, ref) => (
+  <SelectPrimitive.Value
+    placeholder={typeof placeholder === 'string' ? <span>{placeholder}</span> : placeholder}
+    {...props}
+    ref={ref}
+  />
+))
+
+SelectValue.displayName = SelectPrimitive.Value.displayName
 
 const SelectTriggerVariants = cva('', {
   variants: {
@@ -33,7 +47,9 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      'flex w-full items-center justify-between rounded-md border border-button bg-button text-xs ring-offset-background-control placeholder:text-foreground-muted focus:outline-none ring-border-control focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+      'flex w-full items-center justify-between rounded-md border border-strong hover:border-stronger bg-alternative dark:bg-muted hover:bg-selection text-xs ring-offset-background-control data-[placeholder]:text-foreground-lighter focus:outline-none ring-border-control focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200',
+      'data-[state=open]:bg-selection data-[state=open]:border-stronger',
+      'gap-2',
       SelectTriggerVariants({ size }),
       className
     )}
@@ -41,7 +57,7 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 text-foreground-muted" />
+      <ChevronDown className="h-4 w-4 text-foreground-lighter" strokeWidth={1.5} />
     </SelectPrimitive.Icon>
   </SelectPrimitive.Trigger>
 ))
@@ -128,6 +144,8 @@ const SelectLabel = React.forwardRef<
 ))
 SelectLabel.displayName = SelectPrimitive.Label.displayName
 
+// If children is a string, wrap it in a span. This is to avoid page crashes when using Google Translate.
+// https://github.com/radix-ui/primitives/issues/2578#issuecomment-1890801041 for more info.
 const SelectItem = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
@@ -136,7 +154,7 @@ const SelectItem = React.forwardRef<
     ref={ref}
     className={cn(
       'group',
-      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-xs outline-none focus:bg-overlay-hover text-foreground-light focus:text-foreground data-[state=checked]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+      'relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-overlay-hover text-foreground-light focus:text-foreground data-[state=checked]:text-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       className
     )}
     {...props}
@@ -147,7 +165,9 @@ const SelectItem = React.forwardRef<
       </SelectPrimitive.ItemIndicator>
     </span>
 
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+    <SelectPrimitive.ItemText>
+      {typeof children === 'string' ? <span>{children}</span> : children}
+    </SelectPrimitive.ItemText>
   </SelectPrimitive.Item>
 ))
 SelectItem.displayName = SelectPrimitive.Item.displayName
@@ -170,9 +190,9 @@ export {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-  SelectScrollUpButton,
-  SelectScrollDownButton,
 }

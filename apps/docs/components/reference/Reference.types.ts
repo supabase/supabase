@@ -1,4 +1,4 @@
-import { enrichedOperation } from '~/lib/refGenerator/helpers'
+import type { enrichedOperation } from '~/lib/refGenerator/helpers'
 
 export interface ISpec {
   openref: any
@@ -53,9 +53,6 @@ export interface ICommonCategory extends ICommonBase {
 
 export interface ICommonMarkdown extends ICommonBaseSection {
   type: 'markdown'
-  meta?: {
-    shared?: boolean
-  }
 }
 
 export interface ICommonFunctionGroup extends ICommonBaseSection {

@@ -1,11 +1,12 @@
 import { isUndefined } from 'lodash'
+import { ArrowUpRight, LogOut } from 'lucide-react'
 import Link from 'next/link'
-import { ReactNode } from 'react'
-import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
+import { PropsWithChildren, ReactNode, useState } from 'react'
 
-import { useFlag } from 'hooks'
+import { Badge, cn, Menu, Sheet, SheetContent } from 'ui'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
 import type { SidebarLink, SidebarSection } from './AccountLayout.types'
+import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
 interface WithSidebarProps {
   title: string
@@ -16,7 +17,6 @@ interface WithSidebarProps {
   subitemsParentKey?: number
   hideSidebar?: boolean
   customSidebarContent?: ReactNode
-  children: ReactNode
 }
 
 const WithSidebar = ({
@@ -29,63 +29,106 @@ const WithSidebar = ({
   subitemsParentKey,
   hideSidebar = false,
   customSidebarContent,
-}: WithSidebarProps) => {
+}: PropsWithChildren<WithSidebarProps>) => {
   const noContent = !sections && !customSidebarContent
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  const [isSheetOpen, setIsSheetOpen] = useState(false)
+
+  const handleMobileMenu = () => {
+    setIsSheetOpen(true)
+  }
 
   return (
-    <div className="flex h-full">
+    <div className="flex flex-col md:flex-row h-full">
       {!hideSidebar && !noContent && (
-        <div
-          id="with-sidebar"
-          className={[
-            'h-full bg-studio',
-            'hide-scrollbar w-64 overflow-auto border-r border-default',
-          ].join(' ')}
-        >
-          {title && (
-            <div className="mb-2">
-              <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
-                <h4 className="mb-0 text-lg truncate" title={title}>
-                  {title}
-                </h4>
-              </div>
-            </div>
-          )}
-          {header && header}
-          <div className="-mt-1">
-            <Menu>
-              {customSidebarContent}
-              {sections.map((section) => {
-                return Boolean(section.heading) ? (
-                  <SectionWithHeaders
-                    key={section.key}
-                    section={section}
-                    subitems={subitems}
-                    subitemsParentKey={subitemsParentKey}
-                  />
-                ) : (
-                  <div className="border-b py-5 px-6 border-default" key={section.key}>
-                    <SidebarItem
-                      links={section.links}
-                      subitems={subitems}
-                      subitemsParentKey={subitemsParentKey}
-                    />
-                  </div>
-                )
-              })}
-            </Menu>
-          </div>
-        </div>
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          subitems={subitems}
+          subitemsParentKey={subitemsParentKey}
+          customSidebarContent={customSidebarContent}
+          className="hidden md:block"
+        />
       )}
       <div className="flex flex-1 flex-col">
-        {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
+        <LayoutHeader
+          breadcrumbs={breadcrumbs}
+          showProductMenu={!hideSidebar && !noContent}
+          handleMobileMenu={handleMobileMenu}
+        />
         <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
+      <MobileSheetNav open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SidebarContent
+          title={title}
+          header={header}
+          sections={sections}
+          subitems={subitems}
+          subitemsParentKey={subitemsParentKey}
+          customSidebarContent={customSidebarContent}
+        />
+      </MobileSheetNav>
     </div>
   )
 }
 export default WithSidebar
+
+export const SidebarContent = ({
+  title,
+  header,
+  sections,
+  subitems,
+  subitemsParentKey,
+  customSidebarContent,
+  className,
+}: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
+  return (
+    <>
+      <div
+        id="with-sidebar"
+        className={cn(
+          'h-full bg-dash-sidebar',
+          'hide-scrollbar w-full md:w-64 overflow-auto md:border-r border-default',
+          className
+        )}
+      >
+        {title && (
+          <div className="block mb-2">
+            <div className="flex h-12 max-h-12 items-center border-b px-6 border-default">
+              <h4 className="mb-0 text-lg truncate" title={title}>
+                {title}
+              </h4>
+            </div>
+          </div>
+        )}
+        {header && header}
+        <div className="-mt-1">
+          <Menu>
+            {customSidebarContent}
+            {sections.map((section) => {
+              return Boolean(section.heading) ? (
+                <SectionWithHeaders
+                  key={section.key}
+                  section={section}
+                  subitems={subitems}
+                  subitemsParentKey={subitemsParentKey}
+                />
+              ) : (
+                <div className="border-b py-5 px-6 border-default" key={section.key}>
+                  <SidebarItem
+                    links={section.links}
+                    subitems={subitems}
+                    subitemsParentKey={subitemsParentKey}
+                  />
+                </div>
+              )
+            })}
+          </Menu>
+        </div>
+      </div>
+    </>
+  )
+}
 
 interface SectionWithHeadersProps {
   section: SidebarSection
@@ -132,6 +175,7 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
             href={link.href}
             onClick={link.onClick}
             isExternal={link.isExternal || false}
+            icon={link.icon}
           />
         )
 
@@ -144,10 +188,12 @@ const SidebarItem = ({ links, subitems, subitemsParentKey }: SidebarItemProps) =
               label={y.label}
               onClick={y.onClick}
               isExternal={link.isExternal || false}
+              icon={link.icon}
             />
           ))
           render = [render, ...subItemsRender]
         }
+
         return render
       })}
     </ul>
@@ -167,15 +213,16 @@ const SidebarLinkItem = ({
   isSubitem,
   isExternal,
   onClick,
+  icon,
 }: SidebarLinkProps) => {
   if (isUndefined(href)) {
     let icon
     if (isExternal) {
-      icon = <IconArrowUpRight size={'tiny'} />
+      icon = <ArrowUpRight size={14} />
     }
 
     if (label === 'Log out') {
-      icon = <IconLogOut size={'tiny'} />
+      icon = <LogOut size={14} />
     }
 
     return (
@@ -185,7 +232,7 @@ const SidebarLinkItem = ({
         style={{
           marginLeft: isSubitem ? '.5rem' : '0rem',
         }}
-        active={isActive ? true : false}
+        active={isActive}
         onClick={onClick || (() => {})}
         icon={icon}
       >
@@ -199,15 +246,21 @@ const SidebarLinkItem = ({
       <span className="group flex max-w-full cursor-pointer items-center space-x-2 border-default py-1 font-normal outline-none ring-foreground focus-visible:z-10 focus-visible:ring-1 group-hover:border-foreground-muted">
         {isExternal && (
           <span className="truncate text-sm text-foreground-lighter transition group-hover:text-foreground-light">
-            <IconArrowUpRight size={'tiny'} />
+            <ArrowUpRight size={14} />
           </span>
         )}
-        <span
-          title={label}
-          className="w-full truncate text-sm text-foreground-light transition group-hover:text-foreground"
-        >
-          {isSubitem ? <p>{label}</p> : label}
-        </span>
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <span
+            title={label}
+            className={cn(
+              'w-full truncate text-sm transition',
+              isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground'
+            )}
+          >
+            {isSubitem ? <p>{label}</p> : label}
+          </span>
+          {icon}
+        </div>
       </span>
     </Link>
   )

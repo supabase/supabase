@@ -1,17 +1,17 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgSubscription } from 'data/subscriptions/types'
-import { useFlag } from 'hooks'
+import { useFlag } from 'hooks/ui/useFlag'
 import { Alert, Button, Input, Modal } from 'ui'
+import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
-import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -20,7 +20,7 @@ export interface ExitSurveyModalProps {
   onClose: (success?: boolean) => void
 }
 
-// [Joshen] For context - Exit survey is only when going to free plan from a paid plan
+// [Joshen] For context - Exit survey is only when going to Free Plan from a paid plan
 const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurveyModalProps) => {
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
@@ -53,9 +53,6 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
   })
 
   const hasProjectsWithComputeDowngrade = projectsWithComputeDowngrade.length > 0
-
-  const willPlanDowngradeHappenImmediately =
-    subscription?.billing_via_partner === false || subscription?.billing_partner !== 'fly'
 
   function reducer(state: any, action: any) {
     if (includes(state, action.target.value)) {
@@ -105,11 +102,9 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
             // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
           } finally {
             toast.success(
-              willPlanDowngradeHappenImmediately
-                ? hasProjectsWithComputeDowngrade
-                  ? 'Successfully downgraded organization to the Free plan. Your projects are currently restarting to update their compute instances.'
-                  : 'Successfully downgraded organization to the Free plan'
-                : 'Your organization is scheduled for the downgrade at the end of your current billing cycle',
+              hasProjectsWithComputeDowngrade
+                ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+                : 'Successfully downgraded organization to the Free Plan',
               { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
             )
             onClose(true)
@@ -147,7 +142,7 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
         size="xlarge"
         visible={visible}
         onCancel={onClose}
-        header="We're sad that you're leaving"
+        header="Help us improve."
       >
         <Modal.Content>
           <div className="space-y-4">
@@ -199,7 +194,7 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
               <Alert
                 withIcon
                 variant="warning"
-                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted ${willPlanDowngradeHappenImmediately ? 'upon clicking confirm' : 'once the downgrade takes effect at the end of your current billing cycle'}`}
+                title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
               >
                 This is due to changes in compute instances from the downgrade. Affected projects
                 include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
@@ -209,11 +204,11 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
         </Modal.Content>
 
         <div className="flex items-center justify-between border-t px-4 py-4">
-          {willPlanDowngradeHappenImmediately && (
-            <p className="text-xs text-foreground-lighter">
-              The unused amount for the remaining of your billing cycle will be refunded as credits
-            </p>
-          )}
+          <p className="text-xs text-foreground-lighter">
+            The unused amount for the remaining time of your billing cycle will be refunded as
+            credits
+          </p>
+
           <div className="flex items-center space-x-2">
             <Button type="default" onClick={() => onClose()}>
               Cancel

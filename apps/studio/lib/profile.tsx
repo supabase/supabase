@@ -1,14 +1,15 @@
-import { useIsLoggedIn, useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { useIsLoggedIn } from 'common'
 import { PropsWithChildren, createContext, useContext, useMemo } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
 import type { Profile } from 'data/profile/types'
-import Telemetry from 'lib/telemetry'
+import { useSendIdentifyMutation } from 'data/telemetry/send-identify-mutation'
 import type { ResponseError } from 'types'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { TelemetryActions } from './constants/telemetry'
 
 export type ProfileContextType = {
   profile: Profile | undefined
@@ -27,22 +28,15 @@ export const ProfileContext = createContext<ProfileContextType>({
 })
 
 export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-
   const isLoggedIn = useIsLoggedIn()
 
+  const { mutate: sendEvent } = useSendEventMutation()
+  const { mutate: sendIdentify } = useSendIdentifyMutation()
   const { mutate: createProfile, isLoading: isCreatingProfile } = useProfileCreateMutation({
-    async onSuccess() {
-      Telemetry.sendEvent(
-        { category: 'conversion', action: 'sign_up', label: '' },
-        telemetryProps,
-        router
-      )
+    onSuccess: () => {
+      sendEvent({ action: TelemetryActions.SIGN_UP, properties: { category: 'conversion' } })
     },
-    onError() {
-      toast.error('Failed to create your profile. Please refresh to try again.')
-    },
+    onError: () => toast.error('Failed to create your profile. Please refresh to try again.'),
   })
 
   // Track telemetry for the current user
@@ -55,11 +49,11 @@ export const ProfileProvider = ({ children }: PropsWithChildren<{}>) => {
   } = useProfileQuery({
     enabled: isLoggedIn,
     onSuccess(profile) {
-      Telemetry.sendIdentify(profile, telemetryProps)
+      sendIdentify({ user: profile })
     },
     onError(err) {
       // if the user does not yet exist, create a profile for them
-      if (typeof err === 'object' && err !== null && 'code' in err && (err as any).code === 404) {
+      if (typeof err === 'object' && err !== null && err.message === "User's profile not found") {
         createProfile()
       }
     },

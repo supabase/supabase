@@ -10,10 +10,7 @@
     "id": "installing",
     "slug": "installing",
     "type": "markdown",
-    "excludes": [
-      "reference_javascript_v1",
-      "reference_swift_v1"
-    ]
+    "excludes": ["reference_javascript_v1", "reference_kotlin_v1", "reference_swift_v1"]
   },
   {
     "title": "Initializing",
@@ -36,7 +33,8 @@
       "reference_swift_v1",
       "reference_swift_v2",
       "reference_kotlin_v1",
-      "reference_kotlin_v2"
+      "reference_kotlin_v2",
+      "reference_kotlin_v3"
     ]
   },
   {
@@ -53,7 +51,8 @@
       "reference_swift_v1",
       "reference_swift_v2",
       "reference_kotlin_v1",
-      "reference_kotlin_v2"
+      "reference_kotlin_v2",
+      "reference_kotlin_v3"
     ]
   },
   {
@@ -398,15 +397,6 @@
         "title": "Overview",
         "slug": "auth-api",
         "type": "function"
-      },
-      {
-        "id": "auth-error-codes",
-        "title": "Error codes",
-        "slug": "auth-error-codes",
-        "type": "markdown",
-        "meta": {
-          "shared": true
-        }
       },
       {
         "id": "sign-up",
@@ -996,11 +986,13 @@
     "excludes": [
       "reference_dart_v1",
       "reference_dart_v2",
+      "reference_javascript_v1",
+      "reference_kotlin_v1",
+      "reference_kotlin_v2",
       "reference_python_v2",
       "reference_swift_v1",
       "reference_swift_v2",
-      "reference_kotlin_v1",
-      "reference_kotlin_v2"
+      "reference_kotlin_v3"
     ],
     "items": [
       {

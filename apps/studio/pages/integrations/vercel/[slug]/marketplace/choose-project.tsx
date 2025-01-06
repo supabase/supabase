@@ -1,16 +1,17 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import { toast } from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import ProjectLinker, {
+  ForeignProject,
+} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -63,7 +64,9 @@ const VercelIntegration: NextPageWithLayout = () => {
             project.organization_id === organization?.id &&
             (project.status === PROJECT_STATUS['ACTIVE_HEALTHY'] ||
               project.status === PROJECT_STATUS['COMING_UP'] ||
-              project.status === PROJECT_STATUS['RESTORING'])
+              project.status === PROJECT_STATUS['RESTORING'] ||
+              project.status === PROJECT_STATUS['RESTARTING'] ||
+              project.status === PROJECT_STATUS['RESIZING'])
         )
         .map((project) => ({ name: project.name, ref: project.ref })) ?? EMPTY_ARR,
     [organization?.id, supabaseProjectsData]
@@ -100,17 +103,9 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      async onSuccess({ id }) {
-        try {
-          await syncEnvs({ connectionId: id })
-        } catch (error: any) {
-          snapshot.setLoading(false)
-          toast.error('Failed to sync environment variables: ', error.message)
-        }
-
+      onSuccess() {
         if (next) {
           snapshot.setLoading(false)
           window.location.href = next

@@ -2,7 +2,6 @@ import {
   AccountInformation,
   AnalyticsSettings,
   ThemeSettings,
-  ThemeSettingsOld,
 } from 'components/interfaces/Account/Preferences'
 import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
@@ -10,7 +9,7 @@ import AccountLayout from 'components/layouts/AccountLayout/AccountLayout'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
 import { useProfile } from 'lib/profile'
 import type { NextPageWithLayout } from 'types'
 
@@ -40,10 +39,7 @@ export default User
 
 const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
-
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
-
-  const experimentalThemeEnabled = useFlag('enableExperimentalTheme')
 
   return (
     <article className="max-w-4xl p-4">
@@ -70,7 +66,9 @@ const ProfileCard = () => {
         </>
       )}
 
-      <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
+      <section>
+        <ThemeSettings />
+      </section>
 
       <section>
         <AnalyticsSettings />

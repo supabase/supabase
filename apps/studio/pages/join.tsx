@@ -4,19 +4,9 @@ import { useRouter } from 'next/router'
 import { OrganizationInvite } from 'components/interfaces/OrganizationInvite/OrganizationInvite'
 import { NextPageWithLayout } from 'types'
 import { cn } from 'ui'
-import { useFlag } from 'hooks'
-import { OrganizationInviteOld } from 'components/interfaces/OrganizationInvite/OrganizationInviteOld'
 
 const JoinOrganizationPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const isProjectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
-
-  console.log({ isProjectLevelPermissionsEnabled })
-
-  // [Joshen] Can remove this once API changes are deployed to production
-  if (!isProjectLevelPermissionsEnabled) {
-    return <OrganizationInviteOld />
-  }
 
   return (
     <div

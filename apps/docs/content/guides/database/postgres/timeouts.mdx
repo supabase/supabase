@@ -1,0 +1,183 @@
+---
+title: Timeouts
+subtitle: Extend database timeouts to execute longer transactions
+---
+
+<Admonition type="note">
+
+Dashboard and [Client](/docs/guides/api/rest/client-libs) queries have a max-configurable timeout of 60 seconds. For longer transactions, use [Supavisor or direct connections](/docs/guides/database/connecting-to-postgres#quick-summary).
+
+</Admonition>
+
+## Change Postgres timeout
+
+You can change the Postgres timeout at the:
+
+1.  [Session level](#session-level)
+1.  [Function level](#function-level)
+1.  [Global level](#global-level)
+1.  [Role level](#role-level)
+
+### Session level
+
+Session level settings persist only for the duration of the connection.
+
+Set the session timeout by running:
+
+```sql
+set statement_timeout = '10min';
+```
+
+Because it applies to sessions only, it can only be used with connections through Supavisor in session mode (port 5432) or a direct connection. It cannot be used in the Dashboard, with the Supabase Client API, nor with Supavisor in Transaction mode (port 6543).
+
+This is most often used for single, long running, administrative tasks, such as creating an HSNW index. Once the setting is implemented, you can view it by executing:
+
+```sql
+SHOW statement_timeout;
+```
+
+See the full guide on [changing session timeouts](https://github.com/orgs/supabase/discussions/21133).
+
+### Function level
+
+This works with the Database REST API when called from the Supabase client libraries:
+
+```sql
+create or replace function myfunc()
+returns void as $$
+ select pg_sleep(3); -- simulating some long-running process
+$$
+language sql
+set statement_timeout TO '4s'; -- set custom timeout
+```
+
+This is mostly for recurring functions that need a special exemption for runtimes.
+
+### Role level
+
+This sets the timeout for a specific role.
+
+The default role timeouts are:
+
+- `anon`: 3s
+- `authenticated`: 8s
+- `service_role`: none (capped by API to be 60s)
+- `postgres`: none (capped by default global timeout to be 2min)
+
+Run the following query to change a role's timeout:
+
+```sql
+alter role example_role set statement_timeout = '10min'; -- could also use seconds '10s'
+```
+
+<Admonition type="tip">
+  If you are changing the timeout for the Supabase Client API calls, you will need to reload
+  postgREST to reflect the timeout changes by running the following script:
+
+```sql
+NOTIFY pgrst, 'reload config';
+```
+
+</Admonition>
+
+Unlike global settings, the result cannot be checked with `SHOW
+statement_timeout`. Instead, run:
+
+```sql
+select
+  rolname,
+  rolconfig
+from pg_roles
+where
+  rolname in (
+    'anon',
+    'authenticated',
+    'postgres',
+    'service_role'
+    -- ,<ANY CUSTOM ROLES>
+  );
+```
+
+### Global level
+
+This changes the statement timeout for all roles and sessions without an explicit timeout already set.
+
+```sql
+alter database postgres set statement_timeout TO '4s';
+```
+
+Check if your changes took effect:
+
+```sql
+show statement_timeout;
+```
+
+Although not necessary, if you are uncertain if a timeout has been applied, you can run a quick test:
+
+```sql
+create or replace function myfunc()
+returns void as $$
+  select pg_sleep(601); -- simulating some long-running process
+$$
+language sql;
+```
+
+## Identifying timeouts
+
+The Supabase Dashboard contains tools to help you identify timed-out and long-running queries.
+
+### Using the Logs Explorer
+
+Go to the [Logs Explorer](/dashboard/project/_/logs/explorer), and run the following query to identify timed-out events (`statement timeout`) and queries that successfully run for longer than 10 seconds (`duration`).
+
+```sql
+select
+  cast(postgres_logs.timestamp as datetime) as timestamp,
+  event_message,
+  parsed.error_severity,
+  parsed.user_name,
+  parsed.query,
+  parsed.detail,
+  parsed.hint,
+  parsed.sql_state_code,
+  parsed.backend_type
+from
+  postgres_logs
+  cross join unnest(metadata) as metadata
+  cross join unnest(metadata.parsed) as parsed
+where
+  regexp_contains(event_message, 'duration|statement timeout')
+  -- (OPTIONAL) MODIFY OR REMOVE
+  and parsed.user_name = 'authenticator' -- <--------CHANGE
+order by timestamp desc
+limit 100;
+```
+
+### Using the Query Performance page
+
+Go to the [Query Performance page](/dashboard/project/_/advisors/query-performance?preset=slowest_execution) and filter by relevant role and query speeds. This only identifies slow-running but successful queries. Unlike the Log Explorer, it does not show you timed-out queries.
+
+### Understanding roles in logs
+
+Each API server uses a designated user for connecting to the database:
+
+| Role                       | API/Tool                                                                  |
+| -------------------------- | ------------------------------------------------------------------------- |
+| supabase_admin             | Used by Supabase to configure projects and for monitoring                 |
+| authenticator              | PostgREST                                                                 |
+| supabase_auth_admin        | Auth                                                                      |
+| supabase_storage_admin     | Storage                                                                   |
+| supabase_realtime_admin    | Realtime                                                                  |
+| supabase_replication_admin | Synchronizes Read Replicas                                                |
+| postgres                   | Supabase Dashboard and External Tools (e.g., Prisma, SQLAlchemy, PSQL...) |
+| Custom roles               | External Tools (e.g., Prisma, SQLAlchemy, PSQL...)                        |
+
+Filter by the `parsed.user_name` field to only retrieve logs made by specific users:
+
+```sql
+-- find events based on role/server
+... query
+where
+  -- find events from the relevant role
+  parsed.user_name = '<ROLE>'
+```

@@ -242,7 +242,6 @@ const uiConfig = ui({
               backgroundColor: 'hsl(var(--background-surface-200))',
               border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
-              // wordBreak: 'break-all',
             },
             a: {
               position: 'relative',
@@ -421,6 +420,9 @@ const uiConfig = ui({
     require('@tailwindcss/typography'),
     require('tailwindcss-animate'),
     plugin(motionSafeTransition),
+    function ({ addVariant }) {
+      addVariant('not-disabled', '&:not(:disabled)')
+    },
   ],
 })
 

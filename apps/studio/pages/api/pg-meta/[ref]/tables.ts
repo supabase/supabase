@@ -26,9 +26,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
-  const headers = constructHeaders(req.headers)
-
+/**
+ * Construct the pgMeta redirection url passing along the filtering query params
+ * @param req
+ * @param endpoint
+ */
+export function getPgMetaRedirectUrl(req: NextApiRequest, endpoint: string) {
   const query = Object.entries(req.query).reduce((query, entry) => {
     const [key, value] = entry
     if (Array.isArray(value)) {
@@ -41,12 +44,17 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     return query
   }, new URLSearchParams())
 
-  let url = `${PG_META_URL}/tables`
+  let url = `${PG_META_URL}/${endpoint}`
   if (Object.keys(req.query).length > 0) {
     url += `?${query}`
   }
+  return url
+}
 
-  const response = await get(url, { headers })
+const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+  const headers = constructHeaders(req.headers)
+
+  const response = await get(getPgMetaRedirectUrl(req, 'tables'), { headers })
   if (response.error) {
     return res.status(400).json({ error: response.error })
   }

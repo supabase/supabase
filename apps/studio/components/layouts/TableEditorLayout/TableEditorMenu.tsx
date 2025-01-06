@@ -1,8 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
 import { Filter, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useParams } from 'common'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -11,9 +10,13 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import InfiniteList from 'components/ui/InfiniteList'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { useSchemasQuery } from 'data/database/schemas-query'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useLocalStorage } from 'hooks/misc/useLocalStorage'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   AlertDescription_Shadcn_,
@@ -36,12 +39,14 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 const TableEditorMenu = () => {
-  const router = useRouter()
-  const { id } = useParams()
+  const { id: _id } = useParams()
+  const id = _id ? Number(_id) : undefined
   const snap = useTableEditorStateSnapshot()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+  const isMobile = useBreakpoint()
 
   const [showModal, setShowModal] = useState(false)
   const [searchText, setSearchText] = useState<string>('')
@@ -58,7 +63,6 @@ const TableEditorMenu = () => {
     isSuccess,
     isError,
     error,
-    refetch,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
@@ -66,8 +70,8 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
-      search: searchText || undefined,
+      schemas: [selectedSchema],
+      search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
     },
@@ -86,19 +90,26 @@ const TableEditorMenu = () => {
     connectionString: project?.connectionString,
   })
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const refreshTables = async () => {
-    await refetch()
-  }
-
-  refreshTables
   const [protectedSchemas] = partition(
     (schemas ?? []).sort((a, b) => a.name.localeCompare(b.name)),
-    (schema) => EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+    (schema) => PROTECTED_SCHEMAS.includes(schema?.name ?? '')
   )
   const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const { data: selectedTable } = useTableEditorQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    id,
+  })
+
+  useEffect(() => {
+    if (selectedTable?.schema) {
+      setSelectedSchema(selectedTable.schema)
+    }
+  }, [selectedTable?.schema])
 
   return (
     <>
@@ -109,11 +120,10 @@ const TableEditorMenu = () => {
         <div className="flex flex-col gap-y-1.5">
           <SchemaSelector
             className="mx-4"
-            selectedSchemaName={snap.selectedSchemaName}
+            selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
-              snap.setSelectedSchemaName(name)
-              router.push(`/project/${project?.ref}/editor`)
+              setSelectedSchema(name)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
           />
@@ -133,7 +143,9 @@ const TableEditorMenu = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to create tables',
+                    text: !canCreateTables
+                      ? 'You need additional permissions to create tables'
+                      : undefined,
                   },
                 }}
               >
@@ -159,10 +171,11 @@ const TableEditorMenu = () => {
         <div className="flex flex-auto flex-col gap-2 pb-4 px-2">
           <InnerSideBarFilters>
             <InnerSideBarFilterSearchInput
+              autoFocus={!isMobile}
               name="search-tables"
               aria-labelledby="Search tables"
               onChange={(e) => {
-                setSearchText(e.target.value.trim())
+                setSearchText(e.target.value)
               }}
               value={searchText}
               placeholder="Search tables..."
@@ -190,7 +203,7 @@ const TableEditorMenu = () => {
               <PopoverTrigger_Shadcn_ asChild>
                 <Button
                   type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[28px] px-1.5"
+                  className="h-[32px] md:h-[28px] px-1.5"
                   icon={<Filter />}
                 />
               </PopoverTrigger_Shadcn_>
@@ -256,7 +269,7 @@ const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1" data-testid="tables-list">
+                <div className="flex flex-1 -mx-2" data-testid="tables-list">
                   <InfiniteList
                     items={entityTypes}
                     ItemComponent={EntityListItem}

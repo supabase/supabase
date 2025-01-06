@@ -1,10 +1,11 @@
-import clsx from 'clsx'
 import type { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+
+import { cn } from 'ui'
 import { Attribute, COLOR_MAP } from './Usage.constants'
 
 export interface SingleAttributeTooltipContentProps {
   name: string
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
   value: any
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
@@ -37,7 +38,7 @@ export interface MultiAttributeTooltipContentProps {
   values: Payload<ValueType, string | number>[]
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
 }
 
 const AttributeContent = ({
@@ -51,7 +52,7 @@ const AttributeContent = ({
   attributeMeta?: Payload<ValueType, string | number>
   sumValue: number
   tooltipFormatter?: (value: any) => any
-  unit: 'bytes' | 'percentage' | 'absolute' | 'hours'
+  unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'
 }) => {
   const attrValue = Number(attributeMeta?.value ?? 0)
   const percentageContribution = ((attrValue / sumValue) * 100).toFixed(1)
@@ -59,7 +60,7 @@ const AttributeContent = ({
   return (
     <div key={attribute.name} className="flex items-center justify-between">
       <div className="flex items-center space-x-2 w-[175px]">
-        <div className={clsx('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
+        <div className={cn('w-3 h-3 rounded-full border', COLOR_MAP[attribute.color].marker)} />
         <p className="text-xs prose">
           {attribute.name} ({percentageContribution}%):{' '}
         </p>

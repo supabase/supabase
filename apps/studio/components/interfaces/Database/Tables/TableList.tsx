@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { noop, partition } from 'lodash'
+import { noop } from 'lodash'
 import {
   Check,
   Columns,
@@ -27,14 +28,15 @@ import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from 'data/materialized-views/materialized-views-query'
+import { usePrefetchEditorTablePage } from 'data/prefetchers/project.$ref.editor.$id'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useViewsQuery } from 'data/views/views-query'
-import { useCheckPermissions } from 'hooks'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
+import { PROTECTED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Button,
   Checkbox_Shadcn_,
@@ -55,16 +57,16 @@ import {
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
-import { useForeignTableQuery } from 'data/foreign-tables/foreign-table-query'
-import { useForeignTablesQuery } from 'data/foreign-tables/foreign-tables-query'
 
 interface TableListProps {
   onAddTable: () => void
-  onEditTable: (table: any) => void
-  onDeleteTable: (table: any) => void
+  onEditTable: (table: PostgresTable) => void
+  onDeleteTable: (table: PostgresTable) => void
+  onDuplicateTable: (table: PostgresTable) => void
 }
 
 const TableList = ({
+  onDuplicateTable,
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
@@ -72,19 +74,14 @@ const TableList = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+
+  const prefetchEditorTablePage = usePrefetchEditorTablePage()
+
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [filterString, setFilterString] = useState<string>('')
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const canUpdateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-
-  const { data: schemas } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const [protectedSchemas] = partition(schemas ?? [], (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
-  )
 
   const {
     data: tables,
@@ -96,7 +93,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
       sortByProperty: 'name',
       includeColumns: true,
     },
@@ -119,7 +116,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(views) {
@@ -140,7 +137,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(materializedViews) {
@@ -163,7 +160,7 @@ const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
     },
     {
       select(foreignTables) {
@@ -184,18 +181,18 @@ const TableList = ({
     (publication) => publication.name === 'supabase_realtime'
   )
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+
+  const isLocked = PROTECTED_SCHEMAS.includes(selectedSchema)
 
   const error = tablesError || viewsError || materializedViewsError || foreignTablesError
   const isError = isErrorTables || isErrorViews || isErrorMaterializedViews || isErrorForeignTables
   const isLoading =
     isLoadingTables || isLoadingViews || isLoadingMaterializedViews || isLoadingForeignTables
   const isSuccess =
-    (isSuccessTables && isSuccessViews) || isSuccessMaterializedViews || isSuccessForeignTables
+    isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -206,80 +203,84 @@ const TableList = ({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-x-4">
-          <div className="flex items-center gap-x-2">
-            <SchemaSelector
-              className="w-[260px]"
-              size="small"
-              showError={false}
-              selectedSchemaName={snap.selectedSchemaName}
-              onSelectSchema={snap.setSelectedSchemaName}
+    <div className="flex flex-col gap-y-4">
+      <div className="flex items-center gap-x-2 flex-wrap">
+        <SchemaSelector
+          className="w-[180px]"
+          size="tiny"
+          showError={false}
+          selectedSchemaName={selectedSchema}
+          onSelectSchema={setSelectedSchema}
+        />
+        <Popover_Shadcn_>
+          <PopoverTrigger_Shadcn_ asChild>
+            <Button
+              size="tiny"
+              type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+              className="px-1"
+              icon={<Filter />}
             />
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="py-4 px-2"
-                  icon={<Filter />}
-                />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
-                <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-                  <p className="text-xs">Show entity types</p>
-                  <div className="flex flex-col">
-                    {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                      <div key={key} className="group flex items-center justify-between py-0.5">
-                        <div className="flex items-center gap-x-2">
-                          <Checkbox_Shadcn_
-                            id={key}
-                            name={key}
-                            checked={visibleTypes.includes(value)}
-                            onCheckedChange={() => {
-                              if (visibleTypes.includes(value)) {
-                                setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                              } else {
-                                setVisibleTypes(visibleTypes.concat([value]))
-                              }
-                            }}
-                          />
-                          <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
-                            {key.toLowerCase().replace('_', ' ')}
-                          </Label_Shadcn_>
-                        </div>
-                        <Button
-                          size="tiny"
-                          type="default"
-                          onClick={() => setVisibleTypes([value])}
-                          className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                        >
-                          Select only
-                        </Button>
-                      </div>
-                    ))}
+          </PopoverTrigger_Shadcn_>
+          <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
+              <p className="text-xs">Show entity types</p>
+              <div className="flex flex-col">
+                {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                  <div key={key} className="group flex items-center justify-between py-0.5">
+                    <div className="flex items-center gap-x-2">
+                      <Checkbox_Shadcn_
+                        id={key}
+                        name={key}
+                        checked={visibleTypes.includes(value)}
+                        onCheckedChange={() => {
+                          if (visibleTypes.includes(value)) {
+                            setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                          } else {
+                            setVisibleTypes(visibleTypes.concat([value]))
+                          }
+                        }}
+                      />
+                      <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                        {key.toLowerCase().replace('_', ' ')}
+                      </Label_Shadcn_>
+                    </div>
+                    <Button
+                      size="tiny"
+                      type="default"
+                      onClick={() => setVisibleTypes([value])}
+                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                    >
+                      Select only
+                    </Button>
                   </div>
-                </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
-          </div>
-          <Input
-            size="small"
-            className="w-64"
-            placeholder="Search for a table"
-            value={filterString}
-            onChange={(e: any) => setFilterString(e.target.value)}
-            icon={<Search size={12} />}
-          />
-        </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent_Shadcn_>
+        </Popover_Shadcn_>
+
+        <Input
+          size="tiny"
+          className="w-52"
+          placeholder="Search for a table"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          icon={<Search size={12} />}
+        />
 
         {!isLocked && (
           <ButtonTooltip
+            className="ml-auto"
             icon={<Plus />}
             disabled={!canUpdateTables}
             onClick={() => onAddTable()}
             tooltip={{
-              content: { side: 'bottom', text: 'You need additional permissions to create tables' },
+              content: {
+                side: 'bottom',
+                text: !canUpdateTables
+                  ? 'You need additional permissions to create tables'
+                  : undefined,
+              },
             }}
           >
             New table
@@ -287,14 +288,14 @@ const TableList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={snap.selectedSchemaName} entity="tables" />}
+      {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
 
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <div className="my-4 w-full">
+        <div className="w-full">
           <Table
             head={[
               <Table.th key="icon" className="!px-0" />,
@@ -316,7 +317,7 @@ const TableList = ({
             body={
               <>
                 {entities.length === 0 && filterString.length === 0 && (
-                  <Table.tr key={snap.selectedSchemaName}>
+                  <Table.tr key={selectedSchema}>
                     <Table.td colSpan={7}>
                       {visibleTypes.length === 0 ? (
                         <>
@@ -342,7 +343,7 @@ const TableList = ({
                                     .join(
                                       ', '
                                     )}, and ${formatTooltipText(visibleTypes[visibleTypes.length - 1])}s`}{' '}
-                            found in the schema "{snap.selectedSchemaName}"
+                            found in the schema "{selectedSchema}"
                           </p>
                         </>
                       )}
@@ -350,7 +351,7 @@ const TableList = ({
                   </Table.tr>
                 )}
                 {entities.length === 0 && filterString.length > 0 && (
-                  <Table.tr key={snap.selectedSchemaName}>
+                  <Table.tr key={selectedSchema}>
                     <Table.td colSpan={7}>
                       <p className="text-sm text-foreground">No results found</p>
                       <p className="text-sm text-foreground-light">
@@ -384,9 +385,11 @@ const TableList = ({
                                   x.type === ENTITY_TYPE.FOREIGN_TABLE &&
                                     'text-yellow-900 bg-yellow-500',
                                   x.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-                                    'text-purple-1000 bg-purple-500',
-                                  x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
-                                    'text-foreground-light bg-border-stronger'
+                                    'text-purple-1000 bg-purple-500'
+                                  // [Alaister]: tables endpoint doesn't distinguish between tables and partitioned tables
+                                  // once we update the endpoint to include partitioned tables, we can uncomment this
+                                  // x.type === ENTITY_TYPE.PARTITIONED_TABLE &&
+                                  //   'text-foreground-light bg-border-stronger'
                                 )}
                               >
                                 {Object.entries(ENTITY_TYPE)
@@ -444,9 +447,7 @@ const TableList = ({
                         {x.size !== undefined ? <code className="text-xs">{x.size}</code> : '-'}
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
-                        {(realtimePublication?.tables ?? []).find(
-                          (table: any) => table.id === x.id
-                        ) ? (
+                        {(realtimePublication?.tables ?? []).find((table) => table.id === x.id) ? (
                           <div className="flex justify-center">
                             <Check size={18} strokeWidth={2} className="text-brand" />
                           </div>
@@ -481,6 +482,9 @@ const TableList = ({
                                   onClick={() =>
                                     router.push(`/project/${project?.ref}/editor/${x.id}`)
                                   }
+                                  onMouseEnter={() =>
+                                    prefetchEditorTablePage({ id: x.id ? String(x.id) : undefined })
+                                  }
                                 >
                                   <Eye size={12} />
                                   <p>View in Table Editor</p>
@@ -513,7 +517,9 @@ const TableList = ({
                                       className="space-x-2"
                                       onClick={(e) => {
                                         e.stopPropagation()
-                                        snap.onDuplicateTable()
+                                        if (canUpdateTables) {
+                                          onDuplicateTable(x)
+                                        }
                                       }}
                                     >
                                       <Copy size={12} />
@@ -528,7 +534,7 @@ const TableList = ({
                                             if (canUpdateTables && !isLocked) {
                                               onDeleteTable({
                                                 ...x,
-                                                schema: snap.selectedSchemaName,
+                                                schema: selectedSchema,
                                               })
                                             }
                                           }}

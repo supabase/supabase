@@ -7,10 +7,10 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  IconChevronDown,
 } from 'ui'
 
 import { DATE_FORMAT } from 'lib/constants'
+import { ChevronDown } from 'lucide-react'
 
 /**
  * There's timestamp rounding that kicks in if there are more than 50 data points
@@ -196,7 +196,7 @@ const DateRangePicker = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<IconChevronDown />}>
+          <Button type="default" iconRight={<ChevronDown />}>
             <span>{timePeriod && options.find((x) => x.key === timePeriod)?.label}</span>
           </Button>
         </DropdownMenuTrigger>

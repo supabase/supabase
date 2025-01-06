@@ -1,17 +1,17 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
-import { ArchiveRestoreIcon } from 'lucide-react'
+import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button, IconArchive, IconExternalLink, cn } from 'ui'
+import { Button, cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
 import type { Organization } from 'types'
+import { CriticalIcon, WarningIcon } from 'ui'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
@@ -142,7 +142,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                   <Button
                     key={key}
                     type="default"
-                    icon={<IconExternalLink strokeWidth={1.5} size={14} />}
+                    icon={<ExternalLink strokeWidth={1.5} />}
                     asChild
                   >
                     <Link href={url} target="_blank" rel="noreferrer">
@@ -201,7 +201,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
             <Tooltip.Trigger asChild>
               <Button
                 type="outline"
-                icon={<IconArchive size={13} strokeWidth={2} className="text-foreground-light" />}
+                icon={<Archive size={13} strokeWidth={2} className="text-foreground-light" />}
                 className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
               />

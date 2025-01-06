@@ -1,39 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CriticalIcon,
   Form,
   Input,
   Modal,
   Toggle,
+  cn,
 } from 'ui'
-import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
@@ -43,7 +39,7 @@ const EdgeFunctionDetails = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
 
-  const { data: settings } = useProjectApiQuery({ projectRef })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
   const { mutate: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
@@ -57,20 +53,20 @@ const EdgeFunctionDetails = () => {
   const formId = 'edge-function-update-form'
   const canUpdateEdgeFunction = useCheckPermissions(PermissionAction.FUNCTIONS_WRITE, '*')
 
-  // Get the API service
-  const apiService = settings?.autoApiService
-  const anonKey = apiService?.defaultApiKey ?? '[YOUR ANON KEY]'
+  const { anonKey } = getAPIKeys(settings)
+  const apiKey = anonKey?.api_key ?? '[YOUR ANON KEY]'
 
-  const endpoint = apiService?.app_config.endpoint ?? ''
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const endpoint = settings?.app_config?.endpoint ?? ''
   const functionUrl =
     customDomainData?.customDomain?.status === 'active'
-      ? `${apiService?.protocol}://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
-      : `${apiService?.protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
+      ? `https://${customDomainData.customDomain.hostname}/functions/v1/${selectedFunction?.slug}`
+      : `${protocol}://${endpoint}/functions/v1/${selectedFunction?.slug}`
 
   const { managementCommands, secretCommands, invokeCommands } = generateCLICommands(
     selectedFunction,
     functionUrl,
-    anonKey
+    apiKey
   )
 
   const onUpdateFunction = async (values: any, { resetForm }: any) => {
@@ -105,7 +101,7 @@ const EdgeFunctionDetails = () => {
 
   return (
     <>
-      <div className="space-y-4 pb-16">
+      <div className="space-y-4 pb-16 pt-3">
         <Form id={formId} initialValues={{}} onSubmit={onUpdateFunction}>
           {({ handleReset, values, initialValues, resetForm }: any) => {
             const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
@@ -185,7 +181,7 @@ const EdgeFunctionDetails = () => {
                         <div className="flex items-center space-x-2">
                           <p className="text-sm">
                             Import maps are{' '}
-                            <span className={clsx(hasImportMap ? 'text-brand' : 'text-amber-900')}>
+                            <span className={cn(hasImportMap ? 'text-brand' : 'text-amber-900')}>
                               {hasImportMap ? 'used' : 'not used'}
                             </span>{' '}
                             for this function
@@ -262,7 +258,9 @@ const EdgeFunctionDetails = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text: 'You need additional permissions to delete edge functions',
+                    text: !canUpdateEdgeFunction
+                      ? 'You need additional permissions to delete edge functions'
+                      : undefined,
                   },
                 }}
               >

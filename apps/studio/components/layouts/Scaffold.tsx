@@ -1,9 +1,10 @@
 import React from 'react'
+import { useAppStateSnapshot } from 'state/app-state'
 import { cn } from 'ui'
 
-const maxWidthClasses = 'mx-auto w-full max-w-[1600px]'
-const paddingClasses = 'px-6 lg:px-14 xl:px-24 2xl:px-32'
-const maxWidthClassesColumn = 'min-w-[420px]'
+export const MAX_WIDTH_CLASSES = 'mx-auto w-full max-w-[1200px]'
+export const PADDING_CLASSES = 'px-4 md:px-6 lg:px-14 xl:px-24 2xl:px-28'
+export const MAX_WIDTH_CLASSES_COLUMN = 'min-w-[420px]'
 
 const ScaffoldHeader = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => {
@@ -35,11 +36,19 @@ const ScaffoldContainer = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & { bottomPadding?: boolean }
 >(({ className, bottomPadding, ...props }, ref) => {
+  const { aiAssistantPanel } = useAppStateSnapshot()
+  const { open } = aiAssistantPanel
   return (
     <div
       ref={ref}
       {...props}
-      className={cn(maxWidthClasses, paddingClasses, bottomPadding && 'pb-16', className)}
+      className={cn(
+        MAX_WIDTH_CLASSES,
+        PADDING_CLASSES,
+        bottomPadding && 'pb-16',
+        open ? 'xl:px-6' : '',
+        className
+      )}
     />
   )
 })
@@ -68,7 +77,7 @@ const ScaffoldColumn = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTM
       <div
         ref={ref}
         {...props}
-        className={cn('flex flex-col gap-3', maxWidthClassesColumn, className)}
+        className={cn('flex flex-col gap-3', MAX_WIDTH_CLASSES_COLUMN, className)}
       />
     )
   }
@@ -131,7 +140,7 @@ const ScaffoldContainerLegacy = React.forwardRef<
     <div
       ref={ref}
       {...props}
-      className={cn(maxWidthClasses, paddingClasses, 'my-8 flex flex-col gap-8', className)}
+      className={cn(MAX_WIDTH_CLASSES, PADDING_CLASSES, 'my-8 flex flex-col gap-8', className)}
     />
   )
 })

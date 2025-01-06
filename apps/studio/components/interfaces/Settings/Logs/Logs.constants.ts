@@ -1,5 +1,6 @@
 import dayjs from 'dayjs'
-import { DatetimeHelper, FilterTableSet, LogTemplate } from '.'
+
+import type { DatetimeHelper, FilterTableSet, LogTemplate } from './Logs.types'
 
 export const LOGS_EXPLORER_DOCS_URL =
   'https://supabase.com/docs/guides/platform/logs#querying-with-the-logs-explorer'
@@ -259,7 +260,7 @@ from edge_logs f
   cross join unnest(m.request) as r
   cross join unnest(m.response) as res
   cross join unnest(res.headers) as h
-where starts_with(r.path, '/storage/v1/object') 
+where starts_with(r.path, '/storage/v1/object')
   and r.method = 'GET'
   and h.cf_cache_status in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
 group by path, search
@@ -349,6 +350,9 @@ export const SQL_FILTER_TEMPLATES: any = {
     ..._SQL_FILTER_COMMON,
     database: (value: string) => `m.project like '${value}%'`,
   },
+  pg_cron_logs: {
+    ..._SQL_FILTER_COMMON,
+  },
 }
 
 export enum LogsTableName {
@@ -362,6 +366,7 @@ export enum LogsTableName {
   POSTGREST = 'postgrest_logs',
   SUPAVISOR = 'supavisor_logs',
   WAREHOUSE = 'warehouse_logs',
+  PG_CRON = 'pg_cron_logs',
 }
 
 export const LOGS_TABLES = {
@@ -375,6 +380,7 @@ export const LOGS_TABLES = {
   postgrest: LogsTableName.POSTGREST,
   supavisor: LogsTableName.SUPAVISOR,
   warehouse: LogsTableName.WAREHOUSE,
+  pg_cron: LogsTableName.POSTGRES,
 }
 
 export const LOGS_SOURCE_DESCRIPTION = {
@@ -388,6 +394,7 @@ export const LOGS_SOURCE_DESCRIPTION = {
   [LogsTableName.POSTGREST]: 'RESTful API web server logs',
   [LogsTableName.SUPAVISOR]: 'Cloud-native Postgres connection pooler logs',
   [LogsTableName.WAREHOUSE]: 'Logs obtained from a data warehouse collection',
+  [LogsTableName.PG_CRON]: 'Postgres logs from pg_cron cron jobs',
 }
 
 export const genQueryParams = (params: { [k: string]: string }) => {

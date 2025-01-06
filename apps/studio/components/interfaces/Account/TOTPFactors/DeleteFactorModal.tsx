@@ -1,11 +1,4 @@
-import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
+import { toast } from 'sonner'
 
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'

@@ -39,7 +39,7 @@ for select using (true);`.trim(),
     statement: `
 create policy "Enable insert for authenticated users only"
 on "${schema}"."${table}"
-for insert to authenticated 
+for insert to authenticated
 with check (true);`.trim(),
     name: 'Enable insert for authenticated users only',
     definition: '',
@@ -110,7 +110,7 @@ for insert with check (
     templateName: 'Policy with table joins',
     description: `
 Query across tables to build more advanced RLS rules
-    
+
 Assuming 2 tables called \`teams\` and \`members\`, you can query both tables in the policy to control access to the members table.`,
     statement: `
 create policy "Members can update team details if they belong to the team"
@@ -130,8 +130,8 @@ on teams for update using (
     preview: true,
     templateName: 'Policy with security definer functions',
     description: `
-Useful in a many-to-many relationship where you want to restrict access to the linking table. 
-    
+Useful in a many-to-many relationship where you want to restrict access to the linking table.
+
 Assuming 2 tables called \`teams\` and \`members\`, you can use a security definer function in combination with a policy to control access to the members table.`.trim(),
     statement: `
 create or replace function get_teams_for_user(user_id uuid)
@@ -158,7 +158,7 @@ for all using (
     templateName: 'Policy to implement Time To Live (TTL)',
     description: `
 Implement a TTL-like feature that you see in Instagram stories or Snapchat where messages expire after a day.
-    
+
 Rows under the table are available only if they have been created within the last 24 hours.`,
     statement: `
 create policy "Stories are live for a day"
@@ -171,6 +171,25 @@ for select using (
     check: '',
     command: 'SELECT',
     roles: [],
+  },
+  {
+    id: 'policy-9',
+    preview: false,
+    templateName: 'Allow users to only view their own data',
+    description: 'Restrict users to reading only their own data.',
+    statement: `
+create policy "Enable users to view their own data only"
+on "${schema}"."${table}"
+for select
+to authenticated
+using (
+  (select auth.uid()) = user_id
+);`.trim(),
+    name: 'Enable users to view their own data only',
+    definition: '(select auth.uid()) = user_id',
+    check: '',
+    command: 'SELECT',
+    roles: ['authenticated'],
   },
 ]
 
@@ -199,14 +218,13 @@ using ( realtime.messages.extension = 'broadcast' );`.trim(),
       description: 'This policy allows pushing broadcasts for authenticated users only.',
       statement: `
 create policy "Allow pushing broadcasts for authenticated users only"
-ON realtime.messages for update
+ON realtime.messages for insert
 TO authenticated
-using ( realtime.messages.extension = 'broadcast' )
 with check ( realtime.messages.extension = 'broadcast' );`.trim(),
       name: 'Allow pushing broadcasts for authenticated users only',
       definition: "realtime.messages.extension = 'broadcast'",
       check: "realtime.messages.extension = 'broadcast'",
-      command: 'UPDATE',
+      command: 'INSERT',
       roles: ['authenticated'],
     },
     {
@@ -231,13 +249,12 @@ using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channe
       description: 'This policy allow pushing broadcasts to specific channel.',
       statement: `
 create policy "Allow pushing broadcasts to specific channel"
-ON realtime.messages for update
-using ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' )
+ON realtime.messages for insert
 with check ( realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name' );`.trim(),
       name: 'Allow pushing broadcasts to specific channel',
       definition: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
       check: `realtime.messages.extension = 'broadcast' AND realtime.topic() = 'channel_name'`,
-      command: 'UPDATE',
+      command: 'INSERT',
       roles: [],
     },
     {
@@ -265,15 +282,14 @@ using ( realtime.messages.extension = 'presence' );`.trim(),
         'This policy enables broadcasting presences on all channels for all authenticated users only.',
       statement: `
 create policy "Allow broadcasting presences on all channels for authenticated users only"
-ON realtime.messages for update
+ON realtime.messages for insert
 TO authenticated
-using ( realtime.messages.extension = 'presence' )
 with check ( realtime.messages.extension = 'presence' );
   ;`.trim(),
       name: 'Allow broadcasting presences on all channels for authenticated users only',
       definition: "realtime.messages.extension = 'presence'",
       check: "realtime.messages.extension = 'presence'",
-      command: 'UPDATE',
+      command: 'INSERT',
       roles: ['authenticated'],
     },
     {
@@ -298,16 +314,33 @@ using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel
       description: 'This policy allows publishing presence to a specific channel.',
       statement: `
 create policy "Publish presence to a specific channel"
-ON realtime.messages for update
-using ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' )
+ON realtime.messages for insert
 with check ( realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name' );
   ;`.trim(),
       name: 'Publish presence to a specific channel',
       definition: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
       check: `realtime.messages.extension = 'presence' AND realtime.topic() = 'channel_name'`,
-      command: 'UPDATE',
+      command: 'INSERT',
       roles: [],
     },
   ] as PolicyTemplate[]
   return results
+}
+
+export const getQueuePolicyTemplates = (): PolicyTemplate[] => {
+  return [
+    {
+      id: 'policy-queues-1',
+      preview: false,
+      templateName: 'Allow access to queue',
+      statement: ``.trim(),
+      name: 'Allow anon and authenticated to access messages from queue',
+      description:
+        'Base policy to ensure that anon and authenticated can only access appropriate rows. USING and CHECK statements will need to be adjusted accordingly',
+      definition: 'true',
+      check: 'true',
+      command: 'ALL',
+      roles: ['anon', 'authenticated'],
+    },
+  ]
 }

@@ -6,15 +6,6 @@ import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
 import 'reactflow/dist/style.css'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  cn,
-} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
@@ -25,10 +16,19 @@ import {
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from 'data/read-replicas/replicas-status-query'
-import { useCheckPermissions } from 'hooks'
-import { AWS_REGIONS_KEYS } from 'lib/constants'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { timeout } from 'lib/helpers'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import { type AWS_REGIONS_KEYS } from 'shared-data'
+import { useAddonsPagePanel } from 'state/addons-page'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  cn,
+} from 'ui'
 import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
 import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
@@ -39,14 +39,16 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 
 const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
+  const isOrioleDb = useIsOrioleDb()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const numTransition = useRef<number>()
   const { project, isLoading: isLoadingProject } = useProjectContext()
-  const snap = useSubscriptionPageStateSnapshot()
+  const { setPanel } = useAddonsPagePanel()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
   const [showDeleteAllModal, setShowDeleteAllModal] = useState(false)
@@ -207,7 +209,7 @@ const InstanceConfigurationUI = () => {
   }, [isSuccessReplicas, isSuccessLoadBalancers, nodes, edges, view])
 
   return (
-    <>
+    <div className="nowheel border-y">
       <div
         className={`h-[500px] w-full relative ${
           isSuccessReplicas && !isLoadingProject ? '' : 'flex items-center justify-center px-28'
@@ -225,13 +227,17 @@ const InstanceConfigurationUI = () => {
               <div className="flex items-center justify-center">
                 <ButtonTooltip
                   type="default"
-                  disabled={!canManageReplicas}
+                  disabled={!canManageReplicas || isOrioleDb}
                   className={cn(replicas.length > 0 ? 'rounded-r-none' : '')}
                   onClick={() => setShowNewReplicaPanel(true)}
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to deploy replicas',
+                      text: !canManageReplicas
+                        ? 'You need additional permissions to deploy replicas'
+                        : isOrioleDb
+                          ? 'Read replicas are not supported with OrioleDB'
+                          : undefined,
                     },
                   }}
                 >
@@ -247,7 +253,7 @@ const InstanceConfigurationUI = () => {
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-52 *:space-x-2">
-                      <DropdownMenuItem onClick={() => snap.setPanelKey('computeInstance')}>
+                      <DropdownMenuItem onClick={() => setPanel('computeInstance')}>
                         <div>Resize databases</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -342,7 +348,7 @@ const InstanceConfigurationUI = () => {
       />
 
       <ComputeInstanceSidePanel />
-    </>
+    </div>
   )
 }
 

@@ -80,7 +80,7 @@ In the `build.gradle` (app) file, add these dependencies then press "Sync now." 
 ```kotlin
 implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"
 implementation "io.github.jan-tennert.supabase:storage-kt:$supabase_version"
-implementation "io.github.jan-tennert.supabase:gotrue-kt:$supabase_version"
+implementation "io.github.jan-tennert.supabase:auth-kt:$supabase_version"
 implementation "io.ktor:ktor-client-android:$ktor_version"
 implementation "io.ktor:ktor-client-core:$ktor_version"
 implementation "io.ktor:ktor-utils:$ktor_version"
@@ -95,6 +95,8 @@ plugins {
     ...
 }
 ```
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ### Set up Hilt for dependency injection
 
@@ -134,9 +136,11 @@ class MainActivity : ComponentActivity() {
 }
 ```
 
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
 ### Provide Supabase instances with Hilt
 
-To make the app easier to test, create a `SupabaseMdule.kt` file as follows:
+To make the app easier to test, create a `SupabaseModule.kt` file as follows:
 
 ```kotlin
 @InstallIn(SingletonComponent::class)
@@ -303,14 +307,18 @@ class ProductRepositoryImpl @Inject constructor(
                     set("price", price)
                     set("image", buildImageUrl(imageFileName = imageUrl))
                 }) {
-                    eq("id", id)
+                    filter {
+                        eq("id", id)
+                    }
                 }
             } else {
                 postgrest.from("products").update({
                     set("name", name)
                     set("price", price)
                 }) {
-                    eq("id", id)
+                    filter {
+                        eq("id", id)
+                    }
                 }
             }
         }

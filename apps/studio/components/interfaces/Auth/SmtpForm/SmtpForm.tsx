@@ -1,41 +1,35 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import { number, object, string } from 'yup'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
+import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
   Form,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconEye,
-  IconEyeOff,
   Input,
   InputNumber,
   Toggle,
+  WarningIcon,
 } from 'ui'
-import { number, object, string } from 'yup'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions } from 'hooks'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import NoPermission from 'components/ui/NoPermission'
+import { AlertTriangle, Eye, EyeOff } from 'lucide-react'
+import Link from 'next/link'
 
 const SmtpForm = () => {
   const { ref: projectRef } = useParams()
@@ -83,7 +77,7 @@ const SmtpForm = () => {
       },
       then: (schema) =>
         schema
-          .matches(urlRegex, 'Must be a valid URL or IP address')
+          .matches(urlRegex({ excludeSimpleDomains: false }), 'Must be a valid URL or IP address')
           .required('Host URL is required.'),
       otherwise: (schema) => schema,
     }),
@@ -118,7 +112,7 @@ const SmtpForm = () => {
     }),
     SMTP_PASS: string().when([], {
       is: () => {
-        return enableSmtp
+        return enableSmtp && authConfig?.SMTP_PASS === null
       },
       then: (schema) => schema.required('SMTP password is required'),
       otherwise: (schema) => schema,
@@ -131,6 +125,12 @@ const SmtpForm = () => {
     // Format payload: Remove redundant value + convert port to string
     delete payload.ENABLE_SMTP
     payload.SMTP_PORT = payload.SMTP_PORT ? payload.SMTP_PORT.toString() : payload.SMTP_PORT
+
+    // the SMTP_PASS is write-only, it's never shown. If we don't delete it from the payload, it will replace the
+    // previously saved value with an empty one
+    if (payload.SMTP_PASS === '') {
+      delete payload.SMTP_PASS
+    }
 
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -219,17 +219,24 @@ const SmtpForm = () => {
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
                     descriptionText={
-                      <Markdown
-                        className="max-w-full [&>p]:text-foreground-lighter"
-                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/dashboard/project/${projectRef}/auth/rate-limits).`}
-                      />
+                      <p className="max-w-full prose text-sm text-foreground-lighter">
+                        Emails will be sent using your custom SMTP provider. Email rate limits can
+                        be adjusted{' '}
+                        <Link
+                          className="underline"
+                          href={`/project/${projectRef}/auth/rate-limits`}
+                        >
+                          here
+                        </Link>
+                        .
+                      </p>
                     }
                   />
                   {enableSmtp ? (
                     !isValidSmtpConfig && (
                       <div className="">
                         <Alert_Shadcn_ variant="warning">
-                          <IconAlertTriangle strokeWidth={2} />
+                          <AlertTriangle strokeWidth={2} />
                           <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
                           <AlertDescription_Shadcn_>
                             The following fields must be filled before custom SMTP can be properly
@@ -286,7 +293,7 @@ const SmtpForm = () => {
                 <FormSectionContent loading={isLoading}>
                   {values['SMTP_HOST'] && values['SMTP_HOST'].endsWith('.gmail.com') && (
                     <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTriangle strokeWidth={2} />
                       <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
                         Not all SMTP providers are designed for the email sending required by
@@ -343,15 +350,21 @@ const SmtpForm = () => {
                     id="SMTP_PASS"
                     type={hidden ? 'password' : 'text'}
                     label="Password"
-                    placeholder="SMTP Password"
+                    placeholder={authConfig?.SMTP_PASS === null ? 'SMTP Password' : '••••••••'}
                     actions={
                       <Button
-                        icon={hidden ? <IconEye /> : <IconEyeOff />}
+                        icon={hidden ? <Eye /> : <EyeOff />}
                         type="default"
                         onClick={() => setHidden(!hidden)}
                       />
                     }
                     disabled={!canUpdateConfig}
+                    descriptionText={
+                      <span>
+                        For security reasons, the password is write-only. Once saved, it cannot be
+                        retrieved or displayed.
+                      </span>
+                    }
                   />
                 </FormSectionContent>
               </FormSection>

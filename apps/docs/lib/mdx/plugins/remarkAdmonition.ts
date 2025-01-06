@@ -1,7 +1,7 @@
-import { Content, Paragraph, Parent } from 'mdast'
-import { MdxJsxFlowElement } from 'mdast-util-mdx'
-import { AdmonitionProps } from 'ui'
-import { Node } from 'unist'
+import type { Content, Paragraph, Root } from 'mdast'
+import type { MdxJsxFlowElement } from 'mdast-util-mdx'
+import type { AdmonitionProps } from 'ui-patterns/admonition'
+import type { Node } from 'unist'
 import { visit } from 'unist-util-visit'
 
 /**
@@ -10,8 +10,8 @@ import { visit } from 'unist-util-visit'
  * https://squidfunk.github.io/mkdocs-material/reference/admonitions/
  */
 const remarkMkDocsAdmonition = function () {
-  return function transformer(root: Parent) {
-    visit(root, 'paragraph', (paragraph: Paragraph, index: number, parent: Parent) => {
+  return function transformer(root: Root) {
+    visit(root, 'paragraph', (paragraph: Paragraph, index: number, parent: Root) => {
       const [firstChild] = paragraph.children
 
       if (firstChild?.type === 'text') {
@@ -61,6 +61,8 @@ const remarkMkDocsAdmonition = function () {
         parent.children.splice(index, 1, admonitionElement)
       }
     })
+
+    return root
   }
 }
 
@@ -73,7 +75,7 @@ const remarkMkDocsAdmonition = function () {
  *
  * Splices the discovered siblings out of the original parent and returns them.
  */
-function extractLinkedSiblings(parent: Parent, node: Node, index: number, indentAmount = 4) {
+function extractLinkedSiblings(parent: Root, node: Node, index: number, indentAmount = 4) {
   const { column } = node.position.start
 
   let nextSibling: Content

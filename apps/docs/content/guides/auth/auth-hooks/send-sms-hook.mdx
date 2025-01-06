@@ -1,0 +1,645 @@
+---
+id: 'send-sms-hook'
+title: 'Send SMS Hook'
+subtitle: 'Use a custom SMS provider to send authentication messages'
+---
+
+Runs before a message is sent. Use the hook to:
+
+- Use a regional SMS Provider
+- Use alternate messaging channels such as WhatsApp
+- Adjust the message body to include platform specific fields such as the [AppHash](https://developers.google.com/identity/sms-retriever/overview)
+
+**Inputs**
+
+| Field  | Type                                              | Description                                                     |
+| ------ | ------------------------------------------------- | --------------------------------------------------------------- |
+| `user` | [`User`](/docs/guides/auth/users#the-user-object) | The user attempting to sign in.                                 |
+| `sms`  | `object`                                          | Metadata specific to the SMS sending process. Includes the OTP. |
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+>
+<TabPanel id="send-sms-json" label="JSON">
+
+```json
+{
+  "user": {
+    "id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+    "aud": "authenticated",
+    "role": "authenticated",
+    "email": "",
+    "phone": "+1333363128",
+    "phone_confirmed_at": "2024-05-13T11:52:48.157306Z",
+    "confirmation_sent_at": "2024-05-14T12:31:52.824573Z",
+    "confirmed_at": "2024-05-13T11:52:48.157306Z",
+    "phone_change_sent_at": "2024-05-13T11:47:02.183064Z",
+    "last_sign_in_at": "2024-05-13T11:52:48.162518Z",
+    "app_metadata": {
+      "provider": "phone",
+      "providers": ["phone"]
+    },
+    "user_metadata": {},
+    "identities": [
+      {
+        "identity_id": "3be5e552-65aa-41d9-9db9-2a502f845459",
+        "id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+        "user_id": "6481a5c1-3d37-4a56-9f6a-bee08c554965",
+        "identity_data": {
+          "email_verified": false,
+          "phone": "+1612341244428",
+          "phone_verified": true,
+          "sub": "6481a5c1-3d37-4a56-9f6a-bee08c554965"
+        },
+        "provider": "phone",
+        "last_sign_in_at": "2024-05-13T11:52:48.155562Z",
+        "created_at": "2024-05-13T11:52:48.155599Z",
+        "updated_at": "2024-05-13T11:52:48.159391Z"
+      }
+    ],
+    "created_at": "2024-05-13T11:45:33.7738Z",
+    "updated_at": "2024-05-14T12:31:52.82475Z",
+    "is_anonymous": false
+  },
+  "sms": {
+    "otp": "561166"
+  }
+}
+```
+
+</TabPanel>
+<TabPanel id="send-sms-json-schema" label="JSON Schema">
+
+```json
+{
+  "type": "object",
+  "properties": {
+    "user": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "aud": {
+          "type": "string",
+          "enum": ["authenticated"]
+        },
+        "role": {
+          "type": "string",
+          "enum": ["anon", "authenticated"]
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "phone_confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "confirmation_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "confirmed_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "phone_change_sent_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "last_sign_in_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "app_metadata": {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "enum": ["phone"]
+            },
+            "providers": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["phone"]
+              }
+            }
+          }
+        },
+        "user_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "identities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "identity_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "user_id": {
+                "type": "string",
+                "x-faker": "random.uuid"
+              },
+              "identity_data": {
+                "type": "object",
+                "properties": {
+                  "email_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "phone": {
+                    "type": "string",
+                    "x-faker": {
+                      "fake": "{{phone.phoneNumber('+1##########')}}"
+                    }
+                  },
+                  "phone_verified": {
+                    "type": "boolean",
+                    "x-faker": "random.boolean"
+                  },
+                  "sub": {
+                    "type": "string",
+                    "x-faker": "random.uuid"
+                  }
+                }
+              },
+              "provider": {
+                "type": "string",
+                "enum": ["phone", "email", "google"]
+              },
+              "last_sign_in_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              },
+              "updated_at": {
+                "type": "string",
+                "format": "date-time",
+                "x-faker": "date.recent"
+              }
+            },
+            "required": [
+              "identity_id",
+              "id",
+              "user_id",
+              "identity_data",
+              "provider",
+              "last_sign_in_at",
+              "created_at",
+              "updated_at"
+            ]
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "x-faker": "date.recent"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "id",
+        "aud",
+        "role",
+        "email",
+        "phone",
+        "phone_confirmed_at",
+        "confirmation_sent_at",
+        "confirmed_at",
+        "phone_change_sent_at",
+        "last_sign_in_at",
+        "app_metadata",
+        "user_metadata",
+        "identities",
+        "created_at",
+        "updated_at",
+        "is_anonymous"
+      ]
+    },
+    "sms": {
+      "type": "object",
+      "properties": {
+        "otp": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$",
+          "x-faker": {
+            "fake": "{{helpers.replaceSymbols(######)}}"
+          }
+        }
+      },
+      "required": ["otp"]
+    }
+  },
+  "required": ["user", "sms"]
+}
+```
+
+</TabPanel>
+</Tabs>
+
+**Outputs**
+
+- No outputs are required. An empty response with a status code of 200 is taken as a successful response.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql-send-message-via-job-queue"
+>
+<TabPanel id="sql-send-message-via-job-queue" label="Queue SMS Messages">
+
+Your company uses a worker to manage all messaging related jobs. For performance reasons, the messaging system sends messages in intervals via a job queue. Instead of sending a message immediately, messages are queued and sent in periodic intervals via `pg_cron`.
+
+Create a table to store jobs
+
+```sql
+create table job_queue (
+  job_id uuid primary key default gen_random_uuid(),
+  job_data jsonb not null,
+  created_at timestamp default now(),
+  status text default 'pending',
+  priority int default 0,
+  retry_count int default 0,
+  max_retries int default 2,
+  scheduled_at timestamp default now()
+);
+```
+
+Create the hook:
+
+```sql
+create or replace function send_sms(event jsonb) returns void as $$
+declare
+    job_data jsonb;
+    scheduled_time timestamp;
+    priority int;
+begin
+    -- extract phone and otp from the event json
+    job_data := jsonb_build_object(
+        'phone', event->'user'->>'phone',
+        'otp', event->'sms'->>'otp'
+    );
+
+    -- calculate the nearest 5-minute window for scheduled_time
+    scheduled_time := date_trunc('minute', now()) + interval '5 minute' * floor(extract('epoch' from (now() - date_trunc('minute', now())) / 60) / 5);
+
+    -- assign priority dynamically (example logic: higher priority for earlier scheduled time)
+    priority := extract('epoch' from (scheduled_time - now()))::int;
+
+    -- insert the job into the job_queue table
+    insert into job_queue (job_data, priority, scheduled_at, max_retries)
+    values (job_data, priority, scheduled_time, 2);
+end;
+$$ language plpgsql;
+
+grant all
+  on table public.job_queue
+  to supabase_auth_admin;
+
+revoke all
+  on table public.job_queue
+  from authenticated, anon;
+```
+
+Create a function to periodically run and dequeue all jobs
+
+```sql
+create or replace function dequeue_and_run_jobs() returns void as $$
+declare
+    job record;
+begin
+    for job in
+        select * from job_queue
+        where status = 'pending'
+          and scheduled_at <= now()
+        order by priority desc, created_at
+        for update skip locked
+    loop
+        begin
+            -- add job processing logic here.
+            -- for demonstration, we'll just update the job status to 'completed'.
+            update job_queue
+            set status = 'completed'
+            where job_id = job.job_id;
+
+        exception when others then
+            -- handle job failure and retry logic
+            if job.retry_count < job.max_retries then
+                update job_queue
+                set retry_count = retry_count + 1,
+                    scheduled_at = now() + interval '1 minute'  -- delay retry by 1 minute
+                where job_id = job.job_id;
+            else
+                update job_queue
+                set status = 'failed'
+                where job_id = job.job_id;
+            end if;
+        end;
+    end loop;
+end;
+$$ language plpgsql;
+
+grant execute
+  on function public.dequeue_and_run_jobs
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.dequeue_and_run_jobs
+  from authenticated, anon;
+```
+
+Configure `pg_cron` to run the job on an interval. You can use a tool like [crontab.guru](https://crontab.guru/) to check that your job is running on an appropriate schedule. Ensure that `pg_cron` is enabled under `Database > Extensions`
+
+```sql
+select
+  cron.schedule(
+    '* * * * *', -- this cron expression means every minute.
+    'select dequeue_and_run_jobs();'
+  );
+```
+
+</TabPanel>
+</Tabs>
+</TabPanel>
+<TabPanel id="http" label="HTTP">
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="http-alternate-message-provider"
+>
+<TabPanel id="http-alternate-message-provider" label="Alternate message provider">
+Your company would like to use an alternate message provider. Some examples of alternate message providers include [Msg91](https://msg91.com/) for India and [Africa's Talking](https://africastalking.com/). The example uses Twilio as it is widely available and does not require a regional number.
+
+```javascript
+import { Webhook } from 'https://esm.sh/standardwebhooks@1.0.0'
+import { readAll } from 'https://deno.land/std/io/read_all.ts'
+import { Twilio } from 'https://cdn.skypack.dev/twilio'
+import * as base64 from 'https://denopkg.com/chiefbiiko/base64/mod.ts'
+
+const accountSid: string | undefined = Deno.env.get('TWILIO_ACCOUNT_SID')
+const authToken: string | undefined = Deno.env.get('TWILIO_AUTH_TOKEN')
+const fromNumber: string = Deno.env.get('TWILIO_PHONE_NUMBER')
+
+const sendTextMessage = async (
+  messageBody: string,
+  accountSid: string | undefined,
+  authToken: string | undefined,
+  fromNumber: string,
+  toNumber: string
+): Promise<any> => {
+  if (!accountSid || !authToken) {
+    console.log('Your Twilio account credentials are missing. Please add them.')
+    return
+  }
+  const url: string = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`
+
+  const encodedCredentials: string = base64.fromUint8Array(
+    new TextEncoder().encode(`${accountSid}:${authToken}`)
+  )
+
+  const body: URLSearchParams = new URLSearchParams({
+    To: `+${toNumber}`,
+    From: fromNumber,
+    // Uncomment when testing with a fixed number
+    Body: messageBody,
+  })
+
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${encodedCredentials}`,
+    },
+    body,
+  })
+
+  return response.json()
+}
+
+Deno.serve(async (req) => {
+  const payload = await req.text()
+  const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+  const headers = Object.fromEntries(req.headers)
+  const wh = new Webhook(base64_secret)
+  try {
+    const { user, sms } = wh.verify(payload, headers)
+    const messageBody = `Your OTP is: ${sms.otp}`
+    const response = await sendTextMessage(
+      messageBody,
+      accountSid,
+      authToken,
+      fromNumber,
+      user.phone
+    )
+    if (response.status !== 'queued') {
+      return new Response(
+        JSON.stringify({
+          error: {
+            http_code: response.code,
+            message: `Failed to send SMS: ${response.message}. More info: ${response.more_info}`,
+          },
+        }),
+        {
+          status: response.status,
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+    }
+    return new Response(
+      {},
+      {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  } catch (error) {
+    return new Response(
+      JSON.stringify({
+        error: {
+          http_code: 500,
+          message: `Failed to send sms: ${JSON.stringify(error)}`,
+        }
+      }),
+      {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+  }
+})
+```
+
+</TabPanel>
+<TabPanel id="http-whatsapp-and-sms-messages" label="Use WhatsApp with SMS">
+
+Your company is expanding into Latin America and would like to use WhatsApp for higher deliverability. Write a hook to send WhatsApp messages to requests from the continent and SMS messages to all other numbers.
+
+```javascript
+import {
+    Webhook
+} from "https://esm.sh/standardwebhooks@1.0.0";
+import {
+    readAll
+} from "https://deno.land/std/io/read_all.ts";
+import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
+
+const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
+const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
+const fromNumber: string = Deno.env.get("TWILIO_WHATSAPP_NUMBER");
+const smsFromNumber: string = Deno.env.get("TWILIO_SMS_NUMBER");
+
+const latinAmericanCountryCodes = ['54', '55', '56', '57', '58', '501', '502', '503', '504', '505', '506', '507', '508', '509', '51', '52', '53', '591', '592', '593', '594', '595', '596', '597', '598', '599'];
+
+const sendMessage = async (
+    messageBody: string,
+    accountSid: string | undefined,
+    authToken: string | undefined,
+    fromNumber: string,
+    toNumber: string,
+    useWhatsApp: boolean,
+): Promise < any > => {
+    if (!accountSid || !authToken) {
+        console.log("Your Twilio account credentials are missing. Please add them.");
+        return;
+    }
+    const url: string = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
+
+    const encodedCredentials: string = base64.fromUint8Array(
+        new TextEncoder().encode(`${accountSid}:${authToken}`),
+    );
+
+    const body: URLSearchParams = new URLSearchParams({
+        To: useWhatsApp ? `whatsapp:${toNumber}` : toNumber,
+        From: useWhatsApp ? `whatsapp:${fromNumber}` : smsFromNumber,
+        Body: messageBody,
+    });
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Authorization": `Basic ${encodedCredentials}`,
+        },
+        body,
+    });
+
+    return response.json();
+};
+
+Deno.serve(async (req) => {
+    const payload = await req.text();
+    const base64_secret = Deno.env.get("SEND_SMS_HOOK_SECRET");
+    const headers = Object.fromEntries(req.headers);
+    const wh = new Webhook(base64_secret);
+    try {
+        const {
+            user,
+            sms
+        } = wh.verify(payload, headers);
+        const messageBody = `Your OTP is: ${sms.otp}`;
+        const userPhoneNumber = user.phone;
+        const countryCode = userPhoneNumber.substring(1, userPhoneNumber.indexOf(userPhoneNumber.match(/\d/)!));
+
+        const useWhatsApp = latinAmericanCountryCodes.includes(countryCode);
+
+        const response = await sendMessage(
+            messageBody,
+            accountSid,
+            authToken,
+            fromNumber,
+            userPhoneNumber,
+            useWhatsApp,
+        );
+
+        if (response.status !== "queued") {
+            return new Response(
+                JSON.stringify({
+                    error: `Failed to send message, Error Code: ${response.code} ${response.message} ${response.more_info}`,
+                }), {
+                    status: response.status,
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                },
+            );
+        }
+        return new Response(
+            JSON.stringify({
+                message: "Message sent successfully."
+            }), {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+    } catch (error) {
+        return new Response(
+            JSON.stringify({
+                error: `Failed to process the request: ${error}`
+            }), {
+                status: 500,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+    }
+});
+```
+
+</TabPanel>
+</Tabs>
+</TabPanel>
+</Tabs>

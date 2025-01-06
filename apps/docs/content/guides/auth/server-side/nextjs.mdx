@@ -74,7 +74,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">What does the `cookies` object do?</span>}
       id="utility-cookies"
     >
@@ -85,11 +85,11 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">Do I need to create a new client for every route?</span>}
       id="client-deduplication"
     >
@@ -99,7 +99,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
         - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
         - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
 </Accordion>
@@ -122,11 +122,11 @@ export function createClient() {
 ```
 
 ```ts utils/supabase/server.ts
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  const cookieStore = await cookies()
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -247,9 +247,11 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
+  // Do not run code between createServerClient and
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
+
+  // IMPORTANT: DO NOT REMOVE auth.getUser()
 
   const {
     data: { user },
@@ -266,8 +268,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
-  // creating a new response object with NextResponse.next() make sure to:
+  // IMPORTANT: You *must* return the supabaseResponse object as it is.
+  // If you're creating a new response object with NextResponse.next() make sure to:
   // 1. Pass the request in it, like so:
   //    const myNewResponse = NextResponse.next({ request })
   // 2. Copy over the cookies, like so:
@@ -337,7 +339,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -357,7 +359,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -378,6 +380,8 @@ export async function signup(formData: FormData) {
 ```
 
 ```ts app/error/page.tsx
+'use client'
+
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
@@ -417,7 +421,7 @@ Since this is a Router Handler, use the Supabase client from `@/utils/supabase/s
 
 ```ts app/auth/confirm/route.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
-import { type NextRequest, NextResponse } from 'next/server'
+import { type NextRequest } from 'next/server'
 
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
@@ -429,7 +433,7 @@ export async function GET(request: NextRequest) {
   const next = searchParams.get('next') ?? '/'
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = await createClient()
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -482,7 +486,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export default async function PrivatePage() {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -580,7 +584,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
   className="text-foreground-light mt-8 mb-6"
 >
   <div className="border-b pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">Why do I need so many types of clients?</span>}
       id="nextjs-clients"
     >
@@ -592,11 +596,11 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
       - **Component** - Runs on the client. Reads cookies from browser storage. Behind the scenes, `createBrowserClient` reuses the same client instance if called multiple times, so don't worry about deduplicating the client yourself.
       - **API route** - Runs on the server. Reads cookies from the request, which is passed through from `NextApiRequest`.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
   <div className="border-b mt-3 pb-3">
-    <Accordion.Item
+    <AccordionItem
       header={<span className="text-foreground">What does the `cookies` object do?</span>}
       id="client-storage-cookies"
     >
@@ -605,7 +609,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 
     The cookie is named `sb-<project_ref>-auth-token` by default.
 
-    </Accordion.Item>
+    </AccordionItem>
 
   </div>
 </Accordion>
@@ -627,7 +631,7 @@ export function createClient({ req, res }: GetServerSidePropsContext) {
     {
       cookies: {
         getAll() {
-          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] || '' }))
         },
         setAll(cookiesToSet) {
           res.setHeader(
@@ -672,7 +676,7 @@ export function createClient() {
 ```
 
 ```ts utils/supabase/api.ts
-import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
+import { createServerClient, serializeCookieHeader } from '@supabase/ssr'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
 export default function createClient(req: NextApiRequest, res: NextApiResponse) {
@@ -682,12 +686,14 @@ export default function createClient(req: NextApiRequest, res: NextApiResponse) 
     {
       cookies: {
         getAll() {
-          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] }))
+          return Object.keys(req.cookies).map((name) => ({ name, value: req.cookies[name] || '' }))
         },
         setAll(cookiesToSet) {
           res.setHeader(
             'Set-Cookie',
-            cookiesToSet.map(({ name, value, options }) => serialize(name, value, options))
+            cookiesToSet.map(({ name, value, options }) =>
+              serializeCookieHeader(name, value, options)
+            )
           )
         },
       },
@@ -785,7 +791,7 @@ If you have email confirmation turned on (the default), a new user will receive 
 
 Change the email template to support a server-side authentication flow.
 
-Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In each email template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
+Go to the [Auth templates](https://supabase.com/dashboard/project/_/auth/templates) page in your dashboard. In the `Confirm signup` template, change `{{ .ConfirmationURL }}` to `{{ .SiteURL }}/api/auth/confirm?token_hash={{ .TokenHash }}&type=signup`.
 
 </StepHikeCompact.Details>
 

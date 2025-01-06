@@ -1,8 +1,8 @@
 'use client'
 
+import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
-import { ChevronRight } from 'react-feather'
 import ReactTooltip from 'react-tooltip'
 
 interface Props {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
 import { useParams } from 'common'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import {
@@ -42,16 +42,19 @@ const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { data } = useProjectApiQuery({ projectRef: ref })
+  const { data: settings } = useProjectSettingsV2Query({ projectRef: ref })
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
 
+  const { anonKey } = getAPIKeys(settings)
   const apikey = showKeys
-    ? data?.autoApiService.defaultApiKey ?? 'SUPABASE_CLIENT_ANON_KEY'
+    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
     : 'SUPABASE_CLIENT_ANON_KEY'
+  const protocol = settings?.app_config?.protocol ?? 'https'
+  const hostEndpoint = settings?.app_config?.endpoint
   const endpoint =
     customDomainData?.customDomain?.status === 'active'
       ? `https://${customDomainData.customDomain?.hostname}`
-      : `https://${data?.autoApiService.endpoint ?? ''}`
+      : `${protocol}://${hostEndpoint ?? ''}`
 
   return (
     <SidePanel

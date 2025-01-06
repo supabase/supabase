@@ -42,7 +42,7 @@ This is all the information you need to connect to Supabase Storage using any S3
           endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
           credentials: {
             accessKeyId: 'your_access_key_id',
-            accessSecretKey: 'your_secret_access_key',
+            secretAccessKey: 'your_secret_access_key',
           }
         })
         ```
@@ -71,7 +71,7 @@ All S3 operations performed with the Session Token are scoped to the authenticat
 To authenticate with S3 using a Session Token, use the following credentials:
 
 - access_key_id: `project_ref`
-- access_secret_key: `anonKey`
+- secret_access_key: `anonKey`
 - session_token: `valid jwt token`
 
 For example, using the `aws-sdk` library:
@@ -89,7 +89,7 @@ const client = new S3Client({
   endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
   credentials: {
     accessKeyId: 'project_ref',
-    accessSecretKey: 'anonKey',
+    secretAccessKey: 'anonKey',
     sessionToken: session.access_token,
   },
 })

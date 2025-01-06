@@ -1,16 +1,15 @@
 'use client'
 
 import * as Accordion from '@radix-ui/react-accordion'
-import { ChevronLeft, ChevronUp } from 'lucide-react'
+import { ChevronUp } from 'lucide-react'
 import Image from 'next/legacy/image'
-import Link from 'next/link'
 import { Fragment, memo } from 'react'
 import { cn } from 'ui'
 import RevVersionDropdown from '~/components/RefVersionDropdown'
-import { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
+import type { ICommonItem, ICommonSection } from '~/components/reference/Reference.types'
 import { menuState, useMenuActiveRefId } from '~/hooks/useMenuState'
 import { BASE_PATH } from '~/lib/constants'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
+import MenuIconPicker from './MenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { deepFilterSections } from './NavigationMenu.utils'
 
@@ -60,7 +59,10 @@ const FunctionLink = memo(function FunctionLink({
         onClick={(e) => {
           e.preventDefault()
           history.pushState({}, '', url)
-          document.getElementById(slug)?.scrollIntoView()
+          const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          document.getElementById(slug)?.scrollIntoView({
+            behavior: reduceMotion ? 'auto' : 'smooth',
+          })
           onClick()
         }}
         className={cn(
@@ -180,24 +182,9 @@ const NavigationMenuRefListItems = ({
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
-      <Link
-        href="/"
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-foreground-light hover:text-brand-600 hover:cursor-pointer',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <ChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Main Menu</span>
-      </Link>
       <div className="flex items-center gap-3 my-3">
-        <HomeMenuIconPicker icon={menu.icon} width={21} height={21} />
+        <MenuIconPicker icon={menu.icon} width={21} height={21} />
         <HeaderLink title={menu.title} url={menu.url} id={id} />
-        <RevVersionDropdown />
       </div>
       <ul className="function-link-list flex flex-col gap-2 pb-5">
         {filteredSections.map((section) => {

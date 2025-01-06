@@ -1,11 +1,10 @@
 import { CheckSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useOrganizationAcceptInvitationMutation } from 'data/organization-members/organization-invitation-accept-mutation'
-import { useOrganizationDeleteInvitationMutation } from 'data/organization-members/organization-invitation-delete-mutation'
 import { useOrganizationInvitationTokenQuery } from 'data/organization-members/organization-invitation-token-query'
 import { useProfile } from 'lib/profile'
 import { ResponseError } from 'types'
@@ -28,25 +27,15 @@ export const OrganizationInvite = () => {
     isError || (isSuccess && (data.token_does_not_exist || data.expired_token || !data.email_match))
 
   const organizationName = data?.organization_name ?? name ?? 'an organization'
-  const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
+  const loginRedirectLink = `/sign-in?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
   const { mutate: joinOrganization, isLoading: isJoining } =
     useOrganizationAcceptInvitationMutation({
       onSuccess: () => {
-        router.push('/')
+        router.push('/projects')
       },
       onError: (error) => {
         toast.error(`Failed to join organization: ${error.message}`)
-      },
-    })
-
-  const { mutate: declineOrganization, isLoading: isDeclining } =
-    useOrganizationDeleteInvitationMutation({
-      onSuccess: () => {
-        router.push('/')
-      },
-      onError: (error) => {
-        toast.error(`Failed to decline invitation: ${error.message}`)
       },
     })
 
@@ -54,12 +43,6 @@ export const OrganizationInvite = () => {
     if (!slug) return console.error('Slug is required')
     if (!token) return console.error('Token is required')
     joinOrganization({ slug, token })
-  }
-
-  async function handleDeclineJoinOrganization() {
-    if (!slug) return console.error('Slug is required')
-    if (!data?.invite_id) return console.error('Invite ID is required')
-    declineOrganization({ slug, id: data.invite_id })
   }
 
   return (
@@ -94,20 +77,15 @@ export const OrganizationInvite = () => {
               isError={isError}
             />
           )}
-          {isSuccess && (
+          {isSuccess && !hasError && (
             <div className="flex flex-row items-center justify-center gap-3">
-              <Button
-                type="default"
-                loading={isDeclining}
-                disabled={isJoining || isDeclining}
-                onClick={handleDeclineJoinOrganization}
-              >
-                Decline
+              <Button type="default" disabled={isJoining} asChild>
+                <Link href="/projects">Decline</Link>
               </Button>
               <Button
                 type="primary"
                 loading={isJoining}
-                disabled={isJoining || isDeclining}
+                disabled={isJoining}
                 onClick={handleJoinOrganization}
                 icon={<CheckSquare />}
               >

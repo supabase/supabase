@@ -2,7 +2,7 @@ import { GeneralSettings as GeneralSettingsLegacy } from 'components/interfaces/
 import OrganizationLayout from 'components/layouts/OrganizationLayout'
 import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from 'types'
 
 const OrgGeneralSettings: NextPageWithLayout = () => {

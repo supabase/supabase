@@ -71,6 +71,18 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+from supabase import create_client
+
+SUPABASE_URL = 'https://<project>.supabase.co'
+SUPABASE_KEY = '<your-anon-key>'
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+```
+
+</TabPanel>
 </Tabs>
 
 ### Sync and track state
@@ -154,6 +166,21 @@ presenceFlow
     .launchIn(yourCoroutineScope) //You can also use .collect { } here
 
 roomOne.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+Listen to the `sync`, `join`, and `leave` events triggered whenever any client joins or leaves the channel or changes their slice of state:
+
+```python
+room_one = supabase.channel('room_01')
+
+room_one
+  .on_presence_sync(lambda: print('sync', room_one.presenceState()))
+  .on_presence_join(lambda key, curr_presences, joined_presences: print('join', key, curr_presences, joined_presences))
+  .on_presence_leave(lambda key, curr_presences, left_presences: print('leave', key, curr_presences, left_presences))
+  .subscribe()
 ```
 
 </TabPanel>
@@ -250,6 +277,26 @@ roomOne.track(userStatus)
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+room_one = supabase.channel('room_01')
+
+user_status = {
+  "user": 'user-1',
+  "online_at": datetime.datetime.now().isoformat(),
+}
+
+def on_subscribe(status, err):
+  if status != RealtimeSubscribeStates.SUBSCRIBED:
+    return
+
+  room_one.track(user_status)
+
+room_one.subscribe(on_subscribe)
+```
+
+</TabPanel>
 </Tabs>
 
 A client will receive state from any other client that is subscribed to the same topic (in this case `room_01`). It will also automatically trigger its own `sync` and `join` event handlers.
@@ -306,6 +353,13 @@ suspend fun untrackPresence() {
 }
 
 untrackPresence()
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+room_one.untrack()
 ```
 
 </TabPanel>
@@ -368,6 +422,19 @@ val channelC = supabase.channel("test") {
         key = "userId-123"
     }
 }
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+channel_c = supabase.channel('test', {
+  "config": {
+    "presence": {
+      "key": 'userId-123',
+    },
+  },
+})
 ```
 
 </TabPanel>

@@ -1,22 +1,20 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { BookOpen, Check, Clipboard, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs/Logs.constants'
+import Table from 'components/to-be-cleaned/Table'
+import { copyToClipboard } from 'lib/helpers'
 import { logConstants } from 'shared-data'
 import {
   Button,
-  IconBookOpen,
-  IconCheck,
-  IconClipboard,
-  IconExternalLink,
-  IconList,
-  IconX,
   SidePanel,
   Tabs,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
-
-import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
-import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
+import { DocsButton } from '../DocsButton'
 
 export interface LogsExplorerHeaderProps {
   subtitle?: string
@@ -33,16 +31,14 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             border-brand-600 bg-brand-300 text-brand
           "
         >
-          <IconList size={14} strokeWidth={3} />
+          <List size={14} strokeWidth={3} />
         </div>
 
         <h1 className="text-2xl text-foreground">Logs Explorer</h1>
         {subtitle && <span className="text-2xl text-foreground-light">{subtitle}</span>}
       </div>
       <div className="flex flex-row gap-2">
-        <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-          <Link href={LOGS_EXPLORER_DOCS_URL}>Documentation</Link>
-        </Button>
+        <DocsButton href={LOGS_EXPLORER_DOCS_URL} />
 
         <SidePanel
           size="large"
@@ -53,7 +49,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 type="text"
                 className="px-1"
                 onClick={() => setShowReference(false)}
-                icon={<IconX size={18} strokeWidth={1.5} />}
+                icon={<X size={18} strokeWidth={1.5} />}
               />
             </div>
           }
@@ -65,7 +61,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <Button
               type="default"
               onClick={() => setShowReference(true)}
-              icon={<IconBookOpen strokeWidth={1.5} />}
+              icon={<BookOpen strokeWidth={1.5} />}
             >
               Field Reference
             </Button>
@@ -84,8 +80,8 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   className="text-brand"
                 >
                   unnesting joins
-                  <IconExternalLink
-                    size="tiny"
+                  <ExternalLink
+                    size={14}
                     className="ml-1 inline -translate-y-[2px]"
                     strokeWidth={1.5}
                   />
@@ -157,43 +153,23 @@ const Field = ({
       >
         <span>{field.path}</span>
         {isCopied ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconCheck size={14} strokeWidth={3} className="text-brand" />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copied</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
+              <Check size={14} strokeWidth={3} className="text-brand" />
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+              Copied
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <IconClipboard size="tiny" strokeWidth={1.5} />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Copy value</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_>
+              <Clipboard size={14} strokeWidth={1.5} />
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+              Copy value
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         )}
       </Table.td>
       <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>

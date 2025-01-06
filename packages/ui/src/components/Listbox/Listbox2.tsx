@@ -4,13 +4,13 @@ import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu'
 import { flatten } from 'lodash'
 import React, { useEffect, useRef, useState } from 'react'
 
+import { Check } from 'lucide-react'
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { useFormContext } from '../Form/FormContext'
-import { IconCheck } from '../Icon/icons/IconCheck'
 import { SelectContext } from './SelectContext'
 
 export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>, 'size'> {
@@ -321,7 +321,7 @@ function SelectOption({
               <span
                 className={cn(__styles.option_check, active ? __styles.option_check_active : '')}
               >
-                <IconCheck className={__styles.option_check_icon} aria-hidden="true" />
+                <Check className={__styles.option_check_icon} aria-hidden="true" />
               </span>
             ) : null}
           </DropdownMenuPrimitive.Item>

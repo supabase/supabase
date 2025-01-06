@@ -40,12 +40,13 @@ const RadioGroupStackedItem = React.forwardRef<
       className={cn(
         'flex flex-col gap-2',
         'w-full',
-        'bg-overlay/50',
+        'bg-overlay/50 disabled:opacity-50',
         'border',
         'first-of-type:rounded-t-lg last-of-type:rounded-b-lg',
         'shadow-sm',
-        'hover:bg-surface-300',
-        'hover:border-foreground-muted',
+        'enabled:hover:bg-surface-300',
+        'enabled:hover:border-foreground-muted',
+        'enabled:cursor-pointer disabled:cursor-not-allowed',
         'hover:z-[1] focus-visible:z-[1]',
         'data-[state=checked]:z-[1]',
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
@@ -59,18 +60,17 @@ const RadioGroupStackedItem = React.forwardRef<
       <div className="flex gap-3 w-full px-[21px] py-3">
         {showIndicator && (
           <div
-            className="
-                aspect-square h-4 w-4 
-                rounded-full border group-data-[state=checked]:border-foreground-muted
-                group-focus:border-foreground-muted
-                group-hover:border-foreground-muted
-                ring-offset-background 
-                group-focus:outline-none 
-                group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2 
-                group-disabled:cursor-not-allowed group-disabled:opacity-50
-                flex items-center justify-center
-                transition
-          "
+            className={cn(
+              'aspect-square h-4 w-4 min-w-4 min-h-4',
+              'rounded-full border group-data-[state=checked]:border-foreground-muted',
+              'group-focus:border-foreground-muted',
+              'group-hover:border-foreground-muted',
+              'ring-offset-background',
+              'group-focus:outline-none',
+              'group-focus-visible:ring-2 group-focus-visible:ring-ring group-focus-visible:ring-offset-2',
+              'flex items-center justify-center',
+              'transition'
+            )}
           >
             <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
               <Circle className="h-2.5 w-2.5 fill-current text-current" />
@@ -85,8 +85,7 @@ const RadioGroupStackedItem = React.forwardRef<
               '-mt-[0.15rem]',
               'text-sm transition-colors text-left',
               'text-light',
-              'group-hover:text-foreground group-data-[state=checked]:text-foreground',
-              props.disabled ? 'cursor-not-allowed' : 'cursor-pointer'
+              'group-hover:text-foreground group-data-[state=checked]:text-foreground'
             )}
           >
             {label}

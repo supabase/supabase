@@ -279,11 +279,11 @@ begin
         ) as request_id;
 
     -- Optionally Log row data or other data for inspection in Supabase Dashboard's Postgres Logs
-    -- (https://supabase.com/dashboard/project/_/logs/postgres-logs)
     raise log 'Logging an entire row as JSON (%)', row_data_var;
 
-    -- return the row data to inspect
+    -- return row data to inspect
     return row_data_var;
+
 -- Handle exceptions here if needed
 exception
     when others then
@@ -309,13 +309,13 @@ order by "created" desc;
 
 ## Configuration
 
-<Admonition type="note" label="Only Self-Hosted Deployments can Modify Configuration Variables">
+<Admonition type="note" label="Must be on pg_net v0.12.0 or above to reconfigure ">
 
-See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for self-hosting instructions.
+Supabase supports reconfiguring pg*net starting from v0.12.0+. For the latest release, initiate a Postgres upgrade in the [Infrastructure Settings](https://supabase.com/dashboard/project/*/settings/infrastructure).
 
 </Admonition>
 
-The extension is configured to execute up to 200 requests per second reliably. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
+The extension is configured to reliably execute up to 200 requests per second. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
 
 ### Get current settings
 
@@ -329,18 +329,11 @@ where "name" like 'pg_net%';
 
 ### Alter settings
 
-Note, that doing `ALTER SYSTEM` requires SUPERUSER but on PostgreSQL >= 15, you can do:
+Change variables:
 
 ```sql
-grant alter system on parameter pg_net.ttl to <role>;
-grant alter system on parameter pg_net.batch_size to <role>;
-```
-
-Then variables can be changed:
-
-```sql
-alter system set pg_net.ttl to '1 hour'
-alter system set pg_net.batch_size to 500;
+alter role "postgres" set pg_net.ttl to '24 hours';
+alter role "postgres" set pg_net.batch_size to 500;
 ```
 
 Then reload the settings and restart the `pg_net` background worker with:
@@ -423,7 +416,7 @@ with "selected_table_rows" as (
         -- Converts all the rows into a JSONB array
         jsonb_agg(to_jsonb(<table_name>.*)) as JSON_payload
     from <table_name>
-    -- Generally good practice to LIMIT the max amount of rows
+    -- good practice to LIMIT the max amount of rows
 )
 select
     net.http_post(
@@ -433,7 +426,7 @@ select
 FROM "selected_table_rows";
 ```
 
-More examples can be seen in the [Extension's GitHub page](https://github.com/supabase/pg_net/)
+More examples can be seen on the [Extension's GitHub page](https://github.com/supabase/pg_net/)
 
 ## Limitations
 
@@ -442,7 +435,7 @@ More examples can be seen in the [Extension's GitHub page](https://github.com/su
 - Can only make POST requests with JSON data. No other data formats are supported
 - Intended to handle at most 200 requests per second. Increasing the rate can introduce instability
 - Does not have support for PATCH/PUT requests
-- Can only work with one database at a time in PostgreSQL. It defaults to the postgres database.
+- Can only work with one database at a time. It defaults to the postgres database.
 
 ## Resources
 

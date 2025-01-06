@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { Content } from 'data/content/content-query'
@@ -39,6 +39,7 @@ export const UpdateCustomReportModal = ({
       projectRef: ref,
       payload: {
         ...selectedReport,
+        owner_id: selectedReport.owner_id!,
         project_id: selectedReport.project_id,
         id: selectedReport.id,
         name: newVals.name,

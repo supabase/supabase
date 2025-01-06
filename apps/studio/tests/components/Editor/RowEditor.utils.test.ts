@@ -1,9 +1,9 @@
-import { vi } from 'vitest'
+import { RowField } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   generateRowObjectFromFields,
   parseValue,
 } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { RowField } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('parseValue', () => {
   it('should return null when originalValue is null', () => {

@@ -1,13 +1,15 @@
 import { isEqual } from 'lodash'
-import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { DocsButton } from 'components/ui/DocsButton'
 import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useHasAccessToProjectLevelPermissions } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -37,17 +39,15 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  WarningIcon,
   cn,
 } from 'ui'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
-import { RolesAccessMatrix } from './RolesAccessMatrix'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
   ProjectRoleConfiguration,
   formatMemberRoleToProjectRoleConfiguration,
 } from './UpdateRolesPanel.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -58,20 +58,18 @@ interface UpdateRolesPanelProps {
 export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelProps) => {
   const { slug } = useParams()
   const organization = useSelectedOrganization()
-  const projectLevelPermissionsEnabled = useFlag('projectLevelPermissions')
+  const isOptedIntoProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const { data: projects } = useProjectsQuery()
   const { data: permissions } = usePermissionsQuery()
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
   const projectScopedRoles = allRoles?.project_scoped_roles ?? []
-  const isEnterprise = subscription?.plan.id === 'enterprise'
 
   const { rolesAddable, rolesRemovable } = useGetRolesManagementPermissions(
-    organization?.id,
+    organization?.slug,
     orgScopedRoles.concat(projectScopedRoles),
     permissions ?? []
   )
@@ -79,7 +77,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showProjectDropdown, setShowProjectDropdown] = useState(false)
-  const [showRolesAccessMatrix, setShowRolesAccessMatrix] = useState(false)
   const [projectsRoleConfiguration, setProjectsRoleConfiguration] = useState<
     ProjectRoleConfiguration[]
   >([])
@@ -156,8 +153,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         projects ?? []
       )
       setProjectsRoleConfiguration(roleConfiguration)
-    } else {
-      setShowRolesAccessMatrix(false)
     }
   }, [visible, isSuccessRoles])
 
@@ -166,36 +161,21 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
       <Sheet open={visible} onOpenChange={() => onClose()}>
         <SheetContent
           showClose={false}
-          size={showRolesAccessMatrix ? 'lg' : 'default'}
-          className={cn(
-            'bg-surface-200 p-0 flex flex-row gap-0',
-            showRolesAccessMatrix ? '!min-w-[1000px]' : '!min-w-[400px]'
-          )}
+          size="default"
+          className={cn('bg-surface-200 p-0 flex flex-row gap-0 !min-w-[400px]')}
         >
-          <div className={cn('flex flex-col grow', showRolesAccessMatrix ? 'w-[48%]' : 'w-full')}>
+          <div className={cn('flex flex-col grow w-full')}>
             <SheetHeader
               className={cn('py-3 flex flex-row justify-between gap-x-4 items-center border-b')}
             >
               <p className="truncate" title={`Manage access for ${member.username}`}>
                 Manage access for {member.username}
               </p>
-              <Tooltip_Shadcn_ delayDuration={100}>
-                <TooltipTrigger_Shadcn_ asChild>
-                  <Button
-                    type="outline"
-                    className="[&>div]:text-foreground-light px-1.5"
-                    icon={!showRolesAccessMatrix ? <PanelLeftClose /> : <PanelRightClose />}
-                    onClick={() => setShowRolesAccessMatrix(!showRolesAccessMatrix)}
-                  />
-                </TooltipTrigger_Shadcn_>
-                <TooltipContent_Shadcn_ side="left">
-                  {showRolesAccessMatrix ? 'Hide' : 'Show'} role permissions
-                </TooltipContent_Shadcn_>
-              </Tooltip_Shadcn_>
+              <DocsButton href="https://supabase.com/docs/guides/platform/access-control" />
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col gap-y-4">
-              {projectLevelPermissionsEnabled && isEnterprise && (
+              {isOptedIntoProjectLevelPermissions && (
                 <div className="flex items-center gap-x-4">
                   <Switch
                     disabled={cannotAddAnyRoles}
@@ -288,22 +268,20 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                               </SelectTrigger_Shadcn_>
                               <SelectContent_Shadcn_>
                                 <SelectGroup_Shadcn_>
-                                  {(orgScopedRoles ?? [])
-                                    .sort((a, b) => sortByObject[a.name] - sortByObject[b.name])
-                                    .map((role) => {
-                                      const canAssignRole = rolesAddable.includes(role.id)
+                                  {(orgScopedRoles ?? []).map((role) => {
+                                    const canAssignRole = rolesAddable.includes(role.id)
 
-                                      return (
-                                        <SelectItem_Shadcn_
-                                          key={role.id}
-                                          value={role.id.toString()}
-                                          className="text-sm"
-                                          disabled={!canAssignRole}
-                                        >
-                                          {role.name}
-                                        </SelectItem_Shadcn_>
-                                      )
-                                    })}
+                                    return (
+                                      <SelectItem_Shadcn_
+                                        key={role.id}
+                                        value={role.id.toString()}
+                                        className="text-sm"
+                                        disabled={!canAssignRole}
+                                      >
+                                        {role.name}
+                                      </SelectItem_Shadcn_>
+                                    )
+                                  })}
                                 </SelectGroup_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
@@ -316,7 +294,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                                   type="text"
                                   disabled={!canRemoveRole}
                                   className="px-1"
-                                  icon={<X size={14} />}
+                                  icon={<X />}
                                   onClick={() => onRemoveProject(project?.ref)}
                                 />
                               </TooltipTrigger_Shadcn_>
@@ -341,7 +319,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 >
                   <PopoverTrigger_Shadcn_ asChild>
                     <Button type="default" className="w-min">
-                      Assign role to project
+                      Add project
                     </Button>
                   </PopoverTrigger_Shadcn_>
                   <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
@@ -398,8 +376,6 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               </Button>
             </SheetFooter>
           </div>
-
-          {showRolesAccessMatrix && <RolesAccessMatrix visible={showRolesAccessMatrix} />}
         </SheetContent>
       </Sheet>
 

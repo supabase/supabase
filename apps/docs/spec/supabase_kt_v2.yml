@@ -28,15 +28,16 @@ functions:
 
       ### OAuth and OTP link verification
 
-      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
-      **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig`
+      [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. 
+
+      **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig` \
       \* If no deeplinks are being used.
 
-      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
+      *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`* 
 
-      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth. Refer to the [Supabase Auth documentation](/docs/guides/auth/social-login/auth-google?platform=android) to learn more.
-      **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
-      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
+      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use [Native Google Auth](/docs/guides/auth/social-login/auth-google?platform=android). \
+      **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically. \
+      **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR. 
 
       You always make your own implementation and use `auth.parseSessionFromFragment(fragment)` or `auth.parseSessionFromUrl(url)` to let [supabase-kt](https://github.com/supabase-community/supabase-kt) handle the parsing after receiving a callback.
       Then you can simply use `auth.importSession(session)`.
@@ -420,9 +421,9 @@ functions:
     title: 'Create data: insert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.insert'
     notes: |
+      Perform an INSERT into the table or view.
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
-      - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
-      This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
+      - By default, `insert` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value # This function has two signatures: "value: T" and "values: List<T>"
         isOptional: false
@@ -467,8 +468,10 @@ functions:
   - id: update
     title: 'Modify data: update()'
     notes: |
+      Perform an UPDATE on the table or view.
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+      - By default, `update` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value
         type: T or PostgrestUpdate.() -> Unit = {}
@@ -567,10 +570,12 @@ functions:
     title: 'Upsert data: upsert()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.upsert'
     notes: |
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
       - Primary keys should be included in the data payload in order for an update to work correctly.
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+      - By default, `upsert` will not return the inserted data. If you want to return the inserted data, you can use the `select()` method inside the request.
     params:
       - name: value # This function has two signatures: "value: T" and "values: List<T>"
         isOptional: false
@@ -601,6 +606,16 @@ functions:
           val toUpsert = Message(id = 3, message = "foo", username = "supabot")
           supabase.from("messages").upsert(toUpsert)
           ```
+      - id: upsert-your-data-and-return
+        name: Upsert your data and return it
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val toUpsert = Message(id = 3, message = "foo", username = "supabot")
+          val message = supabase.from("messages").upsert(toUpsert) {
+              select()
+          }.decodeSingle<Message>()
+          ```
       - id: upserting-into-tables-with-constraints
         name: Upserting into tables with constraints
         description: |
@@ -628,12 +643,14 @@ functions:
     title: 'Delete data: delete()'
     $ref: '@supabase/postgrest-js."lib/PostgrestQueryBuilder".PostgrestQueryBuilder.delete'
     notes: |
+      Perform a DELETE on the table or view.
       - `delete()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to target the item(s) you wish to delete.
       - If you use `delete()` with filters and you have
         [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - By default, `delete` will not return the deleted data. If you want to return the deleted data, you can use the `select()` method inside the request.
     params:
       - name: request
         isOptional: true
@@ -2163,7 +2180,7 @@ functions:
           with advanced operators.
 
           - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
-          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by `<->` operators, as if processed by phraseto_tsquery.
           - `OR`: the word “or” will be converted to the | operator.
           - `-`: a dash will be converted to the ! operator.
 
@@ -3546,7 +3563,7 @@ functions:
         code: |
           ```kotlin
           supabase.auth.linkIdentity(OAuthProvider)
-          
+
           //Example:
           supabase.auth.linkIdentity(Google)
           ```
@@ -3575,10 +3592,10 @@ functions:
           ```kotlin
           //get all identities linked to a user
           val identities = supabase.auth.currentIdentitiesOrNull() ?: emptyList()
-          
+
           //find the google identity linked to the user
           val googleIdentity = identities.first { it.provider == "google" }
-          
+
           //unlink the google identity from the user
           supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
           ```
@@ -3745,36 +3762,54 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
     notes: |
       Enrolls a new factor.
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Use `FactorType.TOTP` or `FactorType.Phone` as the factorType and use the returned id to create a challenge.
       - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.createChallengeAndVerify()`](/docs/reference/kotlin/auth-mfa-challengeandverify).
     params:
       - name: factorType
         isOptional: false
-        type: FactorType<R>
-        description: The type of MFA factor to enroll. Currently only supports `FactorType.TOTP`.
+        type: FactorType<C, R>
+        description: The type of MFA factor to enroll. Currently supports `FactorType.TOTP` and `FactorType.Phone`.
       - name: issuer
         isOptional: true
         type: String?
         description: Domain which the user is enrolling with.
-      - name: friendlyName
+      - name: config
         isOptional: true
-        type: String?
-        description: Human readable name assigned to a device.
+        type: Config.() -> Unit
+        description: Factor type specific configuration.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
         isSpotlight: true
         code: |
           ```kotlin
-          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP)
+          val factor = supabase.auth.mfa.enroll(factorType = FactorType.TOTP, friendlyName = "Your friendly Name") {
+                // Optional
+                issuer = "example.com"
+          }
 
           // Use the id to create a challenge.
           // The challenge can be verified by entering the code generated from the authenticator app.
           // The code will be generated upon scanning the qr_code or entering the secret into the authenticator app.
           val (id, type, qrCode) = factor.data //qrCode is a svg as a string
           val (factorId, factorType, _) = factor
+          val challenge = supabase.auth.mfa.createChallenge(factor.id)
+          ```
+      - id: enroll-phone-factor
+        name: Enroll a Phone Factor
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val factor = supabase.auth.mfa.enroll(factorType = FactorType.Phone, friendlyName = "Your friendly Name") {
+                phone = "+123456789" 
+          }
+
+          // Use the id to create a challenge and send an SMS with a code to the user.
+          val (phone) = factor.data
+          val (factorId, factorType, _) = factor
+          val challenge = supabase.auth.mfa.createChallenge(factor.id)
           ```
       - id: get-local-verified-factors
         name: Check the local user for verified factors
@@ -3797,11 +3832,16 @@ functions:
       Creates a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+      - A phone factor sends a code to the user upon challenge. The channel defaults to `Phone.Channel.SMS` unless otherwise specified.
     params:
       - name: factorId
         isOptional: false
         type: String
         description: The id of the MFA factor you want to create a challenge for.
+      - name: channel
+        isOptional: true
+        type: Phone.Channel?
+        description: The channel to send the challenge to. Defaults to `Phone.Channel.SMS`.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -3851,6 +3891,7 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       Creates and verifies a challenge for a factor.
+      - Creating and verifying a challenge in a single step is not supported by the `Phone` factor type.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
     params:
@@ -3916,18 +3957,18 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val enabled = supabase.auth.mfa.isMfaEnabled
+          val (enabled, _) = supabase.auth.mfa.status
           //flow variant, automatically emitting new values on session changes
-          val enabledFlow = supabase.auth.mfa.isMfaEnabledFlow
+          val statusFlow = supabase.auth.mfa.statusFlow
           ```
       - id: aal-enabled-for-current-session
         name: Check whether the user is logged in using AAL2
         isSpotlight: true
         code: |
           ```kotlin
-          val loggedInUsingMfa = supabase.auth.mfa.loggedInUsingMfa
+          val (_, active) = supabase.auth.mfa.status
           //flow variant, automatically emitting new values on session changes
-          val loggedInUsingMfaFlow = supabase.auth.mfa.loggedInUsingMfaFlow
+          val statusFlow = supabase.auth.mfa.statusFlow
           ```
   - id: admin-api
     title: 'Overview'
@@ -4221,51 +4262,51 @@ functions:
     notes: |
       Updates the user data.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to update.
-        - name: builder
-          isOptional: false
-          type: AdminUserUpdateBuilder.() -> Unit
-          description: The builder to update the user.
-          subContent:
-            - name: email
-              isOptional: true
-              type: String
-              description: The new email.
-            - name: phone
-              isOptional: true
-              type: String
-              description: The new phone number.
-            - name: password
-              isOptional: true
-              type: String
-              description: The new password.
-            - name: userMetadata
-              isOptional: true
-              type: JsonObject?
-              description: Custom user metadata.
-            - name: appMetadata
-              isOptional: true
-              type: JsonObject?
-              description: Custom app metadata.
-            - name: emailConfirm
-              isOptional: true
-              type: Boolean
-              description: Whether to confirm the user's email.
-            - name: phoneConfirm
-              isOptional: true
-              type: Boolean
-              description: Whether to confirm the user's phone number.
-            - name: banDuration
-              isOptional: true
-              type: String
-              description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
-            - name: role
-              isOptional: true
-              type: String
-              description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to update.
+      - name: builder
+        isOptional: false
+        type: AdminUserUpdateBuilder.() -> Unit
+        description: The builder to update the user.
+        subContent:
+          - name: email
+            isOptional: true
+            type: String
+            description: The new email.
+          - name: phone
+            isOptional: true
+            type: String
+            description: The new phone number.
+          - name: password
+            isOptional: true
+            type: String
+            description: The new password.
+          - name: userMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom user metadata.
+          - name: appMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom app metadata.
+          - name: emailConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to confirm the user's email.
+          - name: phoneConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to confirm the user's phone number.
+          - name: banDuration
+            isOptional: true
+            type: String
+            description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+          - name: role
+            isOptional: true
+            type: String
+            description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -4330,10 +4371,10 @@ functions:
     notes: |
       Lists all factors associated to a user.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to list factors for.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to list factors for.
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -4347,14 +4388,14 @@ functions:
     notes: |
       Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
     params:
-        - name: uid
-          isOptional: false
-          type: String
-          description: The id of the user you want to delete a factor for.
-        - name: factorId
-          isOptional: false
-          type: String
-          description: The id of the factor you want to delete.
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to delete a factor for.
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the factor you want to delete.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
@@ -4371,22 +4412,22 @@ functions:
     notes: |
       - Requires an Authorization header.
     params:
-        - name: function
-          isOptional: false
-          type: String
-          description: The name of the function to invoke.
-        - name: body
-          isOptional: true
-          type: T
-          description: The body to send with the request. T can be any serializable type.
-        - name: region
-          isOptional: true
-          type: FunctionRegion
-          description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
-        - name: headers
-          isOptional: true
-          type: Headers
-          description: The headers to send with the request.
+      - name: function
+        isOptional: false
+        type: String
+        description: The name of the function to invoke.
+      - name: body
+        isOptional: true
+        type: T
+        description: The body to send with the request. T can be any serializable type.
+      - name: region
+        isOptional: true
+        type: FunctionRegion
+        description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
+      - name: headers
+        isOptional: true
+        type: Headers
+        description: The headers to send with the request.
     examples:
       - id: basic-invocation
         name: Basic invocation
@@ -4548,7 +4589,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           //if you want more control and want to receive the raw data, use the `presenceChangeFlow` method
           val presenceFlow = channel.presenceDataFlow<PresenceState>() 
 
@@ -4594,11 +4635,11 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           //This flow will automatically emit the initial data of all messages (which can be restricted by specifying a filter) and then listens for updates.
           //The data is cached automatically by the primary key you specify
           val users: Flow<List<User>> = channel.postgresListDataFlow(schema = "public", table = "users", primaryKey = User::id)
-          
+
           //If you want more control and want to receive the raw data use the `postgresChangeFlow` method:
           val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
               table = "users"
@@ -4652,7 +4693,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
               table = "users"
           }
@@ -4679,7 +4720,7 @@ functions:
           val channel = supabase.channel("channelId") {
               //optional config
           }
-          
+
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
           }
@@ -4698,13 +4739,13 @@ functions:
           val channel = supabase.channel("channelId") {
              //optional config
           }
-          
+
           //This flow will automatically emit the user's initial data and then emits new values on update. The flow ends on deletion
           val user: Flow<User> = channel.postgresSingleDataFlow(schema = "public", table = "users", primaryKey = User::id) {
               //This is the same filter as used in postgrest, so you could use complex queries, but only one entry is fetched
               eq("id", 1)
           }
-          
+
           //If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
@@ -4901,10 +4942,10 @@ functions:
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     params:
-        - name: bucketId
-          isOptional: false
-          type: String
-          description: The id of the bucket you want to empty.
+      - name: bucketId
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4922,10 +4963,10 @@ functions:
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
     params:
-        - name: bucketId
-          isOptional: false
-          type: String
-          description: The id of the bucket you want to delete.
+      - name: bucketId
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket

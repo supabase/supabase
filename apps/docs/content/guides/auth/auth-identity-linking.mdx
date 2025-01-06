@@ -65,6 +65,15 @@ supabase.auth.linkIdentity(Google)
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+Supabase Auth allows a user to initiate identity linking with a different email address when they are logged in. To link an OAuth identity to the user, call [`link_identity()`](/docs/reference/python/auth-linkidentity):
+
+```python
+response = supabase.auth.link_identity({'provider': 'google'})
+```
+
+</TabPanel>
 </Tabs>
 
 In the example above, the user will be redirected to Google to complete the OAuth2.0 flow. Once the OAuth2.0 flow has completed successfully, the user will be redirected back to the application and the Google identity will be linked to the user. You can enable manual linking from your project's authentication [configuration options](/dashboard/project/_/settings/auth) or by setting the environment variable `GOTRUE_SECURITY_MANUAL_LINKING_ENABLED: true` when self-hosting.
@@ -145,4 +154,31 @@ supabase.auth.unlinkIdentity(googleIdentity.identityId!!)
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+You can use [`get_user_identities()`](/docs/reference/python/auth-getuseridentities) to fetch all the identities linked to a user. Then, call [`unlink_identity()`](/docs/reference/python/auth-unlinkidentity) to unlink the identity. The user needs to be logged in and have at least 2 linked identities in order to unlink an existing identity.
+
+```python
+# retrieve all identities linked to a user
+response = supabase.auth.get_user_identities()
+
+# find the google identity linked to the user
+google_identity = next((identity for identity in response.identities if identity.provider == 'google'), None)
+
+# unlink the google identity from the user
+if google_identity:
+    response = supabase.auth.unlink_identity(google_identity.identity_id)
+```
+
+</TabPanel>
 </Tabs>
+
+## Frequently asked questions
+
+### How to add email/password login to an OAuth account?
+
+Call the `updateUser({ password: 'validpassword'})` to add email with password authentication to an account created with an OAuth provider (Google, GitHub, etc.).
+
+### Can you sign up with email if already using OAuth?
+
+If you try to create an email account after previously signing up with OAuth using the same email, you'll receive an obfuscated user response with no verification email sent. This prevents user enumeration attacks.

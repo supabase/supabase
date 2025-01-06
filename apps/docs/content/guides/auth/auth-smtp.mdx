@@ -1,38 +1,142 @@
 ---
 id: 'auth-smtp'
-title: 'Configure a Custom SMTP'
+title: 'Send emails with custom SMTP'
 description: 'Moving towards production: Configuring a custom SMTP provider'
 ---
 
-## Auth SMTP
+If you're using Supabase Auth with the following configuration:
 
-At present, you can trial the Supabase platform by sending up to **3** emails per hour via the built-in service. The default email service as a whole is offered on a best effort basis: we will do our best to maintain it and will review usage of the service on a regular basis to see if the email service should be continued.
+- Email and password accounts
+- Passwordless accounts using one-time passwords or links sent over email (OTP, magic link, invites)
+- Email-based user invitations from the [Users page](/dashboard/project/_/auth/users) or from the Auth admin APIs
+- Social login with email confirmation
 
-As you progress toward production, you may find yourself wanting for a custom SMTP service in order to increase your limits. A custom SMTP server will allow you to set your own cap on the number of emails sent per hour.
+You will need to set up a custom SMTP server to handle the delivery of messages to your users.
 
-Beyond rate limits, an SMTP server might also help with:
+To get you started and let you explore and set up email message templates for your application, Supabase provides a simple SMTP server for all projects. This server imposes a few important restrictions and is not meant for production use.
 
-- Deliverability and Reputation Management
-- Scalability
-- Analytics and Tracking
-- Compliance and Anti Spam measures
+**Send messages only to pre-authorized addresses.**
 
-## How to set up SMTP
+Unless you configure a custom SMTP server for your project, Supabase Auth will refuse to deliver messages to addresses that are not part of the project's team. You can manage this in the [Team tab](/dashboard/org/_/team) of the organization's settings.
 
-Head over to [Auth Settings Page](https://supabase.com/dashboard/project/_/settings/auth) and hit "Enable Custom SMTP" under the SMTP Provider section.
+For example, if your project's organization has these member accounts `person-a@example.com`, `person-b@example.com` and `person-c@example.com` then Supabase Auth will only send messages to these addresses. All other addresses will fail with the error message _Email address not authorized._
 
-Fill in fields below with the relevant details obtained from your custom SMTP provider:
+**Significant rate-limits that can change over time.**
 
-![SMTP settings](/docs/img/guides/auth-smtp/smtp.png)
+To maintain the health and reputation of the default SMTP sending service, the number of messages your project can send is limited and can change without notice. Currently this value is set to <SharedData data="config">auth.rate_limits.email.inbuilt_smtp_per_hour</SharedData> messages per hour.
 
-## How to update email rate limits
+**No SLA guarantee on message delivery or uptime for the default SMTP service.**
 
-After adding a custom SMTP provider, you can head over to [Auth > Rate Limits](https://supabase.com/dashboard/project/_/auth/rate-limits) to configure the rate limits for sending emails.
+The default SMTP service is provided as best-effort only and intended for the following non-production use cases:
 
-### SMTP providers
+- Exploring and getting started with Supabase Auth
+- Setting up and testing email templates with the members of the project's team
+- Building toy projects, demos or any non-mission-critical application
 
-You can use Supabase Auth with any major SMTP provider of your choosing. Some SMTP providers you could consider using are:
+We urge all customers to set up custom SMTP server for all other use cases.
 
-- [Twilio SendGrid](https://docs.sendgrid.com/for-developers/sending-email/integrating-with-the-smtp-api)
+## How to set up a custom SMTP server?
+
+Supabase Auth works with any email sending service that supports the SMTP protocol. First you will need to choose a service, create an account (if you already do not have one) and obtain the SMTP server settings and credentials for your account. These include: the SMTP server host, port, user and password. You will also need to choose a default From address, usually something like `no-reply@example.com`.
+
+A non-exhaustive list of services that work with Supabase Auth is:
+
+- [Resend](https://resend.com/docs/send-with-supabase-smtp)
 - [AWS SES](https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html)
-- [Resend](https://resend.com/docs/dashboard/emails/introduction)
+- [Postmark](https://postmarkapp.com/developer/user-guide/send-email-with-smtp)
+- [Twilio SendGrid](https://www.twilio.com/docs/sendgrid/for-developers/sending-email/getting-started-smtp)
+- [ZeptoMail](https://www.zoho.com/zeptomail/help/smtp-home.html)
+- [Brevo](https://help.brevo.com/hc/en-us/articles/7924908994450-Send-transactional-emails-using-Brevo-SMTP)
+
+Once you've set up your account with an email sending service, head to the [Authentication settings page](/dashboard/project/_/settings/auth) to enable and configure custom SMTP.
+
+Once you save these settings, your project's Auth server will send messages to all addresses. To protect the reputation of your newly set up service a low rate-limit of 30 messages per hour is imposed. To adjust this to an acceptable value for your use case head to the [Rate Limits configuration page](/dashboard/project/_/auth/rate-limits).
+
+## Dealing with abuse: How to maintain the sending reputation of your SMTP server?
+
+As you make your application known to the public and it grows in popularity, you can expect to see a few types of abuse that can negatively impact the reputation of your sending domain.
+
+A common source of abuse is bots or attackers signing up users to your application.
+
+They use lists of known email addresses to sign up users to your project with pre-determined passwords. These can vary in scale and intensity: sometimes the bots slowly send sign up requests over many months, or they send a lot of requests at once.
+
+Usually the goal for this behavior is:
+
+- To negatively affect your email sending reputation, after which they might ask for a ransom promising to stop the behavior.
+- To cause a short-term or even long-term Denial of Service attack on your service, by preventing new account creation, sign ins with magic links or one-time passwords, or to severely impact important security flows in your application (such as reset password or forgot password).
+- To force you to reduce the security posture of your project, such as by disabling email confirmations. At that point, they may target specific or a broad number of users by creating an account in their name. Then they can use social engineering techniques to trick them to use your application in such a way that both attacker and victim have access to the same account.
+
+Mitigation strategies:
+
+- [Configure CAPTCHA protection](/docs/guides/auth/auth-captcha) for your project, which is the most effective way to control bots in this scenario. You can use CAPTCHA services which provide invisible challenges where real users won't be asked to solve puzzles most of the time.
+- Prefer social login (OAuth) or SSO with SAML instead of email-based authentication flows in your apps.
+- Prefer passwordless authentication (one-time password) as this limits the attacker's value to gain from this behavior.
+- Do not disable email confirmations under pressure.
+
+### Additional best practices
+
+**Set up and maintain DKIM, DMARC and SPF configurations.**
+
+Work with your email sending service to configure [DKIM, DMARC and SPF](https://www.cloudflare.com/learning/email-security/dmarc-dkim-spf/) for your sending domain. This will significantly increase the deliverability of your messages.
+
+**Set up a custom domain.**
+
+Authentication messages often contain links to your project's Auth server. [Setting up a custom domain](/docs/guides/platform/custom-domains) will reduce the likelihood of your messages being picked up as spam due to another Supabase project's bad reputation.
+
+**Don't mix Auth emails with marketing emails.**
+
+Use separate services for Auth and marketing messages. If the reputation of one falls, it won't affect your whole application or operation.
+
+This includes:
+
+- Use a separate sending domain for authentication -- `auth.example.com` and a separate domain for marketing `marketing.example.com`.
+- Use a separate From address -- `no-reply@auth.example.com` vs `no-reply@marketing.example.com`.
+
+**Have another SMTP service set up on stand-by.**
+
+In case the primary SMTP service you're using is experiencing difficulty, or your account is under threat of being blocked due to spam, you have another service to quickly turn to.
+
+**Use consistent branding and focused content.**
+
+Make sure you've separated out authentication messages from marketing messages.
+
+- Don't include promotional content as part of authentication messages.
+- Avoid talking about what your application is inside authentication messages. This can be picked up by automated spam filters which will classify the message as marketing and increase its chances of being regarded as spam. This problem is especially apparent if your project is related to: Web3, Blockchain, AI, NFTs, Gambling, Pornography.
+- Avoid taglines or other short-form marketing material in authentication messages.
+- Reduce the number of links and call-to-actions in authentication messages.
+- Change the authentication messages templates infrequently. Prefer a single big change over multiple smaller changes.
+- Avoid A/B testing content in authentication messages.
+- Use a separate base template (HTML) from your marketing messages.
+- Avoid the use of email signatures in authentication messages. If you do, make sure the signatures are different in style and content from your marketing messages.
+- Use short and to-the-point subject lines. Avoid or reduce the number of emojis in subjects.
+- Reduce the number of images placed in authentication messages.
+- Avoid including user-provided data such as names, usernames, email addresses or salutations in authentication messages. If you do, make sure they are sanitized.
+
+**Prepare for large surges ahead of time.**
+
+If you are planning on having a large surge of users coming at a specific time, work with your email sending service to adjust the rate limits and their expectations accordingly. Most email sending services dislike spikes in the number of messages being sent, and this may affect your sending reputation.
+
+Consider implementing additional protections for such events:
+
+- Build a queuing or waitlist system instead of allowing direct sign-up, which will help you control the number of messages being sent from the email sending service.
+- Disable email-based sign ups for the event and use social login only. Alternatively you can deprioritize the email-based sign-up flows for the event by hiding them in the UI or making them harder to reach.
+
+**Use the Send Email Auth Hook for more control.**
+
+If you need more control over the sending process, instead of using a SMTP server you can use the [Send Email Auth Hook](/docs/guides/auth/auth-hooks/send-email-hook). This can be useful in advanced scenarios such as:
+
+- You want to use React or a different email templating engine.
+- You want to use an email sending service that does not provide an SMTP service, or the non-SMTP API is more powerful.
+- You want to queue up messages instead of sending them immediately, in an effort to smooth out spikes in email sending or do additional filtering (avoid repetitive messages).
+- You want to use multiple email sending services to increase reliability (if primary service is unavailable, use backup service automatically).
+- You want to use different email sending services based on the email address or user data (e.g. service A for users in the USA, service B for users in the EU, service C for users in China).
+- You want to add or include additional email headers in messages, for tracking or other reasons.
+- You want to add attachments to the messages (generally not recommended).
+- You want to add [S/MIME signatures](https://en.wikipedia.org/wiki/S/MIME) to messages.
+- You want to use an email server not open to the Internet, such as some corporate or government mail servers.
+
+**Increase the duration of user sessions.**
+
+Having short lived [user sessions](/docs/guides/auth/sessions) can be problematic for email sending, as it forces active users to sign-in frequently, increasing the number of messages needed to be sent. Consider increasing the maximum duration of user sessions. If you do see an unnecessary increase in logins without a clear cause, check your frontend application for bugs.
+
+If you are using a [SSR](/docs/guides/auth/server-side) framework on the frontend and are seeing an increased number of user logins without a clear cause, check your set up. Make sure to keep the `@supabase/ssr` package up to date and closely follow the guides we publish. Make sure that the middleware components of your SSR frontend works as intended and matches the guides we've published. Sometimes a misplaced `return` or conditional can cause early session termination.

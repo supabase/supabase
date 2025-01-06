@@ -1,15 +1,15 @@
-import Link from 'next/link'
 import Image from 'next/legacy/image'
-import { useRouter } from 'next/router'
-import { IconChevronRight, IconArrowLeft } from '~/../../packages/ui'
-import { REFERENCES } from './NavigationMenu/NavigationMenu.constants'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { REFERENCES } from '~/content/navigation.references'
 
-import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 import * as Accordion from '@radix-ui/react-accordion'
+import { ArrowLeft, ChevronRight } from 'lucide-react'
+import { NavMenuGroup, NavMenuSection } from './Navigation.types'
 
 const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
-  const { asPath } = useRouter()
-  const pathSegments = asPath.split('/')
+  const pathname = usePathname()
+  const pathSegments = pathname.split('/')
 
   const isInReferencePages = pathSegments.includes('reference') && pathSegments.length >= 3
   const referenceMeta = pathSegments.length >= 3 ? REFERENCES[pathSegments[2]] : undefined
@@ -18,11 +18,11 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     const foundItem = group.items.find((section) => {
       if (section.items.length > 0) {
         const foundSubItem = section.items.find((item) => {
-          if (item.url === asPath) return item
+          if (item.url === pathname) return item
         })
         if (foundSubItem) return section
       } else {
-        if (section.url === asPath) return section
+        if (section.url === pathname) return section
       }
     })
     if (foundItem) return group
@@ -35,7 +35,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
             return undefined
           } else {
             return section.items.find((item) => {
-              if (item.url === asPath) return item
+              if (item.url === pathname) return item
             })
           }
         })
@@ -43,14 +43,14 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
 
   return (
     <div
-      className="bg-background border-muted sidebar-width sticky top-16
+      className="bg-background border-muted sidebar-width sticky top-44
       h-screen overflow-y-scroll border-r py-8 px-6 sidebar-menu-container hidden lg:block"
     >
       {isInReferencePages && (
         <>
           <Link href="/reference">
             <div className="flex items-center space-x-4 opacity-75 hover:opacity-100 transition">
-              <IconArrowLeft size={16} strokeWidth={2} className="text-foreground" />
+              <ArrowLeft size={16} strokeWidth={2} className="text-foreground" />
               <span className="text-sm text-foreground">All Reference Docs</span>
             </div>
           </Link>
@@ -79,7 +79,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 className={[
                   'py-1.5 px-5 rounded text-sm transition',
                   `${
-                    item.url === asPath
+                    item.url === pathname
                       ? 'bg-background text-brand-link'
                       : 'text-foreground-light hover:text-foreground'
                   }`,
@@ -100,7 +100,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
           {menuItems.map((group: NavMenuGroup) => (
             <Accordion.Item key={group.label} value={group.label}>
               <Accordion.Trigger className="w-full flex items-center space-x-2 py-1.5">
-                <IconChevronRight
+                <ChevronRight
                   className="transition text-foreground-lighter data-open-parent:rotate-90"
                   size={14}
                   strokeWidth={2}
@@ -118,7 +118,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           className={[
                             'py-1.5 px-5 rounded text-sm transition',
                             `${
-                              section.url === asPath
+                              section.url === pathname
                                 ? 'bg-background text-brand'
                                 : 'text-foreground-light hover:text-foreground'
                             }`,
@@ -139,7 +139,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                       >
                         <Accordion.Item value={section.name}>
                           <Accordion.Trigger className="flex items-center space-x-2 px-4 py-1.5">
-                            <IconChevronRight
+                            <ChevronRight
                               className="transition text-foreground-lighter data-open-parent:rotate-90"
                               size={14}
                               strokeWidth={2}
@@ -156,7 +156,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                                   className={[
                                     'py-1.5 ml-4 px-5 rounded text-sm transition',
                                     `${
-                                      item.url === asPath
+                                      item.url === pathname
                                         ? 'bg-background text-brand'
                                         : 'text-foreground-light hover:text-foreground'
                                     }`,

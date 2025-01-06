@@ -1,7 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'

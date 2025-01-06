@@ -1,3 +1,6 @@
+import { LOCAL_STORAGE_KEYS } from './constants'
+import { makeRandomString } from './helpers'
+
 const GITHUB_INTEGRATION_APP_NAME =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
     ? `supabase`
@@ -34,8 +37,15 @@ export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize'
       ? document.documentElement.clientHeight
       : screen.height
 
-  const windowUrl =
-    type === 'install' ? GITHUB_INTEGRATION_INSTALLATION_URL : GITHUB_INTEGRATION_AUTHORIZATION_URL
+  let windowUrl
+  if (type === 'install') {
+    windowUrl = GITHUB_INTEGRATION_INSTALLATION_URL
+  } else if (type === 'authorize') {
+    const state = makeRandomString(32)
+    localStorage.setItem(LOCAL_STORAGE_KEYS.GITHUB_AUTHORIZATION_STATE, state)
+    windowUrl = `${GITHUB_INTEGRATION_AUTHORIZATION_URL}&state=${state}`
+  }
+
   const systemZoom = width / window.screen.availWidth
   const left = (width - w) / 2 / systemZoom + dualScreenLeft
   const top = (height - h) / 2 / systemZoom + dualScreenTop

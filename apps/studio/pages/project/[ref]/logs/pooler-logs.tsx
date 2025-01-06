@@ -1,6 +1,5 @@
 import { useParams } from 'common'
-
-import { LogsTableName } from 'components/interfaces/Settings/Logs'
+import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import { Loading } from 'components/ui/Loading'
@@ -24,6 +23,6 @@ export const LogPage: NextPageWithLayout = () => {
   )
 }
 
-LogPage.getLayout = (page) => <LogsLayout title="Database">{page}</LogsLayout>
+LogPage.getLayout = (page) => <LogsLayout title="Pooler Logs">{page}</LogsLayout>
 
 export default LogPage

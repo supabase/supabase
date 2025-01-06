@@ -1,10 +1,9 @@
 import { useParams } from 'common'
 import { filter, find, get, isEmpty } from 'lodash'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { IconLoader } from 'ui'
+import { toast } from 'sonner'
 
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
@@ -16,6 +15,7 @@ import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
+import { Loader } from 'lucide-react'
 
 const StoragePolicies = () => {
   const { project } = useProjectContext()
@@ -184,7 +184,7 @@ const StoragePolicies = () => {
 
       {isLoading ? (
         <div className="flex h-full items-center justify-center">
-          <IconLoader className="animate-spin" size={16} />
+          <Loader className="animate-spin" size={16} />
         </div>
       ) : (
         <div className="mt-4 space-y-4">

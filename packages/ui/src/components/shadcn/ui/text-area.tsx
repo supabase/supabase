@@ -23,6 +23,6 @@ const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
   }
 )
 
-TextArea.displayName = 'Input'
+TextArea.displayName = 'TextArea'
 
 export { TextArea }

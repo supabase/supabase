@@ -1,10 +1,11 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
+import { Trash } from 'lucide-react'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import { Button, IconTrash, Modal } from 'ui'
+import { toast } from 'sonner'
 
 import Table from 'components/to-be-cleaned/Table'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const AccessTokenList = () => {
@@ -54,7 +55,6 @@ const AccessTokenList = () => {
                       </Table.td>
                       <Table.td>
                         <Button
-                          asChild
                           type="default"
                           title="Delete token"
                           className="px-1"
@@ -62,10 +62,8 @@ const AccessTokenList = () => {
                             setToken(x)
                             setIsOpen(true)
                           }}
-                          icon={<IconTrash />}
-                        >
-                          <span></span>
-                        </Button>
+                          icon={<Trash />}
+                        />
                       </Table.td>
                     </Table.tr>
                   )

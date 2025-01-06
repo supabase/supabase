@@ -26,15 +26,19 @@ const footerData = [
       },
       {
         text: 'Vector',
-        url: '/vector',
+        url: '/modules/vector',
+      },
+      {
+        text: 'Cron',
+        url: '/modules/cron',
       },
       {
         text: 'Pricing',
         url: '/pricing',
       },
       {
-        text: 'GA Week',
-        url: '/ga-week',
+        text: 'Launch Week',
+        url: '/launch-week',
       },
     ],
   },
@@ -56,10 +60,6 @@ const footerData = [
       {
         text: 'Integrations',
         url: '/partners/integrations',
-      },
-      {
-        text: 'Experts',
-        url: '/partners/experts',
       },
       {
         text: 'Brand Assets / Logos',
@@ -134,6 +134,10 @@ const footerData = [
       {
         text: 'Company',
         url: '/company',
+      },
+      {
+        text: 'Events & Webinars',
+        url: '/events',
       },
       {
         text: 'General Availability',

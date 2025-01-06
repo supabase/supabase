@@ -1,6 +1,8 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { ExternalLink } from 'lucide-react'
 import { PropsWithChildren } from 'react'
-import { Button, IconExternalLink } from 'ui'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { Button } from 'ui'
 
 interface ProductEmptyStateProps {
   title?: string
@@ -39,36 +41,23 @@ const ProductEmptyState = ({
             {hasAction && (
               <div className="flex items-center space-x-2">
                 {ctaButtonLabel && onClickCta && (
-                  <Tooltip.Root delayDuration={0}>
-                    <Tooltip.Trigger asChild>
-                      <Button
-                        type="primary"
-                        onClick={onClickCta}
-                        loading={loading}
-                        disabled={loading || disabled}
-                      >
-                        {ctaButtonLabel}
-                      </Button>
-                    </Tooltip.Trigger>
-                    {disabled && disabledMessage.length > 0 && (
-                      <Tooltip.Portal>
-                        <Tooltip.Content side="bottom">
-                          <Tooltip.Arrow className="radix-tooltip-arrow" />
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">{disabledMessage}</span>
-                          </div>
-                        </Tooltip.Content>
-                      </Tooltip.Portal>
-                    )}
-                  </Tooltip.Root>
+                  <ButtonTooltip
+                    type="primary"
+                    onClick={onClickCta}
+                    loading={loading}
+                    disabled={loading || disabled}
+                    tooltip={{
+                      content: {
+                        side: 'bottom',
+                        text: disabled && disabledMessage.length > 0 ? disabledMessage : undefined,
+                      },
+                    }}
+                  >
+                    {ctaButtonLabel}
+                  </ButtonTooltip>
                 )}
                 {infoButtonUrl && infoButtonLabel ? (
-                  <Button type="default" icon={<IconExternalLink size={14} strokeWidth={1.5} />}>
+                  <Button type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                     <a target="_blank" rel="noreferrer" href={infoButtonUrl}>
                       {infoButtonLabel}
                     </a>

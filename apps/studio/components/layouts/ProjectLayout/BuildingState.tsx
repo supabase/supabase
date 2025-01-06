@@ -4,16 +4,16 @@ import ExampleProject from 'components/interfaces/Home/ExampleProject'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
-import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
 import { useParams } from 'common'
 import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import { Loader2 } from 'lucide-react'
+import { ArrowRight, Loader2 } from 'lucide-react'
+import { Badge, Button } from 'ui'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -162,7 +162,7 @@ const ChecklistItem = ({ description }: any) => {
   return (
     <li className="my-3 flex flex-wrap space-x-3">
       <div className="mt-0.5">
-        <IconArrowRight className="text-foreground-lighter" size="tiny" />
+        <ArrowRight className="text-foreground-lighter" size={14} />
       </div>
       <div className="flex-1">{description}</div>
     </li>

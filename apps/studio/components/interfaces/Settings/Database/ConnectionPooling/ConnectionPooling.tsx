@@ -4,13 +4,26 @@ import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
+import z from 'zod'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import AlertError from 'components/ui/AlertError'
+import { DocsButton } from 'components/ui/DocsButton'
+import { FormActions } from 'components/ui/Forms/FormActions'
+import Panel from 'components/ui/Panel'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
+import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Badge,
-  Button,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -18,24 +31,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconExternalLink,
   Input_Shadcn_,
   Listbox,
   Separator,
 } from 'ui'
-import z from 'zod'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import AlertError from 'components/ui/AlertError'
-import { FormActions } from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
-import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions } from 'hooks'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
 
@@ -162,15 +161,7 @@ export const ConnectionPooling = () => {
               </p>
               <Badge>Supavisor</Badge>
             </div>
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler"
-              >
-                Documentation
-              </a>
-            </Button>
+            <DocsButton href="https://supabase.com/docs/guides/database/connecting-to-postgres#connection-pooler" />
           </div>
         }
         footer={
@@ -355,7 +346,7 @@ export const ConnectionPooling = () => {
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}
                         <a
-                          href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size"
                           target="_blank"
                           rel="noreferrer"
                           className="underline"
@@ -393,7 +384,7 @@ export const ConnectionPooling = () => {
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}
                         <a
-                          href="https://supabase.com/docs/guides/platform/custom-postgres-config#pooler-config"
+                          href="https://supabase.com/docs/guides/database/connection-management#configuring-supavisors-pool-size"
                           target="_blank"
                           rel="noreferrer"
                           className="underline"

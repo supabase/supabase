@@ -5,11 +5,14 @@
   "main": "./index.ts",
   "types": "./index.ts",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf node_modules",
     "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts --alphabetize && prettier --write types/api.d.ts"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "openapi-typescript": "^6.7.4"
+    "openapi-typescript": "^6.7.4",
+    "prettier": "3.2.4"
   }
 }

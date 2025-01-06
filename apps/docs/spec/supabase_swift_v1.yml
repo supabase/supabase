@@ -8,14 +8,14 @@ info:
     Supabase Swift.
 
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_swift_v1.yml
-  slugPrefix: "/"
+  slugPrefix: '/'
   libraries:
-    - id: "Swift"
-      version: "0.0.1"
+    - id: 'Swift'
+      version: '0.0.1'
 
 functions:
   - id: initializing
-    title: "Initializing"
+    title: 'Initializing'
     description: |
       You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
       The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
@@ -50,7 +50,7 @@ functions:
           )
           ```
   - id: auth-api
-    title: "Overview"
+    title: 'Overview'
     notes: |
       - The auth methods can be accessed via the `supabase.auth` namespace.
     examples:
@@ -79,7 +79,7 @@ functions:
           let auth = supabase.auth
           ```
   - id: sign-up
-    title: "signUp()"
+    title: 'signUp()'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -130,7 +130,7 @@ functions:
           )
           ```
   - id: sign-in-with-password
-    title: "signInWithPassword()"
+    title: 'signInWithPassword()'
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -162,7 +162,7 @@ functions:
           )
           ```
   - id: sign-in-with-otp
-    title: "signInWithOTP()"
+    title: 'signInWithOTP()'
     notes: |
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
@@ -194,7 +194,7 @@ functions:
           try await supabase.auth.signInWithOTP(phone: "+13334445555")
           ```
   - id: sign-in-with-oauth
-    title: "getOAuthSignInURL()"
+    title: 'getOAuthSignInURL()'
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
@@ -252,10 +252,10 @@ functions:
           )
           ```
   - id: sign-in-with-id-token
-    title: "signInWithIdToken()"
+    title: 'signInWithIdToken()'
     examples:
       - id: sign-in-with-id-token
-        name: "Sign In using ID Token"
+        name: 'Sign In using ID Token'
         description: Use this method to implement native Sign In With Apple.
         code: |
           ```swift
@@ -268,7 +268,7 @@ functions:
           )
           ```
   - id: sign-out
-    title: "signOut()"
+    title: 'signOut()'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
     examples:
@@ -280,7 +280,7 @@ functions:
           try await supabase.auth.signOut()
           ```
   - id: verify-otp
-    title: "verifyOTP()"
+    title: 'verifyOTP()'
     notes: |
       - The `verifyOTP` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, or `email`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOTP` to sign up / sign-in a user.
@@ -308,7 +308,7 @@ functions:
             )
           ```
   - id: get-session
-    title: "session"
+    title: 'session'
     description: |
       - Returns the session, refreshing it if necessary. If no session can be found, a `GoTrueError.sessionNotFound` error is thrown.
     examples:
@@ -320,7 +320,7 @@ functions:
           try await supabase.auth.session
           ```
   - id: get-user
-    title: "user()"
+    title: 'user()'
     description: |
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
       - Fetches the user object from the database instead of local session.
@@ -341,7 +341,7 @@ functions:
           let user = try await supabase.auth.user(jwt: "custom-jwt")
           ```
   - id: update-user
-    title: "updateUser()"
+    title: 'updateUser()'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
@@ -376,7 +376,7 @@ functions:
           )
           ```
   - id: set-session
-    title: "setSession()"
+    title: 'setSession()'
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
@@ -392,7 +392,7 @@ functions:
             try await supabase.auth.setSession(accessToken: "access_token", refreshToken: "refresh_token")
           ```
   - id: refresh-session
-    title: "refreshSession()"
+    title: 'refreshSession()'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
     examples:
@@ -411,7 +411,7 @@ functions:
           let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
           ```
   - id: on-auth-state-change
-    title: "authStateChanges"
+    title: 'authStateChanges'
     notes: |
       - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`, `MFA_CHALLENGE_VERIFIED`
       - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `authStateChanges` is first called.
@@ -434,7 +434,7 @@ functions:
           }
           ```
   - id: exchange-code-for-session
-    title: "exchangeCodeForSession()"
+    title: 'exchangeCodeForSession()'
     notes: |
       - Used when `flowType` is set to `pkce` in client options.
     examples:
@@ -446,7 +446,7 @@ functions:
           try await supabase.auth.exchangeCodeForSession(authCode: "34e770dd-9ff9-416c-87fa-43b31d7ef225")
           ```
   - id: auth-mfa-api
-    title: "Overview"
+    title: 'Overview'
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
@@ -454,7 +454,7 @@ functions:
 
       Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
-    title: "mfa.enroll()"
+    title: 'mfa.enroll()'
     notes: |
       - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge).
@@ -484,7 +484,7 @@ functions:
           let uri = response.totp?.uri
           ```
   - id: mfa-challenge
-    title: "mfa.challenge()"
+    title: 'mfa.challenge()'
     notes: |
       - An [enrolled factor](/docs/reference/swift/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
@@ -501,7 +501,7 @@ functions:
           )
           ```
   - id: mfa-verify
-    title: "mfa.verify()"
+    title: 'mfa.verify()'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/swift/auth-mfa-challenge) first.
     examples:
@@ -519,7 +519,7 @@ functions:
           )
           ```
   - id: mfa-challenge-and-verify
-    title: "mfa.challengeAndVerify()"
+    title: 'mfa.challengeAndVerify()'
     notes: |
       - An [enrolled factor](/docs/swift/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify) in a single step.
@@ -537,7 +537,7 @@ functions:
           )
           ```
   - id: mfa-unenroll
-    title: "mfa.unenroll()"
+    title: 'mfa.unenroll()'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -551,7 +551,7 @@ functions:
           )
           ```
   - id: mfa-get-authenticator-assurance-level
-    title: "mfa.getAuthenticatorAssuranceLevel()"
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
@@ -568,7 +568,7 @@ functions:
           let currentAuthenticationMethods = aal.currentAuthenticationMethods
           ```
   - id: mfa-list-factors
-    title: "mfa.listFactors()"
+    title: 'mfa.listFactors()'
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -578,7 +578,7 @@ functions:
           let factors = try await supabase.auth.mfa.listFactors()
           ```
   - id: select
-    title: "Fetch data: select()"
+    title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
       - `select()` can be combined with [Modifiers](/docs/reference/swift/using-modifiers)
@@ -1210,7 +1210,7 @@ functions:
         hideCodeBlock: true
 
   - id: insert
-    title: "Create data: insert()"
+    title: 'Create data: insert()'
     examples:
       - id: create-a-record
         name: Create a record
@@ -1325,7 +1325,7 @@ functions:
         hideCodeBlock: true
 
   - id: update
-    title: "Modify data: update()"
+    title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/swift/using-filters) to target the item(s) you wish to update.
     examples:
@@ -1479,7 +1479,7 @@ functions:
         hideCodeBlock: true
 
   - id: upsert
-    title: "Upsert data: upsert()"
+    title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
     examples:
@@ -1629,7 +1629,7 @@ functions:
         hideCodeBlock: true
 
   - id: delete
-    title: "Delete data: delete()"
+    title: 'Delete data: delete()'
 
     notes: |
       - `delete()` should always be combined with [filters](/docs/reference/swift/using-filters) to target the item(s) you wish to delete.
@@ -1671,7 +1671,7 @@ functions:
         isSpotlight: true
 
   - id: rpc
-    title: "Postgres functions: rpc()"
+    title: 'Postgres functions: rpc()'
     description: |
       You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
       Functions are useful when the logic rarely changes—like for password resets and updates.

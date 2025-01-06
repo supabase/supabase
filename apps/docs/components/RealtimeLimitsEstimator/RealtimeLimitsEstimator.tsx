@@ -1,5 +1,6 @@
+import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { Select, Collapsible, Button, IconChevronDown } from 'ui'
+import { Button, Collapsible, Select } from 'ui'
 import throughputTable from '~/data/realtime/throughput.json'
 
 export default function RealtimeLimitsEstimater({}) {
@@ -136,11 +137,7 @@ export default function RealtimeLimitsEstimater({}) {
             <Button
               type="text"
               icon={
-                <IconChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={expandPreview && 'rotate-180'}
-                />
+                <ChevronDown size={18} strokeWidth={2} className={expandPreview && 'rotate-180'} />
               }
               className="px-1"
               onClick={() => setExpandPreview(!expandPreview)}

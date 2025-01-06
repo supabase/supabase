@@ -15,7 +15,8 @@ export async function getWarehouseAccessTokens(
     throw new Error('projectRef is required')
   }
 
-  const response = await get(`/v1/projects/{ref}/analytics/warehouse/access-tokens`, {
+  // TODO: Remove typecast when codegen types are fixed
+  const response = await get(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
     params: { path: { ref: projectRef } },
     signal,
   })
@@ -29,7 +30,9 @@ export async function getWarehouseAccessTokens(
 
 export type WarehouseAccessTokensData = Awaited<ReturnType<typeof getWarehouseAccessTokens>>
 export type WarehouseAccessTokensError = ResponseError
-
+/**
+ * This will be deprecated or rewritten in favor of the new project API keys
+ */
 export const useWarehouseAccessTokensQuery = <TData = WarehouseAccessTokensData>(
   { projectRef }: WarehouseAccessTokensVariables,
   {

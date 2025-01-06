@@ -56,7 +56,7 @@ export default function TicketHome({ users }: Props) {
       />
       <DefaultLayout>
         <div className="bg-[#1C1C1C] -mt-[65px]">
-          <div className="relative bg-lw7 pt-16">
+          <div className="relative bg-[#9e44ef] pt-16">
             <div className="relative z-10">
               <SectionContainer className="flex flex-col justify-around items-center !py-4 md:!py-8 gap-2 md:gap-4 !px-2 !mx-auto">
                 <LaunchWeekLogoHeader />

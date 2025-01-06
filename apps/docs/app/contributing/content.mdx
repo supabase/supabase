@@ -1,0 +1,441 @@
+# Contributing to Supabase Docs
+
+Thanks for contributing to Supabase Docs! Here are a few resources to help you get started.
+
+The code and content for our docs site are located in the main [Supabase GitHub repo](https://github.com/supabase/supabase), under the `apps/docs` directory.
+
+In the repo, you'll also find:
+
+- The [developers guide](https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md), which will help you set up your local machine to develop the docs site
+- The [contributing guide](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md), which goes over the content organization and some general guidelines for writing docs content
+
+## Components
+
+Our docs content is mainly written in MDX. Aside from standard GitHub-flavored Markdown, you can use the following helper components to help you organize and display your content:
+
+### Accordion
+
+For content that requires progressive disclosure:
+
+```mdx
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Accordion item 1"
+      id="item-1"
+    >
+
+    Your content here.
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Accordion item 2"
+      id="item-2"
+    >
+
+    More content here.
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+```
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Accordion item 1"
+      id="item-1"
+    >
+
+    Your content here.
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Accordion item 2"
+      id="item-2"
+    >
+
+    More content here.
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+### Admonition
+
+For extra information that doesn't fit into the main flow. There are 5 supported types of admonitions:
+
+- `danger` to warn the user about any missteps that could cause data loss or data leaks
+- `deprecation` to notify the user about features that are (or will soon be) deprecated
+- `caution` to warn about anything that could cause a bug or serious user inconvenience
+- `tip` to point out helpful but optional actions
+- `note` for anything else
+
+Leave a blank line between the admonition tag and the contained content. This will prevent Prettier from trying to break the lines within the content.
+
+```mdx
+<Admonition type="danger">
+
+This could lead to data loss!
+
+</Admonition>
+
+<Admonition type="deprecation">
+
+This feature is deprecated.
+
+</Admonition>
+
+<Admonition type="caution">
+
+You should make sure you don't set this up wrong.
+
+</Admonition>
+
+<Admonition type="tip">
+
+In certain cases, you may want to do this.
+
+</Admonition>
+
+<Admonition type="note">
+
+Additional helpful information.
+
+</Admonition>
+```
+
+<Admonition type="danger">
+
+This could lead to data loss!
+
+</Admonition>
+
+<Admonition type="deprecation">
+
+This feature is deprecated.
+
+</Admonition>
+
+<Admonition type="caution">
+
+You should make sure you don't set this up wrong.
+
+</Admonition>
+
+<Admonition type="tip">
+
+In certain cases, you may want to do this.
+
+</Admonition>
+
+<Admonition type="note">
+
+Additional helpful information.
+
+</Admonition>
+
+### Code Samples
+
+You can include code samples as normal in Markdown:
+
+````mdx
+```js
+const PI = 3.14
+```
+````
+
+Or, you can use the `<$CodeSample />` component to include code samples from a source code file.
+
+If the file is within the `supabase/supabase` repo's `examples` directory:
+
+```mdx
+<$CodeSample
+path="/relative/path/from/examples/directory.js"
+{/_ Array of [start, end] line numbers to include.
+Line numbers are 1-indexed and inclusive.
+-1 indicates the final line. _/}
+lines={[[1, 3], [5, -1]]}
+{/* Optional, displays as a file name on the code block */}
+meta="display/path.js"
+/>
+```
+
+If the file is within some other GitHub repo:
+
+```mdx
+<$CodeSample
+external={true}
+org="supabase"
+repo="cli"
+commit="1623aa9b95ec90e21c5bae5a0d50dcf272abe92f"
+path="/relative/path/from/root.js"
+lines={[[1, 3], [5, -1]]}
+meta="display/path.js"
+/>
+```
+
+The repo must be public, the org must be on the allow list, and the commit must be an immutable SHA (not a mutable tag or branch name).
+
+### Icons
+
+The following icons are available. They can be styled with [Tailwind](https://tailwindcss.com/) classes:
+
+```mdx
+<IconArrowDown />
+<IconCheck />
+<IconX />
+```
+
+<div class="flex items-center gap-2">
+  <IconArrowDown />
+  <IconCheck />
+  <IconX />
+</div>
+
+### Image
+
+You can include images with regular Markdown syntax:
+
+```mdx
+![Supabase architectural diagram](/docs/img/supabase-architecture.svg)
+```
+
+![Supabase architectural diagram](/docs/img/supabase-architecture.svg)
+
+If your image has alternate light and dark versions, or you want to make it zoomable, you can also use the image component:
+
+```mdx
+<Image
+  alt="Supabase architectural diagram"
+  src={{
+    dark: '/docs/img/supabase-architecture.svg',
+    light: '/docs/img/supabase-architecture--light.svg',
+  }}
+  zoomable
+/>
+```
+
+<Image
+  alt="Supabase architectural diagram"
+  src={{
+    dark: '/docs/img/supabase-architecture.svg',
+    light: '/docs/img/supabase-architecture--light.svg',
+  }}
+  zoomable
+/>
+
+### Project Variables
+
+Some guides and tutorials will require that users copy their Supabase project URL and anon key. You can provide those inline if the user is signed in:
+
+```mdx
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="anonKey" />
+```
+
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="anonKey" />
+
+### Step Hike
+
+For tutorials, which feature step-by-step instructions, often with accompanying code, we use the `StepHike` pattern:
+
+````mdx
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="The first step">
+
+    Explanation of what to do first.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      select ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="No code in this step" fullWidth>
+
+    Explanation of what to do next. This stretches the full width of the section: Sweet tiramisu apple biscuit candy cake. Orange ipsum muffin cookie cake biscuit. Orange muffin vanilla sweet sugar candy. Sprinkles jelly sweet orange candy cream.
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+````
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="The first step">
+
+    Explanation of what to do first.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      select ...
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="No code in this step" fullWidth>
+
+    Explanation of what to do next. This stretches the full width of the section: Sweet tiramisu apple biscuit candy cake. Orange ipsum muffin cookie cake biscuit. Orange muffin vanilla sweet sugar candy. Sprinkles jelly sweet orange candy cream.
+
+
+    </StepHikeCompact.Details>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+### Tabs
+
+Use tabs when users can select between multiple versions of the content. For example, the content might differ based on language or package manager.
+
+If you include the `queryGroup` prop, the user's selection will sync with other tab groups. Leave out this prop to omit this behavior.
+
+````mdx
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const supabase = createSupabaseClient()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() async {
+  Supabase.initialize();
+}
+```
+
+</TabPanel>
+</Tabs>
+````
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const supabase = createSupabaseClient()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+void main() async {
+  Supabase.initialize();
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Partials
+
+We incorporate content reuse in the docs to avoid duplication. If you find yourself writing the same content over and over, you can put it in a partial instead. Here are some examples of commonly used partials:
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Database setup"
+      id="database-setup"
+    >
+
+    ```mdx
+    <DatabaseSetup />
+    ```
+
+    <DatabaseSetup />
+
+    </AccordionItem>
+
+  </div>
+  <div className="border-b mt-3 pb-3">
+    <AccordionItem
+      header="Create client for Auth"
+      id="create-client-auth"
+    >
+
+    ```mdx
+    <CreateClientSnippet />
+    ```
+
+    <CreateClientSnippet />
+
+    </AccordionItem>
+
+  </div>
+</Accordion>
+
+To make a new partial:
+
+1. Make a new MDX file in `apps/docs/components/MDX`.
+1. Write your reusable content.
+1. Inside `apps/docs/components/MDX/partials.tsx`, import and re-export your partial.
+1. Inside `apps/docs/features/docs/mdx.shared.tsx`, import your partial and include it in the `components` object.
+1. You can now use your partial inside any other MDX file by using: `<YourPartialName />`.

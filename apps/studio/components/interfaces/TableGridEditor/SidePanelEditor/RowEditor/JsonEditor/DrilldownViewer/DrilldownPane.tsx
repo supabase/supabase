@@ -1,5 +1,5 @@
 import { isNull, noop } from 'lodash'
-import { IconChevronRight } from 'ui'
+import { ChevronRight } from 'lucide-react'
 
 import type { Dictionary } from 'types'
 
@@ -57,7 +57,7 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
               key === activeKey ? 'opacity-100' : 'opacity-50'
             } group-hover:opacity-100 transition`}
           >
-            <IconChevronRight strokeWidth={2} size={16} />
+            <ChevronRight strokeWidth={2} size={16} />
           </div>
         </div>
       ))}

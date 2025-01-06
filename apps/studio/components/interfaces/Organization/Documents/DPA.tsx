@@ -1,9 +1,11 @@
+import { ExternalLink } from 'lucide-react'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { Button, IconExternalLink } from 'ui'
+import { Button } from 'ui'
 
 const DPA = () => {
   return (
@@ -31,16 +33,16 @@ const DPA = () => {
         </div>
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent className="flex items-center justify-center h-full">
-        <a
-          href="https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf"
-          target="_blank"
-          rel="noreferrer noopener"
-          download={true}
-        >
-          <Button type="default" iconRight={<IconExternalLink />}>
+        <Button asChild type="default" iconRight={<ExternalLink />}>
+          <a
+            download={true}
+            target="_blank"
+            rel="noreferrer noopener"
+            href="https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf"
+          >
             View DPA
-          </Button>
-        </a>
+          </a>
+        </Button>
       </ScaffoldSectionContent>
     </ScaffoldSection>
   )

@@ -5,12 +5,16 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 import { object, string } from 'yup'
 
 import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticator-assurance-level-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { useLastSignIn } from 'hooks/misc/useLastSignIn'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
+import { LastSignInWrapper } from './LastSignInWrapper'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -20,9 +24,12 @@ const signInSchema = object({
 const SignInForm = () => {
   const router = useRouter()
   const queryClient = useQueryClient()
+  const [_, setLastSignIn] = useLastSignIn()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+
+  const { mutate: sendEvent } = useSendEventMutation()
 
   const onSignIn = async ({ email, password }: { email: string; password: string }) => {
     const toastId = toast.loading('Signing in...')
@@ -40,6 +47,7 @@ const SignInForm = () => {
     })
 
     if (!error) {
+      setLastSignIn('email')
       try {
         const data = await getMfaAuthenticatorAssuranceLevel()
         if (data) {
@@ -52,6 +60,7 @@ const SignInForm = () => {
         }
 
         toast.success(`Signed in successfully!`, { id: toastId })
+        sendEvent({ action: TelemetryActions.SIGN_IN, properties: { category: 'account' } })
         await queryClient.resetQueries()
         const returnTo = getReturnToPath()
         // since we're already on the /sign-in page, prevent redirect loops
@@ -130,16 +139,18 @@ const SignInForm = () => {
               />
             </div>
 
-            <Button
-              block
-              form="signIn-form"
-              htmlType="submit"
-              size="large"
-              disabled={isSubmitting}
-              loading={isSubmitting}
-            >
-              Sign In
-            </Button>
+            <LastSignInWrapper type="email">
+              <Button
+                block
+                form="signIn-form"
+                htmlType="submit"
+                size="large"
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              >
+                Sign In
+              </Button>
+            </LastSignInWrapper>
           </div>
         )
       }}

@@ -1,5 +1,5 @@
-import { AWS_REGIONS, CloudProvider, FLY_REGIONS, Region } from 'lib/constants'
-import { pluckObjectFields } from 'lib/helpers'
+import type { CloudProvider, Region } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 
 export function getAvailableRegions(cloudProvider: CloudProvider): Region {
   if (cloudProvider === 'AWS') {

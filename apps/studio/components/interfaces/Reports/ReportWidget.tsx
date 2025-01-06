@@ -12,9 +12,8 @@ import {
   Tooltip_Shadcn_,
   cn,
 } from 'ui'
-import { LogsEndpointParams } from '../Settings/Logs'
+import type { LogsEndpointParams } from '../Settings/Logs/Logs.types'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
-import AlertError from 'components/ui/AlertError'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]

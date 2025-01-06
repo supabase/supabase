@@ -165,6 +165,13 @@ val data = supabase.from("countries").select(Columns.raw("id, name, cities(id, n
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('countries').select('id, name, cities(id, name)').execute()
+```
+
+</TabPanel>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -284,6 +291,20 @@ val data = supabase.from("teams").select(Columns.raw("id, team_name, users(id, n
 ```
 
 </TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('teams').select('id, team_name, users(id, name)').execute()
+```
+
+</TabPanel>
+<TabPanel id="graphql" label="GraphQL">
+
+````javascript
+const Query = `
+  query {
+
+</TabPanel>
 <TabPanel id="graphql" label="GraphQL">
 
 ```javascript
@@ -293,9 +314,9 @@ const Query = `
       edges {
         node {
           id
-          team_name 
+          team_name
           users {
-            id, 
+            id,
             name
           }
         }
@@ -303,7 +324,7 @@ const Query = `
     }
   }
 `
-```
+````
 
 </TabPanel>
 <TabPanel id="url" label="URL">
@@ -360,12 +381,12 @@ To fetch all the `shifts` with `scan_id_start` and `scan_id_end` related to a sp
 const { data, error } = await supabase.from('shifts').select(
   `
     *,
-    scans:scan_id_start (
+    start_scan:scans!scan_id_start (
       id,
       user_id,
       badge_scan_time
     ),
-   scans:scan_id_end (
+   end_scan:scans!scan_id_end (
      id, 
      user_id,
      badge_scan_time
@@ -380,12 +401,12 @@ const { data, error } = await supabase.from('shifts').select(
 ```dart
 final data = await supabase.from('shifts').select('''
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
     id,
     user_id,
     badge_scan_time
   ),
-scans:scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
@@ -428,7 +449,7 @@ let shifts: [Shift] = try await supabase
   .select(
     """
       *,
-      scans:scan_id_start (
+      start_scan:scans!scan_id_start (
         id,
         user_id,
         badge_scan_time
@@ -451,17 +472,36 @@ let shifts: [Shift] = try await supabase
 ```kotlin
 val data = supabase.from("shifts").select(Columns.raw('''
   *,
-  scans:scan_id_start (
+  start_scan:scans!scan_id_start (
     id,
     user_id,
     badge_scan_time
   ),
-scans:scan_id_end (
+end_scan:scans!scan_id_end (
     id,
     user_id,
     badge_scan_time
   )
 '''));
+```
+
+</TabPanel>
+<TabPanel id="python" label="Python">
+
+```python
+data = supabase.from_('shifts').select("""
+  *,
+  start_scan:scans!scan_id_start (
+    id,
+    user_id,
+    badge_scan_time
+  ),
+  end_scan:scans!scan_id_end (
+    id,
+    user_id,
+    badge_scan_time
+  )
+""").execute()
 ```
 
 </TabPanel>

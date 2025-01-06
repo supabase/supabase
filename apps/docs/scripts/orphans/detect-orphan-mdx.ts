@@ -1,7 +1,7 @@
 import { readdir } from 'node:fs/promises'
 import { extname, join } from 'node:path'
 import {
-  HOMEPAGE_MENU_ITEMS,
+  GLOBAL_MENU_ITEMS,
   gettingstarted,
   cli,
   auth,
@@ -12,11 +12,9 @@ import {
   realtime,
   storage,
   ai,
-  supabase_cli,
   platform,
   resources,
   self_hosting,
-  migrate,
 } from '../../components/Navigation/NavigationMenu/NavigationMenu.constants'
 
 const DOCS_ROOT_DIR = join(__dirname, '..', '..')
@@ -60,9 +58,9 @@ const main = async () => {
       .filter((file) => extname(file) === '.mdx')
       .map((file) => file.replace(/\.mdx$/, ''))
 
-    const flattenedHomepageMenuItems = HOMEPAGE_MENU_ITEMS.flat() as RefItem[]
+    const flattenedGlobalMenuItems = GLOBAL_MENU_ITEMS.flat() as RefItem[]
     const pagesToPublish = [
-      flattenedHomepageMenuItems,
+      flattenedGlobalMenuItems,
       gettingstarted.items,
       cli.items,
       auth.items,
@@ -73,11 +71,9 @@ const main = async () => {
       realtime.items,
       storage.items,
       ai.items,
-      supabase_cli.items,
       platform.items,
       resources.items,
       self_hosting.items,
-      migrate.items,
     ]
       .flatMap((items) => recGetUrl(items))
       // Remove initial slash

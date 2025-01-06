@@ -1,5 +1,5 @@
-import { IS_PLATFORM } from 'lib/constants'
 import type { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
+import { IS_PLATFORM } from 'lib/constants'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')

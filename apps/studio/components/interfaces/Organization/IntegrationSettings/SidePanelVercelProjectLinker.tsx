@@ -1,25 +1,27 @@
 import { keyBy } from 'lodash'
 import { useCallback, useMemo } from 'react'
-import toast from 'react-hot-toast'
-import { SidePanel } from 'ui'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Integrations-Vercel.constants'
-import ProjectLinker, { ForeignProject } from 'components/interfaces/Integrations/ProjectLinker'
+import { ENV_VAR_RAW_KEYS } from 'components/interfaces/Integrations/Vercel/Integrations-Vercel.constants'
+import ProjectLinker, {
+  ForeignProject,
+} from 'components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useSelectedOrganization } from 'hooks'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { SidePanel } from 'ui'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
-    <path fill-rule="evenodd" d="M256,48,496,464H16Z" />
+    <path fillRule="evenodd" d="M256,48,496,464H16Z" />
   </svg>
 )
 

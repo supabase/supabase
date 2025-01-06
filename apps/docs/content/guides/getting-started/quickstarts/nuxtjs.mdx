@@ -8,30 +8,8 @@ hideToc: true
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
-
-    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
-
-    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-     ```sql Editor
-      -- Create the table
-      create table countries (
-        id serial primary key,
-        name varchar(255) not null
-      );
-
-      -- Insert some sample data into the table
-      insert into countries (name) values ('United States');
-      insert into countries (name) values ('Canada');
-      insert into countries (name) values ('Mexico');
-      ````
-
-    </StepHikeCompact.Code>
+    
+    <QuickstartDbSetup />
 
   </StepHikeCompact.Step>
 
@@ -75,18 +53,18 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query data from the app">
 
-    In `src/App.vue`, create a Supabase client using your project URL and public API (anon) key:
+    In `app.vue`, create a Supabase client using your project URL and public API (anon) key:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="anonKey" />
 
-    Replace the existing content in your `src/App.vue` file with the following code.
+    Replace the existing content in your `app.vue` file with the following code.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```vue src/App.vue
+      ```vue app.vue
       <script setup>
       import { createClient } from '@supabase/supabase-js'
       const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
@@ -130,3 +108,9 @@ hideToc: true
 
   </StepHikeCompact.Step>
 </StepHikeCompact>
+
+<Admonition type="tip">
+
+The community-maintained [@nuxtjs/supabase](https://supabase.nuxtjs.org/) module provides an alternate DX for working with Supabase in Nuxt.
+
+</Admonition>

@@ -1,18 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink, Globe } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { FormHeader } from 'components/ui/Forms/FormHeader'
+import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { BASE_PATH } from 'lib/constants'
 import { Badge, Button } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { DocsButton } from 'components/ui/DocsButton'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -68,18 +70,13 @@ const BannedIPs = () => {
 
   return (
     <div id="banned-ips">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <FormHeader
+          className="mb-0"
           title="Network Bans"
           description="List of IP addresses that are temporarily blocked if their traffic pattern looks abusive"
         />
-        <div className="flex items-center space-x-2 mb-6">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a target="_blank" href="https://supabase.com/docs/reference/cli/supabase-network-bans">
-              Documentation
-            </a>
-          </Button>
-        </div>
+        <DocsButton href="https://supabase.com/docs/reference/cli/supabase-network-bans" />
       </div>
       <FormPanel>
         {ipList && ipList.banned_ipv4_addresses.length > 0 ? (
@@ -98,7 +95,9 @@ const BannedIPs = () => {
                   tooltip={{
                     content: {
                       side: 'bottom',
-                      text: 'You need additional permissions to unban networks',
+                      text: !canUnbanNetworks
+                        ? 'You need additional permissions to unban networks'
+                        : undefined,
                     },
                   }}
                 >

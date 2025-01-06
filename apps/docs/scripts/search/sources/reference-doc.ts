@@ -1,14 +1,14 @@
 import { createHash } from 'crypto'
 import { readFile } from 'fs/promises'
 import yaml from 'js-yaml'
-import { OpenAPIV3 } from 'openapi-types'
-import {
+import type { OpenAPIV3 } from 'openapi-types'
+import type {
   ICommonItem,
   ICommonSection,
   IFunctionDefinition,
   ISpec,
 } from '../../../components/reference/Reference.types'
-import { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
+import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec'
 import { flattenSections } from '../../../lib/helpers'
 import { enrichedOperation, gen_v3 } from '../../../lib/refGenerator/helpers'
 import type { Json } from '../../helpers.mdx'

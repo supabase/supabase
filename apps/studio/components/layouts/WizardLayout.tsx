@@ -3,10 +3,10 @@ import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { withAuth } from 'hooks'
+import { withAuth } from 'hooks/misc/withAuth'
 import { BASE_PATH } from 'lib/constants'
-import { Organization } from 'types'
-import { IconChevronRight } from 'ui'
+import { ChevronRight } from 'lucide-react'
+import type { Organization } from 'types'
 import { FeedbackDropdown } from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
 
@@ -52,15 +52,15 @@ const Header = ({ organization }: HeaderProps) => {
                   style={{ height: 24 }}
                 />
               </Link>
-              <IconChevronRight size="small" className="text-foreground-light" />
+              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
               <p className="text-sm">
                 {organization ? `Organization: ${organization.name}` : 'Create an organization'}
               </p>
-              <IconChevronRight size="small" className="text-foreground-light" />
+              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
               <p className={`text-sm ${stepNumber < 1 ? 'text-foreground-light' : ''}`}>
                 Create a new project
               </p>
-              <IconChevronRight size="small" className="text-foreground-light" />
+              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
               <p className={`text-sm ${stepNumber < 2 ? 'text-foreground-light' : ''}`}>
                 Extend your database
               </p>

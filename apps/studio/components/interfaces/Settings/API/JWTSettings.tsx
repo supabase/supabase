@@ -15,7 +15,7 @@ import {
   RefreshCw,
 } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'sonner'
 
 import { useParams } from 'common'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
@@ -23,10 +23,9 @@ import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useCheckPermissions } from 'hooks'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { uuidv4 } from 'lib/helpers'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -38,13 +37,14 @@ import {
   DropdownMenuTrigger,
   Input,
   Modal,
+  WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
+import { Admonition } from 'ui-patterns'
 
 const JWTSettings = () => {
   const { ref: projectRef } = useParams()
@@ -192,12 +192,12 @@ const JWTSettings = () => {
                   )}
                 </div>
                 {isJwtSecretUpdateFailed ? (
-                  <Alert withIcon variant="warning" title="Failed to update JWT secret">
+                  <Admonition type="warning" title="Failed to update JWT secret">
                     Please try again. If the failures persist, please contact Supabase support with
                     the following details: <br />
                     Change tracking ID: {data?.changeTrackingId} <br />
                     Error message: {jwtSecretUpdateErrorMessage}
-                  </Alert>
+                  </Admonition>
                 ) : null}
               </div>
             </>

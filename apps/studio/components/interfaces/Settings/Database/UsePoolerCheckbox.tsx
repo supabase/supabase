@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { useParams } from 'common'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { usePgBouncerStatus } from 'data/config/pgbouncer-enabled-query'
-import { useProjectSettingsQuery } from 'data/config/project-settings-query'
+import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
@@ -31,6 +31,7 @@ interface UsePoolerCheckboxInterface {
   id: string
   checked: boolean
   poolingMode: 'transaction' | 'session'
+  ipv4AddonAdded: boolean
   onCheckedChange: (value: boolean) => void
   onSelectPoolingMode: (mode: 'transaction' | 'session') => void
 }
@@ -39,6 +40,7 @@ export const UsePoolerCheckbox = ({
   id,
   checked,
   poolingMode = 'transaction',
+  ipv4AddonAdded,
   onCheckedChange,
   onSelectPoolingMode,
 }: UsePoolerCheckboxInterface) => {
@@ -49,12 +51,12 @@ export const UsePoolerCheckbox = ({
   const state = useDatabaseSelectorStateSnapshot()
 
   const { data, isLoading, isSuccess } = usePoolingConfigurationQuery({ projectRef })
-  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
+  const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsV2Query({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
   const isDatabaseSettingsPage = router.pathname.endsWith('/settings/database')
   const poolingConfiguration = data?.find((x) => x.identifier === state.selectedDatabaseId)
-  const resolvesToIpV6 = settings?.project.db_ip_addr_config === 'ipv6'
+  const resolvesToIpV6 = settings?.db_ip_addr_config === 'ipv6'
 
   const onSelectOption = (value: 'session' | 'transaction') => {
     onSelectPoolingMode(value)
@@ -171,7 +173,7 @@ export const UsePoolerCheckbox = ({
               {isSuccess && checked && <Badge>Supavisor</Badge>}
               {isSuccessSettings && (
                 <Badge>
-                  {checked
+                  {checked || ipv4AddonAdded
                     ? 'Resolves to IPv4'
                     : resolvesToIpV6
                       ? 'Resolves to IPv6'

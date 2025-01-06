@@ -1,59 +1,74 @@
-import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useState } from 'react'
+
+import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { plans } from 'shared-data/plans'
+import { pricing } from 'shared-data/pricing'
 import { Button, Select, cn } from 'ui'
 import { PricingTableRowDesktop, PricingTableRowMobile } from '~/components/Pricing/PricingTableRow'
-import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-
+import { Organization } from '~/data/organizations'
+import Solutions from '~/data/MainProducts'
 import gaEvents from '~/lib/gaEvents'
-import Solutions from '~/data/Solutions'
-import { pricing } from 'shared-data/pricing'
-import { plans } from 'shared-data/plans'
+import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
+import UpgradePlan from './UpgradePlan'
 
-const PricingComparisonTable = () => {
+const MobileHeader = ({
+  description,
+  priceDescription,
+  price,
+  plan,
+  showDollarSign = true,
+  from = false,
+  organizations,
+  hasExistingOrganizations,
+}: {
+  description: string
+  priceDescription: string
+  price: string
+  plan: string
+  showDollarSign?: boolean
+  from?: boolean
+  organizations?: Organization[]
+  hasExistingOrganizations?: boolean
+}) => {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
-  const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
-
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
     await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
-  const MobileHeader = ({
-    description,
-    priceDescription,
-    price,
-    plan,
-    showDollarSign = true,
-    from = false,
-  }: {
-    description: string
-    priceDescription: string
-    price: string
-    plan: string
-    showDollarSign?: boolean
-    from?: boolean
-  }) => {
-    const selectedPlan = plans.find((p) => p.name === plan)!
+  const selectedPlan = plans.find((p) => p.name === plan)!
+  const isUpgradablePlan = selectedPlan.name === 'Pro' || selectedPlan.name === 'Team'
 
-    return (
-      <div className="mt-8 px-4 mobile-header">
-        <h2 className="text-foreground text-3xl font-medium uppercase font-mono">{plan}</h2>
-        <div className="flex items-baseline gap-2">
-          {from && <span className="text-foreground text-base">From</span>}
-          {showDollarSign ? (
-            <span className="h1 font-mono">
-              {plan !== 'Enterprise' ? '$' : ''}
-              {price}
-            </span>
-          ) : (
-            <span className="text-foreground-light">{price}</span>
-          )}
+  return (
+    <div className="mt-8 px-4 mobile-header">
+      <h2 className="text-foreground text-3xl font-medium uppercase font-mono">{plan}</h2>
+      <div className="flex items-baseline gap-2">
+        {from && <span className="text-foreground text-base">From</span>}
+        {showDollarSign ? (
+          <span className="h1 font-mono">
+            {plan !== 'Enterprise' ? '$' : ''}
+            {price}
+          </span>
+        ) : (
+          <span className="text-foreground-light">{price}</span>
+        )}
 
-          <p className="p">{priceDescription}</p>
-        </div>
-        <p className="p">{description}</p>
+        <p className="p">{priceDescription}</p>
+      </div>
+      <p className="p">{description}</p>
+      {isUpgradablePlan && hasExistingOrganizations ? (
+        <UpgradePlan
+          organizations={organizations}
+          onClick={() =>
+            sendTelemetryEvent(
+              gaEvents[`www_pricing_comparison_${plan.toLowerCase()}_mobile_upgrade`]
+            )
+          }
+          size="medium"
+        />
+      ) : (
         <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
             href={selectedPlan.href}
@@ -64,8 +79,26 @@ const PricingComparisonTable = () => {
             {selectedPlan.cta}
           </Link>
         </Button>
-      </div>
-    )
+      )}
+    </div>
+  )
+}
+
+interface PricingComparisonTableProps {
+  organizations?: Organization[]
+  hasExistingOrganizations?: boolean
+}
+
+const PricingComparisonTable = ({
+  organizations,
+  hasExistingOrganizations,
+}: PricingComparisonTableProps) => {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const [activeMobilePlan, setActiveMobilePlan] = useState('Free')
+
+  const sendTelemetryEvent = async (event: TelemetryEvent) => {
+    await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (
@@ -161,6 +194,8 @@ const PricingComparisonTable = () => {
               price={'25'}
               priceDescription={'/month + additional use'}
               description={'Everything you need to scale your project into production'}
+              organizations={organizations}
+              hasExistingOrganizations={hasExistingOrganizations}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -213,6 +248,8 @@ const PricingComparisonTable = () => {
               price={'599'}
               priceDescription={'/month + additional use'}
               description={'Collaborate with different permissions and access patterns'}
+              organizations={organizations}
+              hasExistingOrganizations={hasExistingOrganizations}
             />
             <PricingTableRowMobile
               category={pricing.database}
@@ -327,54 +364,72 @@ const PricingComparisonTable = () => {
                 />
               </th>
 
-              {plans.map((plan) => (
-                <th
-                  className="text-foreground w-1/4 px-0 text-left text-sm font-normal"
-                  scope="col"
-                  key={plan.name}
-                >
-                  <span className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
-                    <span className="flex flex-col xl:flex-row xl:items-end gap-1">
-                      <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 uppercase font-mono font-normal flex items-center">
-                        {plan.name}
-                      </h3>
-                      <p
-                        className={cn(
-                          'text-foreground-lighter -my-1 xl:m-0',
-                          plan.name === 'Enterprise' && 'xl:opacity-0'
-                        )}
-                      >
-                        <span className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter">
-                          {plan.name !== 'Enterprise' && '$'}
-                          {plan.priceMonthly}
-                        </span>
-                        {['Free', 'Pro', 'Team'].includes(plan.name) && (
-                          <span className="text-[13px] leading-4 mt-1">{plan.costUnit}</span>
-                        )}
-                      </p>
-                    </span>
-                    <span className="flex flex-col justify-between h-full pb-2">
-                      <Button
-                        asChild
-                        size="tiny"
-                        type={plan.name === 'Enterprise' ? 'default' : 'primary'}
-                        block
-                      >
-                        <Link
-                          href={plan.href}
-                          onClick={() =>
-                            sendTelemetryEvent(
-                              gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
-                            )
-                          }
+              {plans.map((plan) => {
+                const isUpgradablePlan = plan.name === 'Pro' || plan.name === 'Team'
+
+                return (
+                  <th
+                    className="text-foreground w-1/4 px-0 text-left text-sm font-normal"
+                    scope="col"
+                    key={plan.name}
+                  >
+                    <span className="flex flex-col px-6 pr-2 pt-2 gap-1.5">
+                      <span className="flex flex-col xl:flex-row xl:items-end gap-1">
+                        <h3 className="text-lg xl:text-xl 2xl:text-2xl leading-5 uppercase font-mono font-normal flex items-center">
+                          {plan.name}
+                        </h3>
+                        <p
+                          className={cn(
+                            'text-foreground-lighter -my-1 xl:m-0',
+                            plan.name === 'Enterprise' && 'xl:opacity-0'
+                          )}
                         >
-                          {plan.cta}
-                        </Link>
-                      </Button>
+                          <span className="text-foreground-lighter font-mono text-xl mr-1 tracking-tighter">
+                            {plan.name !== 'Enterprise' && '$'}
+                            {plan.priceMonthly}
+                          </span>
+                          {['Free', 'Pro', 'Team'].includes(plan.name) && (
+                            <span className="text-[13px] leading-4 mt-1">{plan.costUnit}</span>
+                          )}
+                        </p>
+                      </span>
+                      <span className="flex flex-col justify-between h-full pb-2">
+                        {isUpgradablePlan && hasExistingOrganizations ? (
+                          <UpgradePlan
+                            organizations={organizations}
+                            onClick={() =>
+                              sendTelemetryEvent(
+                                gaEvents[
+                                  `www_pricing_comparison_${plan.name.toLowerCase()}_upgrade`
+                                ]
+                              )
+                            }
+                            size="tiny"
+                          />
+                        ) : (
+                          <Button
+                            asChild
+                            size="tiny"
+                            type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                            block
+                          >
+                            <Link
+                              href={plan.href}
+                              onClick={() =>
+                                sendTelemetryEvent(
+                                  gaEvents[`www_pricing_comparison_${plan.name.toLowerCase()}`]
+                                )
+                              }
+                            >
+                              {plan.cta}
+                            </Link>
+                          </Button>
+                        )}
+                      </span>
                     </span>
-                  </span>
-                </th>
-              ))}
+                  </th>
+                )
+              })}
             </tr>
           </thead>
           <tbody className="border-default divide-border divide-y first:divide-y-0">
