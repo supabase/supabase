@@ -10,7 +10,6 @@ import { Markdown } from 'components/interfaces/Markdown'
 import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
@@ -30,14 +29,15 @@ import {
 } from 'ui'
 
 interface DatabaseSelectorProps {
+  selectedDatabaseId?: string // To override initial state
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'
   additionalOptions?: { id: string; name: string }[]
-  onSelectId?: (id: string) => void // Optional callback
-
   buttonProps?: ButtonProps
+  onSelectId?: (id: string) => void // Optional callback
 }
 
 const DatabaseSelector = ({
+  selectedDatabaseId: _selectedDatabaseId,
   variant = 'regular',
   additionalOptions = [],
   onSelectId = noop,
@@ -48,9 +48,8 @@ const DatabaseSelector = ({
   const [open, setOpen] = useState(false)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const appState = useAppStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
-  const selectedDatabaseId = state.selectedDatabaseId
+  const selectedDatabaseId = _selectedDatabaseId ?? state.selectedDatabaseId
 
   const { data, isLoading, isSuccess } = useReadReplicasQuery({ projectRef })
   const databases = data ?? []
