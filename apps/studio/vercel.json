@@ -1,7 +1,6 @@
 {
   "framework": "vite",
   "trailingSlash": false,
-  "buildCommand": "npm run build-remix",
   "outputDirectory": "build/client",
   "rewrites": [
     {
