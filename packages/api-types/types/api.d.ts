@@ -5681,6 +5681,10 @@ export interface components {
     }
     StorageFeatures: {
       imageTransformation: components['schemas']['StorageFeatureImageTransformation']
+      s3Protocol: components['schemas']['StorageFeatureS3Protocol']
+    }
+    StorageFeatureS3Protocol: {
+      enabled: boolean
     }
     StorageObject: {
       bucket_id: string
