@@ -10,7 +10,7 @@ import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
+import { getAppStateSnapshot, useAppStateSnapshot } from 'state/app-state'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 const getAnonId = async (id: string) => {
@@ -52,7 +52,9 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     function handleRouteChange() {
-      if (snap.isOptedInTelemetry) handlePageTelemetry(window.location.href)
+      if (IS_PLATFORM && getAppStateSnapshot().isOptedInTelemetry) {
+        sendPage({ url: window.location.href })
+      }
     }
 
     // Listen for page changes after a navigation or when the query changes
@@ -61,17 +63,17 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, snap.isOptedInTelemetry])
+  }, [router])
 
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
     // if not the path will be dynamic route instead of the browser url
-    if (router.isReady && snap.isOptedInTelemetry) {
-      handlePageTelemetry(window.location.href)
+    if (router.isReady && getAppStateSnapshot().isOptedInTelemetry) {
+      sendPage({ url: window.location.href })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady, snap.isOptedInTelemetry])
+  }, [router.isReady])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
@@ -125,7 +127,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
 
   useEffect(() => {
     const handleBeforeUnload = async () => {
-      if (snap.isOptedInTelemetry) await sendPageLeave()
+      if (getAppStateSnapshot().isOptedInTelemetry) await sendPageLeave()
     }
     window.addEventListener('beforeunload', handleBeforeUnload)
 
@@ -133,10 +135,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [])
-
-  const handlePageTelemetry = async (route: string) => {
-    if (IS_PLATFORM) sendPage({ url: route })
-  }
 
   return <>{children}</>
 }

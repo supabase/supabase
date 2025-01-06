@@ -97,7 +97,7 @@ export const useConsent = () => {
           const telemetryData = JSON.parse(decodeURIComponent(encodedData))
           handlePageTelemetry(
             process.env.NEXT_PUBLIC_API_URL!,
-            window.location.pathname,
+            telemetryProps.pathname,
             telemetryData
           )
           // remove the telemetry cookie
@@ -122,7 +122,7 @@ export const useConsent = () => {
 
         handlePageTelemetry(
           process.env.NEXT_PUBLIC_API_URL!,
-          window.location.pathname,
+          telemetryProps.pathname,
           telemetryData
         )
       }
