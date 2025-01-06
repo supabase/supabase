@@ -4,15 +4,14 @@ import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
 import { DiffType } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { getContentById } from 'data/content/content-id-query'
-import { UpsertContentPayloadV2, upsertContent } from 'data/content/content-upsert-v2-mutation'
+import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { createSQLSnippetFolder } from 'data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from 'data/content/sql-folder-update-mutation'
 import { Snippet, SnippetFolder } from 'data/content/sql-folders-query'
 import { getQueryClient } from 'data/query-client'
-import { SqlSnippets } from 'types'
 import { useMemo } from 'react'
+import { SqlSnippets } from 'types'
 
 export type StateSnippetFolder = {
   projectRef: string
@@ -285,7 +284,7 @@ export const useSnippets = (projectRef: string) => {
 // ## Below are all the asynchronous saving logic for the SQL Editor
 // ========================================================================
 
-async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayloadV2) {
+async function upsertSnippet(id: string, projectRef: string, payload: UpsertContentPayload) {
   try {
     sqlEditorState.savingStates[id] = 'UPDATING'
     await upsertContent({ projectRef, payload })
@@ -305,7 +304,7 @@ async function upsertSnippet(id: string, projectRef: string, payload: UpsertCont
 
 const memoizedUpdateSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
 
-const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertContentPayloadV2) =>
+const debouncedUpdateSnippet = (id: string, projectRef: string, payload: UpsertContentPayload) =>
   memoizedUpdateSnippet(id)(id, projectRef, payload)
 
 async function upsertFolder(id: string, projectRef: string, name: string) {

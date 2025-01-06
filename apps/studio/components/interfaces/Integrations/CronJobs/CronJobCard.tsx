@@ -146,7 +146,10 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
                           className="font-sans text-sm"
                         />
                         {data?.status && (
-                          <Badge variant="success" className="capitalize ml-2">
+                          <Badge
+                            variant={data.status === 'failed' ? 'destructive' : 'success'}
+                            className="capitalize ml-2"
+                          >
                             {data.status}
                           </Badge>
                         )}

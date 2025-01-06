@@ -213,7 +213,7 @@ export const SqlCard = ({
                   })
 
                   sendEvent({
-                    action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                    action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
                     properties: {
                       type: 'mutation',
                       category: identifyQueryType(sql) ?? 'unknown',
@@ -261,7 +261,13 @@ export const SqlCard = ({
                     icon={<Edit size={14} />}
                     onClick={() => {
                       handleEditInSQLEditor()
-                      sendEvent({ action: TelemetryActions.ASSISTANT_EDIT_SQL_CLICKED })
+                      sendEvent({
+                        action: TelemetryActions.ASSISTANT_EDIT_IN_SQL_EDITOR_CLICKED,
+                        properties: {
+                          isInSQLEditor,
+                          isInNewSnippet,
+                        },
+                      })
                     }}
                     tooltip={{ content: { side: 'bottom', text: 'Edit in SQL Editor' } }}
                   />
@@ -306,7 +312,7 @@ export const SqlCard = ({
                     handleExecute()
                     if (isReadOnlySelect(sql)) {
                       sendEvent({
-                        action: TelemetryActions.ASSISTANT_SUGGESTION_RAN,
+                        action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
                         properties: { type: 'select' },
                       })
                     }
