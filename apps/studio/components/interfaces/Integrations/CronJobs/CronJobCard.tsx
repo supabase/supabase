@@ -47,6 +47,7 @@ export const CronJobCard = ({ job, onEditCronJob, onDeleteCronJob }: CronJobCard
   })
   const lastRun = data?.start_time ? dayjs(data.start_time).valueOf() : undefined
   const nextRun = getNextRun(job.schedule, data?.start_time)
+  console.log(job.jobname, { nextRun: dayjs(nextRun).format('DD MMM YYYY HH:mm:ss (ZZ)') })
   const schedule = convertCronToString(job.schedule)
 
   const { mutate: sendEvent } = useSendEventMutation()
