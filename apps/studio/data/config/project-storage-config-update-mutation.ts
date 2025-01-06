@@ -1,15 +1,19 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
+import { patch } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
-import { components } from 'api-types'
 
-type StorageConfigUpdatePayload = components['schemas']['UpdateStorageConfigBody']
-
-export type ProjectStorageConfigUpdateUpdateVariables = StorageConfigUpdatePayload & {
+export type ProjectStorageConfigUpdateUpdateVariables = {
   projectRef: string
+  fileSizeLimit: number
+  features?: {
+    imageTransformation: {
+      enabled: boolean
+    }
+  }
 }
 
 export async function updateProjectStorageConfigUpdate({
@@ -17,12 +21,12 @@ export async function updateProjectStorageConfigUpdate({
   fileSizeLimit,
   features,
 }: ProjectStorageConfigUpdateUpdateVariables) {
-  const { data, error } = await patch('/platform/projects/{ref}/config/storage', {
-    params: { path: { ref: projectRef } },
-    body: { fileSizeLimit, features },
+  const response = await patch(`${API_URL}/projects/${projectRef}/config/storage`, {
+    fileSizeLimit,
+    features,
   })
-  if (error) handleError(error)
-  return data
+  if (response.error) throw response.error
+  return response
 }
 
 type ProjectStorageConfigUpdateUpdateData = Awaited<
