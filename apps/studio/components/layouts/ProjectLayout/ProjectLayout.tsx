@@ -202,7 +202,7 @@ const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<ProjectLayout
                   direction="horizontal"
                   autoSaveId="project-layout-content"
                 >
-                  <ResizablePanel id="panel-content" className="w-full md:min-w-[600px]">
+                  <ResizablePanel id="panel-content" className="w-full lg:min-w-[600px]">
                     <main
                       className="h-full flex flex-col flex-1 w-full overflow-y-auto overflow-x-hidden"
                       ref={ref}

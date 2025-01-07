@@ -5,7 +5,13 @@ import { FormHeader } from 'components/ui/Forms/FormHeader'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  ScrollArea,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 import { TEMPLATES_SCHEMAS } from '../AuthTemplatesValidation'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import TemplateEditor from './TemplateEditor'
@@ -47,16 +53,17 @@ const EmailTemplates = () => {
       {isSuccess && (
         <FormPanel>
           <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
-            <TabsList_Shadcn_ className="px-8 pt-2 gap-5">
-              {TEMPLATES_SCHEMAS.map((template) => {
-                return (
-                  <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
-                    {template.title}
-                  </TabsTrigger_Shadcn_>
-                )
-              })}
-            </TabsList_Shadcn_>
-
+            <ScrollArea>
+              <TabsList_Shadcn_ className="px-8 pt-2 gap-5">
+                {TEMPLATES_SCHEMAS.map((template) => {
+                  return (
+                    <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
+                      {template.title}
+                    </TabsTrigger_Shadcn_>
+                  )
+                })}
+              </TabsList_Shadcn_>
+            </ScrollArea>
             {TEMPLATES_SCHEMAS.map((template) => {
               const panelId = template.title.trim().replace(/\s+/g, '-')
               return (

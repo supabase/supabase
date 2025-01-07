@@ -109,7 +109,7 @@ const Indexes = () => {
             )}
             {isSuccessSchemas && (
               <SchemaSelector
-                className="w-[180px]"
+                className="w-full lg:w-[180px]"
                 size="tiny"
                 showError={false}
                 selectedSchemaName={selectedSchema}
@@ -119,7 +119,7 @@ const Indexes = () => {
             <Input
               size="tiny"
               value={search}
-              className="w-52"
+              className="w-full lg:w-52"
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search for an index"
               icon={<Search size={14} />}
@@ -127,7 +127,7 @@ const Indexes = () => {
 
             {!isLocked && (
               <Button
-                className="ml-auto"
+                className="ml-auto flex-grow lg:flex-grow-0"
                 type="primary"
                 onClick={() => setShowCreateIndex(true)}
                 disabled={!isSuccessSchemas}
