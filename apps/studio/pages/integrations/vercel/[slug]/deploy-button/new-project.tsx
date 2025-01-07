@@ -11,7 +11,6 @@ import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -72,7 +71,6 @@ const CreateProject = () => {
   const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
 
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
-  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
 
   const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
@@ -195,8 +193,6 @@ const CreateProject = () => {
             },
             orgSlug: selectedOrganization?.slug,
           })
-
-          await syncEnvs({ connectionId })
         } catch (error) {
           console.error('An error occurred during createConnections:', error)
           return

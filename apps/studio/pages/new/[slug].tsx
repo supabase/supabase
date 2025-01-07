@@ -4,7 +4,7 @@ import { debounce } from 'lodash'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -149,15 +149,19 @@ const Wizard: NextPageWithLayout = () => {
 
   const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    [orgSubscription]
+  )
+
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      orgSubscription !== undefined &&
-      !['team', 'enterprise'].includes(orgSubscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
+
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === currentOrg?.id
   )
-  const hasOutstandingInvoices = overdueInvoices.length > 0
+  const hasOutstandingInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
   const { data: allProjects } = useProjectsQuery({})
   const organizationProjects =

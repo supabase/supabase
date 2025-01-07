@@ -12,7 +12,6 @@ import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
 import { vercelIcon } from 'components/to-be-cleaned/ListIcons'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -104,17 +103,9 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutateAsync: syncEnvs } = useIntegrationsVercelConnectionSyncEnvsMutation()
   const { mutate: createConnections, isLoading: isCreatingConnection } =
     useIntegrationVercelConnectionsCreateMutation({
-      async onSuccess({ id }) {
-        try {
-          await syncEnvs({ connectionId: id })
-        } catch (error: any) {
-          snapshot.setLoading(false)
-          toast.error('Failed to sync environment variables: ', error.message)
-        }
-
+      onSuccess() {
         if (next) {
           snapshot.setLoading(false)
           window.location.href = next
