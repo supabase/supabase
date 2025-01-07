@@ -15,7 +15,7 @@ import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { Announcement, SonnerToaster, themes } from 'ui'
+import { SonnerToaster, themes } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -23,7 +23,6 @@ import MetaFaviconsPagesRouter, {
   DEFAULT_FAVICON_ROUTE,
   DEFAULT_FAVICON_THEME_COLOR,
 } from 'common/MetaFavicons/pages-router'
-import LW13CountdownBanner from 'ui/src/layout/banners/LW13CountdownBanner/LW13CountdownBanner'
 import { WwwCommandMenu } from '~/components/CommandMenu'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION, IS_PREVIEW } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
@@ -161,9 +160,6 @@ export default function App({ Component, pageProps }: AppProps) {
           forcedTheme={forceDarkMode ? 'dark' : undefined}
         >
           <CommandProvider>
-            <Announcement>
-              <LW13CountdownBanner />
-            </Announcement>
             <SonnerToaster position="top-right" />
             <Component {...pageProps} />
             <WwwCommandMenu />
