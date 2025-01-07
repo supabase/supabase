@@ -215,7 +215,7 @@ export const SqlCard = ({
                   sendEvent({
                     action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
                     properties: {
-                      type: 'mutation',
+                      queryType: 'mutation',
                       category: identifyQueryType(sql) ?? 'unknown',
                     },
                   })
@@ -313,7 +313,7 @@ export const SqlCard = ({
                     if (isReadOnlySelect(sql)) {
                       sendEvent({
                         action: TelemetryActions.ASSISTANT_SUGGESTION_RUN_QUERY_CLICKED,
-                        properties: { type: 'select' },
+                        properties: { queryType: 'select' },
                       })
                     }
                   }}
