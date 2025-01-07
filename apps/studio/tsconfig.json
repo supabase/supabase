@@ -1,18 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ES2021",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2023",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "downlevelIteration": true,
     "incremental": true,
@@ -20,20 +21,15 @@
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "useDefineForClassFields": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "types": ["node", "vite/client"]
   },
   "include": [
-    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
     "**/*.js",
     "**/*.jsx",
-    ".next/types/**/*.ts",
-    "./../../packages/ui/src/**/*.d.ts"
+    "./../../packages/ui/src/**/*.d.ts",
+    ".react-router/types/**/*"
   ],
   "exclude": ["node_modules"]
 }

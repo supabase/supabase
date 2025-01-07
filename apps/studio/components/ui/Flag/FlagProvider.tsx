@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js'
-import { FlagValues } from '@vercel/flags/react'
+// import { FlagValues } from '@vercel/flags/react'
 import { PropsWithChildren, useEffect, useState } from 'react'
 
 import { useUser } from 'lib/auth'
@@ -69,7 +69,7 @@ const FlagProvider = ({ children }: PropsWithChildren<{}>) => {
         [Joshen] Just support configcat flags in Vercel flags for now for simplicity
         although I think it should be fairly simply to support PH too 
       */}
-      <FlagValues values={store.configcat} />
+      {/* <FlagValues values={store.configcat} /> */}
       {children}
     </Provider>
   )

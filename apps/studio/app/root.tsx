@@ -19,15 +19,7 @@ import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
-import {
-  Links,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  UIMatch,
-  useMatches,
-} from '@remix-run/react'
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, UIMatch, useMatches } from 'react-router'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider, useThemeSandbox } from 'common'

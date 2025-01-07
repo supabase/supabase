@@ -1,4 +1,4 @@
-import { Link as RemixLink } from '@remix-run/react'
+import { Link as RemixLink } from 'react-router'
 
 export default function Link({
   children,

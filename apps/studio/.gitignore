@@ -8,9 +8,8 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
+# react-router
+/.react-router/
 
 # production
 /build

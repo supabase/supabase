@@ -69,7 +69,7 @@ declare module 'next/router' {
   }
 
   /**
-   * @deprecated use functions from `@remix-run/react` instead
+   * @deprecated use functions from `react-router` instead
    */
   export function useRouter(): NextRouter
 }

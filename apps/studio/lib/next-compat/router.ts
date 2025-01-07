@@ -1,4 +1,4 @@
-import { useLocation, useParams, useSearchParams, useNavigate } from '@remix-run/react'
+import { useLocation, useParams, useSearchParams, useNavigate } from 'react-router'
 import { BASE_PATH } from 'lib/constants'
 import { NextRouter } from 'next/router'
 import { parse } from 'querystring'
