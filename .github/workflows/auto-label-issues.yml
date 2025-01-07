@@ -68,5 +68,5 @@ jobs:
           IS_SPAM=$(echo "$SPAM_RESPONSE" | jq -r '.spam')
           if [ "$IS_SPAM" == "true" ]; then
             echo "Applying flagged label for new issue suspected of spam"
-            gh issue edit "$NUMBER" --add-label "$LABELS"
+            gh issue edit "$NUMBER" --add-label "$LABEL"
           fi
