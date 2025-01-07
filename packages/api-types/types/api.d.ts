@@ -2123,6 +2123,10 @@ export interface paths {
     /** Deletes the given project */
     delete: operations['v1-delete-a-project']
   }
+  '/v1/projects/{ref}/analytics/endpoints/logs.all': {
+    /** Gets project's logs */
+    get: operations['V1ProjectLogsController_getLogs']
+  }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
@@ -4956,6 +4960,8 @@ export interface components {
     }
     ProjectClonedResponse: {
       source_project_ref: string
+      target_disk_size_gb: number
+      target_instance_size: string
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
@@ -6851,6 +6857,26 @@ export interface components {
       total: number
       users: components['schemas']['UserBody'][]
     }
+    V1AnalyticsResponse: {
+      error?: OneOf<
+        [
+          {
+            code?: number
+            errors?: {
+              domain?: string
+              location?: string
+              locationType?: string
+              message?: string
+              reason?: string
+            }[]
+            message?: string
+            status?: string
+          },
+          string,
+        ]
+      >
+      result?: Record<string, never>[]
+    }
     V1Backup: {
       inserted_at: string
       is_physical_backup: boolean
@@ -8048,7 +8074,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['BackupsResponse']
+          'application/json': Record<string, never>
         }
       }
       /** @description Failed to list available valid backups */
@@ -11851,16 +11877,12 @@ export interface operations {
   /** Gets project's logs */
   LogsController_getApiPaths: {
     parameters: {
-      query: {
-        sql: string
-        project: string
-        iso_timestamp_start: string
-        iso_timestamp_end: string
-        timestamp_start: string
-        timestamp_end: string
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
       }
       path: {
-        /** @description Project ref */
         ref: string
       }
     }
@@ -16072,6 +16094,29 @@ export interface operations {
       200: {
         content: {
           'application/json': components['schemas']['V1ProjectRefResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's logs */
+  V1ProjectLogsController_getLogs: {
+    parameters: {
+      query?: {
+        iso_timestamp_end?: string
+        iso_timestamp_start?: string
+        sql?: string
+      }
+      path: {
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1AnalyticsResponse']
         }
       }
       403: {

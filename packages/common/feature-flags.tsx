@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 
 import { components } from 'api-types'
 import { useUser } from './auth'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from './constants'
+import { LOCAL_STORAGE_KEYS } from './constants'
 import { get, post } from './fetchWrappers'
 
 type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBodyDto']
