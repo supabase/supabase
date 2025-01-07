@@ -5,20 +5,20 @@ import {
   SVGProps,
   ForwardRefExoticComponent,
   RefAttributes,
-} from 'react';
-import defaultAttributes from './defaultAttributes';
+} from 'react'
+import defaultAttributes from './defaultAttributes'
 
-export type IconNode = [elementName: keyof ReactSVG, attrs: Record<string, string>][];
+export type IconNode = [elementName: keyof ReactSVG, attrs: Record<string, string>][]
 
-export type SVGAttributes = Partial<SVGProps<SVGSVGElement>>;
-type ComponentAttributes = RefAttributes<SVGSVGElement> & SVGAttributes;
+export type SVGAttributes = Partial<SVGProps<SVGSVGElement>>
+type ComponentAttributes = RefAttributes<SVGSVGElement> & SVGAttributes
 
 export interface LucideProps extends ComponentAttributes {
-  size?: string | number;
-  absoluteStrokeWidth?: boolean;
+  size?: string | number
+  absoluteStrokeWidth?: boolean
 }
 
-export type LucideIcon = ForwardRefExoticComponent<LucideProps>;
+export type LucideIcon = ForwardRefExoticComponent<LucideProps>
 /**
  * Converts string to KebabCase
  * Copied from scripts/helper. If anyone knows how to properly import it here
@@ -31,7 +31,7 @@ export const toKebabCase = (string: string) =>
   string
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
     .toLowerCase()
-    .trim();
+    .trim()
 
 const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
   const Component = forwardRef<SVGSVGElement, LucideProps>(
@@ -45,7 +45,7 @@ const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
         children,
         ...rest
       },
-      ref,
+      ref
     ) => {
       return createElement(
         'svg',
@@ -64,14 +64,14 @@ const createLucideIcon = (iconName: string, iconNode: IconNode): LucideIcon => {
         [
           ...iconNode.map(([tag, attrs]) => createElement(tag, attrs)),
           ...(Array.isArray(children) ? children : [children]),
-        ],
-      );
-    },
-  );
+        ]
+      )
+    }
+  )
 
-  Component.displayName = `${iconName}`;
+  Component.displayName = `${iconName}`
 
-  return Component;
-};
+  return Component
+}
 
-export default createLucideIcon;
+export default createLucideIcon

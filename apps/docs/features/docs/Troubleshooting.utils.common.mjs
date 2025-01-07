@@ -1,3 +1,5 @@
+// @ts-check
+
 /**
  * This file is for utils needed in both the Next.js app build and the
  * troubleshooting sync script. Because of unsolved problems with imports, the
@@ -98,16 +100,13 @@ export const TroubleshootingSchema = z
   })
   .strict()
 
-/*
+/**
  * @param {unknown} troubleshootingMetadata
  */
 function validateTroubleshootingMetadata(troubleshootingMetadata) {
   return TroubleshootingSchema.safeParse(troubleshootingMetadata)
 }
 
-/*
- * @returns {Promise<TroubleshootingEntry[]>}
- */
 export async function getAllTroubleshootingEntriesInternal() {
   const troubleshootingDirectoryContents = await readdir(TROUBLESHOOTING_DIRECTORY, {
     recursive: true,
@@ -172,7 +171,7 @@ export async function getAllTroubleshootingEntriesInternal() {
     }
   })
 
-  return (await Promise.all(troubleshootingFiles)).filter(Boolean)
+  return (await Promise.all(troubleshootingFiles)).filter((x) => x != null)
 }
 
 /**

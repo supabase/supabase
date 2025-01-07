@@ -1,20 +1,6 @@
 {
   "$schema": "../icon.schema.json",
-  "contributors": [
-    "it-is-not",
-    "jguddas",
-    "danielbayley",
-    "ericfennis"
-  ],
-  "tags": [
-    "letter",
-    "font size",
-    "text",
-    "formatting",
-    "smaller"
-  ],
-  "categories": [
-    "text",
-    "design"
-  ]
+  "contributors": ["it-is-not", "jguddas", "danielbayley", "ericfennis"],
+  "tags": ["letter", "font size", "text", "formatting", "smaller"],
+  "categories": ["text", "design"]
 }

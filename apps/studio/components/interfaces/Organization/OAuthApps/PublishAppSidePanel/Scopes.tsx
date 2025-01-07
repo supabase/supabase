@@ -107,6 +107,14 @@ export const ScopesPanel = ({
   return (
     <div className="-space-y-px">
       <Scope
+        title="Analytics"
+        description="Analytics logs."
+        readScopeName={OAuthScope.ANALYTICS_READ}
+        writeScopeName={OAuthScope.ANALYTICS_WRITE}
+        scopes={scopes}
+        setScopes={setScopes}
+      />
+      <Scope
         title="Auth"
         description="Auth configurations and SSO providers."
         readScopeName={OAuthScope.AUTH_READ}

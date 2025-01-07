@@ -159,8 +159,6 @@ If your repository doesn't have all the migration files, your production branch 
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Install the GitHub Integration" fullWidth>
 
-            When clicking `Enable branching` you will see the following dialog:
-
             <figure className="max-w-[520px]">
                 <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.png?v=1" />
             </figure>
@@ -173,9 +171,35 @@ If your repository doesn't have all the migration files, your production branch 
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="If You See the Following Dialog, You're in the Early Access Group" fullWidth>
+        <StepHikeCompact.Details title="Install the GitHub integration" fullWidth>
 
-            You should now see a popover with the GitHub Connection details shown.
+            When clicking `Enable branching` you will see the following dialog:
+
+            <figure className="max-w-[520px]">
+                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.jpg?v=1" />
+            </figure>
+
+            If you don't have the GitHub integration installed, click `Add new project connection`. The integration is required to run migration files and the optional database seed file.
+
+            You're taken to the GitHub integration page. Click `Install`.
+
+            <figure className="max-w-[520px]">
+                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-permissions.jpg?v=1" />
+            </figure>
+
+            Follow the instructions to link your Supabase project to its GitHub repository.
+
+            <figure className="max-w-[520px]">
+                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github-integration-link.jpg?v=1" />
+            </figure>
+
+            Return to your project and re-click `Enable branching`.
+
+        </StepHikeCompact.Details>
+    </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={3}>
+        <StepHikeCompact.Details title="You should now see a popover with the GitHub Connection details shown" fullWidth>
 
             Type in the branch you want to use for production. The name of the branch will be validated to make sure it exists in your GitHub repository.
 
@@ -192,10 +216,8 @@ If your repository doesn't have all the migration files, your production branch 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
-    <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Click `I Understand, Enable Branching`. Branching is Now Enabled for Your Project." fullWidth>
-
-
+    <StepHikeCompact.Step step={4}>
+        <StepHikeCompact.Details title="Click `I understand, enable branching`. Branching is now enabled for your project." fullWidth>
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
@@ -458,6 +480,71 @@ Persistent branches are the type of branches that will remain active even after 
 You can change any branch to be persistent on the [Branches](/dashboard/project/_/branches) page by clicking the triple dots icon next to the branch you want to modify, and selecting "Switch to persistent".
 All persistent branches can be toggled back to be an ephemeral branch in the exact same way.
 
+## Migration and seeding behavior
+
+Migrations are run in sequential order. Each migration builds upon the previous one.
+
+The preview branch has a record of which migrations have been applied, and only applies new migrations for each commit. This can create an issue when rolling back migrations.
+
+## Branch configuration with remotes
+
+When Branching is enabled, your `config.toml` settings automatically sync to all ephemeral branches through a one-to-one mapping between your Git and Supabase branches.
+
+### Basic configuration
+
+To update configuration for a Supabase branch, simply modify `config.toml` and push to git. The Supabase integration will detect the changes and apply them to the corresponding branch.
+
+### Remote-specific configuration
+
+For persistent branches that need specific settings, you can use the `[remotes]` block in your `config.toml`. Each remote configuration must reference an existing project ID.
+
+Here's an example of configuring a separate seed script for a staging environment:
+
+```toml
+[remotes.staging]
+project_id = "your-project-ref"
+
+[remotes.staging.db.seed]
+sql_paths = ["./seeds/staging.sql"]
+```
+
+Since the `project_id` field must reference an existing branch, you need to create the persistent branch before adding its configuration. Use the CLI to create a persistent branch first:
+
+```bash
+supabase --experimental branches create --persistent
+# Do you want to create a branch named develop? [Y/n]
+```
+
+### Configuration merging
+
+When merging a PR into a persistent branch, the Supabase integration:
+
+1. Checks for configuration changes
+2. Logs the changes
+3. Applies them to the target remote
+
+If no remote is declared or the project ID is incorrect, the configuration step is skipped.
+
+### Available configuration options
+
+All standard configuration options are available in the `[remotes]` block. This includes:
+
+- Database settings
+- API configurations
+- Authentication settings
+- Edge Functions configuration
+- And more
+
+You can use this to maintain different configurations for different environments while keeping them all in version control.
+
+### Rolling back migrations
+
+You might want to roll back changes you've made in an earlier migration change. For example, you may have pushed a migration file containing schema changes you no longer want.
+
+To fix this, push your latest changes, then delete the preview branch in Supabase and reopen it.
+
+The new preview branch is reseeded from your `./supabase/seed.sql` file by default. Any additional data changes you made on the old preview branch are lost. This is equivalent to running `supabase db reset` locally. All migrations are rerun in sequential order.
+
 ### Seeding behavior
 
 Your Preview Branches are seeded with sample data using the same as [local seeding behavior](/docs/guides/local-development/seeding-your-database).
@@ -471,12 +558,6 @@ Branching works with hosting providers that support preview deployments.
 With the Supabase branching integration, you can sync the Git branch used by the hosting provider with the corresponding Supabase preview branch. This means that the preview deployment built by your hosting provider is matched to the correct database schema, edge functions, and other Supabase configurations.
 
 ### Vercel
-
-<Admonition type="note" label="Vercel Marketplace support.">
-
-    The Vercel Integration for Supabase branching is working only with Supabase managed projects. There is currently no support for Vercel Marketplace managed resources, however the support is planned in the future.
-
-</Admonition>
 
 Install the Vercel integration:
 

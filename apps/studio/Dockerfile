@@ -8,7 +8,10 @@
 #    docker builder prune
 #    docker build . -f apps/studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:20-slim as base
+FROM node:20-slim AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 # Fixes issues with Sentry CLI and SSL certificates during build
 # TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
@@ -24,33 +27,33 @@ RUN apt-get update -qq && \
 WORKDIR /app
 
 # Prune unneeded dependencies with turbo (from apps/ for example)
-FROM base as turbo
+FROM base AS turbo
 COPY . .
 
-RUN npx turbo@2.0.4 prune studio --docker
+RUN pnpm dlx turbo@2.3.3 prune studio --docker
 
 # Install dev dependencies (only if needed)
-FROM base as deps
+FROM base AS deps
 COPY --from=turbo /app/out/json ./
-COPY --from=turbo /app/out/package-lock.json ./
+COPY --from=turbo /app/out/pnpm-lock.yaml ./
 
 # No need to clean cache because production uses standalone build
-RUN npm clean-install
+RUN pnpm install --frozen-lockfile
 
 # dev contains dependencies and source code not compiled
-FROM deps as dev
+FROM deps AS dev
 COPY --from=turbo /app/out/full ./
 ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 8082
-CMD ["npm", "run", "dev:studio"]
+CMD ["pnpm", "dev:studio"]
 
 # Compile Next.js
-FROM dev as builder
+FROM dev AS builder
 
-RUN npx turbo@2.0.4 run build --filter studio -- --no-lint
+RUN pnpm dlx turbo@2.3.3 run build --filter studio -- --no-lint
 
 # Copy only compiled code and dependencies
-FROM base as production
+FROM base AS production
 COPY --from=builder /app/apps/studio/public ./apps/studio/public
 COPY --from=builder /app/apps/studio/.next/standalone ./
 COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static

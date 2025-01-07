@@ -1,6 +1,6 @@
 'use client'
 
-import { isBrowser } from 'common'
+import { isBrowser, useTelemetryCookie } from 'common'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 import { useConsent } from 'ui-patterns/ConsentToast'
@@ -60,6 +60,12 @@ const useTelemetryWithConsent = () => {
 
 const PageTelemetry = () => {
   const pathname = usePathname()
+
+  const title = typeof document !== 'undefined' ? document?.title : ''
+  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
+  const { hasAcceptedConsent } = useConsent()
+  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
+
   const { sendPageTelemetry, sendPageLeaveTelemetry } = useTelemetryWithConsent()
 
   useEffect(() => {

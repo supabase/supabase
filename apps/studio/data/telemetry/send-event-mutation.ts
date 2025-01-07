@@ -4,14 +4,77 @@ import { components } from 'api-types'
 import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
-import { TelemetryActions } from 'lib/constants/telemetry'
+import {
+  ConnectionStringCopiedEvent,
+  CronJobCreateClickedEvent,
+  CronJobCreatedEvent,
+  CronJobDeleteClickedEvent,
+  CronJobDeletedEvent,
+  CronJobHistoryClickedEvent,
+  CronJobUpdateClickedEvent,
+  CronJobUpdatedEvent,
+  FeaturePreviewsClickedEvent,
+  FeaturePreviewEnabledEvent,
+  FeaturePreviewDisabledEvent,
+  SqlEditorQuickstartClickedEvent,
+  SqlEditorTemplateClickedEvent,
+  SqlEditorResultDownloadCsvClickedEvent,
+  SqlEditorResultCopyMarkdownClickedEvent,
+  SqlEditorResultCopyJsonClickedEvent,
+  TelemetryActions,
+  SignUpEvent,
+  SignInEvent,
+  RealtimeInspectorListenChannelClickedEvent,
+  RealtimeInspectorBroadcastSentEvent,
+  RealtimeInspectorMessageClickedEvent,
+  RealtimeInspectorCopyMessageClickedEvent,
+  RealtimeInspectorFiltersAppliedEvent,
+  RealtimeInspectorDatabaseRoleUpdatedEvent,
+  AssistantPromptSubmittedEvent,
+  AssistantDebugSubmittedEvent,
+  AssistantSuggestionRunQueryClickedEvent,
+  AssistantSqlDiffHandlerEvaluatedEvent,
+  AssistantEditInSqlEditorClickedEvent,
+} from 'lib/constants/telemetry'
 import { useRouter } from 'next/router'
 import type { ResponseError } from 'types'
 
-export type SendEventVariables = {
-  action: TelemetryActions
-  properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
-}
+export type SendEventVariables =
+  | SignUpEvent
+  | SignInEvent
+  | ConnectionStringCopiedEvent
+  | CronJobCreatedEvent
+  | CronJobUpdatedEvent
+  | CronJobDeletedEvent
+  | CronJobCreateClickedEvent
+  | CronJobUpdateClickedEvent
+  | CronJobDeleteClickedEvent
+  | CronJobHistoryClickedEvent
+  | FeaturePreviewsClickedEvent
+  | FeaturePreviewEnabledEvent
+  | FeaturePreviewDisabledEvent
+  | RealtimeInspectorListenChannelClickedEvent
+  | RealtimeInspectorBroadcastSentEvent
+  | RealtimeInspectorMessageClickedEvent
+  | RealtimeInspectorCopyMessageClickedEvent
+  | RealtimeInspectorFiltersAppliedEvent
+  | RealtimeInspectorDatabaseRoleUpdatedEvent
+  | SqlEditorQuickstartClickedEvent
+  | SqlEditorTemplateClickedEvent
+  | SqlEditorResultDownloadCsvClickedEvent
+  | SqlEditorResultCopyMarkdownClickedEvent
+  | SqlEditorResultCopyJsonClickedEvent
+  | AssistantPromptSubmittedEvent
+  | AssistantDebugSubmittedEvent
+  | AssistantSuggestionRunQueryClickedEvent
+  | AssistantSqlDiffHandlerEvaluatedEvent
+  | AssistantEditInSqlEditorClickedEvent
+
+  // TODO remove this once all events are documented
+  | {
+      action: TelemetryActions
+      properties?: Record<string, any> // Is arbitrary, but always aim to be self-explanatory with custom properties
+    }
 
 type SendEventPayload = components['schemas']['TelemetryEventBodyV2']
 
@@ -47,7 +110,8 @@ export const useSendEventMutation = ({
 
   return useMutation<SendEventData, ResponseError, SendEventVariables>(
     (vars) => {
-      const { action, properties } = vars
+      const { action } = vars
+      const properties = 'properties' in vars ? vars.properties : {}
 
       const body: SendEventPayload = {
         action,
@@ -62,7 +126,7 @@ export const useSendEventMutation = ({
           viewport_height: isBrowser ? window.innerHeight : 0,
           viewport_width: isBrowser ? window.innerWidth : 0,
         },
-        custom_properties: (properties || {}) as any,
+        custom_properties: properties as any,
       }
 
       return sendEvent({ body })

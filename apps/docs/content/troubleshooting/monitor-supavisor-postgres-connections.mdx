@@ -20,7 +20,7 @@ It can be run locally within Docker. Alternatively, you can deploy it to fly.io 
 
 Installation instructions can be found in it the [metrics docs ](/docs/guides/platform/metrics#deploying-supabase-grafana)
 
-## Observing Connections
+## Observing connections
 
 In Supabase Grafana, the "Client Connections" graph shows connections to both Supavisor and Postgres
 ![image](https://github.com/supabase/supabase/assets/91111415/141b8e01-9aae-4544-818c-acb47371ef3b)
@@ -28,7 +28,7 @@ In Supabase Grafana, the "Client Connections" graph shows connections to both Su
 - **Yellow**: The yellow line represents the number of actively querying and idle connections to the Supavisor Pooler.
 - **Green**: The green line represents the total number of actively querying and idle direct connections to the database.
 
-## Investigating Connection Sources
+## Investigating connection sources
 
 `pg_stat_activity` is a `VIEW` that keeps track of processes being run by your database, including connections. It's particularly useful for determining if idle clients are hogging connection slots.
 
@@ -76,7 +76,7 @@ If you believe a connection should be killed, you can do so by running the follo
   where pid = <connection_id>;
 ```
 
-## Managing the Supavisor Pooler:
+## Managing the Supavisor pooler:
 
 The Supavisor Pooler is an intermediary between your clients (application servers) and the database. In transaction mode (port 6543), it can enable Postgres to share single connections with many clients, only allowing access when a query is pending. This prevents idle clients from hogging a direct connection and allows for more throughput.
 
@@ -87,7 +87,7 @@ The general rule is that if you are using the PostgREST database API, you should
 
 These numbers are generalizations and assume a certain level of activity from all connected servers. The actual values depend on your peak connection usage. For instance, if you were only using 80 connections in a week period and your database could support 500 connections, then realistically you could allocate the remaining 420 (minus a reasonable buffer) to service more demand.
 
-## Secondary Issues:
+## Secondary issues:
 
 When managing Postgres, outside of connections, there are generally 3 likely bottlenecks (links to address each):
 

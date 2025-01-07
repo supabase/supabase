@@ -50,6 +50,9 @@ info:
     - id: local
       title: Local Development
       description: Local Development settings.
+    - id: branching
+      title: Branching
+      description: Branching configurations settings.
 
 # This section is an array of public functions which a user might need to execute.
 parameters:
@@ -499,6 +502,18 @@ parameters:
     description: |
       External URL of the API server that frontend connects to.
     links: []
+
+  - id: 'studio.openai_api_key'
+    title: 'studio.openai_api_key'
+    tags: ['dashboard']
+    required: false
+    default: 'env(OPENAI_API_KEY)'
+    description: |
+      OpenAI API key used for AI features in the Studio dashboard.
+      DO NOT commit your OpenAI API key to git. Use environment variable substitution instead.
+    links:
+      - name: 'OpenAI API Keys'
+        link: 'https://platform.openai.com/api-keys'
 
   - id: 'inbucket.enabled'
     title: 'inbucket.enabled'
@@ -1587,3 +1602,19 @@ parameters:
       DO NOT commit your AWS secret key to git. Use environment variable substitution instead.
       Note: This is an experimental feature and may change in future releases.
     links: []
+
+  - id: 'remotes.branch_name.project_id'
+    title: 'remotes.<branch_name>.project_id'
+    tags: ['branching']
+    required: true
+    description: |
+      The project reference ID for a specific persistent Supabase branch.
+      This ID is used to configure branch-specific settings in your config.toml file for branches deployments.
+      All other configuration options available in the root config are also supported in the remotes block.
+      For example, you can specify branch-specific database settings like so:
+    usage: |
+      [remotes.<branch_name>]
+      project_id = "your-project-ref"
+
+      [remotes.<branch_name>.db.seed]
+      sql_paths = ["./seeds/staging.sql"]
