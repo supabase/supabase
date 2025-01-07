@@ -68,7 +68,7 @@ function getPostgrestRoleImpersonationSql(projectRef: string, role: PostgrestImp
 
   return /* SQL */ `
     select set_config('role', '${role.role}', true),
-           set_config('request.jwt.claims', '${JSON.stringify(claims)}', true),
+           set_config('request.jwt.claims', '${JSON.stringify(claims).replaceAll("'", "''")}', true),
            set_config('request.method', 'POST', true),
            set_config('request.path', '/impersonation-example-request-path', true),
            set_config('request.headers', '{"accept": "*/*"}', true);
