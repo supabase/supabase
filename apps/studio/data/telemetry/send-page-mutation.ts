@@ -1,13 +1,10 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 
 import { components } from 'api-types'
-import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
-import FlagContext from 'components/ui/Flag/FlagContext'
-import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
+import { isBrowser, LOCAL_STORAGE_KEYS, useFeatureFlags } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useContext } from 'react'
 import type { ResponseError } from 'types'
 
 export type SendPageVariables = {
@@ -39,7 +36,7 @@ export const useSendPageMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageData, ResponseError, SendPageVariables>, 'mutationFn'> = {}) => {
   const router = useRouter()
-  const flagStore = useContext(FlagContext) as FlagProviderStore
+  const flagStore = useFeatureFlags()
 
   const title = typeof document !== 'undefined' ? document?.title : ''
   const referrer = typeof document !== 'undefined' ? document?.referrer : ''

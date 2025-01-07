@@ -1,13 +1,10 @@
 import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
-import { LOCAL_STORAGE_KEYS } from 'common'
-import FlagContext from 'components/ui/Flag/FlagContext'
-import { FlagProviderStore } from 'components/ui/Flag/FlagProvider'
+import { LOCAL_STORAGE_KEYS, useFeatureFlags } from 'common'
 import { handleError, post } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
-import { useContext } from 'react'
 import type { ResponseError } from 'types'
 
 type SendPageLeaveBody = components['schemas']['TelemetryPageLeaveBodyDto']
@@ -35,7 +32,7 @@ export const useSendPageLeaveMutation = ({
   ...options
 }: Omit<UseMutationOptions<SendPageLeaveData, ResponseError>, 'mutationFn'> = {}) => {
   const router = useRouter()
-  const flagStore = useContext(FlagContext) as FlagProviderStore
+  const flagStore = useFeatureFlags()
 
   const url = typeof window !== 'undefined' ? window.location.href : ''
   const title = typeof document !== 'undefined' ? document?.title : ''

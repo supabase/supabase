@@ -22,14 +22,14 @@ import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
+import { FeatureFlagProvider, ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useMemo, useState } from 'react'
+import { ErrorInfo, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -40,11 +40,11 @@ import { FeaturePreviewContextProvider } from 'components/interfaces/App/Feature
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { GenerateSql } from 'components/interfaces/SqlGenerator/SqlGenerator'
 import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
-import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
+import { getFlags as getConfigCatFlags } from 'lib/configcat'
+import { API_URL, BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
@@ -105,7 +105,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           <AuthProvider>
-            <FlagProvider>
+            <FeatureFlagProvider API_URL={API_URL} getConfigCatFlags={getConfigCatFlags}>
               <ProfileProvider>
                 <Head>
                   <title>Supabase</title>
@@ -142,7 +142,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 {!isTestEnv && <HCaptchaLoadedStore />}
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </ProfileProvider>
-            </FlagProvider>
+            </FeatureFlagProvider>
           </AuthProvider>
         </Hydrate>
       </QueryClientProvider>
