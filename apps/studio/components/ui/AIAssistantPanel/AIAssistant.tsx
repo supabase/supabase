@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { last } from 'lodash'
 import { ArrowDown, FileText, Info, X } from 'lucide-react'
 import { memo, useEffect, useMemo, useRef, useState } from 'react'

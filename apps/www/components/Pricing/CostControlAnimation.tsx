@@ -1,5 +1,5 @@
 import React, { FC, useRef, useState } from 'react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { Switch, cn } from 'ui'
 
 interface Props {

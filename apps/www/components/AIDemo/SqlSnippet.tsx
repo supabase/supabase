@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Code, Play, DatabaseIcon } from 'lucide-react'
 import { Button, cn, ChartContainer, ChartTooltip, ChartTooltipContent, SQL_ICON } from 'ui'
 import { BarChart, Bar, XAxis, CartesianGrid } from 'recharts'

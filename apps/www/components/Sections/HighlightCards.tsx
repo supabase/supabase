@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react'
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useInView } from 'motion/react'
 import { INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import Panel from '~/components/Panel'

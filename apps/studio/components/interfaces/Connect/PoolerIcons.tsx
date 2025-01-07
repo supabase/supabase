@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { Fragment, useEffect, useState } from 'react'
 
 import { Database } from 'icons'

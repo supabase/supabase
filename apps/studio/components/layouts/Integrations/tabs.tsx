@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion, MotionProps, useScroll, useTransform } from 'motion/react'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ComponentType, useRef } from 'react'

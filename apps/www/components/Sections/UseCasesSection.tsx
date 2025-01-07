@@ -1,4 +1,4 @@
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useInView } from 'motion/react'
 import Link from 'next/link'
 import { ReactNode, useRef } from 'react'
 import { Button } from 'ui'

@@ -1,4 +1,4 @@
-import { LazyMotion, domAnimation, m, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useInView } from 'motion/react'
 import { ArrowUpRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'

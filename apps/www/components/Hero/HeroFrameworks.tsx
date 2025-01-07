@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useBreakpoint, useTelemetryProps } from 'common'
 import { cn } from 'ui'
 import Telemetry from '~/lib/telemetry'

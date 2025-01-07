@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { cn } from 'ui'
 import { detectBrowser, isBrowser } from 'common'
 

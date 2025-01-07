@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion'
+import { m, AnimatePresence, LazyMotion, domAnimation } from 'motion/react'
 
 import { DEFAULT_EASE } from '~/lib/animations'
 import { Accordion, Button, TextLink } from 'ui'

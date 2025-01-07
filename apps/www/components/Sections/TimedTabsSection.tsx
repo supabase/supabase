@@ -1,6 +1,6 @@
 import 'swiper/css'
 
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { AnimatePresence, motion, useAnimation } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'

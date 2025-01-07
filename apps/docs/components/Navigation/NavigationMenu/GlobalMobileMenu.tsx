@@ -1,4 +1,4 @@
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
 import { X } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'

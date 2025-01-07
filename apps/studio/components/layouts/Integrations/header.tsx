@@ -1,4 +1,4 @@
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion, useScroll, useTransform } from 'motion/react'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'

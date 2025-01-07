@@ -1,4 +1,4 @@
-import { LazyMotion, m } from 'framer-motion'
+import { LazyMotion, m } from 'motion/react'
 import { PropsWithChildren } from 'react'
 import { SyntaxHighlighterProps, createElement } from 'react-syntax-highlighter'
 

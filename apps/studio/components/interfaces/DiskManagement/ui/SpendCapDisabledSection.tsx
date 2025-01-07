@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'

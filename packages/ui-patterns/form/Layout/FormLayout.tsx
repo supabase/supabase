@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import React from 'react'
 import {
   FormDescription_Shadcn_,

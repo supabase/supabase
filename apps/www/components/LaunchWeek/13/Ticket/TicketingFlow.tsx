@@ -1,5 +1,5 @@
 import React from 'react'
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, m, LazyMotion, domAnimation } from 'motion/react'
 import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW13_DATE } from '~/lib/constants'
