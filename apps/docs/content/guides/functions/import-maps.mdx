@@ -6,6 +6,42 @@ subtitle: 'Managing packages and dependencies.'
 tocVideo: 'ILr3cneZuFk'
 ---
 
+## Importing dependencies
+
+Supabase Edge Functions support several ways to import dependencies:
+
+- JavaScript modules from npm (https://docs.deno.com/examples/npm/)
+- Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
+- Modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
+
+### NPM modules
+
+You can import npm modules using the `npm:` specifier:
+
+```ts
+import { createClient } from 'npm:@supabase/supabase-js@2'
+```
+
+### Node.js built-ins
+
+For Node.js built-in APIs, use the `node:` specifier:
+
+```ts
+import process from 'node:process'
+```
+
+Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
+
+### JSR
+
+You can import JS modules published to [JSR](https://jsr.io/) (eg: Deno's standard library), using the `jsr:` specifier:
+
+```ts
+import path from 'jsr:@std/path@1.0.8'
+```
+
+## Managing dependencies
+
 Developing with Edge Functions is similar to developing with Node.js, but with a few key differences.
 
 In the Deno ecosystem, each function should be treated as an independent project with its own set of dependencies and configurations. This "isolation by design" approach:
@@ -16,8 +52,6 @@ In the Deno ecosystem, each function should be treated as an independent project
 - Allows for different versions of the same dependency across functions
 
 For these reasons, we recommend maintaining separate configuration files (`deno.json`/`deno.jsonc`, `.npmrc`, or `import_map.json`) within each function's directory, even if it means duplicating some configurations.
-
-## Managing dependencies
 
 There are two ways to manage your dependencies in Supabase Edge Functions:
 
@@ -152,56 +186,16 @@ import MyPackage from 'npm:@myorg/private-package@v1.0.1'
 // use MyPackage
 ```
 
-## Importing dependencies
+### Using a custom NPM registry
 
-Supabase Edge Functions support several ways to import dependencies:
+<Admonition type="info">This feature requires Supabase CLI version 2.2.8 or higher.</Admonition>
 
-- The Deno [standard library](https://deno.land/std)
-- JavaScript modules from npm (https://docs.deno.com/examples/npm/)
-- Built-in [Node APIs](https://docs.deno.com/runtime/manual/node/compatibility)
-- Third party modules published to [JSR](https://jsr.io/) or [deno.land/x](https://deno.land/x)
+Some organizations require a custom NPM registry for security and compliance purposes. In such instances, you can specify the custom NPM registry to use via `NPM_CONFIG_REGISTRY` environment variable.
 
-### NPM modules
+You can define it in the project's `.env` file or directly specify it when running the deploy command:
 
-You can import npm modules using the `npm:` specifier:
-
-```ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
-```
-
-### Node.js built-ins
-
-For Node.js built-in APIs, use the `node:` specifier:
-
-```ts
-import process from 'node:process'
-```
-
-Learn more about npm specifiers and Node built-in APIs in [Deno's documentation](https://docs.deno.com/runtime/manual/node/npm_specifiers).
-
-### Importing from private registries
-
-<Admonition type="info">
-
-This feature requires Supabase CLI version 1.207.9 or higher.
-
-</Admonition>
-
-Create a `.npmrc` file within `supabase/functions`. This will allow you to import the private packages into multiple functions. Alternatively, you can place the `.npmrc` file directly inside `supabase/functions/function-name` directory.)
-
-Add your registry details in the `.npmrc` file. Follow [this guide](https://docs.npmjs.com/cli/v10/configuring-npm/npmrc) to learn more about the syntax of npmrc files.
-
-```
-@myorg:registry=https://npm.registryhost.com
-//npm.registryhost.com/:_authToken=VALID_AUTH_TOKEN
-```
-
-After that, you can import the package directly in your function code or add it to the import_map.json (/docs/guides/functions/import-maps#using-import-maps).
-
-```ts
-import MyPackage from 'npm:@myorg/private-package@v1.0.1'
-
-// use MyPackage
+```bash
+NPM_CONFIG_REGISTRY=https://custom-registry/ supabase functions deploy my-function
 ```
 
 ## Importing types
