@@ -16,6 +16,7 @@
     "lint": "next lint",
     "lint:mdx": "supa-mdx-lint content/guides --config ../../supa-mdx-lint.config.toml",
     "typecheck": "tsc --noEmit",
+    "pretest": "pnpm run codegen:examples",
     "test": "vitest --exclude \"**/*.smoke.test.ts\"",
     "test:smoke": "pnpm run codegen:references && vitest -t \"prod smoke test\"",
     "embeddings": "tsx scripts/search/generate-embeddings.ts",
