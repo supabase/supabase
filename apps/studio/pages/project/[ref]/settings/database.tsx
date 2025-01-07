@@ -19,11 +19,9 @@ import { useFlag } from 'hooks/ui/useFlag'
 import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
-  const diskManagementV2 = useFlag('diskManagementV2')
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
   const project = useSelectedProject()
-
-  const showNewDiskManagementUI = diskManagementV2 && project?.cloud_provider === 'AWS'
+  const connectDialogUpdate = useFlag('connectDialogUpdate')
+  const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <>

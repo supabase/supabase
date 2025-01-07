@@ -18,6 +18,8 @@ import {
   useRemainingDurationForDiskAttributeUpdate,
 } from 'data/config/disk-attributes-query'
 import { useUpdateDiskAttributesMutation } from 'data/config/disk-attributes-update-mutation'
+import { useDiskAutoscaleCustomConfigQuery } from 'data/config/disk-autoscale-config-query'
+import { useUpdateDiskAutoscaleConfigMutation } from 'data/config/disk-autoscale-config-update-mutation'
 import { useDiskUtilizationQuery } from 'data/config/disk-utilization-query'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
@@ -46,6 +48,7 @@ import { DiskManagementMessage } from './DiskManagement.types'
 import { mapComputeSizeNameToAddonVariantId } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { DiskManagementReviewAndSubmitDialog } from './DiskManagementReviewAndSubmitDialog'
+import { AutoScaleFields } from './fields/AutoScaleFields'
 import { ComputeSizeField } from './fields/ComputeSizeField'
 import { DiskSizeField } from './fields/DiskSizeField'
 import { IOPSField } from './fields/IOPSField'
@@ -53,6 +56,7 @@ import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
+  DISK_AUTOSCALE_CONFIG_DEFAULTS,
   DiskType,
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
@@ -61,11 +65,8 @@ import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 
 export function DiskManagementForm() {
-  const {
-    project,
-    // isLoading is used to avoid a useCheckPermissions() race condition
-    isLoading: isProjectLoading,
-  } = useProjectContext()
+  // isLoading is used to avoid a useCheckPermissions() race condition
+  const { project, isLoading: isProjectLoading } = useProjectContext()
   const org = useSelectedOrganization()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
@@ -136,12 +137,15 @@ export function DiskManagementForm() {
   const { data: subscription, isSuccess: isSubscriptionSuccess } = useOrgSubscriptionQuery({
     orgSlug: org?.slug,
   })
+  const { data: diskAutoscaleConfig, isSuccess: isDiskAutoscaleConfigSuccess } =
+    useDiskAutoscaleCustomConfigQuery({ projectRef })
 
   /**
    * Handle default values
    */
   // @ts-ignore
   const { type, iops, throughput_mbps, size_gb } = data?.attributes ?? { size_gb: 0 }
+  const { growth_percent, max_size_gb, min_increment_gb } = diskAutoscaleConfig ?? {}
   const defaultValues = {
     storageType: type ?? DiskType.GP3,
     provisionedIOPS: iops,
@@ -150,6 +154,10 @@ export function DiskManagementForm() {
     computeSize: project?.infra_compute_size
       ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
       : undefined,
+
+    growthPercent: growth_percent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent,
+    minIncrementGb: min_increment_gb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize,
+    maxSizeGb: max_size_gb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb,
   }
 
   const form = useForm<DiskStorageSchemaType>({
@@ -169,6 +177,7 @@ export function DiskManagementForm() {
     isDiskUtilizationSuccess &&
     isReadReplicasSuccess &&
     isSubscriptionSuccess &&
+    isDiskAutoscaleConfigSuccess &&
     isCooldownSuccess
 
   const isRequestingChanges = data?.requested_modification !== undefined
@@ -205,19 +214,23 @@ export function DiskManagementForm() {
       // this is to suppress to toast message
       onError: () => {},
       onSuccess: () => {
-        /**
-         * Manually set project status to RESIZING
-         * Project status should be RESIZING on next project status request.
-         */
+        //Manually set project status to RESIZING, Project status should be RESIZING on next project status request.
         setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESIZING)
       },
     })
+  const { mutateAsync: updateDiskAutoscaleConfig, isLoading: isUpdatingDiskAutoscaleConfig } =
+    useUpdateDiskAutoscaleConfigMutation({
+      // this is to suppress to toast message
+      onError: () => {},
+    })
 
-  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute
+  const isUpdatingConfig = isUpdatingDisk || isUpdatingCompute || isUpdatingDiskAutoscaleConfig
 
   const onSubmit = async (data: DiskStorageSchemaType) => {
     let payload = data
+    let willUpdateDiskConfiguration = false
     setMessageState(null)
+
     try {
       if (
         payload.storageType !== form.formState.defaultValues?.storageType ||
@@ -225,6 +238,8 @@ export function DiskManagementForm() {
         payload.throughput !== form.formState.defaultValues?.throughput ||
         payload.totalSize !== form.formState.defaultValues?.totalSize
       ) {
+        willUpdateDiskConfiguration = true
+
         if (RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(payload.computeSize)) {
           payload.provisionedIOPS = IOPS_RANGE[DiskType.GP3].min
         }
@@ -235,6 +250,19 @@ export function DiskManagementForm() {
           storageType: payload.storageType,
           totalSize: payload.totalSize,
           throughput: payload.throughput,
+        })
+      }
+
+      if (
+        payload.growthPercent !== form.formState.defaultValues?.growthPercent ||
+        payload.minIncrementGb !== form.formState.defaultValues?.minIncrementGb ||
+        payload.maxSizeGb !== form.formState.defaultValues?.maxSizeGb
+      ) {
+        await updateDiskAutoscaleConfig({
+          projectRef,
+          growthPercent: payload.growthPercent,
+          minIncrementGb: payload.minIncrementGb,
+          maxSizeGb: payload.maxSizeGb,
         })
       }
 
@@ -250,6 +278,9 @@ export function DiskManagementForm() {
 
       setIsDialogOpen(false)
       form.reset(data as DiskStorageSchemaType)
+      toast.success(
+        `Successfully updated disk settings!${willUpdateDiskConfiguration ? ' The requested changes will be applied to your disk shortly.' : ''}`
+      )
     } catch (error: unknown) {
       setMessageState({
         message: error instanceof Error ? error.message : 'An unknown error occurred',
@@ -365,9 +396,9 @@ export function DiskManagementForm() {
                 <CollapsibleTrigger_Shadcn_ className="px-8 py-3 w-full border flex items-center gap-6 rounded-t data-[state=closed]:rounded-b group justify-between">
                   <div className="flex flex-col items-start">
                     <span className="text-sm text-foreground">Advanced disk settings</span>
-                    <span className="text-sm text-foreground-light">
-                      Specify additional settings for your disk, including IOPS, throughput, and
-                      disk type.
+                    <span className="text-sm text-foreground-light text-left">
+                      Specify additional settings for your disk, including autoscaling
+                      configuration, IOPS, throughput, and disk type.
                     </span>
                   </div>
                   <ChevronRight
@@ -378,32 +409,38 @@ export function DiskManagementForm() {
                 </CollapsibleTrigger_Shadcn_>
                 <CollapsibleContent_Shadcn_
                   className={cn(
-                    'flex flex-col gap-8 px-8 py-8 transition-all',
+                    'flex flex-col gap-8 py-8 transition-all',
                     'data-[state=open]:border data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
                   )}
                 >
-                  <StorageTypeField form={form} disableInput={disableDiskInputs} />
-                  <NoticeBar
-                    type="default"
-                    visible={
-                      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
-                        form.watch('computeSize')
-                      ) && subscription?.plan.id !== 'free'
-                    }
-                    title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
-                    actions={
-                      <Button
-                        type="default"
-                        onClick={() => {
-                          form.setValue('computeSize', 'ci_large')
-                        }}
-                      >
-                        Change to LARGE Compute
-                      </Button>
-                    }
-                  />
-                  <IOPSField form={form} disableInput={disableDiskInputs} />
-                  <ThroughputField form={form} disableInput={disableDiskInputs} />
+                  <div className="px-8 flex flex-col gap-y-8">
+                    <AutoScaleFields form={form} />
+                  </div>
+                  <Separator />
+                  <div className="px-8 flex flex-col gap-y-8">
+                    <StorageTypeField form={form} disableInput={disableDiskInputs} />
+                    <NoticeBar
+                      type="default"
+                      visible={
+                        RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
+                          form.watch('computeSize')
+                        ) && subscription?.plan.id !== 'free'
+                      }
+                      title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
+                      actions={
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            form.setValue('computeSize', 'ci_large')
+                          }}
+                        >
+                          Change to LARGE Compute
+                        </Button>
+                      }
+                    />
+                    <IOPSField form={form} disableInput={disableDiskInputs} />
+                    <ThroughputField form={form} disableInput={disableDiskInputs} />
+                  </div>
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
             </>
