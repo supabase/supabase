@@ -27,7 +27,7 @@ export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVa
 
 export type FeatureFlagContextType = {
   API_URL?: string
-  configcat: { [key: string]: boolean | string }
+  configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
 }
@@ -97,7 +97,8 @@ export const FeatureFlagProvider = ({
 
         flagValues.forEach((item) => {
           flagStore['configcat'][item.settingKey] =
-            overridesCookieValue[item.settingKey] ?? item.settingValue
+            overridesCookieValue[item.settingKey] ??
+            (item.settingValue === null ? null : item.settingValue ?? false)
         })
       }
 
