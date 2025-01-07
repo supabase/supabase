@@ -49,6 +49,26 @@ functions:
             )
           )
           ```
+      - id: initialize-client-with-logging
+        name: Initialize Client with Logging
+        code: |
+          ```swift
+          struct AppLogger: SupabaseLogger {
+            func log(message: SupabaseLogMessage) {
+              print(message.description)
+            }
+          }
+
+          let client = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+            supabaseKey: "public-anon-key",
+            options: SupabaseClientOptions(
+              global: SupabaseClientOptions.GlobalOptions(
+                logger: AppLogger()
+              )
+            )
+          )
+          ```
       - id: api-schemas
         name: With custom schemas
         code: |
