@@ -10,6 +10,7 @@ import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
+import { InlineLink } from 'components/ui/InlineLink'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
@@ -27,7 +28,6 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { InlineLink } from 'components/ui/InlineLink'
 
 const Home: NextPageWithLayout = () => {
   const connectDialogUpdate = useFlag('connectDialogUpdate')
