@@ -49,6 +49,21 @@ breadcrumb: 'Migrations'
   </div>
 </Accordion>
 
+## Things to keep in mind
+
+Here are some things that are not stored directly in your database and will require you to re-create or setup on the new project:
+
+    - Edge Functions
+    - Auth Settings and API keys
+    - Realtime settings
+    - Database extensions and settings
+    - Read Replicas
+
+Here is a non-exhaustive list of items that are commonly asked about and will be migrated with your backup restoration:
+
+    - Database triggers
+    - Database functions
+
 ## Restore backup
 
 <StepHikeCompact>
@@ -74,6 +89,9 @@ breadcrumb: 'Migrations'
   </StepHikeCompact.Step>
 <StepHikeCompact.Step step={2}>
   <StepHikeCompact.Details title="Get the database password" fullWidth>
+    <Admonition type="caution">
+      It can take a few minutes for the database password reset to take effect. Especially if multiple password resets are done. 
+    </Admonition>
     Reset the password in the [Database Settings](https://supabase.com/dashboard/project/_/settings/database).
 
     Replace ```[YOUR-PASSWORD]``` in the connection string with the database password.
@@ -148,4 +166,4 @@ You are possibly using psql and postgres version 15 or lower. Completely remove 
 
 "**psql: error: connection to server at "aws-0-us-east-1.pooler.supabase.com" (44.216.29.125), port 5432 failed: error received from server in SCRAM exchange: Wrong password**"
 
-If you reset your password for your project, it may take a few minutes for it to reflect. Try again after a few minutes if you did a password reset.
+If the database password was reset, it may take a few minutes for it to reflect. Try again after a few minutes if you did a password reset.
