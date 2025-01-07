@@ -8,7 +8,7 @@ import { useTelemetryCookie } from './hooks'
 
 export function handlePageTelemetry(
   API_URL: string,
-  pathname: string,
+  pathname?: string,
   featureFlags?: {
     [key: string]: unknown
   }
@@ -18,7 +18,7 @@ export function handlePageTelemetry(
     {
       page_url: isBrowser ? window.location.href : '',
       page_title: isBrowser ? document?.title : '',
-      pathname,
+      pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
       ph: {
         referrer: isBrowser ? document?.referrer : '',
         language: navigator.language ?? 'en-US',
@@ -77,21 +77,25 @@ export const PageTelemetry = ({
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pagesPathname ?? appPathname, featureFlags.posthog).catch(
-      (e) => {
-        console.error('Problem sending telemetry page:', e)
-      }
-    )
+    return handlePageTelemetry(
+      API_URL,
+      pagesPathname ?? appPathname ?? undefined,
+      featureFlags.posthog
+    ).catch((e) => {
+      console.error('Problem sending telemetry page:', e)
+    })
   }, [API_URL, pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(API_URL, pagesPathname ?? appPathname, featureFlags.posthog).catch(
-      (e) => {
-        console.error('Problem sending telemetry page-leave:', e)
-      }
-    )
+    return handlePageTelemetry(
+      API_URL,
+      pagesPathname ?? appPathname ?? undefined,
+      featureFlags.posthog
+    ).catch((e) => {
+      console.error('Problem sending telemetry page-leave:', e)
+    })
   }, [pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
 
   useEffect(() => {
