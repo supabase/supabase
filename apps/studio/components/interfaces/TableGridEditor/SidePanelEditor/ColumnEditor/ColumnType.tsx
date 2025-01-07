@@ -1,7 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
+import {
+  Calendar,
+  Check,
+  ChevronsUpDown,
+  ExternalLink,
+  Hash,
+  ListPlus,
+  ToggleRight,
+  Type,
+} from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useState } from 'react'
+
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,19 +34,6 @@ import {
   ScrollArea,
   cn,
 } from 'ui'
-
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
-import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
-} from 'lucide-react'
-
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
@@ -67,8 +66,9 @@ const ColumnType = ({
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
   const [open, setOpen] = useState(false)
-  // @ts-ignore
-  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
+  const availableTypes = POSTGRES_DATA_TYPES.concat(
+    enumTypes.map((type) => type.format.replaceAll('"', ''))
+  )
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
@@ -78,7 +78,7 @@ const ColumnType = ({
     if (pgOption) return pgOption
 
     // handle custom enums
-    const enumType = enumTypes.find((type) => type.name === name)
+    const enumType = enumTypes.find((type) => type.format === name)
     return enumType ? { ...enumType, type: 'enum' } : undefined
   }
 
@@ -200,7 +200,7 @@ const ColumnType = ({
             {value ? (
               <div className="flex gap-2 items-center">
                 <span>{inferIcon(getOptionByName(value)?.type ?? '')}</span>
-                {value}
+                {value.replaceAll('"', '')}
               </div>
             ) : (
               'Choose a column type...'
@@ -231,11 +231,7 @@ const ColumnType = ({
                         <span className="text-foreground-lighter">{option.description}</span>
                       </div>
                       <span className="absolute right-3 top-2">
-                        {option.name === value ? (
-                          <Check className="text-brand-500" size={14} />
-                        ) : (
-                          ''
-                        )}
+                        {option.name === value ? <Check className="text-brand" size={14} /> : ''}
                       </span>
                     </CommandItem_Shadcn_>
                   ))}
@@ -244,13 +240,20 @@ const ColumnType = ({
                   <>
                     <CommandItem_Shadcn_>Other types</CommandItem_Shadcn_>
                     <CommandGroup_Shadcn_>
-                      {enumTypes.map((option: any) => (
+                      {enumTypes.map((option) => (
                         <CommandItem_Shadcn_
-                          key={option.name}
-                          value={option.name}
-                          className={cn('relative', option.name === value ? 'bg-surface-200' : '')}
+                          key={option.id}
+                          value={option.format}
+                          className={cn(
+                            'relative',
+                            option.format === value ? 'bg-surface-200' : ''
+                          )}
                           onSelect={(value: string) => {
-                            onOptionSelect(value)
+                            // [Joshen] For camel case types specifically, format property includes escaped double quotes
+                            // which will cause the POST columns call to error out. So we strip it specifically in this context
+                            onOptionSelect(
+                              option.schema === 'public' ? value.replaceAll('"', '') : value
+                            )
                             setOpen(false)
                           }}
                         >
@@ -258,15 +261,22 @@ const ColumnType = ({
                             <div>
                               <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
                             </div>
-                            <span className="text-foreground">{option.name}</span>
+                            <span className="text-foreground">
+                              {option.format.replaceAll('"', '')}
+                            </span>
                             {option.comment !== undefined && (
-                              <span title={option.comment} className="text-foreground-lighter">
+                              <span
+                                title={option.comment ?? ''}
+                                className="text-foreground-lighter"
+                              >
                                 {option.comment}
                               </span>
                             )}
-                            <span className="flex items-center gap-1.5">
-                              {option.name === value ? <Check size={13} /> : ''}
-                            </span>
+                            {option.format === value && (
+                              <span className="absolute right-3 top-2">
+                                <Check className="text-brand" size={14} />
+                              </span>
+                            )}
                           </div>
                         </CommandItem_Shadcn_>
                       ))}

@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { ReactNode, useMemo } from 'react'
 
-import Connect from 'components/interfaces/Connect/Connect'
 import { useParams } from 'common'
+import Connect from 'components/interfaces/Connect/Connect'
 import AssistantButton from 'components/layouts/AppLayout/AssistantButton'
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
@@ -13,7 +13,6 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM } from 'lib/constants'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
@@ -60,8 +59,6 @@ const LayoutHeader = ({
   const selectedOrganization = useSelectedOrganization()
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
-
   const { data: subscription } = useOrgSubscriptionQuery({
     orgSlug: selectedOrganization?.slug,
   })
@@ -102,7 +99,7 @@ const LayoutHeader = ({
         </div>
       )}
       <div className="relative flex flex-1 overflow-hidden">
-        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-scroll">
+        <div className="flex w-full items-center justify-between py-2 pl-1 pr-3 md:px-3 flex-nowrap overflow-x-auto">
           <div className="flex items-center text-sm">
             {projectRef && (
               <>
@@ -128,7 +125,7 @@ const LayoutHeader = ({
                 </div>
 
                 <div className="ml-3 flex items-center gap-x-3">
-                  {connectDialogUpdate && <Connect />}
+                  <Connect />
                   {!isBranchingEnabled && <EnableBranchingButton />}
                 </div>
               </>
@@ -159,4 +156,5 @@ const LayoutHeader = ({
     </div>
   )
 }
+
 export default LayoutHeader
