@@ -4,7 +4,13 @@ description: 'Use Supabase Branches to test and preview changes.'
 subtitle: 'Use Supabase Branches to test and preview changes'
 ---
 
-Supabase Branching allows the creation of separate, temporary instances of a project, similar to Git branching. This enables experimentation with new configurations, database schemas, or features in isolation. When ready, changes can be merged into the production instance.
+Use branching to safely and easily experiment with changes to your Supabase project.
+
+Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup.
+
+When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
+
+If you understand Git, you already understand Supabase Branching.
 
 ## How branching works
 
@@ -17,6 +23,8 @@ Supabase Branching allows the creation of separate, temporary instances of a pro
 
 - **Supabase Project**: You need an existing Supabase project.
 - **GitHub Repository**: Your project must be connected to a GitHub repository containing your Supabase directory.
+
+You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after <SharedData data="config">branching.inactivity_period_in_minutes</SharedData> minutes of inactivity. Note that `pg_cron` executions will be impacted by inactivity related pausing.
 
 <Image
   zoomable
@@ -33,11 +41,11 @@ Supabase Branching allows the creation of separate, temporary instances of a pro
 
 Preview Branch instances contain no data by default. You must include a seed file to seed your preview instance with sample data when the Preview Branch is created. Future versions of Branching may allow for automated data seeding and cloning after we are confident that we can provide safe data masking.
 
-### Git providers
+## Git providers
 
 To manage code changes, your Supabase project must be connected to a Git repository. At this stage, we only support [GitHub](#branching-with-github). If you are interested in other Git providers, join the [discussion](https://github.com/orgs/supabase/discussions/18936) for GitLab, BitBucket, and non-Git based Branching.
 
-## Branching with GitHub
+### Branching with GitHub
 
 Supabase Branching uses the Supabase GitHub integration to read files from your GitHub repository. With this integration, Supabase watches all commits, branches, and pull requests of your GitHub repository.
 
@@ -73,11 +81,11 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
   defaultActiveId="existing"
   queryGroup="platform"
 >
-<TabPanel id="existing" label="Existing Project">
+<TabPanel id="existing" label="Existing project">
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Initialize Supabase Locally" fullWidth>
+        <StepHikeCompact.Details title="Initialize Supabase locally" fullWidth>
 
             If you don't have a `./supabase` directory, you can create one:
 
@@ -92,7 +100,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Pull Your Database Migration" fullWidth>
+        <StepHikeCompact.Details title="Pull your database migration" fullWidth>
 
             Pull your database changes using `supabase db pull`. You can find your database URL in your [database settings](https://supabase.com/dashboard/project/_/settings/database), under the URI tab of the Connection String settings panel. Make sure **Use connection pooling** is checked so you can use the IPv4-enabled connection pooler. (Without connection pooling, your database is only accessible over IPv6, which isn't yet supported by all network providers.)
 
@@ -111,7 +119,7 @@ You can use the [Supabase CLI](/docs/guides/cli) to manage changes inside a loca
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Commit the `supabase` Directory to Git" fullWidth>
+        <StepHikeCompact.Details title="Commit the `supabase` directory to Git" fullWidth>
 
             Commit the `supabase` directory to Git, and push your changes to your remote repository.
 
@@ -157,16 +165,10 @@ If your repository doesn't have all the migration files, your production branch 
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Install the GitHub Integration" fullWidth>
-
+        <StepHikeCompact.Details title="Inside your Supabase project, click `Enable branching`" fullWidth>
             <figure className="max-w-[520px]">
-                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-install-github.png?v=1" />
+                <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-opt-in-popover.jpg?v=1" />
             </figure>
-
-            If you don't have the GitHub integration installed, click `Add new project connection`.
-
-            Follow the instructions to link your Supabase project to its GitHub repository.
-
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
 
@@ -257,7 +259,7 @@ Preview branches are automatically created for each pull request, but you can al
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Create a New Git Branch in Your GitHub Repository" fullWidth>
+        <StepHikeCompact.Details title="Create a new Git branch in your GitHub repository" fullWidth>
 
         You need at least one other branch aside from your Supabase production branch.
 
@@ -268,7 +270,7 @@ Preview branches are automatically created for each pull request, but you can al
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Navigate to the Branches Page in Your Supabase Dashboard." fullWidth>
+        <StepHikeCompact.Details title="Navigate to the Branches page in your Supabase dashboard." fullWidth>
 
         In the Supabase dashboard, look for the branch dropdown on the right-hand side of the top bar. It should be set to your production branch by default. Open the dropdown and click [`Manage branches`](/dashboard/project/_/branches).
 
@@ -280,7 +282,7 @@ Preview branches are automatically created for each pull request, but you can al
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Create a Supabase Preview Branch" fullWidth>
+        <StepHikeCompact.Details title="Create a Supabase preview branch" fullWidth>
 
         Click `Create preview branch`.
 
@@ -295,6 +297,10 @@ Preview branches are automatically created for each pull request, but you can al
             Git branches from external contributors currently can't support a Preview Branch
 
         </Admonition>
+
+        <figure className="max-w-[520px]">
+            <Image src="/docs/img/guides/platform/branching/enable-supabase-branching-first-preview-branch-choose-branch.jpg?v=1" />
+        </figure>
 
         </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -322,7 +328,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
 <StepHikeCompact>
 
     <StepHikeCompact.Step step={1}>
-        <StepHikeCompact.Details title="Make Schema Changes Locally" fullWidth>
+        <StepHikeCompact.Details title="Make schema changes locally" fullWidth>
 
             Start supabase locally:
 
@@ -342,7 +348,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={2}>
-        <StepHikeCompact.Details title="Generate a Migration File" fullWidth>
+        <StepHikeCompact.Details title="Generate a migration file" fullWidth>
 
             Once you are finished making database changes, run `supabase db diff` to create a new migration file. For example:
 
@@ -372,7 +378,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
     </StepHikeCompact.Step>
 
     <StepHikeCompact.Step step={3}>
-        <StepHikeCompact.Details title="Commit Your Changes and Push." fullWidth>
+        <StepHikeCompact.Details title="Commit your changes and push." fullWidth>
 
             Commit and push your migration file to your remote GitHub repository. For example:
 
