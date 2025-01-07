@@ -28,6 +28,7 @@ export async function getContentCount(
   if (name) query.name = name
 
   const { data, error } = await get('/platform/projects/{ref}/content/count', {
+    // @ts-expect-error [Joshen] Suspect its an API code gen issue here, complaining that visiblity and favorite are not valid query params
     params: { path: { ref: projectRef }, query: { type, visibility, favorite, name } },
     signal,
   })
