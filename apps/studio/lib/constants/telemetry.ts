@@ -41,6 +41,37 @@ export enum TelemetryActions {
 }
 
 /**
+ * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-up
+ */
+export interface SignUpEvent {
+  action: TelemetryActions.SIGN_UP
+  properties: {
+    category: 'conversion'
+  }
+}
+
+/**
+ * Triggered when a user signs in with Github, Email and Password or SSO.
+ *
+ * Some unintuitive behavior:
+ *   - If signing up with GitHub the SignInEvent gets triggered first before the SignUpEvent.
+ *
+ * @group Events
+ * @source studio
+ * @page /sign-in-mfa
+ */
+export interface SignInEvent {
+  action: TelemetryActions.SIGN_IN
+  properties: {
+    category: 'account'
+  }
+}
+
+/**
  * User copied the database connection string.
  *
  * @group Events
@@ -207,4 +238,137 @@ export interface FeaturePreviewDisabledEvent {
      */
     feature: string
   }
+}
+
+/**
+ * After selecting channel, either "Listening to channel" or "Start listening" button was clicked.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorListenChannelClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_LISTEN_CHANNEL_CLICKED
+}
+
+/**
+ * A broadcast message was sent from the SendMessageModal.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorBroadcastSentEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_BROADCAST_SENT
+}
+
+/**
+ * A message was clicked in the RealtimeInspector, which opens a sidebar that shows the messsage details including metadata.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorMessageClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_MESSAGE_CLICKED
+}
+
+/**
+ * A message was copied from the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorCopyMessageClickedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_COPY_MESSAGE_CLICKED
+}
+
+/**
+ * Filters were applied in the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorFiltersAppliedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_FILTERS_APPLIED
+}
+
+/**
+ * Database role was updated in the RealtimeInspector.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/realtime/inspector
+ */
+export interface RealtimeInspectorDatabaseRoleUpdatedEvent {
+  action: TelemetryActions.REALTIME_INSPECTOR_DATABASE_ROLE_UPDATED
+}
+
+/**
+ * Quickstart card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorQuickstartClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_QUICKSTART_CLICKED
+  properties: {
+    /**
+     * The title of the quickstart card clicked.
+     */
+    quickstartName: string
+  }
+}
+
+/**
+ * Template card clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorTemplateClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_TEMPLATE_CLICKED
+  properties: {
+    /**
+     * The name of the template card clicked.
+     */
+    templateName: string
+  }
+}
+
+/**
+ * Result download CSV button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultDownloadCsvClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_DOWNLOAD_CSV_CLICKED
+}
+
+/**
+ * Result copy markdown button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyMarkdownClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_MARKDOWN_CLICKED
+}
+
+/**
+ * Result copy JSON button clicked in the SQL editor.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql
+ */
+export interface SqlEditorResultCopyJsonClickedEvent {
+  action: TelemetryActions.SQL_EDITOR_RESULT_COPY_JSON_CLICKED
 }

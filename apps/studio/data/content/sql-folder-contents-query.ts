@@ -3,6 +3,7 @@ import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { contentKeys } from './keys'
+import { SNIPPET_PAGE_LIMIT } from './sql-folders-query'
 
 export type SQLSnippetFolderContentsVariables = {
   projectRef?: string
@@ -24,7 +25,13 @@ export async function getSQLSnippetFolderContents(
   const { data, error } = await get('/platform/projects/{ref}/content/folders/{id}', {
     params: {
       path: { ref: projectRef, id: folderId },
-      query: { cursor, limit: '3', sort_by: sort, sort_order: sortOrder, name },
+      query: {
+        cursor,
+        limit: SNIPPET_PAGE_LIMIT.toString(),
+        sort_by: sort,
+        sort_order: sortOrder,
+        name,
+      },
     },
     signal,
   })

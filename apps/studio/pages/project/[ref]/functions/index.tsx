@@ -1,16 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTrigger,
-  Modal,
-} from 'ui'
+import { Button, Dialog, DialogContent, DialogSection, DialogTrigger } from 'ui'
 
 import {
   EdgeFunctionsListItem,
@@ -26,7 +15,6 @@ import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
-  const [showTerminalInstructions, setShowTerminalInstructions] = useState(false)
 
   const {
     data: functions,
@@ -55,9 +43,7 @@ const PageLayout: NextPageWithLayout = () => {
                   } deployed`}</span>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button type="primary" onClick={() => setShowTerminalInstructions(true)}>
-                        Deploy a new function
-                      </Button>
+                      <Button type="primary">Deploy a new function</Button>
                     </DialogTrigger>
                     <DialogContent size={'large'}>
                       <DialogSection padding="small">

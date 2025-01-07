@@ -1,4 +1,6 @@
+import parser from 'cron-parser'
 import { toString as CronToString } from 'cronstrue'
+import dayjs from 'dayjs'
 
 import { CronJobType } from './CreateCronJobSheet'
 import { HTTPHeader } from './CronJobs.constants'
@@ -188,5 +190,43 @@ export const formatScheduleString = (value: string) => {
     }
   } catch (error) {
     return ''
+  }
+}
+
+export const convertCronToString = (schedule: string) => {
+  // pg_cron can also use "30 seconds" format for schedule. Cronstrue doesn't understand that format so just use the
+  // original schedule when cronstrue throws
+  try {
+    return CronToString(schedule)
+  } catch (error) {
+    return schedule
+  }
+}
+
+export const getNextRun = (schedule: string, lastRun?: string) => {
+  // cron-parser can only deal with the traditional cron syntax but technically users can also
+  // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
+  // (can't guarantee as scope is quite big)
+  if (schedule.includes('*')) {
+    try {
+      const interval = parser.parseExpression(schedule)
+      return interval.next().getTime()
+    } catch (error) {
+      return undefined
+    }
+  } else {
+    // [Joshen] Only going to attempt to parse if the schedule is as simple as "n seconds", "n minutes", or "n days"
+    // Returned undefined otherwise - we can revisit this perhaps if we get feedback about this
+    const [value, unit] = schedule.split(' ')
+    if (
+      ['seconds', 'minutes', 'days'].includes(unit) &&
+      !Number.isNaN(Number(value)) &&
+      lastRun !== undefined
+    ) {
+      const parsedLastRun = dayjs(lastRun).add(Number(value), unit as dayjs.ManipulateType)
+      return parsedLastRun.valueOf()
+    } else {
+      return undefined
+    }
   }
 }

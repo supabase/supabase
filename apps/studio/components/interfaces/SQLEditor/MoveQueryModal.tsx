@@ -192,8 +192,8 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
           <form id="move-snippet" onSubmit={form.handleSubmit(onConfirmMove)}>
             <DialogHeader>
               <DialogTitle>
-                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`} to a
-                folder
+                Move {snippets.length === 1 ? `"${snippets[0].name}"` : `${snippets.length}`}{' '}
+                snippet{snippets.length > 1 ? 's' : ''} to a folder
               </DialogTitle>
               <DialogDescription>
                 Select which folder to move your quer{snippets.length > 1 ? 'ies' : 'y'} to
