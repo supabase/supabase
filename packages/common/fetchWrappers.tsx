@@ -1,13 +1,18 @@
+import { getAccessToken } from './auth'
+
 interface DataProps {
   [prop: string]: any
 }
 
-export const get = (url: string, options = {} as { [key: string]: any }) => {
+export async function get(url: string, options = {} as { [key: string]: any }) {
   const { headers: optionHeaders, ...otherOptions } = options
+
+  const accessToken = await getAccessToken()
 
   let headers = new Headers({
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     ...optionHeaders,
   })
 
@@ -24,12 +29,15 @@ export const get = (url: string, options = {} as { [key: string]: any }) => {
     })
 }
 
-export const post = (url: string, data: DataProps, options = {} as { [key: string]: any }) => {
+export async function post(url: string, data: DataProps, options = {} as { [key: string]: any }) {
   const { headers: optionHeaders, ...otherOptions } = options
+
+  const accessToken = await getAccessToken()
 
   let headers = new Headers({
     'Content-Type': 'application/json',
     Accept: 'application/json',
+    ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
     ...optionHeaders,
   })
 

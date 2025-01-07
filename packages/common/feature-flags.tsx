@@ -10,7 +10,6 @@ type TrackFeatureFlagVariables = components['schemas']['TelemetryFeatureFlagBody
 export type CallFeatureFlagsResponse = components['schemas']['TelemetryCallFeatureFlagsResponseDto']
 
 export async function getFeatureFlags(API_URL: string) {
-  if (!IS_PLATFORM) return undefined
   const data = await get(`${API_URL}/telemetry/feature-flags`)
 
   return data as CallFeatureFlagsResponse
@@ -22,7 +21,7 @@ export async function trackFeatureFlag(API_URL: string, body: TrackFeatureFlagVa
       ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       : null) === 'true'
 
-  if (!consent || !IS_PLATFORM) return undefined
+  if (!consent) return undefined
   await post(`${API_URL}/telemetry/feature-flags/track`, { body })
 }
 
@@ -30,12 +29,14 @@ export type FeatureFlagContextType = {
   API_URL?: string
   configcat: { [key: string]: boolean | string }
   posthog: CallFeatureFlagsResponse
+  hasLoaded?: boolean
 }
 
 const FeatureFlagContext = createContext<FeatureFlagContextType>({
   API_URL: undefined,
   configcat: {},
   posthog: {},
+  hasLoaded: false,
 })
 
 function getCookies() {
@@ -52,10 +53,12 @@ function getCookies() {
 
 export const FeatureFlagProvider = ({
   API_URL,
+  enabled = true,
   getConfigCatFlags,
   children,
 }: PropsWithChildren<{
   API_URL: string
+  enabled?: boolean
   getConfigCatFlags?: (
     userEmail?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
@@ -66,20 +69,21 @@ export const FeatureFlagProvider = ({
     API_URL,
     configcat: {},
     posthog: {},
+    hasLoaded: false,
   })
 
   useEffect(() => {
     let mounted = true
 
     async function processFlags() {
-      if (!IS_PLATFORM) return
+      if (!enabled) return
 
-      const flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
+      let flagStore: FeatureFlagContextType = { configcat: {}, posthog: {} }
 
       // Load PH flags
-      if (user?.email) {
-        const flags = await getFeatureFlags(API_URL)
-        if (flags) flagStore.posthog = flags
+      const flags = await getFeatureFlags(API_URL)
+      if (flags) {
+        flagStore.posthog = flags
       }
 
       // Load ConfigCat flags
@@ -97,6 +101,8 @@ export const FeatureFlagProvider = ({
         })
       }
 
+      flagStore.hasLoaded = true
+
       if (mounted) {
         setStore(flagStore)
       }
@@ -111,7 +117,7 @@ export const FeatureFlagProvider = ({
     return () => {
       mounted = false
     }
-  }, [user?.email])
+  }, [enabled, user?.email])
 
   return (
     <FeatureFlagContext.Provider value={store}>

@@ -1,16 +1,15 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 import * as Sentry from '@sentry/nextjs'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { useParams, useTelemetryCookie, useUser } from 'common'
 import { useSendGroupsIdentifyMutation } from 'data/telemetry/send-groups-identify-mutation'
 import { useSendGroupsResetMutation } from 'data/telemetry/send-groups-reset-mutation'
-import { useSendPageLeaveMutation } from 'data/telemetry/send-page-leave-mutation'
-import { useSendPageMutation } from 'data/telemetry/send-page-mutation'
 import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { getAppStateSnapshot, useAppStateSnapshot } from 'state/app-state'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 const getAnonId = async (id: string) => {
@@ -23,7 +22,11 @@ const getAnonId = async (id: string) => {
   return base64String
 }
 
-const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
+const GroupsTelemetry = () => {
+  // Although this is "technically" breaking the rules of hooks
+  // IS_PLATFORM never changes within a session, so this won't cause any issues
+  if (!IS_PLATFORM) return null
+
   const user = useUser()
   const router = useRouter()
   const { ref, slug } = useParams()
@@ -34,8 +37,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   const previousPathname = usePrevious(router.pathname)
 
   const trackTelemetryPH = consentValue === 'true'
-  const { mutate: sendPage } = useSendPageMutation()
-  const { mutateAsync: sendPageLeave } = useSendPageLeaveMutation()
   const { mutate: sendGroupsIdentify } = useSendGroupsIdentifyMutation()
   const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
 
@@ -49,31 +50,6 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [consentValue])
-
-  useEffect(() => {
-    function handleRouteChange() {
-      if (IS_PLATFORM && getAppStateSnapshot().isOptedInTelemetry) {
-        sendPage({ url: window.location.href })
-      }
-    }
-
-    // Listen for page changes after a navigation or when the query changes
-    router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      router.events.off('routeChangeComplete', handleRouteChange)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router])
-
-  useEffect(() => {
-    // Send page telemetry on first page load
-    // Waiting for router ready before sending page_view
-    // if not the path will be dynamic route instead of the browser url
-    if (router.isReady && getAppStateSnapshot().isOptedInTelemetry) {
-      sendPage({ url: window.location.href })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router.isReady])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
@@ -125,18 +101,7 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackTelemetryPH, slug, ref, router.pathname])
 
-  useEffect(() => {
-    const handleBeforeUnload = async () => {
-      if (getAppStateSnapshot().isOptedInTelemetry) await sendPageLeave()
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload)
-    }
-  }, [])
-
-  return <>{children}</>
+  return null
 }
 
-export default PageTelemetry
+export default GroupsTelemetry
