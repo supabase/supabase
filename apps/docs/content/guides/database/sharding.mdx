@@ -1,0 +1,69 @@
+---
+title: Sharding
+subtitle: 'Using postgres_fdw to treat many databases as one'
+---
+
+Sharding is the process of splitting a large database into smaller, more manageable pieces, called shards. Each shard is a separate database that contains a subset of the data. Sharding can help improve performance and scalability by distributing the load across multiple databases.
+
+For more in-depth information, see the [PostgreSQL documentation on sharding](https://www.postgresql.org/docs/current/postgres-fdw.html).
+
+## Example of Sharding in Postgres
+
+To implement sharding in Postgres, you can use the [postgres_fdw](/docs/guides/database/extensions/postgres_fdw) extension, which allows you to query and manage data across multiple Postgres databases as if they were a single database.
+
+### Example
+
+1. **Install the `postgres_fdw` extension**:
+
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS postgres_fdw;
+   ```
+
+2. **Create foreign servers for each shard**:
+
+   ```sql
+   CREATE SERVER shard1 FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'db.<SUPABASE_PROJECT_1>.supabase.co', dbname 'postgres', port '5432');
+   CREATE SERVER shard2 FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'db.<SUPABASE_PROJECT_2>.supabase.co', dbname 'postgres', port '5432');
+   ```
+
+3. **Create user mappings for each shard**:
+
+   ```sql
+   CREATE USER MAPPING FOR current_user SERVER shard1 OPTIONS (user 'shard_user', password 'shard_password');
+   CREATE USER MAPPING FOR current_user SERVER shard2 OPTIONS (user 'shard_user', password 'shard_password');
+   ```
+
+4. **Create foreign tables for each shard**:
+
+   ```sql
+   CREATE FOREIGN TABLE shard1_table (id INT, data TEXT) SERVER shard1 OPTIONS (table_name 'local_table');
+   CREATE FOREIGN TABLE shard2_table (id INT, data TEXT) SERVER shard2 OPTIONS (table_name 'local_table');
+   ```
+
+5. **Query the shards as if they were a single table**:
+
+   ```sql
+   SELECT * FROM shard1_table
+   UNION ALL
+   SELECT * FROM shard2_table;
+   ```
+
+By following these steps, you can distribute your data across multiple Postgres databases and query them as if they were a single database, improving performance and scalability.
+
+## Use Cases for Sharding
+
+Sharding can be particularly useful in the following scenarios:
+
+- **High Traffic Applications**
+  <br />
+  Applications with a high volume of read and write operations can benefit from sharding by distributing the load across multiple databases.
+- **Geographically Distributed Data**
+  <br />
+  Use our [read-replicas](/docs/guides/platform/read-replicas) if you want to distribute your database globally. If you also need the capability to write in different regions, sharding can solve this.
+- **Large Datasets**
+  <br />
+  Applications with large datasets that exceed the storage capacity of a single database can use sharding to split the data across multiple databases.
+- **Multi-Tenant Applications**
+  <br />
+  In multi-tenant applications, sharding can be used to isolate data for different tenants, improving security and performance.
+

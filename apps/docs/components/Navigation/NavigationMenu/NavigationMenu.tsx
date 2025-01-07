@@ -22,7 +22,6 @@ enum MenuId {
   MonitoringTroubleshooting = 'monitoring_troubleshooting',
   Resources = 'resources',
   SelfHosting = 'self_hosting',
-  Scaling = 'scaling',
   Integrations = 'integrations',
   LocalDevelopment = 'local_development',
   RefJavaScriptV1 = 'reference_javascript_v1',
@@ -115,10 +114,6 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.Resources,
-    type: 'guide',
-  },
-  {
-    id: MenuId.Scaling,
     type: 'guide',
   },
   {
