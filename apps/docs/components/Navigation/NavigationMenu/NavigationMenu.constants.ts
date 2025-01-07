@@ -91,6 +91,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             level: 'deployment',
           },
           {
+            label: 'Scaling',
+            icon: 'scaling',
+            href: '/guides/scaling',
+            level: 'scaling',
+          },
+          {
             label: 'Self-Hosting',
             icon: 'self-hosting',
             href: '/guides/self-hosting',
@@ -2272,6 +2278,22 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Automated testing', url: '/guides/deployment/ci/testing' },
         { name: 'Back up your database', url: '/guides/deployment/ci/backups' },
+      ],
+    },
+  ],
+}
+
+export const scaling: NavMenuConstant = {
+  title: 'Scaling',
+  url: '/guides/scaling',
+  icon: 'deployment',
+  items: [
+    { name: 'Overview', url: '/guides/scaling' },
+    {
+      name: 'Horizontal',
+      items: [
+        { name: 'Partitioning', url: '/guides/database/partitioning' },
+        { name: 'Sharding', url: '/guides/scaling/sharding' },
       ],
     },
   ],
