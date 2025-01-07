@@ -8,10 +8,11 @@ import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgSubscription } from 'data/subscriptions/types'
 import { useFlag } from 'hooks/ui/useFlag'
-import { Alert, Button, Input, Modal } from 'ui'
+import { Button, Input, Modal } from 'ui'
 import type { ProjectInfo } from '../../../../../data/projects/projects-query'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+import { Admonition } from 'ui-patterns'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -191,14 +192,13 @@ const ExitSurveyModal = ({ visible, subscription, projects, onClose }: ExitSurve
               </div>
             </div>
             {hasProjectsWithComputeDowngrade && (
-              <Alert
-                withIcon
-                variant="warning"
+              <Admonition
+                type="warning"
                 title={`${projectsWithComputeDowngrade.length} of your projects will be restarted upon clicking confirm,`}
               >
                 This is due to changes in compute instances from the downgrade. Affected projects
                 include {projectsWithComputeDowngrade.map((project) => project.name).join(', ')}.
-              </Alert>
+              </Admonition>
             )}
           </div>
         </Modal.Content>
