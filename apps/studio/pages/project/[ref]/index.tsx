@@ -51,7 +51,7 @@ const Home: NextPageWithLayout = () => {
   return (
     <div className="w-full mx-auto my-12 md:my-16 space-y-12 md:space-y-16 max-w-7xl">
       <div className="flex flex-col md:flex-row md:items-center justify-between mx-6 gap-6">
-        <div className="flex flex-row items-center gap-3">
+        <div className="flex flex-col md:flex-row md:items-center gap-3">
           <h1 className="text-3xl">{projectName}</h1>
           {isOrioleDb && (
             <Tooltip_Shadcn_>

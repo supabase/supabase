@@ -51,15 +51,25 @@ const Header = ({ organization, project }: WizardLayoutProps) => {
                 />
               </Link>
               <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
-              <p className="text-sm">
+              <p className="text-sm hidden md:block">
                 {organization ? `Organization: ${organization.name}` : 'Create an organization'}
               </p>
-              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
+              <ChevronRight
+                size="18"
+                className="text-foreground-light hidden md:block"
+                strokeWidth={1}
+              />
               <p className={`text-sm ${stepNumber < 1 ? 'text-foreground-light' : ''}`}>
                 {project ? project.name : 'Create a new project'}
               </p>
-              <ChevronRight size="18" className="text-foreground-light" strokeWidth={1} />
-              <p className={`text-sm ${stepNumber < 2 ? 'text-foreground-light' : ''}`}>
+              <ChevronRight
+                size="18"
+                className="text-foreground-light hidden md:block"
+                strokeWidth={1}
+              />
+              <p
+                className={`text-sm hidden md:block ${stepNumber < 2 ? 'text-foreground-light' : ''}`}
+              >
                 {project ? project.name : 'Extend your database'}
               </p>
             </div>
