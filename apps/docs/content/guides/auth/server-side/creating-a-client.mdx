@@ -744,15 +744,15 @@ export const getSupabase = (c: Context) => {
 }
 
 type SupabaseEnv = {
-  VITE_SUPABASE_URL: string
-  VITE_SUPABASE_ANON_KEY: string
+  SUPABASE_URL: string
+  SUPABASE_ANON_KEY: string
 }
 
 export const supabaseMiddleware = (): MiddlewareHandler => {
   return async (c, next) => {
     const supabaseEnv = env<SupabaseEnv>(c)
-    const supabaseUrl = supabaseEnv.VITE_SUPABASE_URL
-    const supabaseAnonKey = supabaseEnv.VITE_SUPABASE_ANON_KEY
+    const supabaseUrl = supabaseEnv.SUPABASE_URL
+    const supabaseAnonKey = supabaseEnv.SUPABASE_ANON_KEY
 
     if (!supabaseUrl) {
       throw new Error('SUPABASE_URL missing!')
