@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 
 import { useParams } from 'common'
-import Connect from 'components/interfaces/Connect/Connect'
 import { ClientLibrary, ExampleProject } from 'components/interfaces/Home'
 import { CLIENT_LIBRARIES, EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
 import ProjectUsageSection from 'components/interfaces/Home/ProjectUsageSection'
@@ -10,10 +9,10 @@ import ServiceStatus from 'components/interfaces/Home/ServiceStatus'
 import { ProjectPausedState } from 'components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
 import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
+import { InlineLink } from 'components/ui/InlineLink'
 import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useIsOrioleDb, useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { useFlag } from 'hooks/ui/useFlag'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
@@ -27,14 +26,10 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
 } from 'ui'
-import { InlineLink } from 'components/ui/InlineLink'
 
 const Home: NextPageWithLayout = () => {
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
-
   const organization = useSelectedOrganization()
   const project = useSelectedProject()
-
   const isOrioleDb = useIsOrioleDb()
   const snap = useAppStateSnapshot()
   const { enableBranching } = useParams()
@@ -85,9 +80,6 @@ const Home: NextPageWithLayout = () => {
         <div className="flex items-center gap-x-3">
           {project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
-          {IS_PLATFORM &&
-            project?.status === PROJECT_STATUS.ACTIVE_HEALTHY &&
-            !connectDialogUpdate && <Connect />}
         </div>
       </div>
 
