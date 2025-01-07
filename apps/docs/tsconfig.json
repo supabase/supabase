@@ -5,7 +5,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./*"],
-      "@ui/*": ["./../../packages/ui/src/*"]
+      "@ui/*": ["./../../packages/ui/src/*"],
     },
     "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],
@@ -22,10 +22,10 @@
     "module": "esnext",
     "plugins": [
       {
-        "name": "next"
-      }
+        "name": "next",
+      },
     ],
-    "strictNullChecks": false
+    "strictNullChecks": false,
   },
   "include": [
     "next-env.d.ts",
@@ -33,7 +33,7 @@
     "**/*.tsx",
     "pages/guides/append-test.js",
     ".next/types/**/*.ts",
-    "./../../packages/ui/src/**/*.d.ts"
+    "./../../packages/ui/src/**/*.d.ts",
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "examples"],
 }
