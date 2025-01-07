@@ -106,7 +106,7 @@ export interface CronJobCreatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
@@ -127,7 +127,7 @@ export interface CronJobUpdatedEvent {
     /**
      * What the cron job executes, e.g. sql_function or sql_snippet
      */
-    type: 'sql_function' | 'sql_snippet'
+    type: 'sql_function' | 'sql_snippet' | 'edge_function' | 'http_request'
     /**
      * Schedule of the cron job in the format of * * * * *
      */
