@@ -28,7 +28,6 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
   if (rows.length === 0) return ''
 
   const columns = table.columns.map((col) => `"${col.name}"`).join(', ')
-
   const valuesSets = rows
     .map((row) => {
       const filteredRow = { ...row }
@@ -36,23 +35,28 @@ export const formatTableRowsToSQL = (table: SupaTable, rows: any[]) => {
 
       const values = Object.entries(filteredRow).map(([key, val]) => {
         const { dataType, format } = table.columns.find((col) => col.name === key) ?? {}
-
-        // We only check for NULL, array and JSON types, everything else we stringify
-        // given that Postgres can implicitly cast the right type based on the column type
         if (val === null) {
           return 'null'
-        } else if (dataType === 'ARRAY') {
-          return `'${JSON.stringify(val).replace('[', '{').replace(/.$/, '}')}'`
-        } else if (format?.includes('json')) {
-          return `${JSON.stringify(val).replace(/\\"/g, '"').replace('"', "'").replace(/.$/, "'")}`
-        } else {
-          return `'${val}'`
         }
+        let escapedVal
+        if (dataType === 'ARRAY') {
+          const arr: any[] = Array.isArray(val) ? val : JSON.parse(val as string)
+          if (format?.includes('json')) {
+            // The JSON needs to be stringified twice to escape the double quotes
+            escapedVal = `{${arr.map((v) => JSON.stringify(JSON.stringify(v))).join(',')}}`
+          } else {
+            // Just stringifying the array will create issues with the newline \n character (and similar characters)
+            escapedVal = `{${arr.map((v) => (typeof v === 'string' ? `"${v.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"` : v)).join(',')}}`
+          }
+        } else if (format?.includes('json')) {
+          escapedVal = typeof val === 'string' ? val : JSON.stringify(val)
+        } else {
+          escapedVal = `${val}`
+        }
+        return `'${escapedVal.replace(/'/g, "''")}'`
       })
-
       return `(${values.join(', ')})`
     })
     .join(', ')
-
   return `INSERT INTO "${table.schema}"."${table.name}" (${columns}) VALUES ${valuesSets};`
 }
