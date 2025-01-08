@@ -33,6 +33,7 @@ import Panel from 'components/ui/Panel'
 import { projectSpecToMonthlyPrice } from 'components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
 import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
 import { DiskType } from 'components/interfaces/DiskManagement/ui/DiskManagement.constants'
+import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
 
 const RestoreToNewProjectPage: NextPageWithLayout = () => {
   return (
@@ -90,7 +91,7 @@ const RestoreToNewProject = () => {
   const dbVersion = getDatabaseMajorVersion(project?.dbVersion ?? '')
   const IS_PG15_OR_ABOVE = dbVersion >= 15
   const targetVolumeSizeGb = cloneBackups?.target_volume_size_gb
-  const targetComputeSize = cloneBackups?.target_compute_size
+  const targetComputeSize = cloneBackups?.target_compute_size as InfraInstanceSize
   const planId = subscription?.plan?.id ?? 'free'
   const { data } = useDiskAttributesQuery({ projectRef: project?.ref })
   const storageType = data?.attributes?.type ?? 'gp3'
