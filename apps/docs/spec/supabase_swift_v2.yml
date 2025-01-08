@@ -32,7 +32,7 @@ functions:
         code: |
           ```swift
           let client = SupabaseClient(
-            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: SupabaseClientOptions(
               db: .init(
@@ -62,7 +62,7 @@ functions:
                 schema: "other_schema"
               )
             )
-          ) 
+          )
           ```
         description: |
           By default the API server points to the `public` schema. You can enable other database schemas within the Dashboard.
@@ -136,7 +136,7 @@ functions:
         code: |
           ```swift
           let supabase = SupabaseClient(
-            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
             supabaseKey: "public-anon-key",
             options: .init(
               auth: .init(
@@ -256,7 +256,7 @@ functions:
         - `INITIAL_SESSION`
           - Emitted right after the Supabase client is constructed and the initial session from storage is loaded.
         - `SIGNED_IN`
-          - Emitted each time a user session is confirmed or re-established, including on user sign in. 
+          - Emitted each time a user session is confirmed or re-established, including on user sign in.
           - Avoid making assumptions as to when this event is fired, this may occur even when the user is already signed in. Instead, check the user object attached to the event to see if a new user has signed in and update your application's UI.
         - `SIGNED_OUT`
           - Emitted when the user signs out. This can be after:
@@ -291,7 +291,7 @@ functions:
           }
 
           // Using Closure
-          let subscription = await supabase.auth.onAuthStateChange { event, session in 
+          let subscription = await supabase.auth.onAuthStateChange { event, session in
             print(event, session)
           }
 
@@ -498,7 +498,7 @@ functions:
           ```swift
           let session = try await supabase.auth.signInWithOAuth(
             provider: .github
-          ) { (session: ASWebAuthenticationSession) in 
+          ) { (session: ASWebAuthenticationSession) in
             // customize session
           }
           ```
@@ -512,7 +512,7 @@ functions:
           ```swift
           let session = try await supabase.auth.signInWithOAuth(
             provider: .github
-          ) { url in 
+          ) { url in
             // use url to start OAuth flow
             // and return a result url that contains the OAuth token.
             // ...
@@ -531,7 +531,7 @@ functions:
           ```swift
           let url = try await supabase.auth.getOAuthSignInURL(provider: .github, redirectTo: URL(string: "my-app-scheme://"))
 
-          let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in 
+          let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in
             guard let url else { return }
 
             Task {
@@ -899,7 +899,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          try await supabase.auth.linkIdentity(provider: provider) { url in 
+          try await supabase.auth.linkIdentity(provider: provider) { url in
             // custom URL opening logic
           }
           ```
@@ -919,7 +919,7 @@ functions:
           // retrieve all identites linked to a user
           let identities = try await supabase.auth.userIdentities()
 
-          // find the google identity 
+          // find the google identity
           let googleIdentity = identities.first {
             $0.provider == .google
           }
@@ -1397,7 +1397,7 @@ functions:
               let name: String
               let teams: [Team]
             }
-            
+
             struct Team: Decodable {
               let name: String
             }
@@ -1936,7 +1936,7 @@ functions:
             .insert(Country(id: 1, name: "Denmark"))
             .select()
             // specify you want a single value returned, otherwise it returns a list.
-            .single() 
+            .single()
             .execute()
             .value
           ```
@@ -2048,7 +2048,7 @@ functions:
           ```swift
           struct Country: Decodable {
             let id: Int
-            let name: String          
+            let name: String
           }
 
           let country: Country = try await supabase
@@ -2825,8 +2825,8 @@ functions:
       filter() expects you to use the raw PostgREST syntax for the filter values.
 
       ```swift
-      .filter("id", operator: .in, value: "(5,6,7)")  // Use `()` for `in` filter
-      .filter("arraycol", operator: .cs, value: #"{"a","b"}"#)  // Use `cs` for `contains()`, `{}` for array values
+      .filter("id", operator: "in", value: "(5,6,7)")  // Use `()` for `in` filter
+      .filter("arraycol", operator: "cs", value: #"{"a","b"}"#)  // Use `cs` for `contains()`, `{}` for array values
       ```
     examples:
       - id: with-select
@@ -2836,7 +2836,7 @@ functions:
           try await supabase
             .from("countries")
             .select()
-            .filter("name", operator: .in, value: #"("Algeria","Japan")"#)
+            .filter("name", operator: "in", value: #"("Algeria","Japan")"#)
           ```
         data:
           sql: |
@@ -2880,7 +2880,7 @@ functions:
                 )
               """
             )
-            .filter("cities.name", operator: .eq, value: "Bali")
+            .filter("cities.name", operator: "eq", value: "Bali")
           ```
         data:
           sql: |
@@ -3435,7 +3435,7 @@ functions:
 
           let response: Response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 body: ["foo": "bar"]
               )
@@ -3448,11 +3448,11 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 body: ["foo": "bar"]
               ),
-              decode: { data, response in 
+              decode: { data, response in
                 String(data: data, encoding: .utf8)
               }
             )
@@ -3484,7 +3484,7 @@ functions:
           do {
             let response = try await supabase.functions
               .invoke(
-                "hello", 
+                "hello",
                 options: FunctionInvokeOptions(
                   body: ["foo": "bar"]
                 )
@@ -3506,7 +3506,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 headers: [
                   "my-custom-header": "my-custom-header-value"
@@ -3554,7 +3554,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 method: .delete,
                 headers: [
@@ -3573,7 +3573,7 @@ functions:
           ```swift
           let response = try await supabase.functions
             .invoke(
-              "hello", 
+              "hello",
               options: FunctionInvokeOptions(
                 method: .get,
                 headers: [
@@ -3752,10 +3752,10 @@ functions:
         name: Listen to a specific table
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let changeStream = channel.postgresChange(
-            AnyAction.self, 
+            AnyAction.self,
             schema: "public",
             table: "users"
           )
@@ -3817,13 +3817,13 @@ functions:
         name: Listen to inserts using callback
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let subscription = channel.onPostgresChange(
-            InsertAction.self, 
+            InsertAction.self,
             schema: "public",
             table: "users"
-          ) { insert in 
+          ) { insert in
             print("Inserted: \(insert.record)")
           }
 
@@ -3843,16 +3843,16 @@ functions:
           ```
         code: |
           ```swift
-           let channel = supabase.channel("channelId") 
-           
+           let channel = supabase.channel("channelId")
+
            let updates = channel.postgresChange(
-             UpdateAction.self, 
+             UpdateAction.self,
              schema: "public",
              table: "users"
            )
 
            await channel.subscribe()
-           
+
            for await update in updates {
              print("Updated: \(update.oldRecord) with \(update.record)")
            }
@@ -3868,18 +3868,18 @@ functions:
           ```
         code: |
           ```swift
-           let channel = supabase.channel("channelId") 
-           
+           let channel = supabase.channel("channelId")
+
            let subscription = channel.onPostgresChange(
-             UpdateAction.self, 
+             UpdateAction.self,
              schema: "public",
              table: "users"
-           ) { update in 
+           ) { update in
             print("Updated: \(update.oldRecord) with \(update.record)")
            }
 
            await channel.subscribe()
-           
+
            // remove subscription some time later
           subscription.cancel()
            ```
@@ -3894,10 +3894,10 @@ functions:
           ```
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let deletions = channel.postgresChange(
-            DeleteAction.self, 
+            DeleteAction.self,
             schema: "public",
             table: "users"
           )
@@ -3919,10 +3919,10 @@ functions:
           ```
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let subscription = channel.onPostgresChange(
-            DeleteAction.self, 
+            DeleteAction.self,
             schema: "public",
             table: "users"
           ) { deletion in
@@ -3938,10 +3938,10 @@ functions:
         name: Listen to row level changes
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let deletions = channel.postgresChange(
-            DeleteAction.self, 
+            DeleteAction.self,
             schema: "public",
             table: "users",
             filter: "id=eq.1"
@@ -3957,14 +3957,14 @@ functions:
         name: Listen to row level changes using callback
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           let subscription = channel.onPostgresChange(
-            DeleteAction.self, 
+            DeleteAction.self,
             schema: "public",
             table: "users",
             filter: "id=eq.1"
-          ) { deletion in 
+          ) { deletion in
             print("Deleted: \(deletion.oldRecord)")
           }
 
@@ -3988,7 +3988,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           //...
           await supabase.removeChannel(channel)
@@ -3998,7 +3998,7 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase.channel("channelId") 
+          let channel = supabase.channel("channelId")
 
           //...
           await channel.unsubscribe()
@@ -4081,7 +4081,7 @@ functions:
           ```swift
           try await supabase.storage
             .createBucket(
-              "avatars", 
+              "avatars",
               options: BucketOptions(
                 public: false,
                 allowedMimeTypes: ["image/png"],
@@ -4121,7 +4121,7 @@ functions:
           ```swift
           try await supabase.storage
             .updateBucket(
-              "avatars", 
+              "avatars",
               options: BucketOptions(
                 public: false,
                 fileSizeLimit: 1024,
