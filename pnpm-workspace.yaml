@@ -1,7 +1,6 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "tests"
   - "playwright-tests"
 
 catalog:
