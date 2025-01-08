@@ -1,6 +1,6 @@
 import classNames from 'classnames'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 
 export function LaunchWeekLogoHeader() {

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import Tilt from 'vanilla-tilt'
 import { useWindowSize } from 'react-use'
 import { cn } from 'ui'

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { AlertCircle, Info } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useInterval } from 'react-use'

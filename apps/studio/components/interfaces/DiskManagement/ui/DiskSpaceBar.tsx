@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { Info } from 'lucide-react'
 import MotionNumber from '@number-flow/react'
 import { useTheme } from 'next-themes'

@@ -9,7 +9,7 @@ import { getSortedPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import type PostTypes from '~/types/post'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import styles from '~/styles/customers.module.css'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'

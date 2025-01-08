@@ -184,7 +184,7 @@ Now that we have our tickets loaded, we want to add some animation to make them 
 We'll wrap each ticket in a motion component and add a transition effect to stagger their appearance on the screen:
 
 ```jsx
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 // ...
 
@@ -248,7 +248,7 @@ Here's the complete code:
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 const supabase = createClient('supabase-url', 'supabase-key')
 

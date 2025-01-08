@@ -15,7 +15,7 @@ import {
 
 import { cn } from '../../../lib/utils/cn'
 import { Label } from './label'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 
 const Form = FormProvider
 

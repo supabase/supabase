@@ -9,7 +9,7 @@ import { Button } from 'ui'
 import { SITE_URL, LW_URL } from '~/lib/constants'
 import supabase from '~/lib/supabase'
 import { Database } from '~/lib/database.types'
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, m, LazyMotion, domAnimation } from 'motion/react'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 
 import DefaultLayout from '~/components/Layouts/Default'

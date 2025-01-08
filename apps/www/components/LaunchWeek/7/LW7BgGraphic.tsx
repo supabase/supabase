@@ -1,4 +1,4 @@
-import { motion, useScroll, useTransform } from 'framer-motion'
+import { motion, useScroll, useTransform } from 'motion/react'
 import Image from 'next/image'
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import styles from './lw7-bg-graphic.module.css'

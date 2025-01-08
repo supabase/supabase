@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Check } from 'lucide-react'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { Badge, cn } from 'ui'
 import BrowserFrame from './BrowserFrame'
 

@@ -1,7 +1,7 @@
 import 'swiper/css'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'motion/react'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import Panel from '../Panel'

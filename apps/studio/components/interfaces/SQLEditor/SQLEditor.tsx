@@ -1,6 +1,6 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { ChevronUp, Command, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'

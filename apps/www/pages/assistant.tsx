@@ -1,5 +1,5 @@
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'

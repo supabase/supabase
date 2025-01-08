@@ -15,7 +15,7 @@ import {
 } from './components'
 
 import { useBreakpoint } from 'common/hooks/useBreakpoint'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import Day5 from './Day5'
 
 export const defaultEase = [0.25, 0.25, 0, 1]

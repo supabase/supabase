@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { FileText, MessageCircleMore, WandSparkles } from 'lucide-react'
 
 import { Button } from 'ui'

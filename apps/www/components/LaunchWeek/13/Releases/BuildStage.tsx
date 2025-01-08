@@ -3,7 +3,7 @@ import { buildDays as days } from '~/components/LaunchWeek/13/Releases/data'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BuildCard from './components/BuildCard'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView } from 'motion/react'
 import { cn } from 'ui'
 
 const BuildStage: FC = () => {

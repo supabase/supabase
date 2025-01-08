@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { User } from 'lucide-react'
 import { PropsWithChildren } from 'react'
 import ReactMarkdown from 'react-markdown'

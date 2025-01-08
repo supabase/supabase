@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import { Search } from 'lucide-react'
 import debounce from 'lodash/debounce'
 

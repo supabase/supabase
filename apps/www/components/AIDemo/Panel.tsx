@@ -1,6 +1,6 @@
 // components/AIDemoPanel.tsx
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 import { Button, Input } from 'ui'
 import { AiIconAnimation, cn } from 'ui'
 import errorGif from 'public/images/ai/error.gif'
