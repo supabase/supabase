@@ -15,7 +15,16 @@ const GITLAB_INTEGRATION_CLIENT_ID =
       ? `<todo>`
       : `135a5e5431501d073c92cb8b767f8f4a80bc3bc961e60c268a3f417fb2cdbe50`
 
-const GITLAB_INTEGRATION_AUTHORIZATION_URL = `https://gitlab.com/oauth/authorize?client_id=${GITLAB_INTEGRATION_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(`${window.location.origin}/integrations/gitlab/authorize`)}`
+console.log(process.env.NEXT_PUBLIC_ENVIRONMENT)
+
+const GITLAB_INTEGRATION_REDIRECT_URI =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
+    ? `<todo>`
+    : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+      ? `<todo>`
+      : `http://localhost:8082/integrations/gitlab/authorize`
+
+const GITLAB_INTEGRATION_AUTHORIZATION_URL = `https://gitlab.com/oauth/authorize?client_id=${GITLAB_INTEGRATION_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(GITLAB_INTEGRATION_REDIRECT_URI)}`
 // export const GITHUB_INTEGRATION_INSTALLATION_URL = `https://github.com/apps/${GITHUB_INTEGRATION_APP_NAME}/installations/new`
 // export const GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL = `https://github.com/settings/connections/applications/${GITHUB_INTEGRATION_CLIENT_ID}`
 
