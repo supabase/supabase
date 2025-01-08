@@ -247,6 +247,7 @@ const LinterDataGrid = ({
                                 open: true,
                                 initialInput: `Help me resolve ${lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
                                 \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}
+                                \nSchema to retrieve: ${selectedLint.metadata?.schema ?? ''}
                                 \nIssue: ${selectedLint.detail.replace(/\\`/g, '`')}
                                 \nDescription: ${selectedLint.description.replace(/\\`/g, '`')}
                                 `,
