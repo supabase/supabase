@@ -181,10 +181,15 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
 
       {!!growthPercent && !!minIncrementGb && !!maxSizeGb && (
         <Admonition type="default" showIcon={false} className="[&>div]:text-foreground-light">
-          Disk size will be automatically be expanded by{' '}
-          <span className="text-foreground">{formattedGrowValue} GB</span> to a total of{' '}
-          <span className="text-foreground">{formattedTotalSizeAfterGrowth} GB</span> when the
-          database reaches 90% of the disk size
+          Disk size will automatically be expanded by{' '}
+          <span className="text-foreground">
+            {String(formattedGrowValue).length > 4
+              ? formattedGrowValue.toFixed(2)
+              : formattedGrowValue}{' '}
+            GB
+          </span>{' '}
+          to a total of <span className="text-foreground">{formattedTotalSizeAfterGrowth} GB</span>{' '}
+          when the database reaches 90% of the disk size
         </Admonition>
       )}
     </>

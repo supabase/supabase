@@ -190,6 +190,9 @@ export function DiskManagementForm() {
   const usedPercentage = (usedSize / totalSize) * 100
 
   const isFlyArchitecture = project?.cloud_provider === 'FLY'
+  const disableIopsThroughputConfig =
+    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(form.watch('computeSize')) &&
+    subscription?.plan.id !== 'free'
 
   const disableDiskInputs =
     isRequestingChanges ||
@@ -421,11 +424,7 @@ export function DiskManagementForm() {
                     <StorageTypeField form={form} disableInput={disableDiskInputs} />
                     <NoticeBar
                       type="default"
-                      visible={
-                        RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(
-                          form.watch('computeSize')
-                        ) && subscription?.plan.id !== 'free'
-                      }
+                      visible={disableIopsThroughputConfig}
                       title={`IOPS ${form.getValues('storageType') === 'gp3' ? 'and Throughput ' : ''}configuration requires LARGE Compute size or above`}
                       actions={
                         <Button
@@ -438,8 +437,14 @@ export function DiskManagementForm() {
                         </Button>
                       }
                     />
-                    <IOPSField form={form} disableInput={disableDiskInputs} />
-                    <ThroughputField form={form} disableInput={disableDiskInputs} />
+                    <IOPSField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                    />
+                    <ThroughputField
+                      form={form}
+                      disableInput={disableIopsThroughputConfig || disableDiskInputs}
+                    />
                   </div>
                 </CollapsibleContent_Shadcn_>
               </Collapsible_Shadcn_>
