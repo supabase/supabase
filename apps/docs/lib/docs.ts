@@ -26,7 +26,7 @@ export type GuideFrontmatter = {
   description?: string
   canonical?: string
   hideToc?: boolean
-  // @deprecated
+  /** @deprecated */
   hide_table_of_contents?: boolean
   tocVideo?: string
 }
