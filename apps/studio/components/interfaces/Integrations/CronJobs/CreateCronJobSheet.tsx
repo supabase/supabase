@@ -264,15 +264,23 @@ export const CreateCronJobSheet = ({
             toast.success(`Successfully created cron job ${name}`)
           }
 
-          sendEvent({
-            action: isEditing
-              ? TelemetryActions.CRON_JOB_UPDATED
-              : TelemetryActions.CRON_JOB_CREATED,
-            properties: {
-              type: values.type,
-              schedule: schedule,
-            },
-          })
+          if (isEditing) {
+            sendEvent({
+              action: TelemetryActions.CRON_JOB_UPDATED,
+              properties: {
+                type: values.type,
+                schedule: schedule,
+              },
+            })
+          } else {
+            sendEvent({
+              action: TelemetryActions.CRON_JOB_CREATED,
+              properties: {
+                type: values.type,
+                schedule: schedule,
+              },
+            })
+          }
 
           onClose()
         },
