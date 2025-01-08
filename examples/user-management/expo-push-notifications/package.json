@@ -19,6 +19,7 @@
     "expo-device": "~6.0.2",
     "expo-notifications": "~0.28.3",
     "expo-status-bar": "~1.12.1",
+    "expo-user-management": "file:",
     "react": "18.2.0",
     "react-native": "0.74.1",
     "react-native-url-polyfill": "^2.0.0"

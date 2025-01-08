@@ -10,6 +10,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
+    "@supabase/pg-meta": "file:",
     "zod": "^3.22.4"
   },
   "devDependencies": {

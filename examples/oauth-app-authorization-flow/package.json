@@ -4,7 +4,8 @@
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
-    "hono": "^4.6.3"
+    "hono": "^4.6.3",
+    "supabase-oauth-example": "file:"
   },
   "devDependencies": {
     "@types/bun": "latest"

@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import { useParams } from 'common'
@@ -79,14 +79,17 @@ const DeployNewReplicaPanel = ({
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
   const { data: diskConfiguration } = useDiskAttributesQuery({ projectRef })
 
+  const isNotOnTeamOrEnterprisePlan = useMemo(
+    () => !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    [subscription]
+  )
   const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
-    enabled:
-      subscription !== undefined && !['team', 'enterprise'].includes(subscription?.plan.id ?? ''),
+    enabled: isNotOnTeamOrEnterprisePlan,
   })
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
-  const hasOverdueInvoices = overdueInvoices.length > 0
+  const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnTeamOrEnterprisePlan
 
   // Opting for useState temporarily as Listbox doesn't seem to work with react-hook-form yet
   const [defaultRegion] = Object.entries(AWS_REGIONS).find(

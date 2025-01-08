@@ -24,6 +24,7 @@
 		"@supabase/auth-ui-shared": "^0.1.8",
 		"@supabase/auth-ui-svelte": "^0.2.9",
 		"@supabase/ssr": "^0.4.0",
-		"@supabase/supabase-js": "^2.44.2"
+		"@supabase/supabase-js": "^2.44.2",
+		"supabase-sveltekit": "file:"
 	}
 }

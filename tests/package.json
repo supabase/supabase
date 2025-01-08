@@ -35,5 +35,8 @@
     "postgres": "^3.0.5",
     "ts-jest": "^29.1.1",
     "typescript": "~5.5.0"
+  },
+  "dependencies": {
+    "supabase-tests": "file:"
   }
 }

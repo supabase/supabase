@@ -15,7 +15,8 @@
     "@tanstack/react-query": "^5.12.2",
     "next": "14.2.10",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "supa-react-query": "file:"
   },
   "devDependencies": {
     "@types/node": "^20",

@@ -10,6 +10,7 @@
   "dependencies": {
     "eslint-config-next": "^14.2.3",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-config-supabase": "file:",
     "eslint-config-turbo": "^2.0.4"
   }
 }

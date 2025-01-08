@@ -14,7 +14,8 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.45.0",
-    "react-router-dom": "^6.8.1"
+    "react-router-dom": "^6.8.1",
+    "refine-user-management": "file:"
   },
   "devDependencies": {
     "@types/node": "^18.16.2",

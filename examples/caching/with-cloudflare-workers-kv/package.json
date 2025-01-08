@@ -12,6 +12,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^1.35.4",
     "itty-router": "^2.6.1",
-    "itty-router-extras": "^0.4.2"
+    "itty-router-extras": "^0.4.2",
+    "supabase-at-the-edge": "file:"
   }
 }

@@ -10,6 +10,7 @@
     "deploy": "wrangler publish"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
+    "@supabase/supabase-js": "^2.0.0",
+    "supabase-at-the-edge": "file:"
   }
 }

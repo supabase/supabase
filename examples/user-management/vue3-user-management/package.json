@@ -10,7 +10,8 @@
 	},
 	"dependencies": {
 		"@supabase/supabase-js": "^2.0.4",
-		"vue": "^3.2.37"
+		"vue": "^3.2.37",
+		"vue3-user-management": "file:"
 	},
 	"devDependencies": {
 		"@vitejs/plugin-vue": "^3.1.0",
