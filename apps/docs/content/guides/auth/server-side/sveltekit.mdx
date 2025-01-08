@@ -625,18 +625,32 @@ When using OAuth with SvelteKit SSR, you need to handle redirects for successful
 Here’s an example:
 
 ```javascript
+import { createSupabaseClient } from '@supabase/supabase-js';
 import { redirect } from '@sveltejs/kit';
 
-export const load = async ({ fetch }) => {
-    const res = await fetch('/auth/oauth');
-    const data = await res.json();
+// Initialize the Supabase client
+const supabase = createSupabaseClient(
+    'https://your-supabase-project-url.supabase.co',
+    'your-anon-key'
+);
 
-    if (data.error) {
-        console.error(data.error);
+export const load = async ({ url }) => {
+    const provider = 'github'; // Replace with your desired OAuth provider (e.g., google, facebook)
+
+    // Perform OAuth sign-in
+    const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+            redirectTo: `${url.origin}/auth/callback`
+        }
+    });
+
+    if (error) {
+        console.error(error);
         throw redirect(303, '/auth/error');
     }
 
-    throw redirect(303, data.url);
+    throw redirect(303, '/dashboard'); // Redirect after successful login
 };
 
 </StepHikeCompact.Code>
