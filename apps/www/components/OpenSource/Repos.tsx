@@ -72,8 +72,6 @@ const Repos = ({ tabs }: Props) => {
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [swiperState, setSwiperState] = useState<SWIPER_STATE>(SWIPER_STATE.START)
 
-  console.log(tabs)
-
   useEffect(() => {
     async function fetchOctoData() {
       const { Octokit } = await import('@octokit/core')
