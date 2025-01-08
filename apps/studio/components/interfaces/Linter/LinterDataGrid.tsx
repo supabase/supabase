@@ -10,6 +10,7 @@ import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Li
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
 import {
+  AiIconAnimation,
   Button,
   ResizableHandle,
   ResizablePanel,
@@ -22,6 +23,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
+import { useAppStateSnapshot } from 'state/app-state'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -41,6 +43,7 @@ const LinterDataGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
   const { ref } = useParams()
   const router = useRouter()
+  const { setAiAssistantPanel } = useAppStateSnapshot()
 
   const [view, setView] = useState<'details' | 'suggestion'>('details')
 
@@ -237,6 +240,21 @@ const LinterDataGrid = ({
                       <div className="grid gap-2">
                         <h3 className="text-sm">Resolve</h3>
                         <div className="flex items-center gap-2">
+                          <Button
+                            icon={<AiIconAnimation className="scale-75 w-3 h-3" />}
+                            onClick={() => {
+                              setAiAssistantPanel({
+                                open: true,
+                                initialInput: `Help me resolve ${lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                                \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}
+                                \nIssue: ${selectedLint.detail.replace(/\\`/g, '`')}
+                                \nDescription: ${selectedLint.description.replace(/\\`/g, '`')}
+                                `,
+                              })
+                            }}
+                          >
+                            Debug with Assistant
+                          </Button>
                           <LintCTA
                             title={selectedLint.name}
                             projectRef={ref!}
