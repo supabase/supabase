@@ -1144,7 +1144,7 @@ export interface paths {
   }
   '/platform/telemetry/page-leave': {
     /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_pageLeave']
+    post: operations['TelemetryPageLeaveController_trackPageLeave']
   }
   '/platform/telemetry/reset': {
     /** Reset analytics */
@@ -3287,9 +3287,16 @@ export interface components {
       payment_method_id: string
     }
     CreditsTopUpResponseDto: {
-      new_balance: null
-      payment_intent_secret: null
-      status: string
+      payment_intent_secret?: string
+      /** @enum {string} */
+      status:
+        | 'canceled'
+        | 'processing'
+        | 'requires_action'
+        | 'requires_capture'
+        | 'requires_confirmation'
+        | 'requires_payment_method'
+        | 'succeeded'
     }
     CustomerBillingAddress: {
       city?: string
@@ -5888,21 +5895,22 @@ export interface components {
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
     }
-    TelemetryEventBodyV2: {
+    TelemetryEventBodyV2Dto: {
       action: string
-      custom_properties: Record<string, never>
+      custom_properties: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryEventPostHog']
-    }
-    TelemetryEventPostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
@@ -5921,24 +5929,29 @@ export interface components {
       project_ref?: string
       user_id: string
     }
-    TelemetryPageBodyV2: {
+    TelemetryPageBodyV2Dto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-      ph: components['schemas']['TelemetryPagePostHog']
+      ph: {
+        language: string
+        referrer: string
+        search: string
+        user_agent: string
+        viewport_height: number
+        viewport_width: number
+      }
     }
-    TelemetryPageLeaveBody: {
+    TelemetryPageLeaveBodyDto: {
+      feature_flags?: {
+        [key: string]: unknown
+      }
       page_title: string
       page_url: string
       pathname: string
-    }
-    TelemetryPagePostHog: {
-      language: string
-      referrer: string
-      search: string
-      user_agent: string
-      viewport_height: number
-      viewport_width: number
     }
     ThirdPartyAuth: {
       custom_jwks?: unknown
@@ -14427,7 +14440,7 @@ export interface operations {
   TelemetryEventController_sendServerEventV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBodyV2']
+        'application/json': components['schemas']['TelemetryEventBodyV2Dto']
       }
     }
     responses: {
@@ -14527,7 +14540,7 @@ export interface operations {
   TelemetryPageController_sendServerPageV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2']
+        'application/json': components['schemas']['TelemetryPageBodyV2Dto']
       }
     }
     responses: {
@@ -14541,13 +14554,17 @@ export interface operations {
     }
   }
   /** Send analytics page leave event */
-  TelemetryPageLeaveController_pageLeave: {
+  TelemetryPageLeaveController_trackPageLeave: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBody']
+        'application/json': components['schemas']['TelemetryPageLeaveBodyDto']
       }
     }
     responses: {
+      /** @description Page leave event sent */
+      200: {
+        content: never
+      }
       201: {
         content: never
       }

@@ -244,9 +244,9 @@ const CreditBalance = () => {
                               />
 
                               <p className="prose text-sm">
-                                If you are interested in larger discounted credit packages, please{' '}
+                                For larger discounted credit packages, please{' '}
                                 <Link
-                                  href={`/support/new?slug=${slug}&ref=no-project&message=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.BILLING}`}
+                                  href={`/support/new?slug=${slug}&message=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.BILLING}`}
                                   target="_blank"
                                 >
                                   reach out.
