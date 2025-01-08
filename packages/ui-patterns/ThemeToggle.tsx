@@ -49,13 +49,11 @@ export const ThemeToggle = ({
             triggerClassName
           )}
         >
-          {resolvedTheme === 'dark' && (
+          {resolvedTheme === 'dark' ? (
             <Moon className="h-[20px] w-[20px] rotate-90 transition-all dark:rotate-0" />
-          )}
-          {resolvedTheme !== 'dark' && (
+          ) : (
             <Sun className="w-[20px] h-[20px] rotate-0 transition-all dark:-rotate-90" />
           )}
-
           <span className="sr-only">Toggle theme</span>
         </button>
       </DropdownMenuTrigger>
