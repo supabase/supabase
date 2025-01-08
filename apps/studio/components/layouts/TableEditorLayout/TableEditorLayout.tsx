@@ -3,6 +3,7 @@ import { PropsWithChildren, useMemo } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { useIsEmbedded } from 'lib/embedded'
 import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 
@@ -11,6 +12,7 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
 
   const tableEditorMenu = useMemo(() => <TableEditorMenu />, [])
+  const isEmbedded = useIsEmbedded()
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -26,6 +28,8 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
       productMenu={tableEditorMenu}
       isBlocking={false}
       resizableSidebar
+      hideIconBar={isEmbedded}
+      hideHeader={isEmbedded}
     >
       {children}
     </ProjectLayoutWithAuth>
