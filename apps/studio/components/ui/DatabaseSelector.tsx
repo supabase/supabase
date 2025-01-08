@@ -3,7 +3,7 @@ import { Check, ChevronDown, Loader2, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -62,6 +62,11 @@ const DatabaseSelector = ({
   const formattedDatabaseId = formatDatabaseID(selectedDatabaseId ?? '')
 
   const selectedAdditionalOption = additionalOptions.find((x) => x.id === selectedDatabaseId)
+
+  useEffect(() => {
+    if (_selectedDatabaseId) state.setSelectedDatabaseId(_selectedDatabaseId)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [_selectedDatabaseId])
 
   return (
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
