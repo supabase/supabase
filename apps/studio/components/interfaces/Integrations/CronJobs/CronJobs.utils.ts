@@ -209,7 +209,7 @@ export const getNextRun = (schedule: string, lastRun?: string) => {
   // (can't guarantee as scope is quite big)
   if (schedule.includes('*')) {
     try {
-      const interval = parser.parseExpression(schedule)
+      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
       return interval.next().getTime()
     } catch (error) {
       return undefined

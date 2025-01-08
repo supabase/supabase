@@ -37,7 +37,6 @@
     "@sentry/nextjs": "^8.34.0",
     "@stripe/react-stripe-js": "^2.5.0",
     "@stripe/stripe-js": "^3.0.5",
-    "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-js": "2.64.2",
     "@supabase/pg-meta": "workspace:*",
     "@supabase/realtime-js": "2.10.2",
