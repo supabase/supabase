@@ -42,8 +42,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const canCreateCredentials = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
-  // [Joshen clean up] Remove ?? true once storage BE changes are deployed
-  const isS3ConnectionEnabled = config?.features.s3Protocol?.enabled ?? true
+  const isS3ConnectionEnabled = config?.features.s3Protocol.enabled
   const disableCreation = !isProjectActive || !canCreateCredentials || !isS3ConnectionEnabled
 
   const FormSchema = z.object({
