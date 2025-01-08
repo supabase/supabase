@@ -1,0 +1,10 @@
+graph LR
+    subgraph Supabase Projects
+        shard01["tbqapicsffzqqyoczviy (shard01)"]
+        shard02["nadzrbgepigdivnxdcur (shard02)"]
+        shard03["uywjiphfeyvdqzvdzgyk (shard03)"]
+    end
+
+    shard01 <--postgres_fdw--> shard02
+    shard01 <--postgres_fdw--> shard03
+    shard02 <--postgres_fdw--> shard03
