@@ -237,7 +237,7 @@ You can provide a callback for the `broadcast` channel to receive message. In th
     const channelB = supabase.channel('room-1')
 
     const channelSubscribed = await new Promise((resolve, reject) => {
-      channel.subscribe((status) => {
+      channelB.subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           resolve(channel);
         } else {
