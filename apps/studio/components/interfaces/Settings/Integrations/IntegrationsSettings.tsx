@@ -8,8 +8,10 @@ import { BASE_PATH } from 'lib/constants'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, WarningIcon } from 'ui'
 import GitHubSection from './GithubIntegration/GithubSection'
 import VercelSection from './VercelIntegration/VercelSection'
+import SidePanelGitLabRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitLabRepoLinker'
+import GitLabSection from './GitlabIntegration/GitlabSection'
 
-export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
+export const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' | 'gitlab' }) => {
   return (
     <img
       className="border rounded-lg shadow w-48 mt-6 border-body"
@@ -45,9 +47,12 @@ const IntegrationSettings = () => {
       )}
       <GitHubSection />
       <ScaffoldDivider />
+      <GitLabSection />
+      <ScaffoldDivider />
       <VercelSection isProjectScoped={true} />
       <SidePanelVercelProjectLinker />
       <SidePanelGitHubRepoLinker />
+      <SidePanelGitLabRepoLinker />
     </>
   )
 }

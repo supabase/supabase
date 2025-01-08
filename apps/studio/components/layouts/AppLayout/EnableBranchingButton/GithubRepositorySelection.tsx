@@ -37,7 +37,7 @@ const GithubRepositorySelection = ({
   const sidePanels = useSidePanelsStateSnapshot()
 
   function onSelectConnectRepo() {
-    sidePanels.setGithubConnectionsOpen(true)
+    sidePanels.setGitConnectionsOpen(true)
   }
 
   return (

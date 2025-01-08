@@ -11,6 +11,7 @@ import {
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from 'lib/constants'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { openInstallGitLabIntegrationWindow } from 'lib/gitlab'
 import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
@@ -55,7 +56,7 @@ export interface ProjectLinkerProps {
 
   defaultSupabaseProjectRef?: string
   defaultForeignProjectId?: string
-  mode: 'Vercel' | 'GitHub'
+  mode: 'Vercel' | 'GitHub' | 'GitLab'
 }
 
 const ProjectLinker = ({
@@ -361,6 +362,20 @@ const ProjectLinker = ({
                             >
                               <PlusIcon size={16} />
                               Add GitHub Repositories
+                            </CommandItem_Shadcn_>
+                          </CommandGroup_Shadcn_>
+                        </>
+                      )}
+                      {mode === 'GitLab' && (
+                        <>
+                          <CommandSeparator_Shadcn_ />
+                          <CommandGroup_Shadcn_>
+                            <CommandItem_Shadcn_
+                              className="flex gap-2 items-center cursor-pointer"
+                              onSelect={() => openInstallGitLabIntegrationWindow('install')}
+                            >
+                              <PlusIcon size={16} />
+                              Add GitLab Repositories
                             </CommandItem_Shadcn_>
                           </CommandGroup_Shadcn_>
                         </>

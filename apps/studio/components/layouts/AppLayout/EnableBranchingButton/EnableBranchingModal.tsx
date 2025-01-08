@@ -1,14 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { last } from 'lodash'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import SidePanelGitHubRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitHubRepoLinker'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
@@ -27,6 +25,7 @@ import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
 import { DocsButton } from 'components/ui/DocsButton'
+import SidePanelGitRepoLinker from 'components/interfaces/Organization/IntegrationSettings/SidePanelGitRepoLinker'
 
 const EnableBranchingModal = () => {
   const { ref } = useParams()
@@ -265,7 +264,7 @@ const EnableBranchingModal = () => {
         </Form_Shadcn_>
       </Modal>
 
-      <SidePanelGitHubRepoLinker projectRef={ref} />
+      <SidePanelGitRepoLinker projectRef={ref} />
     </>
   )
 }

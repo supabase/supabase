@@ -17,11 +17,27 @@ export const sidePanelsState = proxy({
   },
 
   /**
+   * Git connections
+   */
+  gitConnectionsOpen: false as boolean,
+  setGitConnectionsOpen: (bool: boolean) => {
+    sidePanelsState.gitConnectionsOpen = bool
+  },
+
+  /**
    * GitHub connections
    */
   githubConnectionsOpen: false as boolean,
   setGithubConnectionsOpen: (bool: boolean) => {
     sidePanelsState.githubConnectionsOpen = bool
+  },
+
+  /**
+   * GitLab connections
+   */
+  gitlabConnectionsOpen: false as boolean,
+  setGitlabConnectionsOpen: (bool: boolean) => {
+    sidePanelsState.gitlabConnectionsOpen = bool
   },
 })
 
