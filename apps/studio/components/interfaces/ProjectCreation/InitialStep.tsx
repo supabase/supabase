@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Button, Textarea } from 'ui'
 import { Database, Import } from 'lucide-react'
+
+import { cn } from 'ui'
 import { SchemaGenerator } from './SchemaGenerator'
 
 interface SupabaseService {
@@ -8,7 +8,7 @@ interface SupabaseService {
   reason: string
 }
 
-const Step1 = ({
+export const InitialStep = ({
   onSubmit,
   onStartBlank,
   onMigrate,
@@ -25,13 +25,6 @@ const Step1 = ({
   onTitleUpdated: (title: string) => void
   isLoading: boolean
 }) => {
-  const [value, setValue] = useState('')
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSubmit(value)
-  }
-
   return (
     <div className="w-full">
       <h3>What are you building?</h3>
@@ -39,6 +32,7 @@ const Step1 = ({
         We can generate a schema for you to kick start your project.
       </p>
       <SchemaGenerator
+        isOneOff
         step="initial"
         onSqlGenerated={(sql) => {
           onSqlGenerated(sql)
@@ -46,9 +40,13 @@ const Step1 = ({
         }}
         onServicesUpdated={onServicesUpdated}
         onTitleUpdated={onTitleUpdated}
-        isOneOff={true}
       />
-      <div className="relative text-center text-sm text-foreground-lighter my-4 before:absolute before:inset-y-1/2 before:left-0 before:w-[calc(50%-24px)] before:h-px before:bg-border after:absolute after:inset-y-1/2 after:right-0 after:w-[calc(50%-24px)] after:h-px after:bg-border">
+      <div
+        className={cn(
+          'relative text-center text-sm text-foreground-lighter my-4 before:absolute before:inset-y-1/2 before:left-0 before:w-[calc(50%-24px)]',
+          'before:h-px before:bg-border after:absolute after:inset-y-1/2 after:right-0 after:w-[calc(50%-24px)] after:h-px after:bg-border'
+        )}
+      >
         or
       </div>
       <div className="grid grid-cols-2 gap-4">
@@ -84,5 +82,3 @@ const Step1 = ({
     </div>
   )
 }
-
-export default Step1

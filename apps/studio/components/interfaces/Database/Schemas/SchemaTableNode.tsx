@@ -1,8 +1,8 @@
-import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Link2, Table2 } from 'lucide-react'
-import { Handle, NodeProps } from 'reactflow'
+import { DiamondIcon, ExternalLink, Fingerprint, Hash, Key, Table2 } from 'lucide-react'
 import Link from 'next/link'
+import { Handle, NodeProps } from 'reactflow'
 
-import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { Button, cn } from 'ui'
 
 // ReactFlow is scaling everything by the factor of 2
 const TABLE_NODE_WIDTH = 320

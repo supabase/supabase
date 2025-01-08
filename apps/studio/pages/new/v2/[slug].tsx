@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { components } from 'api-types'
 import { useParams } from 'common'
+import { AnimatePresence, motion } from 'framer-motion'
 import { debounce } from 'lodash'
 import { ExternalLink, Settings } from 'lucide-react'
 import Link from 'next/link'
@@ -10,7 +11,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import 'reactflow/dist/style.css'
 import { toast } from 'sonner'
-import { AnimatePresence, motion } from 'framer-motion'
 import { z } from 'zod'
 
 import { PopoverSeparator } from '@ui/components/shadcn/ui/popover'
@@ -19,15 +19,19 @@ import {
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { AdvancedConfiguration } from 'components/interfaces/ProjectCreation/AdvancedConfiguration'
+import { InitialStep } from 'components/interfaces/ProjectCreation/InitialStep'
 import {
   PostgresVersionSelector,
   extractPostgresVersionDetails,
 } from 'components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
 import { SecurityOptions } from 'components/interfaces/ProjectCreation/SecurityOptions'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import PartnerManagedResource from 'components/ui/PartnerManagedResource'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import { ScrollGradient } from 'components/ui/ScrollGradient'
 import { useAvailableOrioleImageVersion } from 'data/config/project-creation-postgres-versions-query'
 import { useOverdueInvoicesQuery } from 'data/invoices/invoices-overdue-query'
 import { useDefaultRegionQuery } from 'data/misc/get-default-region-query'
@@ -41,6 +45,7 @@ import {
 } from 'data/projects/project-create-mutation'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { withAuth } from 'hooks/misc/withAuth'
 import { useFlag } from 'hooks/ui/useFlag'
@@ -54,14 +59,15 @@ import {
   PROJECT_STATUS,
   PROVIDERS,
 } from 'lib/constants'
+import { TelemetryActions } from 'lib/constants/telemetry'
 import passwordStrength from 'lib/password-strength'
 import { generateStrongPassword } from 'lib/project'
 import type { CloudProvider } from 'shared-data'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import type { NextPageWithLayout } from 'types'
 import {
   Badge,
   Button,
-  cn,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   Form_Shadcn_,
@@ -78,18 +84,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  cn,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
-import InitialStep from 'components/interfaces/ProjectCreation/InitialStep'
-import { ProjectVisual } from 'components/interfaces/ProjectCreation/ProjectVisual'
-import { SchemaGenerator } from 'components/interfaces/ProjectCreation/SchemaGenerator'
-import { ScrollGradient } from 'components/ui/ScrollGradient'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { TelemetryActions } from 'lib/constants/telemetry'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 

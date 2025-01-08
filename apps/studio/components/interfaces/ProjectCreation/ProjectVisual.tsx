@@ -1,15 +1,16 @@
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  TooltipProvider_Shadcn_,
-  Tooltip_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  TooltipContent_Shadcn_,
-} from 'ui'
-import { User2, File, Database, Zap, Clock, ListOrdered, Box } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Box, Clock, Database, File, ListOrdered, User2, Zap } from 'lucide-react'
+
 import { SchemaVisualizer } from 'components/interfaces/SchemaVisualizer'
 import Globe from 'components/ui/Globe'
-import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
 import { BASE_PATH } from 'lib/constants'
+import { AWS_REGIONS, FLY_REGIONS } from 'shared-data'
+import {
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipProvider_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'

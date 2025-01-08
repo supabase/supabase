@@ -1,7 +1,7 @@
-import createGlobe, { Marker } from 'cobe'
-import { useCallback, useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes'
+import createGlobe from 'cobe'
 import { debounce } from 'lodash'
+import { useTheme } from 'next-themes'
+import { useEffect, useRef } from 'react'
 
 interface GlobeProps {
   readonly markers?: [number, number][]

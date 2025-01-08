@@ -1,21 +1,18 @@
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
-  useNodesState,
-  useEdgesState,
-  useReactFlow,
-  ReactFlow,
+  applyNodeChanges,
   Background,
   BackgroundVariant,
-  Controls,
-  Position,
-  useStore,
   Edge,
   Node,
-  applyNodeChanges,
-  MiniMap,
-  NodeProps,
   NodeChange,
+  NodeProps,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
+  useReactFlow,
 } from 'reactflow'
-import { useMemo, useState, useEffect, useCallback } from 'react'
+
 import { TableNode, TableNodeData } from '../Database/Schemas/SchemaTableNode'
 
 export const TABLE_NODE_WIDTH = 640
@@ -26,7 +23,7 @@ interface SchemaFlowProps {
   edges: Edge[]
 }
 
-export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaFlowProps) {
+export const SchemaFlow = ({ nodes: initialNodes, edges: initialEdges }: SchemaFlowProps) => {
   const [nodes, setNodes] = useNodesState(initialNodes)
   const [edges, setEdges] = useEdgesState(initialEdges)
   const nodeTypes = useMemo(
@@ -86,40 +83,6 @@ export function SchemaFlow({ nodes: initialNodes, edges: initialEdges }: SchemaF
       </ReactFlow>
     </div>
   )
-}
-
-function useOnResize(fn: () => void, debounce = 200) {
-  const reactFlowInstance = useReactFlow()
-
-  const width = useStore(({ width }) => width)
-  const height = useStore(({ height }) => height)
-
-  const debouncedWidth = useDebounce(width, debounce)
-  const debouncedHeight = useDebounce(height, debounce)
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(fn, [reactFlowInstance, debouncedWidth, debouncedHeight])
-}
-
-type ResizeHandlerProps = {
-  onResize: () => void
-  debounce?: number
-}
-
-/**
- * Component to detect React Flow container resizes.
- * Calls `onResize` when `width` or `height` changes.
- *
- * Debounces at 200ms by default.
- *
- * It's better to use this child component instead of the
- * `useOnResize` hook directly in order to prevent a large
- * amount of re-renders on the main component.
- */
-function ResizeHandler({ onResize, debounce = 200 }: ResizeHandlerProps) {
-  useOnResize(onResize, debounce)
-
-  return null
 }
 
 export function useDebounce<T>(value: T, delay: number) {

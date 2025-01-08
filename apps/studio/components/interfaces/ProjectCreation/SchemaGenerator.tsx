@@ -1,19 +1,19 @@
 import { useChat } from 'ai/react'
-import { Button, Textarea } from 'ui'
 import { ArrowUp } from 'lucide-react'
-import { Markdown } from 'components/interfaces/Markdown'
-import { Label_Shadcn_ } from 'ui'
-import { BASE_PATH } from 'lib/constants'
 import { useState } from 'react'
+
+import { Markdown } from 'components/interfaces/Markdown'
 import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
+import { BASE_PATH } from 'lib/constants'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { Button, Label_Shadcn_, Textarea } from 'ui'
 
 interface SupabaseService {
   name: 'Auth' | 'Storage' | 'Database' | 'Edge Function' | 'Cron' | 'Queues' | 'Vector'
   reason: string
 }
 
-interface Props {
+interface SchemaGeneratorProps {
   step: 'initial' | 'second'
   onSqlGenerated: (sql: string) => void
   onReset?: () => void
@@ -29,7 +29,7 @@ export const SchemaGenerator = ({
   onTitleUpdated,
   onReset,
   isOneOff = false,
-}: Props) => {
+}: SchemaGeneratorProps) => {
   const [input, setInput] = useState('')
   const [hasSql, setHasSql] = useState(false)
 
@@ -197,7 +197,7 @@ export const SchemaGenerator = ({
             loading={isMessagesLoading}
             icon={<ArrowUp size={16} />}
             className="rounded-full absolute bottom-2 right-2"
-          ></Button>
+          />
         </div>
       </div>
     </div>

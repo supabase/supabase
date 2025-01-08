@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { RefObject, useCallback, useEffect, useState } from 'react'
 
 interface ScrollGradientProps {
-  scrollRef: React.RefObject<HTMLElement>
+  scrollRef: RefObject<HTMLElement>
   className?: string
   offset?: number // Pixels to offset from bottom before showing gradient
 }
