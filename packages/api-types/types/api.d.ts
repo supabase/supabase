@@ -8806,6 +8806,7 @@ export interface operations {
       }
     }
   }
+  /** Tops up the credit balance */
   OrgCreditsController_createTopUp: {
     parameters: {
       path: {
