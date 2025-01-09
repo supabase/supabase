@@ -3297,7 +3297,7 @@ export interface components {
     }
     CreditsTopUpRequestDto: {
       amount: number
-      hcaptchaToken: string
+      hcaptcha_token: string
       payment_method_id: string
     }
     CreditsTopUpResponseDto: {

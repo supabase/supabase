@@ -15,7 +15,7 @@ export async function topUpCredits({
   payment_method_id,
   amount,
   slug,
-  hcaptchaToken
+  hcaptchaToken,
 }: OrganizationCreditTopUpVariables) {
   if (!payment_method_id) {
     throw new Error('Payment method id required')
@@ -35,7 +35,7 @@ export async function topUpCredits({
         slug,
       },
     },
-    body: { payment_method_id, amount, hcaptchaToken },
+    body: { payment_method_id, amount, hcaptcha_token: hcaptchaToken },
   })
 
   if (error) handleError(error)
