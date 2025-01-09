@@ -389,16 +389,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                 <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
               </TooltipTrigger_Shadcn_>
               <TooltipContent_Shadcn_ side="bottom">
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    File is corrupted, please delete and reupload again.
-                  </span>
-                </div>
+                File is corrupted, please delete and reupload again.
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           )}

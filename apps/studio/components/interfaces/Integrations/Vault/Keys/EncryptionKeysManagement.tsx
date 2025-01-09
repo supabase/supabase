@@ -208,16 +208,7 @@ export const EncryptionKeysManagement = () => {
                           </TooltipTrigger_Shadcn_>
                           {!canManageKeys && (
                             <TooltipContent_Shadcn_ side="bottom">
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  You need additional permissions to delete keys
-                                </span>
-                              </div>
+                              You need additional permissions to delete keys
                             </TooltipContent_Shadcn_>
                           )}
                         </Tooltip_Shadcn_>

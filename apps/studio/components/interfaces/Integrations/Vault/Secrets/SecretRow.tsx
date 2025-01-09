@@ -121,16 +121,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
               </TooltipTrigger_Shadcn_>
               {!canManageSecrets && (
                 <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to edit secrets
-                    </span>
-                  </div>
+                  You need additional permissions to edit secrets
                 </TooltipContent_Shadcn_>
               )}
             </Tooltip_Shadcn_>
@@ -148,16 +139,7 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
               </TooltipTrigger_Shadcn_>
               {!canManageSecrets && (
                 <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to delete secrets
-                    </span>
-                  </div>
+                  You need additional permissions to delete secrets
                 </TooltipContent_Shadcn_>
               )}
             </Tooltip_Shadcn_>

@@ -133,17 +133,8 @@ const ColumnType = ({
         </TooltipTrigger_Shadcn_>
         {!showLabel && (
           <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background w-[240px]',
-              ].join(' ')}
-            >
-              <span className="text-xs text-foreground">
-                Custom non-native psql data types currently cannot be changed to a different data
-                type via Supabase Studio
-              </span>
-            </div>
+            Custom non-native psql data types currently cannot be changed to a different data type
+            via Supabase Studio
           </TooltipContent_Shadcn_>
         )}
       </Tooltip_Shadcn_>
@@ -166,14 +157,7 @@ const ColumnType = ({
         </TooltipTrigger_Shadcn_>
         {!showLabel && description && (
           <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background w-[240px]',
-              ].join(' ')}
-            >
-              <span className="text-xs text-foreground">{description}</span>
-            </div>
+            <div className="w-[240px]">{description}</div>
           </TooltipContent_Shadcn_>
         )}
       </Tooltip_Shadcn_>

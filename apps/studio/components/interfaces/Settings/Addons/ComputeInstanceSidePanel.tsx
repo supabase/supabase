@@ -352,18 +352,11 @@ const ComputeInstanceSidePanel = () => {
                                 </div>
                               </TooltipTrigger_Shadcn_>
                               <TooltipContent_Shadcn_ side="bottom">
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
-                                  ].join(' ')}
-                                >
-                                  <div className="flex items-center space-x-1">
-                                    <p className="text-foreground text-sm">
-                                      ${Number(option.price * 672).toFixed(0)} - $
-                                      {Number(option.price * 744).toFixed(0)} per month
-                                    </p>
-                                  </div>
+                                <div className="flex items-center space-x-1">
+                                  <p className="text-foreground text-sm">
+                                    ${Number(option.price * 672).toFixed(0)} - $
+                                    {Number(option.price * 744).toFixed(0)} per month
+                                  </p>
                                 </div>
                               </TooltipContent_Shadcn_>
                             </Tooltip_Shadcn_>

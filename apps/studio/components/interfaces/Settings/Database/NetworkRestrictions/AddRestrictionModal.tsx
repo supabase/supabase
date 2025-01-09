@@ -194,23 +194,14 @@ const AddRestrictionModal = ({
                               <HelpCircle size="14" strokeWidth={2} />
                             </TooltipTrigger_Shadcn_>
                             <TooltipContent_Shadcn_ side="bottom">
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background w-[300px]',
-                                ].join(' ')}
-                              >
-                                <span className="text-xs text-foreground">
-                                  Classless inter-domain routing (CIDR) notation is the notation
-                                  used to identify networks and hosts in the networks. The block
-                                  size tells us how many bits we need to take for the network
-                                  prefix, and is a value between 0 to{' '}
-                                  {type === 'IPv4'
-                                    ? IPV4_MAX_CIDR_BLOCK_SIZE
-                                    : IPV6_MAX_CIDR_BLOCK_SIZE}
-                                  .
-                                </span>
-                              </div>
+                              Classless inter-domain routing (CIDR) notation is the notation used to
+                              identify networks and hosts in the networks. The block size tells us
+                              how many bits we need to take for the network prefix, and is a value
+                              between 0 to{' '}
+                              {type === 'IPv4'
+                                ? IPV4_MAX_CIDR_BLOCK_SIZE
+                                : IPV6_MAX_CIDR_BLOCK_SIZE}
+                              .
                             </TooltipContent_Shadcn_>
                           </Tooltip_Shadcn_>
                         </div>

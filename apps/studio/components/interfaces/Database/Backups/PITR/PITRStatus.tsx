@@ -70,20 +70,11 @@ const PITRStatus = ({
               {hasReadReplicas ||
                 (!canTriggerPhysicalBackup && (
                   <TooltipContent_Shadcn_ side="left">
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        {hasReadReplicas
-                          ? 'You will need to remove all read replicas first to trigger a PITR recovery'
-                          : !canTriggerPhysicalBackup
-                            ? 'You need additional permissions to trigger a PITR recovery'
-                            : null}
-                      </span>
-                    </div>
+                    {hasReadReplicas
+                      ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                      : !canTriggerPhysicalBackup
+                        ? 'You need additional permissions to trigger a PITR recovery'
+                        : null}
                   </TooltipContent_Shadcn_>
                 ))}
             </Tooltip_Shadcn_>

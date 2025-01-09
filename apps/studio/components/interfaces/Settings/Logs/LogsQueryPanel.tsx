@@ -363,32 +363,14 @@ const Field = ({
             <TooltipTrigger_Shadcn_>
               <Check size={14} strokeWidth={3} className="text-brand" />
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Copied</span>
-              </div>
-            </TooltipContent_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">Copied</TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
         ) : (
           <Tooltip_Shadcn_>
             <TooltipTrigger_Shadcn_>
               <Clipboard size={14} strokeWidth={1.5} />
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Copy value</span>
-              </div>
-            </TooltipContent_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">Copy value</TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
         )}
       </Table.td>

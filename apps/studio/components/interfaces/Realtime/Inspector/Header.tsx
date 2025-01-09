@@ -43,14 +43,7 @@ export const Header = ({ config, onChangeConfig }: HeaderProps) => {
           </TooltipTrigger_Shadcn_>
           {config.channelName.length === 0 && (
             <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">You'll need to join a channel first</span>
-              </div>
+              You'll need to join a channel first
             </TooltipContent_Shadcn_>
           )}
         </Tooltip_Shadcn_>

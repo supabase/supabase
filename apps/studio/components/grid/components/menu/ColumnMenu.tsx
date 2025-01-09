@@ -55,16 +55,7 @@ const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
             </TooltipTrigger_Shadcn_>
             {isEncrypted && (
               <TooltipContent_Shadcn_ side="bottom">
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">
-                    Encrypted columns cannot be edited
-                  </span>
-                </div>
+                Encrypted columns cannot be edited
               </TooltipContent_Shadcn_>
             )}
           </Tooltip_Shadcn_>

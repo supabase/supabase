@@ -181,16 +181,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
               />
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Unarchive</span>
-              </div>
-            </TooltipContent_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">Unarchive</TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
         ) : (
           <Tooltip_Shadcn_>
@@ -202,16 +193,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
               />
             </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">Archive</span>
-              </div>
-            </TooltipContent_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">Archive</TooltipContent_Shadcn_>
           </Tooltip_Shadcn_>
         )}
       </div>

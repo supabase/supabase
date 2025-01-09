@@ -145,12 +145,7 @@ const RolesList = () => {
               </div>
             </TooltipTrigger_Shadcn_>
             <TooltipContent_Shadcn_ align="start" side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background space-y-1',
-                ].join(' ')}
-              >
+              <div className="space-y-1">
                 <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
                 {rolesWithActiveConnections.map((role) => (
                   <div key={role.id} className="text-xs text-foreground">

@@ -472,17 +472,8 @@ const Addons = () => {
                       {/* Only show the tooltip if the user can't add the addon and ipv4 is not currently applied */}
                       {!(canUpdateIPv4 || ipv4) && (
                         <TooltipContent_Shadcn_ side="bottom">
-                          <div
-                            className={[
-                              'rounded bg-alternative py-1 px-2 leading-none shadow',
-                              'border border-background',
-                            ].join(' ')}
-                          >
-                            <span className="text-xs text-foreground">
-                              Temporarily disabled while we are migrating to IPv6, please check back
-                              later.
-                            </span>
-                          </div>
+                          Temporarily disabled while we are migrating to IPv6, please check back
+                          later.
                         </TooltipContent_Shadcn_>
                       )}
                     </Tooltip_Shadcn_>

@@ -125,17 +125,12 @@ const AttributeUsage = ({
                               )}
                             </TooltipTrigger_Shadcn_>
                             <TooltipContent_Shadcn_ side="bottom">
-                              <div
-                                className={[
-                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                  'border border-background',
-                                ].join(' ')}
-                              >
-                                <p className="text-xs text-foreground">
+                              <div>
+                                <p>
                                   Exceeding your plans included usage will lead to restrictions to
                                   your project.
                                 </p>
-                                <p className="text-xs text-foreground">
+                                <p>
                                   Upgrade to a usage-based plan or disable the spend cap to avoid
                                   restrictions.
                                 </p>

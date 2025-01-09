@@ -248,16 +248,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
             />
           </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_
-            side="bottom"
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background',
-              'text-xs text-foreground',
-            ].join(' ')}
-          >
-            {tooltipContent}
-          </TooltipContent_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">{tooltipContent}</TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
       )
     }
@@ -322,14 +313,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               </div>
             )}
           </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_
-            side="bottom"
-            className={[
-              'rounded bg-alternative py-1 px-2 leading-none shadow',
-              'border border-background',
-              'text-xs text-foreground capitalize',
-            ].join(' ')}
-          >
+          <TooltipContent_Shadcn_ side="bottom">
             {formatTooltipText(entity.type)}
           </TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>

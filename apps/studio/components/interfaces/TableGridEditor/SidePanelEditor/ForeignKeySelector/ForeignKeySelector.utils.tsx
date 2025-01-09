@@ -56,13 +56,8 @@ export const generateCascadeActionDescription = (
               <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
             </TooltipTrigger_Shadcn_>
             <TooltipContent_Shadcn_ side="bottom">
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'w-[300px] space-y-2 border border-background',
-                ].join(' ')}
-              >
-                <p className="text-xs text-foreground">
+              <div className="w-[300px] space-y-2">
+                <p>
                   This is similar to no action, but the restrict check cannot be deferred till later
                   in the transaction
                 </p>

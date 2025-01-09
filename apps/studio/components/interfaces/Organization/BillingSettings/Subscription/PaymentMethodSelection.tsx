@@ -89,13 +89,8 @@ const PaymentMethodSelection = ({
               </TooltipTrigger_Shadcn_>
               {!canUpdatePaymentMethods && (
                 <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                      'w-48 border border-background text-center', //border
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
+                  <div className="w-48 text-center">
+                    <span>
                       You need additional permissions to add new payment methods to this
                       organization
                     </span>

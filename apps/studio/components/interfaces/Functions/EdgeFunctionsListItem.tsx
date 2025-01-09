@@ -9,6 +9,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
+import { EdgeFunctionsListItem } from '.'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -89,16 +90,7 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
             </div>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-              ].join(' ')}
-            >
-              <span className="text-xs text-foreground">
-                Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
-              </span>
-            </div>
+            Last updated on {dayjs(item.updated_at).format('DD MMM, YYYY HH:mm')}
           </TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
       </Table.td>

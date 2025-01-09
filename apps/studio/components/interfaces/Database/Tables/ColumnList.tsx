@@ -163,16 +163,7 @@ const ColumnList = ({
                                 </TooltipTrigger_Shadcn_>
                                 {!canUpdateColumns && (
                                   <TooltipContent_Shadcn_ side="bottom">
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                        'border border-background',
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        Additional permissions required to edit column
-                                      </span>
-                                    </div>
+                                    Additional permissions required to edit column
                                   </TooltipContent_Shadcn_>
                                 )}
                               </Tooltip_Shadcn_>
@@ -189,16 +180,7 @@ const ColumnList = ({
                                 </TooltipTrigger_Shadcn_>
                                 {!canUpdateColumns && (
                                   <TooltipContent_Shadcn_ side="bottom">
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                        'border border-background',
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        Additional permissions required to edit column
-                                      </span>
-                                    </div>
+                                    Additional permissions required to edit column
                                   </TooltipContent_Shadcn_>
                                 )}
                               </Tooltip_Shadcn_>

@@ -107,16 +107,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
             />
           </TooltipTrigger_Shadcn_>
 
-          <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'bg-alternative rounded py-1 px-2 leading-none shadow',
-                'border-background border',
-              ].join(' ')}
-            >
-              <span className="text-foreground text-xs">Hours (HH)</span>
-            </div>
-          </TooltipContent_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Hours (HH)</TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
         <span>:</span>
         <Tooltip_Shadcn_>
@@ -135,16 +126,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
             />
           </TooltipTrigger_Shadcn_>
 
-          <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'bg-alternative rounded py-1 px-2 leading-none shadow',
-                'border-background border',
-              ].join(' ')}
-            >
-              <span className="text-foreground text-xs">Minutes (MM)</span>
-            </div>
-          </TooltipContent_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Minutes (MM)</TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
         <span>:</span>
         <Tooltip_Shadcn_>
@@ -162,16 +144,7 @@ const TimeInput = ({ defaultTime, minimumTime, maximumTime, onChange = noop }: T
               className="w-full text-sm bg-transparent p-0 text-center outline-none border-none focus:ring-0"
             />
           </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
-            <div
-              className={[
-                'bg-alternative rounded py-1 px-2 leading-none shadow',
-                'border-background border',
-              ].join(' ')}
-            >
-              <span className="text-foreground text-xs">Seconds (SS)</span>
-            </div>
-          </TooltipContent_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Seconds (SS)</TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
       </div>
       {error && <p className="text-sm text-red-900">{error}</p>}

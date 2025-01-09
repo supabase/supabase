@@ -24,11 +24,7 @@ const columnRender = (name: string, isPrimaryKey = false) => {
               <Key size={14} strokeWidth={2} />
             </div>
           </TooltipTrigger_Shadcn_>
-          <TooltipContent_Shadcn_ side="bottom">
-            <div className="rounded bg-alternative py-1 px-2 leading-none shadow border border-background">
-              <span className="text-xs text-foreground">Primary key</span>
-            </div>
-          </TooltipContent_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">Primary key</TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
       )}
 

@@ -46,12 +46,7 @@ const PolicyDefinition = ({
                 </TooltipTrigger_Shadcn_>
 
                 <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'w-[300px] space-y-2 border border-background',
-                    ].join(' ')}
-                  >
+                  <div className="w-[300px] space-y-2">
                     <p className="text-xs text-foreground">
                       This expression will be added to queries that refer to the table if row-level
                       security is enabled.
@@ -90,12 +85,7 @@ const PolicyDefinition = ({
                 </TooltipTrigger_Shadcn_>
 
                 <TooltipContent_Shadcn_ side="bottom">
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'w-[300px] space-y-2 border border-background',
-                    ].join(' ')}
-                  >
+                  <div className="w-[300px] space-y-2">
                     <p className="text-xs text-foreground">
                       This expression will be used in INSERT and UPDATE queries against the table if
                       row-level security is enabled.
