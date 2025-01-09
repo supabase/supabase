@@ -5,15 +5,21 @@ date_created = "2024-02-14T04:26:37+00:00"
 topics = ["auth", "studio"]
 keywords = ["users"]
 
-[[errors]]
-message = "Database error"
+[api]
+sdk = ["auth-signup"]
 
 [[errors]]
-message = "Error sending"
+message = "Failed to send magic link: failed to make magiclink request: Error sending magic link"
+
+[[errors]]
+message = "Failed to delete user: Database error deleting user"
+
+[[errors]]
+message = "Failed to create user: Database error creating new user"
 
 [[errors]]
 http_status_code = 500
-message = "Database error"
+message = "Database error saving new user"
 ---
 
 ## PROBLEM
