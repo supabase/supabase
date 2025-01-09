@@ -32,7 +32,7 @@ const EmailTemplates = () => {
     (!authConfig.SMTP_HOST || !authConfig.SMTP_USER || !authConfig.SMTP_PASS)
 
   return (
-    <div>
+    <div className="w-full">
       <div className="flex justify-between items-center">
         <FormHeader
           title="Email Templates"
@@ -53,23 +53,21 @@ const EmailTemplates = () => {
       {isSuccess && (
         <FormPanel>
           <Tabs_Shadcn_ defaultValue={TEMPLATES_SCHEMAS[0].title.trim().replace(/\s+/g, '-')}>
-            <ScrollArea>
-              <TabsList_Shadcn_ className="px-8 pt-2 gap-5">
-                {TEMPLATES_SCHEMAS.map((template) => {
-                  return (
-                    <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
-                      {template.title}
-                    </TabsTrigger_Shadcn_>
-                  )
-                })}
-              </TabsList_Shadcn_>
-            </ScrollArea>
+            <TabsList_Shadcn_ className="px-4 md:px-8 pt-2 gap-5 overflow-x-scroll">
+              {TEMPLATES_SCHEMAS.map((template) => {
+                return (
+                  <TabsTrigger_Shadcn_ value={template.title.trim().replace(/\s+/g, '-')}>
+                    {template.title}
+                  </TabsTrigger_Shadcn_>
+                )
+              })}
+            </TabsList_Shadcn_>
             {TEMPLATES_SCHEMAS.map((template) => {
               const panelId = template.title.trim().replace(/\s+/g, '-')
               return (
                 <TabsContent_Shadcn_ value={panelId} key={panelId}>
                   {builtInSMTP ? (
-                    <div className="mx-8">
+                    <div className="px-4 md:px-8">
                       <EmailRateLimitsAlert />
                     </div>
                   ) : null}
