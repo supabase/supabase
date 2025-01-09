@@ -20,8 +20,6 @@ import 'ui/build/css/themes/light.css'
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { ThemeProvider, useThemeSandbox } from 'common'
@@ -79,31 +77,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const queryClient = useRootQueryClient()
 
-  // [Joshen] Some issues with using createBrowserSupabaseClient
-  const [supabase] = useState(() =>
-    IS_PLATFORM
-      ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL as string,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string
-        )
-      : undefined
-  )
-
   const getLayout = Component.getLayout ?? ((page) => page)
-
-  const AuthContainer = useMemo(
-    // eslint-disable-next-line react/display-name
-    () => (props: any) => {
-      return IS_PLATFORM ? (
-        <SessionContextProvider supabaseClient={supabase as any}>
-          <AuthProvider>{props.children}</AuthProvider>
-        </SessionContextProvider>
-      ) : (
-        <AuthProvider>{props.children}</AuthProvider>
-      )
-    },
-    [supabase]
-  )
 
   const TelemetryContainer = useMemo(
     // eslint-disable-next-line react/display-name
@@ -130,7 +104,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
-          <AuthContainer>
+          <AuthProvider>
             <FlagProvider>
               <ProfileProvider>
                 <Head>
@@ -169,7 +143,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </ProfileProvider>
             </FlagProvider>
-          </AuthContainer>
+          </AuthProvider>
         </Hydrate>
       </QueryClientProvider>
     </ErrorBoundary>

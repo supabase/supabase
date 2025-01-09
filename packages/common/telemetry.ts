@@ -17,7 +17,8 @@ interface TelemetryData {
 export function handlePageTelemetry(API_URL: string, route: string, telemetryData: TelemetryData) {
   const { page_url } = telemetryData
 
-  const { search, language, viewport_height, viewport_width } = telemetryData.ph
+  const { search, language, viewport_height, viewport_width, referrer, user_agent } =
+    telemetryData.ph
 
   return post(
     `${API_URL}/telemetry/page`,
@@ -26,12 +27,12 @@ export function handlePageTelemetry(API_URL: string, route: string, telemetryDat
       page_title: document.title,
       pathname: route,
       ph: {
-        referrer: document.referrer,
+        referrer: referrer ?? document.referrer,
         language,
         search,
         viewport_height,
         viewport_width,
-        user_agent: navigator.userAgent,
+        user_agent: user_agent ?? navigator.userAgent,
       },
     },
     { headers: { Version: '2' }, credentials: 'include' }

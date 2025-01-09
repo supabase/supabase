@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -30,6 +31,7 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
     const router = useRouter()
+    const org = useSelectedOrganization()
 
     const { type, connection } = props
     const { data: projects } = useProjectsQuery()
@@ -113,7 +115,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       </Link>
                     </DropdownMenuItem>
                   )}
-                  {type === 'Vercel' && (
+                  {type === 'Vercel' && org?.managed_by !== 'vercel-marketplace' && (
                     <DropdownMenuItem
                       className="space-x-2"
                       onSelect={(event) => {
@@ -130,9 +132,8 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                       <p>Resync environment variables</p>
                     </DropdownMenuItem>
                   )}
-                  {(type === 'Vercel' || router.pathname !== projectIntegrationUrl) && (
-                    <DropdownMenuSeparator />
-                  )}
+                  {((type === 'Vercel' && org?.managed_by !== 'vercel-marketplace') ||
+                    router.pathname !== projectIntegrationUrl) && <DropdownMenuSeparator />}
                   <DropdownMenuItem className="space-x-2" onSelect={() => setIsOpen(true)}>
                     <Trash size={14} />
                     <p>Delete connection</p>

@@ -1,16 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { ExternalLink, Plug } from 'lucide-react'
+import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
-import { DatabaseConnectionString as OldDatabaseConnectionString } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseConnectionString'
-
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useFlag } from 'hooks/ui/useFlag'
-import { parseAsBoolean, useQueryState } from 'nuqs'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -34,7 +31,6 @@ import ConnectTabContent from './ConnectTabContent'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
-  const connectDialogUpdate = useFlag('connectDialogUpdate')
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
@@ -154,11 +150,7 @@ const Connect = () => {
   return (
     <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>
       <DialogTrigger asChild>
-        <Button
-          type={connectDialogUpdate ? 'default' : 'primary'}
-          className={cn(connectDialogUpdate && 'rounded-full')}
-          icon={<Plug className="rotate-90" />}
-        >
+        <Button type="default" className="rounded-full" icon={<Plug className="rotate-90" />}>
           <span>Connect</span>
         </Button>
       </DialogTrigger>
@@ -196,13 +188,7 @@ const Connect = () => {
                   className={cn('!mt-0', 'p-0', 'flex flex-col gap-6')}
                 >
                   <div className={DIALOG_PADDING_Y}>
-                    {connectDialogUpdate ? (
-                      <DatabaseConnectionString />
-                    ) : (
-                      <div className="px-7">
-                        <OldDatabaseConnectionString appearance="minimal" />
-                      </div>
-                    )}
+                    <DatabaseConnectionString />
                   </div>
                 </TabsContent_Shadcn_>
               )
