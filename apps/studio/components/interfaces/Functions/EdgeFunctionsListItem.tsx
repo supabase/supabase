@@ -9,7 +9,6 @@ import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 import { Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
-import { EdgeFunctionsListItem } from '.'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
