@@ -31,7 +31,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Info } from 'lucide-react'
 import { useFlag } from 'hooks/ui/useFlag'
 import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { toast } from 'sonner'
@@ -66,12 +66,11 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   )
   const isPermissionsLoaded = usePermissionsLoaded()
 
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
-  )
-
-  const { mutate: topUpCredits, isLoading: executingTopUp } = useOrganizationCreditTopUpMutation({})
+  const {
+    mutate: topUpCredits,
+    isLoading: executingTopUp,
+    error: errorInitiatingTopUp,
+  } = useOrganizationCreditTopUpMutation({})
 
   const form = useForm<CreditTopUpForm>({
     resolver: zodResolver(FormSchema),
@@ -92,12 +91,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   }, [])
 
   const resetCaptcha = () => {
-    console.log('reset captcha')
     setCaptchaToken(null)
     captchaRef?.resetCaptcha()
   }
-
-  console.log({ topUpModalVisible, captchaRef, captchaLoaded })
 
   const initHcaptcha = async () => {
     if (topUpModalVisible && captchaRef && captchaLoaded) {
@@ -108,10 +104,13 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
           const captchaResponse = await captchaRef.execute({ async: true })
           token = captchaResponse?.response ?? null
           setCaptchaToken(token)
+          return token
         }
       } catch (error) {
-        return
+        return token
       }
+
+      return token
     }
   }
 
@@ -125,15 +124,14 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const onSubmit: SubmitHandler<CreditTopUpForm> = async ({ amount, paymentMethod }) => {
     setPaymentIntentConfirmation(undefined)
 
-    await initHcaptcha()
-    console.log({ captchaToken })
+    const token = await initHcaptcha()
 
     await topUpCredits(
       {
         slug,
         amount,
         payment_method_id: paymentMethod,
-        hcaptchaToken: captchaToken,
+        hcaptchaToken: token,
       },
       {
         onSuccess: (data) => {
@@ -145,7 +143,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
 
           resetCaptcha()
         },
-        onError: (err) => console.error(err),
       }
     )
   }
@@ -160,7 +157,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const onTopUpDialogVisibilityChange = (visible: boolean) => {
     setTopUpModalVisible(visible)
     if (!visible) {
-      console.log('not visible')
       setCaptchaRef(null)
       setPaymentIntentConfirmation(undefined)
       setPaymentIntentSecret('')
@@ -224,12 +220,10 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
               if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
             }}
             onVerify={(token) => {
-              console.log('on verify ' + token)
               setCaptchaToken(token)
               if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
             }}
             onExpire={() => {
-              console.log('on expire')
               setCaptchaToken(null)
             }}
           />
@@ -287,6 +281,29 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                     </AlertDescription_Shadcn_>
                   </Alert_Shadcn_>
                 )}
+
+                {paymentIntentConfirmation?.paymentIntent &&
+                  paymentIntentConfirmation.paymentIntent.status === 'processing' && (
+                    <Alert_Shadcn_ variant="default">
+                      <Info className="h-4 w-4" />
+                      <AlertTitle_Shadcn_>Payment processing</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Your payment is processing and we are waiting for a confirmation from your
+                        card issuer. If the payment goes through you'll automatically be credited.
+                        Please check back later.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+
+                {errorInitiatingTopUp && (
+                  <Alert_Shadcn_ variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle_Shadcn_>Error topping up balance</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      {errorInitiatingTopUp.message}
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
               </DialogSection>
 
               {!paymentIntentConfirmation?.paymentIntent && (
@@ -310,20 +327,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                   paymentIntentConfirmed(paymentIntentConfirmation)
                 }
                 onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
+                paymentMethodId={form.getValues().paymentMethod}
               />
             </Elements>
-          )}
-
-          {paymentIntentConfirmation && paymentIntentConfirmation.paymentIntent && (
-            <div className="text-sm prose">
-              {paymentIntentConfirmation.paymentIntent.status === 'processing' && (
-                <p>
-                  Your payment is processing and we are waiting for a confirmation from your card
-                  issuer. If the payment goes through you'll automatically be credited. Please check
-                  back later.
-                </p>
-              )}
-            </div>
           )}
         </DialogContent>
       </Dialog>
@@ -335,8 +341,10 @@ const PaymentConfirmation = ({
   paymentIntentSecret,
   onPaymentIntentConfirm,
   onLoadingChange,
+  paymentMethodId,
 }: {
   paymentIntentSecret: string
+  paymentMethodId: string
   onPaymentIntentConfirm: (response: PaymentIntentResult) => void
   onLoadingChange: (loading: boolean) => void
 }) => {
@@ -346,13 +354,12 @@ const PaymentConfirmation = ({
     if (stripe && paymentIntentSecret) {
       onLoadingChange(true)
       stripe!
-        .confirmCardPayment(paymentIntentSecret)
+        .confirmCardPayment(paymentIntentSecret, { payment_method: paymentMethodId })
         .then((res) => {
           onPaymentIntentConfirm(res)
           onLoadingChange(false)
         })
         .catch((err) => {
-          console.error(err)
           onLoadingChange(false)
         })
     }

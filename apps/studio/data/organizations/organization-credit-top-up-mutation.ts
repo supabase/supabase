@@ -8,7 +8,7 @@ export type OrganizationCreditTopUpVariables = {
   payment_method_id: string
   amount: number
   slug?: string
-  hcaptchaToken: string | null
+  hcaptchaToken?: string | null
 }
 
 export async function topUpCredits({
