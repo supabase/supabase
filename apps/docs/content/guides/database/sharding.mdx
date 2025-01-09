@@ -15,7 +15,7 @@ Each shard should have the connection details for every other shard configured, 
 
 ![Supabase shardingarchitectural diagram](/docs/img/database/sharding)
 
-## Schema management and Foreign tables
+## Schema management and foreign tables
 
 A foreign table is a table that is treated like a local table but it exists on a different shard. One important thing to note with foreign tables is that it creates a pointer to an existing table on the shard that is specified, the source table **must** exist as well.
 
