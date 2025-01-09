@@ -13,7 +13,7 @@ import { PlanId } from 'data/subscriptions/types'
  *
  * @param targetVolumeSizeGb - The target volume size in GB
  * @param targetComputeSize - The target compute size
- * @returns The monthly price for the new project. Which is the sum of the instance price and the extra disk price
+ * @returns The disk price and compute price for the new project
  */
 
 export type NewProjectPrice = {
@@ -44,12 +44,10 @@ export function projectSpecToMonthlyPrice({
     availableOptions: [
       { identifier: targetComputeSize, price: getComputeHourlyPrice(targetComputeSize) },
     ],
-    oldComputeSize: 'ci_nano', // not used for r2np
+    oldComputeSize: 'nano', // not used for r2np
     newComputeSize: targetComputeSize,
     plan: planId,
   })
-
-  console.log('🫒', diskPrice)
 
   return {
     diskPrice: Number(diskPrice.newPrice) || 0,
@@ -59,10 +57,10 @@ export function projectSpecToMonthlyPrice({
 
 function getComputeHourlyPrice(computeSize: InfraInstanceSize): number {
   if (computeSize === 'nano') {
-    return 0
+    return 0 // free project (cant use the r2np feature)
   }
 
   const computePrice = instanceSizeSpecs[computeSize]?.priceHourly
 
-  return computePrice || 0
+  return computePrice
 }
