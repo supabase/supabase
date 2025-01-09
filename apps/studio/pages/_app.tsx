@@ -112,7 +112,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
                 <TelemetryContainer>
-                  <TooltipProvider_Shadcn_>
+                  <TooltipProvider_Shadcn_ delayDuration={0}>
                     <RouteValidationWrapper>
                       <ThemeProvider
                         defaultTheme="system"
