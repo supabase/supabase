@@ -244,9 +244,9 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <FormField_Shadcn_
                   control={form.control}
                   name="amount"
-                  render={({ field: { ref, ...rest } }) => (
+                  render={({ field }) => (
                     <FormItemLayout label="Amount (USD)" className="gap-1">
-                      <Input_Shadcn_ {...rest} type="number" placeholder="100" />
+                      <Input_Shadcn_ {...field} type="number" placeholder="100" />
                     </FormItemLayout>
                   )}
                 />
@@ -265,7 +265,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
                 <p className="prose text-sm">
                   For larger discounted credit packages, please{' '}
                   <Link
-                    href={`/support/new?slug=${slug}&message=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.BILLING}`}
+                    href={`/support/new?slug=${slug}&subject=${encodeURIComponent('I would like to inquire about larger credit packages')}&category=${SupportCategories.BILLING}`}
                     target="_blank"
                   >
                     reach out.
