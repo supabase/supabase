@@ -45,7 +45,7 @@ import {
 } from './DiskManagement.utils'
 import { DiskMangementRestartRequiredSection } from './DiskManagementRestartRequiredSection'
 import { BillingChangeBadge } from './ui/BillingChangeBadge'
-import { DiskType } from './ui/DiskManagement.constants'
+import { DISK_AUTOSCALE_CONFIG_DEFAULTS, DiskType } from './ui/DiskManagement.constants'
 import { DiskMangementCoolDownSection } from './ui/DiskManagementCoolDownSection'
 
 const TableHeaderRow = () => (
@@ -335,8 +335,13 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {form.formState.defaultValues?.growthPercent !== form.getValues('growthPercent') && (
               <TableDataRow
                 attribute="Growth percent"
-                defaultValue={form.formState.defaultValues?.growthPercent ?? ''}
-                newValue={form.getValues('growthPercent') ?? ''}
+                defaultValue={
+                  form.formState.defaultValues?.growthPercent ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                }
+                newValue={
+                  form.getValues('growthPercent') ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+                }
                 unit="%"
                 beforePrice={0}
                 afterPrice={0}
@@ -345,8 +350,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {form.formState.defaultValues?.minIncrementGb !== form.getValues('minIncrementGb') && (
               <TableDataRow
                 attribute="Min increment"
-                defaultValue={form.formState.defaultValues?.minIncrementGb ?? 0}
-                newValue={form.getValues('minIncrementGb') ?? 0}
+                defaultValue={
+                  form.formState.defaultValues?.minIncrementGb ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                }
+                newValue={
+                  form.getValues('minIncrementGb') ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+                }
                 unit="GB"
                 beforePrice={0}
                 afterPrice={0}
@@ -355,8 +366,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {form.formState.defaultValues?.maxSizeGb !== form.getValues('maxSizeGb') && (
               <TableDataRow
                 attribute="Max disk size"
-                defaultValue={form.formState.defaultValues?.maxSizeGb?.toLocaleString() ?? 0}
-                newValue={form.getValues('maxSizeGb')?.toLocaleString() ?? 0}
+                defaultValue={
+                  form.formState.defaultValues?.maxSizeGb?.toLocaleString() ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                }
+                newValue={
+                  form.getValues('maxSizeGb')?.toLocaleString() ??
+                  DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+                }
                 unit="GB"
                 beforePrice={0}
                 afterPrice={0}

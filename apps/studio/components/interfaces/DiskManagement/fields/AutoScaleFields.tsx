@@ -7,6 +7,7 @@ import { cn, FormControl_Shadcn_, FormField_Shadcn_, Input_Shadcn_, Skeleton } f
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
+import { DISK_AUTOSCALE_CONFIG_DEFAULTS } from '../ui/DiskManagement.constants'
 import FormMessage from '../ui/FormMessage'
 import { InputPostTab } from '../ui/InputPostTab'
 
@@ -16,17 +17,30 @@ type AutoScaleFieldProps = {
 
 export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
   const { ref: projectRef } = useParams()
-  const { control, setValue } = form
+  const {
+    control,
+    setValue,
+    formState: { errors },
+  } = form
   const { totalSize, growthPercent, maxSizeGb, minIncrementGb } = form.watch()
 
   const { error, isLoading, isError } = useDiskAutoscaleCustomConfigQuery({ projectRef })
 
-  const growthSize = totalSize * ((growthPercent ?? 0) / 100)
-  const autoscaleGrowValue = (minIncrementGb ?? 0) > growthSize ? minIncrementGb ?? 0 : growthSize
+  const _growthPercent = growthPercent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent
+  const _minIncrementGb = minIncrementGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize
+  const _maxSizeGb = errors.maxSizeGb
+    ? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+    : maxSizeGb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb
+
+  const growthSize = Math.floor(totalSize * (_growthPercent / 100))
+  const autoscaleGrowValue = Math.min(
+    Math.max(Math.floor((totalSize * _growthPercent) / 100), _minIncrementGb),
+    200
+  )
 
   const totalSizeAfterGrowth = autoscaleGrowValue + totalSize
   const formattedTotalSizeAfterGrowth =
-    totalSizeAfterGrowth < (maxSizeGb ?? 0) ? totalSizeAfterGrowth : maxSizeGb ?? 0
+    totalSizeAfterGrowth < _maxSizeGb ? totalSizeAfterGrowth : _maxSizeGb
   const formattedGrowValue = formattedTotalSizeAfterGrowth - totalSize
 
   return (
@@ -42,7 +56,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               id={field.name}
               labelOptional="Percentage of current disk size to grow"
               description={
-                !!growthSize
+                !errors.growthPercent
                   ? `This amounts to ${growthSize} GB based on the current disk size of ${totalSize} GB`
                   : undefined
               }
@@ -64,14 +78,19 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                       {...field}
                       type="number"
                       className="flex-grow font-mono rounded-r-none max-w-20"
-                      value={field.value ?? 0}
+                      value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {
-                        setValue('growthPercent', e.target.valueAsNumber, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
+                        setValue(
+                          'growthPercent',
+                          e.target.value === '' ? null : e.target.valueAsNumber,
+                          {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          }
+                        )
                       }}
+                      placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent)}
                     />
                   </FormControl_Shadcn_>
                 )}
@@ -93,7 +112,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
               id={field.name}
               labelOptional="Minimum value to autoscale disk size by"
               description={
-                !!minIncrementGb && minIncrementGb > growthSize
+                !!minIncrementGb && minIncrementGb > growthSize && !errors.minIncrementGb
                   ? `This value takes precedence as the minimum increment is larger than the growth percent`
                   : undefined
               }
@@ -115,14 +134,19 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                       {...field}
                       type="number"
                       className="flex-grow font-mono rounded-r-none max-w-32"
-                      value={field.value ?? 0}
+                      value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {
-                        setValue('minIncrementGb', e.target.valueAsNumber, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
+                        setValue(
+                          'minIncrementGb',
+                          e.target.value === '' ? null : e.target.valueAsNumber,
+                          {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          }
+                        )
                       }}
+                      placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize)}
                     />
                   </FormControl_Shadcn_>
                 )}
@@ -161,14 +185,19 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
                       {...field}
                       type="number"
                       className="flex-grow font-mono rounded-r-none max-w-32"
-                      value={field.value ?? 0}
+                      value={field.value ?? undefined}
                       disabled={isError}
                       onChange={(e) => {
-                        setValue('maxSizeGb', e.target.valueAsNumber, {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        })
+                        setValue(
+                          'maxSizeGb',
+                          e.target.value === '' ? null : e.target.valueAsNumber,
+                          {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          }
+                        )
                       }}
+                      placeholder={String(DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb)}
                     />
                   </FormControl_Shadcn_>
                 )}
@@ -179,7 +208,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
         }}
       />
 
-      {!!growthPercent && !!minIncrementGb && !!maxSizeGb && (
+      {
         <Admonition type="default" showIcon={false} className="[&>div]:text-foreground-light">
           Disk size will automatically be expanded by{' '}
           <span className="text-foreground">
@@ -191,7 +220,7 @@ export const AutoScaleFields = ({ form }: AutoScaleFieldProps) => {
           to a total of <span className="text-foreground">{formattedTotalSizeAfterGrowth} GB</span>{' '}
           when the database reaches 90% of the disk size
         </Admonition>
-      )}
+      }
     </>
   )
 }

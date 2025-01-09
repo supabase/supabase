@@ -21,20 +21,26 @@ const baseSchema = z.object({
   computeSize: z
     .custom<ComputeInstanceAddonVariantId>((val): val is ComputeInstanceAddonVariantId => true)
     .describe('Compute size'),
-
   growthPercent: z
     .number()
+    .int('Value must be an integer')
     .min(10, 'Growth percent must be at least 10%')
     .max(100, 'Growth percent cannot exceed 100%')
-    .nullable()
-    .optional(),
+    .optional()
+    .nullable(),
   minIncrementGb: z
     .number()
+    .int('Value must be an integer')
     .min(1, 'Minimum increment must be at least 1 GB')
     .max(200, 'Minimum increment cannot exceed 200 GB')
-    .nullable()
-    .optional(),
-  maxSizeGb: z.number().max(60000, 'Maximum size cannot exceed 60TB').nullable().optional(),
+    .optional()
+    .nullable(),
+  maxSizeGb: z
+    .number()
+    .int('Value must be an integer')
+    .max(60000, 'Maximum size cannot exceed 60TB')
+    .optional()
+    .nullable(),
 })
 
 export const CreateDiskStorageSchema = (defaultTotalSize: number) => {

@@ -56,7 +56,6 @@ import { StorageTypeField } from './fields/StorageTypeField'
 import { ThroughputField } from './fields/ThroughputField'
 import { DiskCountdownRadial } from './ui/DiskCountdownRadial'
 import {
-  DISK_AUTOSCALE_CONFIG_DEFAULTS,
   DiskType,
   IOPS_RANGE,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
@@ -154,10 +153,9 @@ export function DiskManagementForm() {
     computeSize: project?.infra_compute_size
       ? mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
       : undefined,
-
-    growthPercent: growth_percent ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.growthPercent,
-    minIncrementGb: min_increment_gb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.minIncrementSize,
-    maxSizeGb: max_size_gb ?? DISK_AUTOSCALE_CONFIG_DEFAULTS.maxSizeGb,
+    growthPercent: growth_percent,
+    minIncrementGb: min_increment_gb,
+    maxSizeGb: max_size_gb,
   }
 
   const form = useForm<DiskStorageSchemaType>({
