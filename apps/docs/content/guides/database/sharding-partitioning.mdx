@@ -40,7 +40,7 @@ To set up sharding and partitioning, you can partition your tables and store eac
    SERVER shard2 OPTIONS (table_name 'sales_2000_02');
    ```
 
-## Moving partitions Between Shards
+## Moving partitions between shards
 
 To move a partition from one shard to another, you can use the following steps:
 
@@ -79,7 +79,7 @@ FROM sales
 WHERE order_date >= '2000-01-01' AND order_date < '2000-03-01';
 ```
 
-### Querying specific Partitions
+### Querying specific partitions
 
 If you only need to retrieve data from a specific partition, you can directly query that partition.
 
