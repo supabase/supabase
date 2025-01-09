@@ -332,10 +332,6 @@ export interface paths {
     /** Retrieves a list of available Postgres versions available to the organization */
     post: operations['OrganizationSlugController_getAvailableImageVersions']
   }
-  '/platform/organizations/{slug}/billing/credits/top-up': {
-    /** Tops up the credit balance */
-    post: operations['OrgCreditsController_createTopUp']
-  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -873,8 +869,8 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/platform/projects/{ref}/content/count': {
-    /** Gets the user's content counts */
-    get: operations['ContentController_getContentCountV2']
+    /** Gets the count of a user's content */
+    get: operations['ContentController_getContentCount']
   }
   '/platform/projects/{ref}/content/folders': {
     /** Gets project's content root folder */
@@ -1144,7 +1140,7 @@ export interface paths {
   }
   '/platform/telemetry/page-leave': {
     /** Send analytics page leave event */
-    post: operations['TelemetryPageLeaveController_trackPageLeave']
+    post: operations['TelemetryPageLeaveController_pageLeave']
   }
   '/platform/telemetry/reset': {
     /** Reset analytics */
@@ -1879,8 +1875,8 @@ export interface paths {
     patch: operations['ContentController_updateContent']
   }
   '/v0/projects/{ref}/content/count': {
-    /** Gets the user's content counts */
-    get: operations['ContentController_getContentCountV2']
+    /** Gets the count of a user's content */
+    get: operations['ContentController_getContentCount']
   }
   '/v0/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
@@ -2127,10 +2123,6 @@ export interface paths {
     /** Deletes the given project */
     delete: operations['v1-delete-a-project']
   }
-  '/v1/projects/{ref}/analytics/endpoints/logs.all': {
-    /** Gets project's logs */
-    get: operations['V1ProjectLogsController_getLogs']
-  }
   '/v1/projects/{ref}/api-keys': {
     /** Get project api keys */
     get: operations['v1-get-project-api-keys']
@@ -2337,16 +2329,6 @@ export interface paths {
   '/v1/projects/{ref}/readonly/temporary-disable': {
     /** Disables project's readonly mode for the next 15 minutes */
     post: operations['v1-disable-readonly-mode-temporarily']
-  }
-  '/v1/projects/{ref}/restore': {
-    /** Lists available restore versions for the given project */
-    get: operations['v1-list-available-restore-versions']
-    /** Restores the given project */
-    post: operations['v1-restore-a-project']
-  }
-  '/v1/projects/{ref}/restore/cancel': {
-    /** Cancels the given project restoration */
-    post: operations['v1-cancel-a-project-restoration']
   }
   '/v1/projects/{ref}/secrets': {
     /**
@@ -2798,19 +2780,19 @@ export interface components {
       release_channel: string
       /** @enum {string} */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -2853,19 +2835,6 @@ export interface components {
       messages: Record<string, never>[]
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
-    }
-    CloneBackupsResponse: {
-      backups: components['schemas']['Backup'][]
-      physicalBackupData: {
-        earliestPhysicalBackupDateUnix?: number
-        latestPhysicalBackupDateUnix?: number
-      }
-      pitr_enabled: boolean
-      region: string
-      target_compute_size: string
-      target_volume_size_gb: number
-      tierKey: string
-      walg_enabled: boolean
     }
     CloneProjectDto: {
       /** @default 0 */
@@ -3295,23 +3264,6 @@ export interface components {
       secret_access_key: string
       session_token: string
     }
-    CreditsTopUpRequestDto: {
-      amount: number
-      hcaptchaToken: string
-      payment_method_id: string
-    }
-    CreditsTopUpResponseDto: {
-      payment_intent_secret?: string
-      /** @enum {string} */
-      status:
-        | 'canceled'
-        | 'processing'
-        | 'requires_action'
-        | 'requires_capture'
-        | 'requires_confirmation'
-        | 'requires_payment_method'
-        | 'succeeded'
-    }
     CustomerBillingAddress: {
       city?: string
       country: string
@@ -3338,22 +3290,6 @@ export interface components {
     CustomSupabaseInternalRequests: {
       ami: components['schemas']['AmiSearchOptions']
     }
-    /** @enum {string} */
-    database_status:
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UNKNOWN'
-      | 'INIT_READ_REPLICA'
-      | 'INIT_READ_REPLICA_FAILED'
-      | 'RESTARTING'
-      | 'RESIZING'
-    /** @enum {string} */
-    database_type: 'PRIMARY' | 'READ_REPLICA'
     DatabaseDetailResponse: {
       /** @enum {string} */
       cloud_provider: 'AWS' | 'FLY'
@@ -3377,11 +3313,27 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
+        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTORING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'INIT_READ_REPLICA'
+      | 'INIT_READ_REPLICA_FAILED'
+      | 'RESTARTING'
+      | 'RESIZING'
     DatabaseStatusResponse: {
       identifier: string
       replicaInitializationStatus?: Record<string, never>
@@ -3395,11 +3347,14 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
+        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
         | 'RESIZING'
     }
+    /** @enum {string} */
+    DatabaseType: 'PRIMARY' | 'READ_REPLICA'
     DatabaseUpgradeStatus: {
       /** @enum {string} */
       error?:
@@ -3685,11 +3640,6 @@ export interface components {
     GetContentCountResponse: {
       count: number
     }
-    GetContentCountV2Response: {
-      favorites: number
-      private: number
-      shared: number
-    }
     GetMetricsBody: {
       /** @enum {string} */
       interval: '1d' | '3d' | '7d'
@@ -3757,9 +3707,6 @@ export interface components {
         slug?: string
       }
       updated_at: string
-    }
-    GetProjectAvailableRestoreVersionsResponse: {
-      available_versions: components['schemas']['ProjectAvailableRestoreVersion'][]
     }
     GetProjectByFlyExtensionIdResponse: {
       ref: string
@@ -4419,19 +4366,19 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       /**
@@ -4515,7 +4462,7 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata: unknown
+      billing_metadata?: Record<string, never>
       has_oriole_project: boolean
       id: number
       name: string
@@ -4932,23 +4879,6 @@ export interface components {
       username: string
     }
     /** @enum {string} */
-    project_status:
-      | 'INACTIVE'
-      | 'ACTIVE_HEALTHY'
-      | 'ACTIVE_UNHEALTHY'
-      | 'COMING_UP'
-      | 'UNKNOWN'
-      | 'GOING_DOWN'
-      | 'INIT_FAILED'
-      | 'REMOVED'
-      | 'RESTORING'
-      | 'UPGRADING'
-      | 'PAUSING'
-      | 'RESTORE_FAILED'
-      | 'RESTARTING'
-      | 'PAUSE_FAILED'
-      | 'RESIZING'
-    /** @enum {string} */
     ProjectAddonPricingInterval: 'monthly' | 'hourly'
     ProjectAddonsResponse: {
       available_addons: components['schemas']['AvailableAddonResponse'][]
@@ -4985,17 +4915,8 @@ export interface components {
       db_schema: string
       endpoint: string
     }
-    ProjectAvailableRestoreVersion: {
-      /** @enum {string} */
-      postgres_engine: '13' | '14' | '15' | '17-oriole'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
-      version: string
-    }
     ProjectClonedResponse: {
       source_project_ref: string
-      target_disk_size_gb: number
-      target_instance_size: string
       target_project_ref: string
     }
     ProjectClonedStatusResponse: {
@@ -5019,8 +4940,8 @@ export interface components {
       identifier: string
       infra_compute_size?: components['schemas']['DbInstanceSize']
       region: string
-      status: components['schemas']['database_status']
-      type: components['schemas']['database_type']
+      status: components['schemas']['DatabaseStatus']
+      type: components['schemas']['DatabaseType']
     }
     ProjectDetailResponse: {
       cloud_provider: string
@@ -5042,19 +4963,19 @@ export interface components {
       restUrl: string
       /** @enum {string} */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       subscription_id: string
@@ -5208,11 +5129,26 @@ export interface components {
       ssl_enforced: boolean
       status: string
     }
+    /** @enum {string} */
+    ProjectStatus:
+      | 'ACTIVE_HEALTHY'
+      | 'ACTIVE_UNHEALTHY'
+      | 'COMING_UP'
+      | 'GOING_DOWN'
+      | 'INACTIVE'
+      | 'INIT_FAILED'
+      | 'REMOVED'
+      | 'RESTARTING'
+      | 'UNKNOWN'
+      | 'UPGRADING'
+      | 'PAUSING'
+      | 'RESTORING'
+      | 'RESTORE_FAILED'
+      | 'PAUSE_FAILED'
+      | 'RESIZING'
     ProjectUnpauseVersionInfo: {
-      /** @enum {string} */
-      postgres_engine: '13' | '14' | '15' | '17-oriole'
-      /** @enum {string} */
-      release_channel: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+      postgres_engine: components['schemas']['PostgresEngine']
+      release_channel: components['schemas']['ReleaseChannel']
       version: string
     }
     ProjectUpgradeEligibilityResponse: {
@@ -5240,7 +5176,7 @@ export interface components {
       name: string
       ref: string
       region: string
-      status: components['schemas']['project_status']
+      status: components['schemas']['ProjectStatus']
     }
     Provider: {
       created_at?: string
@@ -5306,6 +5242,7 @@ export interface components {
         | 'REMOVED'
         | 'RESTORING'
         | 'UNKNOWN'
+        | 'UPGRADING'
         | 'INIT_READ_REPLICA'
         | 'INIT_READ_REPLICA_FAILED'
         | 'RESTARTING'
@@ -5379,19 +5316,19 @@ export interface components {
        * @enum {string}
        */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
       /**
@@ -5434,18 +5371,6 @@ export interface components {
     RestorePhysicalBackupBody: {
       id: number
       recovery_time_target: string
-    }
-    RestoreProjectBodyDto: {
-      /**
-       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17-oriole'
-      /**
-       * @description Release channel version. If not provided, GeneralAvailability will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
     }
     RestrictionData: {
       grace_period_end?: string
@@ -5685,7 +5610,7 @@ export interface components {
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
-      description: string | null
+      description?: string
       id: string
       inserted_at: string
       name: string
@@ -5705,7 +5630,7 @@ export interface components {
     }
     SnippetResponse: {
       content: components['schemas']['SnippetContent']
-      description: string | null
+      description?: string
       id: string
       inserted_at: string
       name: string
@@ -5909,22 +5834,21 @@ export interface components {
     TelemetryCallFeatureFlagsResponseDto: {
       [key: string]: unknown
     }
-    TelemetryEventBodyV2Dto: {
+    TelemetryEventBodyV2: {
       action: string
-      custom_properties: {
-        [key: string]: unknown
-      }
+      custom_properties: Record<string, never>
       page_title: string
       page_url: string
       pathname: string
-      ph: {
-        language: string
-        referrer: string
-        search: string
-        user_agent: string
-        viewport_height: number
-        viewport_width: number
-      }
+      ph: components['schemas']['TelemetryEventPostHog']
+    }
+    TelemetryEventPostHog: {
+      language: string
+      referrer: string
+      search: string
+      user_agent: string
+      viewport_height: number
+      viewport_width: number
     }
     TelemetryFeatureFlagBodyDto: {
       feature_flag_name: string
@@ -5943,29 +5867,24 @@ export interface components {
       project_ref?: string
       user_id: string
     }
-    TelemetryPageBodyV2Dto: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
+    TelemetryPageBodyV2: {
       page_title: string
       page_url: string
       pathname: string
-      ph: {
-        language: string
-        referrer: string
-        search: string
-        user_agent: string
-        viewport_height: number
-        viewport_width: number
-      }
+      ph: components['schemas']['TelemetryPagePostHog']
     }
-    TelemetryPageLeaveBodyDto: {
-      feature_flags?: {
-        [key: string]: unknown
-      }
+    TelemetryPageLeaveBody: {
       page_title: string
       page_url: string
       pathname: string
+    }
+    TelemetryPagePostHog: {
+      language: string
+      referrer: string
+      search: string
+      user_agent: string
+      viewport_height: number
+      viewport_width: number
     }
     ThirdPartyAuth: {
       custom_jwks?: unknown
@@ -5992,19 +5911,11 @@ export interface components {
     UnpauseProjectAvailableVersionsResponse: {
       available_versions: components['schemas']['ProjectUnpauseVersionInfo'][]
     }
-    UnpauseProjectBodyDto: {
-      /**
-       * @description Postgres engine version. If not provided, the latest version from the given release channel will be used.
-       * @enum {string}
-       */
-      postgres_engine?: '15' | '17-oriole'
-      /**
-       * @description Release channel version. If not provided, GeneralAvailability will be used.
-       * @enum {string}
-       */
-      release_channel?: 'internal' | 'alpha' | 'beta' | 'ga' | 'withdrawn' | 'preview'
+    UnpauseProjectBody: {
+      postgres_engine?: components['schemas']['PostgresEngine']
+      release_channel?: components['schemas']['ReleaseChannel']
     }
-    UnpauseProjectResponse: {
+    UnpauseProjectInfo: {
       back_ups: components['schemas']['BackupId'][]
       cloud_provider: string
       id: number
@@ -6778,8 +6689,7 @@ export interface components {
       updated_at?: string
     }
     UpdateVercelConnectionsBody: {
-      /** @enum {array} */
-      env_sync_targets?: production | preview | development
+      env_sync_targets?: ('production' | 'preview' | 'development')[]
       public_env_var_prefix?: string
     }
     UpgradeDatabaseBody: {
@@ -6890,26 +6800,6 @@ export interface components {
     UsersResponse: {
       total: number
       users: components['schemas']['UserBody'][]
-    }
-    V1AnalyticsResponse: {
-      error?: OneOf<
-        [
-          {
-            code?: number
-            errors?: {
-              domain?: string
-              location?: string
-              locationType?: string
-              message?: string
-              reason?: string
-            }[]
-            message?: string
-            status?: string
-          },
-          string,
-        ]
-      >
-      result?: Record<string, never>[]
     }
     V1Backup: {
       inserted_at: string
@@ -7071,19 +6961,19 @@ export interface components {
       region: string
       /** @enum {string} */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -7107,19 +6997,19 @@ export interface components {
       region: string
       /** @enum {string} */
       status:
-        | 'INACTIVE'
         | 'ACTIVE_HEALTHY'
         | 'ACTIVE_UNHEALTHY'
         | 'COMING_UP'
-        | 'UNKNOWN'
         | 'GOING_DOWN'
+        | 'INACTIVE'
         | 'INIT_FAILED'
         | 'REMOVED'
-        | 'RESTORING'
+        | 'RESTARTING'
+        | 'UNKNOWN'
         | 'UPGRADING'
         | 'PAUSING'
+        | 'RESTORING'
         | 'RESTORE_FAILED'
-        | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
     }
@@ -8108,7 +7998,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['CloneBackupsResponse']
+          'application/json': components['schemas']['BackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
@@ -8890,34 +8780,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to determine available Postgres versions */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Tops up the credit balance */
-  OrgCreditsController_createTopUp: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['CreditsTopUpRequestDto']
-      }
-    }
-    responses: {
-      /** @description Top up has been successfully created. */
-      201: {
-        content: {
-          'application/json': components['schemas']['CreditsTopUpResponseDto']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to top up credit balance */
       500: {
         content: never
       }
@@ -11939,12 +11801,16 @@ export interface operations {
   /** Gets project's logs */
   LogsController_getApiPaths: {
     parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        sql?: string
+      query: {
+        sql: string
+        project: string
+        iso_timestamp_start: string
+        iso_timestamp_end: string
+        timestamp_start: string
+        timestamp_end: string
       }
       path: {
+        /** @description Project ref */
         ref: string
       }
     }
@@ -12959,11 +12825,13 @@ export interface operations {
       }
     }
   }
-  /** Gets the user's content counts */
-  ContentController_getContentCountV2: {
+  /** Gets the count of a user's content */
+  ContentController_getContentCount: {
     parameters: {
       query?: {
+        visibility?: string
         type?: 'sql' | 'report' | 'log_sql'
+        favorite?: boolean
         name?: string
       }
       path: {
@@ -12973,10 +12841,10 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['GetContentCountV2Response']
+          'application/json': components['schemas']['GetContentCountResponse']
         }
       }
-      /** @description Failed to retrieve user's content counts */
+      /** @description Failed to retrieve user's content count */
       500: {
         content: never
       }
@@ -13562,18 +13430,19 @@ export interface operations {
   UnpauseController_unpauseProject: {
     parameters: {
       path: {
+        /** @description Project ref */
         ref: string
       }
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UnpauseProjectBodyDto']
+        'application/json': components['schemas']['UnpauseProjectBody']
       }
     }
     responses: {
-      200: {
+      201: {
         content: {
-          'application/json': components['schemas']['UnpauseProjectResponse']
+          'application/json': components['schemas']['UnpauseProjectInfo']
         }
       }
       403: {
@@ -13589,11 +13458,12 @@ export interface operations {
   UnpauseController_cancelProjectRestoration: {
     parameters: {
       path: {
+        /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
+      201: {
         content: {
           'application/json': components['schemas']['RestoreCancellation']
         }
@@ -13611,6 +13481,7 @@ export interface operations {
   UnpauseController_getAvailableImageVersions: {
     parameters: {
       path: {
+        /** @description Project ref */
         ref: string
       }
     }
@@ -14454,7 +14325,7 @@ export interface operations {
   TelemetryEventController_sendServerEventV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryEventBodyV2Dto']
+        'application/json': components['schemas']['TelemetryEventBodyV2']
       }
     }
     responses: {
@@ -14554,7 +14425,7 @@ export interface operations {
   TelemetryPageController_sendServerPageV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageBodyV2Dto']
+        'application/json': components['schemas']['TelemetryPageBodyV2']
       }
     }
     responses: {
@@ -14568,17 +14439,13 @@ export interface operations {
     }
   }
   /** Send analytics page leave event */
-  TelemetryPageLeaveController_trackPageLeave: {
+  TelemetryPageLeaveController_pageLeave: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['TelemetryPageLeaveBodyDto']
+        'application/json': components['schemas']['TelemetryPageLeaveBody']
       }
     }
     responses: {
-      /** @description Page leave event sent */
-      200: {
-        content: never
-      }
       201: {
         content: never
       }
@@ -16163,29 +16030,6 @@ export interface operations {
       }
     }
   }
-  /** Gets project's logs */
-  V1ProjectLogsController_getLogs: {
-    parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        sql?: string
-      }
-      path: {
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1AnalyticsResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
   /** Get project api keys */
   'v1-get-project-api-keys': {
     parameters: {
@@ -17292,61 +17136,6 @@ export interface operations {
       }
       /** @description Failed to disable project's readonly mode */
       500: {
-        content: never
-      }
-    }
-  }
-  /** Lists available restore versions for the given project */
-  'v1-list-available-restore-versions': {
-    parameters: {
-      path: {
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetProjectAvailableRestoreVersionsResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-    }
-  }
-  /** Restores the given project */
-  'v1-restore-a-project': {
-    parameters: {
-      path: {
-        ref: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RestoreProjectBodyDto']
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
-        content: never
-      }
-    }
-  }
-  /** Cancels the given project restoration */
-  'v1-cancel-a-project-restoration': {
-    parameters: {
-      path: {
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-      403: {
         content: never
       }
     }
