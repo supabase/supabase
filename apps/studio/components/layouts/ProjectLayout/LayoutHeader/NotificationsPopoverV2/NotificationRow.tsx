@@ -1,10 +1,9 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import dayjs from 'dayjs'
 import { Archive, ArchiveRestoreIcon, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useInView } from 'react-intersection-observer'
-import { Button, cn } from 'ui'
+import { Button, cn, Tooltip_Shadcn_, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_ } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
@@ -171,8 +170,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
         {priority === 'Warning' && <WarningIcon className="w-5 h-5" />}
         {priority === 'Critical' && <CriticalIcon className="w-5 h-5" />}
         {notification.status === 'archived' ? (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
                 type="outline"
                 icon={
@@ -181,45 +180,39 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onUpdateNotificationStatus(notification.id, 'seen')}
               />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Unarchive</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">Unarchive</span>
+              </div>
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         ) : (
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
                 type="outline"
                 icon={<Archive size={13} strokeWidth={2} className="text-foreground-light" />}
                 className="p-1.5 group-hover:opacity-100 opacity-0 transition rounded-full"
                 onClick={() => onUpdateNotificationStatus(notification.id, 'archived')}
               />
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background',
-                  ].join(' ')}
-                >
-                  <span className="text-xs text-foreground">Archive</span>
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">Archive</span>
+              </div>
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         )}
       </div>
     </div>

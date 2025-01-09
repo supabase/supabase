@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
@@ -14,7 +13,17 @@ import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { Key, Loader, Search, Trash, X } from 'lucide-react'
-import { Button, Form, Input, Listbox, Modal, Separator } from 'ui'
+import {
+  Button,
+  Form,
+  Input,
+  Listbox,
+  Modal,
+  Separator,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+} from 'ui'
 import { Admonition } from 'ui-patterns'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -187,8 +196,8 @@ export const EncryptionKeysManagement = () => {
                         <p className="text-sm text-foreground-light">
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
-                        <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger asChild>
+                        <Tooltip_Shadcn_>
+                          <TooltipTrigger_Shadcn_ asChild>
                             <Button
                               type="default"
                               className="py-2"
@@ -196,25 +205,22 @@ export const EncryptionKeysManagement = () => {
                               disabled={!canManageKeys}
                               onClick={() => setSelectedKeyToRemove(key)}
                             />
-                          </Tooltip.Trigger>
+                          </TooltipTrigger_Shadcn_>
                           {!canManageKeys && (
-                            <Tooltip.Portal>
-                              <Tooltip.Content side="bottom">
-                                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                <div
-                                  className={[
-                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                    'border border-background',
-                                  ].join(' ')}
-                                >
-                                  <span className="text-xs text-foreground">
-                                    You need additional permissions to delete keys
-                                  </span>
-                                </div>
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
+                            <TooltipContent_Shadcn_ side="bottom">
+                              <div
+                                className={[
+                                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                  'border border-background',
+                                ].join(' ')}
+                              >
+                                <span className="text-xs text-foreground">
+                                  You need additional permissions to delete keys
+                                </span>
+                              </div>
+                            </TooltipContent_Shadcn_>
                           )}
-                        </Tooltip.Root>
+                        </Tooltip_Shadcn_>
                       </div>
                     </div>
                     {idx !== keys.length - 1 && <Separator />}

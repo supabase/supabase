@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { ChevronLeft, Edit, MoreVertical, Plus, Search, Trash } from 'lucide-react'
@@ -23,6 +22,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Input,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
@@ -154,58 +156,52 @@ const ColumnList = ({
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(x)}
                             >
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger className="flex items-center space-x-2">
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_ className="flex items-center space-x-2">
                                   <Edit size={12} />
                                   <p>Edit column</p>
-                                </Tooltip.Trigger>
+                                </TooltipTrigger_Shadcn_>
                                 {!canUpdateColumns && (
-                                  <Tooltip.Portal>
-                                    <Tooltip.Content side="bottom">
-                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                      <div
-                                        className={[
-                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                          'border border-background',
-                                        ].join(' ')}
-                                      >
-                                        <span className="text-xs text-foreground">
-                                          Additional permissions required to edit column
-                                        </span>
-                                      </div>
-                                    </Tooltip.Content>
-                                  </Tooltip.Portal>
+                                  <TooltipContent_Shadcn_ side="bottom">
+                                    <div
+                                      className={[
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                        'border border-background',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-foreground">
+                                        Additional permissions required to edit column
+                                      </span>
+                                    </div>
+                                  </TooltipContent_Shadcn_>
                                 )}
-                              </Tooltip.Root>
+                              </Tooltip_Shadcn_>
                             </DropdownMenuItem>
 
                             <DropdownMenuItem
                               disabled={!canUpdateColumns || isLocked}
                               onClick={() => onDeleteColumn(x)}
                             >
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger className="flex items-center space-x-2">
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_ className="flex items-center space-x-2">
                                   <Trash stroke="red" size={12} />
                                   <p>Delete column</p>
-                                </Tooltip.Trigger>
+                                </TooltipTrigger_Shadcn_>
                                 {!canUpdateColumns && (
-                                  <Tooltip.Portal>
-                                    <Tooltip.Content side="bottom">
-                                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                      <div
-                                        className={[
-                                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                          'border border-background',
-                                        ].join(' ')}
-                                      >
-                                        <span className="text-xs text-foreground">
-                                          Additional permissions required to edit column
-                                        </span>
-                                      </div>
-                                    </Tooltip.Content>
-                                  </Tooltip.Portal>
+                                  <TooltipContent_Shadcn_ side="bottom">
+                                    <div
+                                      className={[
+                                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                        'border border-background',
+                                      ].join(' ')}
+                                    >
+                                      <span className="text-xs text-foreground">
+                                        Additional permissions required to edit column
+                                      </span>
+                                    </div>
+                                  </TooltipContent_Shadcn_>
                                 )}
-                              </Tooltip.Root>
+                              </Tooltip_Shadcn_>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>

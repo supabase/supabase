@@ -5,7 +5,6 @@
 // with timeouts and a lot of unnecessary defensive guards - but these can go away when we port
 // the component over to the UI library
 
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import { List } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -18,6 +17,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   Input,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
 
 import type { Suggestion } from './ColumnEditor.types'
@@ -98,30 +100,27 @@ const InputWithSuggestions = ({
         actions={
           showSuggestions && (
             <DropdownMenu>
-              <Tooltip.Root delayDuration={0}>
+              <Tooltip_Shadcn_>
                 <DropdownMenuTrigger asChild>
-                  <Tooltip.Trigger asChild>
+                  <TooltipTrigger_Shadcn_ asChild>
                     <Button type="default" className="!px-1 mr-0.5">
                       <List strokeWidth={1.5} size={14} />
                     </Button>
-                  </Tooltip.Trigger>
+                  </TooltipTrigger_Shadcn_>
                 </DropdownMenuTrigger>
-                <Tooltip.Portal>
-                  <Tooltip.Content side="bottom">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'bg-alternative rounded py-1 px-2 leading-none shadow',
-                        'border-background border',
-                      ].join(' ')}
-                    >
-                      <span className="text-foreground text-xs">
-                        {suggestionsTooltip || 'Suggestions'}
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              </Tooltip.Root>
+                <TooltipContent_Shadcn_ side="bottom">
+                  <div
+                    className={[
+                      'bg-alternative rounded py-1 px-2 leading-none shadow',
+                      'border-background border',
+                    ].join(' ')}
+                  >
+                    <span className="text-foreground text-xs">
+                      {suggestionsTooltip || 'Suggestions'}
+                    </span>
+                  </div>
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
 
               <DropdownMenuContent align="end" side="bottom">
                 <DropdownMenuLabel>{suggestionsHeader || 'Suggestions'}</DropdownMenuLabel>

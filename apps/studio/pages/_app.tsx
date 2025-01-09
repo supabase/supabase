@@ -18,7 +18,6 @@ import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
 import * as Sentry from '@sentry/nextjs'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -29,7 +28,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { ErrorInfo, useMemo, useState } from 'react'
+import { ErrorInfo, useMemo } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -48,7 +47,7 @@ import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import { SonnerToaster } from 'ui'
+import { SonnerToaster, TooltipProvider_Shadcn_ } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 
 dayjs.extend(customParseFormat)
@@ -113,7 +112,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </Head>
                 <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
                 <TelemetryContainer>
-                  <TooltipProvider>
+                  <TooltipProvider_Shadcn_>
                     <RouteValidationWrapper>
                       <ThemeProvider
                         defaultTheme="system"
@@ -136,7 +135,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         </AppBannerContextProvider>
                       </ThemeProvider>
                     </RouteValidationWrapper>
-                  </TooltipProvider>
+                  </TooltipProvider_Shadcn_>
                 </TelemetryContainer>
 
                 {!isTestEnv && <HCaptchaLoadedStore />}
