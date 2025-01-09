@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query'
 import {
   AlignLeft,
   Check,
@@ -11,8 +10,8 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 
+import { useParams } from 'common'
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -50,14 +49,17 @@ const UtilityActions = ({
   executeQuery,
 }: UtilityActionsProps) => {
   const os = detectOS()
-  const client = useQueryClient()
-  const { project } = useProjectContext()
+  const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
+  )
+  const [lastSelectedDb, setLastSelectedDb] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_LAST_SELECTED_DB(ref as string),
+    ''
   )
 
   const snippet = snapV2.snippets[id]
@@ -70,12 +72,13 @@ const UtilityActions = ({
     )
   }
 
-  const addFavorite = async () => {
-    snapV2.addFavorite(id)
-  }
+  const addFavorite = () => snapV2.addFavorite(id)
 
-  const removeFavorite = async () => {
-    snapV2.removeFavorite(id)
+  const removeFavorite = () => snapV2.removeFavorite(id)
+
+  const onSelectDatabase = (databaseId: string) => {
+    snapV2.resetResult(id)
+    setLastSelectedDb(databaseId)
   }
 
   return (
@@ -182,8 +185,9 @@ const UtilityActions = ({
       <div className="flex items-center justify-between gap-x-2">
         <div className="flex items-center">
           <DatabaseSelector
+            selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
             variant="connected-on-right"
-            onSelectId={() => snapV2.resetResult(id)}
+            onSelectId={onSelectDatabase}
           />
           <RoleImpersonationPopover serviceRoleLabel="postgres" variant="connected-on-both" />
           <Button
