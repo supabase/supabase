@@ -9,6 +9,7 @@ import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
+import { useAppStateSnapshot } from 'state/app-state'
 import {
   AiIconAnimation,
   Button,
@@ -23,7 +24,6 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
-import { useAppStateSnapshot } from 'state/app-state'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -249,8 +249,7 @@ const LinterDataGrid = ({
                                 \nEntity: ${(selectedLint.metadata && (selectedLint.metadata.entity || (selectedLint.metadata.schema && selectedLint.metadata.name && `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))) ?? ''}
                                 \nSchema: ${selectedLint.metadata?.schema ?? ''}
                                 \nIssue: ${selectedLint.detail.replace(/\\`/g, '`')}
-                                \nDescription: ${selectedLint.description.replace(/\\`/g, '`')}
-                                `,
+                                \nDescription: ${selectedLint.description.replace(/\\`/g, '`')}\n`,
                               })
                             }}
                           >
