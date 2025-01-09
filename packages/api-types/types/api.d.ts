@@ -2854,6 +2854,19 @@ export interface components {
       result: components['schemas']['CustomHostnameDetails']
       success: boolean
     }
+    CloneBackupsResponse: {
+      backups: components['schemas']['Backup'][]
+      physicalBackupData: {
+        earliestPhysicalBackupDateUnix?: number
+        latestPhysicalBackupDateUnix?: number
+      }
+      pitr_enabled: boolean
+      region: string
+      target_compute_size: string
+      target_volume_size_gb: number
+      tierKey: string
+      walg_enabled: boolean
+    }
     CloneProjectDto: {
       /** @default 0 */
       cloneBackupId?: number
@@ -3284,6 +3297,7 @@ export interface components {
     }
     CreditsTopUpRequestDto: {
       amount: number
+      hcaptchaToken: string
       payment_method_id: string
     }
     CreditsTopUpResponseDto: {
@@ -4501,7 +4515,7 @@ export interface components {
     }
     OrganizationSlugResponse: {
       billing_email: string | null
-      billing_metadata?: Record<string, never>
+      billing_metadata: unknown
       has_oriole_project: boolean
       id: number
       name: string
@@ -5671,7 +5685,7 @@ export interface components {
       data: components['schemas']['SnippetMeta'][]
     }
     SnippetMeta: {
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -5691,7 +5705,7 @@ export interface components {
     }
     SnippetResponse: {
       content: components['schemas']['SnippetContent']
-      description?: string
+      description: string | null
       id: string
       inserted_at: string
       name: string
@@ -8094,7 +8108,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': Record<string, never>
+          'application/json': components['schemas']['CloneBackupsResponse']
         }
       }
       /** @description Failed to list available valid backups */
