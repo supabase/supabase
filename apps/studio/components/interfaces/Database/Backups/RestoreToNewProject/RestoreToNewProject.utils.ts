@@ -57,10 +57,8 @@ export function projectSpecToMonthlyPrice({
 
 function getComputeHourlyPrice(computeSize: InfraInstanceSize): number {
   if (computeSize === 'nano') {
-    return 0 // free project (cant use the r2np feature)
+    return 0
   }
 
-  const computePrice = instanceSizeSpecs[computeSize]?.priceHourly
-
-  return computePrice
+  return instanceSizeSpecs[computeSize]?.priceHourly
 }
