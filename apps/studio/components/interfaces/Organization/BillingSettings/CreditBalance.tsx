@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+
 import { useParams } from 'common'
 import {
   ScaffoldSection,
@@ -6,15 +7,17 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useOrgSubscriptionQuery } from '../../../../data/subscriptions/org-subscription-query'
 import { FormPanel } from 'components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from 'components/ui/Forms/FormSection'
+import NoPermission from 'components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useFlag } from 'hooks/ui/useFlag'
 import { CreditTopUp } from './CreditTopUp'
 
 const CreditBalance = () => {
   const { slug } = useParams()
+  const creditTopUpEnabled = useFlag('creditTopUp')
 
   const canReadSubscriptions = useCheckPermissions(
     PermissionAction.BILLING_READ,
@@ -54,7 +57,7 @@ const CreditBalance = () => {
           <NoPermission resourceText="view this organization's credits" />
         ) : (
           <>
-            <FormPanel footer={<CreditTopUp slug={slug} />}>
+            <FormPanel footer={creditTopUpEnabled ? <CreditTopUp slug={slug} /> : null}>
               <FormSection>
                 <FormSectionContent fullWidth loading={isLoading}>
                   {isError && (

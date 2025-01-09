@@ -1,5 +1,23 @@
+import HCaptcha from '@hcaptcha/react-hcaptcha'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Elements, useStripe } from '@stripe/react-stripe-js'
+import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useQueryClient } from '@tanstack/react-query'
+import { AlertCircle, Info } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
+import { subscriptionKeys } from 'data/subscriptions/keys'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
+import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import {
   Alert_Shadcn_,
   AlertDescription_Shadcn_,
@@ -19,26 +37,8 @@ import {
   Input_Shadcn_,
   LoadingLine,
 } from 'ui'
-import { loadStripe, PaymentIntentResult } from '@stripe/stripe-js'
-import { STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { Elements, useStripe } from '@stripe/react-stripe-js'
-import { useTheme } from 'next-themes'
-import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { useOrganizationCreditTopUpMutation } from 'data/organizations/organization-credit-top-up-mutation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { AlertCircle, Info } from 'lucide-react'
-import { useFlag } from 'hooks/ui/useFlag'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
-import { subscriptionKeys } from 'data/subscriptions/keys'
-import HCaptcha from '@hcaptcha/react-hcaptcha'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
+import PaymentMethodSelection from './Subscription/PaymentMethodSelection'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -59,7 +59,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
   const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
 
-  const creditTopUpEnabled = useFlag('creditTopUp')
   const canTopUpCredits = useCheckPermissions(
     PermissionAction.BILLING_WRITE,
     'stripe.subscriptions'
@@ -179,10 +178,6 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     toast.success(
       'Successfully topped up balance. It may take a minute to reflect in your account.'
     )
-  }
-
-  if (!creditTopUpEnabled) {
-    return null
   }
 
   return (
