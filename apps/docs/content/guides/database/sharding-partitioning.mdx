@@ -65,7 +65,7 @@ To move a partition from one shard to another, you can use the following steps:
    ALTER TABLE sales ATTACH PARTITION sales_2000_02_new FOR VALUES FROM ('2000-02-01') TO ('2000-03-01');
    ```
 
-## Querying Partitioned Tables
+## Querying partitioned Tables
 
 You can query partitioned tables by querying the parent table or specific partitions.
 
