@@ -30,7 +30,7 @@ const defaultEnv = {
 const environment = { ...generatedEnv, ...defaultEnv }
 
 fs.writeFileSync(
-  '../apps/studio/.env.test',
+  '../../apps/studio/.env.test',
   Object.keys(environment)
     .map((key) => `${key}=${environment[key]}`)
     .join('\n')
