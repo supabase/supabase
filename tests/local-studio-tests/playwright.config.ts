@@ -73,8 +73,8 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     // using npm run dev instead of turbo because turbo doesn't stop the server after a test (doesn't handle SIGTERM).
-    command: 'npm run dev',
-    cwd: '../apps/studio',
+    command: 'pnpm dev',
+    cwd: '../../apps/studio',
     url: 'http://localhost:8082',
     reuseExistingServer: !process.env.CI,
     env: {
