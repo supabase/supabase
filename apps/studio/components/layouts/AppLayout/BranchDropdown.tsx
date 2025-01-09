@@ -1,4 +1,4 @@
-import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle } from 'lucide-react'
+import { AlertCircle, Check, ChevronsUpDown, ListTree, MessageCircle, Shield } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -51,10 +51,11 @@ const BranchLink = ({
           setOpen(false)
         }}
       >
-        <p className="truncate w-60" title={branch.name}>
+        <p className="truncate w-60 flex items-center gap-1" title={branch.name}>
+          {branch.is_default && <Shield size={14} className="text-amber-900" />}
           {branch.name}
         </p>
-        {isSelected && <Check />}
+        {isSelected && <Check size={14} strokeWidth={1.5} />}
       </CommandItem_Shadcn_>
     </Link>
   )
@@ -76,6 +77,15 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
 
   const [open, setOpen] = useState(false)
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+
+  const mainBranch = branches?.find((branch) => branch.is_default)
+  const restOfBranches = branches
+    ?.filter((branch) => !branch.is_default)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+
+  const sortedBranches = mainBranch
+    ? [mainBranch].concat(restOfBranches ?? [])
+    : restOfBranches ?? []
 
   const BRANCHING_GITHUB_DISCUSSION_LINK = 'https://github.com/orgs/supabase/discussions/18937'
 
@@ -112,7 +122,7 @@ const BranchDropdown = ({ isNewNav = false }: BranchDropdownProps) => {
                   <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
                   <CommandGroup_Shadcn_>
                     <ScrollArea className="max-h-[210px] overflow-y-auto">
-                      {branches?.map((branch) => (
+                      {sortedBranches?.map((branch) => (
                         <BranchLink
                           key={branch.id}
                           branch={branch}
