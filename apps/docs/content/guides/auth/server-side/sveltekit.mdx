@@ -625,32 +625,41 @@ When using OAuth with SvelteKit SSR, you need to handle redirects for successful
 Here’s an example:
 
 ```javascript
-import { createSupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 
-// Initialize the Supabase client
-const supabase = createSupabaseClient(
-    'https://your-supabase-project-url.supabase.co',
-    'your-anon-key'
-);
+// Initialize Supabase client
+const supabase = createClient({
+    supabaseUrl: 'https://your-supabase-project-url.supabase.co',
+    supabaseKey: 'your-anon-key',
+});
 
-export const load = async ({ url }) => {
-    const provider = 'github'; // Replace with your desired OAuth provider (e.g., google, facebook)
+export const actions = {
+    default: async ({ url }) => {
+        const provider = 'github'; // Replace with your desired OAuth provider (e.g., google, facebook)
 
-    // Perform OAuth sign-in
-    const { error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-            redirectTo: `${url.origin}/auth/callback`
+        // Perform OAuth sign-in
+        const { error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+                redirectTo: `${url.origin}/auth/callback`, // Specify the callback URL
+            },
+        });
+
+        // Handle errors
+        if (error) {
+            console.error('Error during sign-in:', error.message);
+            throw redirect(303, '/auth/error'); // Redirect to error page
         }
-    });
 
-    if (error) {
-        console.error(error);
-        throw redirect(303, '/auth/error');
-    }
+        throw redirect(303, '/dashboard'); // Redirect after successful login
+    },
+};
 
-    throw redirect(303, '/dashboard'); // Redirect after successful login
+export const load = async ({ locals }) => {
+    // Example: Get user session data if needed
+    const { user } = locals;
+    return { user };
 };
 
 </StepHikeCompact.Code>
