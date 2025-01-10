@@ -80,7 +80,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
       )}
 
       {isSuccessMembers && (
-        <div className="rounded w-full">
+        <div className="rounded w-full overflow-hidden overflow-x-scroll">
           <Loading active={!filteredMembers}>
             <Table
               head={[
