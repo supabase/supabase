@@ -26,8 +26,8 @@ import { useSchemasForAi } from 'hooks/misc/useSchemasForAi'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { detectOS, uuidv4 } from 'lib/helpers'
 import { TelemetryActions } from 'lib/constants/telemetry'
+import { detectOS, uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { format } from 'sql-formatter'
@@ -320,6 +320,7 @@ export const SQLEditor = () => {
           }),
           autoLimit: appendAutoLimit ? limit : undefined,
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          contextualInvalidation: true,
           handleError: (error) => {
             throw error
           },
