@@ -13,7 +13,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { Badge, cn } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown'
@@ -57,6 +57,7 @@ const LayoutHeader = ({
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
+  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
   const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: subscription } = useOrgSubscriptionQuery({
@@ -124,10 +125,12 @@ const LayoutHeader = ({
                   )}
                 </div>
 
-                <div className="ml-3 flex items-center gap-x-3">
-                  <Connect />
-                  {!isBranchingEnabled && <EnableBranchingButton />}
-                </div>
+                {isActiveHealthy && (
+                  <div className="ml-3 flex items-center gap-x-3">
+                    <Connect />
+                    {!isBranchingEnabled && <EnableBranchingButton />}
+                  </div>
+                )}
               </>
             )}
 
