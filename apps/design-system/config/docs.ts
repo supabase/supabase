@@ -117,6 +117,11 @@ export const docsConfig: DocsConfig = {
           href: '/docs/fragments/multi-select',
           items: [],
         },
+        {
+          title: 'Filter Bar',
+          href: '/docs/fragments/filter-bar',
+          items: [],
+        },
       ],
     },
     {

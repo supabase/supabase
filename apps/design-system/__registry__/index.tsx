@@ -1787,6 +1787,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "filter-bar-demo": {
+      name: "filter-bar-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/filter-bar-demo")),
+      source: "",
+      files: ["registry/default/example/filter-bar-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "info-tooltip-demo": {
       name: "info-tooltip-demo",
       type: "components:example",
