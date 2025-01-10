@@ -125,12 +125,10 @@ const LayoutHeader = ({
                   )}
                 </div>
 
-                {isActiveHealthy && (
-                  <div className="ml-3 flex items-center gap-x-3">
-                    <Connect />
-                    {!isBranchingEnabled && <EnableBranchingButton />}
-                  </div>
-                )}
+                <div className="ml-3 flex items-center gap-x-3">
+                  {isActiveHealthy && <Connect />}
+                  {!isBranchingEnabled && <EnableBranchingButton />}
+                </div>
               </>
             )}
 
