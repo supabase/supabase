@@ -48,7 +48,7 @@ const ThemeSettings = () => {
           aria-label="Choose a theme"
           defaultValue={theme}
           value={theme}
-          className="flex flex-wrap gap-5"
+          className="flex flex-wrap gap-2 md:gap-5"
         >
           {singleThemes.map((theme: Theme) => (
             <RadioGroupLargeItem_Shadcn_

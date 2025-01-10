@@ -242,7 +242,7 @@ export const UsersV2 = () => {
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 !mb-0" title="Users" />
-        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t">
+        <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-center justify-between gap-2 border-t">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
               <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
