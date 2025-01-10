@@ -1,7 +1,7 @@
 packages:
   - "apps/*"
   - "packages/*"
-  - "playwright-tests"
+  - "tests/*"
 
 catalog:
   '@types/node': ^20.0.0
