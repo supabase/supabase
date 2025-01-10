@@ -206,7 +206,7 @@ export const QueuesSettings = () => {
                               <code className="text-xs">send_batch</code>,{' '}
                               <code className="text-xs">read</code>,{' '}
                               <code className="text-xs">pop</code>,
-                              <code className="text-xs">archive</code>, and
+                              <code className="text-xs">archive</code>, and{' '}
                               <code className="text-xs">delete</code>
                             </p>
                           </>
@@ -217,13 +217,27 @@ export const QueuesSettings = () => {
                             name="enable"
                             size="large"
                             disabled={
-                              isLoading || tablesWithoutRLS.length > 0 || !canUpdatePostgrestConfig
+                              isLoading ||
+                              tablesWithoutRLS.length > 0 ||
+                              !canUpdatePostgrestConfig ||
+                              // [Joshen] Temporarily disable setting, to remove once fix is out
+                              field.value === false
                             }
                             checked={field.value}
                             onCheckedChange={(value) => field.onChange(value)}
                           />
                         </FormControl_Shadcn_>
                       </FormItemLayout>
+                      <Admonition
+                        type="default"
+                        className="mt-2"
+                        title="Enabling exposure of Queues via PostgREST is temporarily disabled"
+                        description={
+                          field.value === true
+                            ? "This setting can still be toggled off but cannot be re-enabled. We're currently working on a fix to support this setting."
+                            : "We're currently working on a fix to support this setting."
+                        }
+                      />
                       {tablesWithoutRLS.length > 0 && (
                         <Admonition
                           type="default"
