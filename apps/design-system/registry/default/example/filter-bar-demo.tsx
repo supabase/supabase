@@ -32,18 +32,7 @@ const filterProperties = [
 
 const initialFilters: FilterGroup = {
   logicalOperator: 'AND',
-  conditions: [
-    {
-      propertyName: 'name',
-      value: '',
-      operator: '=',
-    },
-    {
-      propertyName: 'status',
-      value: '',
-      operator: '=',
-    },
-  ],
+  conditions: [],
 }
 
 export default function FilterBarDemo() {
