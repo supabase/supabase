@@ -144,7 +144,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   hasAcceptedConsent={hasAcceptedConsent}
                   enabled={IS_PLATFORM}
                 />
-                <GroupsTelemetry />
+                <GroupsTelemetry hasAcceptedConsent={hasAcceptedConsent} />
                 {!isTestEnv && <HCaptchaLoadedStore />}
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </ProfileProvider>

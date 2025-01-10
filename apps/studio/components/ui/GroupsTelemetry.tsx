@@ -10,7 +10,6 @@ import { usePrevious } from 'hooks/deprecated'
 import { useSelectedOrganization } from 'hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { useConsent } from 'ui-patterns/ConsentToast'
 
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
@@ -22,7 +21,7 @@ const getAnonId = async (id: string) => {
   return base64String
 }
 
-const GroupsTelemetry = () => {
+const GroupsTelemetry = ({ hasAcceptedConsent }: { hasAcceptedConsent: boolean }) => {
   // Although this is "technically" breaking the rules of hooks
   // IS_PLATFORM never changes within a session, so this won't cause any issues
   if (!IS_PLATFORM) return null
@@ -33,10 +32,8 @@ const GroupsTelemetry = () => {
   const snap = useAppStateSnapshot()
   const organization = useSelectedOrganization()
 
-  const { consentValue, hasAcceptedConsent } = useConsent()
   const previousPathname = usePrevious(router.pathname)
 
-  const trackTelemetryPH = consentValue === 'true'
   const { mutate: sendGroupsIdentify } = useSendGroupsIdentifyMutation()
   const { mutate: sendGroupsReset } = useSendGroupsResetMutation()
 
@@ -45,11 +42,11 @@ const GroupsTelemetry = () => {
   useTelemetryCookie({ hasAcceptedConsent, title, referrer })
 
   useEffect(() => {
-    if (consentValue !== null) {
+    if (hasAcceptedConsent) {
       snap.setIsOptedInTelemetry(hasAcceptedConsent)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [consentValue])
+  }, [hasAcceptedConsent])
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
@@ -85,7 +82,7 @@ const GroupsTelemetry = () => {
     const isLeavingOrgRoute =
       (previousPathname ?? '').includes('[slug]') && !router.pathname.includes('[slug]')
 
-    if (trackTelemetryPH) {
+    if (hasAcceptedConsent) {
       if (ref && (isLandingOnProjectRoute || isEnteringProjectRoute)) {
         sendGroupsIdentify({ organization_slug: organization?.slug, project_ref: ref as string })
       } else if (slug && (isLandingOnOrgRoute || isEnteringOrgRoute)) {
@@ -99,7 +96,7 @@ const GroupsTelemetry = () => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trackTelemetryPH, slug, ref, router.pathname])
+  }, [hasAcceptedConsent, slug, ref, router.pathname])
 
   return null
 }
