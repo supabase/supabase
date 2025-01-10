@@ -138,7 +138,7 @@ const Usage = () => {
               <Listbox
                 size="tiny"
                 name="schema"
-                className="w-[180px]"
+                className="w-full md:w-[180px]"
                 value={selectedProjectRef}
                 onChange={(value: any) => {
                   if (value === 'all-projects') setSelectedProjectRef(undefined)
