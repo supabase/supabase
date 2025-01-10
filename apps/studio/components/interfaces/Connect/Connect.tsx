@@ -5,9 +5,12 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
 
 import { DatabaseConnectionString } from 'components/interfaces/Connect/DatabaseConnectionString'
+import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import Panel from 'components/ui/Panel'
 import { getAPIKeys, useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
 import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { useSelectedProject } from 'hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   Button,
   DIALOG_PADDING_X,
@@ -31,6 +34,8 @@ import ConnectTabContent from './ConnectTabContent'
 
 const Connect = () => {
   const { ref: projectRef } = useParams()
+  const selectedProject = useSelectedProject()
+  const isActiveHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   const [showConnect, setShowConnect] = useQueryState(
     'showConnect',
@@ -146,6 +151,25 @@ const Connect = () => {
     selectedChild,
     selectedGrandchild,
   })
+
+  if (!isActiveHealthy) {
+    return (
+      <ButtonTooltip
+        disabled
+        type="default"
+        className="rounded-full"
+        icon={<Plug className="rotate-90" />}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: 'Project is currently not active and cannot be connected',
+          },
+        }}
+      >
+        Connect
+      </ButtonTooltip>
+    )
+  }
 
   return (
     <Dialog open={showConnect} onOpenChange={(open) => setShowConnect(!open ? null : open)}>

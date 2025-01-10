@@ -332,6 +332,10 @@ export interface paths {
     /** Retrieves a list of available Postgres versions available to the organization */
     post: operations['OrganizationSlugController_getAvailableImageVersions']
   }
+  '/platform/organizations/{slug}/billing/credits/top-up': {
+    /** Tops up the credit balance */
+    post: operations['OrgCreditsController_createTopUp']
+  }
   '/platform/organizations/{slug}/billing/invoices': {
     /** Gets invoices for the given organization */
     get: operations['OrgInvoicesController_getInvoices']
@@ -3263,6 +3267,23 @@ export interface components {
       expiry_time: string
       secret_access_key: string
       session_token: string
+    }
+    CreditsTopUpRequestDto: {
+      amount: number
+      hcaptcha_token: string
+      payment_method_id: string
+    }
+    CreditsTopUpResponseDto: {
+      payment_intent_secret?: string
+      /** @enum {string} */
+      status:
+        | 'canceled'
+        | 'processing'
+        | 'requires_action'
+        | 'requires_capture'
+        | 'requires_confirmation'
+        | 'requires_payment_method'
+        | 'succeeded'
     }
     CustomerBillingAddress: {
       city?: string
@@ -8780,6 +8801,34 @@ export interface operations {
         content: never
       }
       /** @description Failed to determine available Postgres versions */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Tops up the credit balance */
+  OrgCreditsController_createTopUp: {
+    parameters: {
+      path: {
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreditsTopUpRequestDto']
+      }
+    }
+    responses: {
+      /** @description Top up has been successfully created. */
+      201: {
+        content: {
+          'application/json': components['schemas']['CreditsTopUpResponseDto']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to top up credit balance */
       500: {
         content: never
       }
