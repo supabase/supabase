@@ -91,7 +91,10 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
-  const { hasAcceptedConsent } = useConsent()
+  // Although this is "technically" breaking the rules of hooks
+  // IS_PLATFORM never changes within a session, so this won't cause any issues
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { hasAcceptedConsent } = IS_PLATFORM ? useConsent() : { hasAcceptedConsent: true }
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
