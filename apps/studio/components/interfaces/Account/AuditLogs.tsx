@@ -175,36 +175,36 @@ const AuditLogs = () => {
                     <Table.th key="date" className="py-2">
                       <div className="flex items-center space-x-2">
                         <p>Date</p>
-                      <ButtonTooltip
-                        type="text"
-                        className="px-1"
-                        icon={
-                          dateSortDesc ? (
-                            <ArrowDown strokeWidth={1.5} size={14} />
-                          ) : (
-                            <ArrowUp strokeWidth={1.5} size={14} />
-                          )
-                        }
-                        onClick={() => setDateSortDesc(!dateSortDesc)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
-                          },
-                        }}
-                      />
-                    </div>
-                  </Table.th>,
-                  <Table.th key="actions" className="py-2"></Table.th>,
-                ]}
-                body={
-                  sortedLogs?.map((log) => {
-                    const project = projects?.find(
-                      (project) => project.ref === log.target.metadata.project_ref
-                    )
-                    const organization = organizations?.find(
-                      (org) => org.slug === log.target.metadata.org_slug
-                    )
+                        <ButtonTooltip
+                          type="text"
+                          className="px-1"
+                          icon={
+                            dateSortDesc ? (
+                              <ArrowDown strokeWidth={1.5} size={14} />
+                            ) : (
+                              <ArrowUp strokeWidth={1.5} size={14} />
+                            )
+                          }
+                          onClick={() => setDateSortDesc(!dateSortDesc)}
+                          tooltip={{
+                            content: {
+                              side: 'bottom',
+                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
+                            },
+                          }}
+                        />
+                      </div>
+                    </Table.th>,
+                    <Table.th key="actions" className="py-2"></Table.th>,
+                  ]}
+                  body={
+                    sortedLogs?.map((log) => {
+                      const project = projects?.find(
+                        (project) => project.ref === log.target.metadata.project_ref
+                      )
+                      const organization = organizations?.find(
+                        (org) => org.slug === log.target.metadata.org_slug
+                      )
 
                       const hasStatusCode = log.action.metadata[0]?.status !== undefined
 

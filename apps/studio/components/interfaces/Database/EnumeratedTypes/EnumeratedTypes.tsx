@@ -82,7 +82,11 @@ const EnumeratedTypes = () => {
         <div className="flex items-center gap-2">
           <DocsButton href="https://www.postgresql.org/docs/current/datatype-enum.html" />
           {!isLocked && (
-            <Button className="ml-auto flex-1" type="primary" onClick={() => setShowCreateTypePanel(true)}>
+            <Button
+              className="ml-auto flex-1"
+              type="primary"
+              onClick={() => setShowCreateTypePanel(true)}
+            >
               Create type
             </Button>
           )}
