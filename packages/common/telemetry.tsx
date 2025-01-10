@@ -1,3 +1,4 @@
+import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect, useRef } from 'react'
@@ -11,24 +12,27 @@ export function handlePageTelemetry(
   pathname?: string,
   featureFlags?: {
     [key: string]: unknown
-  }
+  },
+  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2Dto']
 ) {
   return post(
     `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    {
-      page_url: isBrowser ? window.location.href : '',
-      page_title: isBrowser ? document?.title : '',
-      pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
-      ph: {
-        referrer: isBrowser ? document?.referrer : '',
-        language: navigator.language ?? 'en-US',
-        user_agent: navigator.userAgent,
-        search: isBrowser ? window.location.search : '',
-        viewport_height: isBrowser ? window.innerHeight : 0,
-        viewport_width: isBrowser ? window.innerWidth : 0,
-      },
-      feature_flags: featureFlags,
-    },
+    telemetryDataOverride !== undefined
+      ? { feature_flags: featureFlags, ...telemetryDataOverride }
+      : {
+          page_url: isBrowser ? window.location.href : '',
+          page_title: isBrowser ? document?.title : '',
+          pathname: pathname ? pathname : isBrowser ? window.location.pathname : '',
+          ph: {
+            referrer: isBrowser ? document?.referrer : '',
+            language: navigator.language ?? 'en-US',
+            user_agent: navigator.userAgent,
+            search: isBrowser ? window.location.search : '',
+            viewport_height: isBrowser ? window.innerHeight : 0,
+            viewport_width: isBrowser ? window.innerWidth : 0,
+          },
+          feature_flags: featureFlags,
+        },
     { headers: { Version: '2' } }
   )
 }

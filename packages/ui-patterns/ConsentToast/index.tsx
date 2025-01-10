@@ -5,6 +5,7 @@ import {
   handlePageTelemetry,
   isBrowser,
   useBreakpoint,
+  useFeatureFlags,
   useTelemetryProps,
 } from 'common'
 
@@ -81,6 +82,7 @@ export const useConsent = () => {
   const { TELEMETRY_CONSENT, TELEMETRY_DATA } = LOCAL_STORAGE_KEYS
   const consentToastId = useRef<string | number>()
   const telemetryProps = useTelemetryProps()
+  const featureFlags = useFeatureFlags()
 
   const initialValue = isBrowser ? localStorage?.getItem(TELEMETRY_CONSENT) : null
   const [consentValue, setConsentValue] = useState<string | null>(initialValue)
@@ -98,6 +100,7 @@ export const useConsent = () => {
           handlePageTelemetry(
             process.env.NEXT_PUBLIC_API_URL!,
             telemetryProps.pathname,
+            featureFlags.posthog,
             telemetryData
           )
           // remove the telemetry cookie
@@ -106,24 +109,10 @@ export const useConsent = () => {
           console.error('Invalid telemetry data:', error)
         }
       } else {
-        const telemetryData = {
-          page_url: telemetryProps.page_url,
-          page_title: typeof document !== 'undefined' ? document?.title : '',
-          pathname: telemetryProps.pathname,
-          ph: {
-            referrer: typeof document !== 'undefined' ? document?.referrer : '',
-            language: telemetryProps.language,
-            search: telemetryProps.search,
-            viewport_height: telemetryProps.viewport_height,
-            viewport_width: telemetryProps.viewport_width,
-            user_agent: navigator.userAgent,
-          },
-        }
-
         handlePageTelemetry(
           process.env.NEXT_PUBLIC_API_URL!,
           telemetryProps.pathname,
-          telemetryData
+          featureFlags.posthog
         )
       }
     } else {
