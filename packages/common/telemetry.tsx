@@ -1,9 +1,9 @@
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
-import { isBrowser } from './helpers'
+import { ensurePlatformSuffix, isBrowser } from './helpers'
 import { useTelemetryCookie } from './hooks'
 
 export function handlePageTelemetry(
@@ -98,12 +98,19 @@ export const PageTelemetry = ({
     })
   }, [pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
 
+  const hasSentInitialPageTelemetryRef = useRef(false)
+
   useEffect(() => {
     // Send page telemetry on first page load
     // Waiting for router ready before sending page_view
     // if not the path will be dynamic route instead of the browser url
-    if ((router?.isReady ?? true) && featureFlags.hasLoaded) {
+    if (
+      (router?.isReady ?? true) &&
+      featureFlags.hasLoaded &&
+      !hasSentInitialPageTelemetryRef.current
+    ) {
       sendPageTelemetry()
+      hasSentInitialPageTelemetryRef.current = true
     }
   }, [router?.isReady, featureFlags.hasLoaded])
 
@@ -142,8 +149,4 @@ export const PageTelemetry = ({
   }, [enabled, sendPageLeaveTelemetry])
 
   return null
-}
-
-function ensurePlatformSuffix(apiUrl: string) {
-  return apiUrl.endsWith('/platform') ? apiUrl : `${apiUrl}/platform`
 }
