@@ -22,7 +22,7 @@ export function useTelemetryProps(): TelemetryProps {
   return {
     screenResolution: isBrowser ? `${window.innerWidth}x${window.innerHeight}` : undefined,
     page_url: isBrowser ? window.location.href : '',
-    pathname: router?.pathname ?? pathname ?? window.location.pathname,
+    pathname: router?.pathname ?? pathname ?? (isBrowser ? window.location.pathname : ''),
     search: isBrowser ? window.location.search : '',
     viewport_height: isBrowser ? window.innerHeight : 0,
     viewport_width: isBrowser ? window.innerWidth : 0,
