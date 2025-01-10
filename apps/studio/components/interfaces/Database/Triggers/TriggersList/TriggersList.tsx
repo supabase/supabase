@@ -159,30 +159,32 @@ const TriggersList = ({
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
-          <Table
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="table">Table</Table.th>
-                <Table.th key="function">Function</Table.th>
-                <Table.th key="events">Events</Table.th>
-                <Table.th key="orientation">Orientation</Table.th>
-                <Table.th key="enabled" className="w-20">
-                  Enabled
-                </Table.th>
-                <Table.th key="buttons" className="w-1/12"></Table.th>
-              </>
-            }
-            body={
-              <TriggerList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editTrigger={editTrigger}
-                deleteTrigger={deleteTrigger}
-              />
-            }
-          />
+          <div className="w-full overflow-hidden overflow-x-auto">
+            <Table
+              head={
+                <>
+                  <Table.th key="name">Name</Table.th>
+                  <Table.th key="table">Table</Table.th>
+                  <Table.th key="function">Function</Table.th>
+                  <Table.th key="events">Events</Table.th>
+                  <Table.th key="orientation">Orientation</Table.th>
+                  <Table.th key="enabled" className="w-20">
+                    Enabled
+                  </Table.th>
+                  <Table.th key="buttons" className="w-1/12"></Table.th>
+                </>
+              }
+              body={
+                <TriggerList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isLocked}
+                  editTrigger={editTrigger}
+                  deleteTrigger={deleteTrigger}
+                />
+              }
+            />
+          </div>
         </div>
       )}
     </>
